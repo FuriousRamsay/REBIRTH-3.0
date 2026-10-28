@@ -4,6 +4,8 @@ using System.Xml.Linq;
 
 public static partial class RebirthWorldCharacterRepository
 {
+    // A calculation cache only; every scope/retirement/epoch guard below stays live.
+    private static readonly RebirthNativeSaveDirectoryCache scopeDirectoryCalculation = new RebirthNativeSaveDirectoryCache();
     private static World scopeWorld;
     private static string scopePath;
     private static string scopeSaveDirectory;
@@ -12,7 +14,7 @@ public static partial class RebirthWorldCharacterRepository
         try
         {
             if(scopeWorld==null||!ReferenceEquals(scopeWorld,GameManager.Instance?.World))return false;
-            if(current==null)current=GameIO.GetSaveGameDir();
+            if(current==null)current=scopeDirectoryCalculation.Get();
             if(string.Equals(current,scopeSaveDirectory,StringComparison.Ordinal))return true;
             if(string.IsNullOrEmpty(current))return false;
             return string.Equals(scopePath,Path.GetFullPath(Path.Combine(current,"RebirthData","Survivor","Players")),RepositoryPathComparison);
@@ -23,7 +25,7 @@ public static partial class RebirthWorldCharacterRepository
     {
         if(!serverAuthority)return false;
         var world=GameManager.Instance?.World;
-        string saveDirectory=GameIO.GetSaveGameDir();
+        string saveDirectory=scopeDirectoryCalculation.Get();
         if(world==null||string.IsNullOrEmpty(saveDirectory))return false;
         if(scopeWorld!=null)
         {

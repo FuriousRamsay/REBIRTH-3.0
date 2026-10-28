@@ -71,11 +71,17 @@ class Program{
  RebirthGearOwnerReservation.TryAcquireIntent(player,connection,intent);RebirthGearOwnerReservation.TryAcquire(player,connection,bound);
  RebirthGearTerminalClient.Marker="_rbgearintent_test";RebirthGearTerminalClient.Value=new(){CreationId=bound.CreationId,TransactionId=bound.TransactionId,GearRevision=3,PreparationRequestDigest=bound.PreparationRequestDigest,Applied=true};
  player.Buffs.CVars[RebirthGearTerminalClient.Marker]=1;player.Buffs.Value=1;RebirthGearPlayerFileWitness.Saved=1;RebirthGearPreparationPlayerFileWitness.Saved=true;
+ var diagnostics=new System.Collections.Generic.List<string>();RebirthGearTerminalOwnerCheckpoint.Diagnostic=(o,s)=>diagnostics.Add(s);
  GameManager.Instance.Fail=true;Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound)&&RebirthGearOwnerReservation.IsHeld(player)&&player.Buffs.CVars.Count==0,"uncertain terminal save retains hold and same retirement intent");
+ Check(diagnostics.Contains("retirement-save"),"failed retirement save reports its actual stage");
  GameManager.Instance.Fail=false;Check(RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound)&&RebirthGearTerminalOwnerCheckpoint.HasSavedRetirement(player,bound,true)&&RebirthGearOwnerReservation.IsHeld(player),"same original terminal save retry proves absence without release");
  int saves=GameManager.Instance.Saves;Check(RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound)&&GameManager.Instance.Saves==saves,"saved terminal absence retry idempotent");
  player.Buffs.CVars["_RBGEARINTENT_future"]=0;Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound),"competing zero family key prevents terminal cleanup");player.Buffs.CVars.Clear();
- Plan.After=false;Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound),"changed live postimage prevents cleanup");Plan.After=true;
+ Plan.After=false;Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound),"changed live postimage prevents cleanup");
+ Check(diagnostics.Contains("inventory-postimage"),"postimage refusal reports its actual stage");
+ RebirthGearTerminalOwnerCheckpoint.Diagnostic=(o,s)=>throw new Exception("diagnostic sink failure");
+ Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound)&&RebirthGearOwnerReservation.IsHeld(player),"diagnostic failure cannot release original custody");
+ RebirthGearTerminalOwnerCheckpoint.Diagnostic=null;Plan.After=true;
  connection.Disconnected=true;Check(!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,bound),"disconnected original connection prevents cleanup");connection.Disconnected=false;
  Check(!RebirthGearOwnerReservation.ReleaseSettledWithTransport(player,connection,bound,()=>true,()=>false)&&RebirthGearOwnerReservation.IsHeld(player),"failed inbox finalization retains original hold");
  Check(RebirthGearOwnerReservation.ReleaseSettledWithTransport(player,connection,bound,()=>true,()=>true)&&!RebirthGearOwnerReservation.IsHeld(player),"transport finalized before hold release");
@@ -203,7 +209,42 @@ class Program{
  Reset();manager=SingletonMonoBehaviour<ConnectionManager>.Instance;player.Dead=true;Check(!RebirthGearPreparationClient.TryRequestOriginal(player,intent)&&manager.Sent.Count==0,"dead owner cannot start original request");
  Reset();manager=SingletonMonoBehaviour<ConnectionManager>.Instance;GamePrefs.WorldOverride="unknown";Check(!RebirthGearPreparationClient.TryRequestOriginal(player,intent)&&manager.Sent.Count==0,"unknown native saved world refuses original producer");
  }
+ static void TraceNonMutationChecks(){
+ foreach(bool traceOn in new[]{false,true}){
+  Reset();RebirthGearTrace.Configure(traceOn,true);
+  var connection=SingletonMonoBehaviour<ConnectionManager>.Instance.connectionToServer[0];
+  var originalBag=player.bag.ItemGrid.items;var originalBelt=player.inventory.ItemGrid.items;
+  Check(RebirthGearOwnerReservation.TryAcquire(player,connection,offer),"trace mode failed original reservation admission");
+  GameManager.Instance.Fail=true;
+  Check(!Save(RebirthGearOwnerReceipt.Applying)&&player.Buffs.Value==2&&RebirthGearPlayerFileWitness.Saved==0&&
+   RebirthGearOwnerReservation.IsHeld(player),"trace mode changed failed-save receipt/custody");
+  GameManager.Instance.Fail=false;
+  Check(Save(RebirthGearOwnerReceipt.Applying)&&Save(RebirthGearOwnerReceipt.Applied),"trace mode changed native witness retry");
+  Check(GameManager.Instance.Saves==3&&player.Buffs.Writes==3&&RebirthGearPlayerFileWitness.Saved==1,
+   "trace mode added a native save or receipt write");
+  Check(Save(RebirthGearOwnerReceipt.Applied)&&GameManager.Instance.Saves==3&&player.Buffs.Writes==3,
+   "trace mode replayed applied checkpoint effects");
+  Check(!RebirthGearOwnerReservation.ReleaseSettledWithTransport(player,connection,offer,()=>true,()=>false)&&
+   RebirthGearOwnerReservation.IsHeld(player),"trace mode released a failed inbox finalization");
+  Check(RebirthGearOwnerReservation.ReleaseSettledWithTransport(player,connection,offer,()=>true,()=>true)&&
+   !RebirthGearOwnerReservation.IsHeld(player),"trace mode withheld original verified release");
+  Check(ReferenceEquals(originalBag,player.bag.ItemGrid.items)&&ReferenceEquals(originalBelt,player.inventory.ItemGrid.items)&&
+   originalBag.All(v=>v==null)&&originalBelt.All(v=>v==null),"trace adapter modified inventory backing/items");
+  Check(traceOn?RebirthGearTrace.Count>0:RebirthGearTrace.Count==0,"trace adapter opt-in/default-off mismatch");
+  if(traceOn)Check(RebirthGearTrace.Stages.Contains("reservation.settled-transport-release"),"actual release tracepoint absent");
+ }
+ RebirthGearTrace.Configure(false,true);Reset();
+ }
  static void Main(){
+ TraceNonMutationChecks();
+ Reset();string diagnostic=null;RebirthGearOwnerSaveCheckpoint.Diagnostic=(o,s)=>diagnostic=s;
+ Plan.After=false;player.Buffs.Value=2;
+ Check(!Save(RebirthGearOwnerReceipt.Applied)&&diagnostic=="owner-save.Applied.inventory-postimage","missing exact owner-save refusal stage");
+ Reset();GameManager.Instance.Fail=true;diagnostic=null;
+ Check(!Save(RebirthGearOwnerReceipt.Applying)&&diagnostic=="owner-save.Applying.native-file-witness","missing native file refusal stage");
+ Reset();Plan.After=false;player.Buffs.Value=2;RebirthGearOwnerSaveCheckpoint.Diagnostic=(o,s)=>throw new Exception("diagnostic sink");
+ Check(!Save(RebirthGearOwnerReceipt.Applied)&&player.Buffs.Value==2,"diagnostic failure changed receipt handling");
+ RebirthGearOwnerSaveCheckpoint.Diagnostic=null;
  ColdHoldChecks();
  TerminalChecks();
  ClientProducerChecks();

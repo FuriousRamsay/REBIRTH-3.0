@@ -14,9 +14,12 @@ internal static class RebirthCamperWorldLighting
     private static readonly ConcurrentQueue<WeakReference<Chunk>> pending=new ConcurrentQueue<WeakReference<Chunk>>();
     private const string MarkerPrefix="rebirth.poi.light.v1:";
     private sealed class Migration {public Migration(){}internal bool Done,Queued;internal long Enqueued;}
-    private sealed class Discovery {public Discovery(){}internal World World;internal float Time;internal TileEntityLight[] Lights;}
+    private sealed class Discovery {public Discovery(){}internal World World;internal int Generation;internal TileEntityLight[] Lights;internal Chunk[] Chunks;internal int MinX,MinZ,MaxX,MaxZ;}
     private static readonly ConditionalWeakTable<Chunk,Migration> migrated=new ConditionalWeakTable<Chunk,Migration>();
     private static readonly ConditionalWeakTable<PrefabInstance,Discovery> discovery=new ConditionalWeakTable<PrefabInstance,Discovery>();
+    private static int discoveryGeneration;
+    internal static int DiscoveryGeneration=>System.Threading.Volatile.Read(ref discoveryGeneration);
+    internal static void InvalidateDiscovery()=>System.Threading.Interlocked.Increment(ref discoveryGeneration);
     internal static void Install(Harmony harmony)
     {
         if(installed)return;
@@ -34,6 +37,7 @@ internal static class RebirthCamperWorldLighting
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperWorldLightLoaded));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperWorldLightRpc));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperWorldPoweredLightTile));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperAuthoredLightIndexChanged));
         ModEvents.GameUpdate.RegisterHandler(Update);ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);installed=true;
     }
     private static string Key(Vector3i p)=>MarkerPrefix+p.x+":"+p.y+":"+p.z;
@@ -44,15 +48,22 @@ internal static class RebirthCamperWorldLighting
     {return light?.chunk!=null&&light.chunk.ChunkCustomData.dict.TryGetValue(Key(light.localChunkPos),out var marker)&&marker?.data?.Length==8?BitConverter.ToUInt32(marker.data,4):0;}
     internal static void Capture(Chunk chunk,WorldBase world,int x,int y,int z,BlockValue value,BlockValue previous)
     {
+        bool currentLight=value.Block is BlockLight||value.Block is BlockPoweredLight;
+        bool previousLight=previous.Block is BlockLight||previous.Block is BlockPoweredLight;
+        if(!currentLight&&!previousLight)return;
         var local=new Vector3i(x,y,z);string key=Key(local);
-        if(Admission!=null&&!world.IsRemote()&&!world.IsEditor()&&(value.Block is BlockLight||value.Block is BlockPoweredLight)&&!value.ischild)
+        if((value.type!=previous.type||value.rotation!=previous.rotation)&&
+            (currentLight||previousLight))
+            InvalidateDiscovery();
+        if(Admission!=null&&!world.IsRemote()&&!world.IsEditor()&&currentLight&&!value.ischild)
         {
+            RebirthCamperPoiLightChoices.Clear(chunk,local);
             chunk.ChunkCustomData.Set(key,new ChunkCustomData(key,ulong.MaxValue,false){data=Image(value,(byte)(Trader(world,chunk.GetWorldPos()+local)?2:1))});
             DefaultPoweredTile(chunk,chunk.GetTileEntity(local));
             chunk.isModified=true;
         }
-        else if(previous.type!=value.type&&chunk.ChunkCustomData.dict.ContainsKey(key))
-        {chunk.ChunkCustomData.Remove(key);chunk.isModified=true;}
+        else if(previous.type!=value.type||previous.rotation!=value.rotation)
+        {RebirthCamperPoiLightChoices.Clear(chunk,local);if(chunk.ChunkCustomData.dict.ContainsKey(key))chunk.ChunkCustomData.Remove(key);chunk.isModified=true;InvalidateDiscovery();}
     }
     internal static void Queue(Chunk chunk)
     {
@@ -79,27 +90,36 @@ internal static class RebirthCamperWorldLighting
     internal static void Migrate(World world,Chunk chunk)
     {
         if(!ThreadManager.IsMainThread()||world.IsRemote())return;
-        var prefabs=GameManager.Instance.GetDynamicPrefabDecorator()?.allPrefabs;if(prefabs==null)return;
+        var decorator=GameManager.Instance.GetDynamicPrefabDecorator();
+        var prefabs=decorator?.allPrefabs;if(prefabs==null)return;
         var state=migrated.GetOrCreateValue(chunk);if(state.Done)return;
         if(!prefabs.Any())return;
+        bool measure=RebirthGameBridgeFrames.IsRecording;
+        long started=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+        int scanned=0,overlapping=0,created=0;
         bool pendingAuthoredData=false;
         // Some native prefab lamps are blocks with no instantiated light tile.
         // Recover only exact authored BlockLight matches in this loaded chunk;
         // the normal migration below then stamps and switches them off.
         var origin=chunk.GetWorldPos();
-        foreach(var poi in prefabs)
+        var nearby=new List<PrefabInstance>();
+        decorator.GetPrefabsAtXZ(origin.x,origin.x+15,origin.z,origin.z+15,nearby);
+        foreach(var poi in nearby)
         {
             if(poi?.prefab==null||poi.prefab.bTraderArea)continue;
             var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
             int minX=Math.Max(origin.x,a.x),maxX=Math.Min(origin.x+15,a.x+b.x-1);
             int minZ=Math.Max(origin.z,a.z),maxZ=Math.Min(origin.z+15,a.z+b.z-1);
             if(minX>maxX||minZ>maxZ)continue;
+            if(measure)overlapping++;
             if(poi.prefab.blockCells==null){pendingAuthoredData=true;continue;}
-            for(int x=minX;x<=maxX;x++)for(int z=minZ;z<=maxZ;z++)
-                for(int y=a.y;y<a.y+b.y;y++)
+            foreach(var offset in RebirthCamperAuthoredLightIndex.Lights(poi.prefab))
                 {
+                    int x=a.x+offset.x,y=a.y+offset.y,z=a.z+offset.z;
+                    if(x<minX||x>maxX||z<minZ||z>maxZ)continue;
+                    if(measure)scanned++;
                     var position=new Vector3i(x,y,z);
-                    var value=world.GetBlock(position);
+                    var value=chunk.GetBlock(new Vector3i(x-origin.x,y,z-origin.z));
                     if(value.ischild||value.Block is not BlockLight lamp||!lamp.HasTileEntity)continue;
                     var authored=poi.prefab.GetBlock(x-a.x,y-a.y,z-a.z);
                     if(authored.type!=value.type||authored.rotation!=value.rotation)continue;
@@ -112,6 +132,7 @@ internal static class RebirthCamperWorldLighting
                         if(light==null)continue;
                         light.localChunkPos=World.toBlock(position);
                         chunk.AddTileEntity(light);light.SetModified();chunk.isModified=true;
+                        if(measure)created++;
                     }
                     catch(Exception error){Log.Warning("[REBIRTH CamperEnergy] Authored lamp tile unavailable at "+position+": "+error.GetType().Name);}
                 }
@@ -124,7 +145,11 @@ internal static class RebirthCamperWorldLighting
             if(RebirthPlacedOriginal.IsUnpublished(world,position)){pendingAuthoredData=true;continue;}
             if(!(value.Block is BlockLight)&&!(value.Block is BlockPoweredLight)||value.ischild||chunk.ChunkCustomData.dict.ContainsKey(Key(tile.localChunkPos)))continue;
             if(world.IsWithinTraderArea(position)||world.GetLandClaimOwner(position,null)!=EnumLandClaimOwner.None)continue;
-            var poi=prefabs.FirstOrDefault(p=>p?.prefab!=null&&Inside(p,position));if(poi==null||poi.prefab.bTraderArea)continue;
+            // Preserve original tie order only when overlapping POIs make it
+            // relevant; the common single-POI chunk needs no world-wide search.
+            var poi=nearby.Count==1?(Inside(nearby[0],position)?nearby[0]:null):
+                nearby.Count==0?null:prefabs.FirstOrDefault(p=>p?.prefab!=null&&Inside(p,position));
+            if(poi?.prefab==null||poi.prefab.bTraderArea)continue;
             if(poi.prefab.blockCells==null){pendingAuthoredData=true;continue;}
             // Decorator stores GetPrefabRotated; GetBlock itself handles its
             // shared-data RotateCoords/ApplyRotation. Do not rotate twice.
@@ -137,10 +162,20 @@ internal static class RebirthCamperWorldLighting
             var image=Image(value,3);if(retain)Array.Copy(BitConverter.GetBytes(stamp),0,image,4,4);
             chunk.ChunkCustomData.Set(Key(tile.localChunkPos),new ChunkCustomData(Key(tile.localChunkPos),ulong.MaxValue,false){data=image});
             chunk.isModified=true;
+            InvalidateDiscovery();
         }
         // A loaded chunk can precede its decorator prefab's block data. Do not
         // permanently cache that temporary inability as a completed migration.
         state.Done=!pendingAuthoredData;
+        if(measure)
+        {
+            double elapsed=1000.0*(System.Diagnostics.Stopwatch.GetTimestamp()-started)/System.Diagnostics.Stopwatch.Frequency;
+            if(elapsed>=15)
+                Log.Out("[REBIRTH LightMigrationPerf] frame="+UnityEngine.Time.frameCount+
+                    " chunk="+chunk.X+":"+chunk.Z+" ms="+elapsed.ToString("F2")+
+                    " overlappingPoi="+overlapping+" scanned="+scanned+" created="+created+
+                    " pending="+pendingAuthoredData);
+        }
     }
     internal static void MigratePoi(World world,PrefabInstance poi)
     {
@@ -157,7 +192,7 @@ internal static class RebirthCamperWorldLighting
     // A player-placed BlockLight can have no native TileEntityLight. Install the
     // block's own native light tile only for a persistent, matching placement
     // marker in reach; then the existing reversible plain-light path applies.
-    private static void MaterializePlacedLightTiles(World world,Chunk chunk,UnityEngine.Vector3 center,float range,Func<Vector3i,bool> authorized)
+    private static void MaterializePlacedLightTiles(World world,Chunk chunk,UnityEngine.Vector3 center,float range,Func<Vector3i,bool> authorized,Func<Vector3i,bool> footprint=null)
     {
         foreach(var key in chunk.ChunkCustomData.dict.Keys.Where(value=>value.StartsWith(RebirthPlacedWorkmanshipIdentity.Prefix,StringComparison.Ordinal)).ToArray())
         {
@@ -165,7 +200,7 @@ internal static class RebirthCamperWorldLighting
             if(coordinates.Length!=3||!int.TryParse(coordinates[0],out int x)||!int.TryParse(coordinates[1],out int y)||!int.TryParse(coordinates[2],out int z)||
                 x<0||x>15||z<0||z>15)continue;
             var origin=chunk.GetWorldPos();var position=new Vector3i(origin.x+x,y,origin.z+z);
-            if(!RebirthCamperEnergyBounds.ContainsDistance(RebirthCamperEnergyBounds.Distance(center,position.ToVector3Center()),range)||
+            if(!(footprint!=null?footprint(position):RebirthCamperEnergyBounds.ContainsDistance(RebirthCamperEnergyBounds.Distance(center,position.ToVector3Center()),range))||
                 authorized?.Invoke(position)!=true||RebirthPlacedWorkmanshipIdentity.Read(world,position)==null||world.GetTileEntity(position)!=null)continue;
             var block=world.GetBlock(position);
             if(block.ischild||block.Block is not BlockLight lamp||!block.Block.HasTileEntity||world.IsWithinTraderArea(position))continue;
@@ -177,6 +212,61 @@ internal static class RebirthCamperWorldLighting
             }
             catch(Exception error){Log.Warning("[REBIRTH CamperEnergy] Native placed lamp tile unavailable at "+position+": "+error.GetType().Name);}
         }
+    }
+    // Native additions are an incarnation boundary even when the replacement
+    // has the same block type/rotation. The caller is the existing placement hook.
+    internal static void RecordPlacedPoiLight(Block block,WorldBase worldBase,Chunk chunk,Vector3i position,BlockValue placed,PlatformUserIdentifierAbs actor)
+    {
+        if(actor==null||chunk==null||Admission!=null||placed.ischild||!(block is BlockLight||block is BlockPoweredLight)||
+            !ThreadManager.IsMainThread()||!(worldBase is World world)||world.IsRemote()||world.IsEditor()||
+            SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||!ReferenceEquals(GameManager.Instance?.World,world)||
+            !ReferenceEquals(world.ChunkCache?.GetChunkFromWorldPos(position),chunk)||world.IsWithinTraderArea(position))return;
+        var current=world.GetBlock(position);
+        if(current.ischild||current.type!=placed.type||current.rotation!=placed.rotation||!ReferenceEquals(current.Block,block))return;
+        var local=World.toBlock(position);
+        RebirthCamperPoiLightChoices.Clear(chunk,local);
+        chunk.ChunkCustomData.Set(Key(local),new ChunkCustomData(Key(local),ulong.MaxValue,false){data=Image(current,3)});
+        chunk.isModified=true;InvalidateDiscovery();
+    }
+    // Called at the adapter's existing admission cadence, never per frame. Scan
+    // only loaded footprint chunks and existing placement records/native tiles.
+    internal static void AdmitPlacedPoiTarget(World world,PrefabInstance poi,TileEntity tile,Func<Vector3i,bool> authorized)
+    {
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||world.IsEditor()||tile?.chunk==null||
+            !ReferenceEquals(GameManager.Instance?.World,world)||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||
+            poi?.prefab==null||poi.prefab.bTraderArea||authorized==null)return;
+        var chunk=tile.chunk;var position=tile.ToWorldPos();
+        if(!Inside(poi,position)||world.IsWithinTraderArea(position)||!authorized(position)||
+            !ReferenceEquals(world.GetTileEntity(position),tile)||!ReferenceEquals(world.ChunkCache?.GetChunkFromWorldPos(position),chunk))return;
+        bool placed=RebirthPlacedWorkmanshipIdentity.Read(world,position)!=null||tile is TileEntityPoweredBlock nativePlaced&&nativePlaced.IsPlayerPlaced;
+        if(!placed)return;
+        var value=world.GetBlock(position);
+        if(value.ischild||!(value.Block is BlockLight&&tile is TileEntityLight||value.Block is BlockPoweredLight&&tile is TileEntityPoweredBlock))return;
+        string key=Key(tile.localChunkPos);
+        if(chunk.ChunkCustomData.dict.TryGetValue(key,out var marker)&&marker?.data?.Length==8&&(marker.data[3]==1||marker.data[3]==2))return;
+        if(marker?.data?.Length==8&&marker.data[3]==3&&(marker.data[0]|marker.data[1]<<8)==value.type&&marker.data[2]==value.rotation&&BitConverter.ToUInt32(marker.data,4)!=0)return;
+        RebirthCamperPoiLightChoices.Clear(chunk,tile.localChunkPos);
+        chunk.ChunkCustomData.Set(key,new ChunkCustomData(key,ulong.MaxValue,false){data=Image(value,3)});
+        chunk.isModified=true;InvalidateDiscovery();
+    }
+    internal static void AdmitPlacedPoiLights(World world,PrefabInstance poi,Func<Vector3i,bool> authorized)
+    {
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||world.IsEditor()||
+            !ReferenceEquals(GameManager.Instance?.World,world)||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||
+            poi?.prefab==null||poi.prefab.bTraderArea||authorized==null)return;
+        var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
+        if(b.x<=0||b.y<=0||b.z<=0)return;
+        for(int x=World.toChunkXZ(a.x);x<=World.toChunkXZ(a.x+b.x-1);x++)
+            for(int z=World.toChunkXZ(a.z);z<=World.toChunkXZ(a.z+b.z-1);z++)
+            {
+                if(world.ChunkCache?.GetChunkSync(x,0,z) is not Chunk chunk)continue;
+                MaterializePlacedLightTiles(world,chunk,UnityEngine.Vector3.zero,0,authorized,p=>Inside(poi,p));
+                foreach(var tile in chunk.tileEntities.list.ToArray())
+                {
+                    if(tile==null||!ReferenceEquals(tile.chunk,chunk))continue;
+                    AdmitPlacedPoiTarget(world,poi,tile,authorized);
+                }
+            }
     }
     internal static IEnumerable<TileEntityLight> PlacedLights(World world,UnityEngine.Vector3 center,float range,Func<TileEntityLight,bool> authorized,Func<Vector3i,bool> authorizeMissingTile)
     {
@@ -198,6 +288,7 @@ internal static class RebirthCamperWorldLighting
                 {
                     chunk.ChunkCustomData.Set(key,new ChunkCustomData(key,ulong.MaxValue,false){data=Image(value,3)});
                     chunk.isModified=true;
+                    InvalidateDiscovery();
                 }
                 if(Stamp(light)!=0)yield return light;
             }
@@ -206,14 +297,23 @@ internal static class RebirthCamperWorldLighting
     internal static IEnumerable<TileEntityLight> Lights(World world,PrefabInstance poi)
     {
         if(poi?.prefab==null||poi.prefab.bTraderArea||world==null)return Array.Empty<TileEntityLight>();
-        var cached=discovery.GetOrCreateValue(poi);float now=UnityEngine.Time.realtimeSinceStartup;
-        if(ReferenceEquals(cached.World,world)&&cached.Lights!=null&&now>=cached.Time&&now-cached.Time<1f)
-            return cached.Lights.Where(t=>ReferenceEquals(world.GetTileEntity(t.ToWorldPos()),t)&&world.GetBlock(t.ToWorldPos()).Block is BlockLight).ToArray();
-        var result=new List<TileEntityLight>();var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
-        for(int x=World.toChunkXZ(a.x);x<=World.toChunkXZ(a.x+b.x-1);x++)
-            for(int z=World.toChunkXZ(a.z);z<=World.toChunkXZ(a.z+b.z-1);z++)
+        var cached=discovery.GetOrCreateValue(poi);int generation=System.Threading.Volatile.Read(ref discoveryGeneration);
+        var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
+        int minX=World.toChunkXZ(a.x),maxX=World.toChunkXZ(a.x+b.x-1);
+        int minZ=World.toChunkXZ(a.z),maxZ=World.toChunkXZ(a.z+b.z-1);
+        if(ReferenceEquals(cached.World,world)&&cached.Lights!=null&&cached.Generation==generation&&
+            cached.MinX==minX&&cached.MaxX==maxX&&cached.MinZ==minZ&&cached.MaxZ==maxZ&&cached.Chunks!=null)
+        {
+            bool same=true;int index=0;
+            for(int x=minX;x<=maxX&&same;x++)for(int z=minZ;z<=maxZ;z++)
+                if(!ReferenceEquals(cached.Chunks[index++],world.ChunkCache?.GetChunkSync(x,0,z))){same=false;break;}
+            if(same)return cached.Lights;
+        }
+        var result=new List<TileEntityLight>();var chunks=new Chunk[(maxX-minX+1)*(maxZ-minZ+1)];int chunkIndex=0;
+        for(int x=minX;x<=maxX;x++)
+            for(int z=minZ;z<=maxZ;z++)
             {
-                var chunk=world.ChunkCache?.GetChunkSync(x,0,z) as Chunk;if(chunk==null)continue;
+                var chunk=world.ChunkCache?.GetChunkSync(x,0,z) as Chunk;chunks[chunkIndex++]=chunk;if(chunk==null)continue;
                 foreach(var tile in chunk.tileEntities.list)
                 {
                     if(!(tile is TileEntityLight light)||!Inside(poi,tile.ToWorldPos()))continue;
@@ -224,7 +324,8 @@ internal static class RebirthCamperWorldLighting
                     result.Add(light);
                 }
             }
-        cached.World=world;cached.Time=now;cached.Lights=result.ToArray();return cached.Lights;
+        cached.World=world;cached.Generation=generation;cached.Lights=result.ToArray();cached.Chunks=chunks;
+        cached.MinX=minX;cached.MaxX=maxX;cached.MinZ=minZ;cached.MaxZ=maxZ;return cached.Lights;
     }
     // Explicit /energy devices observation only. Include excluded native light
     // tiles so a reported pendant can be identified without changing its state.
@@ -299,14 +400,20 @@ internal static class RebirthCamperWorldLightAdmission
     [HarmonyPriority(Priority.First)]
     private static void Prefix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,ref BlockValue __4)
     {
-        var position=__instance.GetWorldPos()+new Vector3i(__1,__2,__3);
         if(RebirthCamperWorldLighting.Admission!=null&&!RebirthCamperWorldLighting.Admission.bTraderArea&&!__0.IsRemote()&&!__0.IsEditor()&&
-            (__4.Block is BlockLight||__4.Block is BlockPoweredLight)&&!(__0 is World world&&world.IsWithinTraderArea(position)))
-            RebirthCamperEnergyDeviceAdapter.OnPlainReset(__0,position);
-        RebirthCamperWorldLighting.ApplyDefault(__0,position,ref __4);
+            (__4.Block is BlockLight||__4.Block is BlockPoweredLight))
+        {
+            var position=__instance.GetWorldPos()+new Vector3i(__1,__2,__3);
+            if(!(__0 is World world&&world.IsWithinTraderArea(position)))
+                RebirthCamperEnergyDeviceAdapter.OnPlainReset(__0,position);
+            RebirthCamperWorldLighting.ApplyDefault(__0,position,ref __4);
+        }
     }
     private static void Postfix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,BlockValue __4,BlockValue __result)
-        =>RebirthCamperWorldLighting.Capture(__instance,__0,__1,__2,__3,__4,__result);
+    {
+        if(__4.Block is BlockLight||__4.Block is BlockPoweredLight||__result.Block is BlockLight||__result.Block is BlockPoweredLight)
+            RebirthCamperWorldLighting.Capture(__instance,__0,__1,__2,__3,__4,__result);
+    }
 }
 
 [HarmonyPatch(typeof(Chunk),"read",new[]{typeof(PooledBinaryReader),typeof(uint),typeof(bool)})]
@@ -330,4 +437,8 @@ internal static class RebirthCamperWorldLightRpc
 
 [HarmonyPatch(typeof(Chunk),nameof(Chunk.AddTileEntity),new[]{typeof(TileEntity)})]
 internal static class RebirthCamperWorldPoweredLightTile
-{private static void Prefix(Chunk __instance,TileEntity __0)=>RebirthCamperWorldLighting.DefaultPoweredTile(__instance,__0);}
+{
+    private static void Prefix(Chunk __instance,TileEntity __0)=>RebirthCamperWorldLighting.DefaultPoweredTile(__instance,__0);
+    private static void Postfix(TileEntity __0)
+    {if(__0 is TileEntityLight)RebirthCamperWorldLighting.InvalidateDiscovery();}
+}

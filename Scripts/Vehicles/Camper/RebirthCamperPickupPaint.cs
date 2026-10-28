@@ -14,6 +14,7 @@ internal static class RebirthCamperPickupPaint
         internal string LastOverride;
         internal Color Color;
         internal readonly MaterialPropertyBlock Properties=new MaterialPropertyBlock();
+        internal readonly System.Collections.Generic.List<Material> Materials=new System.Collections.Generic.List<Material>();
     }
     internal static void Apply(EntityVehicle entity)
     {
@@ -37,17 +38,23 @@ internal static class RebirthCamperPickupPaint
         }
         foreach(var panel in state.Panels)
         {
-            if(panel==null||panel.sharedMaterial==null||!panel.sharedMaterial.HasProperty(Tint))continue;
+            if(panel==null)continue;
+            // Observe the live materials every pass, without allocating the
+            // sharedMaterials array or retrieving its first element twice.
+            state.Materials.Clear();panel.GetSharedMaterials(state.Materials);
+            if(state.Materials.Count==0||state.Materials[0]==null||!state.Materials[0].HasProperty(Tint))continue;
             Set(panel,state,-1);
             // An indexed block overrides the renderer block. Preserve all its
             // other values while updating an already-present indexed override.
-            if(panel.sharedMaterials.Length==1){state.Properties.Clear();panel.GetPropertyBlock(state.Properties,0);if(!state.Properties.isEmpty)Set(panel,state,0);}
+            if(state.Materials.Count==1)Set(panel,state,0,true);
         }
+        state.Materials.Clear();
     }
-    private static void Set(Renderer panel,State state,int material)
+    private static void Set(Renderer panel,State state,int material,bool existingOnly=false)
     {
         var block=state.Properties;block.Clear();
         if(material<0)panel.GetPropertyBlock(block);else panel.GetPropertyBlock(block,material);
+        if(existingOnly&&block.isEmpty)return;
         if(block.GetColor(Tint)==state.Color)return;
         block.SetColor(Tint,state.Color);
         if(material<0)panel.SetPropertyBlock(block);else panel.SetPropertyBlock(block,material);

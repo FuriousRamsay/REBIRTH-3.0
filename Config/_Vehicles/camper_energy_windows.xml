@@ -819,6 +819,7 @@
           <label pos="34,-12" width="176" height="24" font_size="17" justify="center" text_key="xuiRebirthCamperEnergyShowBounds" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" name="energyBoundsLabel" />
         </rect>
       </rect>
+      <rebirth_item_stats_popup />
     </window>
   </append>
 </configs>

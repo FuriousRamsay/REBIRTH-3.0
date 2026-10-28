@@ -38,6 +38,7 @@ internal static partial class RebirthCamperTurretAccess
             if(items.Length!=native+(held?1:0))throw new InvalidDataException("Turret actor dimensions changed.");
             RebirthCamperTurretInventory.Publish(session.Player,held?items.Take(native).ToArray():items);
             if(held)session.Player.PlayerUI.xui.DragAndDropWindow.SetCurrentStack(items[native].Clone(),false);
+            if(held)session.View.TraceDrag("actor.published","action="+session.Action);
         }
         finally{publishingActor=false;}
     }
@@ -71,9 +72,12 @@ internal static partial class RebirthCamperTurretAccess
     private static void Close(Session s){if(!ReferenceEquals(current,s))return;if(s.Waiting){s.Closing=true;return;}current=null;s.Release();}
     private static void Command(Session s,RebirthCamperTurretAction action,int corner,int option)
     {
+        if(action!=RebirthCamperTurretAction.Query)s.View.TraceDrag("command","action="+action+" corner="+corner+" option="+option+" current="+s.Current()+" pending="+s.Waiting+" revision="+s.View.Revision+" remote="+s.Player.world.IsRemote()+" nativeCursorNull="+(s.Player.DragAndDropItem==null));
         if(s.Waiting||!s.Current())return;
         if(!s.Player.PlayerUI.xui.DragAndDropWindow.CurrentStack.IsEmpty()&&action!=RebirthCamperTurretAction.Query&&!RebirthCamperTurretHeldTransfer.IsHeld(action)){s.View.Status("xuiCamperTurretEmptyCursor");return;}
-        s.Before=action==RebirthCamperTurretAction.Query?Array.Empty<byte>():RebirthCamperInventorySnapshot.Capture(RebirthCamperTurretHeldTransfer.Capture(s.Player,action));s.Revision=s.View.Revision;s.Operation=Guid.NewGuid();s.Action=action;s.Corner=corner;s.Option=option;s.Waiting=true;s.View.Wait(true);
+        try{s.Before=action==RebirthCamperTurretAction.Query?Array.Empty<byte>():RebirthCamperInventorySnapshot.Capture(RebirthCamperTurretHeldTransfer.Capture(s.Player,action));}
+        catch(Exception e){s.View.TraceDrag("command.capture-refused",e.GetType().Name+": "+e.Message);throw;}
+        s.Revision=s.View.Revision;s.Operation=Guid.NewGuid();s.Action=action;s.Corner=corner;s.Option=option;s.Waiting=true;s.View.Wait(true);
         if(s.Player.world.IsRemote())
         {
             // Ordered native actor publication precedes this bounded command.
@@ -94,9 +98,10 @@ internal static partial class RebirthCamperTurretAccess
                 else if(!RebirthVehicleInventoryWrite.CanMutate(s.Player,true)||!RebirthVehicleInventoryWrite.CanMutate(s.Player,false))error="xuiCamperTurretChanged";else{var candidate=state.Copy();error=RebirthCamperTurretInventory.Apply(s.Player,candidate,bag,s.Player.bag.ItemGrid.items.Length,RebirthToolbeltCapacity.GetOwnedSlotCount(s.Player,s.Player.inventory.ItemGrid.items.Length),s.Action,s.Corner,s.Option,out var debit);if(error==null){candidate.Encode();debit?.Invoke();PublishActor(s,bag);RebirthCamperTurretRuntime.For(s.Vehicle).Changed(candidate);state=candidate;}}
             }
             if(error==null&&bag!=null)CommittedSound(s,bag);
+            if(s.Action!=RebirthCamperTurretAction.Query)s.View.TraceDrag("command.local-result","action="+s.Action+" status="+(error??"accepted"));
             s.Waiting=false;s.View.Present(state,error);if(s.Closing)Close(s);
         }
-        catch(Exception e){s.Waiting=false;s.View.Wait(false);s.View.Status("xuiCamperTurretInvalid");if(s.Closing)Close(s);Log.Warning("[CamperTurrets] Management refused: "+e.Message);}
+        catch(Exception e){s.View.TraceDrag("command.exception",e.GetType().Name+": "+e.Message);s.Waiting=false;s.View.Wait(false);s.View.Status("xuiCamperTurretInvalid");if(s.Closing)Close(s);Log.Warning("[CamperTurrets] Management refused: "+e.Message);}
     }
     internal static void Receive(World world,ClientInfo sender,int actor,int entity,Guid operation,RebirthCamperTurretAction action,int corner,int option,long revision,byte[] before)
     {
@@ -138,6 +143,7 @@ internal static partial class RebirthCamperTurretAccess
     internal static void Present(int entity,Guid operation,byte[] state,byte[] bag,string status)
     {
         var s=current;if(s==null||s.Vehicle.entityId!=entity||s.Operation!=operation||!ReferenceEquals(s.Player.world,GameManager.Instance?.World))return;
+        if(s.Action!=RebirthCamperTurretAction.Query)s.View.TraceDrag("command.remote-result","action="+s.Action+" status="+status+" actorBytes="+bag.Length);
         if(bag.Length>0)
         {
             var now=RebirthCamperInventorySnapshot.Capture(RebirthCamperTurretHeldTransfer.Capture(s.Player,s.Action));

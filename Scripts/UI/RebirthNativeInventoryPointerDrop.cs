@@ -20,9 +20,14 @@ internal static class RebirthNativeInventoryPointerDrop
     private static readonly ConditionalWeakTable<XUi,Gesture> states=new ConditionalWeakTable<XUi,Gesture>();
     internal static void Arm(XUiC_ItemStack slot)
     {
-        if(slot?.xui==null||slot.IsDragAndDrop||slot is XUiC_Creative2Stack||slot is XUiC_RebirthReadonlyItemSlot||slot is XUiC_RebirthEditorPreviewSlot
+        if(slot?.xui==null)return;
+        var pointer=slot.xui.playerUI?.CursorController;
+        if(pointer==null||(!pointer.GetMouseButton(UICamera.MouseButton.LeftButton)
+            &&!pointer.GetMouseButtonDown(UICamera.MouseButton.LeftButton)
+            &&!pointer.GetMouseButtonUp(UICamera.MouseButton.LeftButton)))return;
+        if(slot.IsDragAndDrop||slot is XUiC_Creative2Stack||slot is XUiC_RebirthReadonlyItemSlot||slot is XUiC_RebirthEditorPreviewSlot
             ||slot.windowGroup?.Controller is XUiC_RebirthCookingStation||slot.GetParentByType<XUiC_RebirthVehicleFrame>()!=null)return;
-        var ui=slot.xui;var player=ui.playerUI?.entityPlayer as EntityPlayerLocal;var pointer=ui.playerUI?.CursorController;
+        var ui=slot.xui;var player=ui.playerUI?.entityPlayer as EntityPlayerLocal;
         if(player==null||pointer==null||player.IsDead()||RebirthConsoleInputGuardRuntime.BlocksGameplayInput())return;
         var state=states.GetValue(ui,_=>new Gesture());var held=ui.DragAndDropWindow?.CurrentStack;
         if(state.Frame!=Time.frameCount)

@@ -11,6 +11,12 @@ public static class RebirthGameBridgeEnergyObservation
         var vehicle=world?.GetEntity(req.QueryInt("entity",-1)) as EntityVehicle;
         if(!ThreadManager.IsMainThread()||world==null||!RebirthCamperRadial.IsCamper(vehicle)||!ReferenceEquals(vehicle.world,world))
         {req.Fail("Current loaded camper required.",409);return;}
+        if(req.QueryInt("auditLightIndex",0)==1)
+        {req.Complete(RebirthGameBridgeLightIndexAudit.Run(vehicle));return;}
+        if(req.QueryInt("auditPoiLookup",0)==1)
+        {req.Complete(RebirthGameBridgeLightIndexAudit.AuditPoiLookup(vehicle));return;}
+        if(req.QueryInt("auditCollisions",0)==1)
+        {req.Complete(RebirthGameBridgeCamperCollisionAudit.Run(vehicle));return;}
         var snapshot=RebirthCamperEnergyRuntime.Observe(vehicle);
         if(snapshot==null){req.Fail("Registered existing Energy state unavailable; observation creates no state.",409);return;}
         var sources=new JArray();
@@ -46,7 +52,9 @@ public static class RebirthGameBridgeEnergyObservation
             ["transitionSeconds"]=snapshot.TransitionSeconds,["revision"]=snapshot.Revision,["range"]=snapshot.Range,
             ["demandWatts"]=snapshot.DemandWatts,["suppliedWatts"]=snapshot.SuppliedWatts,["availableWatts"]=snapshot.AvailableWatts,
             ["sources"]=sources,["poi"]=new JObject{["authoritativeKnown"]=!world.IsRemote(),["inRange"]=poi.InRange,["name"]=poi.PoiName,["requestedOn"]=poi.IsOn,
-                ["supportedLights"]=poi.SupportedLights,["range"]=poi.Range,["activeMeteredDemand"]=poi.DemandWatts},
+                ["supportedLights"]=poi.SupportedLights,["selectedLights"]=poi.SelectedLights,["pinnedOnLights"]=poi.PinnedOnLights,
+                ["selectableLights"]=poi.SelectableLights,["requiredWatts"]=poi.RequiredWatts,["prospectiveRuntimeSeconds"]=poi.ProspectiveRuntimeSeconds,
+                ["range"]=poi.Range,["activeMeteredDemand"]=poi.DemandWatts},
             ["claim"]=new JObject{["scope"]=RebirthCamperClaimIntegration.Scope.ToString(),["ready"]=RebirthCamperClaimIntegration.Active(vehicle),
                 ["vehicleOwnerIdentityPresent"]=vehicle.GetOwner()!=null,["ownerPersistentPresent"]=claimOwner!=null,
                 ["localPlayerPersistentPresent"]=localClaimRelative!=null,["ownerMatchesLocal"]=claimOwner!=null&&ReferenceEquals(claimOwner,localClaimRelative),

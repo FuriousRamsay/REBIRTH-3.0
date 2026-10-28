@@ -16,7 +16,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     private static World clientWorld;private static string clientDirectory;private static float clientScan;
     private static RebirthRemoteResourceClientOriginalJournal ClientPermissions()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","NativePlacedOwnerPermissions"));
     private static void BindClientWorld(World world)
-    {string directory=GameIO.GetSaveGameDir();if(!ReferenceEquals(world,clientWorld)||directory!=clientDirectory){clientJobs.Clear();beforeFlushPending.Clear();clientWorld=world;clientDirectory=directory;clientScan=0;}}
+    {string directory=bindingSaveDirectory.Get();if(!ReferenceEquals(world,clientWorld)||directory!=clientDirectory){clientJobs.Clear();beforeFlushPending.Clear();clientWorld=world;clientDirectory=directory;clientScan=0;}}
     internal static bool BeginClient(EntityPlayerLocal player,ItemActionEntryCraft entry,ulong epoch,ulong request,List<ItemStack> required,List<ItemStack> remote)
     {
         try

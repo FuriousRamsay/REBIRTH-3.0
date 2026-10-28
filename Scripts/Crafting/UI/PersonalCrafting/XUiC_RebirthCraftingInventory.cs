@@ -87,7 +87,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
             RefreshAuthoritativePresentation(true);
 
         // V3.2 may raise the same Bag mutation two or three times in the same frame/burst while
-        // crafting. Wait a few milliseconds and project only the newest snapshot once. This keeps
+        // crafting. Project only the newest queued snapshot on the next Update. This keeps
         // item controls, hover borders and the scrolled grid transform from visibly repainting.
         FlushPendingProjection(false);
 
@@ -137,7 +137,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
     private void QueueProjection(ItemStack[] stackList)
     {
         bool firstRequest = pendingProjectionStacks == null;
-        pendingProjectionStacks = CloneStacks(stackList);
+        pendingProjectionStacks = RebirthInventoryProjectionSnapshot.Update(pendingProjectionStacks, stackList);
         if (firstRequest)
             pendingProjectionDue = Time.realtimeSinceStartup + ProjectionCoalesceSeconds;
         pendingProjectionRequests++;
@@ -162,16 +162,6 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
         ApplyAuthoritativePresentation(latest, false);
         if (trace)
             TraceInventory("SetStacks coalescedRequests=" + requests + " changed=" + lastProjectionChangedCount, latest, true);
-    }
-
-    private static ItemStack[] CloneStacks(ItemStack[] source)
-    {
-        if (source == null)
-            return Array.Empty<ItemStack>();
-        ItemStack[] copy = new ItemStack[source.Length];
-        for (int i = 0; i < source.Length; i++)
-            copy[i] = source[i] != null ? source[i].Clone() : ItemStack.Empty.Clone();
-        return copy;
     }
 
     public override void HandleSlotChangedEvent(int slotNumber, ItemStack stack)

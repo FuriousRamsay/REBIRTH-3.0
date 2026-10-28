@@ -208,8 +208,11 @@ public static class RebirthWorkstationSecurityService
         {
             if(pair.Value.Owner!=user.CombinedString&&!pair.Value.AllowedUsers.Contains(user.CombinedString))continue;
             // Remember types across chunk unloading so station separation does not matter.
-            var tile=player.world.GetTileEntity(pair.Key) as TileEntityWorkstation;
-            if(tile!=null&&string.IsNullOrEmpty(pair.Value.StationType)){pair.Value.StationType=player.world.GetBlock(pair.Key).Block.GetBlockName();dirty=true;}
+            if(string.IsNullOrEmpty(pair.Value.StationType))
+            {
+                var tile=player.world.GetTileEntity(pair.Key) as TileEntityWorkstation;
+                if(tile!=null){pair.Value.StationType=player.world.GetBlock(pair.Key).Block.GetBlockName();dirty=true;}
+            }
             if(string.IsNullOrEmpty(pair.Value.StationType))continue;
             types.Add(pair.Value.StationType);
             if(Vector3.Distance(player.position,new Vector3(pair.Key.x,pair.Key.y,pair.Key.z))<=20)nearby=true;

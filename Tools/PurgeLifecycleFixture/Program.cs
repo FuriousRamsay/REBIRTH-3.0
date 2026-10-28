@@ -11,7 +11,10 @@ class GameManager { public static GameManager Instance; public World World; publ
 class ConnectionManager { public bool IsServer=true; }
 class SingletonMonoBehaviour<T> { public static T Instance; }
 class ThreadManager { public static bool IsMainThread()=>true; }
-class GameIO { public static string Path; public static string GetSaveGameDir()=>Path; }
+class GameIO { public static string Path; public static int Reads; public static string GetSaveGameDir(){Reads++;return Path;} public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>Path; }
+static class Platform { public enum UserDataStorageType { Local, Other } }
+enum EnumGamePrefs { GameSaveStorageType, GameWorld, GameName }
+static class GamePrefs { public static int Storage; public static string World="world",Game="game"; public static int GetInt(EnumGamePrefs p)=>Storage; public static string GetString(EnumGamePrefs p)=>p==EnumGamePrefs.GameWorld?World:Game; }
 class Log { public static void Warning(string message) { } }
 static class ModEvents
 {
@@ -99,7 +102,14 @@ static class Program
         // Native API registration path and partial-registration retry.
         ModEvents.GameUpdate.ThrowNext=true; var api=new RebirthPoiWorldModApi();try{api.InitMod(new Mod());}catch(IOException){}api.InitMod(new Mod());api.InitMod(new Mod());
         Check(ModEvents.GameStarting.Handlers.Count==1 && ModEvents.GameStartDone.Handlers.Count==1 && ModEvents.GameUpdate.Handlers.Count==1 && ModEvents.WorldShuttingDown.Handlers.Count==1 && ModEvents.GameShutdown.Handlers.Count==1,"ModApi partial retry registrations exactly once");
-        GameIO.Path=Binding().SaveDirectory;var world=new World();GameManager.Instance=new GameManager{World=world};SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager();
+        GameIO.Path=Binding().SaveDirectory;var world=new World();GameManager.Instance=new GameManager{World=world};SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager();        Check(RebirthPoiWorldBinding.TryCapture(world,out var captured),"native binding captured");
+        int reads=GameIO.Reads;
+        bool current=true;for(int i=0;i<1000;i++)current &= captured.IsCurrent;Check(current,"unchanged binding remains current");
+        Check(GameIO.Reads==reads,"repeated validation does not rebuild save path");
+        GamePrefs.Game="different";Check(!captured.IsCurrent,"game name change invalidates binding");GamePrefs.Game="game";
+        GamePrefs.World="different";Check(!captured.IsCurrent,"world name change invalidates binding");GamePrefs.World="world";
+        GamePrefs.Storage=1;Check(!captured.IsCurrent,"storage change invalidates binding");GamePrefs.Storage=0;
+        string originalPath=GameIO.Path;GameIO.Path+="-other";Check(!captured.IsCurrent,"save root change invalidates binding");GameIO.Path=originalPath;
         ModEvents.GameStarting.Invoke(new ModEvents.SGameStartingData{AsServer=false});ModEvents.GameStartDone.Invoke(new ModEvents.SGameStartDoneData());ModEvents.GameUpdate.Invoke(new ModEvents.SGameUpdateData());
         Check(RebirthPoiWorldLifecycle.Instance.State==RebirthPoiLifecycleState.Off,"native event client disabled");
                 GameManager.Instance.IsStartingGame=true;
@@ -125,4 +135,11 @@ internal sealed class RebirthPurgePoiCensus {internal static readonly RebirthPur
 internal static class RebirthPurgeSupplyCoordinator {internal static void Reset(){}internal static void Pulse(){}}
 
 internal static class RebirthPurgeClearNotification { internal static void Reset(){} internal static void Pulse(){} }
-internal static class RebirthPurgeHudProgress { internal static void Pulse(){} }
+internal static class RebirthPurgeHudProgress { internal static void Pulse(){} internal static void Reset(){} internal static void InitializeLoadedWorld(){} }
+
+// Downstream service adapters only; their behavior is qualified separately.
+internal static class RebirthPurgePoiEligibility {internal static void Load(string path){}}
+internal static class RebirthPurgeScanner {internal static void Reset(){}internal static void Pulse(){}}
+internal static class RebirthPurgeMilestoneNotification {internal static void Reset(){}internal static void Pulse(){}}
+internal static class RebirthPurgeInformationService {internal static void Reset(){}internal static void Pulse(){}}
+internal static class RebirthPurgeDiscoveryMaintenance {internal static void Reset(){}internal static void Pulse(){}}

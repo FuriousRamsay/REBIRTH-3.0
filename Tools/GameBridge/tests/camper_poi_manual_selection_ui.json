@@ -1,0 +1,16 @@
+{
+ "name":"POI total-selection slider pinned-count UI smoke",
+ "stopOnFailure":true,
+ "preconditions":"NOT RUN. Lead-owned disposable save; current Energy window open in Camp with working source and prepared eligible lights, including manual ON pins and a manual OFF exclusion. Capture authoritative counts before running. Full zero/min/max/manual-toggle/source-off/multi-camper qualification is staged in POI_MANUAL_UI_NETWORK_20261027.md.",
+ "steps":[
+  {"expectWindowOpen":"rebirthCamperEnergyManagement"},
+  {"screenshot":"poi_manual_slider_before"},
+  {"action":{"command":"uitree","args":{"window":"rebirthCamperEnergyManagement"}}},
+  {"click":{"id":"energyPoiSlider","window":"rebirthCamperEnergyManagement"}},
+  {"wait":1},
+  {"expectWindowOpen":"rebirthCamperEnergyManagement"},
+  {"screenshot":"poi_manual_slider_after_native_midpoint"},
+  {"action":{"command":"uitree","args":{"window":"rebirthCamperEnergyManagement"}}},
+  {"expectNoErrors":true}
+ ]
+}

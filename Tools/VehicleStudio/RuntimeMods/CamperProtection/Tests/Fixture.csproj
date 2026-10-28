@@ -1,0 +1,2 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup><ItemGroup><Compile Include="../RebirthCamperModProtection.cs"/><Compile Include="../RebirthCamperArmorVisibility.cs"/><Compile Include="Fixture.cs"/></ItemGroup></Project>
+

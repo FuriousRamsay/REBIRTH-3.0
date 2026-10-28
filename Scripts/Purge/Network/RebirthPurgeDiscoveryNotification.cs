@@ -21,7 +21,7 @@ internal static class RebirthPurgeDiscoveryNotification
         var world = GameManager.Instance?.World;
         if (!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge ||
             identity == null || world == null || world.IsRemote() || discoverer == null ||
-            !discoverer.IsSpawned() || discoverer.IsDead() || discoverer.AttachedToEntity != null ||
+            !discoverer.IsSpawned() || discoverer.IsDead() || discoverer.IsSpectator || discoverer.AttachedToEntity != null ||
             discoverer.IsFlyMode.Value || RebirthPurgeKillContributor.Identify(discoverer, world) == null) return;
         string name = DisplayName(discoverer);
         RebirthPurgePoiHistory.Discover(identity,name);

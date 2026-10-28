@@ -17,9 +17,13 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
         try{frame=RebirthCamperRelayWiring.Read(Vehicle);}catch{return;}
         if(frame==null)return;
         var live=new HashSet<System.Guid>();
+        // Share only this pass's successful relay lookups. Connection frame/stamp/tile
+        // admission and transform positions are still observed for every external link.
+        var relays=new RebirthCamperRelayWiring.RelayLookup();
         foreach(var link in frame.Links)
         {
-            var relay=RebirthCamperRelayWiring.Relay(Vehicle,link.Relay);if(!relay)continue;
+            Transform relay=relays.Resolve(Vehicle,link.Relay);
+            if(!relay)continue;
             Vector3 endpoint;
             if(link.Mounted)
             {
@@ -30,7 +34,7 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
             else
             {
                 var tile=Vehicle.world.GetTileEntity(link.Position);
-                if(tile==null||!RebirthCamperRelayWiring.Connected(Vehicle,tile))continue;
+                if(tile==null||!RebirthCamperRelayWiring.Connected(Vehicle,tile,ref relays))continue;
                 endpoint=link.Position.ToVector3Center()-Origin.position;
                 if(tile is TileEntityPowered powered)endpoint+=powered.WireOffset;
             }

@@ -1,0 +1,16 @@
+{
+  "status": "RIM_SHAPE_CHECK_NOT_FIDELITY_PASS",
+  "originalInnerRadius": 0.10757894736842105,
+  "originalResidualMeanMaxPx": [
+    3.747329784104977,
+    12.603164580645005
+  ],
+  "proposedInnerRadius": 0.102,
+  "proposedWallThickness": 0.029578947368421052,
+  "proposedResidualMeanMaxPx": [
+    2.832157552650859,
+    9.6340452929861
+  ],
+  "interpretation": "Original wall estimate gives an oversized opening relative to the independently traced inner rim. Proposed thickness is an image-fit hypothesis; irregular rim and shared camera remain unresolved.",
+  "blenderAllowed": false
+}

@@ -1,0 +1,12 @@
+// AUTHORED_NOT_RUN. Actual warm acknowledgment sender; native packet/send adapters.
+  RemoteReady();Need(RebirthHydrationOwnerHold.TryAcquire(player,original)&&RebirthHydrationRemoteClientGrant.Receive(player.world,player.entityId,original.Operation,original.Digest)&&RebirthHydrationRemoteClientGrant.TryGet(player,out remoteClientGrant),"ack sender original unavailable");
+  Need(RebirthHydrationOwnerApply.Apply(remoteClientGrant)==RebirthGearOwnerApplySequence.Result.Applied&&RebirthHydrationRemoteClientTerminal.Receive(player.world,player.entityId,original.Operation,original.Digest),"ack sender released terminal unavailable");
+  ConnectionManager.Sends=0;ConnectionManager.DuringSend=null;NetPackageManager.Available=false;
+  Need(!RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&ConnectionManager.Sends==0&&RebirthHydrationRemoteClientTerminal.TryGetAcknowledgment(player,original.Operation,original.Digest,out _),"unmapped acknowledgment lost retry description");
+  NetPackageManager.Available=true;Need(RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&ConnectionManager.Sends==1&&NativeWrites.Calls==1&&!RebirthHydrationOwnerHold.IsHeld(player),"ack sender failed or repeated native financial action");
+  bool nestedAck=true;ConnectionManager.DuringSend=()=>nestedAck=RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest);
+  Need(RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&!nestedAck&&ConnectionManager.Sends==2,"native acknowledgment callback reentered sender");
+  ConnectionManager.DuringSend=()=>{throw new IOException("unknown acknowledgment send");};Need(!RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&RebirthHydrationRemoteClientTerminal.TryGetAcknowledgment(player,original.Operation,original.Digest,out _),"unknown acknowledgment send discarded retry");
+  ConnectionManager.DuringSend=null;Need(RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&NativeWrites.Calls==1,"unknown acknowledgment retry repeated item mutation");
+  int sends=ConnectionManager.Sends;NetPackageManager.DuringMapping=()=>SingletonMonoBehaviour<ConnectionManager>.Instance.connectionToServer[0]=new Peer();
+  Need(!RebirthHydrationAcknowledgmentClient.TrySend(player,original.Operation,original.Digest)&&ConnectionManager.Sends==sends,"peer change during mapping sent stale acknowledgment");NetPackageManager.DuringMapping=null;

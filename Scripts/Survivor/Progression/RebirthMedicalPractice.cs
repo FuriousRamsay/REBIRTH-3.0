@@ -258,7 +258,8 @@ public static class RebirthMedicalPractice
     }
     public static void Observe(EntityAlive patient)
     {
-        if (RebirthSkillEvalDiagnostics.On && PendingUses.Count > 0 && UnityEngine.Time.time - lastObserveLog > 1f) { lastObserveLog = UnityEngine.Time.time; Log.Out("[REBIRTH SkillEval] medical Observe enter pending=" + PendingUses.Count + " patient=" + (patient != null ? patient.entityId : -1) + " sameWorld=" + (patient != null && ReferenceEquals(world, patient.world))); }
+        bool traceObservation=RebirthSkillEvalDiagnostics.On && PendingUses.Count > 0 && UnityEngine.Time.time - lastObserveLog > 1f;
+        if (traceObservation) { lastObserveLog = UnityEngine.Time.time; Log.Out("[REBIRTH SkillEval] medical Observe enter pending=" + PendingUses.Count + " patient=" + (patient != null ? patient.entityId : -1) + " sameWorld=" + (patient != null && ReferenceEquals(world, patient.world))); }
         if(PendingUses.Count==0 || patient?.world==null || ClinicalTransfers.Contains(patient))return;
         if(world!=patient.world){ClearPending();world=patient.world;return;}
         // Allocate a tick's useful change once, oldest treatment first, never once per stacked dose.
@@ -287,7 +288,7 @@ public static class RebirthMedicalPractice
                 if(healthBudget<0)healthBudget=reserve<use.Reserve?Math.Min(Math.Max(0,health-use.Health),(use.Reserve-reserve)*Math.Max(0,C(patient,"medRegHealthIncSpeed"))/2f):0;
                 amount=Math.Min(use.Remaining,healthBudget);healthBudget-=amount;use.Health=health;use.Reserve=reserve;
             }
-            if (RebirthSkillEvalDiagnostics.On && true) Log.Out("[REBIRTH SkillEval] medical Observe pending=" + PendingUses.Count + " amount=" + amount + " remaining=" + use.Remaining + " useReserve=" + use.Reserve + " saw=" + use.SawReserve + " reserveNow=" + C(patient,"medicalRegHealthAmount"));
+            if (RebirthSkillEvalDiagnostics.On && (amount>0f || traceObservation)) Log.Out("[REBIRTH SkillEval] medical Observe pending=" + PendingUses.Count + " amount=" + amount + " remaining=" + use.Remaining + " useReserve=" + use.Reserve + " saw=" + use.SawReserve + " reserveNow=" + C(patient,"medicalRegHealthAmount"));
             if(amount>0){if(!use.InfectionTreatment)RebirthConstitutionTrainingService.OnHealthRestored(patient,amount);Award(e,amount/use.Unit);use.Remaining-=amount;}
             bool exhausted=use.InfectionTreatment?C(patient,"$infectionCureCounter")<=0 || C(patient,"infectionCounter")<=0:(C(patient,"medicalRegHealthAmount")<=0 && use.SawReserve) || (!use.SawReserve && UnityEngine.Time.time-use.CreatedAt>20f);
             if(use.Remaining<=.0001f || exhausted){FinishSelf(e);PendingUses.RemoveAt(i);}else i++;

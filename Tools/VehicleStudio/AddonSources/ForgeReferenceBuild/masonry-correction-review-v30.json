@@ -1,0 +1,20 @@
+{
+  "status": "MEASURED_DIAGNOSTIC_NOT_GEOMETRY_APPROVAL",
+  "source": "E:/_Haven/shared/REBIRTHTemp/ForgeReferenceBuild/ApprovedTextureBaseline/MortarContactFit_v29/mortar-contact.blend",
+  "reference": "Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+  "diagnostic": "MortarContactFit_v29/mortar-width-classified-audit.json",
+  "findings": [
+    "220 exterior mortar samples; 93 exceed the prior nearest-stone distance threshold. This is not a direct joint-width measurement.",
+    "At pixel cell 12,2 the average projected distance to nearest stone is 33.6 mm while signed camera-depth difference averages 11.5 mm. Increasing mortar brightness cannot correct this broad crown patch.",
+    "Lower-right cells 20,11 and 19,12 have approximately 20.3 and 18.6 mm projected distances. Some core surfaces are already near the stone depth; lifting the entire core further would flatten the stone relief.",
+    "The chamber visibly has a broad smooth backing between isolated inner stones, unlike the reference's continuous refractory masonry.",
+    "Bellows board, seams, collar bolt plate and mounting feet remain separate outstanding geometry differences. They cannot be fixed by texture changes."
+  ],
+  "nextGeometryPlan": [
+    "Trace each broad patch against the original image before defining an individual stone envelope; preserve authored arch silhouette and left assembly positions.",
+    "Replace broad chamber backing exposure with fitted irregular inner masonry and narrow recessed mortar; retain the opening and internal depth.",
+    "Use local mortar edge construction rather than another global core offset. Verify clay and mortar-ID views from the saved camera before material work."
+  ],
+  "prohibitedPromotion": "No texture rebake, Unity import or other station construction until the corrected geometry is visually verified.",
+  "measurementLimits": "Nearest surface may be on a neighboring facet. Signed depth and projected distances identify planning regions, not validated target vertex positions."
+}

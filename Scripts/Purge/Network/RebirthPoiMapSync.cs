@@ -99,16 +99,43 @@ internal static class RebirthPoiMapSync
     private static RebirthPurgeObjectiveFrame.Biome[] objectiveBiomes=new RebirthPurgeObjectiveFrame.Biome[0];
     private static RebirthPurgeObjectiveClient objectiveClient;
     internal static RebirthPurgeObjectiveFrame LocalObjectives => objectiveClient?.Published;
+    // Retain one coherent last-published view during a same-world retry, not
+    // an abandoned receiver and its partially assembled page buffers.
+    private sealed class ClientProjection
+    {
+        internal readonly IReadOnlyDictionary<string,RebirthPoiMapRecord> Map;
+        internal readonly Guid World,Session;
+        internal readonly long Revision;
+        internal ClientProjection(RebirthPoiMapReceiver source)
+        {Map=source.Published;World=source.PublishedWorld;Session=source.PublishedSession;Revision=source.Sequence;}
+    }
+    private static ClientProjection presented;
     private static World clientWorld;
     private static Guid clientRequest;
     private static RebirthPoiMapReceiver receiver;
     private static double nextClientRequest, nextPoll, nextSend;
     private static bool clientNeedsSnapshot;
-    internal static IReadOnlyDictionary<string, RebirthPoiMapRecord> LocalMap =>
-        clientWorld != null ? receiver?.Published : map;
-    internal static long LocalRevision => clientWorld != null ? receiver?.Sequence ?? 0 : sequence;
-    internal static Guid LocalWorld => clientWorld != null ? receiver?.PublishedWorld ?? Guid.Empty : worldId;
-    internal static Guid LocalSession => clientWorld != null ? receiver?.PublishedSession ?? Guid.Empty : session;
+    private static bool CurrentClientScope => clientWorld==null||ReferenceEquals(GameManager.Instance?.World,clientWorld);
+    internal static IReadOnlyDictionary<string, RebirthPoiMapRecord> LocalMap => clientWorld != null
+        ? (CurrentClientScope ? presented?.Map ?? receiver?.Published : null) : map;
+    internal static long LocalRevision => clientWorld != null
+        ? (CurrentClientScope ? presented?.Revision ?? receiver?.Sequence ?? 0 : 0) : sequence;
+    internal static Guid LocalWorld => clientWorld != null
+        ? (CurrentClientScope ? presented?.World ?? receiver?.PublishedWorld ?? Guid.Empty : Guid.Empty) : worldId;
+    internal static Guid LocalSession => clientWorld != null
+        ? (CurrentClientScope ? presented?.Session ?? receiver?.PublishedSession ?? Guid.Empty : Guid.Empty) : session;
+    // Handshake consumers read only the current nonce's receiver, never the
+    // retained view. Both views stop exposing a previous native world at once.
+    internal static IReadOnlyDictionary<string,RebirthPoiMapRecord> TransportMap => clientWorld != null
+        ? (CurrentClientScope ? receiver?.Published : null) : map;
+    internal static long TransportRevision => clientWorld != null
+        ? (CurrentClientScope ? receiver?.Sequence ?? 0 : 0) : sequence;
+    internal static Guid TransportWorld => clientWorld != null
+        ? (CurrentClientScope ? receiver?.PublishedWorld ?? Guid.Empty : Guid.Empty) : worldId;
+    internal static Guid TransportSession => clientWorld != null
+        ? (CurrentClientScope ? receiver?.PublishedSession ?? Guid.Empty : Guid.Empty) : session;
+    internal static bool PresentationMatchesTransport => CurrentClientScope&&(clientWorld==null||presented==null||receiver!=null&&
+        presented.World==receiver.PublishedWorld&&presented.Session==receiver.PublishedSession&&presented.Revision==receiver.Sequence);
     private static double Now => Time.realtimeSinceStartup;
     internal static void Reset()
     {
@@ -119,7 +146,7 @@ internal static class RebirthPoiMapSync
         changedRecords = null; fullRecords = new RebirthPoiMapRecord[0];
         peers.Clear(); roundRobin.Clear(); deltas.Clear(); map = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal); sequence = 0; fullSnapshotFloor = 0;
         worldId = Guid.Empty; session = Guid.NewGuid(); overflow = false;
-        clientWorld = null; clientRequest = Guid.Empty; receiver = null; nextClientRequest = 0; nextPoll = 0; nextSend = 0; clientNeedsSnapshot = true;
+        clientWorld = null; clientRequest = Guid.Empty; receiver = null; presented = null; nextClientRequest = 0; nextPoll = 0; nextSend = 0; clientNeedsSnapshot = true;
         objectiveSource=null;objectiveSequence=0;objectiveRevision=0;objectiveGeneration=0;objectiveKnown=false;objectiveBiomes=new RebirthPurgeObjectiveFrame.Biome[0];objectiveClient=null;
         objectiveBands=Array.Empty<RebirthPurgeObjectiveFrame.DiscoveryBand>();objectiveBandSource=null;
         RebirthPoiMapPresentation.Reset();
@@ -147,8 +174,14 @@ internal static class RebirthPoiMapSync
         var result = receiver.Accept(world, frame);
         // Only new staged progress extends the transfer timeout. Replayed pages must
         // neither start a needless resync after publication nor postpone a stalled transfer.
-        if (result == RebirthPoiMapReceive.Accepted) { clientNeedsSnapshot = true; nextClientRequest = Now + 30; }
-        if (result == RebirthPoiMapReceive.Published) { clientNeedsSnapshot = false; objectiveClient?.Publish(receiver.PublishedWorld,receiver.PublishedSession); }
+        if (result == RebirthPoiMapReceive.Accepted)
+        {
+            // A validated current-nonce page establishes a new transport epoch.
+            // Retain presentation only while that epoch still matches it.
+            if (presented != null && (presented.World != frame.World || presented.Session != frame.Session)) presented = null;
+            clientNeedsSnapshot = true; nextClientRequest = Now + 30;
+        }
+        if (result == RebirthPoiMapReceive.Published) { presented = new ClientProjection(receiver); clientNeedsSnapshot = false; objectiveClient?.Publish(receiver.PublishedWorld,receiver.PublishedSession); }
         if (result == RebirthPoiMapReceive.Resync) { clientNeedsSnapshot = true; nextClientRequest = Math.Min(nextClientRequest, Now + 1); }
     }
     internal static void ReceiveObjectives(World world,RebirthPurgeObjectiveFrame frame)
@@ -182,7 +215,7 @@ internal static class RebirthPoiMapSync
             var player = game.World.GetPrimaryPlayer(); if (player == null) return;
             if (!ReferenceEquals(clientWorld, game.World))
             {
-                clientWorld = game.World; clientRequest = Guid.NewGuid();
+                clientWorld = game.World; presented = null; clientRequest = Guid.NewGuid();
                 receiver = new RebirthPoiMapReceiver(clientWorld, clientRequest); objectiveClient=new RebirthPurgeObjectiveClient(clientRequest); nextClientRequest = 0; clientNeedsSnapshot = true;
             }
             if (clientNeedsSnapshot && Now >= nextClientRequest)

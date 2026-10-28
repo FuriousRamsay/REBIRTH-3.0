@@ -6,7 +6,7 @@ public class EntityPlayer { public int entityId=7; }
 public class ClientInfo {}
 public class Attr {public float Current=10;}
 public class Progress {public Dictionary<string,Attr> Attributes=new Dictionary<string,Attr>{{"strength",new Attr()},{"constitution",new Attr()}};}
-public class RebirthWorldSupportState {public RebirthGearSettlement LastGearSettlement;public RebirthGearTransferState LastGearSettlementOriginal;public long GearRevision=2;public RebirthGearTransferState PendingGearTransfer;public object PendingLibraryTransfer,PendingMusicTransfer;public RebirthGearTransferPhase GearTransferPhase;public Dictionary<string,string> EquippedGearBySlot=new Dictionary<string,string>(),EquippedGearItemDataBySlot=new Dictionary<string,string>();}
+public class RebirthWorldSupportState {public RebirthGearSettlement LastGearSettlement;public RebirthGearTransferState LastGearSettlementOriginal;public long GearRevision=2;public RebirthGearTransferState PendingGearTransfer;public RebirthGearPreparationRefusal PendingGearPreparationRefusal;public object PendingLibraryTransfer,PendingMusicTransfer;public RebirthGearTransferPhase GearTransferPhase;public Dictionary<string,string> EquippedGearBySlot=new Dictionary<string,string>(),EquippedGearItemDataBySlot=new Dictionary<string,string>();}
 public class Origin {public string CreationId="11111111111111111111111111111111";}
 public class RebirthWorldCharacterRecord {public string StablePlayerKey="owner";public RebirthWorldSupportState Support=new RebirthWorldSupportState();public Origin Origin=new Origin();public Progress Progression=new Progress();}
 public class Profile {public string Kind="survivor_gear",GearSlotId;public float GearMinStrength=5,GearMinConstitution=5;public int GearToolbeltSlotBonus;}
@@ -282,7 +282,21 @@ class Program {
  SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.Sender=new();Check(!RebirthRemoteGearAppliedConfirmation.TryGetBoundSettlement(player,sender,marker,out _),"old native session cannot fetch terminal");SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.Sender=sender;
  GameManager.Instance.World.worldState.Guid=Guid.NewGuid().ToString("N");Check(!RebirthRemoteGearAppliedConfirmation.TryGetBoundSettlement(player,sender,marker,out _),"foreign world cannot fetch original terminal");
  }
+ static void PendingRefusalChecks(){
+ Reset();Check(Build(out var offer),"pending refusal candidate built before custody");var state=RebirthWorldCharacterService.Record.Support;var snap=RebirthRemoteGearInventorySource.Snapshot;
+ Check(RebirthGearPreparationIntent.TryCreate(offer.CreationId,Guid.NewGuid(),1,1,3,true,7,snap,out var stale),"stale original intent constructed");
+ Check(RebirthGearPreparationMarker.TryEncode(Guid.Parse(GameManager.Instance.World.worldState.Guid),snap.OwnedBeltSlots,stale,out var marker),"stale original marker constructed");
+ Check(RebirthGearPreparationRefusal.TryCreateStale(marker,state.GearRevision,out var refusal),"actual stale refusal constructed");
+ state.PendingGearPreparationRefusal=refusal;Check(refusal.MatchesSupport(offer.CreationId,state.GearRevision,false,null),"pending refusal matches current support invariant");int saves=0;
+ Check(!RebirthGearTransferJournal.Prepare(state,offer,offer.CreationId,()=>{saves++;return true;})&&saves==0&&state.PendingGearTransfer==null&&ReferenceEquals(state.PendingGearPreparationRefusal,refusal)&&state.GearRevision==2,"pending refusal blocks new gear custody before save without mutation");
+ state.PendingGearTransfer=offer;
+ Check(!RebirthGearTransferJournal.Prepare(state,offer,offer.CreationId,()=>{saves++;return true;})&&saves==0&&ReferenceEquals(state.PendingGearTransfer,offer)&&ReferenceEquals(state.PendingGearPreparationRefusal,refusal),"pending refusal also blocks exact pending offer replay before save");
+ // Fixture-only setup removal; production refusal retirement is exercised elsewhere.
+ state.PendingGearPreparationRefusal=null;state.PendingGearTransfer=null;
+ Check(RebirthGearTransferJournal.Prepare(state,offer,offer.CreationId,()=>{saves++;return true;})&&saves==1&&ReferenceEquals(state.PendingGearTransfer,offer),"normal journal admission remains available without pending refusal");
+ }
  static void Main(){
+ PendingRefusalChecks();
  UnequipChecks();
  BoundTerminalChecks();
  RetainedPhaseReplayChecks();

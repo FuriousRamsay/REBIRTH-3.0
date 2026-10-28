@@ -1,12 +1,12 @@
 using System;using System.Collections.Generic;using System.IO;using System.Threading;
-class World { public Cache ChunkCache=new Cache();public bool Remote;public bool IsRemote()=>Remote;public Biome GetBiome(int x,int z)=>new Biome(); }
+class World { public Cache ChunkCache=new Cache();public bool Remote;public bool IsRemote()=>Remote;public Biome GetBiome(int x,int z)=>null; }
 class Cache {public object ChunkProvider;}
 class Biome {public string m_sBiomeName="forest";}
-class ChunkProviderGenerateWorld {public DynamicPrefabDecorator prefabDecorator;public Location worldLocation=new Location();}
+class ChunkProviderGenerateWorld {public DynamicPrefabDecorator prefabDecorator;public Location worldLocation=new Location();public BiomeProvider GetBiomeProvider()=>new BiomeProvider();}
 class Location {public string FullPath;}
 class DynamicPrefabDecorator {public object listsLock=new object();public List<PrefabInstance> allPrefabs=new List<PrefabInstance>();public event Action<PrefabInstance> OnPrefabLoaded,OnPrefabChanged,OnPrefabRemoved;public void Change()=>OnPrefabChanged?.Invoke(null);}
 class PrefabInstance {public Prefab prefab=new Prefab();public V boundingBoxPosition,boundingBoxSize=new V(20,20,20);public int rotation;}
-class Prefab {public int yOffset;public bool bTraderArea;public string PrefabName="house";public List<Room> SleeperVolumeList=new List<Room>{new Room()};public byte DifficultyTier=2;}
+class Prefab {public int yOffset;public FastTags<TagGroup.Poi> Tags;public bool bTraderArea;public string PrefabName="house";public List<Room> SleeperVolumeList=new List<Room>{new Room()};public byte DifficultyTier=2;}
 class Room {public int spawnCountMax=1;public string minScript;}
 struct V {public int x,y,z;public V(int a,int b,int c){x=a;y=b;z=c;}}
 static class ThreadManager {public static bool IsMainThread()=>true;}
@@ -14,7 +14,7 @@ struct Vector3i {public int x,y,z;public static Vector3i Parse(string s){var p=s
 class GameManager {public static GameManager Instance=new GameManager();public World World;public bool IsStartingGame;public DynamicPrefabDecorator Native;public DynamicPrefabDecorator GetDynamicPrefabDecorator()=>Native;}
 static class RebirthPurgeReleasePolicy {public static bool Enabled=true;}
 static class RebirthSandboxOptionManager {public static Options Current=new Options();}
-class Options {public bool IsPurge=true;}
+class Options {public bool IsPurge=true;public int PurgeCompletionPercentage;public int PurgeProgression;}
 internal enum RebirthPoiClearanceState {Discovered,Cleared,ResetPending}
 internal class RebirthPoiClearanceRecord {public RebirthPoiClearanceState State;public bool ResetOnly;}
 internal class RebirthPoiWorldBinding {public bool IsCurrent=true;}
@@ -27,7 +27,8 @@ class Program {
  static RebirthPurgePoiCensus Setup(int count,int fileCount=-1){var d=new DynamicPrefabDecorator();for(int n=0;n<count;n++)d.allPrefabs.Add(new PrefabInstance{boundingBoxPosition=new V(n*30,40,0)});var w=new World();w.ChunkCache.ChunkProvider=new ChunkProviderGenerateWorld{prefabDecorator=d,worldLocation=new Location{FullPath=dir}};GameManager.Instance.World=w;GameManager.Instance.Native=d;File.WriteAllText(Path.Combine(dir,"prefabs.xml"),"<prefabs>"+string.Concat(System.Linq.Enumerable.Select(System.Linq.Enumerable.Range(0,fileCount<0?count:fileCount),n=>"<decoration name='house' position='"+(n*30)+",40,0'/>"))+"</prefabs>");RebirthPurgePoiCensus.Instance.Reset();return RebirthPurgePoiCensus.Instance;}
  static void Tick(RebirthPurgePoiCensus c){Thread.Sleep(110);c.Pulse();}
  static void Main(){dir=Path.Combine(Path.GetTempPath(),"RebirthCensus_"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);try{
- var c=Setup(130);Tick(c);Check(!c.Ready,"source reading cannot publish a partial denominator");Tick(c);Check(!c.Ready,"first census slice remains unknown");Tick(c);Check(!c.Ready,"second census slice remains unknown");Tick(c);Tick(c);Check(c.Ready&&c.Published.Count==130,"complete bounded census publishes all distinct instances");
+ RebirthPurgePoiCensus c; c=Setup(3);var repeated=GameManager.Instance.Native.allPrefabs[1];repeated.prefab.SleeperVolumeList.Clear();GameManager.Instance.Native.allPrefabs[2].prefab.SleeperVolumeList.Clear();GameManager.Instance.Native.allPrefabs[2].boundingBoxPosition=repeated.boundingBoxPosition;File.WriteAllText(Path.Combine(dir,"prefabs.xml"),"<prefabs><decoration name='house' position='0,40,0'/><decoration name='house' position='30,40,0'/><decoration name='house' position='30,40,0'/></prefabs>");Tick(c);Check(c.Ready&&c.Published.Count==1,"repeated noncombat decorations match occurrence counts without blocking eligible POIs");
+ c=Setup(2);GameManager.Instance.Native.allPrefabs[1].boundingBoxPosition=GameManager.Instance.Native.allPrefabs[0].boundingBoxPosition;File.WriteAllText(Path.Combine(dir,"prefabs.xml"),"<prefabs><decoration name='house' position='0,40,0'/><decoration name='house' position='0,40,0'/></prefabs>");Tick(c);Check(!c.Ready&&c.Unresolved==1,"duplicate eligible identity is not counted twice"); c=Setup(130);Tick(c);Check(!c.Ready,"source reading cannot publish a partial denominator");Tick(c);Check(!c.Ready,"first census slice remains unknown");Tick(c);Check(!c.Ready,"second census slice remains unknown");Tick(c);Tick(c);Check(c.Ready&&c.Published.Count==130,"complete bounded census publishes all distinct instances");
  Check(c.Published.Values.GetEnumerator().MoveNext(),"authored entries available");GameManager.Instance.Native.Change();Check(!c.Ready&&c.Published==null,"same-count native replacement immediately invalidates publication");
  c=Setup(1,2);Tick(c);Check(!c.Ready&&c.Unresolved==1,"skipped native source definition cannot reduce denominator");
  c=Setup(1);GameManager.Instance.Native.allPrefabs[0].prefab.bTraderArea=true;Tick(c);Check(c.Ready&&c.Published.Count==0,"trader definition explicitly excluded");
@@ -84,3 +85,9 @@ Console.WriteLine("RESULT "+checks+" PASS");
  }finally{RebirthPurgePoiCensus.Instance.Reset();Directory.Delete(dir,true);}}
 }
 class Log{public static void Warning(string text){}}
+
+class TagGroup {public class Poi{}}
+struct FastTags<T>{public static FastTags<T> Parse(string value)=>default;public bool Test_AnySet(FastTags<T> other)=>false;}
+static class RebirthPurgePoiEligibility{public static bool Available=>true;public static bool Allows(string name,bool trader,bool rwg,bool street)=>!trader;}
+
+class BiomeProvider{public Biome GetBiomeAt(int x,int z)=>new Biome();}

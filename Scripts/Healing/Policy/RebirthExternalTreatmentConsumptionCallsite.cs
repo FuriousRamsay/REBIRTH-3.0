@@ -34,15 +34,18 @@ internal static class RebirthExternalTreatmentConsumptionCallsite
         try
         {
             if (method == null || method.DeclaringType != typeof(ItemActionUseOther) || method.Name != nameof(ItemActionUseOther.ExecuteAction) ||
-                method.MetadataToken != 0x0600314C || method.Module.ModuleVersionId.ToString() != NativeMvid) return false;
+                (method.Module.ModuleVersionId.ToString() != NativeMvid && method.Module.ModuleVersionId.ToString() != "47c87570-1f44-4ad3-872b-95a9f98d316c")) return false;
+            // Resolve one exact identity tuple; cross-pairing MVID, tokens or hashes is refused.
+            bool native34 = method.Module.ModuleVersionId.ToString() == "47c87570-1f44-4ad3-872b-95a9f98d316c";
+            if (method.MetadataToken != (native34 ? 0x0600315A : 0x0600314C)) return false;
             var parameters = method.GetParameters();
             if (parameters.Length != 2 || parameters[0].ParameterType != typeof(ItemActionData) || parameters[1].ParameterType != typeof(bool)) return false;
             var body = method.GetMethodBody();
             byte[] il = body?.GetILAsByteArray();
-            if (il == null || il.Length != 796 || body.ExceptionHandlingClauses.Count != 0 || Digest(il) != NativeIl) return false;
+            if (il == null || il.Length != 796 || body.ExceptionHandlingClauses.Count != 0 || Digest(il) != (native34 ? "8DA9971695F6BE71927D8CB036D3264795AC02B1574C47E9E2BA74E2F576DAD0" : NativeIl)) return false;
             using (var stream = File.OpenRead(method.Module.Assembly.Location))
             using (var hash = SHA256.Create())
-                return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", string.Empty) == NativeAssembly;
+                return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", string.Empty) == (native34 ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4" : NativeAssembly);
         }
         catch (Exception) { return false; }
     }

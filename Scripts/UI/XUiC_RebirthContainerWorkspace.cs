@@ -96,7 +96,7 @@ public sealed class XUiC_RebirthContainerWorkspace : XUiController
             case 0: Select(null); controls.Sort(); break;
             case 1: Select(null); controls.MoveFillAndSmart(); break;
             case 2: Select(null); controls.MoveAll(); break;
-            case 3: controls.ToggleLockMode(); break;
+            case 3: controls.UserLockMode = !controls.UserLockMode; break;
         }
         nextSync = 0f;
         left?.Invalidate(); right?.Invalidate();
@@ -180,8 +180,8 @@ public sealed class XUiC_RebirthContainerWorkspace : XUiController
         }
         if (input.GUIActions.Cancel.WasPressed || input.PermanentActions.Cancel.WasPressed)
         {
-            if (session.LockMode(false)) session.LeftControls.ToggleLockMode();
-            if (session.LockMode(true)) session.RightControls.ToggleLockMode();
+            if (session.LockMode(false)) session.LeftControls.UserLockMode = false;
+            if (session.LockMode(true)) session.RightControls.UserLockMode = false;
             nextSync = 0f;
         }
         if (!xui.playerUI.windowManager.IsInputActive() && xui.DragAndDropWindow.IsEmpty() &&

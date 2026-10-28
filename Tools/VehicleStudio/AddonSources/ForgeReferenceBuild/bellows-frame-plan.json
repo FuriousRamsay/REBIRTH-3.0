@@ -1,0 +1,223 @@
+{
+  "status": "CONNECTED_FRAME_DIMENSION_PLAN_NOT_FULL_FIDELITY_PASS",
+  "cameraElevationDegrees": 22.88949901583545,
+  "cameraAzimuthDegrees": 26.063965073925417,
+  "units": "same provisional units as nozzle; 760 pixels/unit",
+  "records": [
+    {
+      "id": "upper_shaft",
+      "shape": "stepped round shaft",
+      "axisEndpoints": [
+        [
+          -0.6459832698242606,
+          0.6737453357420525,
+          0.7612489635378099
+        ],
+        [
+          -0.34570984834545154,
+          0.6737453357420525,
+          0.7612489635378099
+        ]
+      ],
+      "diameter": 0.03289473684210526,
+      "length": 0.30027342147880903,
+      "connections": [
+        "near_post_bearing",
+        "far_post_bearing"
+      ]
+    },
+    {
+      "id": "lower_shaft",
+      "shape": "stepped round shaft",
+      "axisEndpoints": [
+        [
+          -0.6254767922598543,
+          0.6737453357420525,
+          0.24184488315313207
+        ],
+        [
+          -0.3252033707810453,
+          0.6737453357420525,
+          0.24184488315313207
+        ]
+      ],
+      "diameter": 0.031578947368421054,
+      "length": 0.30027342147880903,
+      "connections": [
+        "near_post_bearing",
+        "far_post_bearing"
+      ]
+    },
+    {
+      "id": "near_post",
+      "shape": "beveled rectangular timber",
+      "axisEndpoints": [
+        [
+          -0.6235042900262808,
+          0.6737453357420525,
+          0.19188380595359056
+        ],
+        [
+          -0.6477585218344767,
+          0.6737453357420525,
+          0.8062139330173973
+        ]
+      ],
+      "crossSection": [
+        0.05789473684210526,
+        0.065
+      ],
+      "bevelRadius": 0.007,
+      "axisUnit": [
+        -0.039450044671470036,
+        0.0,
+        0.9992215439908304
+      ],
+      "connections": [
+        "upper_shaft",
+        "lower_shaft"
+      ],
+      "hiddenGeometry": "Far lower post partly occluded; extend coherently to lower shaft, not traced as visible"
+    },
+    {
+      "id": "far_post",
+      "shape": "beveled rectangular timber",
+      "axisEndpoints": [
+        [
+          -0.3232308685474718,
+          0.6737453357420525,
+          0.19188380595359056
+        ],
+        [
+          -0.3474851003556677,
+          0.6737453357420525,
+          0.8062139330173973
+        ]
+      ],
+      "crossSection": [
+        0.05789473684210526,
+        0.065
+      ],
+      "bevelRadius": 0.007,
+      "axisUnit": [
+        -0.039450044671470036,
+        0.0,
+        0.9992215439908304
+      ],
+      "connections": [
+        "upper_shaft",
+        "lower_shaft"
+      ],
+      "hiddenGeometry": "Far lower post partly occluded; extend coherently to lower shaft, not traced as visible"
+    },
+    {
+      "id": "bearing_0",
+      "shape": "washer, short bearing boss and domed head",
+      "center": [
+        -0.6459832698242606,
+        0.6737453357420525,
+        0.7612489635378099
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "washerOuterRadius": 0.028,
+      "washerThickness": 0.009,
+      "bossRadius": 0.02,
+      "bossLength": 0.016,
+      "headDomeHeight": 0.01
+    },
+    {
+      "id": "bearing_1",
+      "shape": "washer, short bearing boss and domed head",
+      "center": [
+        -0.34570984834545154,
+        0.6737453357420525,
+        0.7612489635378099
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "washerOuterRadius": 0.028,
+      "washerThickness": 0.009,
+      "bossRadius": 0.02,
+      "bossLength": 0.016,
+      "headDomeHeight": 0.01
+    },
+    {
+      "id": "bearing_2",
+      "shape": "washer, short bearing boss and domed head",
+      "center": [
+        -0.6254767922598543,
+        0.6737453357420525,
+        0.24184488315313207
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "washerOuterRadius": 0.028,
+      "washerThickness": 0.009,
+      "bossRadius": 0.02,
+      "bossLength": 0.016,
+      "headDomeHeight": 0.01
+    },
+    {
+      "id": "bearing_3",
+      "shape": "washer, short bearing boss and domed head",
+      "center": [
+        -0.3252033707810453,
+        0.6737453357420525,
+        0.24184488315313207
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "washerOuterRadius": 0.028,
+      "washerThickness": 0.009,
+      "bossRadius": 0.02,
+      "bossLength": 0.016,
+      "headDomeHeight": 0.01
+    }
+  ],
+  "endpointChecks": {
+    "upper_shaft": {
+      "predictedFarEndpoint": [
+        430.00000000000006,
+        268.0
+      ],
+      "observedFarEndpoint": [
+        430,
+        268
+      ],
+      "distancePixels": 5.684341886080802e-14
+    },
+    "lower_shaft": {
+      "predictedFarEndpoint": [
+        443.99999999999994,
+        629.0
+      ],
+      "observedFarEndpoint": [
+        444,
+        628
+      ],
+      "distancePixels": 1.0
+    }
+  },
+  "postLeanFromVerticalDegrees": 2.2609077641417357,
+  "depthAuthority": "Near upper bearing depth fixed to zero as a provisional assembly datum; full forge attachment remains unresolved",
+  "remaining": [
+    "Verify post outlines including thickness",
+    "Fit leather envelope between frame and throat",
+    "Add lower bracket and grounded foot",
+    "Check far-post visibility and common support height"
+  ],
+  "blenderAllowed": false
+}

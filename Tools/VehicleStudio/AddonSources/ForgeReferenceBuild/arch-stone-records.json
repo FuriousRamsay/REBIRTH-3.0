@@ -1,0 +1,20 @@
+{
+ "status":"MANUAL_CONTOURS_PENDING_VALIDATION",
+ "authority":"Approximate visible contours drawn from approved image at 1448x1086; depths are not observable. Contours are guides, not claimed exact segmentation.",
+ "surfaceRule":"Each stone is a closed irregular solid with a broad fractured front face and beveled/chipped transitions, fitted to neighbours. Visible outline controls shape. No identical wedges or regular cube rows.",
+ "records":[
+  {"id":"jamb_left_bottom","contourPixels":[[822,658],[863,637],[900,650],[927,685],[925,723],[904,749],[857,737],[834,710]],"neighbours":["jamb_left_middle","sill_left"],"depth":"unresolved"},
+  {"id":"jamb_left_middle","contourPixels":[[819,558],[852,530],[900,536],[923,567],[919,604],[901,637],[854,648],[824,620]],"neighbours":["jamb_left_bottom","jamb_left_upper"],"depth":"unresolved"},
+  {"id":"jamb_left_upper","contourPixels":[[823,450],[855,416],[893,413],[927,442],[947,479],[929,513],[897,535],[847,529],[824,500]],"neighbours":["jamb_left_middle","arch_left_shoulder"],"depth":"unresolved"},
+  {"id":"arch_left_shoulder","contourPixels":[[864,356],[899,332],[947,340],[977,367],[982,402],[951,436],[921,433],[901,411],[870,408]],"neighbours":["jamb_left_upper","arch_crown_left"],"depth":"unresolved"},
+  {"id":"arch_crown_left","contourPixels":[[959,324],[1000,311],[1040,316],[1057,347],[1055,380],[1022,394],[990,412],[976,385]],"neighbours":["arch_left_shoulder","arch_crown_right"],"depth":"unresolved"},
+  {"id":"arch_crown_right","contourPixels":[[1046,317],[1089,302],[1130,315],[1155,349],[1141,384],[1108,398],[1076,388],[1055,376]],"neighbours":["arch_crown_left","arch_right_shoulder"],"depth":"unresolved"},
+  {"id":"arch_right_shoulder","contourPixels":[[1140,337],[1176,332],[1210,355],[1234,389],[1226,419],[1199,440],[1172,424],[1142,395]],"neighbours":["arch_crown_right","jamb_right_upper"],"depth":"unresolved"},
+  {"id":"jamb_right_upper","contourPixels":[[1210,433],[1242,416],[1269,440],[1279,476],[1260,507],[1230,515],[1204,492],[1189,462]],"neighbours":["arch_right_shoulder","jamb_right_lower"],"depth":"unresolved"},
+  {"id":"jamb_right_lower","contourPixels":[[1229,515],[1267,503],[1290,530],[1294,572],[1275,605],[1238,615],[1227,584]],"neighbours":["jamb_right_upper","sill_right"],"depth":"unresolved"},
+  {"id":"sill_left","contourPixels":[[926,658],[972,648],[1026,663],[1043,693],[1025,724],[971,742],[935,725]],"neighbours":["jamb_left_bottom","sill_center"],"depth":"unresolved"},
+  {"id":"sill_center","contourPixels":[[1020,654],[1068,640],[1120,649],[1150,673],[1139,705],[1080,729],[1036,723]],"neighbours":["sill_left","sill_right"],"depth":"unresolved"},
+  {"id":"sill_right","contourPixels":[[1137,635],[1180,615],[1228,620],[1251,644],[1239,685],[1191,709],[1146,698]],"neighbours":["sill_center","jamb_right_lower"],"depth":"unresolved"}
+ ],
+ "nextValidation":"Compare outer and inner edges to reference opening; resolve overlapping contour estimates and gaps before converting to 3D. Numeric depths/rotations must follow shared camera fit, not arbitrary extrusion."
+}

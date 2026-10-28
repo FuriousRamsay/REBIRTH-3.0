@@ -1,0 +1,16 @@
+{
+  "status": "PREVIOUS_NOZZLE_CANDIDATE_FAILS_FLANGE_CONSTRAINT",
+  "predictedCircularFlangeMinorMajorRatio": 0.8948149489292855,
+  "draftTraceFittedMinorMajorRatio": 0.5546875,
+  "fittedEllipseCenterRadiiRotation": [
+    620.75,
+    531.0,
+    35.5,
+    64.0,
+    -0.25375
+  ],
+  "fitRmsPixels": 2.4102077869971663,
+  "decision": "Do not promote the pitched perpendicular-heading nozzle candidate. It predicts a substantially more face-on flange than the traced outline.",
+  "uncertainty": "Flange trace includes thickness and may need correction; its visible face must be separated from rear edge before solving a replacement axis.",
+  "blenderAllowed": false
+}

@@ -14,7 +14,8 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthTrackedProgressionHud : XUiController
 {
-    public const int AuthoredRows = 64;
+    // Render already caps the display at 15 cells; overflow represents the rest.
+    public const int AuthoredRows = 15;
     public const int RowHeight = 34;
     public const int RowPitch = 36;
     public const int HudWidth = 288;
@@ -113,7 +114,9 @@ public sealed class XUiC_RebirthTrackedProgressionHud : XUiController
 
     public override void Update(float dt)
     {
-        base.Update(dt); // Native traversal is preserved even while presentation is closed.
+        // Children are passive display cells. Keep native updates for visible UI;
+        // the controller below still watches data/context while its view sleeps.
+        if (presentationActive && !hidden) base.Update(dt);
         if (!presentationActive) return;
         RefreshContextScope();
         if(ViewComponent!=null)

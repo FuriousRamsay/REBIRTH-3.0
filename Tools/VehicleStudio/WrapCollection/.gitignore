@@ -1,0 +1,12 @@
+_UnityProject/
+_Build/
+_Build-*.log
+_CompileCheck/
+_Runtime/
+_Review*/
+_Jobs/
+_Deliveries/
+RejectedArt/
+__pycache__/
+**/bin/
+**/obj/

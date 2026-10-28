@@ -1,0 +1,15 @@
+{
+ "status":"RETRACED_VISIBLE_PATHS_PENDING_VALIDATION",
+ "imageSize":[1448,1086],
+ "measurementUncertaintyPixels":8,
+ "reason":"Earlier crown path was too low and treated two crossing limbs as one smooth arc.",
+ "records":[
+  {"id":"left_front_strap","pathPixels":[[864,187],[834,266],[806,336],[785,425],[782,507],[777,596],[778,693],[782,801],[761,917]],"widthPixels":52},
+  {"id":"right_front_strap","pathPixels":[[1010,158],[1109,207],[1191,291],[1249,383],[1277,472],[1280,565],[1278,637],[1269,733],[1267,823]],"widthPixels":38},
+  {"id":"crown_diagonal_left","pathPixels":[[614,210],[674,231],[737,258],[802,288]],"widthPixels":44},
+  {"id":"crown_cross_band","pathPixels":[[832,291],[925,282],[1023,266],[1140,246]],"widthPixels":49},
+  {"id":"left_shoulder_band","pathPixels":[[478,307],[535,248],[602,201],[674,176],[741,157],[788,148]],"widthPixels":31}
+ ],
+ "crossingOrder":"Left diagonal and right crown limb terminate beneath the longitudinal front strap at its visible junction; depth fit must enforce that order.",
+ "blenderAllowed":false
+}

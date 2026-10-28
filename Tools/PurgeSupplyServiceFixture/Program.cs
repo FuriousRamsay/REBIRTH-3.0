@@ -1,4 +1,6 @@
 using System;using System.Collections.Generic;using System.IO;using System.Linq;
+// Controlled availability input; native equipment resolution is not exercised.
+class RebirthPurgeSupplyEquipment {internal static bool Available=true;internal static bool TryTier(string player,out int tier){tier=0;return Available;}}
 class Program
 {
  static int checks;static void Check(bool value,string text){if(!value)throw new Exception(text);checks++;Console.WriteLine("PASS "+text);}
@@ -17,7 +19,11 @@ class Program
    var partial=new RebirthPoiPartialObservation(Guid.NewGuid(),0,1,new[]{new RebirthPoiVolumeObservation(7,new string('b',64),new[]{actor})});
    store.TryObservePartial(store.Published,poi,0,partial);store.TryClear(store.Published,poi,0,new RebirthPoiClearEvidence(Guid.NewGuid(),1,1,1,0,0,false,11));
   }
+  RebirthPurgeSupplyEquipment.Available=false;
   Step();Check(RebirthPurgeSupplyService.Published.Count==0,"130-record aggregation stays bounded and does not publish incomplete sum");
+  for(int n=0;n<8;n++)Step();
+  Check(!RebirthPurgeSupplyService.Published.ContainsKey(player),"unavailable owner equipment withholds redemption without inventing full price");
+  RebirthPurgeSupplyEquipment.Available=true;
   for(int n=0;n<5;n++)Step();
   Check(RebirthPurgeSupplyService.Published[player].ObservedCredits==130&&RebirthPurgeSupplyService.Published[player].EarnedDrops==1&&RebirthPurgeSupplyService.Published[player].SpentCredits==75,"connected service earns exact cumulative quota");
   var file=Path.Combine(dir,"RebirthData","Purge","Supplies","world.xml");var original=File.ReadAllText(file);

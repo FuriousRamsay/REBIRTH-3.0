@@ -51,10 +51,18 @@ public sealed class RebirthCamperEnergyRuntime
         &&RebirthCamperRadial.IsCamper(vehicle)&&ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle);
     public static bool TryObserveMode(EntityVehicle vehicle,out RebirthCamperEnergyMode mode,out long revision,out float range)
     { return TryObservePresentation(vehicle,out mode,out revision,out range,out _); }
+    // Physics/pose admission needs live mode, not the owner's electrical radius.
+    internal static bool TryObserveMode(EntityVehicle vehicle,out RebirthCamperEnergyMode mode)
+        =>TryObservePresentationState(vehicle,out mode,out _,out _);
     // Lightweight presentation observation: does not clone bank inventories.
     public static bool TryObservePresentation(EntityVehicle vehicle,out RebirthCamperEnergyMode mode,out long revision,out float range,out float remaining)
     {
         mode=RebirthCamperEnergyMode.Travel;revision=-1;range=RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle);remaining=0;
+        return TryObservePresentationState(vehicle,out mode,out revision,out remaining);
+    }
+    private static bool TryObservePresentationState(EntityVehicle vehicle,out RebirthCamperEnergyMode mode,out long revision,out float remaining)
+    {
+        mode=RebirthCamperEnergyMode.Travel;revision=-1;remaining=0;
         if(!IsRegistered||!Current(vehicle))return false;
         if(!vehicle.world.IsRemote()&&runtimes.TryGetValue(vehicle,out var runtime))
         {mode=runtime.state.Mode;revision=runtime.state.Revision;remaining=runtime.state.Remaining;return true;}
@@ -377,7 +385,10 @@ public sealed class RebirthCamperEnergyRuntime
         foreach(var source in state.Sources)
             if(source.Bank is PowerSolarPanel&&solarBudget.TryGetValue(source.Id,out long left))
                 source.Bank.CurrentPower=(ushort)Math.Min(source.Bank.MaxPower,left);
-        if(state.Mode==RebirthCamperEnergyMode.Camp&&(demand>0||supplied>0)&&UnityEngine.Time.realtimeSinceStartup>=nextPowerTrace)
+        // Detailed periodic accounting is for explicit diagnostic captures. Keep
+        // transition/error logs, but don't format banks or recompute an estimate
+        // every second solely for logging during ordinary play.
+        if(RebirthGameBridgeFrames.IsRecording&&state.Mode==RebirthCamperEnergyMode.Camp&&(demand>0||supplied>0)&&UnityEngine.Time.realtimeSinceStartup>=nextPowerTrace)
         {
             nextPowerTrace=UnityEngine.Time.realtimeSinceStartup+1f;
             var banks=string.Join(";",state.Sources.Select(source=>

@@ -1,0 +1,18 @@
+{
+  "status": "SHARED_ELEVATION_CONSISTENT_WITH_DRAFT_TRACES_NOT_FULL_CAMERA_PASS",
+  "collarElevationDegrees": 23.2943259101323,
+  "crucibleElevationDegrees": 22.4846721215386,
+  "proposedSharedElevationDegrees": 22.88949901583545,
+  "collarPredictedMinorDiameterPixels": 85.57012458279215,
+  "collarObservedMinorDiameterPixels": 87,
+  "cruciblePredictedMinorDiameterPixels": 68.6505772221037,
+  "crucibleObservedMinorDiameterPixels": 67.5,
+  "limitations": [
+    "Contours remain manually estimated",
+    "Perspective not determined",
+    "Azimuth and camera roll not determined",
+    "Collar inner opening partly occluded and must not be treated as a complete coplanar ellipse"
+  ],
+  "nextAction": "Use approximately 22.9 degrees as provisional shared elevation, then resolve azimuth using connected frame axes without forcing nozzle perpendicularity.",
+  "blenderAllowed": false
+}

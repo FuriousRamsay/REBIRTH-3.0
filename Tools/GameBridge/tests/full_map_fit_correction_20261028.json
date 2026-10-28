@@ -1,0 +1,13 @@
+{
+  "name": "Map fit, borderless exterior and same-frame terrain binding",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. User owns game. At 1920x1080 and 5120x1440/current UI scale, open Map and zoom fully out with slider, wheel/Shift-wheel and controller. Playable world must fill the map height; no black top/bottom strip. Lateral exterior may remain black. Confirm no white/gray outlines on exterior masks; only the intended purple playable border remains." },
+    { "screenshot": "map-fit-borderless" },
+    { "_note": "At detail, midpoint and maximum zoom, pan vertically to both extremes and reopen/recenter/resize. No top/bottom black may appear. Verify fine/detail zoom still works and all input methods share the same endpoint. Repeat in static map mode and another world size if available." },
+    { "_note": "Repeatedly zoom in/out across native detailed/overview handoff and atlas size levels, including quick reversals and slider dragging near world edges. Inspect terrain, pins and masks frame-to-frame: no one-frame texture/UV mismatch or mask-position lag. Record whether any residual flicker remains; offline checks do not prove visual acceptance." },
+    { "screenshot": "map-fit-transition" },
+    { "_note": "Retain prior checks: no POI cards/tooltips/context/teleport during zoom/slider gestures, normal hover after settling, valid intentional native teleports/waypoints unaffected. No automated game input or teleport in this scenario." },
+    { "expectNoErrors": true }
+  ]
+}

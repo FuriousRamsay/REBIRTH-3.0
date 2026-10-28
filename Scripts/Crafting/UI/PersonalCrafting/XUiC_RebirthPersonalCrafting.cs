@@ -209,6 +209,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
 
     public override void Update(float dt)
     {
+        using var captureTiming = RebirthGameBridgeFrames.MeasureUi(0);
         base.Update(dt);
         if (!State.IsOpen || layoutService == null)
             return;

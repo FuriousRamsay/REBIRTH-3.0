@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs" />
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionDurableReceipt.cs" Link="ActualReceipt.cs" />
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionDurableReceiptStore.cs" Link="ActualReceiptStore.cs" />
+    <Compile Include="../../Scripts/Persistence/RebirthDurableFileCommit.cs" Link="ActualDurablePublication.cs" />
+  </ItemGroup>
+</Project>

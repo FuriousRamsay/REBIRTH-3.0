@@ -12,7 +12,7 @@ public class RebirthVehicleAssemblySerializer {
  public static RebirthVehicleAssembly FromBase64(string s){Convert.FromBase64String(s);return new RebirthVehicleAssembly();}
  public static string ToBase64(RebirthVehicleAssembly a){return "AA==";}
 }
-public class RebirthVehicleRequestResult {public RebirthVehicleAssemblyCarrier Carrier;public Vector3i Position;public int EntityId;public RebirthVehicleAssembly Snapshot;public string Message,ActorId,Fingerprint;public RebirthVehicleRequestOutcome Outcome;}
+public class RebirthVehicleRequestResult {public RebirthVehicleAssemblyCarrier Carrier;public Vector3i Position;public int EntityId;public RebirthVehicleAssembly Snapshot;public string Message,ActorId,Fingerprint,PickupNativeItem;public RebirthVehicleRequestOutcome Outcome;}
 // SOURCE
 class Test {
  static string PathName;
@@ -65,22 +65,37 @@ class Test {
  if(RebirthVehicleRequestJournal.TryGet(transaction,"different-owner","transfer",out result))throw new Exception("owner mismatch accepted");
  RebirthVehicleRequestJournal.Clear();
  Guid sessionId=Guid.NewGuid();long oldSession,newSession;
- if(!RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out oldSession))throw new Exception("old session admission");
+ if(!RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out oldSession,false))throw new Exception("old session admission");
  RebirthVehicleRequestJournal.Clear();
- if(!RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out newSession))throw new Exception("new session admission");
+ if(!RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out newSession,false))throw new Exception("new session admission");
  if(RebirthVehicleRequestJournal.Remember(sessionId,new RebirthVehicleRequestResult{ActorId="owner",Fingerprint="session"},oldSession))throw new Exception("old session published");
  RebirthVehicleRequestJournal.Abort(sessionId,oldSession);
  long ignoredSession;
  if(RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out ignoredSession))throw new Exception("old abort released new request");
  RebirthVehicleRequestJournal.Abort(sessionId,newSession);
  if(!RebirthVehicleRequestJournal.TryBegin(sessionId,"owner","session",out result,out ignoredSession))throw new Exception("current abort did not release");
+ // Durable intent must precede effects and become uncertainty after a cold read.
+ var durableIntent=new XmlDocument();durableIntent.Load(PathName);
+ if(durableIntent.DocumentElement.GetAttribute("format")!="2"||durableIntent.SelectSingleNode("/rebirthVehicleRequestJournal/intent[@id='"+sessionId.ToString("D")+"']")==null)
+     throw new Exception("pre-effect intent not durable");
+ RebirthVehicleRequestJournal.Clear();
+ if(!RebirthVehicleRequestJournal.TryGet(sessionId,"owner","session",out result)||result.Outcome!=RebirthVehicleRequestOutcome.Indeterminate)
+     throw new Exception("cold intent not retained as uncertain");
+ if(Begin(sessionId,"owner","session",out result)||Begin(Guid.NewGuid(),"owner","session",out result))
+     throw new Exception("interrupted original replayed by old or new request ID");
+ string unresolved="";
+ for(int i=0;i<512;i++)unresolved+=Entry(Guid.NewGuid()).Replace("outcome='1'","outcome='3'");
+ Load(unresolved);
+ if(!RebirthVehicleRequestJournal.IsAvailable||RebirthVehicleRequestJournal.Count!=512||Begin(Guid.NewGuid(),"owner","capacity",out result)||RebirthVehicleRequestJournal.Count!=512)
+     throw new Exception("capacity evicted unresolved vehicle outcomes");
  // A directory at the temporary-file path deterministically prevents writing.
  Load(Entry(id));
  if(!RebirthVehicleRequestJournal.IsAvailable)throw new Exception("pre-save unavailable");
- Directory.CreateDirectory(PathName+".tmp");
  Guid failedWriteId=Guid.NewGuid();
+ if(!Begin(failedWriteId,"owner","save-failure",out result))throw new Exception("pre-failure intent admission");
+ Directory.CreateDirectory(PathName+".tmp");
  string durableBeforeFailure=File.ReadAllText(PathName);
- Remember(failedWriteId,new RebirthVehicleRequestResult {ActorId="owner",Fingerprint="save-failure",Message="known in memory"});
+ RebirthVehicleRequestJournal.Remember(failedWriteId,new RebirthVehicleRequestResult {ActorId="owner",Fingerprint="save-failure",Message="known in memory"},sessionGeneration);
  if(RebirthVehicleRequestJournal.IsAvailable||Begin(Guid.NewGuid(),"owner","after-failure",out result))throw new Exception("save failure admitted more mutations");
  if(!RebirthVehicleRequestJournal.TryGet(failedWriteId,out result)||result.Message!="known in memory")throw new Exception("failed write lost known live outcome");
  result.Message="caller mutation";

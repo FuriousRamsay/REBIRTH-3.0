@@ -1,0 +1,16 @@
+{
+  "status": "NOT_VALIDATED",
+  "blenderAllowed": false,
+  "remaining": [
+    "Bellows foot appears detached in schematic: its support path and parent assignment must be resolved from the image",
+    "Crown band intersection layering not specified",
+    "Arch opening and stone contours still conflict",
+    "3D depth and camera not validated"
+  ],
+  "artifact": "PlanReview/contour-plan-connections.png",
+  "resolved": [
+    "Nozzle neck outer outline now present",
+    "Projected band widths now visible",
+    "Crucible side connector now represented"
+  ]
+}

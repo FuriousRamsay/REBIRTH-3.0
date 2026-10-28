@@ -5,6 +5,13 @@ using UnityEngine.Scripting;
 public sealed class XUiC_RebirthCamperTurretBackpack:XUiC_RebirthBackpackSectionBackpack
 {
     internal int Filter;
+    private XUiController[] presentationCells;
+    private XUiController PresentationCell(int index)
+    {
+        if(presentationCells==null||presentationCells.Length!=itemControllers.Length)
+            presentationCells=new XUiController[itemControllers.Length];
+        return presentationCells[index]??(presentationCells[index]=GetChildById("sellAvailable"+index+"Cell"));
+    }
     internal void ToggleFilter(int kind)
     {
         Filter=Filter==kind?0:kind;SetStacks(GetSlots());
@@ -24,11 +31,11 @@ public sealed class XUiC_RebirthCamperTurretBackpack:XUiC_RebirthBackpackSection
         {
             var slot=itemControllers[i];if(slot?.ViewComponent==null)continue;
             bool show=i<physical&&Matches(stacks[i]);slot.ViewComponent.IsVisible=show;slot.ViewComponent.Enabled=show;
-            var cell=GetChildById("sellAvailable"+i+"Cell")?.ViewComponent;
+            var cell=PresentationCell(i)?.ViewComponent;
             if(cell!=null)
             {
-                cell.IsVisible=show;if(cell.UiTransform!=null)cell.UiTransform.gameObject.SetActive(show);
-                if(show){cell.Position=new Vector2i(visible%13*67,(i/13-visible/13)*67);cell.TryUpdatePosition();}
+                if(cell.IsVisible!=show)cell.IsVisible=show;if(cell.UiTransform!=null&&cell.UiTransform.gameObject.activeSelf!=show)cell.UiTransform.gameObject.SetActive(show);
+                if(show){var position=new Vector2i(visible%13*67,(i/13-visible/13)*67);if(cell.Position!=position){cell.Position=position;cell.TryUpdatePosition();}}
             }
             if(show)visible++;
             slot.SlotNumber=i;slot.InfoWindow=null;

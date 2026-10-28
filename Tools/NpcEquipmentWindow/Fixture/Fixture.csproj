@@ -1,0 +1,2 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><NuGetAudit>false</NuGetAudit><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="Program.cs"/><Compile Include="Stubs.cs"/><Compile Include="../../../Scripts/NPC/Inventory/RebirthNpcHumanEquipmentCustody.cs" Link="ProductionCustody.cs"/><Compile Include="../../../Scripts/NPC/Persistence/RebirthNpcIdleHandActionQualification.cs" Link="ProductionIdleHand.cs"/></ItemGroup></Project>
+

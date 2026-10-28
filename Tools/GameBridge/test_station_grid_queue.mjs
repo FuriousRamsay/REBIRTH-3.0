@@ -18,7 +18,9 @@ const snapshotCodec=await readFile(join(root,'Scripts/Crafting/UI/RebirthStation
 const intentSource=await readFile(join(root,'Scripts/Survivor/Persistence/RebirthStationTerminalIntent.cs'),'utf8');
 const refundSource=await readFile(join(root,'Scripts/Crafting/UI/RebirthStationCancellationRefund.cs'),'utf8');
 const persistenceSource=await readFile(join(root,'Scripts/Survivor/Persistence/RebirthStationPreparationPersistence.cs'),'utf8');
-const fixture=await readFile(join(here,'test_station_grid_queue_fixture.cs'),'utf8');
+const fixture=(await readFile(join(here,'test_station_grid_queue_fixture.cs'),'utf8'))
+ .replace('static void Main(){','static void Main(){RebirthGridOutputBindingFixture.Verify();')
+ +'\n'+await readFile(join(here,'RebirthGridOutputBindingFixture.cs'),'utf8');
 function extractClass(text, declaration) {
  const start=text.indexOf(declaration);
  if(start<0||text.indexOf(declaration,start+declaration.length)>=0)throw new Error('Missing or ambiguous production declaration: '+declaration);

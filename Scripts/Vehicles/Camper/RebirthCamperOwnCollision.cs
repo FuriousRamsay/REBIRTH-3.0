@@ -9,6 +9,11 @@ using UnityEngine;
 // and turret geometry outside the camper cosmetic module.
 internal static class RebirthCamperOwnCollision
 {
+    private struct ActiveCollider
+    {
+        internal Collider Collider;
+        internal int Layer;
+    }
     private sealed class State
     {
         internal Transform Root, Model;
@@ -18,12 +23,17 @@ internal static class RebirthCamperOwnCollision
         internal float NextCheck;
         internal bool Dirty=true;
         internal BoxCollider CabHull;
+        internal GameObject BodyGuardrails;
+        internal bool BareApplied;
+        internal readonly List<BoxCollider> BareHull=new List<BoxCollider>();
         internal CharacterController HoodController;
         internal bool HoodIgnored;
         internal readonly List<MeshCollider> HoodSupports=new List<MeshCollider>();
         internal readonly List<Collider> All=new List<Collider>();
         internal readonly List<Collider> Detached=new List<Collider>();
         internal readonly List<Collider> Compound=new List<Collider>();
+        internal readonly List<ActiveCollider> ActiveCompound=new List<ActiveCollider>();
+        internal readonly uint[] KnownLayers=new uint[32], IgnoredLayers=new uint[32];
     }
     private static readonly ConditionalWeakTable<EntityVehicle,State> states=new ConditionalWeakTable<EntityVehicle,State>();
     internal static void Invalidate(EntityVehicle vehicle)
@@ -61,15 +71,47 @@ internal static class RebirthCamperOwnCollision
             }
         }
         bool known=RebirthCamperEnergyRuntime.TryObservePresentation(vehicle,out var mode,out _,out _,out _);
-        bool travel=known&&mode!=RebirthCamperEnergyMode.Camp&&RebirthCamperBodyAttachment.HasBody(vehicle);
-        foreach(var support in state.HoodSupports)if(support!=null)support.enabled=travel;
+        bool hasBody=RebirthCamperBodyAttachment.HasBody(vehicle);
+        ApplyBodyGuardrails(hasBody,state.BodyGuardrails);
+        bool travel=known&&mode!=RebirthCamperEnergyMode.Camp&&hasBody;
+        // The native CabHull spans the entire pickup bed at cab-roof height.
+        // Replace that broad solid only while the camper body is absent.
+        bool bare=!hasBody&&state.CabHull!=null&&state.BareHull.Count==11;
+        if(state.CabHull!=null&&(bare||state.BareApplied))
+        {
+            bool cabEnabled=!bare&&(!known||mode!=RebirthCamperEnergyMode.Camp);
+            if(state.CabHull.enabled!=cabEnabled)state.CabHull.enabled=cabEnabled;
+        }
+        state.BareApplied=bare;
+        foreach(var part in state.BareHull)
+            if(part!=null&&part.enabled!=bare)part.enabled=bare;
+        foreach(var support in state.HoodSupports)
+            if(support!=null&&support.enabled!=travel)support.enabled=travel;
+        // Snapshot compound membership once per pass, not once per detached
+        // collider. No persistent cache: native enable/layer changes are still
+        // observed each pass and every eligible physical pair is rechecked.
+        state.ActiveCompound.Clear();
+        foreach(var compound in state.Compound)
+        {
+            if(compound==null||!compound.enabled)continue;
+            var go=compound.gameObject;
+            if(go.activeInHierarchy)state.ActiveCompound.Add(new ActiveCollider{Collider=compound,Layer=go.layer});
+        }
+        Array.Clear(state.KnownLayers,0,32);Array.Clear(state.IgnoredLayers,0,32);
         foreach(var detached in state.Detached)
         {
             if(detached==null||!detached.enabled||!detached.gameObject.activeInHierarchy)continue;
-            foreach(var compound in state.Compound)
+            int detachedLayer=detached.gameObject.layer;
+            foreach(var active in state.ActiveCompound)
             {
-                if(compound==null||!compound.enabled||!compound.gameObject.activeInHierarchy
-                    ||Physics.GetIgnoreLayerCollision(detached.gameObject.layer,compound.gameObject.layer))continue;
+                uint bit=1u<<active.Layer;
+                if((state.KnownLayers[detachedLayer]&bit)==0)
+                {
+                    state.KnownLayers[detachedLayer]|=bit;
+                    if(Physics.GetIgnoreLayerCollision(detachedLayer,active.Layer))state.IgnoredLayers[detachedLayer]|=bit;
+                }
+                if((state.IgnoredLayers[detachedLayer]&bit)!=0)continue;
+                var compound=active.Collider;
                 // Native attachment can toggle colliders/layers in one call;
                 // Unity may clear pair ignores, so verify before simulation.
                 if(!Physics.GetIgnoreCollision(detached,compound))Physics.IgnoreCollision(detached,compound,true);
@@ -107,12 +149,39 @@ internal static class RebirthCamperOwnCollision
 
     private static void BindHoodSupports(State state)
     {
-        state.CabHull=null;state.HoodSupports.Clear();
+        // These native compound solids are siblings of the visual addon, so
+        // hiding BodyModule alone leaves invisible rooftop rails on the pickup.
+        // Keep the original shapes/flags and Physics Rigidbody ownership.
+        var rails=state.Body.transform.Find("Turret-facing guardrail collision");
+        state.BodyGuardrails=rails!=null?rails.gameObject:null;
+        state.CabHull=null;state.HoodSupports.Clear();state.BareHull.Clear();
         foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
         {
             if(node.name=="CabHull")state.CabHull=node.GetComponent<BoxCollider>();
+            if(node.name.StartsWith("REBIRTH bare pickup "))
+            {var part=node.GetComponent<BoxCollider>();if(part!=null)state.BareHull.Add(part);}
             if(node.name.StartsWith("REBIRTH travel Camp "))
             {var existing=node.GetComponent<MeshCollider>();if(existing!=null)state.HoodSupports.Add(existing);}
+        }
+        if(state.CabHull!=null&&state.BareHull.Count==0)
+        {
+            // The cab's main solid stops below its roof. A shallow roof plate
+            // avoids recreating a tall invisible wall at the windshield.
+            // All coordinates are in the original CabHull's Physics space.
+            AddBarePart(state,"cab",new Vector3(0,1.036f,-.09f),new Vector3(1.8075f,1.127f,.75f));
+            AddBarePart(state,"cab roof",new Vector3(0,1.696f,-.09f),new Vector3(1.8075f,.052f,.75f));
+            // These overlapping short steps follow the visible windshield
+            // down to the hood. They remain in the native Rigidbody compound
+            // even when the camper module and its Camp shell are absent.
+            AddBarePart(state,"windshield upper",new Vector3(0,1.08f,.375f),new Vector3(1.52f,1.06f,.19f));
+            AddBarePart(state,"windshield middle",new Vector3(0,.99f,.545f),new Vector3(1.52f,.88f,.19f));
+            AddBarePart(state,"windshield lower",new Vector3(0,.905f,.715f),new Vector3(1.52f,.71f,.19f));
+            AddBarePart(state,"hood rear",new Vector3(0,.875f,1.105f),new Vector3(1.52f,.65f,.69f));
+            AddBarePart(state,"hood front",new Vector3(0,.84f,1.72f),new Vector3(1.52f,.58f,.66f));
+            AddBarePart(state,"bed floor",new Vector3(0,.712f,-1.59f),new Vector3(1.57f,.068f,2.25f));
+            AddBarePart(state,"left bed side",new Vector3(-.79f,.94f,-1.59f),new Vector3(.095f,.40f,2.31f));
+            AddBarePart(state,"right bed side",new Vector3(.79f,.94f,-1.59f),new Vector3(.095f,.40f,2.31f));
+            AddBarePart(state,"tailgate",new Vector3(0,.94f,-2.755f),new Vector3(1.58f,.40f,.075f));
         }
         if(state.HoodSupports.Count==2)return;
         foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
@@ -128,6 +197,19 @@ internal static class RebirthCamperOwnCollision
             var clone=go.AddComponent<MeshCollider>();clone.enabled=false;clone.sharedMesh=source.sharedMesh;
             clone.convex=source.convex;clone.sharedMaterial=source.sharedMaterial;state.HoodSupports.Add(clone);
         }
+    }
+    internal static void ApplyBodyGuardrails(bool hasBody,GameObject guardrails)
+    {
+        if(guardrails!=null&&guardrails.activeSelf!=hasBody)guardrails.SetActive(hasBody);
+    }
+    private static void AddBarePart(State state,string name,Vector3 center,Vector3 size)
+    {
+        var go=new GameObject("REBIRTH bare pickup "+name);
+        go.layer=state.CabHull.gameObject.layer;
+        go.transform.SetParent(state.CabHull.transform,false);
+        var part=go.AddComponent<BoxCollider>();
+        part.center=center;part.size=size;part.enabled=false;
+        state.BareHull.Add(part);
     }
 }
 

@@ -1,5 +1,5 @@
 using System;
-class RebirthGearTransferState{}
+class RebirthGearTransferState{public static bool IsSupportedSlot(string slot)=>slot=="backpack"||slot=="belt"||slot=="support"||slot=="walkman"||slot=="outerwear_lining";}
 internal static partial class FixtureReservation{
 internal static void Stage(EntityPlayerLocal p,object session,Guid world,RebirthGearPreparationIntent intent,bool offer=false){Entries[p]=new Entry{World=p.world,Session=session,SavedWorld=world,Intent=intent,Offer=offer?new():null};}
 internal static void Clear(){Entries.Clear();}

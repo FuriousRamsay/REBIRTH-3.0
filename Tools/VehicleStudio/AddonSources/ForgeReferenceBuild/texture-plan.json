@@ -1,0 +1,29 @@
+{
+  "status": "READY_FOR_MATERIAL_IMPLEMENTATION",
+  "clayDecision": "User explicitly approved Codex/reference-view.png: Yes this one is good. Preserve its geometry as the texture baseline. Earlier fidelity-failed records remain historical.",
+  "sourceBlend": "E:/_Haven/shared/REBIRTHTemp/ForgeComparison/Codex/forge-diagnostic-clay.blend",
+  "sourceSha256": "D344B3F7897BA45C81E1C0DBEA06CC42BAD630E2AD2A6AA3E74E24DC4B07F72A",
+  "output": "E:/_Haven/shared/REBIRTHTemp/ForgeReferenceBuild/ApprovedTextureBaseline",
+  "textureResolution": [2048, 2048],
+  "renderResolution": [1448, 1086],
+  "materials": {
+    "stone": {"appearance": "Dark warm gray fractured rock, muted cream mineral flecks, small pits, restrained dusty edge wear; variation follows each stone without painted lighting", "roughness": [0.72, 0.94], "metallic": 0, "detail": "Normal map only for grain and pits; preserve approved silhouettes"},
+    "mortar": {"appearance": "Charcoal gray joints, darker than stones, soot concentrated inside hearth", "roughness": [0.88, 0.98], "metallic": 0},
+    "iron": {"appearance": "Dark forged iron, patchy brown oxidation, worn silver-gray contact edges, restrained scratches; rivets and plates share metal family", "roughness": [0.38, 0.85], "metallic": "Clean iron 1; oxidized patches 0, interpolated by rust mask"},
+    "leather": {"appearance": "Deep warm brown bellows leather with fine grain, crease darkening and rubbed raised surfaces", "roughness": [0.58, 0.86], "metallic": 0},
+    "wood": {"appearance": "Weathered dark brown frame and boards, grain aligned along each member, worn ends; hardware uses iron", "roughness": [0.65, 0.9], "metallic": 0},
+    "crucible": {"appearance": "Heat-darkened rough refractory exterior, pale worn rim, charcoal inner bowl; retaining bands use iron", "roughness": [0.75, 0.96], "metallic": 0},
+    "coal": {"appearance": "Charcoal lumps, gray ash and localized orange-red hot fissures", "roughness": [0.75, 0.98], "metallic": 0, "emission": "Localized to existing fuel geometry, never entire hearth walls"}
+  },
+  "execution": [
+    "Copy exact approved blend and verify source hash before modification.",
+    "Map every visible mesh to a material role using source component records; fail on unmapped parts.",
+    "Create UVs and procedural source materials with detail scales tied to component dimensions.",
+    "Render initial material comparison with approved camera and studio lighting; evaluate palette and surface response.",
+    "Bake base color, tangent normal, roughness, metallic and emission to 2048px maps; color maps sRGB, data maps linear.",
+    "Reopen baked scene and compare against procedural source. Inspect seams, missing islands and material role boundaries.",
+    "Only after Blender material review, import verified asset and inspect actual Unity render and material channels."
+  ],
+  "validation": ["No geometry edits during texture stage", "No projected reference image or baked studio shadows", "No model text or headings", "All exported maps exactly 2048 square", "No claim of exact fidelity from a bake receipt", "Preserve frozen comparison candidates and original concepts"],
+  "limitations": "Clay approval permits material work but does not prove textured fidelity or game readiness. Hidden surfaces are inferred. Final palette, wear and lighting require actual rendered inspection."
+}

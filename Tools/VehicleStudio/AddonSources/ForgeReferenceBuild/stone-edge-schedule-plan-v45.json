@@ -1,0 +1,431 @@
+{
+  "source": "CrownTopFaces_v43/crown-top-face-clay.blend",
+  "method": "Reduce broad stone edge rounding to 3 mm, 2 segments. No vertices moved; preserve stone volumes, poses and mortar. Compare against 9 mm source edges.",
+  "parts": [
+    {
+      "object": "stone_left_shoulder_01",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_shoulder_02",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_shoulder_03",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_shoulder_04",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_middle_01",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_middle_02",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_middle_03",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_middle_04",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_flange_above",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_flange_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_lower_01",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_lower_02",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_cup_behind_01",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_cup_behind_02",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_midleft",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_middle",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_midright",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_far_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_center_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_center_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_far_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_below_left_band",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_below_right_band",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_arch_gap",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_crown_right_arch_gap",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_right_shoulder_outer",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_right_arch_outer",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_lower_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_lower_center",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_lower_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_base_lower_far_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_under_sill_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_under_sill_center",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_under_sill_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_under_nozzle",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_edge_behind_bellows",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_left_flange_above",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_jamb_left_bottom",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_jamb_left_middle",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_jamb_left_upper",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_arch_left_shoulder",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_arch_crown_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_arch_crown_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_arch_right_shoulder",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_jamb_right_upper",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_jamb_right_lower",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_sill_left",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_sill_center",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    },
+    {
+      "object": "stone_sill_right",
+      "modifier": "Worn stone edge geometry",
+      "fromWidth": 0.008999999612569809,
+      "fromSegments": 4,
+      "toWidth": 0.003,
+      "toSegments": 2
+    }
+  ],
+  "status": "CLAY_COMPARISON_REQUIRED"
+}

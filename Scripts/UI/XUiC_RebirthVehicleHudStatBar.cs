@@ -10,25 +10,28 @@ public sealed class XUiC_RebirthVehicleHudStatBar : XUiC_HUDStatBar
     private string lastEnergyCaption;
     private static EntityVehicle observedEnergyVehicle;
     private static float nextEnergyObservation;
-    private static RebirthCamperEnergySnapshot observedEnergy;
-    internal static RebirthCamperEnergySnapshot ObserveEnergy(EntityVehicle selected)
+    private static bool energyObserved;
+    private static RebirthCamperEnergyMode observedMode;
+    private static float observedTransition;
+    internal static bool TryObserveEnergy(EntityVehicle selected,out RebirthCamperEnergyMode mode,out float transition)
     {
-        if(selected==null||!RebirthCamperRadial.IsCamper(selected)||!RebirthCamperEnergyRuntime.IsRegistered)return null;
+        mode=RebirthCamperEnergyMode.Travel;transition=0;
+        if(selected==null||!RebirthCamperRadial.IsCamper(selected)||!RebirthCamperEnergyRuntime.IsRegistered)return false;
         float now=Time.realtimeSinceStartup;
         if(!ReferenceEquals(selected,observedEnergyVehicle)||now>=nextEnergyObservation||now<nextEnergyObservation-0.2f)
         {
             observedEnergyVehicle=selected;nextEnergyObservation=now+0.2f;
-            observedEnergy=RebirthCamperEnergyRuntime.Observe(selected);
+            energyObserved=RebirthCamperEnergyRuntime.TryObservePresentation(selected,out observedMode,out _,out _,out observedTransition);
         }
-        return observedEnergy;
+        mode=observedMode;transition=observedTransition;return energyObserved;
     }
     private static string FuelCaption(EntityVehicle selected)
     {
-        string title=Localization.Get("xuiRebirthVehicleHudFuel");var energy=ObserveEnergy(selected);
-        if(energy==null)return title;
-        string mode=Localization.Get("xuiRebirthEnergyHud"+energy.Mode);
-        if(energy.Mode==RebirthCamperEnergyMode.Deploying||energy.Mode==RebirthCamperEnergyMode.Packing)
-            mode=string.Format(CultureInfo.InvariantCulture,mode,Mathf.CeilToInt(energy.TransitionSeconds));
+        string title=Localization.Get("xuiRebirthVehicleHudFuel");
+        if(!TryObserveEnergy(selected,out var energyMode,out float transition))return title;
+        string mode=Localization.Get("xuiRebirthEnergyHud"+energyMode);
+        if(energyMode==RebirthCamperEnergyMode.Deploying||energyMode==RebirthCamperEnergyMode.Packing)
+            mode=string.Format(CultureInfo.InvariantCulture,mode,Mathf.CeilToInt(transition));
         return title+" · "+mode;
     }
     internal static EntityVehicle ResolveVehicle(EntityPlayerLocal player)

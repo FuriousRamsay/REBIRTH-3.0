@@ -20,7 +20,7 @@ public static class RebirthBackpackLibraryClientOffers{public static long Revisi
 static class Program{
  static int n;static EntityPlayerLocal p;
  static void Check(bool b,string s){if(!b)throw new Exception(s);n++;}
- static void Setup(){RebirthBackpackLibraryClientOffers.Revision=-1;RebirthBackpackLibraryClientViews.Revision=0;RebirthBackpackLibraryClientViews.Available=true;RebirthBackpackLibraryClientViews.Requests=0;RebirthGearClientTransferPump.Reset();RebirthGearSandboxAdjustmentDeferral.Reset();var w=new World();p=new(){world=w};w.Player=p;GameManager.Instance=new(){World=w};SingletonMonoBehaviour<ConnectionManager>.Instance=new();ThreadManager.Main=true;RebirthGearOwnerReservation.Held=true;RebirthGearPreparationClient.Requests=0;RebirthGearPreparationClient.OriginalRequests=0;RebirthGearPreparationClient.LastOriginal=null;RebirthGearOwnerReservation.Initial=null;RebirthGearOwnerReservation.HeldCreation=null;RebirthGearOfferClient.Offer=new();RebirthGearOfferClient.Applies=RebirthGearOfferClient.Applied=RebirthGearOfferClient.Rejected=RebirthGearOfferClient.Finishes=0;RebirthGearOfferClient.Result=RebirthGearOwnerApplySequence.Result.Applied;RebirthGearTerminalClient.Terminal=null;}
+ static void Setup(){RebirthGearPreparationRefusalClient.Current=null;RebirthGearPreparationRefusalFlow.Advance=false;RebirthGearPreparationRefusalFlow.Attempts=0;RebirthBackpackLibraryClientOffers.Revision=-1;RebirthBackpackLibraryClientViews.Revision=0;RebirthBackpackLibraryClientViews.Available=true;RebirthBackpackLibraryClientViews.Requests=0;RebirthGearClientTransferPump.Reset();RebirthGearSandboxAdjustmentDeferral.Reset();var w=new World();p=new(){world=w};w.Player=p;GameManager.Instance=new(){World=w};SingletonMonoBehaviour<ConnectionManager>.Instance=new();ThreadManager.Main=true;RebirthGearOwnerReservation.Held=true;RebirthGearPreparationClient.Requests=0;RebirthGearPreparationClient.OriginalRequests=0;RebirthGearPreparationClient.LastOriginal=null;RebirthGearOwnerReservation.Initial=null;RebirthGearOwnerReservation.HeldCreation=null;RebirthGearOfferClient.Offer=new();RebirthGearOfferClient.Applies=RebirthGearOfferClient.Applied=RebirthGearOfferClient.Rejected=RebirthGearOfferClient.Finishes=0;RebirthGearOfferClient.Result=RebirthGearOwnerApplySequence.Result.Applied;RebirthGearTerminalClient.Terminal=null;}
  static void Main(){
  Setup();RebirthGearOwnerReservation.Held=false;RebirthGearClientTransferPump.Tick();Check(RebirthGearOfferClient.Applies==0&&RebirthGearPreparationClient.Requests==0,"ordinary gameplay inert");
  Setup();RebirthGearOfferClient.Offer=null;RebirthGearClientTransferPump.Tick();RebirthGearClientTransferPump.Tick();Check(RebirthGearPreparationClient.Requests==1&&RebirthGearOwnerReservation.Held,"original query bounded and hold retained");
@@ -55,10 +55,21 @@ static class Program{
  Setup();RebirthGearOwnerReservation.Held=false;RebirthBackpackLibraryClientOffers.Revision=2;RebirthBackpackLibraryClientViews.Revision=2;RebirthGearClientTransferPump.Tick();Check(RebirthBackpackLibraryClientViews.Requests==0,"caught up library revision stops refresh");
  Setup();RebirthGearOwnerReservation.Held=false;RebirthBackpackLibraryClientOffers.Revision=1;RebirthBackpackLibraryClientViews.Revision=3;RebirthGearClientTransferPump.Tick();Check(RebirthBackpackLibraryClientViews.Requests==0,"older library settlement cannot roll hint back");
  Setup();RebirthBackpackLibraryClientOffers.Revision=9;RebirthGearClientTransferPump.Tick();Check(RebirthBackpackLibraryClientViews.Requests==0&&RebirthGearOfferClient.Applies==1,"library revision cannot replace held gear original continuation");
- Console.WriteLine($"PASS {n} actual pump/deferral checks; native scope, custody, adjustment and Harmony dispatch boundaries doubled");
+ Setup();RebirthGearOfferClient.Offer=null;RebirthGearPreparationRefusalFlow.Advance=true;RebirthGearClientTransferPump.Tick();Check(RebirthGearPreparationRefusalFlow.Attempts==1&&RebirthGearPreparationClient.Requests==0&&RebirthGearPreparationClient.OriginalRequests==0&&RebirthGearOwnerReservation.Held,"refusal continuation precedes original replay and preserves hold");
+ Setup();RebirthGearOwnerReservation.Held=false;RebirthGearPreparationRefusalClient.Current=new Refusal{CreationId=RebirthSurvivorClientState.Creation,ObservedRevision=3};RebirthGearClientTransferPump.Tick();Check(RebirthBackpackLibraryClientViews.Requests==1&&RebirthGearOfferClient.Applies==0,"newer refusal revision refreshes hint without applying gear");
+ Setup();RebirthGearOwnerReservation.Held=false;RebirthGearPreparationRefusalClient.Current=new Refusal{CreationId=Guid.NewGuid().ToString("N"),ObservedRevision=3};RebirthGearClientTransferPump.Tick();Check(RebirthBackpackLibraryClientViews.Requests==0,"foreign refusal cannot refresh this character");
+ Setup();RebirthGearOfferClient.Offer.TransactionId=Guid.NewGuid().ToString("N");RebirthGearTerminalClient.Terminal=RebirthGearOfferClient.Offer;int logged=Log.Lines.Count;RebirthGearClientTransferPump.Tick();Check(RebirthGearOfferClient.Finishes==1&&RebirthGearOwnerReservation.Held&&Log.Lines.Count==logged+1&&Log.Lines[Log.Lines.Count-1].Contains("pump.terminal-retirement"),"terminal refusal identified without releasing hold");
+ RebirthGearCheckpointDiagnostics.ReportStage(RebirthGearOfferClient.Offer.TransactionId,"pump.terminal-retirement");Check(Log.Lines.Count==logged+1,"duplicate stage suppressed");
+ Setup();RebirthGearOfferClient.Offer.TransactionId=Guid.NewGuid().ToString("N");RebirthGearTerminalClient.Terminal=RebirthGearOfferClient.Offer;Log.Throw=true;RebirthGearClientTransferPump.Tick();Log.Throw=false;Check(RebirthGearOfferClient.Finishes==1&&RebirthGearOwnerReservation.Held,"throwing log sink preserves pending cleanup");
+ Console.WriteLine($"PASS {n} actual pump/deferral checks; native scope, custody, refusal adapters, adjustment and Harmony dispatch boundaries doubled");
  }
 }
 public enum EnumGamePrefs{GameGuidClient}
+// Explicit refusal-boundary doubles. The actual pump selects/order-checks these
+// adapters; refusal settlement itself requires its separate linked fixtures.
+public class Refusal{public string CreationId;public long ObservedRevision;}
+public static class RebirthGearPreparationRefusalClient{public static Refusal Current;public static bool TryGetCurrent(EntityPlayerLocal player,object connection,out Refusal refusal){refusal=Current;return refusal!=null;}}
+public static class RebirthGearPreparationRefusalFlow{public static bool Advance;public static int Attempts;public static bool TryAdvance(EntityPlayerLocal player,object connection){Attempts++;return Advance;}}
 public static class GamePrefs{public static string GetString(EnumGamePrefs p)=>"world";}
 namespace HarmonyLib{
 public class HarmonyPatch:Attribute{public HarmonyPatch(Type t,string n){}}
@@ -66,3 +77,7 @@ public class HarmonyPrefix:Attribute{}public class HarmonyPostfix:Attribute{}
 public class HarmonyPriority:Attribute{public HarmonyPriority(int p){}}
 public static class Priority{public const int First=800;}
 }
+
+public class RebirthGearTransferState{public string TransactionId;}
+public static class Log{public static readonly System.Collections.Generic.List<string> Lines=new();public static bool Throw;public static void Out(string line){if(Throw)throw new Exception("diagnostic sink");Lines.Add(line);}}
+

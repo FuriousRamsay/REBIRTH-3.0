@@ -41,7 +41,13 @@ internal static class RebirthWorkstationCompletionPublication
     // Caller reserves clone/read workspace first. This is an immutable byte
     // identity only; it does not issue a native original from a parsed file.
     internal static byte[] CopyPublishedBytes(string path)
-        =>ReadPrimary(path)==null?null:ReadBytes(path);
+    {
+        string full=QualifiedPath(path);
+        if(File.Exists(full+".tmp"))throw new InvalidDataException("Completion staged original retained");
+        var bytes=ReadBytes(full);
+        Parse(bytes); // Validate the exact image returned, without a second file read.
+        return bytes;
+    }
     // Retained native PDS is binary, unlike the surrounding XML receipts.
     // This supplies bytes only; the purpose-specific saved PDS reader must
     // independently qualify their exact length, digest and owner projection.

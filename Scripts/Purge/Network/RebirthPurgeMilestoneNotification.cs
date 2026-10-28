@@ -13,6 +13,7 @@ internal static class RebirthPurgeMilestoneNotification
         internal int Tier;
         internal bool ReadingOnly;
         internal bool Primed;
+        internal bool Reported;
         internal float NextPrime;
         internal float Due;
     }
@@ -70,7 +71,9 @@ internal static class RebirthPurgeMilestoneNotification
         {
             if(RebirthJournalGuideService.ObservePurgeGuide(player,topic.Id)==null)return false;
             RebirthPurgeInformationTopics.UnlockReadingRecipe(player,topic);
-            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,notBefore:notice.Due);
+            // 2.6 offers eligible information before its eight-second toolbelt
+            // report delay. The information service still owns UI/safety gating.
+            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite);
         }
         notice.Primed=true;return true;
     }
@@ -95,11 +98,9 @@ internal static class RebirthPurgeMilestoneNotification
         if(!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge)
         { if(pending.Count>0)Reset();return; }
         if(pending.Count==0)return;
-        Notice notice=pending.Peek();
         World world=GameManager.Instance?.World;
-        if(!ReferenceEquals(world,notice.World)){Reset();return;}
+        if(!ReferenceEquals(world,pending.Peek().World)){Reset();return;}
         float now=Time.realtimeSinceStartup;
-        if(notice.ReadingOnly&&now<notice.Due)return;
         var player=world?.GetPrimaryPlayer();
         if(player==null || !player.IsSpawned() || player.IsDead())return;
         // A live packet may arrive before the player/Journal exists. Persist all
@@ -111,20 +112,28 @@ internal static class RebirthPurgeMilestoneNotification
             foreach(var waiting in pending)
                 if(!waiting.ReadingOnly&&ReferenceEquals(waiting.World,world))Prime(waiting,player,now);
         }
-        if(!notice.ReadingOnly&&!Prime(notice,player,now))return;
-        if(!notice.ReadingOnly&&(now<notice.Due||now<nextDisplay))return;
-        if(notice.ReadingOnly)
+        // Journal readiness must not withhold the independent toolbelt report.
+        // Retain unfinished teaching in this queue after reporting, while later
+        // reports keep their original order and eight-second spacing.
+        Notice notice=null;
+        int count=pending.Count;
+        for(int i=0;i<count;i++)
         {
-            if(!RestoreReading(player,notice.Biome,notice.Tier))
+            var waiting=pending.Dequeue();
+            if(!ReferenceEquals(waiting.World,world)){Reset();return;}
+            if(waiting.ReadingOnly)
             {
-                // Journal initialization can lag behind spawn; retry at the same
-                // bounded cadence as information delivery, rather than every frame.
-                notice.Due=now+0.5f;
-                return;
+                if(now>=waiting.Due)
+                {
+                    if(RestoreReading(player,waiting.Biome,waiting.Tier))continue;
+                    waiting.Due=now+0.5f;
+                }
             }
-            pending.Dequeue();
-            return;
+            else if(waiting.Reported&&waiting.Primed)continue;
+            pending.Enqueue(waiting);
+            if(notice==null&&!waiting.ReadingOnly&&!waiting.Reported)notice=waiting;
         }
+        if(notice==null||now<notice.Due||now<nextDisplay)return;
         string region=Localization.Get("biome_"+notice.Biome);
         string message=notice.Tier<0
             ? string.Format(Localization.Get("xuiRebirthPurgeBiomeCompleted"),region)
@@ -133,7 +142,7 @@ internal static class RebirthPurgeMilestoneNotification
         Audio.Manager.PlayInsidePlayerHead("purge_unlock");
         if(notice.Tier==0)RebirthPurgeInformationTopics.Request(player,"PurgeDiscovery");
         if(notice.Tier==5)RebirthPurgeInformationTopics.RequestBiomeBriefing(player,notice.Biome);
-        pending.Dequeue();
+        notice.Reported=true;
         nextDisplay=now+8f;
     }
 }

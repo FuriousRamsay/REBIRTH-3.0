@@ -13,7 +13,12 @@ internal static class RebirthCamperTurretHeldTransfer
         var items=RebirthCamperTurretInventory.Local(player);
         if(!IsHeld(action))return items;
         var cursor=player.PlayerUI.xui.DragAndDropWindow.CurrentStack;
-        if(!RebirthCamperEnergyItems.Same(cursor,player.DragAndDropItem))throw new InvalidOperationException("Native turret cursor changed.");
+        var native=player.DragAndDropItem;
+        // Native 3.4 permits a null player cursor until its first stack change.
+        // The UI grid already has an empty stack then. Match native empty
+        // semantics without weakening exact custody for any nonempty cursor.
+        bool bothEmpty=cursor!=null&&cursor.IsEmpty()&&(native==null||native.IsEmpty());
+        if(cursor==null||!bothEmpty&&!RebirthCamperEnergyItems.Same(cursor,native))throw new InvalidOperationException("Native turret cursor changed.");
         return items.Concat(new[]{cursor.Clone()}).ToArray();
     }
     internal static string Apply(RebirthCamperTurretState state,ItemStack[] actor,RebirthCamperTurretAction action,int corner,int option)

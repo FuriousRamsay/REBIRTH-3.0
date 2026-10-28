@@ -166,6 +166,82 @@ public sealed class RebirthCamperTransferJournal
         }
     }
 
+    // Only the pending index opts into scoped failures. Other journal consumers
+    // retain strict all-record validation through the parameterless overload.
+    internal System.Collections.Generic.IEnumerable<Record> ReadForIndex(
+        System.Collections.Generic.IDictionary<Guid,Guid> knownVehicles,
+        System.Collections.Generic.HashSet<string> unresolvedCandidates,Action<Guid> unavailable)
+    {
+        var groups=new System.Collections.Generic.Dictionary<Guid,System.Collections.Generic.List<string>>();
+        foreach(string path in Directory.EnumerateFiles(root,"*.rcj*",SearchOption.TopDirectoryOnly))
+        {
+            string name=Path.GetFileName(path);
+            Guid operation,temporary;
+            bool final=name.Length==38;
+            bool staging=name.Length==75&&name[38]=='.'&&name.EndsWith(".tmp",StringComparison.Ordinal)&&
+                Guid.TryParseExact(name.Substring(39,32),"N",out temporary);
+            if((!final&&!staging)||name[32]!='.'||name[34]!='.'||name.Substring(35,3)!="rcj"||
+                name[33]<'0'||name[33]>'3'||!Guid.TryParseExact(name.Substring(0,32),"N",out operation))
+                {unresolvedCandidates.Add(path);continue;}
+            if(!groups.TryGetValue(operation,out var files))groups.Add(operation,files=new System.Collections.Generic.List<string>());
+            files.Add(path);
+        }
+        // A malformed name may be an interrupted rename. Do not infer custody
+        // from the name or forget it merely because it disappears on retry.
+        if(unresolvedCandidates.Count>0)
+        foreach(string path in new System.Collections.Generic.List<string>(unresolvedCandidates))
+        {
+            var record=ReadFile(path); // Missing/unreadable/invalid remains globally fenced.
+            if(knownVehicles.TryGetValue(record.Operation,out var known)&&known!=Guid.Empty&&known!=record.Vehicle)
+                throw new InvalidDataException("Journal candidate attribution conflicts; retain custody.");
+            knownVehicles[record.Operation]=record.Vehicle;
+            unavailable(record.Vehicle); // Valid bytes still do not prove canonical publication.
+            unresolvedCandidates.Remove(path);
+        }
+        foreach(var pair in groups)
+        {
+            bool damaged=false;
+            foreach(string path in pair.Value)if(Path.GetFileName(path).Length!=38){damaged=true;break;}
+            // Healthy bootstrap reads each history once. Attribution recovery is
+            // additional work only for a damaged or unpublished history.
+            Record latest=null;
+            if(!damaged)
+            {
+                try{latest=Read(pair.Key);}
+                catch(InvalidDataException){damaged=true;}
+                catch(IOException){damaged=true;}
+                catch(UnauthorizedAccessException){damaged=true;}
+            }
+            if(!damaged&&latest!=null){yield return latest;continue;}
+            Guid vehicle;
+            knownVehicles.TryGetValue(pair.Key,out vehicle);
+            foreach(string path in pair.Value)
+            {
+                Record record;
+                try{record=ReadFile(path);}
+                catch(InvalidDataException){continue;}
+                catch(IOException){continue;}
+                catch(UnauthorizedAccessException){continue;}
+                string name=Path.GetFileName(path);
+                if(record.Operation!=pair.Key||(int)record.State!=name[33]-'0'||vehicle!=Guid.Empty&&record.Vehicle!=vehicle)
+                    throw new InvalidDataException("Journal attribution conflicts; retain custody.");
+                vehicle=record.Vehicle;
+            }
+            if(vehicle==Guid.Empty)
+            {knownVehicles[pair.Key]=Guid.Empty;throw new InvalidDataException("Journal damage has no validated vehicle identity; retain custody.");}
+            knownVehicles[pair.Key]=vehicle;
+            // A candidate never proves publication, even when its checksum is valid.
+            unavailable(vehicle);
+        }
+        // Removing a damaged file is not evidence that its inventory transaction
+        // settled. Keep a previously identified vehicle fenced until restored.
+        foreach(var pair in knownVehicles)
+            if(!groups.ContainsKey(pair.Key))
+            {
+                if(pair.Value==Guid.Empty)throw new InvalidDataException("Unattributed journal history was removed; retain custody.");
+                unavailable(pair.Value);
+            }
+    }
     private string FileName(Guid operation, Phase state) { return Path.Combine(root, operation.ToString("N") + "." + (int)state + ".rcj"); }
     private static Record ReadFile(string path)
     {

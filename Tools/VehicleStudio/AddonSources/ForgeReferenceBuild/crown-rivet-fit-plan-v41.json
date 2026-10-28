@@ -1,0 +1,83 @@
+{
+  "source": "CrownRigidLayers_v40/crown-layers-clay.blend",
+  "baseline": "BellowsLeatherNormals_v35/leather-normals-clay.blend",
+  "method": "Assign original crown fasteners to their band and apply matching rigid Z translation; do not infer translation from closest surface.",
+  "parts": [
+    {
+      "object": "harness_crown_left_cross",
+      "band": "harness_crown_diagonal_left",
+      "originalLocation": [
+        -0.007671244442462921,
+        0.010224789381027222,
+        -0.0021262168884277344
+      ],
+      "destination": [
+        -0.007671244442462921,
+        0.010224789381027222,
+        0.019873782992362976
+      ],
+      "originalMeshCenter": [
+        0.01633290760219097,
+        0.3394796550273895,
+        0.8844088912010193
+      ],
+      "liftMeters": 0.022,
+      "rotationUnchanged": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "object": "harness_crown_front_cross",
+      "band": "harness_crown_cross_band",
+      "originalLocation": [
+        0.004760757088661194,
+        0.006376773118972778,
+        -0.01819843053817749
+      ],
+      "destination": [
+        0.004760757088661194,
+        0.006376773118972778,
+        -0.007198430597782135
+      ],
+      "originalMeshCenter": [
+        0.07421036064624786,
+        0.2517126202583313,
+        0.8557417392730713
+      ],
+      "liftMeters": 0.011,
+      "rotationUnchanged": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "object": "harness_crown_right_cross",
+      "band": "harness_crown_cross_band",
+      "originalLocation": [
+        0.004003047943115234,
+        -0.0009262263774871826,
+        0.009610652923583984
+      ],
+      "destination": [
+        0.004003047943115234,
+        -0.0009262263774871826,
+        0.02061065286397934
+      ],
+      "originalMeshCenter": [
+        0.5193802118301392,
+        0.29020926356315613,
+        0.8394752740859985
+      ],
+      "liftMeters": 0.011,
+      "rotationUnchanged": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "status": "PLAN_REQUIRES_CLAY_REVIEW"
+}

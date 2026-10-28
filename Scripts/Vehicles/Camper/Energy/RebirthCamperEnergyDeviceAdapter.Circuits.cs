@@ -95,10 +95,28 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         }
     }
     private static readonly Dictionary<PowerItem,NativeCircuit> circuits=new Dictionary<PowerItem,NativeCircuit>();
+    // Snapshot only this vehicle's explicit external endpoints. Failure means no
+    // candidates, so CircuitConsumers still releases its no-longer-valid circuits.
+    private static PowerItem[] CircuitCandidates(Session session)
+    {
+        try
+        {
+            if(!PowerManager.HasInstance)return Array.Empty<PowerItem>();
+            var frame=RebirthCamperRelayWiring.Read(session.Vehicle);
+            if(frame==null||frame.Links.Count==0)return Array.Empty<PowerItem>();
+            var links=frame.Links.ToArray();
+            var candidates=new List<PowerItem>();var seen=new HashSet<PowerItem>();
+            foreach(var link in links)
+                if(!link.Mounted&&PowerManager.Instance.PowerItemDictionary.TryGetValue(link.Position,out var node)&&
+                    node!=null&&seen.Add(node))candidates.Add(node);
+            return candidates.ToArray();
+        }
+        catch{return Array.Empty<PowerItem>();} // Matches Connected's fail-closed contract.
+    }
     private static IEnumerable<IRebirthCamperEnergyConsumer> CircuitConsumers(Session session,float range,bool available,float ownerSaving)
     {
         var found=new HashSet<PowerItem>();
-        if(PowerManager.HasInstance)foreach(var root in PowerManager.Instance.PowerItemDictionary.Values.ToArray())
+        foreach(var root in CircuitCandidates(session))
         {
             // Explicit POI-lighting leases above keep their switch policy.
             if(root==null||owners.ContainsKey(root)||root is PowerSource||root.Parent!=null||root.TileEntity==null||

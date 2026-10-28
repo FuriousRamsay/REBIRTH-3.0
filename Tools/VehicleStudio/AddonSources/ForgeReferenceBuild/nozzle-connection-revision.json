@@ -1,0 +1,26 @@
+{
+  "status": "CONNECTION_TOPOLOGY_REVISED_REQUIRES_3D_PROJECTION",
+  "source": "Original approved forge image, inspected directly",
+  "supersedes": "Single straight cylinder assumption in frame-orientation-candidate.json",
+  "observations": [
+    "The rectangular bellows throat, exposed rounded neck, dark coupling ring and furnace flange are separate visible forms.",
+    "The neck broadens into a rounded end near the coupling; its outer contour is not a constant-width rectangle.",
+    "The flange extends above and below the neck and is partially occluded by the coupling. Its fitted full-outline ellipse includes edge thickness."
+  ],
+  "plannedParts": [
+    {"id":"throat_exit","type":"short round neck emerging from rectangular collar","projectedCenter":[532,521],"projectedDiameter":44},
+    {"id":"neck_middle","type":"rounded swept neck","projectedCenter":[565,539],"projectedDiameter":48},
+    {"id":"coupling_entry","type":"rounded transition into separate coupling ring","projectedCenter":[590,544],"projectedDiameter":51},
+    {"id":"flange_attachment","type":"short terminal section aligned with flange face normal","projectedCenter":[612,538],"projectedDiameter":48}
+  ],
+  "construction": "Use a continuous closed swept surface through the neck stations, with smoothly changing tangent. Terminal tangent comes from the flange plane; initial tangent comes from the throat. Coupling ring is a separate thick annulus around the terminal section. No disconnected cylinders or arbitrary sharp elbow.",
+  "depthPolicy": "Infer centerline depths jointly with flange normal and throat plane. Image-space centers alone do not determine depth or bend radius.",
+  "validation": [
+    "Check neck outer silhouette independently of flange outline",
+    "Check coupling ring plane against flange face",
+    "Check physical overlap into throat and flange without hidden gaps",
+    "Reject a bend introduced solely to fit noisy or incorrect trace points"
+  ],
+  "measurementUncertaintyPixels": 8,
+  "blenderAllowed": false
+}

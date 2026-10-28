@@ -31,7 +31,10 @@ sealed class LiveMonitor : IDisposable
     long lastMain;
     double lastT;
 
-    public string FpsError { get; }
+    readonly string startupFpsError;
+    public string FpsError => etw?.Error ?? (etw != null && etw.EventsSeen == 0 && clock.Elapsed.TotalSeconds >= 10
+        ? "No DXGI frame events received; FPS and frame times are unavailable for this run."
+        : startupFpsError);
     public bool FpsAvailable => etw != null && FpsError == null;
     public bool GpuAvailable => pdh.Available;
     public int Pid { get; }
@@ -46,14 +49,29 @@ sealed class LiveMonitor : IDisposable
         lastCpu = proc.TotalProcessorTime;
         if (mainThread != IntPtr.Zero && GetThreadTimes(mainThread, out _, out _, out long k, out long u)) lastMain = k + u;
         var e = new EtwLive(pid);
-        if (e.Start()) etw = e; else { FpsError = e.Error; e.Dispose(); }
+        if (e.Start()) etw = e; else { startupFpsError = e.Error; e.Dispose(); }
     }
 
     public bool HasExited { get { try { return proc.HasExited; } catch { return true; } } }
 
     /// <param name="window">seconds of recent frames used for the FPS / percentile figures</param>
     readonly object gate = new();
+    readonly List<OsSample> recentOs = new();
     public LiveSample Sample(double window = 5) { lock (gate) return SampleLocked(window); }
+
+    public (double gpu3dAvg, double gpu3dP95, double vramAvg, double vramPeak, double processCoresAvg, int count) RecentOs(double seconds)
+    {
+        lock (gate)
+        {
+            double threshold = clock.Elapsed.TotalSeconds - Math.Max(1, seconds);
+            var samples = recentOs.Where(s => s.T >= threshold).ToArray();
+            if (samples.Length == 0) return (0, 0, 0, 0, 0, 0);
+            var gpu = samples.Select(s => s.Gpu3dPct).OrderBy(x => x).ToArray();
+            int p95 = Math.Min(gpu.Length - 1, (int)Math.Ceiling(gpu.Length * .95) - 1);
+            return (gpu.Average(), gpu[p95], samples.Average(s => s.GpuVramMB),
+                samples.Max(s => s.GpuVramMB), samples.Average(s => s.ProcCores), samples.Length);
+        }
+    }
 
     LiveSample SampleLocked(double window)
     {
@@ -75,6 +93,8 @@ sealed class LiveMonitor : IDisposable
             },
         };
         lastCpu = cpu;
+        recentOs.Add(s.Os);
+        recentOs.RemoveAll(x => x.T < t - 180);
         if (etw != null)
         {
             var r = etw.Recent(window);

@@ -11,11 +11,13 @@ internal static class RebirthCamperEnergyCustody
     {internal Guid Operation;internal string Directory;internal RebirthCamperSavedVehicle.Expected Expected;}
     private static ConditionalWeakTable<EntityVehicle,Publication> publications=new ConditionalWeakTable<EntityVehicle,Publication>();
     private static World journalWorld;
+    private static string journalSaveDirectory;
+    private static bool journalSaveIsFullyQualified;
     private static RebirthCamperTransferJournal currentJournal;
     private static RebirthCamperTransferPendingIndex pendingIndex;
     internal static void ClearRuntimeScope()
     {
-        pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;
+        pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;journalSaveDirectory=null;journalSaveIsFullyQualified=false;
         publications=new ConditionalWeakTable<EntityVehicle,Publication>();
     }
     internal static RebirthCamperTransferJournal Journal()
@@ -23,8 +25,12 @@ internal static class RebirthCamperEnergyCustody
         if(!ThreadManager.IsMainThread()||GameManager.Instance?.World==null||GameManager.Instance.World.IsRemote())
             throw new InvalidOperationException("Authoritative current save required.");
         string save=GameIO.GetSaveGameDir();if(string.IsNullOrWhiteSpace(save))throw new InvalidOperationException("Current save directory missing.");
-        string directory=Path.GetFullPath(Path.Combine(save,"REBIRTH","CamperEnergyTransfers"));
         var world=GameManager.Instance.World;
+        // Relative/root-relative paths still resolve on every call, as their target can
+        // change with the process current directory even when the save text is unchanged.
+        if(ReferenceEquals(journalWorld,world)&&currentJournal!=null&&journalSaveIsFullyQualified&&
+            string.Equals(journalSaveDirectory,save,StringComparison.Ordinal))return currentJournal;
+        string directory=Path.GetFullPath(Path.Combine(save,"REBIRTH","CamperEnergyTransfers"));
         if(!ReferenceEquals(journalWorld,world)||currentJournal==null||
             !string.Equals(currentJournal.DirectoryPath,directory,StringComparison.OrdinalIgnoreCase))
         {
@@ -32,6 +38,9 @@ internal static class RebirthCamperEnergyCustody
             currentJournal=new RebirthCamperTransferJournal(directory);
             pendingIndex=new RebirthCamperTransferPendingIndex(currentJournal);journalWorld=world;
         }
+        journalSaveDirectory=save;
+        journalSaveIsFullyQualified=Path.IsPathRooted(save)&&
+            string.Equals(Path.GetPathRoot(save),Path.GetPathRoot(directory),StringComparison.OrdinalIgnoreCase);
         return currentJournal;
     }
     internal static RebirthCamperTransferJournal.Record FindPending(Guid vehicle)

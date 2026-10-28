@@ -1,0 +1,193 @@
+<configs>
+  <append xpath="/windows">
+    <!-- Approved reference: edit surface only. No screenshot/preview panel in edit mode. -->
+    <window name="rebirthVehicleTuningWindow" anchor="Center" pos="-480,250" width="960" height="500" depth="100" controller="RebirthVehicleTuning, RebirthUtils" cursor_area="true">
+      <sprite name="tuningBackground" width="960" height="500" sprite="menu_empty" color="16,16,22,228" globalopacitymod="0" depth="0" />
+      <sprite width="960" height="500" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" depth="1" />
+      <sprite pos="20,-20" width="44" height="44" sprite="rb_tuner_vehicle" color="181,126,238,255" depth="3" atlas="RebirthUiIcons" />
+      <label pos="80,-14" width="680" height="34" font_size="31" text_key="xuiRbTunerTitle" color="181,126,238,255" depth="3" />
+      <label pos="80,-48" width="680" height="23" font_size="22" text="{titleVehicle}" color="181,126,238,255" depth="3" />
+      <button name="close" pos="864,-15" width="82" height="32" sprite="menu_empty" type="sliced" defaultcolor="15,15,19,210" hovercolor="65,48,80,240" depth="3" hoverscale="1" />
+      <sprite pos="864,-15" width="82" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="213,213,218,255" depth="4" on_press="false" on_hover="false" />
+      <label pos="905,-31" width="75" height="24" font_size="19" text_key="xuiRbTunerClose" justify="center" depth="5" on_press="false" on_hover="false" pivot="center" vjustify="middle" />
+      <sprite pos="16,-79" width="928" height="1" sprite="menu_empty" color="88,85,98,160" depth="2" />
+      <rect name="category0Frame" pos="16,-84" width="206" height="44">
+        <button name="category0" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category0Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category0Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_speed" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory0" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category1Frame" pos="16,-130" width="206" height="44">
+        <button name="category1" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category1Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category1Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_steering" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory1" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category2Frame" pos="16,-176" width="206" height="44">
+        <button name="category2" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category2Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category2Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_brakes" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory2" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category3Frame" pos="16,-222" width="206" height="44">
+        <button name="category3" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category3Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category3Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_suspension" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory3" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category4Frame" pos="16,-268" width="206" height="44">
+        <button name="category4" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category4Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category4Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_stability" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory4" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category5Frame" pos="16,-314" width="206" height="44">
+        <button name="category5" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category5Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category5Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_storage" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory5" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <rect name="category6Frame" pos="16,-360" width="206" height="44">
+        <button name="category6" width="206" height="44" sprite="menu_empty" defaultcolor="29,29,35,210" hovercolor="66,53,83,235" depth="3" hoverscale="1" />
+        <sprite width="206" height="44" sprite="menu_empty" color="116,83,160,150" visible="{category6Selected}" depth="4" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="112,110,125,220" depth="5" on_press="false" on_hover="false" />
+        <sprite width="206" height="44" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" visible="{category6Selected}" depth="6" on_press="false" on_hover="false" />
+        <sprite pos="28,-22" width="27" height="27" sprite="rb_tuner_advanced" color="245,245,248,255" depth="7" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+        <label pos="58,-22" width="143" height="28" text_key="xuiRbTunerCategory6" font_size="19" overflow="ShrinkContent" depth="7" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      </rect>
+      <label pos="240,-83" width="704" height="32" text="{categoryName}" font_size="28" color="181,126,238,255" depth="3" />
+      <rect name="settingsRows" pos="240,-120" width="704" height="271" on_scroll="true">
+        <rect name="row0" pos="0,-0" width="704" height="64" visible="{row0Visible}" on_scroll="true" on_hover="true">
+          <sprite width="704" height="64" sprite="menu_empty" color="28,28,34,145" depth="1" />
+          <sprite width="704" height="64" sprite="menu_empty2px" type="sliced" fillcenter="false" color="103,101,111,160" depth="2" />
+          <sprite pos="16,-18" width="33" height="33" sprite="{row0Icon}" color="245,245,248,255" depth="3" atlas="RebirthUiIcons" />
+          <label pos="68,-12" width="212" height="24" text="{row0Name}" font_size="22" overflow="ShrinkContent" depth="3" />
+          <label pos="68,-36" width="212" height="21" text="{row0Help}" font_size="17" color="160,160,170,255" overflow="ShrinkContent" depth="3" />
+          <rect name="row0NumericTrack" visible="{row0Numeric}">
+            <sprite name="row0Fill" pos="290,-31" width="135" height="8" sprite="menu_empty" color="174,115,235,255" depth="6" on_press="false" on_hover="false" />
+            <sprite name="row0TrackBackground" pos="290,-31" width="270" height="8" sprite="menu_empty" color="77,76,87,255" depth="4" on_press="false" on_hover="false" />
+            <sprite name="row0Slider" pos="290,-25" width="270" height="20" sprite="menu_empty" color="77,76,87,16" depth="5" enabled="{row0Editable}" on_press="true" on_drag="true" on_scroll="true" />
+            <sprite name="row0SliderThumb" pos="421,-27" width="8" height="16" sprite="menu_empty2px" type="sliced" fillcenter="true" color="196,149,251,255" depth="7" on_press="false" on_hover="false" />
+            <sprite name="row0OriginalMarker" pos="425,-25" width="1" height="20" sprite="menu_empty" color="244,241,249,255" depth="8" on_press="false" on_hover="false" />
+            <label name="row0OriginalLabel" pos="387,-5" width="78" height="18" text_key="xuiRbTunerOriginal" font_size="16" color="160,160,170,255" justify="center" depth="7" on_press="false" on_hover="false" />
+          </rect>
+          <sprite name="row0ValueBackground" pos="586,-14" width="101" height="36" sprite="menu_empty" color="13,13,18,160" depth="5" />
+          <sprite name="row0ValueBorder" pos="586,-14" width="101" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="143,140,154,230" depth="6" />
+          <textfield name="row0Value" pos="588,-14" width="64" height="36" value="{row0Value}" enabled="{row0Editable}" font_size="22" character_limit="150" backgroundcolor="0,0,0,0" bordercolor="0,0,0,0" caret_color="210,178,255,255" selection_color="116,83,160,180" clear_on_open="false" focus_on_open="false" open_vk_on_open="false" vk_propagates_events="false" on_return="submit" justify="right" depth="7" />
+          <label name="row0Unit" pos="655,-21" width="29" height="25" text="{row0Unit}" visible="{row0Numeric}" font_size="19" depth="7" overflow="ShrinkContent" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="row1" pos="0,-69" width="704" height="64" visible="{row1Visible}" on_scroll="true" on_hover="true">
+          <sprite width="704" height="64" sprite="menu_empty" color="28,28,34,145" depth="1" />
+          <sprite width="704" height="64" sprite="menu_empty2px" type="sliced" fillcenter="false" color="103,101,111,160" depth="2" />
+          <sprite pos="16,-18" width="33" height="33" sprite="{row1Icon}" color="245,245,248,255" depth="3" atlas="RebirthUiIcons" />
+          <label pos="68,-12" width="212" height="24" text="{row1Name}" font_size="22" overflow="ShrinkContent" depth="3" />
+          <label pos="68,-36" width="212" height="21" text="{row1Help}" font_size="17" color="160,160,170,255" overflow="ShrinkContent" depth="3" />
+          <rect name="row1NumericTrack" visible="{row1Numeric}">
+            <sprite name="row1Fill" pos="290,-31" width="135" height="8" sprite="menu_empty" color="174,115,235,255" depth="6" on_press="false" on_hover="false" />
+            <sprite name="row1TrackBackground" pos="290,-31" width="270" height="8" sprite="menu_empty" color="77,76,87,255" depth="4" on_press="false" on_hover="false" />
+            <sprite name="row1Slider" pos="290,-25" width="270" height="20" sprite="menu_empty" color="77,76,87,16" depth="5" enabled="{row1Editable}" on_press="true" on_drag="true" on_scroll="true" />
+            <sprite name="row1SliderThumb" pos="421,-27" width="8" height="16" sprite="menu_empty2px" type="sliced" fillcenter="true" color="196,149,251,255" depth="7" on_press="false" on_hover="false" />
+            <sprite name="row1OriginalMarker" pos="425,-25" width="1" height="20" sprite="menu_empty" color="244,241,249,255" depth="8" on_press="false" on_hover="false" />
+            <label name="row1OriginalLabel" pos="387,-5" width="78" height="18" text_key="xuiRbTunerOriginal" font_size="16" color="160,160,170,255" justify="center" depth="7" on_press="false" on_hover="false" />
+          </rect>
+          <sprite name="row1ValueBackground" pos="586,-14" width="101" height="36" sprite="menu_empty" color="13,13,18,160" depth="5" />
+          <sprite name="row1ValueBorder" pos="586,-14" width="101" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="143,140,154,230" depth="6" />
+          <textfield name="row1Value" pos="588,-14" width="64" height="36" value="{row1Value}" enabled="{row1Editable}" font_size="22" character_limit="150" backgroundcolor="0,0,0,0" bordercolor="0,0,0,0" caret_color="210,178,255,255" selection_color="116,83,160,180" clear_on_open="false" focus_on_open="false" open_vk_on_open="false" vk_propagates_events="false" on_return="submit" justify="right" depth="7" />
+          <label name="row1Unit" pos="655,-21" width="29" height="25" text="{row1Unit}" visible="{row1Numeric}" font_size="19" depth="7" overflow="ShrinkContent" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="row2" pos="0,-138" width="704" height="64" visible="{row2Visible}" on_scroll="true" on_hover="true">
+          <sprite width="704" height="64" sprite="menu_empty" color="28,28,34,145" depth="1" />
+          <sprite width="704" height="64" sprite="menu_empty2px" type="sliced" fillcenter="false" color="103,101,111,160" depth="2" />
+          <sprite pos="16,-18" width="33" height="33" sprite="{row2Icon}" color="245,245,248,255" depth="3" atlas="RebirthUiIcons" />
+          <label pos="68,-12" width="212" height="24" text="{row2Name}" font_size="22" overflow="ShrinkContent" depth="3" />
+          <label pos="68,-36" width="212" height="21" text="{row2Help}" font_size="17" color="160,160,170,255" overflow="ShrinkContent" depth="3" />
+          <rect name="row2NumericTrack" visible="{row2Numeric}">
+            <sprite name="row2Fill" pos="290,-31" width="135" height="8" sprite="menu_empty" color="174,115,235,255" depth="6" on_press="false" on_hover="false" />
+            <sprite name="row2TrackBackground" pos="290,-31" width="270" height="8" sprite="menu_empty" color="77,76,87,255" depth="4" on_press="false" on_hover="false" />
+            <sprite name="row2Slider" pos="290,-25" width="270" height="20" sprite="menu_empty" color="77,76,87,16" depth="5" enabled="{row2Editable}" on_press="true" on_drag="true" on_scroll="true" />
+            <sprite name="row2SliderThumb" pos="421,-27" width="8" height="16" sprite="menu_empty2px" type="sliced" fillcenter="true" color="196,149,251,255" depth="7" on_press="false" on_hover="false" />
+            <sprite name="row2OriginalMarker" pos="425,-25" width="1" height="20" sprite="menu_empty" color="244,241,249,255" depth="8" on_press="false" on_hover="false" />
+            <label name="row2OriginalLabel" pos="387,-5" width="78" height="18" text_key="xuiRbTunerOriginal" font_size="16" color="160,160,170,255" justify="center" depth="7" on_press="false" on_hover="false" />
+          </rect>
+          <sprite name="row2ValueBackground" pos="586,-14" width="101" height="36" sprite="menu_empty" color="13,13,18,160" depth="5" />
+          <sprite name="row2ValueBorder" pos="586,-14" width="101" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="143,140,154,230" depth="6" />
+          <textfield name="row2Value" pos="588,-14" width="64" height="36" value="{row2Value}" enabled="{row2Editable}" font_size="22" character_limit="150" backgroundcolor="0,0,0,0" bordercolor="0,0,0,0" caret_color="210,178,255,255" selection_color="116,83,160,180" clear_on_open="false" focus_on_open="false" open_vk_on_open="false" vk_propagates_events="false" on_return="submit" justify="right" depth="7" />
+          <label name="row2Unit" pos="655,-21" width="29" height="25" text="{row2Unit}" visible="{row2Numeric}" font_size="19" depth="7" overflow="ShrinkContent" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="row3" pos="0,-207" width="704" height="64" visible="{row3Visible}" on_scroll="true" on_hover="true">
+          <sprite width="704" height="64" sprite="menu_empty" color="28,28,34,145" depth="1" />
+          <sprite width="704" height="64" sprite="menu_empty2px" type="sliced" fillcenter="false" color="103,101,111,160" depth="2" />
+          <sprite pos="16,-18" width="33" height="33" sprite="{row3Icon}" color="245,245,248,255" depth="3" atlas="RebirthUiIcons" />
+          <label pos="68,-12" width="212" height="24" text="{row3Name}" font_size="22" overflow="ShrinkContent" depth="3" />
+          <label pos="68,-36" width="212" height="21" text="{row3Help}" font_size="17" color="160,160,170,255" overflow="ShrinkContent" depth="3" />
+          <rect name="row3NumericTrack" visible="{row3Numeric}">
+            <sprite name="row3Fill" pos="290,-31" width="135" height="8" sprite="menu_empty" color="174,115,235,255" depth="6" on_press="false" on_hover="false" />
+            <sprite name="row3TrackBackground" pos="290,-31" width="270" height="8" sprite="menu_empty" color="77,76,87,255" depth="4" on_press="false" on_hover="false" />
+            <sprite name="row3Slider" pos="290,-25" width="270" height="20" sprite="menu_empty" color="77,76,87,16" depth="5" enabled="{row3Editable}" on_press="true" on_drag="true" on_scroll="true" />
+            <sprite name="row3SliderThumb" pos="421,-27" width="8" height="16" sprite="menu_empty2px" type="sliced" fillcenter="true" color="196,149,251,255" depth="7" on_press="false" on_hover="false" />
+            <sprite name="row3OriginalMarker" pos="425,-25" width="1" height="20" sprite="menu_empty" color="244,241,249,255" depth="8" on_press="false" on_hover="false" />
+            <label name="row3OriginalLabel" pos="387,-5" width="78" height="18" text_key="xuiRbTunerOriginal" font_size="16" color="160,160,170,255" justify="center" depth="7" on_press="false" on_hover="false" />
+          </rect>
+          <sprite name="row3ValueBackground" pos="586,-14" width="101" height="36" sprite="menu_empty" color="13,13,18,160" depth="5" />
+          <sprite name="row3ValueBorder" pos="586,-14" width="101" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="143,140,154,230" depth="6" />
+          <textfield name="row3Value" pos="588,-14" width="64" height="36" value="{row3Value}" enabled="{row3Editable}" font_size="22" character_limit="150" backgroundcolor="0,0,0,0" bordercolor="0,0,0,0" caret_color="210,178,255,255" selection_color="116,83,160,180" clear_on_open="false" focus_on_open="false" open_vk_on_open="false" vk_propagates_events="false" on_return="submit" justify="right" depth="7" />
+          <label name="row3Unit" pos="655,-21" width="29" height="25" text="{row3Unit}" visible="{row3Numeric}" font_size="19" depth="7" overflow="ShrinkContent" on_press="false" on_hover="false" />
+        </rect>
+      </rect>
+      <!-- Native logical list scroll: map 0..1 to first visible setting, four recycled rows. -->
+      <scrollbar name="settingsScroll" pos="948,-120" width="6" height="271" depth="7" visible="{settingsScrollVisible}" thumb_color_hover="205,164,252,255" thumb_color_active="181,126,238,255" thumb_color_inactive="98,81,125,255" border_color_active="49,47,57,180" border_color_inactive="49,47,57,180" background_color_active="0,0,0,0" background_color_inactive="0,0,0,0">
+        <sprite name="scrollbarborder" width="6" height="271" sprite="menu_empty" depth="0" on_press="true" on_hover="true" on_scroll="true" />
+        <sprite name="scrollbarthumb" pos="1,-1" width="4" height="67" sprite="menu_empty" depth="2" on_press="true" on_hover="true" on_scroll="true" auto_resize_collider="true" />
+      </scrollbar>
+      <label name="status" pos="240,-396" width="704" height="23" text="{status}" font_size="17" color="173,165,186,255" depth="4" overflow="ShrinkContent" />
+      <button name="reset" pos="240,-422" width="224" height="40" sprite="menu_empty" defaultcolor="15,15,19,185" hovercolor="61,49,76,235" depth="3" hoverscale="1" />
+      <sprite pos="240,-422" width="224" height="40" sprite="menu_empty2px" type="sliced" fillcenter="false" color="220,218,226,255" depth="4" on_press="false" on_hover="false" />
+      <sprite pos="266,-442" width="22" height="22" sprite="rb_tuner_reset" depth="5" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+      <label pos="287,-442" width="170" height="28" text_key="xuiRbTunerReset" font_size="20" justify="center" depth="5" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      <button name="export" pos="476,-422" width="224" height="40" sprite="menu_empty" defaultcolor="15,15,19,185" hovercolor="61,49,76,235" depth="3" hoverscale="1" />
+      <sprite pos="476,-422" width="224" height="40" sprite="menu_empty2px" type="sliced" fillcenter="false" color="220,218,226,255" depth="4" on_press="false" on_hover="false" />
+      <sprite pos="502,-442" width="22" height="22" sprite="rb_tuner_log" depth="5" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+      <label pos="523,-442" width="170" height="28" text_key="xuiRbTunerExport" font_size="20" justify="center" depth="5" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      <button name="drive" pos="712,-422" width="232" height="40" sprite="menu_empty" defaultcolor="98,62,141,225" hovercolor="127,83,174,245" depth="3" hoverscale="1" />
+      <sprite pos="712,-422" width="232" height="40" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" depth="4" on_press="false" on_hover="false" />
+      <sprite pos="738,-442" width="22" height="22" sprite="rb_tuner_drive" depth="5" on_press="false" on_hover="false" atlas="RebirthUiIcons" pivot="center" />
+      <label pos="759,-442" width="178" height="28" text_key="xuiRbTunerDrive" font_size="20" justify="center" depth="5" on_press="false" on_hover="false" pivot="left" vjustify="middle" />
+      <label pos="20,-474" width="924" height="22" font_size="17" text_key="xuiRbTunerFooter" color="143,143,154,255" depth="3" />
+    </window>
+    <!-- Compact in-world telemetry only; keyboard/mouse driving stays native. -->
+    <window name="rebirthVehicleTuningPreviewWindow" anchor="BottomLeft" pos="18,326" width="260" height="148" depth="90" controller="RebirthVehicleTuningPreview, RebirthUtils" cursor_area="false">
+      <sprite on_press="false" on_hover="false" on_scroll="false" width="260" height="148" sprite="menu_empty" color="15,15,21,224" globalopacitymod="0" depth="0" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" width="260" height="148" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,235,255" depth="1" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="12,-11" width="21" height="21" sprite="rb_tuner_vehicle" color="181,126,238,255" depth="3" atlas="RebirthUiIcons" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="42,-9" width="205" height="26" text_key="xuiRbTunerTitle" font_size="23" color="181,126,238,255" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="12,-40" width="135" height="24" text_key="xuiRbTunerPreviewSpeed" font_size="20" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="143,-40" width="104" height="24" text="{previewSpeed}" font_size="20" justify="right" depth="3" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="12,-63" width="236" height="1" sprite="menu_empty" color="91,86,103,190" depth="2" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="12,-64" width="135" height="24" text_key="xuiRbTunerPreviewForwardLimit" font_size="20" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="143,-64" width="104" height="24" text="{previewForwardLimit}" font_size="20" justify="right" depth="3" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="12,-87" width="236" height="1" sprite="menu_empty" color="91,86,103,190" depth="2" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="12,-88" width="135" height="24" text_key="xuiRbTunerPreviewAcceleration" font_size="20" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="143,-88" width="104" height="24" text="{previewAcceleration}" font_size="20" justify="right" depth="3" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="12,-111" width="236" height="1" sprite="menu_empty" color="91,86,103,190" depth="2" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="12,-122" width="27" height="18" sprite="menu_empty2px" type="sliced" fillcenter="false" color="175,172,185,255" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="12,-122" width="27" height="19" text="F8" font_size="16" justify="center" depth="4" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="47,-120" width="44" height="23" text_key="xuiRbTunerPreviewEdit" font_size="18" depth="4" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="91,-120" width="13" height="23" text="•" font_size="18" depth="4" />
+      <sprite on_press="false" on_hover="false" on_scroll="false" pos="112,-122" width="27" height="18" sprite="menu_empty2px" type="sliced" fillcenter="false" color="175,172,185,255" depth="3" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="112,-122" width="27" height="19" text="F9" font_size="16" justify="center" depth="4" />
+      <label on_press="false" on_hover="false" on_scroll="false" pos="147,-120" width="70" height="23" text_key="xuiRbTunerPreviewHide" font_size="18" depth="4" />
+    </window>
+  </append>
+</configs>

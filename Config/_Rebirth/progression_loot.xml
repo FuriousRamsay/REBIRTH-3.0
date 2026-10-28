@@ -914,12 +914,8 @@
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='groupBackpacks01']">
     <item group="rebirthAudiobookCassettes" count="1" prob="0.4"/>
-  </append>
-  <append xpath="/lootcontainers/lootgroup[@name='groupNightstand']">
-    <item group="rebirthAudiobookCassettes" count="1" prob="0.4"/>
-  </append>
-  <append xpath="/lootcontainers/lootgroup[@name='groupBackpacks01']">
     <item group="rebirthAudioEquipment" count="1" prob="0.04"/>
+    <item group="rebirthLegacyMusicCassettes" count="1" prob="0.18"/>
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='groupWorkingStiffs01']">
     <item group="rebirthWorkshopComponents" count="1" prob="0.4"/>

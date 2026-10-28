@@ -16,8 +16,11 @@ public static class RebirthCamperPattern
         for (int slot = 0; slot < item.CosmeticModCount; slot++)
         {
             var cosmetic = item.GetCosmeticMod(slot);
-            if (cosmetic != null && !cosmetic.IsEmpty()
-                && string.Equals(cosmetic.ItemClass?.GetItemName(), DiscoModifier, StringComparison.Ordinal)) return Disco;
+            if (cosmetic == null || cosmetic.IsEmpty()) continue;
+            string name = cosmetic.ItemClass?.GetItemName();
+            if (string.Equals(name, DiscoModifier, StringComparison.Ordinal)) return Disco;
+            string wrap = RebirthCamperWrapCatalog.FromItem(name);
+            if (wrap != null) return wrap;
         }
         return None;
     }

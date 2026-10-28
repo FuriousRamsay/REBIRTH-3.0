@@ -1,0 +1,41 @@
+{
+ "revision":1,
+ "status":"FRESH_PLAN_IN_PROGRESS_NOT_VALIDATED",
+ "referenceSha256":"04A5D2D06B82E9D40B0BB1DA59ECCD1ECF23EF6BD857D6445E0A11C70B191CA5",
+ "referencePath":"Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+ "sourcePolicy":{"start":"empty scene after plan validation","existingMeshReuse":false,"existingSceneReuse":false,"existingBuilderReuse":false,"oldAttempts":"preserved in place as rejected evidence"},
+ "scale":{"unit":"furnace maximum width = 1","realWorldSize":"deferred until camper fit; do not pretend image supplies meters"},
+ "basis":{"origin":"center of furnace footprint at bottom contact plane","x":"right across hearth","y":"rear, into furnace","z":"up","rotationConvention":"right-handed degrees; transforms local to named parent"},
+ "camera":{"status":"requires fitted projection","constraints":["top collar ellipse","crucible rim ellipse","hearth sill direction","bellows frame shaft direction","upright vertical direction"],"initialElevationRangeDegrees":[22,27],"projection":"test perspective; orthographic only if justified by landmark fit"},
+ "assemblyTree":{
+  "forge":["masonry","hearth","iron_harness","vent","bellows_mount","crucible_mount","feet"],
+  "masonry":["individual_outer_stones","recessed_mortar","individual_inner_stones"],
+  "hearth":["arch_jamb_stones","arch_crown_stones","thick_sill","floor","individual_coals"],
+  "iron_harness":["left_front_band","right_front_band","left_shoulder_band","crossing_crown_bands","lower_bands","overlap_plates","domed_rivets"],
+  "vent":["outer_annulus","inner_wall","overlap_plate","fasteners","recessed_center_detail"],
+  "bellows_mount":["furnace_flange","flange_bolts","air_nozzle","throat_collar","bellows","support_brackets"],
+  "bellows":["front_upright","rear_upright","upper_shafts","lower_shafts","bearing_washers","bearing_bosses","shaped_boards","continuous_pleated_envelope","seam_ridges"],
+  "crucible_mount":["hollow_vessel","upper_hoop","lower_hoop","front_retainer","side_retainer","retainer_rivets","side_link","bottom_support"]
+ },
+ "shapeSpecifications":{
+  "masonry":"Squat near-hemispherical crown over a short rounded wall. Visible stones individually drawn as irregular fractured solids with broad faces, rounded breaks and recessed joints. No random regular courses or displacement-only imitation.",
+  "arch":"Opening silhouette traced independently of exterior. Thick jamb/crown stones surround it; inner cavity remains deep and visible. Front sill irregular with worn edges, not identical bricks.",
+  "iron_harness":"Broad substantial bent bands with rounded worn edges. Paths traced through visible crossings; layers separated physically. Domed rivets sit on plates rather than long cylindrical pegs.",
+  "vent":"Short round annulus with thick lip, interior wall and open center. Small irregularity does not replace its circular silhouette.",
+  "bellows":"Compact fan seen obliquely. Rear uprights and two shaft assemblies enclose its broad end. Folded envelope has a curved top shoulder and rounded joined folds tapering to a finite rectangular collar. No straight triangular sheet and no stack of disconnected pillows.",
+  "nozzle":"Short exposed neck joins rectangular throat collar to circular bolted flange on furnace side. All three are visible; no gaps or floating bolt heads.",
+  "crucible":"Thick-walled slightly tapered open vessel in front of bellows and left of furnace front band. Broad irregular but mostly circular lip, visible inner cavity and floor, external iron hoops/retainers. No sawtooth rim or smooth thin bucket substitute.",
+  "feet":"Separate short bent mounting tabs with holes, attached to structural supports. No enclosing rectangular platform unless visible in reference."
+ },
+ "requiredPerShapeRecord":["uniqueId","parent","referenceContourPixels","observedOrInferred","dimensions","position","rotationOrAxisEndpoints","crossSectionOrSurfaceProfile","connectionTargets","occludes","occludedBy"],
+ "validationSteps":[
+  "Trace every visible silhouette and component junction from original image; inspect trace overlay",
+  "Fit shared camera from rigid landmarks and ellipse constraints; label calibration uncertainty",
+  "Populate numeric per-shape records in common basis, including individual repeated pieces",
+  "Project planned shapes outside Blender; inspect outline/landmark comparison and overlap order",
+  "Check nozzle continuity, frame/shaft bearings, crucible supports and harness contacts",
+  "Correct plan until geometry and placement predictions match reference",
+  "Only then generate new untextured Blender scene and inspect actual clay render"
+ ],
+ "stageGates":{"geometryPlan":"NOT_PASSED","clay":"NOT_STARTED","texturePlan":"only after clay passes","textureExecution":"only after texture plan validation; 2048-square maps","Unity":"only after textured Blender fidelity passes"}
+}

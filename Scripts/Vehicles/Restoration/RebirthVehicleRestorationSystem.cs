@@ -3661,6 +3661,7 @@ public sealed class XUiC_RebirthVehicleStatHover : XUiController
 public sealed class XUiC_RebirthVehicleRestoration : XUiController
 {
     public const string WindowGroupName = "rebirthVehicleRestoration";
+    private readonly RebirthWindowHudScope hud = new RebirthWindowHudScope();
     private sealed class PendingClientRequest
     {
         public XUiC_RebirthVehicleRestoration Controller;
@@ -3843,6 +3844,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         if (instructions != null) instructions.Text = Localization.Get("xuiRebirthVehicleSlotInstructions");
         Refresh();
         SetStatus(string.Empty);
+        hud.Maintain(xui);
     }
 
     private void WireToolbeltDrag()
@@ -3876,6 +3878,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
 
     public override void OnClose()
     {
+        hud.Restore();
         SelectedPartSlot = null;
         RebirthVehicleServicePointerDrop.Reset(this);
         if (ReferenceEquals(current, this)) current = null;
@@ -3911,6 +3914,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         base.Update(dt);
         RetryConfirmedReply();
         if (windowGroup == null || !windowGroup.isShowing || xui == null || xui.playerUI == null) return;
+        hud.Maintain(xui);
 
         if (carrier == RebirthVehicleAssemblyCarrier.VehicleEntity &&
             (entityCarrier == null || !entityCarrier.CheckUIInteraction()))
@@ -3923,6 +3927,12 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             (xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased ||
              xui.playerUI.playerInput.GUIActions.Cancel.WasReleased))
             CloseWindow();
+    }
+
+    public override void Cleanup()
+    {
+        hud.Restore();
+        base.Cleanup();
     }
 
     internal static bool TryGetRequestCharacter(EntityPlayerLocal player,out string creation)
@@ -5296,14 +5306,18 @@ public sealed class XUiC_RebirthRestorationModifiers : XUiC_AssembleWindow
 [Preserve]
 public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
 {
-    private bool hovered;
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
     public override void Update(float dt)
     {
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
-        if(fill!=null){Color color=hovered?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);if(fill.Color!=color)fill.SetColorImmediately(color);}
+        if(fill!=null)
+        {
+            Color color=isOver&&ViewComponent?.UiTransformIsHovered==true?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);
+            if(fill.Color!=color)fill.Color=color;
+            if(fill.Sprite!=null&&fill.Sprite.color!=color)fill.SetColorImmediately(color);
+        }
     }
     public override bool CanRemove()
     {
@@ -5313,20 +5327,22 @@ public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
         return !(ItemClass is ItemClassModifier modifier)||!modifier.ModifierTags.Test_AnySet(EntityVehicle.StorageModifierTags)||
             GetParentByType<XUiC_RebirthVehicleRestoration>()?.NativeVehicle?.CanRemoveInventoryMod()==true;
     }
-    public override void OnHovered(bool over){hovered=over;base.OnHovered(over);}
 }
 
 [Preserve]
 public sealed class XUiC_RebirthRestorationCosmeticSlot : XUiC_ItemCosmeticStack
 {
-    private bool hovered;
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
     public override void Update(float dt)
     {
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
-        if(fill!=null){Color color=hovered?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);if(fill.Color!=color)fill.SetColorImmediately(color);}
+        if(fill!=null)
+        {
+            Color color=isOver&&ViewComponent?.UiTransformIsHovered==true?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);
+            if(fill.Color!=color)fill.Color=color;
+            if(fill.Sprite!=null&&fill.Sprite.color!=color)fill.SetColorImmediately(color);
+        }
     }
-    public override void OnHovered(bool over){hovered=over;base.OnHovered(over);}
 }

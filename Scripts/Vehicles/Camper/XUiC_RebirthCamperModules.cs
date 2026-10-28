@@ -131,6 +131,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
     }
     public override void Update(float dt)
     {
+        using var captureTiming = RebirthGameBridgeFrames.MeasureUi(crafting ? 2 : 1);
         if(opened && !CanInteract)
         { opened=false; xui.playerUI.windowManager.Close((GUIWindow)windowGroup); return; }
         if(opened)

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs"/>
+    <Compile Include="../../Scripts/Crafting/RemoteCrafting/RemoteResourceWorldIdentity.cs"/>
+    <Compile Include="../../Scripts/Crafting/RemoteCrafting/RemoteResourceWorldCustodyScan.cs"/>
+    <Compile Include="../../Scripts/Survivor/Persistence/RebirthAtomicXmlFile.cs"/>
+    <Compile Include="../../Scripts/Persistence/RebirthDurableFileCommit.cs"/>
+  </ItemGroup>
+</Project>

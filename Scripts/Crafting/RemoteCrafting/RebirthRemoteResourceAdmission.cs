@@ -41,13 +41,20 @@ internal sealed class RebirthRemoteResourceAdmission:IDisposable
         catch{refusal="Current authorized sources do not cover the original remote request.";}
     }
     internal Guid Operation=>operation;
-    private bool Current()=>!closed&&network?.Current==true&&ThreadManager.IsMainThread()&&!RebirthRemoteResourcePreAdmissionRefusal.BlocksAdmission(operation)&&world?.IsRemote()==false&&ReferenceEquals(GameManager.Instance?.World,world)&&
+    private bool CurrentActor()=>!closed&&network?.Current==true&&ThreadManager.IsMainThread()&&!RebirthRemoteResourcePreAdmissionRefusal.BlocksAdmission(operation)&&world?.IsRemote()==false&&ReferenceEquals(GameManager.Instance?.World,world)&&
         ReferenceEquals(world.GetEntity(actor.entityId),actor)&&!actor.IsDead()&&actor.Died==deaths&&RebirthOriginalActionScope.Matches(actor,owner,creation)&&
-        RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)&&identity.StorageKey==owner&&RemoteResourceWorldIdentity.TryGet(world,out string current)&&current==worldId;
-    private bool Eligible(IRemoteResourceSource source)=>Current()&&RemoteResourcesRuntimePolicy.Enabled&&!RebirthRemoteResourceSourceCustody.BlocksSource(source)&&
+        RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)&&identity.StorageKey==owner;
+    private bool Current()=>CurrentActor()&&RemoteResourceWorldIdentity.TryGet(world,out string current)&&current==worldId;
+    private bool Eligible(IRemoteResourceSource source)=>Current()&&EligibleSource(source);
+    private bool EligibleSource(IRemoteResourceSource source)=>RemoteResourcesRuntimePolicy.Enabled&&!RebirthRemoteResourceSourceCustody.BlocksSource(source)&&
         (source.Position-actor.position).sqrMagnitude<=RemoteResourcesRuntimePolicy.Radius*RemoteResourcesRuntimePolicy.Radius&&RemoteResourceEligibility.CanUse(source,actor,true,false,out _);
     private List<Frame> Plan(IEnumerable<IRemoteResourceSource> sources)
     {
+        // Plan is synchronous and never mutates item custody. Validate the durable
+        // world identity at its boundaries, rather than reparsing the same XML
+        // for every candidate. Per-source live authority checks remain below;
+        // native publication/debit admission still uses Current independently.
+        if(!Current())throw new InvalidDataException("Remote source planning world is unavailable.");
         var needed=new Dictionary<int,ItemStack>();
         foreach(var stack in requirements)
         {
@@ -64,7 +71,7 @@ internal sealed class RebirthRemoteResourceAdmission:IDisposable
         {
             IRemoteResourceSource source=candidate;
             if(source is RemoteNpcResourceSource npc)source=new RemoteNpcResourceSource(npc.NativeActor);
-            if(!Eligible(source))continue;
+            if(!CurrentActor()||!EligibleSource(source))continue;
             var before=source.Slots;if(before==null||before.Length<1||before.Length>short.MaxValue)throw new InvalidDataException();
             var frame=new Frame{Source=source,Before=ItemStack.Clone(before),After=ItemStack.Clone(before),Locks=new bool[before.Length]};var paid=new List<ItemStack>();
             if(source.SlotLocks!=null&&source.SlotLocks.Length!=before.Length)throw new InvalidDataException();
@@ -81,6 +88,7 @@ internal sealed class RebirthRemoteResourceAdmission:IDisposable
         }
         if(needed.Values.Any(value=>value.count!=0))throw new InvalidDataException("Current authorized remote sources do not cover the original request.");
         var all=frames.SelectMany(frame=>frame.Paid).ToArray();if(all.Length>short.MaxValue||RebirthCamperInventorySnapshot.Capture(all).Length>MaximumOutcomeBytes)throw new InvalidDataException("Original outcome exceeds the bounded native delivery frame.");
+        if(!Current())throw new InvalidDataException("Remote source planning world changed.");
         return frames;
     }
     private bool BeginIdentity(IRemoteResourceSource source)

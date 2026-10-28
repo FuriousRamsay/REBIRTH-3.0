@@ -972,13 +972,13 @@
       </rect>
     </window>
   </append>
-  <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="atlas">RebirthUiIcons</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="sprite">rb_backpack_lock</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="atlas">RebirthUiIcons</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="sprite">rb_backpack_sort</setattribute>
-  <append xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']">
-    <button depth="3" name="btnRebirthQuickStack" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" pos="100,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% rebirth_quick_stack_enabled and !lootingorvehiclestorage }" />
-    <button depth="3" name="btnRebirthCompanions" atlas="RebirthUiIcons" sprite="rb_backpack_companions" color="255,255,255,255" tooltip_key="xuiRebirthCompanions" pos="145,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% !lootingorvehiclestorage }" />
+  <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='actions' and @controller='ContainerStandardControls']//*[@name='btnToggleLockMode']" name="atlas">RebirthUiIcons</setattribute>
+  <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='actions' and @controller='ContainerStandardControls']//*[@name='btnToggleLockMode']" name="sprite">rb_backpack_lock</setattribute>
+  <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='actions' and @controller='ContainerStandardControls']//*[@name='btnSort']" name="atlas">RebirthUiIcons</setattribute>
+  <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='actions' and @controller='ContainerStandardControls']//*[@name='btnSort']" name="sprite">rb_backpack_sort</setattribute>
+  <append xpath="/windows/window[@name='windowBackpack']/rect[@name='header']">
+    <button depth="3" name="btnRebirthQuickStack" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" pos="300,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% rebirth_quick_stack_enabled and !lootingorvehiclestorage }" />
+    <button depth="3" name="btnRebirthCompanions" atlas="RebirthUiIcons" sprite="rb_backpack_companions" color="255,255,255,255" tooltip_key="xuiRebirthCompanions" pos="340,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% !lootingorvehiclestorage }" />
   </append>
   <remove xpath="/windows/window[@name='windowBackpack']/*[@name='content']/grid[@name='inventory'] | /windows/window[@name='windowBackpack']/*[@name='content']/scrollview[grid[@name='inventory']]" />
   <remove xpath="/windows/window[@name='windowBackpack']/*[@name='content']/defaultscrollbar" />
@@ -1016,15 +1016,12 @@
   <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/sprite[@name='headerbackground']" name="height">83</setattribute>
   <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/label[@name='lootName']" name="anchor_bottom">header,1,-41</setattribute>
   <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/label[@name='lootName']" name="anchor_top">header,1,-2</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/rect[@controller='ContainerStandardControls']" name="height">83</setattribute>
   <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='content']" name="pos">3,-89</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">274,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">194,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">234,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">274,-62</setattribute>
-  <append xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']">
-    <button depth="3" name="btnRebirthQuickStackCategories" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack_categories" tooltip_key="xuiRebirthQuickStackCategoriesTooltip" pos="194,-22" pivot="center" style="icon32px, press, hover" defaultcolor="[white]" hovercolor="[white]" sound="[paging_click]" controller="RebirthQuickStackCategoryButton, RebirthUtils" />
-    <button depth="3" name="btnRebirthRemoteResources" sprite="ui_game_symbol_bc" tooltip_key="xuiRebirthRemoteResourcesWifi" pos="234,-22" pivot="center" style="icon32px, press, hover" defaultcolor="[white]" selectedcolor="[disabledColor]" hovercolor="[white]" sound="[paging_click]" controller="RebirthRemoteResourceButton, RebirthUtils" />
+  <append xpath="/windows/window[@name='windowLooting']/rect[@name='header']">
+    <rect name="rebirthLootHeaderActions" anchor_left="scrollbarborder,1,-190" anchor_right="scrollbarborder,1,-30" pos="0,0" height="43">
+    <button depth="3" name="btnRebirthQuickStackCategories" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack_categories" tooltip_key="xuiRebirthQuickStackCategoriesTooltip" pos="20,-22" pivot="center" style="icon32px, press, hover" defaultcolor="[white]" hovercolor="[white]" sound="[paging_click]" controller="RebirthQuickStackCategoryButton, RebirthUtils" />
+    <button depth="3" name="btnRebirthRemoteResources" sprite="ui_game_symbol_bc" tooltip_key="xuiRebirthRemoteResourcesWifi" pos="60,-22" pivot="center" style="icon32px, press, hover" defaultcolor="[white]" selectedcolor="[disabledColor]" hovercolor="[white]" sound="[paging_click]" controller="RebirthRemoteResourceButton, RebirthUtils" />
+      </rect>
   </append>
   <setattribute xpath="/windows/window[@name='itemInfoPanel']/rect[@name='contentInfo']" name="controller">RebirthItemInfoQuickStackTabs, RebirthUtils</setattribute>
   <setattribute xpath="/windows/window[@name='itemInfoPanel']/rect[@name='contentInfo']/rect[@name='description' and @visible='{showonlydescription}']" name="pos">153,-43</setattribute>
@@ -2290,6 +2287,9 @@
           </rect>
         </rect>
       </append>
+      <!-- Match the existing 15-cell render limit; unused authored rows otherwise
+           recurse through native Update even with their parent hidden. -->
+      <remove xpath="/windows/window[@name='HUDLeftStatBars']/rect[@name='rebirthTrackedProgressionHud']/rect[starts-with(@name,'rebirthTrackedProgressionRow') and number(substring-after(@name,'rebirthTrackedProgressionRow')) &gt;= 15]" />
     </if>
   </conditional>
   <conditional>
@@ -13953,14 +13953,10 @@
       <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='content']/defaultscrollbar" name="thumbheight">{% Min( v2i_y(gridDimensions) * 65 + 3 - 8, ${parentinnerheight-8} ) }</setattribute>
       <!-- Container routing is also available while looting, immediately to
        the left of Broadcast, using the same clipboard action as the radial. -->
-      <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthQuickStackCategories']" name="pos">114,-22</setattribute>
+      <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthQuickStackCategories']" name="pos">20,-22</setattribute>
       <!-- Keep the verified Remote Resources/Wi-Fi toggle, lock mode, sort,
        Move Fill & Smart and Take All controls.  No additional storage action is introduced. -->
-      <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthRemoteResources']" name="pos">154,-22</setattribute>
-      <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">194,-22</setattribute>
-      <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">194,-62</setattribute>
-      <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">234,-62</setattribute>
-      <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">274,-62</setattribute>
+      <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthRemoteResources']" name="pos">60,-22</setattribute>
       <append xpath="/windows/window[@name='windowLooting']">
         <sprite depth="20" name="rebirthLootingApprovedFrame" pos="0,0" width="606" height="741" sprite="menu_empty2px" color="151,108,52,255" type="sliced" fillcenter="false" />
       </append>
@@ -28166,16 +28162,13 @@
       <include filename="quest_turnin_workspace.xml" />
     </if>
   </conditional>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">74,-62</setattribute>
-  <append xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']">
-    <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="114,-62" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
-    <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="154,-62" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
+  <append xpath="/windows/window[@name='windowLooting']/rect[@name='header']/rect[@name='rebirthLootHeaderActions']">
+    <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="100,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
+    <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="140,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
   </append>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">-70,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnClearInventory']" name="pos">-125,-22</setattribute>
-  <append xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']">
-    <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="-30,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
-    <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="10,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
+  <append xpath="/windows/window[@name='windowBackpack']/rect[@name='header']">
+    <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="380,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
+    <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="420,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
   </append>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">-60,-22</setattribute>
   <append xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']">
@@ -29349,14 +29342,6 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="pos">688,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="nav_left">contextBackpackStack</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//label[@name='contextContainerName']" name="width">470</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">154,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">194,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">234,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">274,-62</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">50,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">90,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']//button[@name='btnMoveFillAndSmart']" name="pos">130,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']//button[@name='btnMoveAll']" name="pos">170,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">60,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">100,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">140,-22</setattribute>
@@ -29412,6 +29397,7 @@
   <include filename="../_Statistics/purge_windows.xml" />
   <include filename="../_Purge/map_filters.xml" />
 <include filename="../_Purge/map_popup.xml" />
+  <include filename="../_Map/zoom_slider.xml" />
   <!-- U6/S03: Character backpack header row on a uniform 40-unit pitch ending at Sort (x=346) and Lock (x=386):
        Library(240c) Sell(280c) Filter(306) Sort(346) Lock(386). Overrides backpack_toolbar_layout.xml, which
        left Filter (294) overlapping Sell (302c) and the Sell icon 44 units left of Sort. Y is owned at runtime by
@@ -29434,5 +29420,10 @@
   <include filename="../_Vehicles/camper_sink_windows.xml" />
   <include filename="../_NPC/equipment_windows.xml" />
   <include filename="companion_desk_windows.xml" />
+  <include filename="../_Vehicles/vehicle_tuning_windows.xml" />
+
+  <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='header']/button[@name='btnClearInventory']" name="pos">460,-22</setattribute>
+  <!-- 3.4: preserve the native filter/action row; REBIRTH extras occupy header slots. -->
+  <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/label[@name='lootName']" name="anchor_right">scrollbarborder,1,-190</setattribute>
 </configs>
 

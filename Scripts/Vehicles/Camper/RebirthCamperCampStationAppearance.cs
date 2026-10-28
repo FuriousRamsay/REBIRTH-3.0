@@ -6,6 +6,12 @@ using UnityEngine;
 // Guardrails are a separate root and are never changed by this controller.
 internal static class RebirthCamperCampStationAppearance
 {
+    private readonly struct BoundTarget
+    {
+        internal readonly Collider Collider;
+        internal readonly GameObject Object;
+        internal BoundTarget(Collider collider){Collider=collider;Object=collider.gameObject;}
+    }
     private sealed class Equipment
     {
         internal GameObject Model;
@@ -24,11 +30,11 @@ internal static class RebirthCamperCampStationAppearance
         internal float CabTop;
         internal GameObject Roof, Interior, WalkIn, Power, Stairs;
         internal GameObject Relays;
-        internal Collider[] RelayTargets=System.Array.Empty<Collider>();
+        internal BoundTarget[] RelayTargets=System.Array.Empty<BoundTarget>();
         internal Renderer[] FadeRenderers;
         internal int[] MaterialCounts;
         internal GameObject[] FadeGroups;
-        internal Collider[] Targets;
+        internal BoundTarget[] Targets;
         internal readonly MaterialPropertyBlock Block = new MaterialPropertyBlock();
         internal RebirthCamperEnergyMode Mode;
         internal float Opacity, TargetOpacity, LastUpdate;
@@ -116,11 +122,11 @@ internal static class RebirthCamperCampStationAppearance
             if (view.Roof == null && view.Interior == null) return;
             RebirthCamperOwnCollision.Invalidate(vehicle);
             BindFadeGroups(view);
-            var targets = new System.Collections.Generic.List<Collider>();
+            var targets = new System.Collections.Generic.List<BoundTarget>();
             foreach (var c in vehicle.RootTransform.GetComponentsInChildren<Collider>(true))
                 if (c.name.StartsWith("REBIRTHInteraction_", System.StringComparison.Ordinal))
                 {
-                    targets.Add(c);
+                    targets.Add(new BoundTarget(c));
                     string id = c.name.Substring("REBIRTHInteraction_".Length);
                     if (id == "rear_door" || id == "sink") continue;
                     // The supplied manifest authors one target directly under
@@ -147,9 +153,9 @@ internal static class RebirthCamperCampStationAppearance
         if(view.Relays!=relays)
         {
             view.Relays=relays;
-            var targets=new System.Collections.Generic.List<Collider>();
+            var targets=new System.Collections.Generic.List<BoundTarget>();
             if(relays!=null)foreach(var target in relays.GetComponentsInChildren<RebirthCamperWireTarget>(true))
-                if(target.Kind==0){var collider=target.GetComponent<Collider>();if(collider!=null)targets.Add(collider);}
+                if(target.Kind==0){var collider=target.GetComponent<Collider>();if(collider!=null)targets.Add(new BoundTarget(collider));}
             view.RelayTargets=targets.ToArray();BindFadeGroups(view);
         }
         if (Time.realtimeSinceStartup >= view.NextObservation)
@@ -218,10 +224,8 @@ internal static class RebirthCamperCampStationAppearance
                 }
             }
         }
-        foreach (var target in view.Targets)
-            if (target != null) target.enabled = show && target.gameObject.activeInHierarchy;
-        foreach(var target in view.RelayTargets)
-            if(target!=null)target.enabled=show&&target.gameObject.activeInHierarchy;
+        ApplyTargets(view.Targets,show);
+        ApplyTargets(view.RelayTargets,show);
         if (view.WalkIn != null && view.WalkIn.activeSelf != show) view.WalkIn.SetActive(show);
         if (view.Door != null)
         {
@@ -247,8 +251,24 @@ internal static class RebirthCamperCampStationAppearance
         // The restored hull no longer inherits the visual module's active state.
         // Its native compound shape exists only for an installed travel body.
         if (view.CamperHull != null)
-            view.CamperHull.enabled = hasBody && !show;
+        {
+            bool enabled=hasBody&&!show;
+            if(view.CamperHull.enabled!=enabled)view.CamperHull.enabled=enabled;
+        }
         RebirthCamperOwnCollision.Apply(vehicle);
+    }
+
+    private static void ApplyTargets(BoundTarget[] targets,bool show)
+    {
+        foreach(var target in targets)
+            if(target.Collider!=null)
+            {
+                // A component's GameObject is fixed for its lifetime. Cache
+                // only that owner; hierarchy activity/enabled stay live in
+                // both Update and PhysicsFixedUpdate passes.
+                bool enabled=show&&target.Object.activeInHierarchy;
+                if(target.Collider.enabled!=enabled)target.Collider.enabled=enabled;
+            }
     }
 
     private static void BindFadeGroups(View view)

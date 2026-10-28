@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -11,6 +12,10 @@ internal static class RebirthStationPaidCompletionCallsite
 {
     private const string NativeMvid="1a9a4203-3d95-4c90-b094-8926dec1ee9c";
     private const string NativeBody="9D6DD060B6343C7D0F0A11E724C33C8CFAD4E5E802E7D878D99A99A834BBC1DD";
+    private const string NativeImage="FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705";
+    private const string NativeMvid34="47c87570-1f44-4ad3-872b-95a9f98d316c";
+    private const string NativeBody34="2C31FF2A760304C2B941864E95711C849FF232FF8827FB916EABE84036C6302C";
+    private const string NativeImage34="874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4";
     private sealed class Fault { }
     private sealed class PendingCompletion
     {
@@ -126,11 +131,21 @@ internal static class RebirthStationPaidCompletionCallsite
     }
     internal static IEnumerable<CodeInstruction> Transform(IEnumerable<CodeInstruction> instructions,MethodBase original)
     {
-        if(original==null||original.DeclaringType!=typeof(TileEntityWorkstation)||original.Name!="HandleRecipeQueue"||
-            original.Module.ModuleVersionId.ToString("D")!=NativeMvid)throw new InvalidOperationException("Unsupported native station version.");
+        if(original==null||original.DeclaringType!=typeof(TileEntityWorkstation)||original.Name!="HandleRecipeQueue")
+            throw new InvalidOperationException("Unsupported native station version.");
+        string mvid=original.Module.ModuleVersionId.ToString("D"),expectedImage,expectedBody;
+        if(mvid==NativeMvid){expectedImage=NativeImage;expectedBody=NativeBody;}
+        else if(mvid==NativeMvid34){expectedImage=NativeImage34;expectedBody=NativeBody34;}
+        else throw new InvalidOperationException("Unsupported native station version.");
+        // Qualify one reviewed module/image/body tuple, never an independent cross-product.
         using(var sha=SHA256.Create())
-            if(BitConverter.ToString(sha.ComputeHash(original.GetMethodBody().GetILAsByteArray())).Replace("-","")!=NativeBody)
+        {
+            using(var input=File.OpenRead(original.Module.Assembly.Location))
+                if(BitConverter.ToString(sha.ComputeHash(input)).Replace("-","")!=expectedImage)
+                    throw new InvalidOperationException("Unsupported native station image.");
+            if(BitConverter.ToString(sha.ComputeHash(original.GetMethodBody().GetILAsByteArray())).Replace("-","")!=expectedBody)
                 throw new InvalidOperationException("Unsupported native station body.");
+        }
         var source=new List<CodeInstruction>(instructions);
         var expected=PatchProcessor.GetOriginalInstructions(original);
         if(!SameInstructions(source,expected))throw new InvalidOperationException("Station completion IL was changed by another patch.");

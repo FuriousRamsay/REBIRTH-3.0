@@ -1,0 +1,1 @@
+// Retired fixture scaffolding. mp009_outcome_capacity.mjs composes test_remote_outcome_receipt_fixture.cs with LEGACY_CAPACITY, covering actual current refusal and explicitly seeded historical originals. AUTHORED_NOT_RUN.

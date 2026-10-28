@@ -391,7 +391,8 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
         for(int i=0;i<slots.Length;i++)
         {
             bool enabled=view!=null&&i<view.Capacity;
-            if(slots[i] is XUiC_RebirthBackpackSectionNativeSlot native){native.SlotNumber=i;ItemStack full=null;if(enabled)view.TryGetSlot(i,out full);native.ItemStack=full?.Clone()??ItemStack.Empty.Clone();}
+            // TryGetSlot already returns a detached stack owned by this display slot.
+            if(slots[i] is XUiC_RebirthBackpackSectionNativeSlot native){native.SlotNumber=i;ItemStack full=null;if(enabled)view.TryGetSlot(i,out full);native.ItemStack=full??ItemStack.Empty.Clone();}
             var highlight=highlights[i]?.ViewComponent;if(highlight!=null)highlight.IsVisible=enabled&&i==selected;
             if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.IsVisible=enabled;
             string itemId=string.Empty;int count=0;if(enabled)view.TryGetDisplaySlot(i,out itemId,out count);

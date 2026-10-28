@@ -402,6 +402,7 @@ public sealed class RebirthGameBridgePump : MonoBehaviour
 
     private void Update()
     {
+        RebirthGameBridgeFrames.Tick();
         Interlocked.Exchange(ref RebirthGameBridge.LastFrameTicks, DateTime.UtcNow.Ticks);
         RebirthGameBridge.CachedState = RebirthGameBridgeHandlers.DescribeGameState();
         // Mod exceptions can reopen the native developer console on every frame.

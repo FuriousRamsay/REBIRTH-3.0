@@ -50,7 +50,8 @@ public static class RebirthCraftingInventoryBridge
         // V3.2 b10 keeps physical Bag length and encumbrance separate. The effective native
         // CarryCapacity controls burden. Reserve markers remain visible even when a temporary buff
         // (including god mode) increases capacity; the header below still reports actual burden.
-        int carryCapacity = Mathf.RoundToInt(EffectManager.GetValue(PassiveEffects.CarryCapacity, _entity: player));
+        // Native OnUpdateEntity already resolves this effect and uses it for actual burden.
+        int carryCapacity = player.CarryCapacity;
         if (carryCapacity <= 0)
             carryCapacity = physical;
         return Math.Max(0, Math.Min(physical - (RebirthSurvivorGearService.BasePhysicalBagSlots - RebirthSurvivorGearService.BaseUnencumberedBagSlots), carryCapacity));
@@ -70,7 +71,7 @@ public static class RebirthCraftingInventoryBridge
         int used = GetUsedSlotCount(xui);
         int physical = GetPhysicalSlotCount(xui);
         EntityPlayer player = xui?.playerUI?.entityPlayer;
-        int unencumbered = player == null ? physical : Mathf.RoundToInt(EffectManager.GetValue(PassiveEffects.CarryCapacity, _entity: player));
+        int unencumbered = player == null ? physical : player.CarryCapacity;
         if (unencumbered <= 0) unencumbered = physical;
         return Math.Max(0, used - unencumbered);
     }

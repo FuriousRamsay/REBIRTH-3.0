@@ -11,6 +11,10 @@ class Program {
  Tick();Check(p.Buffs.GetCustomVar("_rbPurgeSupplyRemaining")==25&&p.Buffs.GetCustomVar("_rbPurgeSupplyTarget")==80,"HUD derives remaining kills from persisted balance and escalating policy");int writes=p.Buffs.Writes;Tick();Check(p.Buffs.Writes==writes,"unchanged counters produce no repeated synchronized writes");
  RebirthPurgeObjectiveProgress.Instance.Published=new Dictionary<string,RebirthPurgeObjectiveProgress.BiomeProgress>{{"forest",new(){Cleared=3,Eligible=12}}};Check(RebirthPurgeHudProgress.Text(p)=="3/12 25/80","local HUD reads current biome counts");
  world.Remote=true;RebirthPoiMapSync.LocalObjectives=new RebirthPurgeObjectiveFrame{Known=true,Biomes=new(){{"forest",new(){Cleared=4,Eligible=12}}}};Check(RebirthPurgeHudProgress.Text(p)=="4/12 25/80","remote HUD uses received objective counts");Tick();Check(p.Buffs.Writes==writes,"remote world never authors synchronized counters");
+ var frame=RebirthPoiMapSync.LocalObjectives;frame.Session=Guid.NewGuid();Check(RebirthPurgeHudProgress.Text(p).StartsWith("—/—"),"foreign session hides remote counts");frame.Session=RebirthPoiMapSync.LocalSession;
+ frame.World=Guid.NewGuid();Check(RebirthPurgeHudProgress.Text(p).StartsWith("—/—"),"foreign world hides remote counts");frame.World=RebirthPoiMapSync.LocalWorld;
+ frame.ProgressionMode=1;frame.Biomes["forest"].ClearedByTier=new(){{1,1}};frame.Biomes["forest"].EligibleByTier=new(){{1,1},{5,1}};
+ RebirthPurgeHudProgress.BiomeSummary(p,out var biomeLabel,out var percentage,out var counts);Check(counts.StartsWith("2/13")&&percentage=="15.4%","tier HUD uses weighted points and percentage");frame.ProgressionMode=0;
  RebirthPoiMapSync.LocalObjectives=null;Check(RebirthPurgeHudProgress.Text(p).StartsWith("—/—"),"unknown objective snapshot never claims completion");world.Remote=false;
  RebirthPurgeSupplyService.Published=null;Tick();Check(p.Buffs.GetCustomVar("_rbPurgeSupplyKnown")==0&&RebirthPurgeHudProgress.Text(p).EndsWith("—/—"),"missing account publication hides stale supply values");
  world=new World();GameManager.Instance.World=world;var peers=new List<EntityPlayerLocal>();for(int i=0;i<20;i++){var peer=new EntityPlayerLocal{Key="p"+i};peers.Add(peer);world.aiDirector.Tracked.trackedPlayers.list.Add(new Tracked{Player=peer});}RebirthPurgeSupplyService.Published=new();Tick();Check(peers.FindAll(x=>x.Buffs.Writes>0).Count==16,"projection visits at most 16 players in a pulse");Tick();Check(peers.TrueForAll(x=>x.Buffs.GetCustomVar("_rbPurgeSupplyTarget")==75),"round robin eventually projects every connected player");Check(RebirthPurgeHudProgress.Text(null)=="pending","null player remains pending");
@@ -23,7 +27,7 @@ class RebirthSandboxOptionManager{public static RebirthSandboxOptionManager Curr
 class GameManager{public static GameManager Instance=new();public World World;}
 class World{public bool Remote;public bool IsRemote()=>Remote;public Director aiDirector=new();public Biome GetBiome(int x,int z)=>new();}
 class Biome{public string m_sBiomeName="forest";}
-class Director{public AIDirectorPlayerManagementComponent Tracked=new();public T GetComponent<T>()=>(T)(object)Tracked;}
+class Director{public BloodMoon BloodMoonComponent=new();public AIDirectorPlayerManagementComponent Tracked=new();public T GetComponent<T>()=>(T)(object)Tracked;}
 class AIDirectorPlayerManagementComponent{public TrackedList trackedPlayers=new();}
 class TrackedList{public List<Tracked> list=new();}
 class Tracked{public EntityPlayer Player;}
@@ -33,9 +37,22 @@ class Position{public float x,z;}
 class Vars{Dictionary<string,float> data=new();public int Writes;public bool HasCustomVar(string k)=>data.ContainsKey(k);public float GetCustomVar(string k)=>data.TryGetValue(k,out var v)?v:0;public void SetCustomVar(string k,float v,bool sync){if(!sync)throw new Exception("unsynchronized");Writes++;data[k]=v;}}
 static class RebirthPurgeKillContributor{public static string Identify(EntityPlayer p,World w)=>p.Key;}
 static class RebirthPurgeSupplyService{public static Dictionary<string,RebirthPurgeSupplyAccount> Published;}
-class RebirthPurgeSupplyAccount{public long EarnedDrops,ObservedCredits,SpentCredits;}
-class RebirthPurgeObjectiveProgress{public static RebirthPurgeObjectiveProgress Instance=new();public Dictionary<string,BiomeProgress> Published;public class BiomeProgress{public int Cleared,Eligible;}}
-class RebirthPurgeObjectiveFrame{public bool Known;public Dictionary<string,Biome> Biomes;public class Biome{public int Cleared,Eligible;}}
-static class RebirthPoiMapSync{public static RebirthPurgeObjectiveFrame LocalObjectives;}
+class RebirthPurgeSupplyAccount{public long EarnedDrops,ObservedCredits,SpentCredits,DeliveredDrops;}
+class RebirthPurgeObjectiveProgress{public static RebirthPurgeObjectiveProgress Instance=new();public Guid WorldId;public long Revision;public void InitializeLoadedWorld(){}public Dictionary<string,BiomeProgress> Published;public class BiomeProgress{public int Cleared,Eligible;public Dictionary<int,int> ClearedByTier=new(),EligibleByTier=new();}}
+class RebirthPurgeObjectiveFrame{public Guid World,Session;public int ProgressionMode;public bool Known;public Dictionary<string,Biome> Biomes;public class Biome{public int Cleared,Eligible;public Dictionary<int,int> ClearedByTier=new(),EligibleByTier=new();}}
+static class RebirthPoiMapSync{public static Guid LocalWorld,LocalSession;public static RebirthPurgeObjectiveFrame LocalObjectives;}
 static class Localization{public static string Get(string key)=>key=="xuiRebirthPurgeHudProgress"?"{0}/{1} {2}/{3}":"pending";}
 static class Log{public static void Warning(string text){}}
+
+// Explicit provider doubles. Production HUD and progression arithmetic remain linked.
+class BloodMoon {public bool BloodMoonActive;}
+static class SkyManager {public static bool IsBloodMoonVisible()=>false;}
+static class RebirthHordeNightHud {public static bool Visible(EntityPlayerLocal p)=>false;}
+static class RebirthPurgeSupplyEquipment {public static int Tier(EntityPlayer p)=>0;}
+static class RebirthPurgeScanner {public static string LifetimeText(EntityPlayerLocal p)=>"";}
+static class RebirthPurgeObjectivePolicy {public static int ProgressionMode;}
+class RebirthPurgePoiCensus {public static RebirthPurgePoiCensus Instance=new();public void InitializeLoadedWorld(){}}
+class RebirthPoiWorldLifecycle {public static RebirthPoiWorldLifecycle Instance=new();public RebirthPoiWorldStore Store=new();public bool TryGetStore(out RebirthPoiWorldStore store){store=Store;return store!=null;}}
+class RebirthPoiWorldStore {public HudSnapshot Published=new();}
+class HudSnapshot {public Guid WorldId;public long Revision;public HudBinding Binding=new();}
+class HudBinding {public bool IsCurrent=true;}

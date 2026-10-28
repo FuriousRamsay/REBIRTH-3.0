@@ -1,0 +1,11 @@
+{
+ "name":"Native individual light command route smoke",
+ "stopOnFailure":true,
+ "preconditions":"NOT RUN. Lead owns disposable runtime. On foot, all modal windows closed, crosshair aimed within native reach at one parent-verified eligible manual-light fixture with native light command enabled; source and POI fixture prepared separately. Record initial physical/pin/count state first. This smoke dispatches one real E gesture only; semantic qualification is in POI_MANUAL_NATIVE_INPUT_20261027.md.",
+ "steps":[
+  {"key":{"name":"E"}},
+  {"wait":1},
+  {"screenshot":"poi_manual_native_light_command"},
+  {"expectNoErrors":true}
+ ]
+}

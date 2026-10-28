@@ -15,7 +15,7 @@ class EntityPlayer:EntityAlive {public bool IsSpectator;public bool IsAlive()=>!
 class Script {public bool Running;public bool IsRunning()=>Running;}
 class Handle {public bool IsCompleted=true;public Action onComplete;}
 class SleeperVolume {public PrefabInstance prefabInstance;public Vec BoxMin=new Vec(),BoxMax=new Vec(10,10,10);public short spawnCountMin=1,spawnCountMax=2;public int flags,numSpawned;public bool isSpawning,wasCleared;public Script minScript;public Dictionary<int,object> respawnMap=new Dictionary<int,object>();public HashSet<int> pendingSpawnMap=new HashSet<int>();public Queue<Handle> pendingSpawnOps=new Queue<Handle>();}
-class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPos(int x,int z)=>Prefab;}
+class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPosInside(int x,int z)=>Prefab;}
 class GameStateManager {public bool IsGameStarted()=>true;}
 class GameManager {public static GameManager Instance;public World World;public bool IsStartingGame;public GameStateManager gameStateManager=new GameStateManager();public bool IsEditMode()=>false;public Decorator Decorator=new Decorator();public Decorator GetDynamicPrefabDecorator()=>Decorator;}
 class ConnectionManager {public bool IsServer=true;}

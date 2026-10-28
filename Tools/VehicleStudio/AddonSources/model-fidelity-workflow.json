@@ -1,0 +1,11 @@
+{
+ "appliesTo":"Every station, plow, armor and future model",
+ "gateOrder":[
+  {"stage":"geometry_plan","requires":["Inventory every visible shape","Record measured image landmarks separately from estimated 3D dimensions","Resolve common axes, scale, camera, positions, rotations, dimensions and attachment endpoints","Enumerate repeated parts rather than hide them in generic group descriptions","Validate projected contours and occlusion relationships against reference before Blender"]},
+  {"stage":"clay_model","requires":["Build from validated geometry plan","Render without textures, bump or emission","Compare full composition and individual components","Correct geometry and revalidate until reference shapes match"]},
+  {"stage":"texture_plan","startsOnlyAfter":"clay_model passes","requires":["Inventory materials per component","Specify reference color observations with lighting uncertainty","Specify roughness and metallic behavior per material","Separate modeled relief from normal-map detail","Define wear location, scale, direction and intensity","Plan UV islands, seams, density and 2048-square map allocation","Declare color spaces and normal-map convention","Define neutral and reference-like comparison lighting","Validate material plan against reference before creating textures"]},
+  {"stage":"textured_blender","requires":["Apply validated texture plan at 2K","Inspect actual saved model under comparison lighting","Verify all materials and overall reference fidelity"]},
+  {"stage":"unity","startsOnlyAfter":"textured_blender passes","requires":["Inspect imported geometry and material mapping","Verify actual render and camper fit","Coordinate shared builds and installation","Never install an unaccepted candidate"]}
+ ],
+ "acceptance":"Written plans, numeric checks and successful renders are evidence, not automatic visual acceptance. Preserve failures and explain actual remaining differences."
+}

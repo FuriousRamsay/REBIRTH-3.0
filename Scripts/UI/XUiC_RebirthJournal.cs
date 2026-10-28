@@ -100,6 +100,7 @@ public sealed class XUiC_RebirthJournal : XUiController {
     }
     public override void Update(float dt)
     {
+        using var captureTiming = RebirthGameBridgeFrames.MeasureUi(4);
         base.Update(dt);
         // OnOpen refreshes entries and reader state. Hidden windows must not
         // rebuild labels or reload artwork when global guide revisions change.

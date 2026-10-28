@@ -485,6 +485,9 @@ public static class RebirthCompanionOwnerTeleportService
         if (player == null || player.world == null || player.world.IsRemote() || player.world.IsEditor())
             return;
 
+        World world = player.world;
+        if (!ReferenceEquals(GameManager.Instance?.World, world) || !ReferenceEquals(world.GetEntity(player.entityId), player)) return;
+
         PlayerTeleportState state;
         lock (Sync)
         {
@@ -539,6 +542,19 @@ public static class RebirthCompanionOwnerTeleportService
         }
 
         if (Time.realtimeSinceStartup < state.SettleAt) return;
+
+        try { RebirthNpcLifecycle.EnsureCurrentWorldScope(); }
+        catch (InvalidOperationException)
+        {
+            // Match player-spawn deferral: retain the request until original NPC custody can retire.
+            if (ReferenceEquals(GameManager.Instance?.World, world) && ReferenceEquals(world.GetEntity(player.entityId), player))
+            {
+                state.SettleAt = Time.realtimeSinceStartup + SettleSeconds;
+                lock (Sync) if (!States.ContainsKey(player.entityId)) States.Add(player.entityId, state);
+            }
+            return;
+        }
+        if (!ReferenceEquals(GameManager.Instance?.World, world) || !ReferenceEquals(world.GetEntity(player.entityId), player)) return;
 
         state.Pending = false;
         if (player.IsDead()) return;

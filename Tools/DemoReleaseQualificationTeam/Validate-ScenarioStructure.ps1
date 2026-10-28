@@ -5,7 +5,7 @@ if ([string]::IsNullOrWhiteSpace($ScenarioRoot)) { $ScenarioRoot = $PSScriptRoot
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $runner = Get-Content -LiteralPath (Join-Path $projectRoot 'Tools/GameBridge/gamebridge.ps1') -Raw
-$steps = @('action','markItem','expectItemDelta','markSkill','expectSkillGain','expectChallenge','console','wait','look','expectCvar','waitFor','expectStat','expectLivingEntities','activateNearestEntity','expectThreats','expectBuff','expectNoBuff','expectItem','expectNoItem','ui','expectWindowOpen','screenshot','expectLog','expectNoErrors','expectUi','waitForUi','expectNoUi','expectTarget','expectSkill')
+$steps = @('action','markItem','expectItemDelta','markSkill','expectSkillGain','expectChallenge','console','wait','look','expectCvar','waitFor','expectStat','expectLivingEntities','activateNearestEntity','radialSelect','expectNpcGear','waitForWindowOpen','expectUiItem','waitForGuardIdle','expectThreats','expectBuff','expectNoBuff','expectItem','expectNoItem','ui','expectWindowOpen','screenshot','expectLog','expectNoErrors','expectUi','waitForUi','expectNoUi','expectTarget','expectSkill')
 $map = [regex]::Match($runner, '(?s)\$KvCommands\s*=\s*@\{(.*?)\r?\n\}').Groups[1].Value
 if (!$map) { throw 'Unable to retrieve bridge command map' }
 $commands = @([regex]::Matches($map, '(\w+)\s*=\s*@\(') | ForEach-Object { $_.Groups[1].Value })

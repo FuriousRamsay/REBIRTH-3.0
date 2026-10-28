@@ -19,10 +19,17 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     {
         if(cancellationNativeLifecycleQualified)return;
         var assembly=typeof(RegionFileManager).Assembly;
-        if(assembly.ManifestModule.ModuleVersionId!=new Guid("1a9a4203-3d95-4c90-b094-8926dec1ee9c"))
+        Guid module=assembly.ManifestModule.ModuleVersionId;
+        // Each identity is a reviewed image pair, never an independent MVID/hash allowlist.
+        // 3.4b6 guarded methods match the qualified 3.3 source; see Compatibility34 evidence.
+        string expectedImage=module==new Guid("1a9a4203-3d95-4c90-b094-8926dec1ee9c")
+            ? "FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705"
+            : module==new Guid("47c87570-1f44-4ad3-872b-95a9f98d316c")
+                ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4" : null;
+        if(expectedImage==null)
             throw new NotSupportedException("Unqualified placed cancellation native lifecycle module.");
         using(var input=File.OpenRead(assembly.Location))using(var sha=SHA256.Create())
-            if(BitConverter.ToString(sha.ComputeHash(input)).Replace("-","")!="FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705")
+            if(BitConverter.ToString(sha.ComputeHash(input)).Replace("-","")!=expectedImage)
                 throw new NotSupportedException("Unqualified placed cancellation native lifecycle image.");
         if(AccessTools.Constructor(typeof(RegionFileManager),new[]{typeof(string),typeof(string),typeof(int),typeof(bool)})==null)
             throw new MissingMethodException(typeof(RegionFileManager).FullName,".ctor");

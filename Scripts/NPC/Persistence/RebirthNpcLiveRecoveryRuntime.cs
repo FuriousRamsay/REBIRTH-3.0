@@ -20,7 +20,7 @@ internal static partial class RebirthNpcLiveRecoveryRuntime
         {
             if(!ThreadManager.IsMainThread())return true;
             var world=GameManager.Instance?.World;
-            if((context!=null||current!=null)&&(!ReferenceEquals(context,world)||directory!=GameIO.GetSaveGameDir()))return true;
+            if((context!=null||current!=null)&&(!ReferenceEquals(context,world)||directory!=RebirthNpcSaveScope.CurrentDirectory()))return true;
             foreach(var pair in deferred)if(!ReferenceEquals(pair.Value,world))return true;
             return false;
         }
@@ -70,6 +70,7 @@ internal static partial class RebirthNpcLiveRecoveryRuntime
     }
     private static void ResumeDeferred()
     {
+        if(deferred.Count==0)return;
         if(current!=null&&!current.Installed)return;
         if(current==null&&RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return;
         var world=GameManager.Instance?.World;
@@ -142,7 +143,7 @@ internal static partial class RebirthNpcLiveRecoveryRuntime
         if(pumping||!ThreadManager.IsMainThread())return;var world=GameManager.Instance?.World;
         if(world?.IsRemote()==true)
         {
-            if(RebirthNpcRuntimeRegistry.HasForeignDomain)return;
+            if(RebirthNpcRuntimeRegistry.HasForeignDomain||deferred.Count==0)return;
             foreach(var pair in new List<KeyValuePair<EntityRebirthNPC,World>>(deferred))
             {
                 if(!ReferenceEquals(pair.Value,world)||!ReferenceEquals(world.GetEntity(pair.Key.entityId),pair.Key))continue;
@@ -152,7 +153,7 @@ internal static partial class RebirthNpcLiveRecoveryRuntime
             return;
         }
         if(world?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true)return;
-        string save=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(save)||!ReferenceEquals(world,readyWorld))return;
+        string save=RebirthNpcSaveScope.CurrentDirectory();if(string.IsNullOrEmpty(save)||!ReferenceEquals(world,readyWorld))return;
         RebirthNpcSaveQuarantineBundle.RetryServerNativeAdmission(world,save);
         if(!ReferenceEquals(context,world)||directory!=save)
         {

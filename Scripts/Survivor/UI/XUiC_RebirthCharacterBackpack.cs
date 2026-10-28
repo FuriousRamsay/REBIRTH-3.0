@@ -16,7 +16,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     private int BagStride => Creative ? 73 : 76;
     private bool filtered, lockMode;
     private XUiC_BackpackWindow nativeBackpackWindow;
-    private bool EffectiveLockMode => nativeBackpackWindow?.UserLockMode ?? lockMode;
+    private bool EffectiveLockMode => nativeBackpackWindow?.standardControls?.UserLockMode ?? lockMode;
     private XUiView[] cellViews, lockViews;
     private XUiC_ItemStack[] cachedControllers;
     private XUiV_Label capacityLabel;
@@ -255,7 +255,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         if (!CanOperate(button)) return;
         PersistLocks();
         lockMode = !EffectiveLockMode;
-        if (nativeBackpackWindow != null) nativeBackpackWindow.UserLockMode = lockMode;
+        if (nativeBackpackWindow?.standardControls != null) nativeBackpackWindow.standardControls.UserLockMode = lockMode;
         RefreshBindings();
         foreach (var item in itemControllers) { item.RefreshBindings(); item.SetAllChildrenDirty(); }
         sender.ViewComponent.ToolTip = lockMode ? "Lock: select slots to protect from sorting" : "Lock slots";

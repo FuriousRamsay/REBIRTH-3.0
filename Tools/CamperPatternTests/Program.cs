@@ -10,9 +10,9 @@ class Program{
  var late=Panel(Child(module,"Late body split"),true);Time.realtimeSinceStartup=1.1f;RebirthCamperPatternAppearance.Apply(entity);Check(Value(late,pattern)==1,"Late-loaded split discovered on bounded retry");RebirthCamperPattern.Value="none";RebirthCamperPatternAppearance.Apply(entity);foreach(var r in new[]{truck,camper,door,lod,late})Check(Value(r,pattern)==0,"None restores all patterned sections");Check(floor.Blocks.Count==0&&steel.Blocks.Count==0,"Unrelated finish still untouched after None");Console.WriteLine("PASS "+checks+" linked production pattern renderer/MPB checks; actual shader/GPU remains separate qualification.");}
 }
 namespace UnityEngine{
- class Transform{public string name;public readonly List<Transform> Children=new();public readonly List<Renderer> Renderers=new();public Transform Find(string path){var parts=path.Split('/');Transform t=this;foreach(var p in parts){t=t.Children.FirstOrDefault(c=>c.name==p);if(t==null)return null;}return t;}public T[] GetComponentsInChildren<T>(bool inactive)=>Renderers.OfType<T>().Concat(Children.SelectMany(c=>c.GetComponentsInChildren<T>(inactive))).ToArray();}
+ class Transform{public string name;public readonly List<Transform> Children=new();public readonly List<Renderer> Renderers=new();public Transform Find(string path){var parts=path.Split('/');Transform t=this;foreach(var p in parts){t=t.Children.FirstOrDefault(c=>c.name==p);if(t==null)return null;}return t;}public void GetComponentsInChildren<T>(bool inactive,List<T> output){output.AddRange(GetComponentsInChildren<T>(inactive));}public T[] GetComponentsInChildren<T>(bool inactive)=>Renderers.OfType<T>().Concat(Children.SelectMany(c=>c.GetComponentsInChildren<T>(inactive))).ToArray();}
  class Material{public bool Pattern;public bool HasProperty(int id)=>Pattern;}
- class Renderer{public Material[] sharedMaterials;public readonly Dictionary<int,MaterialPropertyBlock> Blocks=new();public void GetPropertyBlock(MaterialPropertyBlock p,int index=-1){p.Clear();if(Blocks.TryGetValue(index,out var b))p.Copy(b);}public void SetPropertyBlock(MaterialPropertyBlock p,int index=-1){var b=new MaterialPropertyBlock();b.Copy(p);Blocks[index]=b;}}
+ class Renderer{public Material[] sharedMaterials;public void GetSharedMaterials(List<Material> output){output.Clear();output.AddRange(sharedMaterials);}public readonly Dictionary<int,MaterialPropertyBlock> Blocks=new();public void GetPropertyBlock(MaterialPropertyBlock p,int index=-1){p.Clear();if(Blocks.TryGetValue(index,out var b))p.Copy(b);}public void SetPropertyBlock(MaterialPropertyBlock p,int index=-1){var b=new MaterialPropertyBlock();b.Copy(p);Blocks[index]=b;}}
  class MaterialPropertyBlock{readonly Dictionary<int,float> values=new();public bool isEmpty=>values.Count==0;public void Clear()=>values.Clear();public void SetFloat(int id,float f)=>values[id]=f;public float GetFloat(int id)=>values.GetValueOrDefault(id);public void Copy(MaterialPropertyBlock p){values.Clear();foreach(var kv in p.values)values[kv.Key]=kv.Value;}}
  static class Shader{static readonly Dictionary<string,int> ids=new();public static int PropertyToID(string s){if(!ids.TryGetValue(s,out int id))ids[s]=id=ids.Count+1;return id;}}
  static class Time{public static float realtimeSinceStartup;}
@@ -20,3 +20,6 @@ namespace UnityEngine{
 class EntityVehicle{public Transform ModelTransform;}
 static class RebirthCamperPickupPaint{public static void Apply(EntityVehicle e){}}
 static class RebirthCamperPattern{public static string Value;public static string Current(EntityVehicle e)=>Value;}
+
+static class RebirthCamperWrapAppearance{public static bool Apply(UnityEngine.Renderer renderer,string id)=>false;}
+

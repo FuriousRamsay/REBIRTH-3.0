@@ -1,0 +1,17 @@
+{
+ "name":"Map reference cache lifecycle and navigation smoke",
+ "stopOnFailure":true,
+ "preconditions":"NOT RUN. Lead owns runtime. Disposable save; map open through native navigation. Full resolution/zoom/Purge-overlay qualification is staged in MAP_REFERENCE_CACHE_20261027.md, not established by this smoke.",
+ "steps":[
+  {"expectWindowOpen":"map"},
+  {"wait":1},
+  {"screenshot":"map_reference_initial"},
+  {"click":{"id":"btnRebirthCraftingTabCrafting","window":"map"}},
+  {"expectWindowOpen":"crafting"},
+  {"click":{"id":"btnRebirthCraftingTabMap","window":"crafting"}},
+  {"expectWindowOpen":"map"},
+  {"wait":1},
+  {"screenshot":"map_reference_reopened"},
+  {"expectNoErrors":true}
+ ]
+}

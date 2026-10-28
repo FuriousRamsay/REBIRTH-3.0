@@ -1,0 +1,70 @@
+{
+  "status": "REFERENCE_MEASUREMENT_ONLY",
+  "axisAnglesDegrees": {
+    "upper_rear_shaft": -11.142889858339318,
+    "front_upright": 87.8619505178742,
+    "nozzle": 14.981632572390918,
+    "crucible": 89.16158502559789
+  },
+  "elevationHypothesesDegrees": {
+    "top_collar": 23.294325910132297,
+    "crucible_rim": 24.512617220099987
+  },
+  "bounds": {
+    "bellows_front_upright": [
+      169,
+      278,
+      246,
+      721
+    ],
+    "bellows_rear_upright": [
+      389,
+      215,
+      469,
+      367
+    ],
+    "bellows_leather_outer": [
+      236,
+      324,
+      520,
+      651
+    ],
+    "compression_collar": [
+      475,
+      462,
+      558,
+      608
+    ],
+    "nozzle_visible": [
+      543,
+      502,
+      612,
+      577
+    ],
+    "furnace_flange": [
+      585,
+      470,
+      661,
+      593
+    ],
+    "crucible_outer": [
+      422,
+      619,
+      624,
+      913
+    ],
+    "crucible_inner_rim": [
+      447,
+      636,
+      590,
+      704
+    ],
+    "hearth_opening": [
+      904,
+      390,
+      1251,
+      690
+    ]
+  },
+  "interpretation": "Elevation hypotheses alone do not resolve camera azimuth, focal length, depth or component transforms. Model generation remains gated."
+}

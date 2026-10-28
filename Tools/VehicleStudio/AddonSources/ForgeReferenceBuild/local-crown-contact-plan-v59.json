@@ -1,0 +1,112 @@
+{
+  "source": "LocalCrownLayers_v58/local-layers-clay.blend",
+  "status": "GEOMETRY_CONTACT_CANDIDATE_NOT_FIDELITY_PASS",
+  "method": "Use top faces whose normals align above 0.5 with measured head axis. Seat base ring 0.5 mm above them. Parent assignments derived from actual contact candidates and crown layout. Nearest-face positions need visual review.",
+  "parts": [
+    {
+      "object": "harness_crown_left_cross",
+      "parent": "harness_crown_diagonal_left",
+      "axis": [
+        -0.3048868477344513,
+        -0.20727506279945374,
+        0.929559588432312
+      ],
+      "base": [
+        0.0012215909082442522,
+        0.33317357301712036,
+        0.9107879400253296
+      ],
+      "contact": [
+        0.0009268486755900085,
+        0.33045902848243713,
+        0.9039754271507263
+      ],
+      "normal": [
+        0.052746206521987915,
+        0.3746887147426605,
+        0.9256491661071777
+      ],
+      "method": "NEAREST_TOP_FACE_POSITION_REVIEW_REQUIRED",
+      "delta": [
+        -0.0004471856518648565,
+        -0.002818167209625244,
+        -0.006347715854644775
+      ],
+      "destination": [
+        -0.026461539790034294,
+        -0.0010967254638671875,
+        0.027758225798606873
+      ]
+    },
+    {
+      "object": "harness_crown_front_cross",
+      "parent": "harness_crown_cross_band",
+      "axis": [
+        -0.23684169352054596,
+        -0.36222100257873535,
+        0.9014998078346252
+      ],
+      "base": [
+        0.0676482766866684,
+        0.24167701601982117,
+        0.8917191028594971
+      ],
+      "contact": [
+        0.068133644759655,
+        0.2424193173646927,
+        0.8898716568946838
+      ],
+      "normal": [
+        -0.13084036111831665,
+        -0.42042461037635803,
+        0.8978440165519714
+      ],
+      "method": "AXIAL_TOP_FACE",
+      "delta": [
+        0.00036694854497909546,
+        0.0005611926317214966,
+        -0.0013967156410217285
+      ],
+      "destination": [
+        -0.003944888710975647,
+        -0.006937295198440552,
+        0.025938116014003754
+      ]
+    },
+    {
+      "object": "harness_crown_right_cross",
+      "parent": "harness_crown_cross_band",
+      "axis": [
+        0.5179518461227417,
+        -0.2845802903175354,
+        0.8066845536231995
+      ],
+      "base": [
+        0.5098084211349487,
+        0.2954683303833008,
+        0.8355671763420105
+      ],
+      "contact": [
+        0.5071002244949341,
+        0.29695630073547363,
+        0.8313493132591248
+      ],
+      "normal": [
+        0.42262035608291626,
+        -0.19428293406963348,
+        0.8852378726005554
+      ],
+      "method": "AXIAL_TOP_FACE",
+      "delta": [
+        -0.002449214458465576,
+        0.0013456940650939941,
+        -0.003814518451690674
+      ],
+      "destination": [
+        -0.0025276541709899902,
+        0.002661973237991333,
+        0.010439477860927582
+      ]
+    }
+  ]
+}

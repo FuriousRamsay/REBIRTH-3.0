@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net481</TargetFramework>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GameRoot>$(MSBuildProjectDirectory)\..\..\..\..\..</GameRoot>
+    <Managed>$(GameRoot)\7DaysToDie_Data\Managed</Managed>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\Scripts\Vehicles\Camper\RebirthCamperCharacterScope.cs" />
+    <Compile Include="..\..\..\Scripts\GameBridge\RebirthGameBridgeVehicleSequence.cs" />
+    <Compile Include="..\..\..\Scripts\Vehicles\Camper\XUiC_RebirthCamperModules.cs" />
+    <Compile Include="..\..\..\Scripts\Vehicles\Camper\XUiC_RebirthCamperStationPicker.cs" />
+    <Compile Include="..\..\..\Scripts\Vehicles\Camper\RebirthCamperRadial.cs" />
+    <Reference Include="mscorlib"><HintPath>$(Managed)\mscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(GameRoot)\Mods\0_TFP_Harmony\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="RebirthUtils"><HintPath>..\..\..\RebirthUtils.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(Managed)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(Managed)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(Managed)\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.VehiclesModule"><HintPath>$(Managed)\UnityEngine.VehiclesModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(Managed)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="InControl"><HintPath>$(Managed)\InControl.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(Managed)\Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

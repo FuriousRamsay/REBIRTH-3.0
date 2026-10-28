@@ -1,0 +1,12 @@
+{
+  "status": "COVERAGE_DIAGNOSTIC_NOT_FIDELITY_PASS",
+  "domainPixels": 472371,
+  "originalStoneCoverageFraction": 0.45588531048688424,
+  "revisedStoneCoverageFraction": 0.5671220290830724,
+  "uncoveredPixels": 204479,
+  "limitations": [
+    "Includes occluded regions behind bellows, crucible and harness; not all uncovered pixels require stones",
+    "Uses draft contours, not segmentation of reference",
+    "Does not assess depths, intersections, silhouette fidelity or material quality"
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "source": "HearthLipRecession_v47/lip-recession-clay.blend",
+  "object": "furnace_core",
+  "method": "In-memory weld test only, maximum10 micrometers. Explicit duplicate pairs, no hole filling and no source edit.",
+  "pairs": [
+    {
+      "sourceIndex": 31888,
+      "targetIndex": 31887,
+      "sourcePosition": [
+        0.003653449472039938,
+        0.25468015670776367,
+        0.7741897702217102
+      ],
+      "targetPosition": [
+        0.003648267826065421,
+        0.25467434525489807,
+        0.7741841077804565
+      ],
+      "distanceMeters": 9.627340251143539e-06
+    },
+    {
+      "sourceIndex": 31884,
+      "targetIndex": 2439,
+      "sourcePosition": [
+        0.0036296481266617775,
+        0.2546593248844147,
+        0.7742457985877991
+      ],
+      "targetPosition": [
+        0.0036244906950742006,
+        0.25465384125709534,
+        0.77424156665802
+      ],
+      "distanceMeters": 8.635884414805933e-06
+    },
+    {
+      "sourceIndex": 22754,
+      "targetIndex": 25178,
+      "sourcePosition": [
+        0.27240633964538574,
+        0.35478562116622925,
+        0.8525813817977905
+      ],
+      "targetPosition": [
+        0.2724006175994873,
+        0.35478413105010986,
+        0.8525819778442383
+      ],
+      "distanceMeters": 5.942855095066325e-06
+    },
+    {
+      "sourceIndex": 18495,
+      "targetIndex": 18496,
+      "sourcePosition": [
+        0.27252185344696045,
+        0.35447758436203003,
+        0.8525209426879883
+      ],
+      "targetPosition": [
+        0.27252209186553955,
+        0.35447192192077637,
+        0.8525192737579346
+      ],
+      "distanceMeters": 5.908080220699015e-06
+    },
+    {
+      "sourceIndex": 27288,
+      "targetIndex": 8909,
+      "sourcePosition": [
+        0.27248239517211914,
+        0.3545847535133362,
+        0.8525373339653015
+      ],
+      "targetPosition": [
+        0.2724766135215759,
+        0.3545832633972168,
+        0.8525379300117493
+      ],
+      "distanceMeters": 6.000266695819802e-06
+    },
+    {
+      "sourceIndex": 7346,
+      "targetIndex": 29522,
+      "sourcePosition": [
+        0.24160650372505188,
+        0.7235371470451355,
+        0.8384202122688293
+      ],
+      "targetPosition": [
+        0.2416079342365265,
+        0.7235362529754639,
+        0.8384189009666443
+      ],
+      "distanceMeters": 2.1366415415924693e-06
+    },
+    {
+      "sourceIndex": 31885,
+      "targetIndex": 18708,
+      "sourcePosition": [
+        0.0036490419879555702,
+        0.2546536326408386,
+        0.7742528915405273
+      ],
+      "targetPosition": [
+        0.0036438736133277416,
+        0.2546478807926178,
+        0.7742473483085632
+      ],
+      "distanceMeters": 9.51437200450442e-06
+    },
+    {
+      "sourceIndex": 23614,
+      "targetIndex": 51500,
+      "sourcePosition": [
+        0.24169349670410156,
+        0.7255630493164062,
+        0.8352982401847839
+      ],
+      "targetPosition": [
+        0.24169351160526276,
+        0.7255628108978271,
+        0.8352954983711243
+      ],
+      "distanceMeters": 2.75220050283543e-06
+    },
+    {
+      "sourceIndex": 18707,
+      "targetIndex": 18709,
+      "sourcePosition": [
+        0.003568632761016488,
+        0.2546887993812561,
+        0.7742272019386292
+      ],
+      "targetPosition": [
+        0.0035617435351014137,
+        0.2546840310096741,
+        0.7742224931716919
+      ],
+      "distanceMeters": 9.610998267720158e-06
+    },
+    {
+      "sourceIndex": 31320,
+      "targetIndex": 7229,
+      "sourcePosition": [
+        0.29835760593414307,
+        0.772793173789978,
+        0.7979924082756042
+      ],
+      "targetPosition": [
+        0.298362135887146,
+        0.7728006839752197,
+        0.797989010810852
+      ],
+      "distanceMeters": 9.405643163325477e-06
+    },
+    {
+      "sourceIndex": 17249,
+      "targetIndex": 51503,
+      "sourcePosition": [
+        0.2415265440940857,
+        0.7215027213096619,
+        0.8421149253845215
+      ],
+      "targetPosition": [
+        0.24151745438575745,
+        0.7215064764022827,
+        0.8421143889427185
+      ],
+      "distanceMeters": 9.849430841005291e-06
+    }
+  ],
+  "before": {
+    "vertices": 55114,
+    "faces": 56958,
+    "boundaryEdges": 804
+  },
+  "after": {
+    "vertices": 55103,
+    "faces": 56946,
+    "boundaryEdges": 804,
+    "nonManifoldEdges": 806,
+    "zeroAreaFaces": 0
+  },
+  "status": "TOPOLOGY_REVIEW_REQUIRED"
+}

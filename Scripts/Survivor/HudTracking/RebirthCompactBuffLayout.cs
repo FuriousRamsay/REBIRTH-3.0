@@ -41,6 +41,7 @@ public static class RebirthCompactBuffLayout
     private sealed class WidgetGeometry
     {
         private UIWidget widget;
+        private Transform widgetTransform;
         private Vector3 before, written;
         private int beforeWidth, beforeHeight, width, height;
         public void Apply(UIWidget next, Vector3 position, int nextWidth, int nextHeight)
@@ -48,21 +49,22 @@ public static class RebirthCompactBuffLayout
             if (widget != next)
             {
                 Restore(); widget = next;
-                if (widget != null) { before = widget.transform.localPosition; beforeWidth = widget.width; beforeHeight = widget.height; }
+                if (widget != null) { widgetTransform = widget.transform; before = widgetTransform.localPosition; beforeWidth = widget.width; beforeHeight = widget.height; }
             }
             if (widget == null) return;
             written = position; width = nextWidth; height = nextHeight;
-            if (widget.transform.localPosition != position) widget.transform.localPosition = position;
+            // Component ownership is fixed; geometry itself remains live.
+            if (widgetTransform.localPosition != position) widgetTransform.localPosition = position;
             if (widget.width != width || widget.height != height) widget.SetDimensions(width, height);
         }
         public void Restore()
         {
             if (widget != null)
             {
-                if (widget.transform.localPosition == written) widget.transform.localPosition = before;
+                if (widgetTransform.localPosition == written) widgetTransform.localPosition = before;
                 if (widget.width == width && widget.height == height) widget.SetDimensions(beforeWidth, beforeHeight);
             }
-            widget = null;
+            widget = null; widgetTransform = null;
         }
     }
     private sealed class EntryState

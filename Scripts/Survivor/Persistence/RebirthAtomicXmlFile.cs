@@ -10,7 +10,7 @@ using System.Xml.Linq;
 /// <summary>
 /// Small cross-platform persistence primitive for REBIRTH-owned XML records.
 /// Writes always occur in the destination directory so replacement never crosses volumes.
-/// The existing final file is retained as a last-good .bak whenever practical.
+/// Atomic replacement retains the previous primary bytes as .bak; their semantic validity is caller-owned.
 /// </summary>
 public static class RebirthAtomicXmlFile
 {
@@ -56,7 +56,6 @@ public static class RebirthAtomicXmlFile
         }
 
         string temp = path + ".tmp";
-        string backup = path + ".bak";
         try
         {
             string directory = Path.GetDirectoryName(path);
@@ -94,55 +93,13 @@ public static class RebirthAtomicXmlFile
             if (validation.Root == null)
                 throw new InvalidDataException("temporary XML has no root element");
 
-            if (!File.Exists(path))
-            {
-                File.Move(temp, path);
+            // If atomic replacement fails, retain the primary instead of deleting
+            // it before a move. Reuse the common publisher rather than another fallback.
+            if (RebirthDurableFileCommit.TryPublish(temp, path, out error))
                 return true;
-            }
-
-            // File.Replace is the preferred same-volume atomic operation. Some Unity/Mono
-            // environments do not support it; in that case keep a copied last-good backup,
-            // remove the old final, and move the fully validated temp into place.
-            try
-            {
-                File.Replace(temp, path, backup);
-                return true;
-            }
-            catch (PlatformNotSupportedException)
-            {
-                // fall through to portable replacement
-            }
-            catch (NotSupportedException)
-            {
-                // fall through to portable replacement
-            }
-            catch (IOException)
-            {
-                // File.Replace can fail on some filesystems despite same-directory paths.
-                // The portable path below still preserves a last-good copy.
-            }
-
-            if (File.Exists(backup))
-                File.Delete(backup);
-            File.Copy(path, backup, true);
-            File.Delete(path);
-            try
-            {
-                File.Move(temp, path);
-                return true;
-            }
-            catch
-            {
-                // Never intentionally leave the record without a readable final if the
-                // portable replacement move fails after the old final was removed.
-                try
-                {
-                    if (!File.Exists(path) && File.Exists(backup))
-                        File.Copy(backup, path, true);
-                }
-                catch { }
-                throw;
-            }
+            // Preserve this helper's existing failed-candidate cleanup contract.
+            try { if (File.Exists(temp)) File.Delete(temp); } catch { }
+            return false;
         }
         catch (Exception ex)
         {

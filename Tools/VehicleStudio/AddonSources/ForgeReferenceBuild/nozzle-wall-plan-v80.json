@@ -1,0 +1,8 @@
+{
+  "source": "ValidatedBevelCleanup_v78/validated-bevel-clay.blend",
+  "object": "planned_mesh_113",
+  "method": "Add3 mm inward solidify wall to open swept nozzle, with end rims. Preserve original outer surface vertices, pose and hardware. Eight confirmed empty construction objects hidden, not deleted. Validate evaluated mesh and outer bounds before save.",
+  "thicknessMeters": 0.003,
+  "offset": -1.0,
+  "status": "TOPOLOGY_AND_FIT_REVIEW_REQUIRED"
+}

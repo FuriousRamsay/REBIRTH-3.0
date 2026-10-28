@@ -1,0 +1,24 @@
+{
+ "name":"Bank OFF then ON retains explicit POI OFF",
+ "stopOnFailure":true,
+ "preconditions":"NOT RUN. User-owned disposable save, authorized local owner, camperCamp inside eligible unclaimed POI, Energy open with fueled Generator selected but OFF, POI requestOFF and physical lampsOFF. Guard remains enabled. Capture native light metadata/power at high rate or video across each bank toggle: UI labels/screenshots alone cannot detect a brief flash. Repeat using compact UI if available, multiple source kinds, UIclose while accepted operationpending and two campers.",
+ "steps":[
+  {"expectWindowOpen":"rebirthCamperEnergyManagement"},
+  {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+  {"waitForUi":{"id":"energyPowerLabel","text":"Turn Generator Off","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"waitForUi":{"id":"energyPoiLabel","text":"Turn POI Lights On","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"screenshot":"first_bank_on_without_poi_request"},
+  {"click":{"id":"energyPoiLights","window":"rebirthCamperEnergyManagement"}},
+  {"waitForUi":{"id":"energyPoiLabel","text":"Turn POI Lights Off","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+  {"waitForUi":{"id":"energyPowerLabel","text":"Turn Generator On","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"waitForUi":{"id":"energyPoiLabel","text":"Turn POI Lights On","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+  {"waitForUi":{"id":"energyPowerLabel","text":"Turn Generator Off","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"waitForUi":{"id":"energyPoiLabel","text":"Turn POI Lights On","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"screenshot":"bank_restart_retains_poi_off"},
+  {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+  {"waitForUi":{"id":"energyPowerLabel","text":"Turn Generator On","window":"rebirthCamperEnergyManagement","timeout":30}},
+  {"expectNoErrors":true}
+ ]
+}

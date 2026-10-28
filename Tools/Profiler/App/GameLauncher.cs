@@ -47,14 +47,14 @@ static class GameLauncher
         Environment.SetEnvironmentVariable("PROFILER_OUT", outputPath);
         Environment.SetEnvironmentVariable("PROFILER_ALLOC", trackAllocations ? "1" : "0");
         Environment.SetEnvironmentVariable("PROFILER_THREADS", SampleThreads ? "1" : "0");
-        T("launch begin");
+        T("launch begin: " + arguments);
         var si = new STARTUPINFO { cb = Marshal.SizeOf<STARTUPINFO>() };
         var cmd = $"\"{gameExe}\" {arguments}";
         if (!CreateProcessW(gameExe, cmd, IntPtr.Zero, IntPtr.Zero, false, 0x4 /*CREATE_SUSPENDED*/, IntPtr.Zero,
                 Path.GetDirectoryName(gameExe), ref si, out var pi))
             throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not start the game");
 
-        T("process created");
+        T("process created: pid=" + pi.dwProcessId);
         try
         {
             T("loadlibrary remote");
@@ -85,9 +85,28 @@ static class GameLauncher
             if (initResult != 0)
                 throw new InvalidOperationException($"The sampler could not start (code {initResult}). See {outputPath}.log");
 
+            var launchedPid = (int)pi.dwProcessId;
+            var currentProcess = GetCurrentProcess();
+            if (!DuplicateHandle(currentProcess, pi.hProcess, currentProcess, out var observationHandle, 0, false, 2))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not retain the game process handle for exit diagnostics");
             T("resume");
-            if (ResumeThread(pi.hThread) == uint.MaxValue) throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not resume the game");
+            if (ResumeThread(pi.hThread) == uint.MaxValue)
+            {
+                CloseHandle(observationHandle);
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not resume the game");
+            }
             LastMainThreadId = pi.dwThreadId;
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                try
+                {
+                    WaitForSingleObject(observationHandle, uint.MaxValue);
+                    if (GetExitCodeProcess(observationHandle, out var code)) T("game exited: pid=" + launchedPid + " code=" + code);
+                    else T("game exit code unavailable: pid=" + launchedPid + " error=" + Marshal.GetLastWin32Error());
+                }
+                catch (Exception ex) { T("game exit observation failed: " + ex); }
+                finally { CloseHandle(observationHandle); }
+            });
             return (int)pi.dwProcessId;
         }
         catch
@@ -157,6 +176,9 @@ static class GameLauncher
     [DllImport("kernel32.dll", SetLastError = true)] static extern uint ResumeThread(IntPtr t);
     [DllImport("kernel32.dll")] static extern bool TerminateProcess(IntPtr p, uint code);
     [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
+    [DllImport("kernel32.dll")] static extern IntPtr GetCurrentProcess();
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool DuplicateHandle(IntPtr sourceProcess, IntPtr source, IntPtr targetProcess, out IntPtr target, uint access, bool inherit, uint options);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern bool GetExitCodeProcess(IntPtr process, out uint code);
     [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr VirtualAllocEx(IntPtr p, IntPtr a, UIntPtr size, uint type, uint protect);
     [DllImport("kernel32.dll", SetLastError = true)] static extern bool WriteProcessMemory(IntPtr p, IntPtr a, byte[] b, UIntPtr size, out UIntPtr written);
     [DllImport("kernel32.dll", SetLastError = true)] static extern IntPtr CreateRemoteThread(IntPtr p, IntPtr attr, UIntPtr stack, IntPtr fn, IntPtr arg, uint flags, out uint id);

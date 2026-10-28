@@ -1,0 +1,29 @@
+{
+  "source": "CrucibleRimBreaks_v70/rim-breaks-clay.blend",
+  "object": "planned_mesh_002",
+  "removeEdge": {
+    "edgeIndex": 214,
+    "vertexIndices": [
+      864,
+      865
+    ],
+    "worldEndpoints": [
+      [
+        -0.42508259415626526,
+        0.13563361763954163,
+        0.11539945006370544
+      ],
+      [
+        -0.42508259415626526,
+        0.13563361763954163,
+        0.0833994448184967
+      ]
+    ],
+    "linkedFaces": 0,
+    "isWire": true,
+    "isBoundary": false,
+    "lengthMeters": 0.03200000524520874
+  },
+  "method": "Remove only unrendered32 mm axial wire edge below floor. Preserve all vertices and faces, rim, pose and hardware.",
+  "status": "TOPOLOGY_VERIFICATION_REQUIRED"
+}

@@ -1,0 +1,20 @@
+{
+  "source": "BellowsLeatherNormals_v35/leather-normals-clay.blend",
+  "status": "EXPERIMENT_REQUIRES_CONTACT_AND_CLAY_REVIEW",
+  "parts": [
+    {
+      "object": "harness_crown_cross_band",
+      "modifier": "Fit to stone surface",
+      "fromOffset": 0.003,
+      "toOffset": 0.014
+    },
+    {
+      "object": "harness_crown_diagonal_left",
+      "modifier": "Fit to stone surface",
+      "fromOffset": 0.003,
+      "toOffset": 0.025
+    }
+  ],
+  "method": "Freeze original evaluated shrinkwrap surface first. Translate cross band +11 mm Z, diagonal +22 mm Z without changing any fitted surface shape. Preserve solidify and bevel. Refit associated rivet positions by nearest surface difference.",
+  "limits": "Full band lift may create excess clearance outside overlaps; inspect before accepting."
+}

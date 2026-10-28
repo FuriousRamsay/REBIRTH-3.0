@@ -104,14 +104,18 @@ internal static partial class Program
     private static void SolarBudget()
     {
         var c=Start();Guid id=Install(c,3);c.Loads=new[]{new Consumer {Id="first",DemandWatts=20},new Consumer {Id="second",DemandWatts=20}};Camp(c);Advance(c,4);
-        Assert(c.Loads[0].Supply==20&&c.Loads[1].Supply==20,"finite68-unit solar budget includes prior native30-unit buffer and fractional production carry; no refresh per consumer");
-        Assert(c.Runtime.TryCopyBank(id,out var solar)&&solar.CurrentPower==18,"shared solar budget debited by exactly50 units");
+        Assert(c.Loads[0].Supply==0&&c.Loads[1].Supply==0,"solar alone never supplies ordinary consumers directly");
+        Assert(c.Runtime.TryCopyBank(id,out var solar)&&solar.CurrentPower==solar.MaxPower,"unspent sunlight stays in the bounded native solar buffer");
         c.Vehicle.world.Chunk.Sun=14;Advance(c,4);Assert(c.Loads.All(v=>v.Supply==0),"native partial sunlight supplies zero solar");
         c.Vehicle.world.Chunk.Sun=15;c.Vehicle.world.Day=false;Advance(c,4);Assert(c.Loads.All(v=>v.Supply==0),"night supplies zero solar");
     }
     private static void SourceImagesAndRefusals()
     {
         var c=Start();Guid id=Install(c,1,9);var slots=c.Runtime.Snapshot().Sources.Single().Components;
+        Assert(RebirthCamperEnergyRuntime.TryCreateBank(Item(1),out var duplicate,out _)&&
+            !c.Runtime.TryPrepareInstall(c.Runtime.Snapshot().Revision,Item(1),duplicate,out _,out string duplicateReason)&&
+            duplicateReason=="A bank of this type is already installed."&&c.Runtime.Snapshot().Sources.Count==1,
+            "second bank of an installed source kind is refused before mutation");
         slots[0].itemValue.TextureFullArray=new byte[]{0,255,4,7};slots[0].itemValue.Metadata["foreign.paint"]="exact";
         slots[0].itemValue.Metadata["foreign.origin"]="do not strip";slots[0].itemValue.Seed=819;
         Assert(c.Runtime.TryPrepareContents(c.Runtime.Snapshot().Revision,id,slots,9,true,out var change,out _),"complete-data native codec DOUBLE input accepted");

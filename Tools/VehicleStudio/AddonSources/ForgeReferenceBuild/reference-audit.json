@@ -1,0 +1,60 @@
+{
+  "status": "NUMERICAL_REFERENCE_AUDIT_ONLY",
+  "sourceSize": [
+    1448,
+    1086
+  ],
+  "sha256": "04a5d2d06b82e9d40b0bb1da59eccd1ecf23ef6bd857d6445e0a11c70b191ca5",
+  "dataErrors": [],
+  "axisMeasurements": {
+    "near_upright": {
+      "lengthPx": 379.2967176235513,
+      "angleDegrees": 87.73353991568393
+    },
+    "far_upright": {
+      "lengthPx": 103.24727599312246,
+      "angleDegrees": 81.08507304285214
+    },
+    "upper_shaft": {
+      "lengthPx": 208.67678356731494,
+      "angleDegrees": -10.771454160198024
+    },
+    "lower_shaft": {
+      "lengthPx": 208.86598574205422,
+      "angleDegrees": -11.040940180323732
+    },
+    "nozzle_neck": {
+      "lengthPx": 62.6418390534633,
+      "angleDegrees": 16.69924423399362
+    },
+    "crucible_body": {
+      "lengthPx": 206.0606706773517,
+      "angleDegrees": 88.60959873595598
+    },
+    "front_retainer": {
+      "lengthPx": 171.74690681348528,
+      "angleDegrees": 84.65455462723291
+    },
+    "side_retainer": {
+      "lengthPx": 158.05062480104277,
+      "angleDegrees": 88.54978370906657
+    },
+    "side_link": {
+      "lengthPx": 54.230987451824994,
+      "angleDegrees": 22.78240573048169
+    }
+  },
+  "projectedRatios": {
+    "crucibleToFurnaceWidth": 0.2403846153846154,
+    "crucibleToFurnaceHeight": 0.37229987293519695,
+    "leatherToFurnaceWidth": 0.34134615384615385
+  },
+  "frameShaftAngleDifferenceDegrees": 0.2694860201257079,
+  "remaining": [
+    "Visual contour validation",
+    "Shared camera fit",
+    "Explicit 3D per-shape specification",
+    "Individual masonry and remaining hardware inventory"
+  ],
+  "blenderGenerationAllowed": false
+}

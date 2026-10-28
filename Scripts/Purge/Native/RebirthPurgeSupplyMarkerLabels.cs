@@ -13,8 +13,11 @@ internal static class RebirthPurgeSupplyMarkerLabels
     private static readonly Dictionary<Vector3i,string> positions=new Dictionary<Vector3i,string>();
     private static RebirthPoiWorldBinding binding;
     private static string path;
-    private static bool reported;
-    internal static void Reset(){binding=null;path=null;labels.Clear();positions.Clear();reported=false;}
+    private static bool reported,clearAfterWrite;
+    internal static void Reset(){binding=null;path=null;labels.Clear();positions.Clear();reported=false;clearAfterWrite=false;}
+    // Native WorldShuttingDown precedes the final WorldState.SetFrom/director
+    // write. Keep optional names until that existing write, then release scope.
+    internal static void PreserveUntilFinalWrite(){clearAfterWrite=true;}
     private static void Report(Exception error)
     {
         if(reported)return;reported=true;
@@ -75,6 +78,20 @@ internal static class RebirthPurgeSupplyMarkerLabels
         }
         catch(Exception error){Report(error);}
     }
+    internal static void BeforeRefresh(AIDirectorAirDropComponent __instance)
+    {
+        // Landing changes native cache positions before RefreshCrates can build
+        // unloaded markers. Do not wait for a disk save to publish owner names.
+        if(!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||
+           binding==null||!binding.IsCurrent||!ReferenceEquals(__instance?.Director?.World,binding.Scope))return;
+        try {Reindex(__instance,false);}catch(Exception error){Report(error);}
+    }
+    internal static void AfterRemove(AIDirectorAirDropComponent __instance,bool __runOriginal)
+    {
+        // Prune presentation only after native removal. Never remove a crate,
+        // nav object, observer or reward because an optional name is missing.
+        if(__runOriginal)BeforeRefresh(__instance);
+    }
     private static void Reindex(AIDirectorAirDropComponent director,bool restoring)
     {
         positions.Clear();var retained=new HashSet<int>();
@@ -86,8 +103,16 @@ internal static class RebirthPurgeSupplyMarkerLabels
             // Coincident crates with different owners must not display the wrong owner's name.
             string old;
             positions[cache.blockPos]=positions.TryGetValue(cache.blockPos,out old)&&old!=label.Owner?string.Empty:label.Owner;
+
+        }
+        // Resolve collisions before decorating existing positional markers too;
+        // native can reuse one positional marker for coincident crates.
+        foreach(var cache in director.supplyCrates)
+        {
+            Label label;if(!retained.Contains(cache.entityId)||!labels.TryGetValue(cache.entityId,out label))continue;
             var nav=NavObjectManager.Instance.GetNavObjectByEntityID(cache.entityId);
-            if(nav!=null)RebirthPurgeSupplyMapLabel.SetName(nav,label.Owner);
+            if(nav!=null)RebirthPurgeSupplyMapLabel.SetName(nav,
+                nav.TrackType==NavObject.TrackTypes.Entity?label.Owner:positions[cache.blockPos]);
         }
         var removed=new List<int>();foreach(int id in labels.Keys)if(!retained.Contains(id))removed.Add(id);
         foreach(int id in removed)labels.Remove(id);
@@ -95,7 +120,7 @@ internal static class RebirthPurgeSupplyMarkerLabels
     internal static void AfterRegisterPosition(string __0,Vector3 __1,NavObject __result,bool __runOriginal)
     {
         string owner;
-        if(__runOriginal&&__result!=null&&__0=="supply_drop"&&positions.TryGetValue(new Vector3i(__1),out owner)&&!string.IsNullOrEmpty(owner))
+        if(__runOriginal&&__result!=null&&__0=="supply_drop"&&positions.TryGetValue(new Vector3i(__1),out owner))
             RebirthPurgeSupplyMapLabel.SetName(__result,owner);
     }
     internal static void AfterWrite(AIDirectorAirDropComponent __instance,bool __runOriginal)
@@ -112,5 +137,6 @@ internal static class RebirthPurgeSupplyMarkerLabels
             if(File.Exists(path))File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);
         }
         catch(Exception error){Report(error);}
+        finally {if(clearAfterWrite)Reset();}
     }
 }

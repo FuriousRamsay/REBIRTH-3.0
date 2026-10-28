@@ -8,7 +8,7 @@ const run=promisify(execFile),here=dirname(fileURLToPath(import.meta.url)),root=
 let source=await readFile(join(root,'Scripts/Vehicles/Restoration/RebirthVehicleRestorationSystem.cs'),'utf8');
 function method(signature){const a=source.indexOf(signature);if(a<0)throw new Error(signature);let b=source.indexOf('{',a),depth=1,i=b+1;for(;depth&&i<source.length;i++){if(source[i]==='{')depth++;if(source[i]==='}')depth--;}return source.slice(a,i);}
 const whole=source;
-function wire(name){source=whole.slice(whole.indexOf('public sealed class '+name));return ['public override void read(','public override void write(','public int GetLength('].map(method).join('\n');}
+function wire(name){const start=whole.search(new RegExp('public sealed (?:partial )?class '+name+'\\b'));if(start<0)throw Error('Missing actual packet '+name);source=whole.slice(start);return ['public override void read(','public override void write(','public int GetLength('].map(method).join('\n');}
 const fixture=(await readFile(join(here,'test_vehicle_wire_fixture.cs'),'utf8')).replace('// REQUEST',wire('NetPackageRebirthVehicleAssemblyRequest')).replace('// SNAPSHOT',wire('NetPackageRebirthVehicleAssemblySnapshot'));
 source=whole;const helper='static class RebirthVehicleAssemblySerializer {public const int MaximumBytes=262144;'+method('public static string ReadBoundedPayload(')+'}';
 source=await readFile(join(root,'Scripts/Survivor/Network/RebirthSurvivorNetworkCodec.cs'),'utf8');

@@ -29,7 +29,9 @@ public sealed class XUiC_RebirthPurgePoiPopup:XUiController
     internal void Show(RebirthPoiMapRecord record)
     {
         if(ViewComponent==null)return;
-        bool visible=record!=null&&RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge;
+        bool visible=record!=null&&
+            (record.State==RebirthPoiClearanceState.Discovered||record.State==RebirthPoiClearanceState.Cleared)&&
+            RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge;
         if(!visible){ViewComponent.IsVisible=false;shown=null;awaitingPlacement=false;ClearPicture();return;}
         if(!ReferenceEquals(shown,record))
         {
@@ -81,7 +83,7 @@ public sealed class XUiC_RebirthPurgePoiPopup:XUiController
         // Use it only for this exact POI and epoch, never another location's counts.
         var scan=RebirthPurgeScanner.Observe(xui?.playerUI?.entityPlayer);
         int areas=record.AreasLeft,entities=record.EstimatedEntities;bool approximate=record.Approximate;
-        if(record.State==RebirthPoiClearanceState.Discovered&&scan!=null&&scan.PoiKey==record.Identity.Key&&scan.Epoch==record.Epoch)
+        if(RebirthPoiMapSync.PresentationMatchesTransport&&record.State==RebirthPoiClearanceState.Discovered&&scan!=null&&scan.PoiKey==record.Identity.Key&&scan.Epoch==record.Epoch)
         {areas=Math.Max(0,scan.Rooms-scan.Cleared);entities=scan.Enemies;approximate=scan.Approximate;}
         Set(Label("poiPopupAreasValue"),areas<0?"—":areas.ToString(CultureInfo.InvariantCulture));
         Set(Label("poiPopupEntitiesValue"),entities<0?"—":entities.ToString(CultureInfo.InvariantCulture)+(approximate?"+":""));

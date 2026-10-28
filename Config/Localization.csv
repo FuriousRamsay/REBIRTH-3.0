@@ -11325,3 +11325,624 @@ xuiRbNpcUiSkillsProgression,Skills & Progression
 xuiRbNpcEquipmentArmor,Armor
 xuiRebirthCamperEnergyBatteryReserveFormat,Battery reserve {0}%
 xuiRebirthCamperEnergyPoiCountFormat,POI lights selected: {0} / {1}
+xuiRbVehicleTune1, [live baseline]
+xuiRbVehicleTune2, [live runtime]
+xuiRbVehicleTune3, [proposal; native semantics unvalidated]
+xuiRbVehicleTune4, [read-only resolved XML]
+xuiRbVehicleTune5," [live spring, damper, target]"
+xuiRbVehicleTune6,Vehicle is no longer available in this local world.
+xuiRbVehicleTune7,This resolved XML property is read-only.
+xuiRbVehicleTune8,Expected true or false.
+xuiRbVehicleTune9,Vehicle unavailable or debug mode disabled.
+xuiRbVehicleTune10,Vehicle no longer available.
+xuiRbVehicleTune11,Source proposal recorded; no live capacity or configuration change.
+xuiRbVehicleTune12,Applied to this vehicle.
+xuiRbVehicleTune13,All original values restored.
+xuiRbVehicleTune14,Complete report written to the game log.
+xuiRbVehicleTune15,Temporary local tuning. Esc closes editing. Reset restores captured originals.
+xuiRbVehicleTune16,Vehicle tuning
+xuiRbVehicleTune17,Original: 
+xuiRbVehicleTune18,Debug vehicle tuning window. Temporary local values; export reproducible report.
+xuiRbVehicleTune19,rbvehicletune [entityId|close] - Esc closes editing. close also works with dm off or the vehicle gone.
+xuiRbVehicleTune20,Enable debug mode with dm first.
+xuiRbVehicleTune21,Only the local host can tune vehicles.
+xuiRbVehicleTune22,No available vehicle. Specify its entity ID.
+xuiRbVehicleTune23,Debug tuning XML is not loaded.
+xuiRbVehicleTune24,"Expected spring, damper, target position (0 to 1)."
+xuiRbVehicleTuneBounds,Values must be finite and between {0} and {1}.
+xuiRbVehicleTuneComponents,Expected {0} comma-separated values.
+xuiRbVehicleTuneCount,Expected {0} values.
+xuiRbVehicleTuneProposalCount,Expected {0} numeric components. Native property semantics require source review.
+xuiRbVehicleTuneNoMatch,No matching setting.
+xuiRbVehicleTuneButton0,Previous
+xuiRbVehicleTuneButton1,Next
+xuiRbVehicleTuneButton2,Apply
+xuiRbVehicleTuneButton3,Reset all
+xuiRbVehicleTuneButton4,Log values
+xuiRbVehicleTuneButton5,Close
+xuiRbVehicleTuneButton6,Find next
+xuiRbTunerTitle,Vehicle Tuning
+xuiRbTunerClose,Close  ×
+xuiRbTunerOriginal,Original
+xuiRbTunerReset,Reset changes
+xuiRbTunerExport,Log settings
+xuiRbTunerDrive,Drive & preview
+xuiRbTunerFooter,Edit mode • Mouse controls settings • Esc closes
+xuiRbTunerPreviewSpeed,Speed
+xuiRbTunerPreviewForwardLimit,Forward limit
+xuiRbTunerPreviewAcceleration,Acceleration
+xuiRbTunerCategory0,Speed & acceleration
+xuiRbTunerCategory1,Steering
+xuiRbTunerCategory2,Brakes
+xuiRbTunerCategory3,Suspension
+xuiRbTunerCategory4,Stability
+xuiRbTunerCategory5,Storage
+xuiRbTunerCategory6,Advanced
+xuiRbTunerPreviewEdit,Edit
+xuiRbTunerPreviewHide,Hide
+xuiRbTuneAcceleration,Acceleration
+xuiRbTuneAccelerationHelp,Torque scaling relative to this session
+xuiRbTuneForwardSpeed,Forward speed
+xuiRbTuneForwardSpeedHelp,Maximum cruising speed
+xuiRbTuneBoostedSpeed,Boosted speed
+xuiRbTuneBoostedSpeedHelp,Maximum speed while boosting
+xuiRbTuneReverseSpeed,Reverse speed
+xuiRbTuneReverseSpeedHelp,Maximum reversing speed
+xuiRbTuneBoostedReverseSpeed,Boosted reverse speed
+xuiRbTuneBoostedReverseSpeedHelp,Maximum reverse speed while boosting
+xuiRbTuneForwardTorque,Forward drive torque
+xuiRbTuneForwardTorqueHelp,Exact forward torque before restoration effects
+xuiRbTuneReverseTorque,Reverse drive torque
+xuiRbTuneReverseTorqueHelp,Exact reverse torque before restoration effects
+xuiRbTuneBoostedTorque,Boosted drive torque
+xuiRbTuneBoostedTorqueHelp,Exact boosted forward torque
+xuiRbTuneBoostedReverseTorque,Boosted reverse torque
+xuiRbTuneBoostedReverseTorqueHelp,Exact boosted reverse torque
+xuiRbTuneSteeringResponse,Steering response
+xuiRbTuneSteeringResponseHelp,How quickly the wheels turn
+xuiRbTuneSteeringReturn,Steering return
+xuiRbTuneSteeringReturnHelp,How quickly steering recenters
+xuiRbTuneSteeringAngle,Maximum turn angle
+xuiRbTuneSteeringAngleHelp,Furthest steering angle
+xuiRbTuneBrakeStrength,Brake strength
+xuiRbTuneBrakeStrengthHelp,How strongly the brakes slow the vehicle
+xuiRbTuneBodyMass,Vehicle weight
+xuiRbTuneBodyMassHelp,Body mass used by native physics
+xuiRbTuneBodyDrag,Coasting resistance
+xuiRbTuneBodyDragHelp,Slows movement without braking
+xuiRbTuneRotationDrag,Rotation resistance
+xuiRbTuneRotationDragHelp,Resists spinning and rolling
+xuiRbTuneMassCenterX,Balance left / right
+xuiRbTuneMassCenterXHelp,Sideways center of mass
+xuiRbTuneMassCenterY,Balance height
+xuiRbTuneMassCenterYHelp,Height of the center of mass
+xuiRbTuneMassCenterZ,Balance front / back
+xuiRbTuneMassCenterZHelp,Lengthwise center of mass
+xuiRbTuneGravity,Gravity
+xuiRbTuneGravityHelp,Use native gravitational force
+xuiRbTuneUprightAngle,Upright angle limit
+xuiRbTuneUprightAngleHelp,Threshold for native upright support
+xuiRbTuneUprightForce,Upright support
+xuiRbTuneUprightForceHelp,Strength of native upright support
+xuiRbTuneLeanAngle,Maximum lean
+xuiRbTuneLeanAngleHelp,Largest steering lean angle
+xuiRbTuneLeanThreshold,Lean threshold
+xuiRbTuneLeanThresholdHelp,Threshold for native lean behavior
+xuiRbTuneLeanDamping,Roll damping
+xuiRbTuneLeanDampingHelp,Resists unwanted angular movement
+xuiRbTuneLeanDampingThreshold,Damping threshold
+xuiRbTuneLeanDampingThresholdHelp,Threshold for native roll damping
+xuiRbTuneLeanRecovery,Lean recovery
+xuiRbTuneLeanRecoveryHelp,Strength of native lean recovery
+xuiRbTuneUnstickForce,Unsticking assistance
+xuiRbTuneUnstickForceHelp,Native velocity assistance when stuck
+xuiRbTuneCameraDistanceStopped,"Camera distance, stopped"
+xuiRbTuneCameraDistanceStoppedHelp,Camera distance at low speed
+xuiRbTuneCameraDistanceMoving,"Camera distance, moving"
+xuiRbTuneCameraDistanceMovingHelp,Camera distance near forward limit
+xuiRbTuneCameraHorizontal,Horizontal camera response
+xuiRbTuneCameraHorizontalHelp,Horizontal camera sensitivity
+xuiRbTuneCameraVertical,Vertical camera response
+xuiRbTuneCameraVerticalHelp,Vertical camera sensitivity
+xuiRbTuneHopStrength,Hop strength
+xuiRbTuneHopStrengthHelp,Upward velocity boost when hopping
+xuiRbTuneHopPosition,Hop force position
+xuiRbTuneHopPositionHelp,Forward offset of hop assistance
+xuiRbTuneWheelParticles,Wheel particle size
+xuiRbTuneWheelParticlesHelp,Scale of native wheel particles
+xuiRbTuneFuelEfficiency,Fuel economy
+xuiRbTuneFuelEfficiencyHelp,Distance traveled per liter of fuel
+xuiRbTuneFoodDrain,Pedaling food use
+xuiRbTuneFoodDrainHelp,Food drain while pedaling normally
+xuiRbTuneBoostedFoodDrain,Boosted pedaling food use
+xuiRbTuneBoostedFoodDrainHelp,Food drain while pedaling with boost
+xuiRbTuneAirSpeedRetention,Airborne speed retention
+xuiRbTuneAirSpeedRetentionHelp,Fraction of speed kept each physics step
+xuiRbTuneAirRotationRetention,Airborne rotation retention
+xuiRbTuneAirRotationRetentionHelp,Fraction of rotation kept each physics step
+xuiRbTuneWaterHeight,Water drag height
+xuiRbTuneWaterHeightHelp,Height used to detect water drag
+xuiRbTuneWaterSpeedRetention,Water speed retention
+xuiRbTuneWaterSpeedRetentionHelp,Fraction of speed kept in water
+xuiRbTuneWaterSpeedLimit,Water speed limit scale
+xuiRbTuneWaterSpeedLimitHelp,Speed limit multiplier while in water
+xuiRbTuneWaterLiftHeight,Buoyancy height
+xuiRbTuneWaterLiftHeightHelp,Height used by native buoyancy
+xuiRbTuneWaterLiftDepth,Buoyancy depth
+xuiRbTuneWaterLiftDepthHelp,Water depth used by native buoyancy
+xuiRbTuneWaterLiftForce,Buoyancy assistance
+xuiRbTuneWaterLiftForceHelp,Native upward velocity assistance
+xuiRbTuneWheelRadius,Wheel radius
+xuiRbTuneWheelRadiusHelp,Radius used by native wheel physics
+xuiRbTuneWheelMass,Wheel weight
+xuiRbTuneWheelMassHelp,Mass used by the wheel collider
+xuiRbTuneSuspensionTravel,Suspension travel
+xuiRbTuneSuspensionTravelHelp,Distance the wheel can move
+xuiRbTuneWheelForceHeight,Wheel force height
+xuiRbTuneWheelForceHeightHelp,Height where wheel forces act
+xuiRbTuneWheelCenterX,"Wheel position, left / right"
+xuiRbTuneWheelCenterXHelp,Sideways wheel collider offset
+xuiRbTuneWheelCenterY,"Wheel position, height"
+xuiRbTuneWheelCenterYHelp,Vertical wheel collider offset
+xuiRbTuneWheelCenterZ,"Wheel position, front / back"
+xuiRbTuneWheelCenterZHelp,Lengthwise wheel collider offset
+xuiRbTuneSpringStrength,Spring strength
+xuiRbTuneSpringStrengthHelp,Resistance to suspension compression
+xuiRbTuneSpringDamping,Spring damping
+xuiRbTuneSpringDampingHelp,Resistance to suspension bouncing
+xuiRbTuneSpringRest,Suspension rest position
+xuiRbTuneSpringRestHelp,Rest position within suspension travel
+xuiRbTuneWheelSetting,Wheel setting
+xuiRbTuneWheelSettingHelp,Native wheel collider setting
+xuiRbTuneStorageActualTotal,Current total cargo
+xuiRbTuneStorageActualTotalHelp,Actual base cargo plus installed containers
+xuiRbTuneStorageBaseProposal,Slots to export
+xuiRbTuneStorageBaseProposalHelp,Log this base-slot proposal only; storage stays unchanged
+xuiRbTuneStorageActualBase,Current base cargo
+xuiRbTuneStorageActualBaseHelp,Fixed base segment; separate from containers
+xuiRbTuneStorageContainers,Installed container capacity
+xuiRbTuneStorageContainersHelp,Sum of actual installed container slot counts
+xuiRbTuneProposal,Source proposal only.
+xuiRbTuneReadOnly,Read-only.
+xuiRbTuneSourceHelp,Requires a source change and restart; not applied live.
+xuiRbTuneResolvedHelp,Resolved native property; cannot be edited here.
+xuiRbTuneOn,On
+xuiRbTuneOff,Off
+xuiRbTunePositive,Acceleration scaling must stay above zero.
+xuiRbTuneUnavailable,This vehicle setting is unavailable.
+xuiRbTuneWheelFormat,Wheel {0}: {1}
+xuiRbTuneSlots,slots
+xuiRbTuneStorageUnavailable,Storage is unavailable or awaiting native reconciliation.
+xuiRbTuneStorageCamperOnly,Base cargo proposals apply to the modular camper only.
+xuiRbTuneStorageMaximum,Choose between 1 and 32767 slots to export. This is a logging proposal only.
+xuiRbTuneStorageOccupied,Storage proposals do not inspect or change cargo.
+xuiRbTunePreviewUnavailable,Passive preview is unavailable. Close the tuner and check its UI configuration.
+xuiRbTuneCloseFailed,The native window did not release input. Use rbvehicletune close to retry.
+xuiRbTuneCommandHelp,rbvehicletune [entityId|close|hide] - F8 switches edit/drive. F9 hides/shows preview. Esc and Close end tuning; close works with dm off or no vehicle.
+xuiRbTuneKeyConflict,F8 or F9 is already assigned to {0}. Rebind that action before opening the tuner.
+xuiRbTuneProposalShort,Source proposal; not live
+xuiRbTuneReadOnlyShort,Current value; read-only
+xuiRebirthCamperPoiLightOn,Light selected and pinned on.
+xuiRebirthCamperPoiLightOff,Light excluded from automatic selection.
+xuiRebirthCamperPoiLightPowerUnavailable,Light choice saved. Eligible camper power and more than two minutes of reserve are required.
+xuiRebirthCamperPoiLightDenied,This light cannot be controlled right now.
+modVehicleWrapMidnightCartographer,Midnight Cartographer Vehicle Wrap
+modVehicleWrapMidnightCartographerDesc,"Midnight Cartographer: Copper compass rose on the hood; mountain contours and turquoise rivers along the truck; copper panoramic maps on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTheHungryRoad,The Hungry Road Vehicle Wrap
+modVehicleWrapTheHungryRoadDesc,"The Hungry Road: Cracked ivory skull on the hood; skeletal hands emerging through thorns along the truck; skulls and vertebrae in crimson brambles on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDeadZoneRunner,Dead Zone Runner Vehicle Wrap
+modVehicleWrapDeadZoneRunnerDesc,"Dead Zone Runner: Yellow biohazard badge on the hood; zombie silhouettes behind torn quarantine tape along the truck; distressed containment chevrons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapShotgunMessiah,Shotgun Messiah Vehicle Wrap
+modVehicleWrapShotgunMessiahDesc,"Shotgun Messiah: Vintage ammunition company badge on the hood; cream brand lettering and shotgun shells along the truck; oxblood-edged branded advertising on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJensClinic,Jen's Clinic Vehicle Wrap
+modVehicleWrapJensClinicDesc,"Jen's Clinic: Illustrated trader jen portrait on the hood; teal clinic script and stethoscope along the truck; coral heartbeat and lavender flowers on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapFuriousRamsaySignature,FuriousRamsay Signature Vehicle Wrap
+modVehicleWrapFuriousRamsaySignatureDesc,"FuriousRamsay Signature: Supplied eye-and-crystal logo on the hood; oversized eye emblem and angular blue shards along the truck; violet crystal shards and repeated eye logo on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRektsLastNerve,Rekt's Last Nerve Vehicle Wrap
+modVehicleWrapRektsLastNerveDesc,"Rekt's Last Nerve: Scowling farmer portrait on the hood; tractor silhouettes and barbed-wire lettering along the truck; weathered farm-store signs on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHughsHeavySupply,Hugh's Heavy Supply Vehicle Wrap
+modVehicleWrapHughsHeavySupplyDesc,"Hugh's Heavy Supply: Stern veteran portrait on the hood; ammo crates and olive supply stencils along the truck; military quartermaster insignia on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBobsSalvageRoute,Bob's Salvage Route Vehicle Wrap
+modVehicleWrapBobsSalvageRouteDesc,"Bob's Salvage Route: Friendly mechanic portrait on the hood; wrench wings and scrapyard truck art along the truck; orange steel rivet panels on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJoelsFrontierFaith,Joel's Frontier Faith Vehicle Wrap
+modVehicleWrapJoelsFrontierFaithDesc,"Joel's Frontier Faith: Cowboy trader portrait on the hood; desert chapel and frontier lettering along the truck; western concho and rope borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPoppysOddities,Poppy's Oddities Vehicle Wrap
+modVehicleWrapPoppysOdditiesDesc,"Poppy's Oddities: Mysterious trader portrait on the hood; mutant specimen jars and violet vines along the truck; strange botanical specimen labels on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRektsHarvestHauler,Rekt's Harvest Hauler Vehicle Wrap
+modVehicleWrapRektsHarvestHaulerDesc,"Rekt's Harvest Hauler: Angry scarecrow badge on the hood; cornfields and farm auction typography along the truck; grain sacks and seed packet borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHughsWinterOutpost,Hugh's Winter Outpost Vehicle Wrap
+modVehicleWrapHughsWinterOutpostDesc,"Hugh's Winter Outpost: Snowbound supply shield on the hood; winter pine patrol silhouettes along the truck; arctic cargo identification panels on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBobsTowService,Bob's Tow Service Vehicle Wrap
+modVehicleWrapBobsTowServiceDesc,"Bob's Tow Service: Crossed tow hooks on the hood; retro roadside recovery advertisement along the truck; checkerboard grease-rag ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJoelsDesertMission,Joel's Desert Mission Vehicle Wrap
+modVehicleWrapJoelsDesertMissionDesc,"Joel's Desert Mission: Sunset cross-and-hat badge on the hood; mesa pilgrimage landscape along the truck; faded leather tooling bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJensNightShift,Jen's Night Shift Vehicle Wrap
+modVehicleWrapJensNightShiftDesc,"Jen's Night Shift: Teal moon and stethoscope on the hood; nocturnal clinic sign with lavender glow artwork along the truck; dark heartbeat and crescent strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRektsNoRefunds,Rekt's No Refunds Vehicle Wrap
+modVehicleWrapRektsNoRefundsDesc,"Rekt's No Refunds: Stamped angry receipt on the hood; ripped refund notices and pitchfork emblem along the truck; rustic price-tag mosaics on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHughsBrassStandard,Hugh's Brass Standard Vehicle Wrap
+modVehicleWrapHughsBrassStandardDesc,"Hugh's Brass Standard: Brass military crest on the hood; precise ammunition inventory diagrams along the truck; olive cartridge-belt borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBobsCopperheadGarage,Bob's Copperhead Garage Vehicle Wrap
+modVehicleWrapBobsCopperheadGarageDesc,"Bob's Copperhead Garage: Coiled copper snake and socket on the hood; vintage speed-shop typography along the truck; copper scales and checkered flags on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJoelsTradingCaravan,Joel's Trading Caravan Vehicle Wrap
+modVehicleWrapJoelsTradingCaravanDesc,"Joel's Trading Caravan: Wagon-wheel compass on the hood; hand-painted caravan and desert tents along the truck; woven frontier textile bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapShamwaySupperRun,Shamway Supper Run Vehicle Wrap
+modVehicleWrapShamwaySupperRunDesc,"Shamway Supper Run: Shamway food-can badge on the hood; retro grocery lettering and canned supper illustration along the truck; pantry-label advertising ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPassNGasRoadCrew,Pass-N-Gas Road Crew Vehicle Wrap
+modVehicleWrapPassNGasRoadCrewDesc,"Pass-N-Gas Road Crew: Fuel-pump brand badge on the hood; vintage filling station advertisement along the truck; red-white service chevrons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPopNPillsHouseCall,Pop-N-Pills House Call Vehicle Wrap
+modVehicleWrapPopNPillsHouseCallDesc,"Pop-N-Pills House Call: Medicine-bottle brand badge on the hood; pharmacy script and pill-bottle illustrations along the truck; clinical pill-capsule patterns on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWorkingStiffsToolRun,Working Stiffs Tool Run Vehicle Wrap
+modVehicleWrapWorkingStiffsToolRunDesc,"Working Stiffs Tool Run: Crossed hammer brand badge on the hood; bold hardware-store lettering and hand tools along the truck; yellow steel ruler strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCrackABookBookmobile,Crack-A-Book Bookmobile Vehicle Wrap
+modVehicleWrapCrackABookBookmobileDesc,"Crack-A-Book Bookmobile: Open book brand badge on the hood; colorful library spines and reading mascot along the truck; stacked vintage book titles on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMoPowerServiceVan,Mo Power Service Van Vehicle Wrap
+modVehicleWrapMoPowerServiceVanDesc,"Mo Power Service Van: Electrical coil brand badge on the hood; blue circuit diagrams and utility lettering along the truck; cable and insulator bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSavageCountryOutfitter,Savage Country Outfitter Vehicle Wrap
+modVehicleWrapSavageCountryOutfitterDesc,"Savage Country Outfitter: Antler outdoor-store badge on the hood; mountain outfitter catalogue illustration along the truck; canvas patches and boot-tread strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHigashiResearchDivision,Higashi Research Division Vehicle Wrap
+modVehicleWrapHigashiResearchDivisionDesc,"Higashi Research Division: Corporate lab insignia on the hood; clean pharmaceutical geometry and specimen artwork along the truck; sterile blue scientific bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDishongExecutiveFleet,Dishong Executive Fleet Vehicle Wrap
+modVehicleWrapDishongExecutiveFleetDesc,"Dishong Executive Fleet: Corporate tower crest on the hood; architectural skyline and executive lettering along the truck; black-and-gold deco borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeGeneralHospital,Navezgane General Hospital Vehicle Wrap
+modVehicleWrapNavezganeGeneralHospitalDesc,"Navezgane General Hospital: Medical facility badge on the hood; ambulance-era hospital signage along the truck; teal emergency pulse strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBuzzsBarFly,Buzz's Bar Fly Vehicle Wrap
+modVehicleWrapBuzzsBarFlyDesc,"Buzz's Bar Fly: Beer-cap pub badge on the hood; retro tavern sign and foaming mugs along the truck; amber bottle-label ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBoarandCorn,Bob's Boars & Carl's Corn Vehicle Wrap
+modVehicleWrapBoarandCornDesc,"Bob's Boars & Carl's Corn: Mutant boar and super-corn farm badge on the hood; rustic farm advertisement with huge boar and cornfields along the truck; corn-stalk and boar-track borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapFatHawaiianFeast,Fats Foods Feast Vehicle Wrap
+modVehicleWrapFatHawaiianFeastDesc,"Fats Foods Feast: Cheerful fast-food chef badge on the hood; bold burger-shop lettering and oversized burger illustration along the truck; red-yellow takeaway menu ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBearDenLodge,The Bear Den Vehicle Wrap
+modVehicleWrapBearDenLodgeDesc,"The Bear Den: Roaring bear and beer-cap medallion on the hood; rustic bar sign with bear claw marks and frothy mugs along the truck; amber beer labels and plaid tavern strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapZoesSalonCruiser,Dirty Laundry Vehicle Wrap
+modVehicleWrapZoesSalonCruiserDesc,"Dirty Laundry: Retro washing-machine badge on the hood; cheerful laundromat script and hanging clothes along the truck; teal soap-bubble and clothespin ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPetesPawnPatrol,Pop's Pawn & Bel's Bakery Vehicle Wrap
+modVehicleWrapPetesPawnPatrolDesc,"Pop's Pawn & Bel's Bakery: Pawn-shop balls and croissant badge on the hood; split vintage pawn-and-bakery storefront advertisement along the truck; gold pawn tickets and bread-label borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJoesUSAHauler,Joe's USA Grocery Run Vehicle Wrap
+modVehicleWrapJoesUSAHaulerDesc,"Joe's USA Grocery Run: Patriotic grocery-store badge on the hood; classic grocery advertisement with fresh produce and pantry goods along the truck; red-white-blue grocery-label strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRedMesaDispatch,Red Mesa Dispatch Vehicle Wrap
+modVehicleWrapRedMesaDispatchDesc,"Red Mesa Dispatch: Restricted facility emblem on the hood; desert test-range stencils and mesa imagery along the truck; red restricted-access bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeCorrections,Navezgane Corrections Vehicle Wrap
+modVehicleWrapNavezganeCorrectionsDesc,"Navezgane Corrections: Prison transport seal on the hood; black-white correctional lettering along the truck; barred-window graphic strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPoopyPantsPlayhouse,Poopy Pants Daycare Vehicle Wrap
+modVehicleWrapPoopyPantsPlayhouseDesc,"Poopy Pants Daycare: Colorful toy mascot badge on the hood; bright nursery alphabet and block toys along the truck; primary-color crayon borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapProwlinPetesRescue,Prowlin Petes Takeout Vehicle Wrap
+modVehicleWrapProwlinPetesRescueDesc,"Prowlin Petes Takeout: Playful fast-food mascot badge on the hood; retro takeaway advertisement with burgers and fries along the truck; bright checkerboard menu strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWashandGo,Auto Wash Express Vehicle Wrap
+modVehicleWrapWashandGoDesc,"Auto Wash Express: Soap-bubble carwash badge on the hood; midcentury auto-wash lettering with foam and sponge art along the truck; turquoise bubble-and-spray ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapOstrichHotelWanderer,Ostrich Hotel Wanderer Vehicle Wrap
+modVehicleWrapOstrichHotelWandererDesc,"Ostrich Hotel Wanderer: Ostrich travel badge on the hood; vintage roadside hotel postcard along the truck; sunset motel-key borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTheLastSunsetMotel,The Last Sunset Golden Years Vehicle Wrap
+modVehicleWrapTheLastSunsetMotelDesc,"The Last Sunset Golden Years: Warm sunset and rocking-chair badge on the hood; vintage retirement-home signage and peaceful garden artwork along the truck; peach floral and sunset bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeBankReserve,The Piggy Bank Reserve Vehicle Wrap
+modVehicleWrapNavezganeBankReserveDesc,"The Piggy Bank Reserve: Gold piggy-bank medallion on the hood; engraved currency-style bank lettering along the truck; green guilloche note borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeFireRescue,Navezgane Fire Rescue Vehicle Wrap
+modVehicleWrapNavezganeFireRescueDesc,"Navezgane Fire Rescue: Fire brigade crest on the hood; vintage fire-engine lettering and ladder art along the truck; reflective-style red-gold bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganePostalRoute,Navezgane Postal Route Vehicle Wrap
+modVehicleWrapNavezganePostalRouteDesc,"Navezgane Postal Route: Postal wing badge on the hood; aged parcel stamps and mail lettering along the truck; airmail envelope edge strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeTransitHeritage,Navezgane Transit Heritage Vehicle Wrap
+modVehicleWrapNavezganeTransitHeritageDesc,"Navezgane Transit Heritage: Bus company roundel on the hood; retro route map and transit advertisement along the truck; colored destination-line bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapShamwayMidnightSnack,Shamway Midnight Snack Vehicle Wrap
+modVehicleWrapShamwayMidnightSnackDesc,"Shamway Midnight Snack: Grinning canned-food mascot on the hood; night-shift snack delivery artwork along the truck; purple convenience-food labels on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPassNGasHighOctane,Pass-N-Gas High Octane Vehicle Wrap
+modVehicleWrapPassNGasHighOctaneDesc,"Pass-N-Gas High Octane: Racing fuel brand crest on the hood; flame-edged pump and pit-crew lettering along the truck; racing checker and octane bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBloodMoonExpress,Blood Moon Express Vehicle Wrap
+modVehicleWrapBloodMoonExpressDesc,"Blood Moon Express: Red lunar eclipse on the hood; horde silhouettes against ruined skyline along the truck; seven-phase blood moon strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeExplorer,Navezgane Explorer Vehicle Wrap
+modVehicleWrapNavezganeExplorerDesc,"Navezgane Explorer: County map compass on the hood; hand-painted regional travel map along the truck; highway shield and landmark borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPineForestRefuge,Pine Forest Refuge Vehicle Wrap
+modVehicleWrapPineForestRefugeDesc,"Pine Forest Refuge: Pinecone crest on the hood; misty forest cabin panorama along the truck; fern and pine-needle strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDesertScavenger,Desert Scavenger Vehicle Wrap
+modVehicleWrapDesertScavengerDesc,"Desert Scavenger: Bleached lizard sun badge on the hood; sandstone mesas and abandoned highway along the truck; sun-baked geometric road bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSnowboundSurvivor,Snowbound Survivor Vehicle Wrap
+modVehicleWrapSnowboundSurvivorDesc,"Snowbound Survivor: Frosted wolf emblem on the hood; ice-blue snowy mountains along the truck; crystalline snowflake strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBurntForestEmbers,Burnt Forest Embers Vehicle Wrap
+modVehicleWrapBurntForestEmbersDesc,"Burnt Forest Embers: Ember phoenix on the hood; charred trunks and drifting sparks along the truck; black ash and copper ember bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWastelandWanderer,Wasteland Wanderer Vehicle Wrap
+modVehicleWrapWastelandWandererDesc,"Wasteland Wanderer: Broken gas-mask badge on the hood; radioactive ruins and twisted steel along the truck; muted green radiation-warning strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPurgeClearanceCrew,Purge Clearance Crew Vehicle Wrap
+modVehicleWrapPurgeClearanceCrewDesc,"Purge Clearance Crew: Cleared-building shield on the hood; marked POI floor plans and stamped objectives along the truck; green mission-complete ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMoonlockProtocol,Moonlock Protocol Vehicle Wrap
+modVehicleWrapMoonlockProtocolDesc,"Moonlock Protocol: Fractured violet moon on the hood; underground hive roots and recovered sunlight along the truck; crystal and lunar-phase bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapQueenHiveHunter,Queen Hive Hunter Vehicle Wrap
+modVehicleWrapQueenHiveHunterDesc,"Queen Hive Hunter: Queen-insect crest on the hood; organic hive tunnels and glowing specimens along the truck; amber chitin and tunnel borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHordeNightEngineer,Horde Night Engineer Vehicle Wrap
+modVehicleWrapHordeNightEngineerDesc,"Horde Night Engineer: Hammer-and-spanner shield on the hood; fortified homestead blueprint along the truck; steel truss and construction-layout strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapGyrocopterAirMail,Gyrocopter Air Mail Vehicle Wrap
+modVehicleWrapGyrocopterAirMailDesc,"Gyrocopter Air Mail: Rotor-wing badge on the hood; vintage airborne courier illustration along the truck; sky-blue cloud and flight-path bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMiningGuildHauler,Mining Guild Hauler Vehicle Wrap
+modVehicleWrapMiningGuildHaulerDesc,"Mining Guild Hauler: Pickaxe and ore emblem on the hood; cutaway mine shafts and mineral veins along the truck; coal-to-gold ore strata bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWrenchandRuin,Wrench and Ruin Vehicle Wrap
+modVehicleWrapWrenchandRuinDesc,"Wrench and Ruin: Salvage gear crest on the hood; exploded engine diagrams and scrap silhouettes along the truck; oxidized gear-tooth strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapUndergroundProspector,Underground Prospector Vehicle Wrap
+modVehicleWrapUndergroundProspectorDesc,"Underground Prospector: Crystal lamp badge on the hood; cross-section cavern wonderland along the truck; geode and stalactite borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapLandClaimHomestead,Land Claim Homestead Vehicle Wrap
+modVehicleWrapLandClaimHomesteadDesc,"Land Claim Homestead: Home-and-flag shield on the hood; cozy fortified farmstead along the truck; fence rail and sunflower bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTreasureMapDrifter,Treasure Map Drifter Vehicle Wrap
+modVehicleWrapTreasureMapDrifterDesc,"Treasure Map Drifter: Buried chest compass on the hood; old parchment treasure trail along the truck; torn-map coordinate strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapScreamerWarning,Screamer Warning Vehicle Wrap
+modVehicleWrapScreamerWarningDesc,"Screamer Warning: Stylized screaming zombie badge on the hood; sound-wave zombie poster art along the truck; red alarm waveform bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDemolitionCountdown,Demolition Countdown Vehicle Wrap
+modVehicleWrapDemolitionCountdownDesc,"Demolition Countdown: Warning timer emblem on the hood; stylized explosive zombie poster along the truck; industrial countdown panel strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSevenDaysRemaining,Seven Days Remaining Vehicle Wrap
+modVehicleWrapSevenDaysRemainingDesc,"Seven Days Remaining: Weathered tally-mark crest on the hood; seven-panel survival storyboard along the truck; calendar and sunrise sequence bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAlpineDaybreak,Alpine Daybreak Vehicle Wrap
+modVehicleWrapAlpineDaybreakDesc,"Alpine Daybreak: Golden mountain sun on the hood; alpine panorama along the truck; edelweiss and contour borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWildflowerMeadow,Wildflower Meadow Vehicle Wrap
+modVehicleWrapWildflowerMeadowDesc,"Wildflower Meadow: Bee on daisy on the hood; lush wildflower field along the truck; botanical bloom ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAutumnFox,Autumn Fox Vehicle Wrap
+modVehicleWrapAutumnFoxDesc,"Autumn Fox: Curled red fox on the hood; fall forest and drifting leaves along the truck; oak and maple leaf strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNorthernLights,Northern Lights Vehicle Wrap
+modVehicleWrapNorthernLightsDesc,"Northern Lights: Polar star medallion on the hood; aurora over snowy pines along the truck; flowing aurora bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapOceanNomad,Ocean Nomad Vehicle Wrap
+modVehicleWrapOceanNomadDesc,"Ocean Nomad: Nautilus shell on the hood; rolling ocean and seabirds along the truck; wave and rope borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRainforestCanopy,Rainforest Canopy Vehicle Wrap
+modVehicleWrapRainforestCanopyDesc,"Rainforest Canopy: Tree frog emblem on the hood; dense tropical leaves and parrots along the truck; monstera and orchid strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDesertBloom,Desert Bloom Vehicle Wrap
+modVehicleWrapDesertBloomDesc,"Desert Bloom: Flowering cactus sun on the hood; cactus garden under pink sunset along the truck; succulent rosette bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapStormwatch,Stormwatch Vehicle Wrap
+modVehicleWrapStormwatchDesc,"Stormwatch: Lightning cloud badge on the hood; dramatic storm front and rain along the truck; zigzag storm-cell strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMushroomKingdomRoadtrip,Mushroom Kingdom Roadtrip Vehicle Wrap
+modVehicleWrapMushroomKingdomRoadtripDesc,"Mushroom Kingdom Roadtrip: Fly-agaric cluster on the hood; whimsical mossy forest floor along the truck; mushroom and fern borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapLoneWolf,Lone Wolf Vehicle Wrap
+modVehicleWrapLoneWolfDesc,"Lone Wolf: Howling wolf portrait on the hood; moonlit running wolf pack along the truck; pine and pawprint borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTigerTerritory,Tiger Territory Vehicle Wrap
+modVehicleWrapTigerTerritoryDesc,"Tiger Territory: Tiger face medallion on the hood; prowling tiger and jungle shadows along the truck; striped bamboo ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRavensFlight,Raven's Flight Vehicle Wrap
+modVehicleWrapRavensFlightDesc,"Raven's Flight: Raven with moon on the hood; sweeping black feather flock along the truck; feather and branch strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapKoiCurrent,Koi Current Vehicle Wrap
+modVehicleWrapKoiCurrentDesc,"Koi Current: Yin-yang koi pair on the hood; flowing koi pond along the truck; water ripple and lotus bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapOctopusInk,Octopus Ink Vehicle Wrap
+modVehicleWrapOctopusInkDesc,"Octopus Ink: Octopus compass on the hood; curling tentacles and deep sea along the truck; suction-cup and wave strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHoneybeeHighway,Honeybee Highway Vehicle Wrap
+modVehicleWrapHoneybeeHighwayDesc,"Honeybee Highway: Queen bee crest on the hood; honeycomb and lavender field along the truck; golden hexagon borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDragonflyDrift,Dragonfly Drift Vehicle Wrap
+modVehicleWrapDragonflyDriftDesc,"Dragonfly Drift: Iridescent dragonfly on the hood; pond reeds and jeweled wings along the truck; art-nouveau insect ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapStagofthePines,Stag of the Pines Vehicle Wrap
+modVehicleWrapStagofthePinesDesc,"Stag of the Pines: Antlered stag portrait on the hood; woodland deer silhouettes along the truck; antler and pinecone bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapButterflyMigration,Butterfly Migration Vehicle Wrap
+modVehicleWrapButterflyMigrationDesc,"Butterfly Migration: Monarch butterfly on the hood; swarm across flowering landscape along the truck; wing-pattern mosaics on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDragonsHoard,Dragon's Hoard Vehicle Wrap
+modVehicleWrapDragonsHoardDesc,"Dragon's Hoard: Coiled dragon crest on the hood; dragon guarding scattered treasure along the truck; gold-scale and jewel bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMoonlitWitch,Moonlit Witch Vehicle Wrap
+modVehicleWrapMoonlitWitchDesc,"Moonlit Witch: Witch hat and crescent on the hood; enchanted cottage and flying broom along the truck; herb and constellation ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPaladinsOath,Paladin's Oath Vehicle Wrap
+modVehicleWrapPaladinsOathDesc,"Paladin's Oath: Sun shield and sword on the hood; stained-glass knight scene along the truck; gold illuminated manuscript borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapGoblinMarket,Goblin Market Vehicle Wrap
+modVehicleWrapGoblinMarketDesc,"Goblin Market: Mischievous goblin face on the hood; chaotic fantasy market stalls along the truck; coin and trinket strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapForestDryad,Forest Dryad Vehicle Wrap
+modVehicleWrapForestDryadDesc,"Forest Dryad: Leaf-crowned face on the hood; living trees and winding roots along the truck; interlaced vine ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNecromancersGrimoire,Necromancer's Grimoire Vehicle Wrap
+modVehicleWrapNecromancersGrimoireDesc,"Necromancer's Grimoire: Arcane skeletal book on the hood; violet spirits rising from runes along the truck; bone and spell-circle strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMermaidsWake,Mermaid's Wake Vehicle Wrap
+modVehicleWrapMermaidsWakeDesc,"Mermaid's Wake: Mermaid shell medallion on the hood; underwater city and flowing tail along the truck; pearl and seaweed borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPhoenixReborn,Phoenix Reborn Vehicle Wrap
+modVehicleWrapPhoenixRebornDesc,"Phoenix Reborn: Fiery phoenix on the hood; rising flame-feather panorama along the truck; embers and gold feather bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapFrostboundRune,Frostbound Rune Vehicle Wrap
+modVehicleWrapFrostboundRuneDesc,"Frostbound Rune: Icy runestone crest on the hood; frozen giant fortress along the truck; carved ice-rune strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDeepSpaceCourier,Deep Space Courier Vehicle Wrap
+modVehicleWrapDeepSpaceCourierDesc,"Deep Space Courier: Orbital delivery badge on the hood; freighter among stars along the truck; orbital route bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCyberRonin,Cyber Ronin Vehicle Wrap
+modVehicleWrapCyberRoninDesc,"Cyber Ronin: Neon samurai mask on the hood; rain-soaked neon city along the truck; angular magenta circuit strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapLunarSurveyor,Lunar Surveyor Vehicle Wrap
+modVehicleWrapLunarSurveyorDesc,"Lunar Surveyor: Moon mission patch on the hood; lunar rover and crater panorama along the truck; technical moon-phase borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAlienBotanist,Alien Botanist Vehicle Wrap
+modVehicleWrapAlienBotanistDesc,"Alien Botanist: Alien flower specimen on the hood; bioluminescent extraterrestrial garden along the truck; strange leaf-cell bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRetroRocketClub,Retro Rocket Club Vehicle Wrap
+modVehicleWrapRetroRocketClubDesc,"Retro Rocket Club: 1950s rocket badge on the hood; pulp space adventure along the truck; atom and starburst ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMechBaySeven,Mech Bay Seven Vehicle Wrap
+modVehicleWrapMechBaySevenDesc,"Mech Bay Seven: Robotic visor emblem on the hood; giant robot assembly schematic along the truck; warning-panel and piston strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapQuantumArcade,Quantum Arcade Vehicle Wrap
+modVehicleWrapQuantumArcadeDesc,"Quantum Arcade: Pixel portal on the hood; glitch city and neon grids along the truck; broken-code mosaic strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMarsRustRunner,Mars Rust Runner Vehicle Wrap
+modVehicleWrapMarsRustRunnerDesc,"Mars Rust Runner: Red planet expedition seal on the hood; Martian mesas and habitats along the truck; terrain-grid border ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBlackHoleClub,Black Hole Club Vehicle Wrap
+modVehicleWrapBlackHoleClubDesc,"Black Hole Club: Gravitational lens emblem on the hood; stars spiraling into singularity along the truck; warped spacetime bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSunsetStripSeventy,Sunset Strip Seventy Vehicle Wrap
+modVehicleWrapSunsetStripSeventyDesc,"Sunset Strip Seventy: Retro setting sun on the hood; seventies rainbow speed stripes along the truck; orange-brown geometric bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNeonEightyEight,Neon Eighty Eight Vehicle Wrap
+modVehicleWrapNeonEightyEightDesc,"Neon Eighty Eight: Pink chrome triangle on the hood; synthwave sunset grid along the truck; purple neon horizon strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBoardwalkSurfClub,Boardwalk Surf Club Vehicle Wrap
+modVehicleWrapBoardwalkSurfClubDesc,"Boardwalk Surf Club: Surfboard wave badge on the hood; vintage beach postcard along the truck; turquoise wave checker ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRouteSixtySixRambler,Route Sixty Six Rambler Vehicle Wrap
+modVehicleWrapRouteSixtySixRamblerDesc,"Route Sixty Six Rambler: Highway shield on the hood; classic Americana roadside collage along the truck; road-sign and pinstripe borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCheckeredThunder,Checkered Thunder Vehicle Wrap
+modVehicleWrapCheckeredThunderDesc,"Checkered Thunder: Racing number badge on the hood; bold diagonal motorsport blocks along the truck; black-white racing checkers on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSaltFlatSpecial,Salt Flat Special Vehicle Wrap
+modVehicleWrapSaltFlatSpecialDesc,"Salt Flat Special: Speed-record roundel on the hood; streamlined land-speed graphics along the truck; thin heritage speed stripes on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRallyDustChampion,Rally Dust Champion Vehicle Wrap
+modVehicleWrapRallyDustChampionDesc,"Rally Dust Champion: Rally crest on the hood; mud-splashed angular rally livery along the truck; sponsor-style geometric bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRockabillyRoadster,Rockabilly Roadster Vehicle Wrap
+modVehicleWrapRockabillyRoadsterDesc,"Rockabilly Roadster: Swallow and dice on the hood; old-school tattoo flames along the truck; cherry and checkerboard strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDiscoInferno,Disco Inferno Vehicle Wrap
+modVehicleWrapDiscoInfernoDesc,"Disco Inferno: Mirrorball badge on the hood; colorful seventies dance swirls along the truck; rainbow disco tile bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAtomicCaravan,Atomic Caravan Vehicle Wrap
+modVehicleWrapAtomicCaravanDesc,"Atomic Caravan: Midcentury atom on the hood; boomerang shapes and starbursts along the truck; mint-coral atomic ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapStrawberryPicnic,Strawberry Picnic Vehicle Wrap
+modVehicleWrapStrawberryPicnicDesc,"Strawberry Picnic: Strawberry basket on the hood; gingham picnic and berries along the truck; strawberry blossom ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSleepyCatCafe,Sleepy Cat Cafe Vehicle Wrap
+modVehicleWrapSleepyCatCafeDesc,"Sleepy Cat Cafe: Sleeping cat cup on the hood; cozy cats and coffee along the truck; pawprint and steam strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBubbleTeaBrigade,Bubble Tea Brigade Vehicle Wrap
+modVehicleWrapBubbleTeaBrigadeDesc,"Bubble Tea Brigade: Happy boba cup on the hood; colorful drinks and tapioca pearls along the truck; pastel bubble bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapLittleGhostHoliday,Little Ghost Holiday Vehicle Wrap
+modVehicleWrapLittleGhostHolidayDesc,"Little Ghost Holiday: Smiling ghost on the hood; friendly ghosts on roadtrip along the truck; tiny star and ghost borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCozyBookNook,Cozy Book Nook Vehicle Wrap
+modVehicleWrapCozyBookNookDesc,"Cozy Book Nook: Teacup on books on the hood; warm reading den illustration along the truck; book-spine and leaf strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCloudPuppy,Cloud Puppy Vehicle Wrap
+modVehicleWrapCloudPuppyDesc,"Cloud Puppy: Puppy on cloud on the hood; playful dogs among pastel clouds along the truck; rainbow pawprint ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapFrogPondFriends,Frog Pond Friends Vehicle Wrap
+modVehicleWrapFrogPondFriendsDesc,"Frog Pond Friends: Frog on lily pad on the hood; pond picnic with friendly frogs along the truck; lily and raindrop borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPeachyDays,Peachy Days Vehicle Wrap
+modVehicleWrapPeachyDaysDesc,"Peachy Days: Peach with leaves on the hood; sunlit orchard illustration along the truck; peach gingham strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCrochetCamper,Crochet Camper Vehicle Wrap
+modVehicleWrapCrochetCamperDesc,"Crochet Camper: Crochet flower medallion on the hood; granny-square textile pattern along the truck; knitted stitch ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCoastalCottage,Coastal Cottage Vehicle Wrap
+modVehicleWrapCoastalCottageDesc,"Coastal Cottage: Seashell wreath on the hood; white cottage and hydrangeas along the truck; blue ceramic tile bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapArtDecoVoyager,Art Deco Voyager Vehicle Wrap
+modVehicleWrapArtDecoVoyagerDesc,"Art Deco Voyager: Gold sunburst on the hood; black-gold architectural fans along the truck; stepped deco borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapStainedGlassGarden,Stained Glass Garden Vehicle Wrap
+modVehicleWrapStainedGlassGardenDesc,"Stained Glass Garden: Rose window on the hood; jewel-tone botanical glass mosaic along the truck; leadlight flower strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBauhausMotion,Bauhaus Motion Vehicle Wrap
+modVehicleWrapBauhausMotionDesc,"Bauhaus Motion: Primary circle composition on the hood; red-yellow-blue geometric balance along the truck; modular primary-shape bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapInkWashMountain,Ink Wash Mountain Vehicle Wrap
+modVehicleWrapInkWashMountainDesc,"Ink Wash Mountain: Brushstroke sun on the hood; monochrome mist mountains along the truck; flowing calligraphic borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMosaicNomad,Mosaic Nomad Vehicle Wrap
+modVehicleWrapMosaicNomadDesc,"Mosaic Nomad: Ceramic rosette on the hood; colorful hand-cut tile landscape along the truck; intricate tile ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPaperCutParadise,Paper Cut Paradise Vehicle Wrap
+modVehicleWrapPaperCutParadiseDesc,"Paper Cut Paradise: Layered paper bird on the hood; bold layered tropical paper shapes along the truck; cut-leaf borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapOpArtMirage,Op Art Mirage Vehicle Wrap
+modVehicleWrapOpArtMirageDesc,"Op Art Mirage: Optical spiral on the hood; high-contrast illusion waves along the truck; monochrome zigzag strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWatercolorWanderlust,Watercolor Wanderlust Vehicle Wrap
+modVehicleWrapWatercolorWanderlustDesc,"Watercolor Wanderlust: Painted sun wreath on the hood; loose watercolor landscape along the truck; blended pigment bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCopperCircuitry,Copper Circuitry Vehicle Wrap
+modVehicleWrapCopperCircuitryDesc,"Copper Circuitry: Circuit mandala on the hood; intricate copper trace network along the truck; technical circuit ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPrismaticFacets,Prismatic Facets Vehicle Wrap
+modVehicleWrapPrismaticFacetsDesc,"Prismatic Facets: Faceted crystal on the hood; colorful low-poly shard composition along the truck; iridescent polygon bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHeavyMetalPilgrim,Heavy Metal Pilgrim Vehicle Wrap
+modVehicleWrapHeavyMetalPilgrimDesc,"Heavy Metal Pilgrim: Winged amplifier on the hood; jagged metal-album landscape along the truck; black-silver guitar-string strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPunkPatchwork,Punk Patchwork Vehicle Wrap
+modVehicleWrapPunkPatchworkDesc,"Punk Patchwork: Safety pin crest on the hood; torn zine collage and stitched patches along the truck; tartan and stud-print bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapJazzAfterMidnight,Jazz After Midnight Vehicle Wrap
+modVehicleWrapJazzAfterMidnightDesc,"Jazz After Midnight: Saxophone moon on the hood; smoky abstract jazz ensemble along the truck; blue-note and keyboard strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapReggaeRoadRhythm,Reggae Road Rhythm Vehicle Wrap
+modVehicleWrapReggaeRoadRhythmDesc,"Reggae Road Rhythm: Lion sun crest on the hood; warm sound-system illustration along the truck; green-gold-red rhythm borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCountryRoadSerenade,Country Road Serenade Vehicle Wrap
+modVehicleWrapCountryRoadSerenadeDesc,"Country Road Serenade: Guitar and horseshoe on the hood; barn dance and rolling hills along the truck; denim and rope bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTechnoPulse,Techno Pulse Vehicle Wrap
+modVehicleWrapTechnoPulseDesc,"Techno Pulse: Minimal pulse emblem on the hood; acid geometric waveform field along the truck; electric rhythm strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHipHopBlockParty,Hip Hop Block Party Vehicle Wrap
+modVehicleWrapHipHopBlockPartyDesc,"Hip Hop Block Party: Turntable badge on the hood; urban mural and boombox art along the truck; graffiti arrow ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapClassicalNocturne,Classical Nocturne Vehicle Wrap
+modVehicleWrapClassicalNocturneDesc,"Classical Nocturne: Gold violin medallion on the hood; elegant orchestral instrument scrollwork along the truck; ivory musical-staff bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapIndieFolkTrail,Indie Folk Trail Vehicle Wrap
+modVehicleWrapIndieFolkTrailDesc,"Indie Folk Trail: Banjo flower wreath on the hood; hand-drawn woodland music scene along the truck; wildflower instrument borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSkateparkConcrete,Skatepark Concrete Vehicle Wrap
+modVehicleWrapSkateparkConcreteDesc,"Skatepark Concrete: Skate deck crest on the hood; street-art ramps and paint splashes along the truck; sticker-bomb ribbon bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapKyotoEvening,Kyoto Evening Vehicle Wrap
+modVehicleWrapKyotoEveningDesc,"Kyoto Evening: Lantern and cherry blossom on the hood; old street under blossoms along the truck; indigo wave and petal bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNordicFjord,Nordic Fjord Vehicle Wrap
+modVehicleWrapNordicFjordDesc,"Nordic Fjord: Longship compass on the hood; dramatic fjord panorama along the truck; interlaced Nordic knot borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTuscanSun,Tuscan Sun Vehicle Wrap
+modVehicleWrapTuscanSunDesc,"Tuscan Sun: Sunflower pottery badge on the hood; rolling vineyard landscape along the truck; terracotta olive-leaf strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSaharaCaravan,Sahara Caravan Vehicle Wrap
+modVehicleWrapSaharaCaravanDesc,"Sahara Caravan: Desert star on the hood; camel caravan and dunes along the truck; woven sand-toned geometric bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAndeanHighland,Andean Highland Vehicle Wrap
+modVehicleWrapAndeanHighlandDesc,"Andean Highland: Condor medallion on the hood; bright mountain village panorama along the truck; multicolor woven textile strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPacificIslandDrift,Pacific Island Drift Vehicle Wrap
+modVehicleWrapPacificIslandDriftDesc,"Pacific Island Drift: Hibiscus compass on the hood; tropical volcanic island along the truck; leaf and ocean geometric bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHighlandRambler,Highland Rambler Vehicle Wrap
+modVehicleWrapHighlandRamblerDesc,"Highland Rambler: Thistle crest on the hood; Scottish hills and stone cottage along the truck; green-blue tartan strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapOutbackWayfarer,Outback Wayfarer Vehicle Wrap
+modVehicleWrapOutbackWayfarerDesc,"Outback Wayfarer: Kangaroo sun badge on the hood; red earth and eucalyptus panorama along the truck; simple road-map dot-trail bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAlaskanPassage,Alaskan Passage Vehicle Wrap
+modVehicleWrapAlaskanPassageDesc,"Alaskan Passage: Orca compass on the hood; glaciers and rugged coast along the truck; ice-and-wave decorative strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMediterraneanBlue,Mediterranean Blue Vehicle Wrap
+modVehicleWrapMediterraneanBlueDesc,"Mediterranean Blue: Lemon ceramic badge on the hood; white coastal village panorama along the truck; blue-and-white tile ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCoffeeBeforeZombies,Coffee Before Zombies Vehicle Wrap
+modVehicleWrapCoffeeBeforeZombiesDesc,"Coffee Before Zombies: Espresso crest on the hood; retro coffee roastery advertisement along the truck; bean and steam strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPizzaPatrol,Pizza Patrol Vehicle Wrap
+modVehicleWrapPizzaPatrolDesc,"Pizza Patrol: Pizza slice badge on the hood; cheerful pizzeria illustration along the truck; red-white checker ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSmokedandLoaded,Smoked and Loaded Vehicle Wrap
+modVehicleWrapSmokedandLoadedDesc,"Smoked and Loaded: Barbecue smoker crest on the hood; rustic pitmaster advertisement along the truck; smoke and spice-label bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSushiNightCruiser,Sushi Night Cruiser Vehicle Wrap
+modVehicleWrapSushiNightCruiserDesc,"Sushi Night Cruiser: Sushi platter emblem on the hood; stylized koi and sushi illustration along the truck; nori and wave borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapGardenersGetaway,Gardeners' Getaway Vehicle Wrap
+modVehicleWrapGardenersGetawayDesc,"Gardeners' Getaway: Watering can wreath on the hood; lush vegetable garden along the truck; seed packet and herb strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAnglersDawn,Angler's Dawn Vehicle Wrap
+modVehicleWrapAnglersDawnDesc,"Angler's Dawn: Trout badge on the hood; sunrise lake fishing scene along the truck; lure and water ripple bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMountainBikeEscape,Mountain Bike Escape Vehicle Wrap
+modVehicleWrapMountainBikeEscapeDesc,"Mountain Bike Escape: Chainring mountain emblem on the hood; woodland cycling trail along the truck; tire-tread and sprocket ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAstronomyClub,Astronomy Club Vehicle Wrap
+modVehicleWrapAstronomyClubDesc,"Astronomy Club: Telescope moon badge on the hood; constellation atlas along the truck; planetary orbit strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPhotographyFieldTrip,Photography Field Trip Vehicle Wrap
+modVehicleWrapPhotographyFieldTripDesc,"Photography Field Trip: Vintage camera crest on the hood; filmstrip landscape photographs artwork along the truck; negative-frame border bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTabletopQuest,Tabletop Quest Vehicle Wrap
+modVehicleWrapTabletopQuestDesc,"Tabletop Quest: Twenty-sided die on the hood; fantasy gaming table illustration along the truck; dice and dungeon-grid strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapHauntedHarvest,Haunted Harvest Vehicle Wrap
+modVehicleWrapHauntedHarvestDesc,"Haunted Harvest: Jack-o-lantern moon on the hood; crooked farm and pumpkin field along the truck; vines and lantern strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapVampiresVelvet,Vampire's Velvet Vehicle Wrap
+modVehicleWrapVampiresVelvetDesc,"Vampire's Velvet: Bat-wing goblet on the hood; gothic castle and crimson roses along the truck; velvet damask borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapLovecraftianTide,Lovecraftian Tide Vehicle Wrap
+modVehicleWrapLovecraftianTideDesc,"Lovecraftian Tide: Eldritch eye medallion on the hood; impossible sea city and tentacles along the truck; ancient tidal glyph bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapAbandonedCarnival,Abandoned Carnival Vehicle Wrap
+modVehicleWrapAbandonedCarnivalDesc,"Abandoned Carnival: Cracked clown mask on the hood; derelict ferris wheel and tents along the truck; faded carnival diamond strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapGhostShipPassage,Ghost Ship Passage Vehicle Wrap
+modVehicleWrapGhostShipPassageDesc,"Ghost Ship Passage: Spectral anchor on the hood; misty phantom sailing ship along the truck; rope and ghostly wave borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMothandCandle,Moth and Candle Vehicle Wrap
+modVehicleWrapMothandCandleDesc,"Moth and Candle: Death-head moth on the hood; candlelit botanical nocturne along the truck; wax-drip and moth-wing bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPlagueDoctorsRemedy,Plague Doctor's Remedy Vehicle Wrap
+modVehicleWrapPlagueDoctorsRemedyDesc,"Plague Doctor's Remedy: Beaked mask crest on the hood; apothecary bottles and ravens along the truck; herbal engraving strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapBlackRoseFuneral,Black Rose Funeral Vehicle Wrap
+modVehicleWrapBlackRoseFuneralDesc,"Black Rose Funeral: Black rose oval on the hood; Victorian mourning floral illustration along the truck; lace and silver thorn borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNightmareCinema,Nightmare Cinema Vehicle Wrap
+modVehicleWrapNightmareCinemaDesc,"Nightmare Cinema: Film reel eye on the hood; expressionist monster shadow city along the truck; torn vintage film strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCryptkeepersCaravan,Cryptkeeper's Caravan Vehicle Wrap
+modVehicleWrapCryptkeepersCaravanDesc,"Cryptkeeper's Caravan: Stone gargoyle shield on the hood; cemetery gate and moonlit crypt along the truck; carved stone ivy bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPearlHorizon,Pearl Horizon Vehicle Wrap
+modVehicleWrapPearlHorizonDesc,"Pearl Horizon: Minimal sunrise medallion on the hood; pearl-white negative space with gold horizon along the truck; fine champagne pinstripe bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapObsidianExecutive,Obsidian Executive Vehicle Wrap
+modVehicleWrapObsidianExecutiveDesc,"Obsidian Executive: Silver geometric crest on the hood; satin black sweeping silver form along the truck; subtle brushed-metal strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapEmeraldTouringClub,Emerald Touring Club Vehicle Wrap
+modVehicleWrapEmeraldTouringClubDesc,"Emerald Touring Club: Emerald leaf badge on the hood; deep green gold botanical accent along the truck; thin heritage gold borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRoseGoldReverie,Rose Gold Reverie Vehicle Wrap
+modVehicleWrapRoseGoldReverieDesc,"Rose Gold Reverie: Rose-gold sun disk on the hood; dusty blush metallic geometry along the truck; fine art-deco rose-gold bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapArcticMonochrome,Arctic Monochrome Vehicle Wrap
+modVehicleWrapArcticMonochromeDesc,"Arctic Monochrome: Minimal ice crystal on the hood; white-gray angular snow forms along the truck; silver glacier line strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSaffronModern,Saffron Modern Vehicle Wrap
+modVehicleWrapSaffronModernDesc,"Saffron Modern: Abstract saffron circle on the hood; cream and mustard asymmetrical blocks along the truck; clean ochre geometric bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDenimHeritage,Denim Heritage Vehicle Wrap
+modVehicleWrapDenimHeritageDesc,"Denim Heritage: Stitched leather badge on the hood; indigo denim seam illustration along the truck; woven blue textile strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWalnutRetreat,Walnut Retreat Vehicle Wrap
+modVehicleWrapWalnutRetreatDesc,"Walnut Retreat: Woodcut tree ring on the hood; warm woodgrain and forest silhouette along the truck; walnut inlay pattern bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapCobaltPorcelain,Cobalt Porcelain Vehicle Wrap
+modVehicleWrapCobaltPorcelainDesc,"Cobalt Porcelain: Blue floral medallion on the hood; ivory cobalt ceramic illustration along the truck; blue pottery border strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapPirateRadioRover,Pirate Radio Rover Vehicle Wrap
+modVehicleWrapPirateRadioRoverDesc,"Pirate Radio Rover: Pirate broadcast skull on the hood; treasure island radio station along the truck; nautical flags and signal bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWildWestShowdown,Wild West Showdown Vehicle Wrap
+modVehicleWrapWildWestShowdownDesc,"Wild West Showdown: Sheriff star on the hood; western town and desert rider along the truck; tooled leather and rope strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSteampunkDispatch,Steampunk Dispatch Vehicle Wrap
+modVehicleWrapSteampunkDispatchDesc,"Steampunk Dispatch: Brass pressure gauge on the hood; airship and mechanical city along the truck; riveted gearwork ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSuperheroDelivery,Superhero Delivery Vehicle Wrap
+modVehicleWrapSuperheroDeliveryDesc,"Superhero Delivery: Bold comic starburst on the hood; original comic action panels along the truck; halftone speed-line bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapDinosaurSafari,Dinosaur Safari Vehicle Wrap
+modVehicleWrapDinosaurSafariDesc,"Dinosaur Safari: Tyrannosaur crest on the hood; prehistoric jungle panorama along the truck; fossil and fern borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapUnderseaLaboratory,Undersea Laboratory Vehicle Wrap
+modVehicleWrapUnderseaLaboratoryDesc,"Undersea Laboratory: Bathysphere badge on the hood; deep-sea research station along the truck; pressure-gauge and bubble strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMountainRescueOne,Mountain Rescue One Vehicle Wrap
+modVehicleWrapMountainRescueOneDesc,"Mountain Rescue One: Rescue rope shield on the hood; helicopter and mountain rescue illustration along the truck; orange technical rescue bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTreelineFirewatch,Treeline Firewatch Vehicle Wrap
+modVehicleWrapTreelineFirewatchDesc,"Treeline Firewatch: Lookout tower badge on the hood; forest watchtower at sunset along the truck; burnt-orange pine borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSolarpunkHomestead,Solarpunk Homestead Vehicle Wrap
+modVehicleWrapSolarpunkHomesteadDesc,"Solarpunk Homestead: Sunflower gear on the hood; green rooftop village illustration along the truck; leaf and solar-grid ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapRainbowRoadtrip,Rainbow Roadtrip Vehicle Wrap
+modVehicleWrapRainbowRoadtripDesc,"Rainbow Roadtrip: Color-wheel compass on the hood; joyful multicolor ribbon landscape along the truck; rainbow geometric strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapFrozenRinkClub,Frozen Rink Club Vehicle Wrap
+modVehicleWrapFrozenRinkClubDesc,"Frozen Rink Club: Crossed hockey sticks and puck crest on the hood; ice rink motion and original hockey club lettering along the truck; skate-cut ice and hockey-stick borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapSundayGridiron,Sunday Gridiron Vehicle Wrap
+modVehicleWrapSundayGridironDesc,"Sunday Gridiron: Football helmet and laurel badge on the hood; football field yard lines and original varsity graphics along the truck; orange-black athletic stripe bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapStreetCourtLegends,Street Court Legends Vehicle Wrap
+modVehicleWrapStreetCourtLegendsDesc,"Street Court Legends: Basketball city-court emblem on the hood; urban basketball mural and dynamic ball trails along the truck; purple-orange court-line ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapWorldPitchWanderer,World Pitch Wanderer Vehicle Wrap
+modVehicleWrapWorldPitchWandererDesc,"World Pitch Wanderer: Soccer ball and globe crest on the hood; flowing stadium panorama and original club geometry along the truck; green-gold pitch-line strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapTracksideVictory,Trackside Victory Vehicle Wrap
+modVehicleWrapTracksideVictoryDesc,"Trackside Victory: Running shoe and stopwatch badge on the hood; colorful track lanes and sprint silhouettes along the truck; red-navy finish-line ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapUndeadChill,Undead Chill Vehicle Wrap
+modVehicleWrapUndeadChillDesc,"A charcoal botanical wrap with a headphone skull on the hood, a skeleton gardener on one side, a cozy vinyl lounge on the other, and a headphone rabbit on the rear door. Install in the camper cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapUndeadChillAfterHours,Undead Chill: Afterlife After Hours Vehicle Wrap
+modVehicleWrapUndeadChillAfterHoursDesc,"Afterlife After Hours: petrol-teal night garden, coral moths and a headphone skull; a hammock gamer on one side and a beanbag gamer on the other. Install in the camper cosmetic slot, replacing dye. Remove to restore the original finish."
+xuiRbCamperBodyStorage,Remove all additional storage containers before removing the camper body.
+xuiRbCamperBodyStations,Remove all installed stations before removing the camper body.
+xuiRbCamperBodyPower,"Remove all installed electrical sources, including generators, battery banks and solar panels, before removing the camper body."
+xuiRbCamperBodyTurrets,Remove all installed turrets before removing the camper body.
+xuiRbCamperBodyTravel,Pack the camper into Travel mode and wait for packing to finish before removing the body.
+xuiRbCamperBodyRecovery,A camper equipment transfer is awaiting recovery. Finish recovery before removing the body.
+xuiRbCamperBodyUnverified,Camper equipment data could not be verified. The body remains installed to protect its equipment and contents.
+xuiRbCamperBodyChanged,"Camper equipment changed. Finish or cancel the current item move, then try again."
+modVehicleWrapCaptStress,CaptStress Vehicle Wrap
+modVehicleWrapCaptStressDesc,"Scotch, copper stills, charred casks and a survivor taking a well-earned dram after horde night. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish."
+xuiRebirthMapTeleportOutsideWorld,Choose a point inside the playable world to teleport.
+xuiRebirthMapZoomTitle,Map zoom
+xuiRebirthMapZoomDetail,Detail
+xuiRebirthMapZoomOverview,Overview
+xuiRebirthMapZoomSpan,{0:0.0} km wide
+xuiRebirthMapZoomHint,Click or drag to zoom; the wheel and controller triggers still work.

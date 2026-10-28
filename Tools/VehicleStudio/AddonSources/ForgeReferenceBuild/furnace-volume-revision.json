@@ -1,0 +1,20 @@
+{
+ "status":"REPLACEMENT_PLAN_NOT_VALIDATED",
+ "reason":"Secondary view exposes camera-ray relief geometry, flat rear and disconnected projecting stone slabs in current furnace-mass-plan.",
+ "replace":["furnace mass depth rings","stone depths inferred from camera-relief mass","iron band depths fitted to that mass"],
+ "preserveAsEvidence":["furnace-mass-plan.json","outer-stones-plan.json","arch-stones-plan.json","iron-bands-plan.json","assembly-side-plan.png"],
+ "construction":{
+  "axis":"world Z, upright; independent of camera",
+  "footprint":"closed horizontal ellipse; width and depth separately declared",
+  "lowerWall":"short rounded wall with near-vertical courses",
+  "crown":"ellipsoidal cap, continuous into lower wall",
+  "hearth":"physical arched cutout and chamber along a fixed horizontal furnace axis; not projected camera rays",
+  "masonry":"individual volumes seated on the actual curved 3D shell; observed contours constrain visible faces but do not determine arbitrary extrusion direction",
+  "mortar":"recessed structural layer under stone faces",
+  "harness":"continuous straps following low-frequency body curvature with local stone clearance"
+ },
+ "initialNormalizedDimensions":{"width":1.10,"depth":1.02,"totalHeight":0.91,"lowerWallHeight":0.34,"capHeight":0.57},
+ "dimensionAuthority":"Initial hypotheses from silhouette; not meters and not approved dimensions",
+ "validation":["Fit body silhouette in shared comparison camera","Show front/side/top volume projections","Keep vertical axis and horizontal ground invariant","Verify cavity does not exit side/back wall","Fit attachments after volume is accepted","Refit each observed stone face using local surface normals and bounded thickness"],
+ "blenderAllowed":false
+}

@@ -1,0 +1,15 @@
+// AUTHORED_NOT_RUN. Injected into the actual remote witness/source scenario.
+  Fresh();Need(RebirthHydrationServerSourceHold.Lease.TryAcquire(player,original,out lease),"remote settlement source unavailable");WitnessFile.Set(original,true);
+  Need(!RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&RebirthMetabolismStateRepository.State.HydrationSlotItem.IsEmpty(),"Prepared-only WAL admitted financial settlement");
+  Need(RebirthHydrationTransferJournal.TryMarkAttempted(player,original,out _),"remote attempted WAL unavailable");WitnessFile.Set(original,false);
+  Need(!RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&RebirthMetabolismStateRepository.State.HydrationSlotItem.IsEmpty(),"applying owner receipt admitted settlement");WitnessFile.Set(original,true);
+  int revision=RebirthMetabolismStateRepository.State.Revision;
+  Need(RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&lease.Current()&&RebirthMetabolismStateRepository.State.HydrationSlotItem.count==1&&RebirthHydrationServerSourceHold.HoldsPlayer(player),"remote saved financial leg failed or released custody");
+  Need(RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&RebirthMetabolismStateRepository.State.Revision==revision+1,"remote retry repeated mutation");
+  int saveCount=RebirthMetabolismStateRepository.Saves;Need(RebirthMetabolismStateRepository.HasSavedRemoteHydrationAfter(lease)&&RebirthMetabolismStateRepository.Saves==saveCount,"remote saved observation wrote repository");
+  Fresh();Need(RebirthHydrationServerSourceHold.Lease.TryAcquire(player,original,out lease)&&RebirthHydrationTransferJournal.TryMarkAttempted(player,original,out _),"remote failed-save original unavailable");WitnessFile.Set(original,true);RebirthMetabolismStateRepository.SourceSaved=false;
+  Need(!RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&lease.Current()&&RebirthHydrationServerSourceHold.HoldsPlayer(player),"remote save failure cleared result/custody");revision=RebirthMetabolismStateRepository.State.Revision;
+  RebirthMetabolismStateRepository.SourceSaved=true;Need(RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&RebirthMetabolismStateRepository.State.Revision==revision,"remote save retry reapplied hydration");
+  Fresh();Need(RebirthHydrationServerSourceHold.Lease.TryAcquire(player,original,out lease)&&RebirthHydrationTransferJournal.TryMarkAttempted(player,original,out _),"remote unknown publication original unavailable");WitnessFile.Set(original,true);RebirthMetabolismStateRepository.ThrowAfter=true;
+  Need(!RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&lease.Current(),"remote unknown publication discarded lease");revision=RebirthMetabolismStateRepository.State.Revision;RebirthMetabolismStateRepository.ThrowAfter=false;
+  Need(RebirthMetabolismStateRepository.TrySettleRemoteHydration(lease)&&RebirthMetabolismStateRepository.State.Revision==revision,"remote unknown publication replayed financial mutation");

@@ -54,6 +54,12 @@ internal static partial class RebirthCamperRelayWiring
         return Voxel.Raycast(world,new Ray(eye,delta.normalized),delta.magnitude+.1f,-538750989,8,0)
             &&Voxel.voxelRayHitInfo.hit.blockPos==position;
     }
+    // External cable admission must use the same owner-specific electrical
+    // sphere as supply and its displayed bounds, not the longer wire-tool reach.
+    // Existing links may still be removed after the camper moves out of range.
+    private static bool CanAdmitExternalLink(EntityVehicle vehicle,Vector3i position)
+        =>RebirthCamperEnergyBounds.Contains(RebirthCamperEnergyBounds.CurrentCenter(vehicle),
+            position.ToVector3Center(),RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle));
     internal static void Receive(World world,ClientInfo sender,int actorId,int vehicleId,Guid token,byte action,int relay,int corner,Vector3i position)
     {
         if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||token==Guid.Empty||action>3)return;
@@ -125,6 +131,15 @@ internal static partial class RebirthCamperRelayWiring
             }
             else
             {
+                if(corner<0&&!CanAdmitExternalLink(vehicle,position))
+                {
+                    status="xuiCamperWireDenied";
+                    Log.Out("[REBIRTH EnergyFlow] relay-refused vehicle="+vehicle.entityId+" relay="+selection.Relay+
+                        " device=block:"+position+" reason=outside-camper-bounds distance="+
+                        RebirthCamperEnergyBounds.Distance(RebirthCamperEnergyBounds.CurrentCenter(vehicle),position.ToVector3Center())+
+                        " radius="+RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle));
+                    return;
+                }
                 if(next.Links.Count>=128)return;
                 var stamp=tile==null?Guid.NewGuid():Claim(tile,frame.Vehicle);
                 next.Links.Add(new Link{Relay=selection.Relay,Corner=corner,Position=position,Block=tile?.blockValue.type??0,Stamp=stamp,Length=selection.Length});

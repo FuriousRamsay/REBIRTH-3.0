@@ -15,6 +15,7 @@ public static partial class RebirthGameBridgeHandlers
         "GET  /ping                                   liveness + state (answered off main thread)",
         "GET  /help                                   this list",
         "GET  /state?sections=player,stats,buffs,cvars,inventory,equipment,skills,world,ui,consumption",
+        "POST /frames?action=start|stop  GET /frames   bounded game-frame timing for profiler sessions",
         "GET  /gearobserve                            read-only exact owner custody, cursor, locks, offer and terminal",
         "GET  /camperturrets?entity=ID[&seconds=0..10]  read-only turret state/poses/consumption and LOD inventory; bounded10Hz capture",
         "GET  /energy?entity=ID[&limit=256]             read-only existing Energy sources, native devices/wiring/baselines; no state creation",
@@ -77,6 +78,7 @@ public static partial class RebirthGameBridgeHandlers
             case "/radial": RebirthGameBridgeRadialObservation.Handle(req); return;
             case "/npcgear": RebirthGameBridgeNpcGear.Handle(req); return;
             case "/state": State(req); return;
+            case "/frames": RebirthGameBridgeFrames.Handle(req); return;
             case "/auditstate": AuditState(req); return;
             case "/camper":
                 RebirthCamperTrace.Enabled=true;

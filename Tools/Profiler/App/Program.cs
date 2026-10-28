@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -155,6 +155,12 @@ static class Program
         if (wa != null) form.Watch(wa.Substring(8));
         var ga = args.FirstOrDefault(a => a.StartsWith("--gameargs="));
         if (ga != null) form.SetGameArgs(ga.Substring(11));
+        var gameArgsFile = args.FirstOrDefault(a => a.StartsWith("--gameargsfile="));
+        if (gameArgsFile != null)
+        {
+            var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, gameArgsFile.Substring(15)));
+            form.SetGameArgs(File.ReadAllText(path).Trim());
+        }
         if (args.Contains("--alloc")) form.SetTrackAllocations(true);
         var ta = args.FirstOrDefault(a => a.StartsWith("--tab="));
         if (ta != null) form.SelectTab(int.Parse(ta.Substring(6)));
@@ -284,6 +290,7 @@ sealed class MainForm : Form
                     File.Delete(metricsRequest);
                     var monitor = autoMon;
                     var sample = monitor?.Sample();
+                    var recent = monitor?.RecentOs(12);
                     var metrics = new
                     {
                         capturedUtc = DateTime.UtcNow,
@@ -300,6 +307,12 @@ sealed class MainForm : Form
                         mainThreadPct = sample?.Os.MainThreadPct,
                         gpu3dPct = sample?.Os.Gpu3dPct,
                         gpuVramMb = sample?.Os.GpuVramMB,
+                        gpu3dAvg12s = recent?.gpu3dAvg,
+                        gpu3dP95_12s = recent?.gpu3dP95,
+                        gpuVramAvg12sMb = recent?.vramAvg,
+                        gpuVramPeak12sMb = recent?.vramPeak,
+                        processCoresAvg12s = recent?.processCoresAvg,
+                        osSamples12s = recent?.count,
                         workingSetMb = sample?.Os.WsMB
                     };
                     File.WriteAllText(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "metrics.json")), JsonSerializer.Serialize(metrics));
@@ -311,9 +324,10 @@ sealed class MainForm : Form
             }
             string request = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "launch.request"));
             if (!File.Exists(request)) return;
-            try { File.Delete(request); }
+            string body;
+            try { body = File.ReadAllText(request); File.Delete(request); }
             catch { return; }
-            LaunchGame();
+            HandleLaunchRequest(body, Path.GetDirectoryName(request));
         };
         launchRequestTimer.Start();
         Text = "Rebirth Profiler";
@@ -518,22 +532,64 @@ sealed class MainForm : Form
 
     // ---- launching and live updates ------------------------------------------------------------------------------
 
-    public void LaunchGame()
+    void HandleLaunchRequest(string body, string directory)
     {
+        string status = "rejected", error = "";
+        int pid = 0;
+        try
+        {
+            if (body.Length > 65536) throw new InvalidDataException("Launch request exceeds 64 KiB.");
+            var request = LaunchRequest.Parse(body, directory);
+            var running = Process.GetProcessesByName("7DaysToDie");
+            bool gameRunning = running.Length != 0;
+            foreach (var process in running) process.Dispose();
+            if (gameRunning) throw new InvalidOperationException("Game is already running; no launch settings changed.");
+            if (GameLauncher.FindGameExe(AppContext.BaseDirectory) == null)
+                throw new FileNotFoundException("Game executable was not found.");
+            if (GameLauncher.FindModule(AppContext.BaseDirectory) == null)
+                throw new FileNotFoundException("Native profiler module was not found.");
+            // Mode's change event edits bridge arguments. Apply the exact file afterwards.
+            if (request.PlayMode.HasValue) SetPlayMode(request.PlayMode.Value);
+            if (request.FreshSave.HasValue) SetFreshSave(request.FreshSave.Value);
+            if (request.GameArgs != null) SetGameArgs(request.GameArgs);
+            if (LaunchGameCore(true)) { status = "launched"; pid = gamePid; }
+            else error = launchRequestError;
+        }
+        catch (Exception ex) { error = ex.Message; }
+        try
+        {
+            File.WriteAllText(Path.Combine(directory, "launch.response.json"), JsonSerializer.Serialize(new
+            { status, pid, error, utc = DateTime.UtcNow, freshSave = freshSave.Checked, playMode = playMode.Checked }));
+        }
+        catch (Exception ex) { summary.Text = "Could not write launch response: " + ex.Message; }
+    }
+
+    string launchRequestError = "";
+    public void LaunchGame() => LaunchGameCore(false);
+
+    bool LaunchGameCore(bool automated)
+    {
+        launchRequestError = "";
+        bool Reject(string message)
+        {
+            launchRequestError = message;
+            if (!automated) MessageBox.Show(this, message, "Could not launch with profiler");
+            return false;
+        }
         string appDir = AppContext.BaseDirectory;
         string exe = GameLauncher.FindGameExe(appDir);
         if (exe == null)
         {
+            if (automated) return Reject("Game executable was not found.");
             using var dlg = new OpenFileDialog { Filter = "7DaysToDie.exe|7DaysToDie.exe", Title = "Locate 7DaysToDie.exe" };
-            if (dlg.ShowDialog(this) != DialogResult.OK) return;
+            if (dlg.ShowDialog(this) != DialogResult.OK) return false;
             exe = dlg.FileName;
         }
         string module = GameLauncher.FindModule(appDir);
-        if (module == null) { MessageBox.Show(this, "mono-profiler-rebirthprof.dll was not found next to the app or in ..\\native. Run build.ps1.", "Rebirth Profiler"); return; }
+        if (module == null) return Reject("mono-profiler-rebirthprof.dll was not found next to the app or in ..\\native. Run build.ps1.");
         if (Process.GetProcessesByName("7DaysToDie").Length > 0)
         {
-            MessageBox.Show(this, "7 Days To Die is already running. Close it first: the profiler has to be loaded when the game starts.", "Rebirth Profiler");
-            return;
+            return Reject("7 Days To Die is already running. Close it first: the profiler has to be loaded when the game starts.");
         }
         string outDir = Path.GetFullPath(Path.Combine(appDir, "..", "out"));
         Directory.CreateDirectory(outDir);
@@ -554,8 +610,9 @@ sealed class MainForm : Form
             livePath = outPath; liveStamp = DateTime.MinValue; cur = null;
             summary.Text = $"Game started (pid {gamePid}) with the profiler attached. Play, then press Reset counters once the save has loaded. The report appears ~20 s after start and refreshes every few seconds.";
             liveTimer.Start();
+            return true;
         }
-        catch (Exception ex) { MessageBox.Show(this, ex.Message, "Could not launch with profiler"); }
+        catch (Exception ex) { return Reject(ex.Message); }
     }
 
     /// <summary>Play mode: once the game window is up and frames are being captured, start recording dips (the first 150 s are ignored while the world loads).</summary>

@@ -9,6 +9,12 @@ using System.Xml.Linq;
 internal static class RemoteResourceWorldIdentity
 {
     private static readonly object Gate=new object();
+    // Failed admission remains a refusal, but must not reparse every player's
+    // custody XML for every caller/frame. Retry after five monotonic seconds;
+    // changing the live World or native save path immediately bypasses this gate.
+    private static WeakReference<World> failedWorld;
+    private static string failedRoot;
+    private static long retryAfter;
     private static bool Current(World world,string root)
     {
         if(world==null||!RebirthWorldCharacterRepository.IsServerAuthority||GameManager.Instance==null||
@@ -45,11 +51,14 @@ internal static class RemoteResourceWorldIdentity
         key=null;
         lock(Gate)
         {
-            string candidate=null;
+            string candidate=null,root=null;bool attempted=false;
             try
             {
                 string raw=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(raw))return false;
-                string root=Path.GetFullPath(raw);if(!Current(world,root))return false;
+                root=Path.GetFullPath(raw);if(!Current(world,root))return false;
+                if(failedWorld!=null&&failedWorld.TryGetTarget(out var failedTarget)&&ReferenceEquals(failedTarget,world)&&string.Equals(failedRoot,root,StringComparison.Ordinal)&&
+                    System.Diagnostics.Stopwatch.GetTimestamp()<retryAfter)return false;
+                attempted=true;
                 string path=Path.Combine(root,"RebirthData","RemoteResources","worldIdentity.xml");
                 if(File.Exists(path)){if(!Read(path,out var existing)||!Current(world,root))return false;key=existing;return true;}
                 if(File.Exists(path+".bak")||File.Exists(path+".tmp"))return false;
@@ -69,6 +78,15 @@ internal static class RemoteResourceWorldIdentity
             catch{key=null;return false;}
             finally
             {
+                if(attempted)
+                {
+                    if(key==null)
+                    {
+                        failedWorld=new WeakReference<World>(world);failedRoot=root;
+                        retryAfter=System.Diagnostics.Stopwatch.GetTimestamp()+5L*System.Diagnostics.Stopwatch.Frequency;
+                    }
+                    else{failedWorld=null;failedRoot=null;retryAfter=0;}
+                }
                 if(candidate!=null)
                 {
                     try{if(File.Exists(candidate))File.Delete(candidate);}catch{}

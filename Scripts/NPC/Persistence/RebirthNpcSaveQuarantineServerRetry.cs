@@ -7,7 +7,7 @@ internal static partial class RebirthNpcSaveQuarantineBundle
     internal static void RetryServerNativeAdmission(World world,string directory)
     {
         if(retryingServerNativeAdmission||!AdmissionEnabled||transferring||!ThreadManager.IsMainThread()||world?.IsRemote()!=false||
-            !ReferenceEquals(world,GameManager.Instance?.World)||!SameDirectory(directory,GameIO.GetSaveGameDir()))return;
+            !ReferenceEquals(world,GameManager.Instance?.World)||retained.Count==0||!SameDirectory(directory,RebirthNpcSaveScope.CurrentDirectory()))return;
         retryingServerNativeAdmission=true;
         try
         {

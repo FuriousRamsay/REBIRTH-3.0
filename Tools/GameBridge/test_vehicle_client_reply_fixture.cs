@@ -5,8 +5,11 @@ enum RebirthVehicleAssemblyAction {Read,Install}
 enum RebirthVehicleAssemblyCarrier {RepairableBlock,VehicleEntity}
 enum RebirthVehicleRequestOutcome {Rejected,Applied,ReadOnly,Indeterminate}
 class RebirthVehicleAssembly {public RebirthVehicleAssembly DeepClone(){return new RebirthVehicleAssembly();}}
-class TestWorld {public bool Remote;public bool IsRemote(){return Remote;}}
-class EntityPlayerLocal {public string Creation="11111111111111111111111111111111";public bool Complete=true;public TestWorld world=new TestWorld();}
+// Explicit native thread/current-world/entity registry boundaries, not network proof.
+static class ThreadManager {public static bool Main=true;public static bool IsMainThread(){return Main;}}
+class GameManager {public static readonly GameManager Instance=new GameManager();public TestWorld World;}
+class TestWorld {public readonly Dictionary<int,EntityPlayerLocal> Entities=new Dictionary<int,EntityPlayerLocal>();public object GetEntity(int id){EntityPlayerLocal p;return Entities.TryGetValue(id,out p)?p:null;}public bool Remote;public bool IsRemote(){return Remote;}}
+class EntityPlayerLocal {static int next;public int entityId=++next;public string Creation="11111111111111111111111111111111";public bool Complete=true;public TestWorld world=new TestWorld();public EntityPlayerLocal(){world.Entities[entityId]=this;}}
 class Origin {public string CreationId;}
 class RebirthWorldCharacterRecord {public bool IsComplete;public Origin Origin;}
 static class RebirthSurvivorMode {public static bool Enabled=true;public static bool IsEnabledForCurrentWorld(){return Enabled;}}
@@ -21,6 +24,7 @@ class XUiC_RebirthVehicleRestoration {
  class PendingClientRequest {public XUiC_RebirthVehicleRestoration Controller;public RebirthVehicleAssemblyAction Action;public RebirthVehicleAssemblyCarrier Carrier;public Vector3i Position;public int EntityId;public long ExpectedRevision;public EntityPlayerLocal Owner;public object OwnerWorld;public string OwnerCreation;public bool HasConfirmedReply;public RebirthVehicleAssembly ConfirmedSnapshot;public string ConfirmedMessage;public RebirthVehicleRequestOutcome ConfirmedOutcome;public ItemStack ReservedCursorItem,PickedCursorItem;}
  static readonly object PendingClientSync=new object();static readonly Dictionary<Guid,PendingClientRequest> PendingClientRequests=new Dictionary<Guid,PendingClientRequest>();
  XUi xui=new XUi();
+ public XUiC_RebirthVehicleRestoration(){GameManager.Instance.World=xui.playerUI.entityPlayer.world;}
  RebirthVehicleAssemblyCarrier carrier;Vector3i position;int entityId;Guid lastCompletedRequestId,pendingRequestId;long pendingExpectedRevision;RebirthVehicleAssembly assembly;int Restores,Deliveries;string Status;
  void RestoreReservedCursorItem(ItemStack s){Restores++;}void DeliverConfirmedPickup(ItemStack s){Deliveries++;}void SetStatus(string s){Status=s;}void Refresh(){}
 
@@ -65,7 +69,14 @@ class XUiC_RebirthVehicleRestoration {
  if(!PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=0)throw new Exception("Replacement world settled item");
  original.world=world;original.Creation="22222222222222222222222222222222";c.RetryConfirmedReply();
  if(!PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=0)throw new Exception("Replacement character settled item");
- original.Creation="11111111111111111111111111111111";c.RetryConfirmedReply();
+ original.Creation="11111111111111111111111111111111";
+ GameManager.Instance.World=new TestWorld();c.RetryConfirmedReply();
+ if(!PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=0)throw new Exception("Retired matching owner/world settled item");
+ GameManager.Instance.World=world;world.Entities[original.entityId]=new EntityPlayerLocal();c.RetryConfirmedReply();
+ if(!PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=0)throw new Exception("Replaced current entity settled item");
+ world.Entities[original.entityId]=original;ThreadManager.Main=false;c.RetryConfirmedReply();
+ if(!PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=0)throw new Exception("Off-thread reply settled item");
+ ThreadManager.Main=true;c.RetryConfirmedReply();
  if(PendingClientRequests.ContainsKey(id)||c.Restores+c.Deliveries!=1)throw new Exception("Available inventory failed settlement");
  }
  var reader=new XUiC_RebirthVehicleRestoration();var readId=Guid.NewGuid();reader.pendingRequestId=readId;PendingClientRequests.Add(readId,new PendingClientRequest{Controller=reader,Owner=reader.xui.playerUI.entityPlayer,OwnerWorld=reader.xui.playerUI.entityPlayer.world,OwnerCreation=reader.xui.playerUI.entityPlayer.Creation,Action=RebirthVehicleAssemblyAction.Read});

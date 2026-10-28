@@ -28,11 +28,19 @@ internal sealed class RebirthPoiWorldBinding
             if(!ThreadManager.IsMainThread() || game==null || manager==null || !manager.IsServer || world==null ||
                 world.IsRemote() || !ReferenceEquals(game.World,world) || state==null) return false;
             string native=state.Guid,rawSave=GameIO.GetSaveGameDir(),save=Path.GetFullPath(rawSave);
+            var storage=(Platform.UserDataStorageType)GamePrefs.GetInt(EnumGamePrefs.GameSaveStorageType);
+            string root=GameIO.GetSaveGameRootDir(storage),worldName=GamePrefs.GetString(EnumGamePrefs.GameWorld),
+                gameName=GamePrefs.GetString(EnumGamePrefs.GameName);
             binding=new RebirthPoiWorldBinding(world,native,save,()=>ThreadManager.IsMainThread() &&
                 ReferenceEquals(GameManager.Instance,game) && ReferenceEquals(game.World,world) &&
                 ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,manager) && manager.IsServer && !world.IsRemote() &&
                 ReferenceEquals(world.worldState,state) && state.Guid==native &&
-                string.Equals(GameIO.GetSaveGameDir(),rawSave,StringComparison.Ordinal));
+                // Sleeper gates call this for each volume. Compare the native
+                // path inputs without rebuilding the identical path each time.
+                (Platform.UserDataStorageType)GamePrefs.GetInt(EnumGamePrefs.GameSaveStorageType)==storage &&
+                string.Equals(GameIO.GetSaveGameRootDir(storage),root,StringComparison.Ordinal) &&
+                string.Equals(GamePrefs.GetString(EnumGamePrefs.GameWorld),worldName,StringComparison.Ordinal) &&
+                string.Equals(GamePrefs.GetString(EnumGamePrefs.GameName),gameName,StringComparison.Ordinal));
             return binding.IsCurrent;
         }
         catch { binding=null; return false; }

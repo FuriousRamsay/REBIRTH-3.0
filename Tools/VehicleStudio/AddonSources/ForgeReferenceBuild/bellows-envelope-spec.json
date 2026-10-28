@@ -1,0 +1,27 @@
+{
+  "status": "FRESH_CONTINUOUS_ENVELOPE_SPEC_REQUIRES_PROJECTED_REVIEW",
+  "construction": "One closed loft between rounded vertical cross-sections. The skin remains connected between fold ridges. Separate broad top and bottom boards follow the envelope edges; seam piping follows the four observed ridge paths.",
+  "cameraSource": "bellows-frame-plan.json",
+  "sectionMeasurements": [
+    {"station":0,"upperPixel":[248,342],"lowerPixel":[259,628],"depthHalfWidth":0.125},
+    {"station":0.2,"upperPixel":[289,345],"lowerPixel":[308,624],"depthHalfWidth":0.112},
+    {"station":0.4,"upperPixel":[346,374],"lowerPixel":[363,608],"depthHalfWidth":0.096},
+    {"station":0.6,"upperPixel":[403,412],"lowerPixel":[416,586],"depthHalfWidth":0.074},
+    {"station":0.8,"upperPixel":[461,462],"lowerPixel":[464,567],"depthHalfWidth":0.048},
+    {"station":1,"upperPixel":[497,494],"lowerPixel":[497,557],"depthHalfWidth":0.029}
+  ],
+  "folds": {
+    "countVisible":4,
+    "source":"left-reference-records.json:fold_envelope.foldRidgePaths",
+    "form":"Rounded shallow bulges with continuous concave valleys, not separate intersecting volumes",
+    "maximumDepthAmplitude":0.012,
+    "amplitudeTaper":"Decrease toward rigid throat to avoid leather intersecting its collar",
+    "seamRadius":0.003,
+    "seamLift":0.002
+  },
+  "boards":{"thickness":0.014,"edgeRoundRadius":0.004,"relationship":"Follow upper and lower envelope boundaries and end inside throat collar"},
+  "units":"Provisional common assembly units; 760 pixels/unit",
+  "depthAuthority":"Widths are inferred from frame separation and must be tested in an oblique view; they are not measurements recovered from the image.",
+  "mustValidate":["Rear broad end is enclosed by the frame","Throat joins collar without a gap","Leather remains one continuous closed volume","Rounded shoulder follows reference rather than a straight triangular wedge","Ridge paths remain distinct and converge toward throat","Envelope does not intersect shaft bearings"],
+  "blenderAllowed":false
+}

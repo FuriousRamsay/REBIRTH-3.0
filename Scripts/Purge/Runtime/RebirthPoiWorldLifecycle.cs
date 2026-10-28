@@ -59,7 +59,9 @@ internal sealed class RebirthPoiWorldLifecycle
     public bool TryGetStore(out RebirthPoiWorldStore current)
     {
         current=null;
-        if(State!=RebirthPoiLifecycleState.Ready || binding==null || !binding.IsCurrent || store==null || store.HasPending || store.Published==null) return false;
+        // Published performs the final live binding check under the store lock.
+        // Keep it on every read and require the exact lifecycle-owned binding.
+        if(State!=RebirthPoiLifecycleState.Ready || binding==null || store==null || store.HasPending || !ReferenceEquals(store.Published?.Binding,binding)) return false;
         current=store; return true;
     }
     // Original passive evidence may arrive while one exact publication is pending.
@@ -67,7 +69,7 @@ internal sealed class RebirthPoiWorldLifecycle
     internal bool TryGetEvidenceStore(out RebirthPoiWorldStore current)
     {
         current=null;
-        if((State!=RebirthPoiLifecycleState.Ready && State!=RebirthPoiLifecycleState.PendingRetry) || binding==null || !binding.IsCurrent || store==null || store.Published==null) return false;
+        if((State!=RebirthPoiLifecycleState.Ready && State!=RebirthPoiLifecycleState.PendingRetry) || binding==null || store==null || !ReferenceEquals(store.Published?.Binding,binding)) return false;
         current=store; return true;
     }
     public void Tick()

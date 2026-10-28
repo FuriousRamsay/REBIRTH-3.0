@@ -1,0 +1,6 @@
+// AUTHORED_NOT_RUN. Native mapping/player-save/upload/send and envelope adapters.
+internal sealed class NetPackagePlayerData {}
+internal sealed class NetPackageRebirthHydrationIntent {internal Guid Operation;internal NetPackageRebirthHydrationIntent Setup(RebirthHydrationProposalClient.Intent intent){if(!intent.Current())throw new InvalidOperationException("stale intent");Operation=intent.Operation;return this;}}
+internal static class NetPackageManager {internal static bool Available=true;internal static int GetPackageId(Type type){if(!Available)throw new InvalidOperationException("mapping missing");return 1;}internal static T GetPackage<T>() where T:new()=>new T();}
+internal sealed partial class GameManager {internal static int Saves,Uploads;internal static Action DuringSave,DuringUpload;internal void SaveLocalPlayerData(){Saves++;DuringSave?.Invoke();}internal void TriggerSendOfLocalPlayerDataFile(float delay){Uploads++;DuringUpload?.Invoke();}}
+internal sealed partial class ConnectionManager {internal static int Sends;internal static Guid LastOperation;internal static Action DuringSend;internal void SendToServer(NetPackageRebirthHydrationIntent packet){Sends++;LastOperation=packet.Operation;DuringSend?.Invoke();}}

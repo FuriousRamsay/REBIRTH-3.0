@@ -1,6 +1,8 @@
 using System;using System.Collections.Generic;
-class Entity {public World world;public int entityId;}
-class EntityAlive:Entity {public Entity entityThatKilledMe;}
+struct Position {public float x;public static Position operator -(Position a,Position b)=>new Position{x=a.x-b.x};public float sqrMagnitude=>x*x;}
+class RebirthStatisticsService {public static EntityPlayer CompanionOwner;public static EntityPlayer ResolveHordeOwner(EntityAlive source)=>source as EntityPlayer ?? CompanionOwner;}
+class Entity {public World world;public int entityId;public Position position;}
+class EntityAlive:Entity {public EntityAlive entityThatKilledMe;}
 class EntityPlayer:EntityAlive {}
 class EntityPlayerLocal:EntityPlayer {}
 class EntityList {public Dictionary<int,Entity> dict=new Dictionary<int,Entity>();}
@@ -31,6 +33,12 @@ class Program
   ThreadManager.Main=false;Check(RebirthPurgeKillContributor.Capture(victim)==null,"worker cannot capture native player attribution");ThreadManager.Main=true;
   GameManager.Instance.World=new World();Check(RebirthPurgeKillContributor.Capture(victim)==null,"replaced saved world withheld");GameManager.Instance.World=world;
   victim.entityThatKilledMe=new EntityAlive{world=world};Check(RebirthPurgeKillContributor.Capture(victim)==null,"non-player source earns no player credit");
+  RebirthStatisticsService.CompanionOwner=player;
+  victim.entityThatKilledMe.position=new Position{x=50};
+  Check(RebirthPurgeKillContributor.Capture(victim)==client.Key,"resolved companion owner at 50 metres retains credit");
+  victim.entityThatKilledMe.position=new Position{x=50.01f};
+  Check(RebirthPurgeKillContributor.Capture(victim)==null,"resolved companion owner beyond 50 metres withheld");
+  RebirthStatisticsService.CompanionOwner=null;
   manager.Clients.Values.Clear();var local=new EntityPlayerLocal{world=world,entityId=123};world.Entities.dict[123]=local;victim.entityThatKilledMe=local;
   Check(RebirthPurgeKillContributor.Capture(victim)==null,"unregistered local platform participant withheld");world.Locals.Add(local);
   Check(RebirthPurgeKillContributor.Capture(victim)==RebirthStablePlayerIdentity.Local,"actual registered local player resolves platform identity");

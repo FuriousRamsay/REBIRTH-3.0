@@ -10,6 +10,7 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
         internal NGUIWindowManager Manager;
         internal UILabel Label;
         internal GameObject Window;
+        internal Transform WindowTransform;
     }
 
     private static float nextRetry;
@@ -60,12 +61,13 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
             // Check the actual window-map association, not just a still-live old label.
             if (entry.Manager == null || entry.Label == null || entry.Manager.windowMap == null ||
                 !entry.Manager.windowMap.TryGetValue(EnumNGUIWindow.Version, out var current) ||
-                current == null || current.transform.gameObject != entry.Window)
+                current == null || (current != entry.WindowTransform && current.gameObject != entry.Window))
             {
                 labels.RemoveAt(i);
                 invalidated = true;
                 continue;
             }
+            entry.WindowTransform = current;
             if (entry.Label.enabled != visible) entry.Label.enabled = visible;
         }
         if (invalidated) nextRetry = 0f;
@@ -84,7 +86,7 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
             if (manager.windowMap == null || !manager.windowMap.TryGetValue(EnumNGUIWindow.Version, out var window) || window == null) continue;
             var label = window.GetComponent<UILabel>();
             if (label == null) continue;
-            labels.Add(new LabelOwner { Manager = manager, Label = label, Window = window.transform.gameObject });
+            labels.Add(new LabelOwner { Manager = manager, Label = label, Window = window.gameObject, WindowTransform = window });
             label.enabled = visible;
             label.supportEncoding = true;
             label.fontSize = 18;

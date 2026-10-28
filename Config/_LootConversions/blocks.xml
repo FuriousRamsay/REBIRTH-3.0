@@ -1,4 +1,4 @@
-<configs>
+﻿<configs>
   <!-- REBIRTH 2.6 parity: decorative/industrial blocks restored as lootable storage
        using the 3.1 CompositeTileEntity storage architecture. -->
 
@@ -12,15 +12,20 @@
     </property>
   </append>
 
-  <!-- Military pallets. -->
+  <!-- Existing saves can contain base/cap storage from the former conversion.
+       Retain its native schema to read/write those exact saved contents. The
+       compatibility class creates no new storage and denies pickup; fresh base
+       and cap blocks remain non-lootable. Tile variants keep their own class. -->
   <append xpath="/blocks/block[@name='palletCartonMilitaryBase']">
-    <property name="Class" value="CompositeTileEntity" />
+    <property name="Class" value="RebirthLegacyMilitaryPalletBase, RebirthUtils" />
     <property class="CompositeFeatures">
       <property class="TEFeatureStorage">
         <property name="LootList" value="rebirthMilitaryAmmoPalletLarge" />
       </property>
     </property>
   </append>
+
+  <!-- Military pallet tile variants only. The base is not a loot container. -->
   <append xpath="/blocks/block[@name='palletCartonMilitaryTile']">
     <property name="Class" value="CompositeTileEntity" />
     <property class="CompositeFeatures">

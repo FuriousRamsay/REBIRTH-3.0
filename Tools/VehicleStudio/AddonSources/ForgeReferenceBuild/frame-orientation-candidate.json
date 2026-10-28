@@ -1,0 +1,39 @@
+{
+  "status": "COHERENT_ORIENTATION_CANDIDATE_NOT_FULL_PLAN_PASS",
+  "assumptions": [
+    "Weak perspective, zero roll",
+    "Rear frame shafts horizontal and parallel",
+    "Shaft direction defines local positive X",
+    "Nozzle heading perpendicular to shaft, with pitch allowed"
+  ],
+  "cameraElevationDegrees": 22.88949901583545,
+  "cameraAzimuthDegrees": 26.063965073925417,
+  "shaftUnitAxis": [
+    1,
+    0,
+    0
+  ],
+  "nozzleUnitAxisTowardFurnace": [
+    0,
+    -0.9732233599351271,
+    0.22986146192126683
+  ],
+  "nozzlePitchDegrees": 13.288915571548829,
+  "observedSlopes": {
+    "upperShaft": -0.1902439024390244,
+    "lowerShaft": -0.1951219512195122,
+    "nozzle": 0.3
+  },
+  "projectedSlopes": {
+    "shaft": -0.1902439024390244,
+    "nozzle": 0.3
+  },
+  "meaning": "The previously inconsistent slope constraints admit a coherent pitched nozzle. This is an explicit geometric hypothesis, not evidence of the hidden reference geometry.",
+  "remaining": [
+    "Verify throat and flange planes against this nozzle axis",
+    "Specify frame dimensions and connected endpoints",
+    "Check perspective sensitivity and upright lean",
+    "Validate complete projected assembly"
+  ],
+  "blenderAllowed": false
+}

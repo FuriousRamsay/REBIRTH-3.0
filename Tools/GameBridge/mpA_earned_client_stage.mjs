@@ -1,0 +1,17 @@
+// PREPARED NOT RUN. Actual native-client file/stage methods; authority is doubled.
+import {readFile,writeFile,mkdtemp,rm} from 'node:fs/promises';
+import {execFile} from 'node:child_process';import {promisify} from 'node:util';
+import {tmpdir} from 'node:os';import {join,resolve,dirname,basename,sep} from 'node:path';import {fileURLToPath} from 'node:url';
+const run=promisify(execFile),here=dirname(fileURLToPath(import.meta.url)),root=resolve(here,'../..');
+const source=await readFile(join(root,'Scripts/Crafting/Recycling/RebirthProductiveEarnedRemoteClient.cs'),'utf8');
+function method(marker){const at=source.indexOf(marker);if(at<0||source.indexOf(marker,at+marker.length)>=0)throw Error('Missing/ambiguous source '+marker);let p=source.indexOf('{',at),depth=0;for(let i=p;i<source.length;i++){if(source[i]==='{')depth++;if(source[i]==='}'&&--depth===0)return source.slice(at,i+1);}throw Error('Unterminated actual method');}
+const actual=['    private static byte[] StageBytes(','    private static bool MatchesStage(','    private static bool MatchesSavedStageDescription(','    private static bool WriteExact(','    private static byte[] Read(','    private static bool Safe('].map(method).join('\n');
+const artifact=await readFile(join(root,'Scripts/Crafting/Recycling/RebirthProductiveEarnedArtifact.cs'),'utf8');
+function artifactMethod(marker){const at=artifact.indexOf(marker);if(at<0||artifact.indexOf(marker,at+marker.length)>=0)throw Error('Missing/ambiguous artifact source');let p=artifact.indexOf('{',at),depth=0;for(let i=p;i<artifact.length;i++){if(artifact[i]==='{')depth++;if(artifact[i]==='}'&&--depth===0)return artifact.slice(at,i+1);}throw Error('Unterminated actual artifact method');}
+const proof=await readFile(join(root,'Scripts/Crafting/Recycling/RebirthProductiveEarnedRowProof.cs'),'utf8');
+const limit=proof.match(/internal const int MaximumArtifactBytes[^;]+;/g);if(limit?.length!==1)throw Error('Artifact bound changed');
+const compare='internal static class RebirthProductiveEarnedRowProof {'+limit[0]+'} internal static class RebirthProductiveEarnedArtifact {'+artifactMethod('    internal static bool FileMatches(')+artifactMethod('    internal static bool SafePath(')+'}';
+let fixture=await readFile(join(here,'mpA_earned_client_stage_fixture.cs'),'utf8');if(fixture.split('// ACTUAL_STAGE_METHODS').length!==2)throw Error('Fixture insertion changed');fixture=fixture.replace('// ACTUAL_STAGE_METHODS',actual);if(fixture.split('// ACTUAL_ARTIFACT_FILE_COMPARE').length!==2)throw Error('Artifact fixture insertion changed');fixture=fixture.replace('// ACTUAL_ARTIFACT_FILE_COMPARE',compare);
+const temp=await mkdtemp(join(tmpdir(),'rebirth-earned-stage-'));
+try{const cs=join(temp,'fixture.cs'),exe=join(temp,'fixture.exe');await writeFile(cs,fixture);await run('C:/Program Files/dotnet/dotnet.exe',['C:/Program Files/dotnet/sdk/9.0.301/Roslyn/bincore/csc.dll','/nologo','/langversion:latest','/target:exe','/out:'+exe,...['mscorlib','System','System.Core'].map(n=>'/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/'+n+'.dll'),cs],{windowsHide:true,timeout:20000});console.log((await run(exe,[temp],{windowsHide:true,timeout:20000})).stdout.trim());}
+finally{if(process.env.REBIRTH_KEEP_FIXTURE==='1')console.log(temp);else{if(!resolve(temp).toLowerCase().startsWith((resolve(tmpdir())+sep).toLowerCase())||!basename(temp).startsWith('rebirth-earned-stage-'))throw Error('Refuse cleanup outside generated temp');await rm(temp,{recursive:true});}}

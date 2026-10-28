@@ -24,6 +24,29 @@ public static class RebirthNpcSaveScope
     private static string observedSaveDirectory = string.Empty;
     private static string observedFingerprint = string.Empty;
     private static int processSaveGeneration;
+    private static string pathRoot, pathWorld, pathGame, cachedDirectory;
+    private static Platform.UserDataStorageType pathStorage;
+
+    // GameIO concatenates the same save path at each call. Its root is already
+    // cached natively; retain the combined path until one of its inputs changes.
+    // This also detects save changes within the same process without relying on
+    // a world-load event arriving before an early recovery check.
+    internal static string CurrentDirectory()
+    {
+        var storage=(Platform.UserDataStorageType)GamePrefs.GetInt(EnumGamePrefs.GameSaveStorageType);
+        string root=GameIO.GetSaveGameRootDir(storage);
+        string world=GamePrefs.GetString(EnumGamePrefs.GameWorld);
+        string game=GamePrefs.GetString(EnumGamePrefs.GameName);
+        lock(Sync)
+        {
+            if(cachedDirectory!=null&&pathStorage==storage&&string.Equals(pathRoot,root,StringComparison.Ordinal)&&
+                string.Equals(pathWorld,world,StringComparison.Ordinal)&&string.Equals(pathGame,game,StringComparison.Ordinal))
+                return cachedDirectory;
+            string directory=GameIO.GetSaveGameDir(world,game,storage);
+            pathRoot=root;pathWorld=world;pathGame=game;pathStorage=storage;
+            return cachedDirectory=directory;
+        }
+    }
 
     public static RebirthNpcSaveScopeSnapshot ObserveCurrent()
     {
@@ -41,7 +64,7 @@ public static class RebirthNpcSaveScope
         }
 
         string directory = string.Empty;
-        try { directory = GameIO.GetSaveGameDir() ?? string.Empty; }
+        try { directory = CurrentDirectory() ?? string.Empty; }
         catch { directory = string.Empty; }
 
         if (string.IsNullOrWhiteSpace(directory))

@@ -1,0 +1,34 @@
+{
+  "status": "DRAFT_NOT_VALIDATED_DO_NOT_SEND_TO_BLENDER",
+  "scope": "Forge only; reusable planning gate applies to every subsequent model",
+  "reference": "../../../ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+  "units": "Normalized furnace body width = 1; physical scale unresolved until camper fit",
+  "axes": {"X":"furnace right","Y":"rear","Z":"up","origin":"furnace center at mounting-foot contact plane","rotations":"degrees, XYZ Euler; pipe axes specified by endpoints instead"},
+  "measurementAuthority": "Image pixels are manually estimated observations. All 3D numbers below are initial hypotheses, not measurements recovered from one image. No model generation until camera and component projections are validated.",
+  "camera": {"status":"UNSOLVED","projection":"perspective hypothesis","requiredLandmarks":["collar ellipse axes","crucible rim ellipse axes","rear bellows upper shaft endpoints","hearth sill endpoints","front strap feet"],"rule":"Fit one shared camera to all rigid landmarks. Do not compensate for a camera mismatch by independently distorting components."},
+  "components": [
+    {"id":"masonry_envelope","shape":"continuous squat dome above short near-vertical lower wall","center":[0,0,0.55],"size":[1,0.86,1.02],"rotation":[0,0,0],"detail":"Individually outlined angular stones, interlocking staggered joints; no five regular horizontal courses","unresolved":"Each visible stone contour and depth must be enumerated before generation"},
+    {"id":"hearth_void","shape":"deep irregular round-headed arch, actual open cavity","center":[0,-0.39,0.43],"size":[0.48,0.52,0.48],"rotation":[0,0,0],"detail":"Near-vertical jambs, rounded crown; visible rear masonry and floor","unresolved":"Trace opening contour and separate arch stones"},
+    {"id":"hearth_sill","shape":"thick irregular joined stone ledge","center":[0,-0.445,0.18],"size":[0.53,0.15,0.085],"rotation":[0,0,0],"detail":"Worn broken edges rather than three identical beveled bricks"},
+    {"id":"collar","shape":"short thick circular open iron ring","center":[0,0,1.065],"size":[0.32,0.32,0.13],"rotation":[0,0,0],"detail":"Rounded irregular lip, front overlap plate and dome rivet; recessed inner aperture"},
+    {"id":"front_left_strap","shape":"thick bent iron ribbon conforming to dome and wall","path":[[-0.28,-0.44,0.09],[-0.28,-0.45,0.50],[-0.24,-0.32,0.86],[-0.10,-0.12,1.04]],"crossSection":[0.075,0.014],"rotation":"parallel-transport cross section along path; broad face outward"},
+    {"id":"front_right_strap","shape":"thick bent iron ribbon","path":[[0.39,-0.39,0.09],[0.41,-0.38,0.50],[0.31,-0.28,0.86],[0.13,-0.08,1.04]],"crossSection":[0.070,0.014],"rotation":"parallel-transport cross section along path; broad face outward"},
+    {"id":"cross_bands","shape":"curved iron bands crossing shoulder and lower body","size":[0.08,0.014],"position":"contact with masonry envelope","rotation":"surface-following","unresolved":"Trace each visible band path and overlaps; no automatic latitude rings"},
+    {"id":"strap_plates_rivets","shape":"rounded rectangular overlap plates with substantial domed heads","plateSize":[0.10,0.022,0.12],"rivetDiameter":0.044,"rivetDepth":0.025,"position":"individual reference junctions","rotation":"head axis normal to plate","unresolved":"Enumerate individual junction positions; reject unplaced repeaters"},
+    {"id":"mounting_feet","shape":"short bent tabs with round through-holes","size":[0.13,0.14,0.025],"position":"under individual structural straps at Z=0.0125","rotation":[0,0,0],"unresolved":"Enumerate locations and hole centers; no continuous pedestal substitute"},
+    {"id":"bellows_frame","shape":"two thick timber uprights with rounded irregular corners","center":[-0.91,0.02,0.56],"size":[0.07,0.30,0.62],"rotation":[0,0,0],"detail":"Uprights separated across Y, paired top and bottom shafts, washers, bosses, short brackets","unresolved":"Yaw and center require projected shaft rising to image right as reference; prior +25/-25 guesses rejected"},
+    {"id":"bellows_leather","shape":"closed fan bellows with four rounded lobes and curved upper shoulder","center":[-0.73,0.02,0.56],"size":[0.35,0.26,0.45],"rotation":"same assembly yaw as frame","detail":"Broad rear lobes contract to a finite-width throat; joined crease valleys, no disconnected pillow stack","unresolved":"Trace upper/lower silhouettes and fold ridges; verify overlap with frame"},
+    {"id":"bellows_shafts","shape":"cylindrical shafts with stepped journals and rounded boss heads","diameter":0.040,"length":0.36,"position":"rear frame top and bottom bearing centers","rotation":"across frame Y axis","unresolved":"Frame fit must place both shaft endpoints inside bearings"},
+    {"id":"nozzle","shape":"exposed short thick cylinder between leather collar and furnace flange","diameter":0.090,"length":0.13,"position":"between bellows throat and left furnace wall at Z=0.56","rotation":"axis defined by connected collar/flange centers","detail":"Collar rectangular with rounded corners; furnace flange circular with eight visible/occluded bolts"},
+    {"id":"crucible","shape":"hollow slightly tapered thick-walled vessel with gently chipped rim","center":[-0.59,-0.34,0.25],"size":[0.30,0.30,0.40],"rotation":[0,0,0],"wallThickness":0.026,"detail":"Broad open interior; softly irregular rim rather than sawtooth notches; floor thickness","relation":"Forward of bellows, left of front strap; rim below nozzle; overlaps lower-right bellows in image"},
+    {"id":"crucible_retainers","shape":"two broad rounded metal hoops and vertical retaining straps","position":"around crucible outer profile, with connector to furnace","rotation":"hoops horizontal; straps vertical following taper","detail":"Separate domed rivets, side coupling and support; no floating hardware","unresolved":"Trace and enumerate visible strap and coupling placements"},
+    {"id":"coals","shape":"irregular small rounded fractured lumps filling hearth floor","position":"within hearth void above sill-bottom level","sizeRange":[0.02,0.055],"rotation":"individually authored","unresolved":"Distribution and prominent silhouettes; do not use texture to replace shape"}
+  ],
+  "validation": {
+    "state":"FAIL_INCOMPLETE",
+    "requiredBeforeBlender":["Resolve comparison camera","Trace visible contours and joints","Enumerate every repeated stone, rivet, band and mounting component with explicit transform","Project plan without Blender and compare landmarks/contours","Check attachment endpoints and occlusion order","Record hidden-side assumptions separately"],
+    "requiredBeforeTexture":"Actual clay model matches validated plan and approved reference in whole assembly and component close-ups",
+    "requiredBeforeUnity":"Textured Blender model passes reference review; textures limited to 2048 square",
+    "rule":"Passing JSON/schema or numerical checks is not visual acceptance"
+  }
+}

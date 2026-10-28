@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs"/><Compile Include="generated/ActualConsumptionService.cs"/>
+    <Compile Include="../ConsumptionFixtureSupport/ConsumptionTraceDouble.cs" Link="ExplicitDiagnosticTraceDouble.cs"/>
+    <Compile Include="../../Scripts/Metabolism/RebirthMetabolismModels.cs" Link="ActualModels.cs"/>
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionSourceIdentity.cs" Link="ActualIdentity.cs"/>
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionSourceWriteback.cs" Link="ActualWriteback.cs"/>
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionServing.cs" Link="ActualServing.cs"/>
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthDrinkSourcePlan.cs" Link="ActualDrinkSourcePlan.cs"/>
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthPreservedConsumableEffects.cs" Link="ActualEffects.cs"/>
+  </ItemGroup>
+  <Target Name="RequirePreparedConsumption" BeforeTargets="CoreCompile">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/ActualConsumptionService.cs')" Text="Run Tools/ConsumptionAdmissionFixture/Prepare.ps1 explicitly before each fixture build/run; prepared actual consumption source is missing." />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/source_manifest.json')" Text="Run Tools/ConsumptionAdmissionFixture/Prepare.ps1 explicitly before each fixture build/run; prepared source manifest is missing." />
+  </Target>
+</Project>

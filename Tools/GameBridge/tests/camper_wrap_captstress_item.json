@@ -1,0 +1,35 @@
+{
+  "name": "CaptStress modifier identity",
+  "status": "PREPARED_NOT_RUN",
+  "preconditions": "Only disposable test save when user authorizes gameplay. Creative search and native cosmetic installation must be verified in running game.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "console": [
+        "giveself modVehicleWrapCaptStress 1 1"
+      ]
+    },
+    {
+      "expectItem": {
+        "name": "modVehicleWrapCaptStress",
+        "min": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

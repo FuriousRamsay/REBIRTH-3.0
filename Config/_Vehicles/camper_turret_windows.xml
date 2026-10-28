@@ -5,97 +5,6 @@
       <rect name="turretBody" pos="8,-8" width="1856" height="813">
         <label name="instructions" pos="16,-760" width="880" height="23" font_size="16" color="222,212,239,255" depth="5" overflow="shrinkcontent" text_key="xuiCamperTurretInstructions" />
         <label name="turretStatus" pos="16,-789" width="880" height="20" font_size="16" color="240,201,120,255" depth="5" overflow="shrinkcontent" />
-        <rect name="ammoPicker" pos="348,-164" width="1160" height="600">
-          <sprite name="pickerBG" pos="0,0" width="1160" height="600" sprite="menu_empty2px" type="sliced" color="23,17,34,255" depth="20" />
-          <sprite name="pickerFrame" pos="0,0" width="1160" height="600" sprite="menu_empty2px" type="sliced" color="181,140,255,255" depth="21" fillcenter="false" />
-          <label name="ammoPickerTitle" pos="24,-18" width="970" height="35" font_size="28" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-          <sprite name="ammoPickerClose" pos="1040,-14" width="96" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
-            <label name="ammoPickerCloseText" pos="10,-5" width="76" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretClose" />
-          </sprite>
-          <label name="ammoPickerHint" pos="24,-65" width="1112" height="32" font_size="21" color="222,212,239,255" depth="25" overflow="shrinkcontent" text_key="xuiCamperTurretPickerHint" />
-          <sprite name="ammoChoice0" pos="24,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon0" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount0" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName0" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource0" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice1" pos="304,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon1" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount1" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName1" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource1" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice2" pos="584,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon2" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount2" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName2" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource2" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice3" pos="864,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon3" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount3" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName3" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource3" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice4" pos="24,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon4" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount4" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName4" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource4" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice5" pos="304,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon5" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount5" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName5" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource5" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice6" pos="584,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon6" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount6" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName6" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource6" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice7" pos="864,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon7" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount7" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName7" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource7" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice8" pos="24,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon8" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount8" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName8" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource8" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice9" pos="304,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon9" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount9" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName9" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource9" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice10" pos="584,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon10" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount10" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName10" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource10" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoChoice11" pos="864,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
-            <sprite name="ammoChoiceIcon11" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
-            <label name="ammoChoiceCount11" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-            <label name="ammoChoiceName11" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
-            <label name="ammoChoiceSource11" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
-          </sprite>
-          <sprite name="ammoPickerUnload" pos="24,-536" width="320" height="40" sprite="menu_empty2px" type="sliced" color="81,37,58,255" depth="25" on_press="true">
-            <label name="ammoPickerUnloadText" pos="10,-5" width="300" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretUnload" />
-          </sprite>
-          <sprite name="ammoPickerPrevious" pos="750,-536" width="110" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
-            <label name="ammoPickerPreviousText" pos="10,-5" width="90" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretPrevious" />
-          </sprite>
-          <label name="ammoPickerPage" pos="868,-542" width="140" height="30" font_size="24" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
-          <sprite name="ammoPickerNext" pos="1016,-536" width="120" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
-            <label name="ammoPickerNextText" pos="10,-5" width="100" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretNextPage" />
-          </sprite>
-        </rect>
         <rect name="turretCameraPanel" pos="16,0" width="1824" height="812" visible="false">
           <sprite name="cameraBackdrop" width="1824" height="812" sprite="menu_empty2px" color="10,8,14,255" depth="40" />
           <texture name="turretCameraView" pos="240,-42" width="1344" height="756" depth="41" />
@@ -1170,6 +1079,7 @@
         </sprite>
         <sprite name="headerRule" pos="16,-80" width="1824" height="2" sprite="menu_empty2px" type="sliced" color="99,76,128,255" depth="2" />
       </rect>
+      <rebirth_item_stats_popup />
     </window>
   </append>
 </configs>

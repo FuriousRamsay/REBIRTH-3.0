@@ -13,4 +13,6 @@
       <property name="SoundPlace" value="dye_place" />
     </item_modifier>
   </append>
+  <include filename="camper_wrap_collection_item_modifiers.xml" />
+  <include filename="camper_undead_chill_item_modifiers.xml" />
 </configs>

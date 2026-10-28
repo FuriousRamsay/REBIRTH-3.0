@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -102,8 +102,7 @@ public static class RebirthHarmonyBootstrap
                 lastPatchClass = patchType.FullName ?? patchType.Name;
                 { if (RebirthLogSettings.HarmonyPatchLoggingEnabled) RebirthLogSettings.TraceHarmonyPatch("BEGIN harmony=" + harmony.Id + " class=" + lastPatchClass); }
                 harmony.CreateClassProcessor(patchType).Patch();
-                RemoveDuplicateHooks(harmony,patchType,beforeAttempt);
-                Installed[patchType]=Capture(patchType,harmony.Id);
+                Installed[patchType]=RemoveDuplicateHooks(harmony,patchType,beforeAttempt);
                 PatchedTypes.Add(patchType);
                 patchedClassCount++;
                 lastError = string.Empty;
@@ -139,7 +138,9 @@ public static class RebirthHarmonyBootstrap
     private static List<InstalledPatch> Capture(Type type,string owner)
     {
         var result=new List<InstalledPatch>();
-        foreach(var original in new List<MethodBase>(Harmony.GetAllPatchedMethods()))
+        // Installed Harmony snapshots its keys to an owned array under the native
+        // patch-info lock; a second list copy adds no iteration isolation.
+        foreach(var original in Harmony.GetAllPatchedMethods())
         {
             var info=Harmony.GetPatchInfo(original);if(info==null)continue;
             Add(result,original,info.Prefixes,type,owner,HarmonyPatchType.Prefix);Add(result,original,info.Postfixes,type,owner,HarmonyPatchType.Postfix);
@@ -147,11 +148,15 @@ public static class RebirthHarmonyBootstrap
         }
         return result;
     }
-    private static void Add(List<InstalledPatch> result,MethodBase original,IEnumerable<Patch> patches,Type type,string owner,HarmonyPatchType kind)
+    private static void Add(List<InstalledPatch> result,MethodBase original,System.Collections.ObjectModel.ReadOnlyCollection<Patch> patches,Type type,string owner,HarmonyPatchType kind)
     {
-        foreach(var patch in patches)
+        // Native Patches owns an immutable List copy behind this read-only view.
+        for(int i=0;i<patches.Count;i++)
+        {
+            var patch=patches[i];
             if(patch.owner==owner&&patch.PatchMethod?.DeclaringType==type)
                 result.Add(new InstalledPatch{Original=original,Method=patch.PatchMethod,Owner=owner,Kind=kind,Priority=patch.priority,Before=(string[])(patch.before??Array.Empty<string>()).Clone(),After=(string[])(patch.after??Array.Empty<string>()).Clone(),NativePatch=patch});
+        }
     }
     private static readonly Lazy<object> NativePatchGate=new Lazy<object>(()=>
     {
@@ -164,10 +169,11 @@ public static class RebirthHarmonyBootstrap
         if(field==null||field.FieldType!=typeof(object))throw new InvalidOperationException("Native Harmony patch gate unavailable.");
         return field.GetValue(null)??throw new InvalidOperationException("Native Harmony patch gate unavailable.");
     });
-    private static void RemoveDuplicateHooks(Harmony owner,Type type,List<InstalledPatch> before)
+    private static List<InstalledPatch> RemoveDuplicateHooks(Harmony owner,Type type,List<InstalledPatch> before)
     {
         var keep=new List<InstalledPatch>(before);var duplicates=new List<InstalledPatch>();
-        foreach(var item in Capture(type,owner.Id))
+        var captured=Capture(type,owner.Id);
+        foreach(var item in captured)
         {
             if(keep.Exists(prior=>ReferenceEquals(prior.NativePatch,item.NativePatch)))continue;
             if(keep.Exists(prior=>prior.Original==item.Original&&prior.Owner==item.Owner&&prior.Kind==item.Kind&&prior.Method==item.Method))duplicates.Add(item);
@@ -175,6 +181,9 @@ public static class RebirthHarmonyBootstrap
         }
         var targets=new HashSet<MethodBase>();foreach(var duplicate in duplicates)targets.Add(duplicate.Original);
         foreach(var target in targets)RemoveAttempt(owner,target,duplicates);
+        // Reuse this invocation's live snapshot only when no hooks were changed.
+        // Selective rollback recompiles wrappers, so mutations still require a fresh capture.
+        return targets.Count==0?captured:Capture(type,owner.Id);
     }
     private static Patch[] WithoutAttempt(Patch[] source,MethodBase original,List<InstalledPatch> added)
     {

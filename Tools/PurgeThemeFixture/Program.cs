@@ -63,3 +63,5 @@ class EntityFactory{public static Entity CreateEntity(int _et,UnityEngine.Vector
 class RebirthSpawnTrace{public int EntityClassId=42;}
 static class RebirthSpawnCompositionService{public static RebirthSpawnContext Last;public static int Calls;public static bool Fail;public static bool TrySelect(RebirthSpawnContext c,Func<double> r,out RebirthSpawnTrace t){Calls++;Last=c;t=new RebirthSpawnTrace();return !Fail;}public static bool IsForbiddenRestrictedSpawnEntity(int id)=>false;}
 namespace GameEvent.SequenceActions{class OwnerSequence{public Entity Target;public UnityEngine.Vector3 TargetPosition;}class ActionBaseSpawn{public bool useEntityGroup;public OwnerSequence Owner;public void OnPerformAction(){}public void SpawnEntity(){}}}
+// Registration-only dependency; loot refresh behavior is outside this fixture.
+static class RebirthPurgeLootRefreshHook {}

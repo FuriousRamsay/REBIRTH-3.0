@@ -151,8 +151,8 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         bool priorPoiObserved=vehiclePoiObserved,priorPoiEligible=vehiclePoiEligible;
         string priorPoiName=vehiclePoiName;float priorPoiRange=vehiclePoiRange;
         var selectedVehicle=XUiC_RebirthVehicleHudStatBar.IsDriving(player)?null:XUiC_RebirthVehicleHudStatBar.ResolveLookVehicle(player);
-        var camperEnergy=XUiC_RebirthVehicleHudStatBar.ObserveEnergy(selectedVehicle);
-        if(camperEnergy?.Mode!=RebirthCamperEnergyMode.Camp)vehiclePoiObserved=false;
+        bool camperEnergy=XUiC_RebirthVehicleHudStatBar.TryObserveEnergy(selectedVehicle,out var camperMode,out _);
+        if(!camperEnergy||camperMode!=RebirthCamperEnergyMode.Camp)vehiclePoiObserved=false;
         else if(!ReferenceEquals(selectedVehicle,lastVehiclePoiTarget)||Time.realtimeSinceStartup>=nextVehiclePoiObservation)
         {
             lastVehiclePoiTarget=selectedVehicle;nextVehiclePoiObservation=Time.realtimeSinceStartup+0.2f;
@@ -920,19 +920,46 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         return progression != null ? progression.Level : 0;
     }
 
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+    private struct SupplyFloatBits
+    {
+        [System.Runtime.InteropServices.FieldOffset(0)] public float Value;
+        [System.Runtime.InteropServices.FieldOffset(0)] public int Bits;
+    }
+    private sealed class SupplyText
+    {
+        internal readonly bool Known;
+        internal readonly int Remaining, Target;
+        internal readonly string Word, Text;
+        internal SupplyText(bool known, int remaining, int target, string word, string text)
+        { Known=known; Remaining=remaining; Target=target; Word=word; Text=text; }
+    }
+    private volatile SupplyText lastSupplyText;
+
     /// <summary>
     /// Compact global trader-job progression matching REBIRTH 2.6 tier math and presentation:
     /// Roman tier numerals and the completed-job value highlighted in REBIRTH UI purple (#B58CFF).
     /// </summary>
-    private static string GetJobTierText(EntityPlayerLocal player)
+    private string GetJobTierText(EntityPlayerLocal player)
     {
         if(RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge)
         {
             bool known=player!=null&&player.Buffs.GetCustomVar("_rbPurgeSupplyKnown")==1;
             float supplyRemaining=known?player.Buffs.GetCustomVar("_rbPurgeSupplyRemaining"):0;
+            float supplyTarget=known?player.Buffs.GetCustomVar("_rbPurgeSupplyTarget"):0;
+            // Keep all inputs live, including language and exact floating-point
+            // representation; only repeated numeric formatting is memoized.
+            string word=Localization.Get(known&&supplyRemaining==1?"xuiRebirthPurgeSupplyKillSingular":"xuiRebirthPurgeSupplyKillPlural");
+            int remainingBits=new SupplyFloatBits{Value=supplyRemaining}.Bits;
+            int targetBits=new SupplyFloatBits{Value=supplyTarget}.Bits;
+            var cached=lastSupplyText;
+            if(cached!=null&&cached.Known==known&&cached.Remaining==remainingBits&&cached.Target==targetBits&&cached.Word==word)
+                return cached.Text;
             string count=known?supplyRemaining.ToString("0",CultureInfo.InvariantCulture):"—";
-            string target=known?player.Buffs.GetCustomVar("_rbPurgeSupplyTarget").ToString("0",CultureInfo.InvariantCulture):"—";
-            return "[D5B4FF]"+count+"[-]/[a4e37d]"+target+"[-] "+Localization.Get(known&&supplyRemaining==1?"xuiRebirthPurgeSupplyKillSingular":"xuiRebirthPurgeSupplyKillPlural");
+            string target=known?supplyTarget.ToString("0",CultureInfo.InvariantCulture):"—";
+            string text="[D5B4FF]"+count+"[-]/[a4e37d]"+target+"[-] "+word;
+            lastSupplyText=new SupplyText(known,remainingBits,targetBits,word,text);
+            return text;
         }
         QuestJournal journal = player != null ? player.QuestJournal : null;
 

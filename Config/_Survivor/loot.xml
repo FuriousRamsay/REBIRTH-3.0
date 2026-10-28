@@ -129,7 +129,6 @@
   </insertBefore>
   <append xpath="/lootcontainers/lootgroup[@name='groupToolsTiered']">
     <item name="rebirthSupportErgonomicGripMod" loot_prob_template="veryLow" />
-    <item group="rebirthAudioEquipment" prob="0.005" />
     <item name="ItemsWeaponsScythe004_FR" loot_prob_template="low" />
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='groupAllClothing']">
@@ -388,7 +387,6 @@
   </insertBefore>
   <append xpath="/lootcontainers/lootgroup[@name='groupJunk']">
     <item group="rebirthLiteratureDistribution" loot_prob_template="veryLow" />
-    <item group="rebirthAudioEquipment" prob="0.0024" />
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='groupBookcase01']">
     <item group="rebirthLiteratureTheoryFieldNotes" loot_prob_template="med" />
@@ -416,7 +414,8 @@
     <item group="rebirthLiteratureDiscoveryAdvanced" loot_prob_template="veryLow" />
     <item group="rebirthAudiobookCassettes" prob="0.025" />
   </append>
-  <insertBefore xpath="/lootcontainers/lootgroup[@name='groupNightstand']">
+  <!-- Groups are parsed in final document order: backpacks also reference music. -->
+  <insertBefore xpath="/lootcontainers/lootgroup[@name='groupToolsTiered']">
     <lootgroup name="rebirthLegacyMusicCassettes" count="1" unique_only="true">
       <item name="FuriousRamsayCassette01" />
       <item name="FuriousRamsayCassette02" />
@@ -444,9 +443,9 @@
     </lootgroup>
   </insertBefore>
   <append xpath="/lootcontainers/lootgroup[@name='groupNightstand']">
-    <item group="rebirthAudioEquipment" prob="0.05" />
-    <item group="rebirthAudiobookCassettes" prob="0.08" />
-    <item group="rebirthLegacyMusicCassettes" prob="0.18" />
+    <item group="rebirthAudioEquipment" prob="0.05" force_prob="true" />
+    <item group="rebirthAudiobookCassettes" prob="0.08" force_prob="true" />
+    <item group="rebirthLegacyMusicCassettes" prob="0.18" force_prob="true" />
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='groupBookcase01']">
     </append>

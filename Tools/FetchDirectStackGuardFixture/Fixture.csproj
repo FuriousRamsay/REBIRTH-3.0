@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><LangVersion>latest</LangVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../Scripts/TraderJobs/RebirthFetchStackGuard.cs" />
+    <Compile Include="../../Scripts/TraderJobs/RebirthFetchRemovalIdentity.cs" />
+  </ItemGroup>
+  <Target Name="ExtractCurrentIdentity" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <FetchIdentityIntermediateDir Condition="$([System.IO.Path]::IsPathRooted('$(IntermediateOutputPath)'))">$(IntermediateOutputPath)</FetchIdentityIntermediateDir>
+      <FetchIdentityIntermediateDir Condition="!$([System.IO.Path]::IsPathRooted('$(IntermediateOutputPath)'))">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)'))</FetchIdentityIntermediateDir>
+      <FetchIdentitySourcePath>$([System.IO.Path]::Combine('$(FetchIdentityIntermediateDir)', 'RebirthFetchIdentitySource.cs'))</FetchIdentitySourcePath>
+    </PropertyGroup>
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/ExtractIdentity.ps1&quot; -Output &quot;$(FetchIdentitySourcePath)&quot;" />
+    <ItemGroup><Compile Include="$(FetchIdentitySourcePath)" /></ItemGroup>
+  </Target>
+</Project>

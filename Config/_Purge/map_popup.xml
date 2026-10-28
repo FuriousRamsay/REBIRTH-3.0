@@ -15,7 +15,7 @@
       <sprite width="620" height="262" sprite="menu_empty2px" type="sliced" color="88,88,97,255" fillcenter="false" depth="504" name="poiPopupBorder" />
       <sprite pos="12,-12" width="202" height="146" sprite="menu_empty2px" type="sliced" color="78,78,87,255" depth="501" />
       <texture name="poiPopupPicture" pos="14,-14" width="198" height="142" color="255,255,255,255" globalopacitymod="0" autounload="false" depth="502" />
-      <label name="poiPopupTitle" pos="232,-15" width="370" height="34" font_size="27" color="112,214,205,255" depth="503" overflow="resizeheight" />
+      <label name="poiPopupTitle" pos="232,-15" width="370" height="34" font_size="27" color="112,214,205,255" depth="503" overflow="shrinkcontent" max_line_count="1" />
       <sprite name="poiPopupTierIcon" pos="232,-62" width="30" height="30" sprite="ui_game_symbol_Skull0" color="255,255,255,255" atlas="PurgeUIAtlas" globalopacitymod="0" depth="503" />
       <label name="poiPopupTier" pos="272,-64" width="132" height="28" font_size="22" color="225,225,232,255" depth="503" overflow="resizeheight" />
       <sprite name="poiPopupStatusBg" pos="418,-60" width="188" height="36" sprite="menu_empty2px" type="sliced" color="33,65,48,255" globalopacitymod="0" depth="501" />

@@ -363,4 +363,5 @@
 <include filename="../_Vehicles/vehicle_editor_xui.xml" />
 <include filename="../_Recycling/xui.xml" />
   <include filename="companion_desk_xui.xml" />
+  <include filename="../_Vehicles/vehicle_tuning_xui.xml" />
 </configs>

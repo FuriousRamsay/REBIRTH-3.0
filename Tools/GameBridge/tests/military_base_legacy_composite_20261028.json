@@ -1,0 +1,11 @@
+{
+  "name": "Legacy military pallet compatibility: read-only acceptance observation",
+  "stopOnFailure": true,
+  "status": "AUTHORED_NOT_RUN",
+  "_note": "User/lead only after full installed-class/XML verification, in disposable CodexTest cloned from a fixture containing pre-removal base/cap composite storage. Never run against or regenerate a real save. Before this observation, manually verify retained native first/last-slot contents and old-container access; fresh base/cap must expose no storage or pickup while tile variants retain native loot/pickup. Afterward user performs normal save/quit/reload and checks the full log for read/OnLoad/write/OnUnload failures. These read-only steps alone do not prove save/reload, gameplay or multiplayer acceptance. No save command, teleport, deletion or repair action is performed here.",
+  "steps": [
+    { "action": { "command": "state", "args": { "Sections": "world,inventory" } } },
+    { "wait": 2 },
+    { "expectNoErrors": true }
+  ]
+}

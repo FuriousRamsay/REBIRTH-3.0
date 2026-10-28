@@ -19,6 +19,7 @@ public static class RebirthCamperClaimIntegration
         if(installed)return;
         var harmony=new Harmony("rebirth.camper.energy.claims");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperClaimOwnership));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperClaimChunkOwnership));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperClaimPermissions));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperClaimChunkChecks));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperClaimHardness));
@@ -37,9 +38,12 @@ public static class RebirthCamperClaimIntegration
     }
     public static bool Contains(EntityVehicle vehicle,Vector3i position)
     {
-        if(!Active(vehicle)||!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out _,out _,out float range))return false;
+        if(!ThreadManager.IsMainThread()||vehicle?.world==null||
+            !RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out float range)||mode!=RebirthCamperEnergyMode.Camp)return false;
         if(vehicle.world.IsRemote()&&!RebirthCamperClaimProjection.TryRange(vehicle,out range))return false;
-        return RebirthCamperEnergyBounds.Contains(RebirthCamperEnergyBounds.CurrentCenter(vehicle),position.ToVector3Center(),range);
+        // Most POI lamps are outside the mobile claim. Reject those before
+        // crossing into native Rigidbody pose/constraint checks for every lamp.
+        return RebirthCamperEnergyBounds.Contains(RebirthCamperEnergyBounds.CurrentCenter(vehicle),position.ToVector3Center(),range)&&Active(vehicle);
     }
     // Native bypass is recursion-scoped only; no persistent flags or altered claim state.
     private static EnumLandClaimOwner Physical(World world,Vector3i position,PersistentPlayerData relative)
@@ -189,17 +193,24 @@ internal static class RebirthCamperClaimChunkChecks
     }
 }
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(World),nameof(World.GetLandClaimOwner),new[]{typeof(Vector3i),typeof(PersistentPlayerData)})]
 internal static class RebirthCamperClaimOwnership
 {
-    private static IEnumerable<MethodBase> TargetMethods()
-    {foreach(var method in typeof(World).GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
-        if(method.Name==nameof(World.GetLandClaimOwner)&&method.ReturnType==typeof(EnumLandClaimOwner))yield return method;}
-    private static void Postfix(World __instance,object[] __args,ref EnumLandClaimOwner __result)
+    private static void Postfix(World __instance,Vector3i __0,PersistentPlayerData __1,ref EnumLandClaimOwner __result)
     {
         if(__result!=EnumLandClaimOwner.None)return;
-        RebirthCamperClaimIntegration.Arguments(__args,out var position,out var relative);
-        __result=RebirthCamperClaimIntegration.Resolve(__instance,position,relative);
+        __result=RebirthCamperClaimIntegration.Resolve(__instance,__0,__1);
+    }
+}
+// Both native overloads retain their original claim behavior. Typed arguments
+// avoid Harmony allocating and boxing an object[] for every light/claim query.
+[HarmonyPatch(typeof(World),nameof(World.GetLandClaimOwner),new[]{typeof(Chunk),typeof(Vector3i),typeof(PersistentPlayerData),typeof(int),typeof(int),typeof(bool)})]
+internal static class RebirthCamperClaimChunkOwnership
+{
+    private static void Postfix(World __instance,Vector3i __1,PersistentPlayerData __2,ref EnumLandClaimOwner __result)
+    {
+        if(__result!=EnumLandClaimOwner.None)return;
+        __result=RebirthCamperClaimIntegration.Resolve(__instance,__1,__2);
     }
 }
 [HarmonyPatch]

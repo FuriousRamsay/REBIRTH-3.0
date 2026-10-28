@@ -14,7 +14,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     }
     private static void BindCancellationWorld()
     {
-        var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+        var world=GameManager.Instance?.World;string directory=bindingSaveDirectory.Get();
         if(ReferenceEquals(world,cancellationWorld)&&directory==cancellationDirectory)return;
         DropCancellationRestart();
         foreach(var original in cancellationClients.Values.ToArray())

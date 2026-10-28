@@ -1,0 +1,4 @@
+// AUTHORED_NOT_RUN. Actual server grant sender; native mapping/packet/send adapters.
+internal sealed class NetPackageRebirthHydrationGrant {internal NetPackageRebirthHydrationGrant Setup(RebirthHydrationRemoteGrant grant){if(!grant.Current())throw new InvalidOperationException("missing grant");return this;}}
+internal static class NetPackageManager {internal static bool Available=true;internal static Action DuringMapping;internal static int GetPackageId(Type type){DuringMapping?.Invoke();if(!Available)throw new InvalidOperationException("unmapped grant");return 1;}internal static T GetPackage<T>() where T:new()=>new T();}
+internal sealed partial class ConnectionManager {internal static int Sends;internal static Action DuringSend;internal void SendPackage(NetPackageRebirthHydrationGrant packet,int _attachedToEntityId){Sends++;DuringSend?.Invoke();}}

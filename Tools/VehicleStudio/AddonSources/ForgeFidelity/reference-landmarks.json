@@ -1,0 +1,29 @@
+{
+ "status":"MANUAL_TRACING_ESTIMATES_REQUIRES_VISUAL_OVERLAY_REVIEW",
+ "imageSize":[1448,1086],
+ "coordinates":"pixels, top-left origin; manual estimates from displayed approved image",
+ "uncertaintyPixels":8,
+ "contours":{
+  "bellows_front_upright":[[169,290],[207,278],[242,304],[246,691],[228,721],[188,710],[172,681]],
+  "bellows_rear_upright":[[389,226],[423,215],[461,235],[469,350],[441,367],[414,327],[399,268]],
+  "bellows_leather_outer":[[236,335],[278,324],[335,354],[399,397],[454,449],[496,478],[520,521],[493,565],[431,590],[351,622],[271,651],[247,627]],
+  "compression_collar":[[476,478],[524,462],[555,476],[558,580],[533,608],[492,603],[475,576]],
+  "nozzle_visible":[[543,502],[576,504],[612,529],[612,559],[590,577],[550,557]],
+  "furnace_flange":[[598,470],[631,481],[653,511],[661,550],[647,583],[624,593],[602,578],[592,551],[585,512]],
+  "crucible_outer":[[422,657],[436,635],[480,619],[540,619],[586,631],[614,658],[624,709],[622,851],[602,889],[556,913],[486,905],[446,882],[426,838]],
+  "crucible_inner_rim":[[447,662],[472,644],[518,636],[558,643],[583,657],[590,677],[563,698],[509,704],[469,692],[449,678]],
+  "hearth_opening":[[911,661],[904,579],[920,504],[948,449],[1006,406],[1060,390],[1122,398],[1180,429],[1217,479],[1247,542],[1251,606],[1242,652],[1164,683],[1032,690]]
+ },
+ "axes":{
+  "upper_rear_shaft":{"endpoints":[[227,306],[425,267]],"purpose":"Frame orientation constraint; rises image-right"},
+  "front_upright":{"endpoints":[[206,309],[220,684]],"purpose":"Near-vertical frame constraint"},
+  "nozzle":{"endpoints":[[548,527],[619,546]],"purpose":"Nozzle axis slopes image-right downward"},
+  "crucible":{"endpoints":[[523,672],[526,877]],"purpose":"Vertical vessel axis"}
+ },
+ "ellipseEstimates":{
+  "top_collar":{"center":[891,103],"majorDiameter":220,"minorDiameter":87},
+  "crucible_rim":{"center":[519,664],"majorDiameter":188,"minorDiameter":78}
+ },
+ "occlusionOrder":["front bellows upright in front of leather rear edge","leather contracts behind compression collar","nozzle exposed between collar and furnace flange","crucible in front of lower-right bellows region","front furnace strap lies to right of crucible"],
+ "limitations":"Circular-opening estimates assume approximately horizontal circles; irregular rims and perspective prevent exact calibration. Hidden upright extent is not traced as observed geometry. Contours require overlay inspection before accepting."
+}

@@ -18,16 +18,15 @@ public static class RebirthCamperEnergyRuntimeEstimate
         =>Evaluate(nativeBanks,(double)demand,mode,sourcePriority,demandCarry);
     public static RebirthCamperEnergyRuntimeEstimateResult Evaluate(IEnumerable<PowerSource> nativeBanks,double demand,RebirthCamperEnergyMode mode,
         IEnumerable<RebirthCamperEnergySourceKind> sourcePriority,double demandCarry=0)
-        =>Calculate(nativeBanks,demand,mode,sourcePriority,demandCarry,null);
+        =>Calculate(nativeBanks,demand,mode,sourcePriority,demandCarry);
     internal static void Apply(RebirthCamperEnergyState state,RebirthCamperEnergySnapshot snapshot,bool authoritative,double energyDemand)
     {
         if(!authoritative)return;
-        var carries=state.Sources.ToDictionary(s=>s.Bank,s=>s.SolarRemainder);
-        var result=Calculate(state.Sources.Select(s=>s.Bank),energyDemand,state.Mode,RebirthCamperEnergyConfiguration.Current.Priority,state.ConsumptionRemainder,carries);
+        var result=Calculate(state.Sources.Select(s=>s.Bank),energyDemand,state.Mode,RebirthCamperEnergyConfiguration.Current.Priority,state.ConsumptionRemainder);
         snapshot.EstimatedRuntimeSeconds=result.Seconds;snapshot.RuntimeEstimateStatus=result.Status;snapshot.RuntimeEstimateSolarConditional=result.SolarConditional;
     }
     private static RebirthCamperEnergyRuntimeEstimateResult Calculate(IEnumerable<PowerSource> banks,double demand,RebirthCamperEnergyMode mode,
-        IEnumerable<RebirthCamperEnergySourceKind> priority,double carry,Dictionary<PowerSource,double> solarCarries)
+        IEnumerable<RebirthCamperEnergySourceKind> priority,double carry)
     {
         var unknown=new RebirthCamperEnergyRuntimeEstimateResult();
         if(banks==null||priority==null||!Finite(demand)||demand<0||mode!=RebirthCamperEnergyMode.Camp||!Finite(carry)||carry<0||carry>=1)return unknown;

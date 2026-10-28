@@ -1,0 +1,53 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="modVehicleWrapUndeadChill" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapUndeadChillDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapUndeadChill" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="UndeadChill" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapUndeadChillAfterHours" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapUndeadChillAfterHoursDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapUndeadChillAfterHours" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="UndeadChillAfterHours" />
+    </item_modifier>
+<item_modifier name="modVehicleWrapGenmaSaotome" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapGenmaSaotomeDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapGenmaSaotome" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="GenmaSaotome" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapCaptStress" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapCaptStressDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapCaptStress" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="CaptStress" />
+    </item_modifier>
+  
+  </append>
+</configs>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="ModelProgram.cs;ModelStubs.cs" />
+    <Compile Include="../../Scripts/NPC/Animation/RebirthSdcsLocomotionSampler.cs" Link="RebirthSdcsLocomotionSampler.cs" />
+    <Compile Include="../../Scripts/NPC/Models/RebirthSdcsMeshRefreshGate.cs" Link="RebirthSdcsMeshRefreshGate.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+{
+  "userRequirement": "Uneven mortar between the stones",
+  "construction": "Tightly fitted irregular stone solids with narrow, uneven recessed mortar joints. No broad flat backing panels visible between stones.",
+  "targetJointWidth": [0.004, 0.012],
+  "targetRecessBehindStoneFaces": [0.012, 0.028],
+  "units": "Current provisional normalized model coordinates; physical camper scale must be set later",
+  "surfaceRelief": {"ridgesAndPits": [0.001, 0.003], "style": "Irregular rough gritty mortar; restrained uneven trowel ridges, local crumbling; never outward stone-sized lumps"},
+  "palette": "Dark desaturated warm gray; darker soot inside hearth; visibly distinct from mineral inclusions on stones",
+  "preserve": ["Approved overall silhouette", "Open hearth", "Bellows and crucible layout", "Original model and all rejected evidence"],
+  "validation": ["Clay render must read as stone masonry with mortar joints", "No new fragments in hearth/collar", "No broad smooth backing patches", "Inspect front and side actual saved geometry", "Textures cannot conceal failed masonry construction"],
+  "status": "REQUIREMENT_RECORDED; geometry and material implementation still needs verification"
+}

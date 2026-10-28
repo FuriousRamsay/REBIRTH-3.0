@@ -1,0 +1,12 @@
+{
+  "name": "Full map world overview owner acceptance",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. User opens native Map tab. Guard stays on; no automatic game launch/teleport/unlock. User scrolls out beyond the old 2km-wide limit; Shift+wheel retains native fast zoom behavior, gamepad zoom must reach same bound." },
+    { "screenshot": "map-overview-extended" },
+    { "_note": "Check known road/POI terrain aligns with native player, waypoint and Purge markers. Pan positive/negative, return to detail zoom, place a waypoint at a known road intersection; check cursor/world position both ways. Test Purge filters, static overlays and world edges. A fresh overview frame loads known records progressively; allow it to settle before judging missing data." },
+    { "screenshot": "map-overview-marker-alignment" },
+    { "_note": "User closes/reopens, loads another world, and explores new ground to verify record refresh and no old-world image leaks. Inspect minimap unchanged. Screenshots and error checks alone do not establish coordinate or gameplay acceptance." },
+    { "expectNoErrors": true }
+  ]
+}

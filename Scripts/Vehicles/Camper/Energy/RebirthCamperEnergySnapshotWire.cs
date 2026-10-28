@@ -12,7 +12,7 @@ internal static class RebirthCamperEnergySnapshotWire
         using(var stream=new MemoryStream())using(var w=new BinaryWriter(stream,Encoding.UTF8,true))
         {
             if(sourceCapacity!=0&&sourceCapacity!=RebirthCamperEnergyCapacity.Normal&&sourceCapacity!=RebirthCamperEnergyCapacity.Electrician)throw new InvalidDataException("Authoritative source capacity required.");
-            w.Write((byte)7);w.Write(busy);w.Write(status??string.Empty);w.Write(boundsAllowed);w.Write(boundsShown&&boundsAllowed);w.Write((byte)sourceCapacity);w.Write(snapshot!=null);
+            w.Write((byte)8);w.Write(busy);w.Write(status??string.Empty);w.Write(boundsAllowed);w.Write(boundsShown&&boundsAllowed);w.Write((byte)sourceCapacity);w.Write(snapshot!=null);
             if(snapshot!=null)
             {
                 w.Write((byte)snapshot.Mode);w.Write(snapshot.TransitionSeconds);w.Write(snapshot.Range);w.Write(snapshot.Revision);
@@ -29,7 +29,8 @@ internal static class RebirthCamperEnergySnapshotWire
             w.Write(poi!=null);if(poi!=null)
             {
                 if(poi.RequiredWatts < -1)throw new InvalidDataException("POI prospective demand invalid.");
-                w.Write(poi.InRange);w.Write(poi.PoiName??string.Empty);w.Write(poi.SupportedLights);w.Write(poi.IsOn);w.Write(poi.Range);w.Write(poi.DemandWatts);w.Write(poi.RequiredWatts);w.Write(poi.ProspectiveRuntimeSeconds);w.Write(poi.SelectedLights);
+                ValidateSelection(poi);
+                w.Write(poi.InRange);w.Write(poi.PoiName??string.Empty);w.Write(poi.SupportedLights);w.Write(poi.IsOn);w.Write(poi.Range);w.Write(poi.DemandWatts);w.Write(poi.RequiredWatts);w.Write(poi.ProspectiveRuntimeSeconds);w.Write(poi.SelectedLights);w.Write(poi.PinnedOnLights);w.Write(poi.SelectableLights);
             }
             w.Flush();return stream.ToArray();
         }
@@ -42,7 +43,7 @@ internal static class RebirthCamperEnergySnapshotWire
         if(bytes==null||bytes.Length>8*1024*1024)throw new InvalidDataException("Bounded Energy observation required.");
         using(var stream=new MemoryStream(bytes,false))using(var r=new BinaryReader(stream,Encoding.UTF8,true))
         {
-            int version=r.ReadByte();if(version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7)throw new InvalidDataException("Energy observation version changed.");busy=r.ReadBoolean();status=r.ReadString();
+            int version=r.ReadByte();if(version!=2&&version!=3&&version!=4&&version!=5&&version!=6&&version!=7&&version!=8)throw new InvalidDataException("Energy observation version changed.");busy=r.ReadBoolean();status=r.ReadString();
             boundsAllowed=r.ReadBoolean();boundsShown=r.ReadBoolean();if(boundsShown&&!boundsAllowed)throw new InvalidDataException("Unscoped bounds observation.");
             if(version>=3){sourceCapacity=r.ReadByte();if(sourceCapacity!=0&&sourceCapacity!=RebirthCamperEnergyCapacity.Normal&&sourceCapacity!=RebirthCamperEnergyCapacity.Electrician)throw new InvalidDataException("Source capacity observation invalid.");}
             if(status.Length>128)throw new InvalidDataException("Energy status bound exceeded.");
@@ -78,6 +79,8 @@ internal static class RebirthCamperEnergySnapshotWire
                 poi=new RebirthCamperEnergyPoiSnapshot {InRange=r.ReadBoolean(),PoiName=r.ReadString(),SupportedLights=r.ReadInt32(),IsOn=r.ReadBoolean(),Range=r.ReadSingle(),DemandWatts=r.ReadInt32()};
                 if(version>=5)poi.RequiredWatts=r.ReadInt32();
                 if(version>=6)poi.ProspectiveRuntimeSeconds=r.ReadDouble();poi.SelectedLights=version>=7?r.ReadInt32():poi.SupportedLights;
+                poi.PinnedOnLights=version>=8?r.ReadInt32():0;poi.SelectableLights=version>=8?r.ReadInt32():poi.SupportedLights;
+                if(version>=8)ValidateSelection(poi);
                 if(poi.PoiName.Length>4096||poi.SupportedLights<0||poi.SelectedLights<0||poi.SelectedLights>poi.SupportedLights||poi.DemandWatts<0||poi.RequiredWatts < -1||
                     double.IsNaN(poi.ProspectiveRuntimeSeconds)||double.IsInfinity(poi.ProspectiveRuntimeSeconds)||poi.ProspectiveRuntimeSeconds < -1||
                     float.IsNaN(poi.Range)||float.IsInfinity(poi.Range)||poi.Range<0)throw new InvalidDataException("POI observation invalid.");
@@ -85,6 +88,12 @@ internal static class RebirthCamperEnergySnapshotWire
             if(boundsAllowed&&snapshot?.Mode!=RebirthCamperEnergyMode.Camp)throw new InvalidDataException("Bounds require current Camp observation.");
             if(stream.Position!=stream.Length)throw new InvalidDataException("Trailing Energy observation bytes.");
         }
+    }
+    private static void ValidateSelection(RebirthCamperEnergyPoiSnapshot poi)
+    {
+        if(poi.PinnedOnLights<0||poi.PinnedOnLights>poi.SelectedLights||
+            poi.SelectedLights>poi.SelectableLights||poi.SelectableLights>poi.SupportedLights)
+            throw new InvalidDataException("POI manual selection observation invalid.");
     }
     private static void ValidateEstimate(RebirthCamperEnergySnapshot snapshot)
     {

@@ -52,6 +52,28 @@ public static class RebirthWorkmanshipSignatureService
     private static bool localCraftPatched,workstationCraftPatched,harvestPatched;
     [ThreadStatic]
     private static HashSet<string> activeBlockDamagePositions;
+    [ThreadStatic]
+    private static HashSet<string> activeEmptyHandInspections;
+
+    // Restore the 2.6 empty-hand block inspector without logging weapon or tool hits.
+    public static void EmptyHandBlockInspectPrefix(Block __instance,WorldBase __0,BlockValueRef __1,int __4,out string __state)
+    {
+        __state=null;
+        if(__instance==null||__0==null||__1.Type!=BlockValueRefType.Block||GameManager.IsDedicatedServer)return;
+        EntityPlayerLocal player=__0.GetEntity(__4) as EntityPlayerLocal;
+        if(player?.inventory?.holdingItem==null||player.inventory.holdingItem.GetItemName()!="meleeHandPlayer")return;
+        Vector3i pos=__1.BlockPosition;
+        string key=pos.x+","+pos.y+","+pos.z;
+        if(activeEmptyHandInspections==null)activeEmptyHandInspections=new HashSet<string>(StringComparer.Ordinal);
+        if(!activeEmptyHandInspections.Add(key))return;
+        __state=key;
+        Log.Out("[REBIRTH Block Inspect] block="+__instance.GetBlockName()+" position="+pos);
+    }
+
+    public static void EmptyHandBlockInspectPostfix(string __state)
+    {
+        if(__state!=null)activeEmptyHandInspections?.Remove(__state);
+    }
 
     public static string Install(Harmony harmony)
     {
@@ -258,7 +280,7 @@ public static class RebirthWorkmanshipSignatureService
         return Math.Min(total,64);
     }
     private static bool IsServerWorld(WorldBase world){ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;return world!=null&&!world.IsRemote()&&c!=null&&c.IsServer&&RebirthSurvivorMode.IsEnabledForCurrentWorld();}
-    private static int PatchBlockDamageMethods(Harmony harmony){int count=0;HashSet<MethodBase> seen=new HashSet<MethodBase>();MethodInfo prefix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePrefix));MethodInfo postfix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePostfix));Type[] args={typeof(WorldBase),typeof(BlockValueRef),typeof(BlockValue),typeof(int),typeof(int),typeof(ItemActionAttack.AttackHitInfo),typeof(bool),typeof(bool),typeof(int)};BindingFlags flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly;foreach(Assembly assembly in new[]{typeof(Block).Assembly,typeof(RebirthWorkmanshipSignatureService).Assembly}){Type[] types;try{types=assembly.GetTypes();}catch(ReflectionTypeLoadException ex){types=ex.Types;}if(types==null)continue;for(int i=0;i<types.Length;i++){Type t=types[i];if(t==null||!typeof(Block).IsAssignableFrom(t))continue;MethodInfo m=t.GetMethod(nameof(Block.OnBlockDamaged),flags,null,args,null);if(m==null||!seen.Add(m))continue;harmony.Patch(m,prefix:new HarmonyMethod(prefix),postfix:new HarmonyMethod(postfix));harmony.Patch(m,prefix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Prefix)),postfix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Postfix)),finalizer:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Finalizer)));count++;}}return count;}
+    private static int PatchBlockDamageMethods(Harmony harmony){int count=0;HashSet<MethodBase> seen=new HashSet<MethodBase>();MethodInfo prefix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePrefix));MethodInfo postfix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePostfix));Type[] args={typeof(WorldBase),typeof(BlockValueRef),typeof(BlockValue),typeof(int),typeof(int),typeof(ItemActionAttack.AttackHitInfo),typeof(bool),typeof(bool),typeof(int)};BindingFlags flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly;foreach(Assembly assembly in new[]{typeof(Block).Assembly,typeof(RebirthWorkmanshipSignatureService).Assembly}){Type[] types;try{types=assembly.GetTypes();}catch(ReflectionTypeLoadException ex){types=ex.Types;}if(types==null)continue;for(int i=0;i<types.Length;i++){Type t=types[i];if(t==null||!typeof(Block).IsAssignableFrom(t))continue;MethodInfo m=t.GetMethod(nameof(Block.OnBlockDamaged),flags,null,args,null);if(m==null||!seen.Add(m))continue;harmony.Patch(m,prefix:new HarmonyMethod(prefix),postfix:new HarmonyMethod(postfix));harmony.Patch(m,prefix:new HarmonyMethod(typeof(RebirthEmptyHandBlockInspectionPatch),nameof(RebirthEmptyHandBlockInspectionPatch.Prefix)),postfix:new HarmonyMethod(typeof(RebirthEmptyHandBlockInspectionPatch),nameof(RebirthEmptyHandBlockInspectionPatch.Postfix)));harmony.Patch(m,prefix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Prefix)),postfix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Postfix)),finalizer:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Finalizer)));count++;}}return count;}
     private static int CountPlayerItem(EntityPlayer player,int type){int total=0;CountSlots(player!=null&&player.inventory!=null?player.inventory.ItemGrid.items:null,type,ref total);CountSlots(player!=null&&player.bag!=null?player.bag.ItemGrid.items:null,type,ref total);return total;}
     private static void CountSlots(ItemStack[] slots,int type,ref int total){if(slots==null)return;for(int i=0;i<slots.Length;i++)if(slots[i]!=null&&slots[i].itemValue!=null&&slots[i].itemValue.type==type)total+=Math.Max(0,slots[i].count);}
     private static ItemValue FindItem(ItemStack[] a,ItemStack[] b,int type,ushort seed,ushort quality){ItemValue v=FindItem(a,type,seed,quality);return v??FindItem(b,type,seed,quality);}

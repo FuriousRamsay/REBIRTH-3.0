@@ -12,7 +12,7 @@ public class ConnectionManager {public bool IsServer=true;public Clients Clients
 public class SingletonMonoBehaviour<T>where T:new(){public static T Instance=new T();}
 public class Player {public int entityId=1;}
 public class World {public bool Remote;public Player Player=new Player();public bool IsRemote()=>Remote;public Player GetPrimaryPlayer()=>Player;}
-public class GameManager {public static GameManager Instance=new GameManager();public World World=new World();public bool IsStartingGame;}
+public class GameManager {public static GameManager Instance=new GameManager();public World World=new World();public bool IsStartingGame;internal Decorator GetDynamicPrefabDecorator()=>null;}
 static class RebirthPurgeReleasePolicy {internal static bool Enabled=true;}
 static class RebirthSandboxOptionManager {internal static Options Current=new Options();}
 class Options {internal bool PoiClearTrackingEnabled=true,IsPurge=true;}
@@ -25,7 +25,7 @@ internal class RebirthPoiWorldBinding {internal bool IsCurrent=true;}
 internal class RebirthPoiWorldSnapshot {internal Guid WorldId=Guid.NewGuid();internal long Revision=1;internal RebirthPoiWorldBinding Binding=new RebirthPoiWorldBinding();internal Dictionary<string,RebirthPoiClearanceLedger> Shards=new Dictionary<string,RebirthPoiClearanceLedger>();}
 internal class RebirthPoiWorldStore {internal RebirthPoiWorldSnapshot Published=new RebirthPoiWorldSnapshot();}
 internal class RebirthPoiWorldLifecycle {internal static RebirthPoiWorldLifecycle Instance=new RebirthPoiWorldLifecycle();internal RebirthPoiWorldStore Store=new RebirthPoiWorldStore();internal bool TryGetEvidenceStore(out RebirthPoiWorldStore s){s=Store;return true;}}
-internal class RebirthPurgePoiCensus {internal static RebirthPurgePoiCensus Instance=new RebirthPurgePoiCensus();internal long Generation=1;}
+internal class RebirthPurgePoiCensus {internal static RebirthPurgePoiCensus Instance=new RebirthPurgePoiCensus();internal bool Ready=true;internal long Generation=1;internal class Entry{internal RebirthPoiIdentity Identity;internal int Tier;}internal IReadOnlyDictionary<string,Entry> Published=new Dictionary<string,Entry>();}
 internal class RebirthPurgeObjectiveProgress {internal static RebirthPurgeObjectiveProgress Instance=new RebirthPurgeObjectiveProgress();internal Guid WorldId;internal long Revision;internal int TargetPercentage=75;internal IReadOnlyDictionary<string,BiomeProgress> Published;internal class BiomeProgress {internal string Biome="forest";internal int Eligible=10,Discovered=6,Cleared=4;internal IReadOnlyDictionary<int,int> EligibleByTier=new Dictionary<int,int>{{1,10}},ClearedByTier=new Dictionary<int,int>{{1,4}};}}
 class Program
 {
@@ -44,6 +44,9 @@ class Program
  int sent=peers.Sum(p=>p.Sent.Count);UnityEngine.Time.realtimeSinceStartup=0.4f;RebirthPoiMapSync.Pulse();Check(peers.Sum(p=>p.Sent.Count)==sent,"unchanged summaries do not resend or rescan per peer");
  snapshot.Revision=2;UnityEngine.Time.realtimeSinceStartup=0.6f;RebirthPoiMapSync.Pulse();var invalid=peers[0].Sent.OfType<NetPackageRebirthPurgeObjectives>().Last();RebirthPurgeObjectiveFrame unknown;Check(RebirthPurgeObjectiveFrame.TryDecode(Field<byte[]>(invalid,"bytes"),out unknown)&&!unknown.Known&&unknown.Revision==2&&unknown.Sequence>objective.Sequence,"changed durable snapshot with unfinished projection withdraws counts");
  progress.Revision=2;progress.Published=new Dictionary<string,RebirthPurgeObjectiveProgress.BiomeProgress>{{"forest",new RebirthPurgeObjectiveProgress.BiomeProgress()}};UnityEngine.Time.realtimeSinceStartup=0.8f;RebirthPoiMapSync.Pulse();Check(peers.All(p=>p.Sent.OfType<NetPackageRebirthPurgeObjectives>().Count()==3),"new committed progress republishes once to each peer");
+ RebirthPurgeObjectivePolicy.ProgressionMode=1;UnityEngine.Time.realtimeSinceStartup=1.0f;RebirthPoiMapSync.Pulse();
+ var modePackage=peers[0].Sent.OfType<NetPackageRebirthPurgeObjectives>().Last();RebirthPurgeObjectiveFrame modeFrame;
+ Check(RebirthPurgeObjectiveFrame.TryDecode(Field<byte[]>(modePackage,"bytes"),out modeFrame)&&modeFrame.ProgressionMode==1&&modeFrame.Revision==2,"mode-only change republishes authoritative choice without ledger mutation");
  RebirthPoiMapSync.Reset();cm.IsServer=false;world.Remote=true;RebirthPoiMapSync.Pulse();var request=cm.Sent.OfType<NetPackageRebirthPoiMapRequest>().Last();var clientNonce=Field<Guid>(request,"request");
  var clientFrame=new RebirthPurgeObjectiveFrame(clientNonce,snapshot.WorldId,objective.Session,1,2,1,true,new[]{new RebirthPurgeObjectiveFrame.Biome("forest",10,6,4,new Dictionary<int,int>{{1,10}},new Dictionary<int,int>{{1,4}})});
  RebirthPoiMapSync.ReceiveObjectives(world,clientFrame);Check(RebirthPoiMapSync.LocalObjectives==null,"production client stages early summary before map publication");
@@ -52,3 +55,17 @@ class Program
  Console.WriteLine("RESULT "+checks+" PASS; production map/objective sync linked; native connection/send/store are doubles.");
  }
 }
+// Controlled providers: this fixture qualifies sync scheduling, not native census,
+// scanner evaluation, milestone eligibility or disk history.
+class Decorator{public Prefab GetPrefabFromWorldPosInside(int x,int z)=>null;}
+class Prefab{public List<Room> sleeperVolumes=new();public PrefabData prefab=new();}
+class PrefabData{public List<object> SleeperVolumeList=new();}
+class Room{public bool wasCleared,isSpawning;public int numSpawned;}
+class RebirthPoiNativeManifest{public RebirthPoiIdentity Identity;public static bool TryResolve(World w,Prefab p,out RebirthPoiNativeManifest m){m=null;return false;}}
+static class RebirthPurgePoiHistory{public static long Revision;public static void Reset(){}public static void Ensure(){}public static History Get(RebirthPoiClearanceRecord r)=>null;internal class History{public string Discoverer,Contributors;public ulong DiscoveredAt,PurgedAt;}}
+static class RebirthPurgeScanner{public static long CounterRevision;public static bool TryCounters(RebirthPoiClearanceRecord r,out int a,out int e,out bool approx){a=e=-1;approx=true;return false;}}
+static class RebirthPurgeObjectivePolicy{public static int ProgressionMode;}
+static class RebirthPurgeDiscoveryPolicy{public static IReadOnlyList<Definition> Definitions=Array.Empty<Definition>();public class Definition{public int Tier,Percent;}public static int ScaledPercent(int p,int t)=>(p*t+74)/75;public static int ScaledNumerator(int p,int t)=>p*t;}
+static class RebirthPurgeMilestoneService{public static Dictionary<string,Receipt> PublishedAll;public class Receipt{public int Tier;public string Key,Biome;}}
+class NetPackageRebirthPurgeMilestoneNotice:NetPackage{public NetPackageRebirthPurgeMilestoneNotice Setup(string b,int t,bool read)=>this;}
+

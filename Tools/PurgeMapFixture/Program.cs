@@ -45,6 +45,30 @@ class Program {
  C(new RebirthPoiMapReceiver(scope,request).Accept(scope,F(1,0,true,0,8,Guid.NewGuid(),repeated))==RebirthPoiMapReceive.Refused,"duplicate stable keys reject transaction");
  var longName=new string('\u4e00',256);var large=Enumerable.Range(0,8).Select(n=>new RebirthPoiMapRecord(new RebirthPoiIdentity(longName,n,0,0,0,1,1,1,new string('\u4e00',64)),0,RebirthPoiClearanceState.Discovered)).ToArray();
  C(RebirthPoiMapFrame.Encode(F(1,0,true,0,8,Guid.NewGuid(),large)).Length<RebirthPoiMapFrame.MaxBytes,"bounded worst-case multibyte names fit packet");
+ for(int tier=0;tier<=7;tier++){
+ var tierRecord=new RebirthPoiMapRecord(R(tier).Identity,0,RebirthPoiClearanceState.Discovered,tier);
+ var tierFrame=F(1,0,true,0,1,Guid.NewGuid(),tierRecord);
+ C(RebirthPoiMapFrame.TryDecode(RebirthPoiMapFrame.Encode(tierFrame),out decoded)&&decoded.Records[0].Tier==tier,"actual discovered tier roundtrips "+tier);
+ }
+ var historyRecord=new RebirthPoiMapRecord(R(0).Identity,0,RebirthPoiClearanceState.Cleared,3,"FuriousRamsay","FuriousRamsay\nMira",24000,36000,0,0,false);
+ var historyFrame=F(1,0,true,0,1,Guid.NewGuid(),historyRecord);
+ C(RebirthPoiMapFrame.TryDecode(RebirthPoiMapFrame.Encode(historyFrame),out decoded)&&decoded.Records[0].Same(historyRecord),"PMP4 retains history, counters and approximation");
+ var estimate=new RebirthPoiMapRecord(R(1).Identity,0,RebirthPoiClearanceState.Discovered,1,"FuriousRamsay","",24000,0,3,12,true);
+ C(RebirthPoiMapFrame.TryDecode(RebirthPoiMapFrame.Encode(F(2,0,true,0,1,Guid.NewGuid(),estimate)),out decoded)&&decoded.Records[0].Same(estimate),"estimated room/entity counters roundtrip without changing evidence");
+ C(!historyRecord.Same(new RebirthPoiMapRecord(historyRecord.Identity,0,historyRecord.State,3,"Other","FuriousRamsay\nMira",24000,36000)),"history change invalidates record equality without changing clearance");
+ var previousHistory=LegacyMapFixture.Encode(historyFrame,0x504d5033);
+ C(RebirthPoiMapFrame.TryDecode(previousHistory,out decoded)&&decoded.Records[0].Discoverer==historyRecord.Discoverer&&decoded.Records[0].Contributors==historyRecord.Contributors&&decoded.Records[0].DiscoveredAt==historyRecord.DiscoveredAt&&decoded.Records[0].PurgedAt==historyRecord.PurgedAt&&decoded.Records[0].AreasLeft==-1&&decoded.Records[0].EstimatedEntities==-1,"PMP3 retains discovery and purge history without inventing counters");
+ foreach(int version in new[]{0x504d5031,0x504d5032}){
+ var legacy=LegacyMapFixture.Encode(historyFrame,version);
+ C(RebirthPoiMapFrame.TryDecode(legacy,out decoded)&&decoded.Records[0].Discoverer==""&&decoded.Records[0].Contributors==""&&decoded.Records[0].DiscoveredAt==0&&decoded.Records[0].PurgedAt==0&&decoded.Records[0].Tier==(version==0x504d5032?3:-1),"old map frame does not invent history "+version);
+ }
  Console.WriteLine("RESULT "+checks+" PASS; production map codec/receiver, native transport not executed.");
  }}
+
+// Previous wire layouts, independent of the current encoder.
+static class LegacyMapFixture {
+ internal static byte[] Encode(RebirthPoiMapFrame f,int version){using(var stream=new MemoryStream())using(var w=new BinaryWriter(stream)){
+ w.Write(version);foreach(var id in new[]{f.Request,f.World,f.Session,f.Transfer})w.Write(id.ToByteArray());w.Write(f.Sequence);w.Write(f.Previous);w.Write(f.Full);w.Write(f.Page);w.Write(f.Pages);w.Write(f.Count);w.Write(f.Records.Length);
+ foreach(var record in f.Records){var id=record.Identity;w.Write(id.Prefab);w.Write(id.Biome);w.Write(id.X);w.Write(id.Y);w.Write(id.Z);w.Write(id.Rotation);w.Write(id.SizeX);w.Write(id.SizeY);w.Write(id.SizeZ);w.Write(record.Epoch);w.Write((byte)record.State);if(version>=0x504d5032)w.Write((sbyte)record.Tier);if(version>=0x504d5033){w.Write(record.Discoverer);w.Write(record.Contributors);w.Write(record.DiscoveredAt);w.Write(record.PurgedAt);}}w.Flush();return stream.ToArray();}}
+}
 

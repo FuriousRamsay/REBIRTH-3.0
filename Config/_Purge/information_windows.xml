@@ -9,7 +9,7 @@
       <panel name="content" pos="0,-46" height="699" depth="1" backgroundcolor="0,0,0,0" bordercolor="[black]" borderthickness="3" pivot="center">
         <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="1003" height="699" color="[black]" type="sliced" fillcenter="false" />
         <sprite name="purgeInformationArt" pos="3,-2" width="996" height="248" atlas="UIAtlas" sprite="AutoDiscovery" depth="9"/>
-        <rect name="purgeInformationReader" controller="RebirthReadableText, RebirthUtils" pos="10,-260" width="983" height="360" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
+        <rect name="purgeInformationReader" controller="RebirthReadableText, RebirthUtils" reset_on_text_change="false" pos="10,-260" width="983" height="360" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
           <defaultscrollbar/>
           <scrollview name="readableTextViewport" depth="10" width="960" height="360" clippingsoftness="0,4">
             <label name="purgeInformationBody" width="950" height="360" font_size="30" color="[white]" overflow="resizeheight" support_bb_code="true"/>

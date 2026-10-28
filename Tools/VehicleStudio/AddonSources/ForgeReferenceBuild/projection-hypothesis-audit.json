@@ -1,0 +1,19 @@
+{
+  "status": "CAMERA_HYPOTHESIS_NOT_VALIDATED",
+  "hypothesis": "rear shaft and nozzle are orthogonal horizontal axes; zero camera roll; weak perspective",
+  "observedSlopes": {
+    "shaft": -0.1902439024390244,
+    "nozzle": 0.3
+  },
+  "elevationFromAxisProductDegrees": 13.821621725179254,
+  "elevationFromCollarEllipseDegrees": 23.294325910132297,
+  "differenceDegrees": 9.472704184953043,
+  "interpretation": "The two estimates disagree. Recheck traced endpoints, perspective and whether axes are orthogonal; do not turn either estimate into an accepted model transform.",
+  "remainingAlternatives": [
+    "Finite perspective instead of weak perspective",
+    "Nozzle and shaft not perpendicular in concept",
+    "Nonhorizontal or irregular collar",
+    "Manual landmark errors"
+  ],
+  "blenderGenerationAllowed": false
+}

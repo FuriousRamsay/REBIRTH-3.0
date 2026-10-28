@@ -1,0 +1,27 @@
+Independent forge clay-model comparison
+
+Status: DELIVERED AND ACKNOWLEDGED. Request FORGE-CLAY-COMPARISON-01 is saved in the separate 7Code application's Blender Modeling session s_01a134edd5da_0301. The assistant acknowledged it explicitly. Initial blockouts are present; final clay delivery and fidelity review remain incomplete. Do not resend this task.
+
+Input: original approved concept only:
+C:/Program Files (x86)/Steam/steamapps/common/7 Days To Die/Mods/zzz_REBIRTH__3_0/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png
+SHA256: 04a5d2d06b82e9d40b0bb1da59eccd1ecf23ef6bd857d6445e0a11c70b191ca5
+
+Create a faithful, fully three-dimensional Blender clay model of this compact forge. Begin from an empty scene. Do not access/reuse the other candidate's meshes, scripts, plans or textures. First write a detailed component plan specifying dimensions, positions, rotations, profiles, connections and comparison camera. Distinguish image observations from inferred hidden geometry. Validate that plan against the reference before constructing the mesh. Then render and inspect actual clay geometry; revise mismatches.
+
+Reproduce the complete composition, including the stone furnace/arch/cavity, iron bands/plates/domelike rivets, open top collar, bellows and frame, nozzle/flange/collar, crucible and its retainers, support brackets and mounting feet. Match relative orientation, scale, overlaps and component contours. No concept title on the model. No textures, material bump/displacement, image planes, reference projection, emission, Unity work or game work. Use a plain neutral clay material and readable studio lighting. Existing scene assets must remain untouched.
+
+Deliver: saved .blend, reproducible source or modeling record, component plan, actual reference-angle clay render at no more than 2K, front/side/elevated diagnostic views, camera parameters, and a candid list of remaining mismatches. The reference image may be viewed for analysis but must not be used as geometry or a render surface. Hidden portions may be reasonably inferred and must be labelled as such.
+
+Output directory: E:/_Haven/shared/REBIRTHTemp/ForgeComparison/7Code/. Do not overwrite another candidate, launch a game, install an asset or change production files.
+
+Comparison procedure:
+1. Preserve each candidate as delivered; record file hashes and elapsed time.
+2. Verify render derives from saved mesh geometry, not an image plane or generated substitute.
+3. Compare the reference view's silhouette and major component layout first.
+4. Compare bellows orientation, frame placement, nozzle connections, and crucible position/shape.
+5. Inspect masonry boundaries, arch opening, bands, rivet shapes, feet and supports.
+6. Inspect diagnostic views for disconnected, intersecting or flattened geometry.
+7. Record camera differences separately from shape differences. Do not independently warp parts to make image comparisons pass.
+8. Judge against the approved image, not against the competing model. A better candidate can still fail fidelity. Do not declare a winner solely from render quality or file validity.
+
+The same fidelity requirements apply to the local candidate. Texture planning begins only after clay geometry passes, and eventual maps are 2K.

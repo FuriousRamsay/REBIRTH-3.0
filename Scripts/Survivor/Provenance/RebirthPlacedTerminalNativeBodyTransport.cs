@@ -127,7 +127,21 @@ internal static partial class RebirthPlacedOriginalDeathPartition
         try
         {
             TerminalOwnerScope(world);if(world?.GetPrimaryPlayer() is not EntityPlayerLocal player)return;
-            string folder=Path.Combine(GameIO.GetSaveGameDir(),"rebirth","placed-original","terminal-native-owner");if(terminalOwnerScan==null&&UnityEngine.Time.realtimeSinceStartup>=terminalOwnerNextScan&&Directory.Exists(folder))terminalOwnerScan=Directory.EnumerateFiles(folder,"*.xml").GetEnumerator();for(int n=0;n<2&&terminalOwnerScan!=null;n++){if(!terminalOwnerScan.MoveNext()){terminalOwnerScan.Dispose();terminalOwnerScan=null;terminalOwnerNextScan=UnityEngine.Time.realtimeSinceStartup+3f;break;}if(ReadTerminalOwner(terminalOwnerScan.Current,out var t,out var source)&&TerminalOwner(player,t))RememberTerminalOwner(world,t,source);}
+            if(terminalOwnerScan==null&&UnityEngine.Time.realtimeSinceStartup>=terminalOwnerNextScan)
+            {
+                // A missing folder is a completed discovery attempt too. New
+                // live receipts enter RememberTerminalOwner directly; this
+                // bounded scan discovers retained records after startup.
+                terminalOwnerNextScan=UnityEngine.Time.realtimeSinceStartup+3f;
+                string folder=Path.Combine(terminalOwnerDirectory,"rebirth","placed-original","terminal-native-owner");
+                bool measure=RebirthGameBridgeFrames.IsRecording;
+                long start=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+                bool exists=Directory.Exists(folder);
+                if(exists)terminalOwnerScan=Directory.EnumerateFiles(folder,"*.xml").GetEnumerator();
+                if(measure)Log.Out("[REBIRTH FileIoPerf] terminalOwnerScan exists="+exists+" elapsedMs="+
+                    ((System.Diagnostics.Stopwatch.GetTimestamp()-start)*1000d/System.Diagnostics.Stopwatch.Frequency).ToString("F4",System.Globalization.CultureInfo.InvariantCulture));
+            }
+            for(int n=0;n<2&&terminalOwnerScan!=null;n++){if(!terminalOwnerScan.MoveNext()){terminalOwnerScan.Dispose();terminalOwnerScan=null;terminalOwnerNextScan=UnityEngine.Time.realtimeSinceStartup+3f;break;}if(ReadTerminalOwner(terminalOwnerScan.Current,out var t,out var source)&&TerminalOwner(player,t))RememberTerminalOwner(world,t,source);}
             foreach(var pending in terminalOwnerPending.Values.ToArray())
             {
                 var t=pending.Body;if(!TerminalOwner(player,t)||TerminalOwnerDone(t)){terminalOwnerPending.Remove(t.Operation);continue;}if(UnityEngine.Time.realtimeSinceStartup<pending.Next)continue;pending.Next=UnityEngine.Time.realtimeSinceStartup+1f;

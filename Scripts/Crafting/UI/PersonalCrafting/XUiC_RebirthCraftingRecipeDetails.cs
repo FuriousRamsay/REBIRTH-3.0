@@ -16,6 +16,9 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private XUiC_RecipeCraftCount craftCount;
     private XUiC_RebirthCraftingActions actions;
     private XUiController knowledgeButton;
+    private XUiC_WorkstationToolGrid requirementTools;
+    private XUiC_WorkstationFuelGrid requirementFuel;
+    private bool requirementControlsResolved;
 
     private XUiV_Sprite outputIcon;
     private XUiV_Label nameLabel;
@@ -84,6 +87,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     public override void OnOpen()
     {
         base.OnOpen();
+        requirementControlsResolved = false;
         ObserveInventory();
         availabilityDirty = true;
         lastRemoteRevision = long.MinValue;
@@ -263,8 +267,17 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private void RefreshToolRequirement()
     {
         var tool=selectedRecipe!=null&&selectedRecipe.craftingToolType>0?ItemClass.GetForId(selectedRecipe.craftingToolType):null;
-        var grid=owner?.GetChildByType<XUiC_WorkstationToolGrid>();
-        var fuel=owner?.GetChildByType<XUiC_WorkstationFuelGrid>();
+        // Controller membership is fixed while this window is open. Remember
+        // absence too: personal crafting has neither grid. Contents and native
+        // requirements remain live and are checked on every refresh below.
+        if (!requirementControlsResolved)
+        {
+            requirementTools = owner?.Controller.GetChildByType<XUiC_WorkstationToolGrid>();
+            requirementFuel = owner?.Controller.GetChildByType<XUiC_WorkstationFuelGrid>();
+            requirementControlsResolved = true;
+        }
+        var grid=requirementTools;
+        var fuel=requirementFuel;
         bool missingTool=tool!=null&&!(grid?.HasRequirement(selectedRecipe)??false);
         bool missingFuel=selectedRecipe!=null&&fuel?.WorkstationData!=null&&!fuel.HasRequirement(selectedRecipe);
         var icon=GetChildById("recipeRequiredToolIcon")?.ViewComponent as XUiV_Sprite;

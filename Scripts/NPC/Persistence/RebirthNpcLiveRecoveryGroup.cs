@@ -49,7 +49,17 @@ internal sealed class RebirthNpcLiveRecoveryGroup
             path=readPath;backupPath=readBackupPath;
         }
         if(!File.Exists(path))
-        {if(File.Exists(backupPath))throw new InvalidDataException("NPC recovery group primary missing with retained backup");return null;}
+        {
+            if(File.Exists(backupPath))
+            {
+                RebirthNpcPersistenceCoordinator.InvalidateRecoveryAbsence();
+                throw new InvalidDataException("NPC recovery group primary missing with retained backup");
+            }
+            return null;
+        }
+        // Independent driver/administrative reads must revoke the negative
+        // observation too, including records found after an external restore.
+        RebirthNpcPersistenceCoordinator.InvalidateRecoveryAbsence();
         if(new FileInfo(path).Length>32768)throw new InvalidDataException("NPC recovery group oversized");
         XElement root;using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=32768}))root=XElement.Load(reader);
         if(root.Name!="npcLiveRecoveryGroup"||((int?)root.Attribute("version")!=1&&(int?)root.Attribute("version")!=2)||!Allowed.Contains((string)root.Attribute("target")??"")||

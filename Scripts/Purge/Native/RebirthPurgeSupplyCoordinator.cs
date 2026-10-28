@@ -12,7 +12,7 @@ internal static class RebirthPurgeSupplyCoordinator
         internal AIAirDrop Flight;
         internal EntityPlayer Player;
         internal RebirthPurgeSupplyCrateStamp Stamp;
-        internal Vector3 Drop;
+        internal Vector3 PlayerPosition,Drop;
         internal float Radius;
         internal bool Spawned;
         internal bool Current()=>NativePurge(Controller)&&ReferenceEquals(Controller.activeAirDrop,Flight)&&Flight!=null;
@@ -26,9 +26,10 @@ internal static class RebirthPurgeSupplyCoordinator
     private static RebirthPurgeSupplyCrateStamp awaitingAccount;
     private static float next;
     private static int playerCursor,entityCursor;
-    internal static void Reset()
+    internal static void Reset(bool preserveMarkerLabelsForFinalWrite=false)
     {
-        RebirthPurgeSupplyMarkerLabels.Reset();
+        if(preserveMarkerLabelsForFinalWrite)RebirthPurgeSupplyMarkerLabels.PreserveUntilFinalWrite();
+        else RebirthPurgeSupplyMarkerLabels.Reset();
         world=null;queued=active=null;awaitingAccount=null;next=0;playerCursor=entityCursor=0;
     }
     private static bool NativePurge(AIDirectorAirDropComponent owner)
@@ -54,20 +55,26 @@ internal static class RebirthPurgeSupplyCoordinator
         if(request.Flight!=null&&!ReferenceEquals(request.Flight,__instance))return true;
         request.Flight=__instance;
         var random=request.Controller.Random;
-        var center=new Vector2(request.Player.position.x,request.Player.position.z);
+        // Native builds paths on a later Tick; retain the original queued location,
+        // as 2.6 did, rather than mixing a moved player with the reserved drop.
+        var center=new Vector2(request.PlayerPosition.x,request.PlayerPosition.z);
         var tangent=random.RandomOnUnitCircle;
         float half=random.RandomRange(50f,100f);
         var drop=new Vector2(request.Drop.x,request.Drop.z);
         var start=center+Vector2.ClampMagnitude(drop-tangent*half-center,request.Radius);
         var end=center+Vector2.ClampMagnitude(drop+tangent*half-center,request.Radius);
         var path=new AIAirDrop.FlightPath {
-            Start=new Vector3(start.x,request.Player.position.y+180f,start.y),
-            End=new Vector3(end.x,request.Player.position.y+180f,end.y),
+            Start=new Vector3(start.x,request.PlayerPosition.y+180f,start.y),
+            End=new Vector3(end.x,request.PlayerPosition.y+180f,end.y),
             Delay=random.RandomRange(0f,15f)
         };
-        path.Crates.Add(new AIAirDrop.SupplyCrateSpawn {
+        var crate=new AIAirDrop.SupplyCrateSpawn {
             SpawnPos=request.Drop,Delay=(start-drop).magnitude/AIAirDrop.cPlaneMetersPerSecond
-        });
+        };
+        // Match native CreateFlightPaths: its Tick waits for this location, then
+        // passes the observer into SpawnSupplyCrate for native landing cleanup.
+        crate.ChunkRef=request.Controller.Director.World.GetGameManager().AddChunkObserver(crate.SpawnPos,false,3,-1);
+        path.Crates.Add(crate);
         __instance.flightPaths=new List<AIAirDrop.FlightPath>{path};
         return false;
     }
@@ -122,16 +129,17 @@ internal static class RebirthPurgeSupplyCoordinator
             if(account.InFlight!=0&&(account.Delivery==null||account.Delivery.Phase!=RebirthPurgeSupplyDeliveryPhase.Prepared&&!account.Delivery.CanResumeFlight))continue;
             Guid id;if(!Guid.TryParseExact(world.worldState?.Guid,"N",out id))return;
             float radius=rules.FlightRadius;
+            var playerPosition=player.position;
             var offset=director.Random.RandomOnUnitCircle*director.Random.RandomRange(0f,radius);
-            var drop=world.ClampToValidWorldPos(new Vector3(player.position.x+offset.x,player.position.y+170f,player.position.z+offset.y));
-            if(new Vector2(drop.x-player.position.x,drop.z-player.position.z).sqrMagnitude>radius*radius)continue;
+            var drop=world.ClampToValidWorldPos(new Vector3(playerPosition.x+offset.x,playerPosition.y+170f,playerPosition.z+offset.y));
+            if(new Vector2(drop.x-playerPosition.x,drop.z-playerPosition.z).sqrMagnitude>radius*radius)continue;
             if(account.InFlight==0)
             {
                 RebirthPurgeSupplyAccount prepared;
                 if(!RebirthPurgeSupplyService.TryPrepare(account,new RebirthPurgeSupplyDeliveryPlan((int)drop.x,(int)drop.y,(int)drop.z),out prepared))return;
                 account=prepared;
             }
-            var request=new Reservation {Controller=director,Player=player,Drop=drop,Radius=radius,
+            var request=new Reservation {Controller=director,Player=player,PlayerPosition=playerPosition,Drop=drop,Radius=radius,
                 Stamp=new RebirthPurgeSupplyCrateStamp(id,key,account.InFlight,account.Token(id))};
             queued=request;
             try

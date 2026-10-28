@@ -1,8 +1,8 @@
 ﻿{
     "port":  8765,
     "world":  "West Xuyofu Territory",
-    "save":  "CodexTest",
-    "baselineSave":  "TestProfile4",
+    "save":  "RebirthBridgeCamper",
+    "baselineSave":  "Camper",
     "windowed":  true,
     "width":  1280,
     "height":  720,

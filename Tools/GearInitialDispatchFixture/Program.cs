@@ -1,5 +1,16 @@
 using System;
-public class EntityPlayerLocal:EntityPlayer{}
+public class EntityPlayerLocal:EntityPlayer{public FixturePlayerUI PlayerUI=new();}
+public class FixturePlayerUI{public FixtureXui xui=new();}
+public class FixtureXui{public bool IsUsingItemActionEntryUse;}
+// Routing double only. The real deferred dispatcher/session/callback behavior
+// belongs to its own fixture; this verifies actual ItemAction selects that seam.
+public static class RebirthGearDeferredInitialDispatcher{
+ public static int Calls;public static bool Accept;public static EntityPlayerLocal Owner;
+ public static ItemValue Selected;public static bool Bag;public static int Index;
+ public static bool TryQueue(EntityPlayerLocal player,ItemValue selected,bool bag,int index)
+ {Calls++;Owner=player;Selected=selected;Bag=bag;Index=index;return Accept;}
+ public static void Reset(){Calls=0;Accept=false;Owner=null;Selected=null;Bag=false;Index=-1;}
+}
 public class ItemClass{public string GetItemName()=>"daypack";}
 public class ItemValue{public string Data="full-native-bytes";public int type=1;public ushort Seed=2;public bool Empty;public ItemClass ItemClass=new();public bool IsEmpty()=>Empty;}
 public class Profile{public string Kind="survivor_gear";}
@@ -9,15 +20,39 @@ public static class SingletonMonoBehaviour<T>{public static T Instance;}
 public static class RebirthGearOwnerReservation{public static bool Match;public static object Expected;public static bool MatchesIntent(EntityPlayerLocal p,object peer,object original)=>Match&&ReferenceEquals(Expected,original);}
 public static class RebirthGearPreparationClient{
  public static bool Capture=true,Queued;public static bool Throw;public static int Captures,Requests,Index;public static bool Bag;public static Guid Transaction;public static object Original;
- public static bool TryCreateOriginal(EntityPlayerLocal p,ItemValue item,bool bag,int index,Guid tx,out object original){Captures++;Bag=bag;Index=index;Transaction=tx;Original=new();original=Original;return Capture;}
+ public static bool TryCreateOriginal(EntityPlayerLocal p,ItemValue item,bool bag,int index,Guid tx,out RebirthGearPreparationIntent original){Captures++;Bag=bag;Index=index;Transaction=tx;original=new(){TransactionId=tx};Original=original;return Capture;}
  public static string UnequipSlot;public static bool TryCreateUnequipOriginal(EntityPlayerLocal p,string slot,Guid tx,out RebirthGearPreparationIntent original){Captures++;UnequipSlot=slot;Transaction=tx;original=new(){TransactionId=tx};Original=original;return Capture&&p!=null&&!string.IsNullOrEmpty(slot);}
  public static bool TryRequestOriginal(EntityPlayerLocal p,object original){Requests++;if(Throw)throw new Exception();RebirthGearOwnerReservation.Expected=original;return Queued;}
 }
 static class Program{
  static int n;static EntityPlayerLocal player=new();static ItemValue item=new();
  static void Check(bool yes,string label){if(!yes)throw new Exception(label);n++;}
- static void Reset(){player.inventory=new();player.bag=new();RebirthGearPreparationClient.Capture=true;RebirthGearPreparationClient.Queued=false;RebirthGearPreparationClient.Throw=false;RebirthGearPreparationClient.Captures=RebirthGearPreparationClient.Requests=0;RebirthGearOwnerReservation.Match=false;RebirthGearOwnerReservation.Expected=null;RebirthSurvivorDefinitionRegistry.Known=true;RebirthSurvivorDefinitionRegistry.Profile=new();SingletonMonoBehaviour<ConnectionManager>.Instance=new();}
+ static void Reset(){player.PlayerUI=new();RebirthGearDeferredInitialDispatcher.Reset();player.inventory=new();player.bag=new();RebirthGearPreparationClient.Capture=true;RebirthGearPreparationClient.Queued=false;RebirthGearPreparationClient.Throw=false;RebirthGearPreparationClient.Captures=RebirthGearPreparationClient.Requests=0;RebirthGearOwnerReservation.Match=false;RebirthGearOwnerReservation.Expected=null;RebirthSurvivorDefinitionRegistry.Known=true;RebirthSurvivorDefinitionRegistry.Profile=new();SingletonMonoBehaviour<ConnectionManager>.Instance=new();}
  static void Main(){
+ foreach(bool traceOn in new[]{false,true}){
+  Reset();RebirthGearTrace.Configure(traceOn,true);RebirthGearPreparationClient.Queued=true;
+  var stack=new ItemStack{itemValue=item,count=1};player.bag.ItemGrid.items[6]=stack;
+  ItemActionEquipSurvivorGearRebirth.Dispatch(player,item);
+  Check(RebirthGearPreparationClient.Requests==1&&RebirthGearPreparationClient.Captures==1&&
+   SingletonMonoBehaviour<ConnectionManager>.Instance.Sends==0,"trace changed exact admission/request count or sent legacy mutation");
+  Check(ReferenceEquals(player.bag.ItemGrid.items[6],stack)&&stack.count==1&&ReferenceEquals(stack.itemValue,item),
+   "trace changed source item/count/custody during admission");
+  Check(ReferenceEquals(RebirthGearOwnerReservation.Expected,RebirthGearPreparationClient.Original)&&
+   RebirthGearPreparationClient.Transaction!=Guid.Empty,"trace replaced original admission identity");
+  Check(traceOn?RebirthGearTrace.Count>0:RebirthGearTrace.Count==0,"admission trace opt-in mismatch");
+ }
+ RebirthGearTrace.Configure(false,true);
+ Reset();player.PlayerUI.xui.IsUsingItemActionEntryUse=true;RebirthGearDeferredInitialDispatcher.Accept=true;
+ ItemActionEquipSurvivorGearRebirth.DispatchSelected(player,item,true,6);
+ Check(RebirthGearDeferredInitialDispatcher.Calls==1&&ReferenceEquals(RebirthGearDeferredInitialDispatcher.Owner,player)&&
+  ReferenceEquals(RebirthGearDeferredInitialDispatcher.Selected,item)&&RebirthGearDeferredInitialDispatcher.Bag&&
+  RebirthGearDeferredInitialDispatcher.Index==6&&RebirthGearPreparationClient.Captures==0&&RebirthGearPreparationClient.Requests==0&&
+  SingletonMonoBehaviour<ConnectionManager>.Instance.Sends==0,"busy item-use UI bypassed original deferred routing seam");
+ Reset();player.PlayerUI.xui.IsUsingItemActionEntryUse=true;
+ ItemActionEquipSurvivorGearRebirth.DispatchSelected(player,item,false,1);
+ Check(RebirthGearDeferredInitialDispatcher.Calls==1&&RebirthGearPreparationClient.Captures==0&&
+  RebirthGearPreparationClient.Requests==0&&SingletonMonoBehaviour<ConnectionManager>.Instance.Sends==0,
+  "refused deferred routing fell back to immediate/legacy mutation");
  Reset();Check(!RebirthGearInitialEquipDispatcher.TryBegin(null,item,true,3)&&RebirthGearPreparationClient.Captures==0,"null owner inert");
  Reset();Check(!RebirthGearInitialEquipDispatcher.TryBegin(player,null,true,3),"null item inert");
  Reset();Check(!RebirthGearInitialEquipDispatcher.TryBegin(player,new ItemValue{Empty=true},true,3),"empty item inert");
@@ -67,7 +102,7 @@ public static class RebirthMusicLibraryClient{public static bool CanSend(Connect
 public enum RebirthSurvivorSupportAction{EquipGearItem}
 public class NetPackageRebirthSurvivorSupportActionRequest{public object Setup(int id,RebirthSurvivorSupportAction action,ItemValue value,string slot)=>this;}
 public static class NetPackageManager{public static T GetPackage<T>()where T:new()=>new();}
-public class RebirthGearPreparationIntent{public Guid TransactionId;}public class Grid{public ItemStack[] items=new ItemStack[52];}
+public class RebirthGearPreparationIntent{public Guid TransactionId;public string CreationId="creation";}public class Grid{public ItemStack[] items=new ItemStack[52];}
 public static class RebirthToolbeltCapacity{public static int GetOwnedSlotCount(EntityPlayerLocal p,int length)=>4;}
 public static class RebirthNativeItemCodec{public static string Encode(ItemValue item)=>item.Data;}
 public class RebirthGearInventoryPlan{public class Stack{public string ItemData;public int Count;}}

@@ -15,6 +15,8 @@
     restart [-Reset] [-NoBuild]          Quit the running game, then launch
     wait    [-Timeout 900]               Wait until the player is in-game
     status | ping                        Bridge liveness + game state
+    call POST /frames action=start        Begin bounded per-frame timing capture
+    call POST /frames action=stop         End capture and return average, p99, worst and hitch counts
     energy entity=ID [limit=256]          Read existing Energy sources/devices, native wiring and restoration baselines
     npcgear [entity=ID]                  Read-only human NPC starting gear: marker CVars, toolbelt/equipment/bag, slot 4/5 live frame vs saved binding
     radial [list]                        Read native radial context, active commands, selection and icon RGB (no input)

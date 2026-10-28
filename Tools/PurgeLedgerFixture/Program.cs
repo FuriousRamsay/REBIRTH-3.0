@@ -64,7 +64,7 @@ static class Program
             Check(!RebirthPoiClearanceCodec.TryRead(xml,Guid.NewGuid(),scope,out loaded),"roundtrip wrong world "+source.Revision);
         }
         string valid=RebirthPoiClearanceCodec.Write(pending); RebirthPoiClearanceLedger parsed;
-        Check(!RebirthPoiClearanceCodec.TryRead(valid.Replace("version=\"1\"","version=\"2\""),world,scope,out parsed),"unknown schema");
+        var unknownVersion=XElement.Parse(valid);unknownVersion.SetAttributeValue("version",999); Check(!RebirthPoiClearanceCodec.TryRead(unknownVersion.ToString(),world,scope,out parsed),"unknown schema");
         Check(!RebirthPoiClearanceCodec.TryRead(valid.Replace("state=\"2\"","state=\"99\""),world,scope,out parsed),"unknown state");
         Check(!RebirthPoiClearanceCodec.TryRead(valid.Replace("required=\"3\"","required=\"4\""),world,scope,out parsed),"malformed saved evidence");
         Check(!RebirthPoiClearanceCodec.TryRead(valid.Replace("epoch=\"0\"","epoch=\"-1\""),world,scope,out parsed),"negative epoch");

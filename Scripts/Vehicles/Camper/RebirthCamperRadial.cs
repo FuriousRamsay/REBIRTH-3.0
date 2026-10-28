@@ -43,19 +43,19 @@ public static class RebirthCamperRadialCommands
     {
         if(!RebirthCamperRadial.IsCamper(__instance)||!RebirthCamperBodyAttachment.HasBody(__instance))return;
         var add=__0;
-        __0=command=>{if(command.commandId!="repair"&&command.commandId!="rebirthCamperNativeVehicleEditor")add(command);};
+        __0=command=>{if(command.commandId!="repair"&&command.commandId!="rebirthCamperNativeVehicleEditor"&&command.commandId!="refuel")add(command);};
     }
 
     private static void Postfix(EntityVehicle __instance, Action<EntityActivationCommand> __0)
     {
-        if (!RebirthCamperRadial.IsCamper(__instance)||!RebirthCamperBodyAttachment.HasBody(__instance)) return;
+        // Native GetActivationCommands caches this list. Register identities before
+        // body restoration; AllowActivationCommand evaluates current body/access state.
+        if (!RebirthCamperRadial.IsCamper(__instance)) return;
         __0(Command(RebirthCamperRadial.Storage, "purgesupplies", "xuiRebirthCamperStorageManagement"));
         __0(Command(RebirthCamperRadial.Stations, "workbench", "xuiRebirthCamperStationManagement"));
         __0(Command(RebirthCamperRadial.Craft, "hammer", "xuiRebirthCamperUseStation"));
         if(RebirthCamperEnergyAccess.Registered)
         {
-            __0(Command(RebirthCamperRadial.PoiOn,"lightbulb","xuiRebirthCamperEnergyPoiOn"));
-            __0(Command(RebirthCamperRadial.PoiOff,"lightbulb","xuiRebirthCamperEnergyPoiOff"));
             __0(Command(RebirthCamperRadial.Energy,"electric_switch","xuiRebirthCamperEnergyManagement"));
         }
         __0(Command(RebirthCamperRadial.Turrets,"junk_turret","xuiCamperTurretManagement"));
@@ -78,7 +78,9 @@ internal static class RebirthCamperRadialStorageOrder
         if (!RebirthCamperRadial.IsCamper(__instance) || __0 == null) return;
         // service is the native Open action for installing parts. Only repair
         // is the redundant wrench; also filter it at initial registration.
-        __0.RemoveAll(command => command.commandId == "repair" || command.commandId == "rebirthCamperNativeVehicleEditor");
+        // Refueling remains available in the native vehicle window. Only this
+        // camper radial identity is removed, including any older cached list.
+        __0.RemoveAll(command => command.commandId == "repair" || command.commandId == "rebirthCamperNativeVehicleEditor" || command.commandId == "refuel");
         int storage = __0.FindIndex(command => command.commandId == "storage");
         int management = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Storage);
         // Swap complete actions after the native owner-specific reorder, retaining
@@ -109,10 +111,8 @@ public static class RebirthCamperRadialPermission
         {__result=RebirthCamperTurretAccess.CanUse(__instance,__1);return false;}
         if(RebirthCamperRadial.IsPoiCommand(__0))
         {
-            __result=RebirthCamperEnergyPoiAccess.Allowed(__instance,__1)&&
-                RebirthCamperEnergyDeviceAdapter.TryObservePoiOn(__instance,out bool on)&&
-                __0.SequenceEqual((on?RebirthCamperRadial.PoiOff:RebirthCamperRadial.PoiOn).AsSpan())&&
-                (on||RebirthCamperEnergyDeviceAdapter.CanTurnPoiLightsOn(__instance));
+            // POI lighting is controlled only from Energy Management.
+            __result=false;
             return false;
         }
         if(__0.SequenceEqual(RebirthCamperRadial.Energy.AsSpan())&&!RebirthCamperEnergyAccess.Registered){__result=false;return false;}
@@ -150,7 +150,7 @@ public static class RebirthCamperRadialActivate
         }
         if(RebirthCamperRadial.IsPoiCommand(__0.commandId))
         {
-            RebirthCamperEnergyPoiAccess.Request(__instance,__1,__0.commandId==RebirthCamperRadial.PoiOn);
+            // Reject an old cached radial command; Energy owns this action now.
             return false;
         }
         if (RebirthCamperRadial.Allowed(__instance, __1)) RebirthCamperModuleInteraction.Request(__instance, __1, __0.commandId);

@@ -132,6 +132,7 @@ namespace Rebirth.Vehicles.Camper
                 Patch(typeof(RebirthCamperEnergyImmobilityPhysics));
                 Patch(typeof(RebirthCamperEnergyDrivingInputRead));
                 Patch(typeof(RebirthCamperCampEngine));
+                Patch(typeof(RebirthCamperCampEngineResume));
                 Patch(typeof(RebirthCamperEnergyDrivingInputPhysics));
                 Patch(typeof(RebirthCamperEnergyImmobilityPosition));
                 Patch(typeof(RebirthCamperEnergyImmobilityRotation));

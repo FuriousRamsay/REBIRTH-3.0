@@ -13,9 +13,10 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     internal enum PreparationStatus{Unknown,Waiting,Ready}
     private sealed class SavedReady{internal EntityPlayer Actor;internal RebirthRemoteResourcePlacedStationCustody.Claim Claim;internal string Original,Reference;}
     private static readonly Dictionary<Guid,SavedReady> readySources=new Dictionary<Guid,SavedReady>();
+    private static readonly RebirthNativeSaveDirectoryCache bindingSaveDirectory = new RebirthNativeSaveDirectoryCache();
     private static World readyWorld;private static string readyDirectory;
     private static void BindReadyWorld()
-    {var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();if(!ReferenceEquals(world,readyWorld)||directory!=readyDirectory){readySources.Clear();readyWorld=world;readyDirectory=directory;}}
+    {var world=GameManager.Instance?.World;string directory=bindingSaveDirectory.Get();if(!ReferenceEquals(world,readyWorld)||directory!=readyDirectory){readySources.Clear();readyWorld=world;readyDirectory=directory;}}
     internal static bool IsEntryCandidate(EntityPlayerLocal player,ItemActionEntryCraft entry)
     {
         var recipe=(entry?.ItemController as XUiC_RecipeEntry)?.Recipe;

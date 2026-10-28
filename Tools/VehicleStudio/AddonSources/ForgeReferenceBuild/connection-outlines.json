@@ -1,0 +1,13 @@
+{
+ "status":"DRAFT_CONNECTION_CONTOURS_NOT_VALIDATED",
+ "coordinateSystem":"reference pixels 1448x1086",
+ "records":[
+  {"id":"nozzle_neck_outline","contourPixels":[[544,500],[563,505],[594,521],[611,535],[617,553],[608,569],[589,575],[564,562],[545,550]],"connects":["throat_collar","furnace_flange"]},
+  {"id":"upper_shaft_outline","contourPixels":[[224,292],[418,251],[438,256],[440,278],[428,285],[226,321]],"connects":["near_upright","far_upright"]},
+  {"id":"lower_shaft_outline","contourPixels":[[239,656],[432,615],[451,625],[449,643],[244,683]],"connects":["near_upright","far_upright"],"visibility":"partly occluded; not all edges observed"},
+  {"id":"near_frame_foot_outline","contourPixels":[[272,710],[299,721],[304,755],[314,774],[312,792],[276,810],[232,790],[230,773],[263,760]],"connects":["lower_frame_bracket","ground"],"uncertainty":"support attachment partly hidden; review before depth assignment"},
+  {"id":"lower_frame_bracket","contourPixels":[[237,655],[261,644],[284,652],[288,688],[309,713],[302,745],[280,754],[262,733],[258,704],[240,690]],"connects":["lower_shaft","near_frame_foot_outline"],"uncertainty":"Visible lower fitting and occluded continuation reconstructed as a proposed closed bracket; not measured hidden geometry"},
+  {"id":"crucible_side_link_outline","contourPixels":[[629,732],[649,727],[674,735],[703,736],[714,749],[707,773],[678,781],[650,778],[631,766]],"connects":["side_retainer","masonry_side"]},
+  {"id":"crucible_bottom_support_outline","contourPixels":[[609,869],[631,863],[650,879],[660,906],[643,923],[619,918],[603,899]],"connects":["crucible_body","furnace_support"],"uncertainty":"occluded surfaces inferred"}
+ ]
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs"/><Compile Include="Doubles.cs"/>
+    <Compile Include="generated/ActualEstimateStatus.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyCapacity.cs" Link="ActualCapacity.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyBoundsRangePolicy.cs" Link="ActualPolicy.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyModel.cs" Link="ActualModel.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyBounds.cs" Link="ActualBounds.cs"/>
+    <AssemblyMetadata Include="FixtureSourceRoot" Value="$(MSBuildProjectDirectory)"/>
+  </ItemGroup>
+  <Target Name="RequirePreparedEnum" BeforeTargets="CoreCompile"><Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/ActualEstimateStatus.cs') Or !Exists('$(MSBuildProjectDirectory)/generated/estimate_manifest.json')" Text="Run Tools/EnergyBoundsRangeFixture/Prepare.ps1 to extract the exact production enum dependency."/></Target>
+</Project>

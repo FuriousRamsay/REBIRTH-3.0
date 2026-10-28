@@ -563,6 +563,7 @@ public static class RemoteResourceAccessEventPatchInstaller
         Harmony harmony = new Harmony("rebirth.remote.resources.live.3.1");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceTileEntityUserAccessPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceServerLockTransitionPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthLocalLockRequestDiagnosis));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleLockCallbackDiagnosis));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceWorkstationModifiedPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceNpcInventoryApplyPatch));
@@ -706,6 +707,7 @@ internal static class RemoteResourceServerLockTransitionPatch
             {
                 try
                 {
+                    RebirthLocalLockRequestDiagnosis.Report(__instance,__0,__state,__exception);
                     var patches=Harmony.GetPatchInfo(__originalMethod);
                     string owners=patches==null?"none":string.Join(",",patches.Owners);
                     Log.Error("[REBIRTH VehicleLock] dispatcher exception player="+__0+
@@ -723,6 +725,63 @@ internal static class RemoteResourceServerLockTransitionPatch
     }
 }
 
+// Capture the exact supplied local target without reading a pooled request twice,
+// resolving a world address again, or invoking any admission/ownership callback.
+// Restored on every exit, including nested local requests and exceptions.
+[HarmonyPatch(typeof(LockManager), nameof(LockManager.LockRequestLocal), new[] { typeof(ILockTarget), typeof(ushort) })]
+internal static class RebirthLocalLockRequestDiagnosis
+{
+    internal struct Scope { internal ILockTarget Target; internal ushort Channel; internal bool Known; }
+    [ThreadStatic] private static Scope current;
+    private static int reports;
+    [HarmonyPrefix]
+    private static void Prefix(ILockTarget __0,ushort __1,out Scope __state)
+    {
+        __state=current;
+        current=RebirthVehicleLockNullProbe.Enabled?new Scope{Target=__0,Channel=__1,Known=true}:default;
+    }
+    [HarmonyFinalizer]
+    private static Exception Finalizer(Scope __state,Exception __exception)
+    {current=__state;return __exception;}
+    private static string Target(ILockTarget target)
+    {
+        if(target==null)return "null";
+        if(target is TileEntity tile)
+        {
+            try{return target.GetType().FullName+"@"+tile.ToWorldPos();}
+            catch(Exception){return target.GetType().FullName+"@position-unavailable";}
+        }
+        if(target is Entity entity)return target.GetType().FullName+"#"+entity.entityId;
+        return target.GetType().FullName;
+    }
+    private static string Entries(List<LockManager.LockEntry> entries)
+    {
+        if(entries==null)return "not-captured";
+        var text=new System.Text.StringBuilder();
+        for(int i=0;i<entries.Count&&i<5;i++)
+        {if(i>0)text.Append(';');text.Append(Target(entries[i].Target)).Append('/').Append(entries[i].Channel);}
+        return entries.Count+"["+text+"]";
+    }
+    internal static void Report(LockManager manager,int player,List<LockManager.LockEntry> before,Exception error)
+    {
+        if(!RebirthVehicleLockNullProbe.Enabled||System.Threading.Interlocked.Increment(ref reports)>16)return;
+        // The later Harmony rethrow can flatten the original call chain. Preserve
+        // it here before returning the exact exception unchanged to the caller.
+        Log.Error("[REBIRTH NativeLock] original exception player="+player+
+            " suppliedLocal="+(current.Known?Target(current.Target):"unknown-remote-or-multi-target")+
+            " channel="+(current.Known?current.Channel.ToString():"unknown")+
+            " locksBefore="+Entries(before)+"\n"+error);
+        try
+        {
+            Log.Error("[REBIRTH NativeLock] state player="+player+
+                " manager="+(manager!=null)+" single="+(manager?.singleLocks!=null)+
+                " shared="+(manager?.sharedLocks!=null)+
+                " locksAfter="+Entries(RemoteResourceServerLockTransitionPatch.Capture(manager,player)));
+        }
+        catch(Exception stateError)
+        {Log.Warning("[REBIRTH NativeLock] state unavailable: "+stateError.GetType().Name);}
+    }
+}
 // Observe the native vehicle callback boundary without changing the lock result.
 // The dispatcher finalizer above logs these values only when the native request throws.
 [HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.OnLockRequestServer))]

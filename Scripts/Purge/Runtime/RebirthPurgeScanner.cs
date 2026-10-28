@@ -7,6 +7,8 @@ using UnityEngine;
 // supplies clear evidence, or scans the world's complete entity collection.
 internal static class RebirthPurgeScanner
 {
+    private static readonly FastTags<TagGroup.Poi> RwgOnly=FastTags<TagGroup.Poi>.Parse("rwgonly");
+    private static readonly FastTags<TagGroup.Poi> StreetTile=FastTags<TagGroup.Poi>.Parse("streettile");
     internal sealed class View
     {
         internal int Player, X, Y, Z, Tier, Rooms, Cleared, Enemies;
@@ -85,28 +87,74 @@ internal static class RebirthPurgeScanner
         }
         Render(world);
     }
+    private static bool TryNativeView(World world,EntityPlayer player,out PrefabInstance prefab,out RebirthPoiIdentity identity,out EntityAlive[] actors)
+    {
+        prefab=null;identity=null;actors=Array.Empty<EntityAlive>();
+        // Match legacy scanner occupancy without borrowing the native name/info-area gate.
+        prefab=RebirthPurgeScannerPoi.Resolve(world,player.position);
+        var authored=prefab?.prefab;
+        if(authored==null||authored.bTraderArea||authored.SleeperVolumeList==null||
+            authored.SleeperVolumeList.Count<1||authored.SleeperVolumeList.Count>4096)return false;
+        if(!RebirthPurgePoiEligibility.Allows(authored.PrefabName,authored.bTraderArea,authored.Tags.Test_AnySet(RwgOnly),authored.Tags.Test_AnySet(StreetTile)))return false;
+        var origin=prefab.boundingBoxPosition;var size=prefab.boundingBoxSize;
+        var biome=world.GetBiome(origin.x+size.x/2,origin.z+size.z/2);
+        if(biome==null)
+        {
+            // Entry rooms can be loaded before a large POI's centre chunk.
+            // Reuse the census's authored biome metadata without loading chunks.
+            try
+            {
+                var provider=world.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
+                biome=provider?.GetBiomeProvider()?.GetBiomeAt(origin.x+size.x/2,origin.z+size.z/2);
+            }
+            catch { return false; }
+        }
+        if(biome==null)return false;
+        try{identity=new RebirthPoiIdentity(authored.PrefabName,origin.x,origin.y,origin.z,(int)prefab.rotation,size.x,size.y,size.z,biome.m_sBiomeName);}
+        catch(ArgumentException){return false;}
+        var live=new List<EntityAlive>();var seen=new HashSet<int>();int roomBudget=4096,entryBudget=8192;
+        foreach(var room in prefab.sleeperVolumes)
+        {
+            if(roomBudget--<=0)break;
+            if(room==null||!ReferenceEquals(room.prefabInstance,prefab))continue;
+            foreach(int id in room.respawnMap.Keys)
+            {
+                if(entryBudget--<=0){actors=live.ToArray();return true;}
+                if(!seen.Add(id))continue;
+                var entity=world.GetEntity(id) as EntityAlive;
+                if(entity!=null&&entity.IsAlive()&&entity.IsSleeper)live.Add(entity);
+                if(seen.Count>=8192){actors=live.ToArray();return true;}
+            }
+        }
+        actors=live.ToArray();return true;
+    }
     private static View Build(World world,EntityPlayer player)
     {
-        var result=new View{Player=player.entityId,World=RebirthPoiMapSync.LocalWorld,Session=RebirthPoiMapSync.LocalSession,Sequence=++sequence};
+        var result=new View{Player=player.entityId,World=RebirthPoiMapSync.TransportWorld,Session=RebirthPoiMapSync.TransportSession,Sequence=++sequence};
         var lifetime=RebirthPurgeSupplyService.LifetimeKills;
         string playerKey=RebirthPurgeKillContributor.Identify(player,world);
         if(lifetime!=null&&playerKey!=null){long kills;lifetime.TryGetValue(playerKey,out kills);result.LifetimeKills=kills;}
-        RebirthPoiNativeManifest manifest;EntityAlive[] actors;
-        if(!Eligible(player)||!RebirthPoiNativeEvidence.Instance.TryScannerView(world,player,out manifest,out actors))
+        PrefabInstance prefab;RebirthPoiIdentity identity;EntityAlive[] actors;
+        if(!Eligible(player)||!TryNativeView(world,player,out prefab,out identity,out actors))
         {roomHistory.Remove(player.entityId);return result;}
-        var identity=manifest.Identity;
-        RebirthPoiWorldStore store;RebirthPoiClearanceRecord record;
-        if(!RebirthPoiWorldLifecycle.Instance.TryGetEvidenceStore(out store)||store.Published==null||!store.Published.TryGet(identity,out record))return result;
-        result.PoiKey=identity.Key;result.Epoch=record.Epoch;
+        // Room HUD is a native presentation, not a durable clearance proof.
+        // A partially loaded POI need not yet have a complete evidence manifest
+        // or a published discovery record (the 2.6 scanner had neither gate).
+        RebirthPoiWorldStore store;RebirthPoiClearanceRecord record=null;
+        if(RebirthPoiWorldLifecycle.Instance.TryGetEvidenceStore(out store)&&store.Published!=null)
+            store.Published.TryGet(identity,out record);
+        if(record!=null&&(record.ResetOnly||record.State!=RebirthPoiClearanceState.Discovered))return result;
+        result.PoiKey=identity.Key;result.Epoch=record?.Epoch??0;
         result.Prefab=identity.Prefab;result.X=identity.X;result.Y=identity.Y;result.Z=identity.Z;
-        result.Tier=manifest.Prefab.prefab.DifficultyTier;
+        result.Tier=prefab.prefab.DifficultyTier;
         // 2.6 displays every authored room, independently of the combat-only
         // manifest used to prove clearance. Count current native rooms likewise.
-        result.Rooms=manifest.Prefab.prefab.SleeperVolumeList.Count;
-        int remaining=0, observedRooms=0;
-        foreach(var room in manifest.Prefab.sleeperVolumes)
+        result.Rooms=prefab.prefab.SleeperVolumeList.Count;
+        int remaining=0, observedRooms=0,roomBudget=4096;
+        foreach(var room in prefab.sleeperVolumes)
         {
-            if(room==null)continue;
+            if(roomBudget--<=0||observedRooms>=result.Rooms)break;
+            if(room==null||!ReferenceEquals(room.prefabInstance,prefab))continue;
             observedRooms++;
             if(room.wasCleared)result.Cleared++;
             else
@@ -129,21 +177,25 @@ internal static class RebirthPurgeScanner
             result.Approximate=true;
         }
         Counter prior;
-        if(!counters.TryGetValue(identity.Key,out prior)||prior.Epoch!=record.Epoch||prior.Areas!=remaining||prior.Entities!=result.Enemies||prior.Approximate!=result.Approximate)
+        if(record!=null&&(!counters.TryGetValue(identity.Key,out prior)||prior.Epoch!=record.Epoch||prior.Areas!=remaining||prior.Entities!=result.Enemies||prior.Approximate!=result.Approximate))
         {
             if(counters.Count>=RebirthPoiClearanceLedger.MaximumRecords)counters.Clear();
             counters[identity.Key]=new Counter{Epoch=record.Epoch,Areas=remaining,Entities=result.Enemies,Approximate=result.Approximate};CounterRevision++;
         }
         RoomHistory history;
-        if(!roomHistory.TryGetValue(player.entityId,out history)||history.PoiKey!=identity.Key||history.Epoch!=record.Epoch)
+        if(!roomHistory.TryGetValue(player.entityId,out history)||history.PoiKey!=identity.Key||history.Epoch!=result.Epoch)
         {
             if(roomHistory.Count>512)roomHistory.Clear();
-            history=new RoomHistory{PoiKey=identity.Key,Epoch=record.Epoch};roomHistory[player.entityId]=history;
+            history=new RoomHistory{PoiKey=identity.Key,Epoch=result.Epoch};roomHistory[player.entityId]=history;
         }
         history.Maximum=Math.Max(history.Maximum,remaining);
         int max=history.Maximum;
+        // Presentation may be available before evidence. Never use it to
+        // override an existing reset/fault owner or mutate clearance state.
+        if(record!=null&&(record.ResetOnly||record.State==RebirthPoiClearanceState.ResetPending)||
+            RebirthPoiNativeEvidence.Instance.IsWithheld(identity))return result;
         foreach(var entity in actors)
-            if(entity.IsSleeper && entity.Buffs.GetCustomVar("$sleeperActivated")==1)ActivatePending(world,manifest,entity);
+            if(entity.IsSleeper && entity.Buffs.GetCustomVar("$sleeperActivated")==1)ActivatePending(world,prefab,entity);
         if(!Threshold(result.Tier,result.Rooms,result.Cleared))return result;
         var targets=new List<int>();
         // The projection supports the full 8192-actor observation bound, rather
@@ -170,14 +222,12 @@ internal static class RebirthPurgeScanner
         }
         result.Targets=targets.ToArray();return result;
     }
-    private static void ActivatePending(World world,RebirthPoiNativeManifest manifest,EntityAlive entity)
+    private static void ActivatePending(World world,PrefabInstance prefab,EntityAlive entity)
     {
-        var decorator=GameManager.Instance.GetDynamicPrefabDecorator();
-        var entityPoint=entity.GetBlockPosition();
-        var entityPoi=decorator?.GetPrefabFromWorldPosInside(entityPoint.x,entityPoint.z);
+        var entityPoi=RebirthPurgeScannerPoi.Resolve(world,entity.position);
         if(entityPoi==null)return;
         var closest=world.GetClosestPlayer(entity.position,120f,false);
-        if(!TargetInPoi(closest,entityPoi,manifest,decorator))
+        if(!TargetInPoi(world,closest,entityPoi,prefab))
         {
             // A nearer player outside the building must not prevent an eligible
             // player inside this POI from receiving the remaining sleeper.
@@ -190,16 +240,15 @@ internal static class RebirthPurgeScanner
                 if(!Eligible(candidate))continue;
                 float distance=(candidate.position-entity.position).sqrMagnitude;
                 if(distance>nearest)continue;
-                if(!TargetInPoi(candidate,entityPoi,manifest,decorator))continue;
+                if(!TargetInPoi(world,candidate,entityPoi,prefab))continue;
                 nearest=distance;closest=candidate;
             }
         }
         if(Eligible(closest))
         {
-            var point=closest.GetBlockPosition();
-            var nearestPoi=decorator?.GetPrefabFromWorldPosInside(point.x,point.z);
+            var nearestPoi=RebirthPurgeScannerPoi.Resolve(world,closest.position);
             if(nearestPoi!=null && nearestPoi.boundingBoxPosition.Equals(entityPoi.boundingBoxPosition) &&
-                entityPoi.boundingBoxPosition.Equals(manifest.Prefab.boundingBoxPosition))
+                entityPoi.boundingBoxPosition.Equals(prefab.boundingBoxPosition))
             {
                 entity.Buffs.SetCustomVar("$sleeperActivated",2,true);
                 entity.ConditionalTriggerSleeperWakeUp();entity.SetAttackTarget(closest,60000);
@@ -209,12 +258,11 @@ internal static class RebirthPurgeScanner
         // Keep the request pending when there is no eligible player in this POI.
         // A player may return or leave fly mode on the next scanner pulse.
     }
-    private static bool TargetInPoi(EntityPlayer player,PrefabInstance entityPoi,RebirthPoiNativeManifest manifest,DynamicPrefabDecorator decorator)
+    private static bool TargetInPoi(World world,EntityPlayer player,PrefabInstance entityPoi,PrefabInstance prefab)
     {
-        if(!Eligible(player)||entityPoi==null||decorator==null||
-            !entityPoi.boundingBoxPosition.Equals(manifest.Prefab.boundingBoxPosition))return false;
-        var point=player.GetBlockPosition();
-        var playerPoi=decorator.GetPrefabFromWorldPosInside(point.x,point.z);
+        if(!Eligible(player)||entityPoi==null||world==null||
+            !entityPoi.boundingBoxPosition.Equals(prefab.boundingBoxPosition))return false;
+        var playerPoi=RebirthPurgeScannerPoi.Resolve(world,player.position);
         return playerPoi!=null&&playerPoi.boundingBoxPosition.Equals(entityPoi.boundingBoxPosition);
     }
     private static bool QuestBoundsContain(EntityPlayer player,Vector3 point)
@@ -236,7 +284,7 @@ internal static class RebirthPurgeScanner
             world.GetPrimaryPlayer()?.entityId!=view.Player)return;
         if(!ReferenceEquals(owner,world)){Reset();owner=world;}
         if(view.World==Guid.Empty||view.Session==Guid.Empty||view.Sequence<1||
-            RebirthPoiMapSync.LocalWorld!=Guid.Empty&&(view.World!=RebirthPoiMapSync.LocalWorld||view.Session!=RebirthPoiMapSync.LocalSession))return;
+            RebirthPoiMapSync.TransportWorld!=Guid.Empty&&(view.World!=RebirthPoiMapSync.TransportWorld||view.Session!=RebirthPoiMapSync.TransportSession))return;
         if(current!=null&&current.World==view.World&&current.Session==view.Session&&view.Sequence<=current.Sequence)return;
         // Pin already replicated actors for this snapshot. A reused runtime ID
         // must not make an old projection follow a replacement entity.
@@ -250,14 +298,21 @@ internal static class RebirthPurgeScanner
     }
     private static bool IsCurrent(World world,EntityPlayerLocal player)
     {
-        if(current==null||!Eligible(player)||current.Player!=player.entityId||string.IsNullOrEmpty(current.Prefab)||
+        if(world==null||!ReferenceEquals(owner,world)||!ReferenceEquals(GameManager.Instance?.World,world)||
+            current==null||!Eligible(player)||current.Player!=player.entityId||string.IsNullOrEmpty(current.Prefab)||
             Time.realtimeSinceStartup-receivedAt>10)return false;
         RebirthPoiMapRecord record;
-        var map=RebirthPoiMapSync.LocalMap;
-        if(current.World!=RebirthPoiMapSync.LocalWorld||current.Session!=RebirthPoiMapSync.LocalSession||map==null||
-            !map.TryGetValue(current.PoiKey,out record)||record.Epoch!=current.Epoch||record.State!=RebirthPoiClearanceState.Discovered)return false;
-        var point=player.GetBlockPosition();
-        var prefab=GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabFromWorldPosInside(point.x,point.z);
+        var map=RebirthPoiMapSync.TransportMap;
+        // Receive already validates the native world object and nonempty
+        // scanner identity. Before the first map publication, its identity is
+        // unknown; do not make map transfer completion a scanner HUD gate.
+        if(RebirthPoiMapSync.TransportWorld!=Guid.Empty&&
+            (current.World!=RebirthPoiMapSync.TransportWorld||current.Session!=RebirthPoiMapSync.TransportSession))return false;
+        // A known successor epoch invalidates old projections; an absent map
+        // entry or an older epoch must not hide a newer scanner snapshot while
+        // the independently paged map projection catches up after a reset.
+        if(map!=null&&map.TryGetValue(current.PoiKey,out record)&&(record.Epoch>current.Epoch||record.Epoch==current.Epoch&&record.State!=RebirthPoiClearanceState.Discovered))return false;
+        var prefab=RebirthPurgeScannerPoi.Resolve(world,player.position);
         return prefab?.prefab!=null&&prefab.prefab.PrefabName==current.Prefab&&prefab.boundingBoxPosition.x==current.X&&
             prefab.boundingBoxPosition.y==current.Y&&prefab.boundingBoxPosition.z==current.Z;
     }
@@ -272,8 +327,11 @@ internal static class RebirthPurgeScanner
     }
     internal static string LifetimeText(EntityPlayerLocal player)
     {
-        if(current==null||player==null||current.Player!=player.entityId||current.World!=RebirthPoiMapSync.LocalWorld||
-            current.Session!=RebirthPoiMapSync.LocalSession||Time.realtimeSinceStartup-receivedAt>10||current.LifetimeKills<0)return "—";
+        var world=GameManager.Instance?.World;
+        if(world==null||!ReferenceEquals(owner,world)||current==null||player==null||current.Player!=player.entityId||
+            RebirthPoiMapSync.TransportWorld!=Guid.Empty&&
+            (current.World!=RebirthPoiMapSync.TransportWorld||current.Session!=RebirthPoiMapSync.TransportSession)||
+            Time.realtimeSinceStartup-receivedAt>10||current.LifetimeKills<0)return "—";
         return current.LifetimeKills.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
     private static void Render(World world)

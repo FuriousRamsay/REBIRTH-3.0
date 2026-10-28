@@ -120,7 +120,9 @@ public static class RebirthWeaponSustainedDpsService
     private static readonly Dictionary<string, float> MeasuredBaseReloadSeconds = new Dictionary<string, float>(StringComparer.Ordinal);
 
     private static readonly object Gate = new object();
-    private static readonly Dictionary<string, CacheEntry> Cache = new Dictionary<string, CacheEntry>(StringComparer.Ordinal);
+    // Keep the same cache identity without formatting strings on every UI/cache hit.
+    private static readonly Dictionary<(bool HasPlayer, int PlayerId, int Signature, bool LiveHeld), CacheEntry> Cache =
+        new Dictionary<(bool HasPlayer, int PlayerId, int Signature, bool LiveHeld), CacheEntry>();
     // Keep the last live-held profile briefly after a switch so delayed arrows/bullets use the
     // profile that was actually active when the weapon was fired rather than a newly previewed one.
     private static readonly Dictionary<string, CacheEntry> RecentHeld = new Dictionary<string, CacheEntry>(StringComparer.Ordinal);
@@ -547,7 +549,7 @@ public static class RebirthWeaponSustainedDpsService
         bool toolRanged = displayTools && !toolMelee && actions != null && actions.Length > 0 && actions[0] is ItemActionRanged;
         if (!supported && !toolMelee && !toolRanged) return false;
         int signature = BuildSignature(player, item, skillId, liveHeld);
-        string key = (player != null ? player.entityId.ToString(CultureInfo.InvariantCulture) : "none") + "|" + signature.ToString(CultureInfo.InvariantCulture) + "|" + (liveHeld ? "1" : "0");
+        var key = (HasPlayer: player != null, PlayerId: player != null ? player.entityId : 0, Signature: signature, LiveHeld: liveHeld);
         float now = Time.realtimeSinceStartup;
         float maxAge = Mathf.Max(0.10f, RebirthProgressionRuntimeConfig.WeaponDpsProfileRefreshSeconds);
         lock (Gate)

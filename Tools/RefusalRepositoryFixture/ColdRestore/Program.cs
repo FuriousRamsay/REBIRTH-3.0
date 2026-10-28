@@ -7,7 +7,7 @@ public static class RebirthGearPreparationOfferBinding{public static bool Matche
 public static class RebirthGearPreparationRecoveryBinding{public static bool TryRecoverOriginal(RebirthGearPreparationIntent i,RebirthGearTransferState t,RebirthGearInventorySnapshot s,Guid w,int owned,float r,out object v){v=null;return false;}}
 public class PlayerDataFile{public MemoryStream buffData;public RebirthGearInventoryPlan.Stack[] Bag,Belt;}
 public static class RebirthGearNativePlayerFile{public static PlayerDataFile File;public static Action ReadAction;public static bool TryRead(RebirthStablePlayerIdentity owner,out PlayerDataFile f){f=File;ReadAction?.Invoke();return f!=null;}}
-public static class RebirthPlayerDataInventory{public static object ReadSlots(PlayerDataFile f,bool bag)=>bag?f.Bag:f.Belt;}
+public static class RebirthGearPlayerDataInventory{public static object ReadSlots(PlayerDataFile f,bool bag)=>bag?f.Bag:f.Belt;}
 public static class EntityBuffs{public const int Version=2;}public class BuffValue{public void Read(PooledBinaryReader r,int version)=>throw new Exception("nonzero buffs not qualified");}
 public class PooledBinaryReader:BinaryReader{public PooledBinaryReader():base(new MemoryStream()){}public void SetBaseStream(Stream s){BaseStream.Position=0;data=new BinaryReader(s);}BinaryReader data;public override byte ReadByte()=>data.ReadByte();public override ushort ReadUInt16()=>data.ReadUInt16();public override string ReadString()=>data.ReadString();public override float ReadSingle()=>data.ReadSingle();}
 public static class MemoryPools{public static ReaderPool poolBinaryReader=new();}public class ReaderPool{public PooledBinaryReader AllocSync(bool b)=>new();}
@@ -27,3 +27,4 @@ Reset();switch(fault){case "action":Cold.Action=true;break;case "cursor":Cold.Cu
 Reset();RebirthGearNativePlayerFile.ReadAction=()=>{GameManager.Instance.World=new();};C(!RebirthGearOwnerReservation.TryRestoreOriginalBeforeProjection(p,peer),"cold world swap during read refuses");
 Reset();RebirthGearNativePlayerFile.ReadAction=()=>{SingletonMonoBehaviour<ConnectionManager>.Instance.connectionToServer=new[]{new Peer()};};C(!RebirthGearOwnerReservation.TryRestoreOriginalBeforeProjection(p,peer),"cold peer swap during read refuses");foreach(var phase in new[]{1f,2f}){Reset(phase);bool result=RebirthGearOwnerReservation.TryRestoreOriginalBeforeProjection(p,peer);Console.WriteLine("OBSERVATION cold phase "+phase+" restore="+result+" nooffer="+RebirthGearOwnerReservation.IsHeld(p));}
 }Console.WriteLine("COLD PASS "+n+" whole actual reservation/original witness/marker+receipt parsers; native file/UI/physical source synthetic");}}
+

@@ -11,6 +11,7 @@ static class SdFile{public static byte[] Image;public static Stream Open(string 
 // Compression adapter deliberately doubled; native Noemax codec covered separately.
 static class RebirthStationChunkInflate{public static int Calls;public static bool Refuse;public static bool TryDecode(byte[] b,int max,out byte[] d){Calls++;if(Refuse){d=null;return false;}d=new byte[b.Length-8];Buffer.BlockCopy(b,8,d,0,d.Length);return true;}}
 public class RebirthStationGridAdmission {
+ public bool IsMobile;
  public string JobId="job",CreationId="creation";
  public System.Xml.Linq.XElement Write(){return new System.Xml.Linq.XElement("admission",new System.Xml.Linq.XAttribute("x",16),new System.Xml.Linq.XAttribute("y",45),new System.Xml.Linq.XAttribute("z",32),new System.Xml.Linq.XAttribute("block","workbench"),new System.Xml.Linq.XAttribute("job",JobId),new System.Xml.Linq.XAttribute("creation",CreationId));}
 }
@@ -42,6 +43,10 @@ class Check{
  SdFile.Image=new byte[16384];SdFile.Image[0]=55;SdFile.Image[1]=114;SdFile.Image[2]=103;SdFile.Image[3]=1;int loc=4096+4*(1+2*32);SdFile.Image[loc]=3;SdFile.Image[loc+3]=1;SdFile.Image[12288]=10;Buffer.BlockCopy(payload,0,SdFile.Image,12304,10);
  var proof=new RebirthStationSnapshotEvidence.Publication(Path.GetFullPath("save/region/r.0.0.7rg"),RebirthStationPublicationRecord.Digest(payload),1,2,8,1,9,1,0,0,0,0);RebirthStationPublicationRecord r;
  A(RebirthStationPublicationRecord.TryCreate("save",a,1,proof,out r)&&r.Revalidate("save",a),"exact payload/span revalidation");
+ a.IsMobile=true;RebirthStationPublicationRecord mobile;
+ A(!RebirthStationPublicationRecord.TryCreate("save",a,1,proof,out mobile),"chunk proof cannot publish a mobile station");
+ A(!RebirthStationPublicationRecord.TryRead(r.Write(),a,out mobile)&&!r.Revalidate("save",a),"chunk receipt cannot recover a mobile station");
+ a.IsMobile=false;
  int calls=RebirthStationChunkInflate.Calls;SdFile.Image[12313]++;A(!r.Revalidate("save",a)&&RebirthStationChunkInflate.Calls==calls,"digest refuses before decompression");SdFile.Image[12313]--;
  RebirthStationChunkInflate.Refuse=true;A(!r.Revalidate("save",a),"decode refusal");RebirthStationChunkInflate.Refuse=false;
  var bad=r.Write();bad.SetAttributeValue("queueStart",10);RebirthStationPublicationRecord q;A(RebirthStationPublicationRecord.TryRead(bad,a,out q)&&!q.Revalidate("save",a),"decoded span out of bounds");

@@ -1,0 +1,168 @@
+{
+  "steps": [
+    {
+      "_note": "NOT_RUN. Root-owned local host acceptance. Already inside grounded uncleared remnant_church_01 after real movement, guard ON, daylight/non-bloodmoon; no fabricated manifest/clearance. Requires SUB5 observation61085FA6 or compatible additive successor. Snapshot/native/UI assertions verify current evidence only; no fixed enemy/cleared counts while guard fights. Native authored counts from installed3.4b6, recheck after prefab updates. See acceptance report for entry/threshold/exit/reload phases."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "value": true,
+            "op": "==",
+            "field": "observationOnly"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "releaseEnabled"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "purgeEnabled"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerPlayerGates.spawned"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerPlayerGates.alive"
+          },
+          {
+            "value": false,
+            "op": "==",
+            "field": "scannerPlayerGates.spectator"
+          },
+          {
+            "value": false,
+            "op": "==",
+            "field": "scannerPlayerGates.mounted"
+          },
+          {
+            "value": false,
+            "op": "==",
+            "field": "scannerPlayerGates.flying"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerPlayerGates.hudAllowed"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerNativePoi.eligibilityAvailable"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerNativePoi.authoredAllowed"
+          },
+          {
+            "value": "remnant_church_01",
+            "op": "==",
+            "field": "scannerNativePoi.prefab"
+          },
+          {
+            "value": 0,
+            "op": "==",
+            "field": "scannerNativePoi.tier"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerCurrent"
+          },
+          {
+            "value": "remnant_church_01",
+            "op": "==",
+            "field": "scanner.prefab"
+          },
+          {
+            "value": 12,
+            "op": "==",
+            "field": "scanner.rooms"
+          },
+          {
+            "op": "==",
+            "field": "scanner.rooms",
+            "expectedField": "scannerNativePoi.authoredRooms"
+          },
+          {
+            "value": 0,
+            "op": ">=",
+            "field": "scanner.cleared"
+          },
+          {
+            "op": "<=",
+            "field": "scanner.cleared",
+            "expectedField": "scanner.rooms"
+          },
+          {
+            "value": 0,
+            "op": ">=",
+            "field": "scanner.areasLeft"
+          },
+          {
+            "op": ">=",
+            "field": "scanner.enemies",
+            "expectedField": "scanner.areasLeft"
+          }
+        ]
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Areas Left:",
+        "window": "compass",
+        "id": "TotalVolumesLabel"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "TotalVolumesValue",
+        "window": "compass"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Estimated Entities:",
+        "window": "compass",
+        "id": "TotalEntitiesLabel"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "TotalEntitiesValue",
+        "window": "compass"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "compass"
+        }
+      }
+    },
+    {
+      "screenshot": "purge_acceptance_remnant_church_01"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Purge focused acceptance remnant_church_01"
+}

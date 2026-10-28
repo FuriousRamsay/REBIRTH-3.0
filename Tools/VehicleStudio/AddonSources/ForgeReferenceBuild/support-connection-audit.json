@@ -1,0 +1,13 @@
+{
+  "status": "CONNECTION_SPECIFICATION_ONLY",
+  "footParent": [
+    "lower_frame_bracket",
+    "ground"
+  ],
+  "bracketConnections": [
+    "lower_shaft",
+    "near_frame_foot_outline"
+  ],
+  "hiddenShape": "inferred, pending visual and 3D validation",
+  "blenderGenerationAllowed": false
+}

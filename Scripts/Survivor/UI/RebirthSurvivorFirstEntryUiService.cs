@@ -409,6 +409,11 @@ public static class RebirthSurvivorFirstEntryUiService
             stagedSelectionReady || stagedWaitingForOwnerReady || stagedRequestId != 0UL ||
             XUiC_RebirthSpawnSelectionSurvivorGate.IsGateVisible;
 
+        // Ordinary condition/progression projections do not complete creation again.
+        // Keep the full transition path whenever this service still owns pending UI.
+        if (!hadPendingCreationUi && snapshot.HasCharacter &&
+            snapshot.CreationState == RebirthSurvivorOwnerCreationState.Ready) return;
+
         bool locallyConfiguredForRebirth = RebirthSurvivorMode.ConfiguredMode == RebirthPlayerProgressionMode.Rebirth;
         bool required = locallyConfiguredForRebirth && snapshot.RebirthModeEnabled && !snapshot.HasCharacter &&
             (snapshot.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||

@@ -9,7 +9,7 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
 {
     private sealed class Cassette
     {
-        internal string Id, SlotId, Fingerprint;
+        internal string Id, SlotId, Fingerprint, Name;
         internal int Index, Count;
         internal bool Audio, Stored;
         internal ItemValue Value;
@@ -23,6 +23,11 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
         internal Cassette Item;
     }
     private readonly List<Cassette> library=new List<Cassette>(), carried=new List<Cassette>();
+    private readonly List<Cassette> catalogue=new List<Cassette>(), bagProjection=new List<Cassette>();
+    private bool projectionDirty=true;
+    private long textRevision=-1;
+    private object definitions;
+    private string culture;
     private readonly List<Action> unbind=new List<Action>();
     private readonly Cell[] libraryCells=new Cell[24], bagCells=new Cell[60];
     private XUiC_RebirthDiscordScrollbar libraryScroll,bagScroll;
@@ -51,7 +56,7 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
         bagScroll?.Configure(()=>Math.Max(3,(carried.Count+19)/20),()=>3,()=>bagRow,n=>{if(n!=bagRow){bagRow=n;DrawCells();}});
         searchInput=GetChildById("cassetteSearch") as XUiC_TextInput;
         Bind("musicTab",()=>SetTab(false));Bind("audioTab",()=>SetTab(true));
-        Bind("cassetteSort",()=>{sort=true;Refresh();});
+        Bind("cassetteSort",()=>{sort=true;projectionDirty=true;Refresh();});
         Bind("cassetteInsert",Transfer);Bind("cassetteRemove",Transfer);
         Bind("musicPlay",Play);Bind("musicPrevious",()=>RebirthLegacyMusicPlaybackService.StepLibrary(Player,-1));
         Bind("musicNext",()=>RebirthLegacyMusicPlaybackService.StepLibrary(Player,1));
@@ -69,7 +74,7 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
         playingIcon=GetChildById("playingPreview")?.ViewComponent as XUiV_Sprite;
         insert=GetChildById("cassetteInsert");remove=GetChildById("cassetteRemove");play=GetChildById("musicPlay");
     }
-    private void SetTab(bool audio){audioTab=audio;libraryRow=0;selected=null;Refresh();}
+    private void SetTab(bool audio){audioTab=audio;libraryRow=0;selected=null;projectionDirty=true;Refresh();}
     private void Bind(string id,Action action)
     {
         var control=GetChildById(id);if(control==null)return;
@@ -94,8 +99,8 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
     }
     private void Unbind(){foreach(var action in unbind)action();unbind.Clear();}
     public override void Cleanup(){Unbind();base.Cleanup();}
-    public override void OnOpen(){base.OnOpen();layoutBounds=new Vector2i(-1,-1);selected=drag=null;libraryRow=bagRow=0;generation=audioRevision=-1;RebirthMusicLibraryClient.Dispatch(Player,0);Refresh();}
-    public override void OnClose(){selected=drag=null;dragOwner=null;base.OnClose();}
+    public override void OnOpen(){base.OnOpen();layoutBounds=new Vector2i(-1,-1);selected=drag=null;libraryRow=bagRow=0;generation=audioRevision=-1;projectionDirty=true;catalogue.Clear();bagProjection.Clear();RebirthMusicLibraryClient.Dispatch(Player,0);Refresh();}
+    public override void OnClose(){selected=drag=null;dragOwner=null;catalogue.Clear();bagProjection.Clear();library.Clear();carried.Clear();projectionDirty=true;base.OnClose();}
     public override void Update(float dt)
     {
         base.Update(dt);if(!IsOpen)return;ApplyLayout();UpdateDragDisplay();
@@ -119,24 +124,63 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
         if(!player.world.IsRemote())RebirthAudiobookLibraryClient.RefreshLocal(player);
         if(!RebirthMusicLibraryClient.EnsureCurrent(player))return;
         if(generation!=RebirthMusicLibraryClient.Generation||audioRevision!=RebirthAudiobookLibraryClient.Revision)
-        {selected=drag=null;generation=RebirthMusicLibraryClient.Generation;audioRevision=RebirthAudiobookLibraryClient.Revision;}
-        string nextSearch=searchInput?.Text??string.Empty;if(search!=nextSearch){search=nextSearch;libraryRow=0;}
-        library.Clear();carried.Clear();
+        {projectionDirty=true;selected=drag=null;generation=RebirthMusicLibraryClient.Generation;audioRevision=RebirthAudiobookLibraryClient.Revision;}
+        string nextSearch=searchInput?.Text??string.Empty;if(search!=nextSearch){search=nextSearch;libraryRow=0;projectionDirty=true;}
+        long nextText=RebirthUiProjectionTextCache.Revision;
+        object nextDefinitions=RebirthSurvivorDefinitionRegistry.Bundle;
+        string nextCulture=System.Globalization.CultureInfo.CurrentCulture.Name;
+        bool changed=projectionDirty||nextText!=textRevision||!ReferenceEquals(definitions,nextDefinitions)||culture!=nextCulture;
+        // If projection refresh fails halfway through, retry rather than publishing a partial observation.
+        projectionDirty=true;
         var ids=audioTab?RebirthAudiobookLibraryClient.Items:RebirthMusicLibraryClient.Items;
-        for(int i=0;i<ids.Count;i++)library.Add(new Cassette{Id=ids[i],Index=i,Count=1,Stored=true,Audio=audioTab,SlotId=audioTab?RebirthAudiobookLibraryClient.SlotIds[i]:null});
-        if(search.Length>0)library.RemoveAll(c=>Name(c.Id).IndexOf(search,StringComparison.CurrentCultureIgnoreCase)<0);
+        for(int i=0;i<ids.Count;i++)
+        {
+            string slot=audioTab?RebirthAudiobookLibraryClient.SlotIds[i]:null,name=Name(ids[i]);
+            var old=i<catalogue.Count?catalogue[i]:null;
+            if(old!=null&&old.Id==ids[i]&&old.SlotId==slot&&old.Audio==audioTab&&old.Name==name)continue;
+            var item=new Cassette{Id=ids[i],Index=i,Count=1,Stored=true,Audio=audioTab,SlotId=slot,Name=name};
+            if(i<catalogue.Count)catalogue[i]=item;else catalogue.Add(item);
+            changed=true;
+        }
+        if(catalogue.Count>ids.Count){catalogue.RemoveRange(ids.Count,catalogue.Count-ids.Count);changed=true;}
+        // Native/external inventory mutations have no complete revision here. Keep exact
+        // custody fingerprints live, but reuse detached values and UI rows when unchanged.
+        int count=0;
         var bag=player.bag?.ItemGrid?.items;if(bag!=null)foreach(var item in bag)
         {
             if(item==null||item.IsEmpty()||item.itemValue?.ItemClass==null)continue;
             string id=item.itemValue.ItemClass.GetItemName();bool audio=RebirthProgressionRuntimeConfig.TryGetAudiobook(id,out _);
             if(!audio&&!RebirthMusicLibraryService.IsMusicCassette(id))continue;
-            carried.Add(new Cassette{Id=id,Audio=audio,Value=item.itemValue.Clone(),Count=item.count,Fingerprint=RebirthMusicLibraryService.Encode(item.itemValue)});
+            string fingerprint=RebirthMusicLibraryService.Encode(item.itemValue),name=Name(id);
+            var old=count<bagProjection.Count?bagProjection[count]:null;
+            if(old==null||old.Id!=id||old.Audio!=audio||old.Count!=item.count||old.Fingerprint!=fingerprint||old.Name!=name)
+            {
+                var row=new Cassette{Id=id,Audio=audio,Value=item.itemValue.Clone(),Count=item.count,Fingerprint=fingerprint,Name=name};
+                if(count<bagProjection.Count)bagProjection[count]=row;else bagProjection.Add(row);
+                changed=true;
+            }
+            count++;
         }
-        if(sort)carried.Sort((a,b)=>StringComparer.CurrentCultureIgnoreCase.Compare(Name(a.Id),Name(b.Id)));
-        bagRow=Math.Min(bagRow,Math.Max(0,(carried.Count+19)/20-3));
-        if(selected!=null&&!selected.Stored)selected=carried.Find(c=>c.Fingerprint==selected.Fingerprint);
-        Text(capacity,library.Count+" / "+(audioTab?RebirthAudiobookLibraryPersistence.Capacity:RebirthMusicLibraryService.Capacity));
-        Text(bagCount,carried.Count.ToString());DrawDetails();
+        if(bagProjection.Count>count){bagProjection.RemoveRange(count,bagProjection.Count-count);changed=true;}
+        if(changed)
+        {
+            library.Clear();library.AddRange(catalogue);
+            if(search.Length>0)library.RemoveAll(c=>c.Name.IndexOf(search,StringComparison.CurrentCultureIgnoreCase)<0);
+            carried.Clear();carried.AddRange(bagProjection);
+            if(sort)carried.Sort((a,b)=>StringComparer.CurrentCultureIgnoreCase.Compare(a.Name,b.Name));
+            bagRow=Math.Min(bagRow,Math.Max(0,(carried.Count+19)/20-3));
+            if(selected!=null)
+                selected=selected.Stored?catalogue.Find(c=>c.Index==selected.Index&&c.Id==selected.Id&&c.Audio==selected.Audio&&c.SlotId==selected.SlotId)
+                    :carried.Find(c=>c.Fingerprint==selected.Fingerprint);
+            Text(capacity,library.Count+" / "+(audioTab?RebirthAudiobookLibraryPersistence.Capacity:RebirthMusicLibraryService.Capacity));
+            Text(bagCount,carried.Count.ToString());DrawDetails();
+            textRevision=nextText;definitions=nextDefinitions;culture=nextCulture;
+        }
+        projectionDirty=false;
+        RefreshPlayback(player);
+    }
+    private void RefreshPlayback(EntityPlayerLocal player)
+    {
         string song=RebirthLegacyMusicPlaybackService.NowPlaying;
         string source="",cassette=RebirthLegacyMusicPlaybackService.CurrentCassetteId;float fraction=0,remaining=0;
         bool listening;
@@ -195,7 +239,7 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
         var item=selected;if(!Current(item))return;
         if(item.Audio)RebirthAudiobookLibraryClient.RequestTransfer(Player,!item.Stored,item.Index,item.Value);
         else RebirthMusicLibraryClient.Dispatch(Player,item.Stored?2:1,item.Index,item.Value);
-        selected=null;Refresh();
+        selected=null;projectionDirty=true;Refresh();
     }
     private void Play()
     {

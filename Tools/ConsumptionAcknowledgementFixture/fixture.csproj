@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><StartupObject>AckProgram</StartupObject><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../ConsumptionFixtureSupport/ConsumptionTraceDouble.cs" Link="ExplicitDiagnosticTraceDouble.cs"/>
+    <Compile Include="../ConsumptionRetryFixture/Program.cs" Link="ExplicitRetryDoubles.cs" />
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionPublicationRetry.cs" Link="ActualRetry.cs" />
+    <Compile Include="../../Scripts/Metabolism/Consumption/RebirthConsumptionOwnerPublication.cs" Link="ActualOwnerPublication.cs" />
+    <Compile Include="../../Scripts/Network/RebirthConsumptionAcknowledgementNetPackage.cs" Link="ActualAckPacket.cs" />
+    <Compile Include="../../Scripts/Survivor/Network/RebirthBackpackLibraryCreationWire.cs" Link="ActualCreationWire.cs" />
+    <Reference Include="Newtonsoft.Json"><HintPath>../../../../7DaysToDie_Data/Managed/Newtonsoft.Json.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

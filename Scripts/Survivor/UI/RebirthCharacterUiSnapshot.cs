@@ -400,6 +400,15 @@ public static class RebirthCharacterUiSnapshotBuilder
         }
     }
 
+    // Conditions need live buff timers and temperature, not a rebuild of traits, gear and vitals.
+    public static void RefreshConditions(RebirthCharacterUiSnapshot result, EntityPlayer player,
+        RebirthSurvivorOwnerStateSnapshot survivor, bool hasMetabolism, RebirthMetabolismSnapshot metabolism)
+    {
+        if (result == null || survivor == null || !survivor.RebirthModeEnabled || !survivor.HasCharacter) return;
+        result.MetabolismRevision = hasMetabolism ? metabolism.Revision : int.MinValue;
+        result.Conditions.Clear();
+        BuildConditions(result, player, survivor, hasMetabolism, metabolism);
+    }
     private static void BuildConditions(RebirthCharacterUiSnapshot result, EntityPlayer player, RebirthSurvivorOwnerStateSnapshot survivor,
         bool hasMetabolism, RebirthMetabolismSnapshot metabolism)
     {

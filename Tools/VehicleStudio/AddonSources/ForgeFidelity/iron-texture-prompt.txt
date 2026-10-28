@@ -1,0 +1,3 @@
+Built-in imagegen; material colour only, not model proof.
+
+Square seamless tileable physically based game material BASE COLOR ALBEDO only. Old hand-forged black iron with dark charcoal blued metal dominant, scattered small irregular orange-brown rust chips, thin rubbed grey edge-like scratches in many directions, tiny shallow pit marks and ash grime. Realistic surface detail, varied patch sizes, approximately 80 percent dark metal and 20 percent rust/worn patches. Flat diffuse evenly lit orthographic surface scan. No directional lighting, no shiny highlights, no cast shadows, no bolts, no objects, no panels or borders, no labels. Not a rendered object or concept art. Tileable across all edges. This material is for straps on a compact rough stone forge.

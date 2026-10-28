@@ -15,7 +15,7 @@ class EntityPlayer:EntityAlive {public bool IsSpectator;public bool IsAlive()=>!
 class Script {public bool Running;public bool IsRunning()=>Running;}
 class Handle {public bool IsCompleted=true;public Action onComplete;}
 class SleeperVolume {public PrefabInstance prefabInstance;public Vec BoxMin=new Vec(),BoxMax=new Vec(10,10,10);public short spawnCountMin=1,spawnCountMax=2;public int flags,numSpawned;public bool isSpawning,wasCleared;public Script minScript;public Dictionary<int,object> respawnMap=new Dictionary<int,object>();public HashSet<int> pendingSpawnMap=new HashSet<int>();public Queue<Handle> pendingSpawnOps=new Queue<Handle>();}
-class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPos(int x,int z)=>Prefab;}
+class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPosInside(int x,int z)=>Prefab;}
 class GameStateManager {public bool IsGameStarted()=>true;}
 class GameManager {public static GameManager Instance;public World World;public bool IsStartingGame;public GameStateManager gameStateManager=new GameStateManager();public bool IsEditMode()=>false;public Decorator Decorator=new Decorator();public Decorator GetDynamicPrefabDecorator()=>Decorator;}
 class ConnectionManager {public bool IsServer=true;}
@@ -25,6 +25,8 @@ class GameIO {public static string GetSaveGameDir()=>"unused";}
 class Log {public static void Warning(string s){} }
 
 internal class RebirthPurgeObjectiveFrame {internal const int MaximumEligible=200000;}
+// Option input double; native option serialization/UI are outside this fixture.
+class RebirthSandboxOptionManager { internal static readonly Options Current=new Options(); internal sealed class Options { internal int PurgeProgression=0;internal int PurgeCompletionPercentage=0; } }
 static class Program {
 static int checks;static void Check(bool ok,string label){if(!ok)throw new Exception(label);checks++;Console.WriteLine("PASS "+label);}static void Main(){
 string dir=Path.Combine(Path.GetTempPath(),"rebirth-purge-milestone-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);bool live=true,armed=false;string stage="afterCandidate";var binding=new RebirthPoiWorldBinding(new object(),Guid.NewGuid().ToString("N").ToUpperInvariant(),dir,()=>live);var store=new RebirthPurgeMilestoneStore(binding,s=>{if(armed&&s==stage)throw new IOException("fixture");});var forest=new RebirthPurgeMilestoneStore.Receipt("forest",75,4,3,1,1);var desert=new RebirthPurgeMilestoneStore.Receipt("desert",75,8,6,2,1);
@@ -46,10 +48,20 @@ Check(!RebirthPurgeDiscoveryPolicy.TryParse("<purge_discovery version='1'><miles
 Check(store.TryOpen(),"exact original history reopened before discovery");
 var discovery=new RebirthPurgeMilestoneStore.Receipt("forest",15,10,2,7,3,"discover_tier_0",0);
 Check(store.TryRecord(new[]{discovery})&&store.Published.Count==3&&store.PublishedAll.Count==4,"discovery coexists with old completion API");
-string discoveryFile=File.ReadAllText(path);Check(discoveryFile.Contains("version=\"2\"")&&discoveryFile.Contains("discover_tier_0"),"discovery upgrades saved schema explicitly");
+string discoveryFile=File.ReadAllText(path);Check(discoveryFile.Contains("version=\"4\"")&&discoveryFile.Contains("discover_tier_0"),"exact threshold schema is written explicitly");
 var discoveryView=store.PublishedAll;
 Check(store.TryRecord(new[]{new RebirthPurgeMilestoneStore.Receipt("forest",25,10,3,8,4,"discover_tier_0",5)})&&ReferenceEquals(discoveryView,store.PublishedAll)&&File.ReadAllText(path)==discoveryFile,"earned discovery tier and threshold survive retuning without rewrite");
 var discoveryCold=new RebirthPurgeMilestoneStore(binding);Check(discoveryCold.TryOpen()&&discoveryCold.Published.Count==3&&discoveryCold.PublishedAll.Values.Single(r=>r.Id=="discover_tier_0").Tier==0,"discovery context survives cold load beside v1 achievements");
+var oldXml=System.Xml.Linq.XElement.Parse(discoveryFile);oldXml.SetAttributeValue("version",2);foreach(var node in oldXml.Elements())foreach(var field in new[]{"numerator","mode","eligibleUnits","clearedUnits"})node.Attribute(field)?.Remove();File.WriteAllText(path,oldXml.ToString());
+var oldStore=new RebirthPurgeMilestoneStore(binding);Check(oldStore.TryOpen()&&oldStore.PublishedAll.Values.All(r=>r.Numerator==r.Percent*75),"v2 saved receipts retain their original integer thresholds");
+File.WriteAllText(path,discoveryFile);Check(store.TryOpen(),"restore current exact history after legacy reader case");
+var fractionalReceipt=new RebirthPurgeMilestoneStore.Receipt("forest",17,3000,501,9,5,"fractional_band",1,1250);
+Check(store.TryRecord(new[]{fractionalReceipt}),"fractional receipt admits16.7percent without requiring17percent");
+var exactCold=new RebirthPurgeMilestoneStore(binding);Check(exactCold.TryOpen()&&exactCold.PublishedAll.Values.Single(r=>r.Id=="fractional_band").Numerator==1250,"fractional receipt precision survives cold save loading");
+var weighted=new RebirthPurgeMilestoneStore.Receipt("weighted",75,5,2,10,5,mode:1,eligibleUnits:48,clearedUnits:36);
+Check(store.TryRecord(new[]{weighted}),"two tier5 clears meet75percent points despite only40percent POI count");
+var weightedCold=new RebirthPurgeMilestoneStore(binding);Check(weightedCold.TryOpen()&&weightedCold.Published["weighted"].Mode==1&&weightedCold.Published["weighted"].Eligible==5&&weightedCold.Published["weighted"].ClearedUnits==36,"weighted receipt cold loads preserving rawcounts and points");
+Check(weightedCold.TryRecord(new[]{new RebirthPurgeMilestoneStore.Receipt("weighted",75,5,4,11,5)})&&weightedCold.Published["weighted"].Mode==1,"switching back tocount does not rewrite earned weighted receipt");
 Console.WriteLine("RESULT "+checks+" PASS; production milestone/domain/binding/codecs and real temporary files; native world doubled; no reward delivery claim.");
 }finally{Directory.Delete(dir,true);}
 }}

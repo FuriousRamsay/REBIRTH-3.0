@@ -1,0 +1,12 @@
+{
+  "name": "Full map zoom progression and bounded debug teleport acceptance",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. User owns game testing. Open Map at original5120x1440 and current UI scale. Test wheel/Shift/gamepad in both directions at detail/intermediate/world-overview levels, including rapid reversal while easing. No automatic teleport or game-control step." },
+    { "screenshot": "map-input-zoom-progression" },
+    { "_note": "With native debug teleport permission, Ctrl-right-click an independently known valid world point at center/corners. Verify requested/landed coordinates and native player marker match the click and terrain. Repeat at negative coordinates, another UI scale and odd/extreme aspect. Waypoint placement must still follow native behavior." },
+    { "_note": "Click beyond playable world or native90m safety edge. Expect localized rejection and no move/respawn, rather than a silent boundary landing. The wider map can legitimately display outside-world fog. Do not bypass the native boundary, debug permission or spawn safety checks." },
+    { "screenshot": "map-input-valid-and-outside-world" },
+    { "expectNoErrors": true }
+  ]
+}

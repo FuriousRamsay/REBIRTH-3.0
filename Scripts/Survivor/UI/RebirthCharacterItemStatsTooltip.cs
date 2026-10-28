@@ -45,7 +45,7 @@ public static class RebirthCharacterItemStatsTooltip
         return cached.Surface;
     }
     private static readonly ConditionalWeakTable<XUiController,SurfaceFrame> SurfaceRoots=new ConditionalWeakTable<XUiController,SurfaceFrame>();
-    private static readonly string[] CardWindowIds = { "rebirthBackpackLibrary", "rebirthBackpackSellStash", "trader", "questTurnIn" };
+    private static readonly string[] CardWindowIds = { "rebirthBackpackLibrary", "rebirthBackpackSellStash", "trader", "questTurnIn", "rebirthCamperEnergyManagement", "rebirthCamperTurrets" };
     private static XUiController ResolveSurface(XUi ui)
     {
         ui = ui ?? Hovered?.xui;
@@ -66,7 +66,9 @@ public static class RebirthCharacterItemStatsTooltip
                     XUiController cardSurface=rootCache.Surface??(XUiController)root.GetChildByType<XUiC_RebirthBackpackLibrary>()
                         ?? (XUiController)root?.GetChildByType<XUiC_RebirthBackpackSellStash>()
                         ?? (XUiController)root?.GetChildByType<XUiC_RebirthTraderSurface>()
-                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthQuestTurnInSurface>();
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthQuestTurnInSurface>()
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthCamperEnergy>()
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthCamperTurrets>();
                     if(cardSurface!=null){rootCache.Surface=cardSurface;return cardSurface;}
                 }
         }
@@ -104,7 +106,20 @@ public static class RebirthCharacterItemStatsTooltip
         }
     }
     public static bool Open => ActiveSurface() != null;
-    public static ItemStack Stack(XUiController source) => source is XUiC_RebirthVehicleRestorationSlot vehiclePart ? vehiclePart.ItemStack
+    private sealed class HoverStack { internal Func<ItemStack> Read; }
+    private static readonly ConditionalWeakTable<XUiController,HoverStack> HoverStacks=new ConditionalWeakTable<XUiController,HoverStack>();
+    internal static void BindStackHover(XUiController source,Func<ItemStack> read)
+    {
+        if(source?.ViewComponent==null)return;
+        if(!HoverStacks.TryGetValue(source,out var binding))
+        {
+            binding=new HoverStack();HoverStacks.Add(source,binding);
+            source.OnHover+=(sender,over)=>Hover(sender,over);
+        }
+        binding.Read=read;source.ViewComponent.EventOnHover=true;
+    }
+    public static ItemStack Stack(XUiController source) => source!=null && HoverStacks.TryGetValue(source,out var binding) ? binding.Read?.Invoke()
+        : source is XUiC_RebirthVehicleRestorationSlot vehiclePart ? vehiclePart.ItemStack
         : source is XUiC_ItemStack slot ? slot.ItemStack
         : source is XUiC_EquipmentStack gear ? gear.ItemStack : source is XUiC_AssembleWindow assembly ? assembly.ItemStack : null;
     private static HashSet<int> ingredientTypes;
@@ -174,8 +189,9 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
                 p is XUiC_RebirthCreativeWorkspace || p is XUiC_RebirthPersonalCrafting || p is XUiC_RebirthStationWorkspace || p is XUiC_RebirthCookingStation ||
                 p is XUiC_RebirthSurvivorCharacter || p is XUiC_RebirthCookingWorkspace ||
                 p is XUiC_RebirthBackpackLibrary || p is XUiC_RebirthBackpackSellStash ||
-                p is XUiC_RebirthTraderSurface || p is XUiC_RebirthQuestTurnInSurface)
+                p is XUiC_RebirthTraderSurface || p is XUiC_RebirthQuestTurnInSurface || p is XUiC_RebirthCamperEnergy || p is XUiC_RebirthCamperTurrets)
             { surface = p; break; }
+        if (surface is XUiC_RebirthCamperTurrets turrets) turrets.BindItemTooltips();
         singleHeader = GetChildById("singlePopupHeader"); comparisonHeader = GetChildById("comparisonPopupHeader");
         background = View<XUiV_Texture>("statsPopupBg"); frame = GetChildById("statsPopupFrame")?.ViewComponent;
         divider = View<XUiV_Sprite>("statsPopupDivider"); singleIcon = GetChildById("singlePopupSlot")?.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
@@ -205,7 +221,12 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         pendingSource = null; pendingType = 0; lastFingerprint = int.MinValue; nextProjection = 0f;
     }
     public override void OnOpen() { base.OnOpen(); HideAndReset(); }
-    public override void OnClose() { HideAndReset(); base.OnClose(); }
+    public override void OnClose()
+    {
+        if(surface is XUiC_RebirthCamperTurrets && RebirthCharacterItemStatsTooltip.Hovered?.xui==xui)
+            RebirthCharacterItemStatsTooltip.Hover(RebirthCharacterItemStatsTooltip.Hovered,false);
+        HideAndReset();base.OnClose();
+    }
     private void SetPopupVisible(bool visible)
     {
         if (ViewComponent == null) return;

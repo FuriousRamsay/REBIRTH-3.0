@@ -41,6 +41,16 @@ namespace Rebirth.Vehicles.Camper
                     RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperBedPosePatch));
                     installed = 5;
                 }
+                if (installed < 6)
+                {
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperCompactBankOpenSound));
+                    installed = 6;
+                }
+                if (installed < 7)
+                {
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperStationOpenSoundPosition));
+                    installed = 7;
+                }
             }
         }
     }

@@ -1,0 +1,19 @@
+{
+  "status": "INDIVIDUAL_SHAPE_HYPOTHESES_NOT_FIDELITY_APPROVED",
+  "units": "Provisional normalized world units; not metres",
+  "method": "Preserve traced perimeter. Move broad face centres asymmetrically and vary bevel width and corner relief to remove identical concentric chamfers. Depths are inferred, not measured from the photograph. Each array follows contour vertex order.",
+  "profiles": {
+    "jamb_left_bottom": {"faceCenterPixel": [875, 689], "inset": [0.88,0.93,0.83,0.92,0.94,0.86,0.90,0.80], "relief": [0.030,0.037,0.032,0.020,0.018,0.028,0.042,0.038], "centerRelief": 0.044},
+    "jamb_left_middle": {"faceCenterPixel": [870, 579], "inset": [0.90,0.82,0.93,0.87,0.94,0.91,0.81,0.92], "relief": [0.031,0.043,0.040,0.026,0.017,0.022,0.038,0.042], "centerRelief": 0.047},
+    "jamb_left_upper": {"faceCenterPixel": [877, 469], "inset": [0.88,0.95,0.84,0.90,0.92,0.79,0.88,0.94,0.85], "relief": [0.022,0.036,0.043,0.039,0.021,0.012,0.020,0.036,0.033], "centerRelief": 0.046},
+    "arch_left_shoulder": {"faceCenterPixel": [923, 371], "inset": [0.90,0.83,0.95,0.89,0.94,0.80,0.90,0.85,0.94], "relief": [0.030,0.043,0.040,0.027,0.015,0.012,0.024,0.037,0.041], "centerRelief": 0.045},
+    "arch_crown_left": {"faceCenterPixel": [1007, 346], "inset": [0.91,0.84,0.93,0.89,0.80,0.95,0.85,0.93], "relief": [0.025,0.036,0.042,0.031,0.013,0.017,0.029,0.035], "centerRelief": 0.046},
+    "arch_crown_right": {"faceCenterPixel": [1103, 344], "inset": [0.94,0.87,0.92,0.80,0.94,0.89,0.82,0.91], "relief": [0.033,0.045,0.038,0.023,0.015,0.020,0.032,0.037], "centerRelief": 0.048},
+    "arch_right_shoulder": {"faceCenterPixel": [1184, 379], "inset": [0.84,0.93,0.88,0.94,0.81,0.92,0.88,0.95], "relief": [0.035,0.043,0.030,0.018,0.012,0.027,0.039,0.041], "centerRelief": 0.044},
+    "jamb_right_upper": {"faceCenterPixel": [1239, 463], "inset": [0.91,0.83,0.94,0.89,0.92,0.81,0.95,0.87], "relief": [0.039,0.042,0.028,0.017,0.024,0.037,0.043,0.032], "centerRelief": 0.045},
+    "jamb_right_lower": {"faceCenterPixel": [1258, 556], "inset": [0.83,0.92,0.88,0.94,0.85,0.93,0.90], "relief": [0.036,0.041,0.029,0.018,0.021,0.038,0.044], "centerRelief": 0.048},
+    "sill_left": {"faceCenterPixel": [976, 681], "inset": [0.93,0.84,0.95,0.89,0.82,0.93,0.87], "relief": [0.036,0.045,0.038,0.020,0.014,0.025,0.033], "centerRelief": 0.043},
+    "sill_center": {"faceCenterPixel": [1083, 672], "inset": [0.84,0.94,0.88,0.92,0.81,0.95,0.90], "relief": [0.034,0.044,0.039,0.025,0.015,0.020,0.031], "centerRelief": 0.045},
+    "sill_right": {"faceCenterPixel": [1192, 652], "inset": [0.92,0.83,0.94,0.88,0.95,0.82,0.91], "relief": [0.040,0.045,0.034,0.018,0.015,0.029,0.039], "centerRelief": 0.046}
+  }
+}

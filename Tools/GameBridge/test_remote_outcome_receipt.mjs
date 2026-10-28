@@ -12,15 +12,18 @@ const start=source.indexOf('internal sealed class RemoteResourceTransactionOutco
 const end=source.indexOf('[HarmonyPatch(typeof(GameManager)',start);
 if(start<0||end<=start)throw new Error('Production method not found');
 const fixture=await readFile(join(here,'test_remote_outcome_receipt_fixture.cs'),'utf8');
+const store=(await readFile(join(root,'Scripts/Crafting/RemoteCrafting/RemoteResourceLegacyOutcomeStore.cs'),'utf8')).replace(/^using .*;\r?\n/gm,'');
 const temp=await mkdtemp(join(tmpdir(),'rebirth-owner-test-'));
 try {
  const cs=join(temp,'check.cs'), exe=join(temp,'check.exe');
- await writeFile(cs,fixture.replace('// PRODUCTION_METHOD',source.slice(start,end)));
+ await writeFile(cs,fixture.replace('// PRODUCTION_METHOD',source.slice(start,end)).replace('// PRODUCTION_STORE',store));
  await run('C:/Program Files/dotnet/dotnet.exe',[
  'C:/Program Files/dotnet/sdk/9.0.301/Roslyn/bincore/csc.dll','/nologo','/target:exe','/out:'+exe,
  '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/mscorlib.dll',
  '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.dll',
- '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Core.dll',cs],{windowsHide:true,timeout:10000});
+ '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Core.dll',
+ '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Xml.dll',
+ '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Xml.Linq.dll',cs],{windowsHide:true,timeout:10000});
  const result=await run(exe,[],{windowsHide:true,timeout:10000});
  console.log(result.stdout.trim());
 } finally {

@@ -1,0 +1,7 @@
+{
+  "status": "OVERLAY_CREATED_NOT_VISUALLY_VALIDATED",
+  "artifact": "trace-review.html",
+  "limitation": "Browser tool refused file protocol. No alternate browser or server workaround attempted.",
+  "blenderAllowed": false,
+  "next": "Continue reference measurements; visual overlay validation remains outstanding"
+}

@@ -1,7 +1,12 @@
 using System;using System.IO;
 class Log{internal static void Warning(string value){}}
 class RebirthPurgeObjectiveFrame{internal const int MaximumEligible=200000;}
+// Isolated option input only; production option serialization/UI are not covered here.
+class RebirthSandboxOptionManager{internal static readonly Options Current=new Options();internal sealed class Options{internal int PurgeCompletionPercentage,PurgeProgression;}}
 class Program{static int checks;static void Check(bool ok,string label){if(!ok)throw new Exception(label);checks++;Console.WriteLine("PASS "+label);}static void Main(){
+foreach(int percent in new[]{10,15,75,90}){RebirthSandboxOptionManager.Current.PurgeCompletionPercentage=percent;Check(RebirthPurgeObjectivePolicy.TargetPercentage==percent,"valid option overrides authored target "+percent);}
+foreach(int percent in new[]{0,5,11,95,100}){RebirthSandboxOptionManager.Current.PurgeCompletionPercentage=percent;Check(RebirthPurgeObjectivePolicy.TargetPercentage==75,"default or invalid option uses authored target "+percent);}
+RebirthSandboxOptionManager.Current.PurgeCompletionPercentage=0;
 foreach(int percent in new[]{1,10,75,99,100}){int value;Check(RebirthPurgeObjectivePolicy.TryParse("<purge_objectives version=\"1\" target_percent=\""+percent+"\" />",out value)&&value==percent,"valid target "+percent);}
 foreach(string text in new[]{"<purge_objectives version=\"1\" target_percent=\"0\" />","<purge_objectives version=\"1\" target_percent=\"101\" />","<purge_objectives version=\"2\" target_percent=\"75\" />","<purge_objectives version=\"1\" target_percent=\"75\" extra=\"yes\" />","<purge_objectives version=\"1\" target_percent=\"75\"><unknown/></purge_objectives>","<purge_objectives xmlns=\"unknown\" version=\"1\" target_percent=\"75\" />","<!DOCTYPE purge_objectives [<!ENTITY a '75'>]><purge_objectives version=\"1\" target_percent=\"&a;\" />","<purge_objectives version=\"1\" target_percent=\"-1\" />","<purge_objectives version=\"1\" target_percent=\"7.5\" />",new string('x',4097)}){int value;Check(!RebirthPurgeObjectivePolicy.TryParse(text,out value)&&value==75,"invalid or unsafe config withheld with stable default "+checks);}
 Check(RebirthPurgeObjectivePolicy.Required(0,75)==0,"absent biome has zero required clears");Check(RebirthPurgeObjectivePolicy.Required(1,75)==1&&RebirthPurgeObjectivePolicy.Required(3,75)==3&&RebirthPurgeObjectivePolicy.Required(4,75)==3,"small denominators round upward");Check(RebirthPurgeObjectivePolicy.Required(200000,100)==200000,"maximum denominator does not overflow");

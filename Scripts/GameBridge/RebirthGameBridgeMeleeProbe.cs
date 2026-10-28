@@ -21,7 +21,9 @@ public static class RebirthGameBridgeMeleeProbe
     {
         if (installed) return;
         installed = true;
-        RebirthSkillEvalDiagnostics.On = true;
+        // Global progression logs are opt-in; ordinary bridge/profiler sessions stay quiet.
+        if (System.Environment.GetEnvironmentVariable("REBIRTH_SKILL_EVAL_DIAGNOSTICS") == "1")
+            RebirthSkillEvalDiagnostics.On = true;
         var m = AccessTools.Method(typeof(ItemActionDynamicMelee), "Raycast");
         if (m != null) harmony.Patch(m, postfix: new HarmonyMethod(typeof(RebirthGameBridgeMeleeProbe), nameof(RaycastPostfix)));
         var f = AccessTools.Method(typeof(ProjectileMoveScript), "Fire");
@@ -36,11 +38,13 @@ public static class RebirthGameBridgeMeleeProbe
     public static int HarvestCalls;
     private static void HitTargetProbe(ItemActionData _actionData, WorldRayHitInfo hitInfo, bool _isGrazingHit)
     {
+        if (!RebirthSkillEvalDiagnostics.On) return;
         try { Log.Out("[REBIRTH SkillEval] hitTarget tag=" + (hitInfo != null ? hitInfo.tag : "null") + " grazing=" + _isGrazingHit + " action=" + (_actionData != null && _actionData.invData != null ? _actionData.invData.item.GetItemName() : "?")); } catch { }
     }
     private static void HarvestProbePrefix(ItemActionData _actionData)
     {
         HarvestCalls++;
+        if (!RebirthSkillEvalDiagnostics.On) return;
         try { var ad = _actionData != null ? _actionData.attackDetails : null; Log.Out("[REBIRTH SkillEval] game HarvestOnAttack #" + HarvestCalls + " block=" + (ad != null && ad.bBlockHit && ad.blockBeingDamaged.Block != null ? ad.blockBeingDamaged.Block.GetBlockName() : "(entity/none)") + " dmg=" + (ad != null ? ad.damageGiven : -1f) + " max=" + (ad != null ? ad.damageMax : -1f)); } catch { }
     }
 

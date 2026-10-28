@@ -96,7 +96,10 @@ internal static class RebirthPurgePoiHistory
             foreach(string file in new[]{path,path+".tmp"})if(File.Exists(file)&&(File.GetAttributes(file)&FileAttributes.ReparsePoint)!=0)throw new IOException("POI history file is a link.");
             Directory.CreateDirectory(binding.Directory);var root=new XElement("poi_history",new XAttribute("version",1),new XAttribute("world",binding.NativeWorldId));
             foreach(var pair in entries)root.Add(new XElement("poi",new XAttribute("key",pair.Key),new XAttribute("epoch",pair.Value.Epoch),new XAttribute("discoverer",pair.Value.Discoverer),new XAttribute("contributors",pair.Value.Contributors),new XAttribute("discovered",pair.Value.DiscoveredAt),new XAttribute("purged",pair.Value.PurgedAt)));
-            new XDocument(root).Save(path+".tmp");if(!binding.IsCurrent)return;
+            new XDocument(root).Save(path+".tmp");
+            // Never replace a readable history with bytes our own loader refuses.
+            if(new FileInfo(path+".tmp").Length>32*1024*1024)throw new IOException("POI history exceeds display budget.");
+            if(!binding.IsCurrent)return;
             if(File.Exists(path))File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);
             dirty=false;
         }

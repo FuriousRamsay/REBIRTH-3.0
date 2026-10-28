@@ -1,0 +1,17 @@
+{
+  "status": "RETRACED_FROM_ORIGINAL_REQUIRES_OVERLAY_REVIEW",
+  "reference": "Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+  "imageSize": [1448,1086],
+  "measurementUncertaintyPixels": 8,
+  "reason": "Original manual trace was left-shifted and undersized. Its silhouette residuals cannot justify changing the model. Ceramic and iron supports must be measured separately.",
+  "supersedesForCrucibleOnly": "left-reference-records.json:crucible_body",
+  "ceramicOuterSilhouette": [[438,658],[447,639],[480,622],[524,615],[572,617],[623,630],[662,650],[674,676],[661,709],[646,726],[638,868],[622,900],[583,919],[530,922],[485,906],[459,879],[447,743],[443,712]],
+  "openingInnerContour": [[468,660],[484,641],[523,631],[567,632],[610,642],[640,658],[642,675],[622,690],[584,698],[537,697],[495,685],[472,674]],
+  "rimCenter": [556,665],
+  "ceramicBaseCenter": [548,897],
+  "ceramicOnly": true,
+  "excludedGeometry": ["right vertical iron bracket and its domed bolts", "left iron retainer", "lower iron hoop", "side axle between bracket and furnace"],
+  "interpretation": "Thick rounded lip projects beyond a narrower cylindrical lower body. Silhouette includes broad natural irregularity, not angular sawtooth chips. Right retainer extends beyond and below ceramic vessel.",
+  "invalidates": ["crucible-silhouette-audit.json as a fidelity judgment", "crucible-profile-audit.json proposed dimensions pending retrace validation"],
+  "blenderAllowed": false
+}

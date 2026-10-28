@@ -9,6 +9,7 @@ using UnityEngine;
 internal static class RebirthPoiMapPresentation
 {
     private static readonly Dictionary<string, NavObject> owned = new Dictionary<string, NavObject>(StringComparer.Ordinal);
+    private static readonly Dictionary<NavObject,HashSet<string>> iconOwners=new Dictionary<NavObject,HashSet<string>>();
     private static Dictionary<long, List<RebirthPoiMapRecord>> cells = new Dictionary<long, List<RebirthPoiMapRecord>>();
     private static Dictionary<long, List<RebirthPoiMapRecord>> building;
     private static IEnumerator<RebirthPoiMapRecord> scan;
@@ -16,12 +17,22 @@ internal static class RebirthPoiMapPresentation
     private static double next;
     // Owner-requested tier filters hide native map icons without erasing discovery.
     private static readonly bool[] dimmed = new bool[7];
+    // Native per-marker compass toggles survive ordinary viewport eviction.
+    // A temporary legend filter must not turn its forced-hidden state into that preference.
+    private static readonly Dictionary<string,bool> compassHidden = new Dictionary<string,bool>(StringComparer.Ordinal);
+    private static readonly HashSet<string> compassFiltered = new HashSet<string>(StringComparer.Ordinal);
+    // Native registration can share one icon across POI keys. This snapshot is
+    // active-ownership only and is removed before native unregister/pool reuse.
+    private static readonly Dictionary<NavObject,bool> compassBeforeFilter = new Dictionary<NavObject,bool>();
     internal static bool Dimmed(int filter)=>filter>=0&&filter<dimmed.Length&&dimmed[filter];
     internal static bool Owns(NavObject icon) => icon != null && owned.Values.Contains(icon);
     internal static RebirthPoiMapRecord Record(NavObject icon)
     {
         if(icon==null)return null;
-        foreach(var pair in owned)if(ReferenceEquals(pair.Value,icon)){RebirthPoiMapRecord record;return RebirthPoiMapSync.LocalMap!=null&&RebirthPoiMapSync.LocalMap.TryGetValue(pair.Key,out record)?record:null;}
+        HashSet<string> owners;if(!iconOwners.TryGetValue(icon,out owners))return null;
+        var current=RebirthPoiMapSync.LocalMap;if(current==null)return null;
+        foreach(var key in owners)if(!compassFiltered.Contains(key))
+        {RebirthPoiMapRecord record;if(current.TryGetValue(key,out record)&&record.State!=RebirthPoiClearanceState.ResetPending)return record;}
         return null;
     }
     internal static void Toggle(int filter)
@@ -30,17 +41,66 @@ internal static class RebirthPoiMapPresentation
     private static long Cell(int x, int z) => ((long)x << 32) | (uint)z;
     internal static void Reset()
     {
-        if (NavObjectManager.HasInstance) foreach (var icon in owned.Values.Distinct()) NavObjectManager.Instance.UnRegisterNavObject(icon);
-        owned.Clear(); scan?.Dispose(); scan = null; cells.Clear(); building = null; original = null; indexed = null; next = 0;
+        if (NavObjectManager.HasInstance) foreach (var icon in owned.Values.Distinct()) { compassBeforeFilter.Remove(icon); NavObjectManager.Instance.UnRegisterNavObject(icon); }
+        owned.Clear(); iconOwners.Clear(); compassHidden.Clear(); compassFiltered.Clear(); compassBeforeFilter.Clear(); scan?.Dispose(); scan = null; cells.Clear(); building = null; original = null; indexed = null; next = 0;
+    }
+    private static void AddOwner(string key,NavObject icon)
+    {
+        owned.Add(key,icon);
+        HashSet<string> owners;
+        if(!iconOwners.TryGetValue(icon,out owners))
+        {owners=new HashSet<string>(StringComparer.Ordinal);iconOwners.Add(icon,owners);}
+        owners.Add(key);
     }
     private static void Release(string key, NavObjectManager manager)
     {
         NavObject icon;
         if (!owned.TryGetValue(key, out icon)) return;
+        bool hidden;compassHidden[key]=compassBeforeFilter.TryGetValue(icon,out hidden)?hidden:icon.hiddenOnCompass;
+        compassFiltered.Remove(key);
         owned.Remove(key);
+        var owners=iconOwners[icon];owners.Remove(key);
         // Native registration deduplicates identical class/position. Two distinct
         // POIs may own the same native icon; retain it until its final owner leaves.
-        if (!owned.Values.Any(other => ReferenceEquals(other, icon))) manager.UnRegisterNavObject(icon);
+        if (owners.Count==0)
+        { iconOwners.Remove(icon); compassBeforeFilter.Remove(icon); manager.UnRegisterNavObject(icon); }
+        else RefreshFilter(icon);
+    }
+    private static void ApplyFilter(string key,NavObject icon,bool filtered)
+    {
+        bool hidden;
+        compassHidden[key]=compassBeforeFilter.TryGetValue(icon,out hidden)?hidden:icon.hiddenOnCompass;
+        if(filtered)compassFiltered.Add(key);else compassFiltered.Remove(key);
+        RefreshFilter(icon);
+    }
+    private static void RefreshFilter(NavObject icon)
+    {
+        // Native icons can be shared by distinct POIs. Hide only when every
+        // owner is filtered, independent of enumeration order. The popup must
+        // likewise resolve to an owner that is still visible.
+        bool filtered=iconOwners[icon].All(key=>compassFiltered.Contains(key));
+        icon.hiddenOnMap=filtered;
+        bool hidden;
+        if(filtered)
+        {
+            if(!compassBeforeFilter.ContainsKey(icon))compassBeforeFilter.Add(icon,icon.hiddenOnCompass);
+            icon.hiddenOnCompass=true;
+        }
+        else if(compassBeforeFilter.TryGetValue(icon,out hidden))
+        {icon.hiddenOnCompass=hidden;compassBeforeFilter.Remove(icon);}
+    }
+    private static void ViewportBounds(XUiC_MapArea area,out double left,out double right,out double bottom,out double top)
+    {
+        // Exact native worldPosToScreenPos uses 2.1190476/zoom even when the
+        // REBIRTH map canvas is wider than the original 712x712 view.
+        var view=area.mapView?.ViewComponent;
+        double width=view==null?712:Math.Max(1,view.Size.x),height=view==null?712:Math.Max(1,view.Size.y);
+        double unit=Math.Max(.01,area.zoomScale)/2.1190476;
+        double cx=area.mapMiddlePosPixel.x,cz=area.mapMiddlePosPixel.y;
+        left=cx-area.cTexMiddle.x*unit-32;
+        right=cx+(width-area.cTexMiddle.x)*unit+32;
+        bottom=cz+(area.cTexMiddle.y-height)*unit-32;
+        top=cz+area.cTexMiddle.y*unit+32;
     }
     internal static void Pulse()
     {
@@ -72,10 +132,9 @@ internal static class RebirthPoiMapPresentation
         if (Time.realtimeSinceStartup < next) return; next = Time.realtimeSinceStartup + .25;
         var manager = NavObjectManager.Instance;
         var wanted = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal);
-        double radius = Math.Max(.7, area.zoomScale) * 168 + 32;
-        double cx = area.mapMiddlePosPixel.x, cz = area.mapMiddlePosPixel.y;
-        int xmin = (int)Math.Floor((cx - radius) / CellSize), xmax = (int)Math.Floor((cx + radius) / CellSize);
-        int zmin = (int)Math.Floor((cz - radius) / CellSize), zmax = (int)Math.Floor((cz + radius) / CellSize);
+        double left,right,bottom,top;ViewportBounds(area,out left,out right,out bottom,out top);
+        int xmin = (int)Math.Floor(left / CellSize), xmax = (int)Math.Floor(right / CellSize);
+        int zmin = (int)Math.Floor(bottom / CellSize), zmax = (int)Math.Floor(top / CellSize);
         bool purge = RebirthSandboxOptionManager.Current.IsPurge;
         for (int x = xmin; x <= xmax; x++) for (int z = zmin; z <= zmax; z++)
         {
@@ -85,7 +144,7 @@ internal static class RebirthPoiMapPresentation
                 RebirthPoiMapRecord record; var current = RebirthPoiMapSync.LocalMap;
                 if (current == null || !current.TryGetValue(candidate.Identity.Key, out record)) continue;
                 var id = record.Identity; double px = id.X + id.SizeX * .5, pz = id.Z + id.SizeZ * .5;
-                if (Math.Abs(px - cx) > radius || Math.Abs(pz - cz) > radius || record.State == RebirthPoiClearanceState.ResetPending
+                if (px < left || px > right || pz < bottom || pz > top || record.State == RebirthPoiClearanceState.ResetPending
                     || !purge && record.State != RebirthPoiClearanceState.Cleared) continue;
                 wanted[id.Key] = record;
             }
@@ -102,26 +161,27 @@ internal static class RebirthPoiMapPresentation
             var id = record.Identity;
             if (icon == null)
             {
-                icon = manager.RegisterNavObject(type, new Vector3(id.X + id.SizeX * .5f, id.Y, id.Z + id.SizeZ * .5f), hiddenOnCompass: true);
+                bool hidden;compassHidden.TryGetValue(pair.Key,out hidden);
+                icon = manager.RegisterNavObject(type, new Vector3(id.X + id.SizeX * .5f, id.Y, id.Z + id.SizeZ * .5f), hiddenOnCompass: hidden);
                 if(icon==null)continue;
-                owned.Add(pair.Key, icon);
+                AddOwner(pair.Key,icon);
             }
-            // Refresh existing icons too: the census can finish after discovery.
-            // Only these six tier sprites are supplied by the original atlas.
+            bool filtered=purge && (record.State==RebirthPoiClearanceState.Cleared?Dimmed(0):record.Tier>=0&&Dimmed(Math.Min(5,record.Tier)+1));
+            ApplyFilter(pair.Key,icon,filtered);
+        }
+        // Resolve artwork and name after all owners' filter states are known,
+        // using the same visible owner as the hover card.
+        foreach(var icon in iconOwners.Keys)
+        {
+            var record=Record(icon);if(record==null)continue;
             icon.OverrideSpriteName = record.State == RebirthPoiClearanceState.Cleared
                 ? "ui_game_symbol_purged"
                 : record.Tier >= 0 ? "ui_game_symbol_Skull" + Math.Min(5, record.Tier)
                 : "ui_game_symbol_twitch_boss_overhead";
-            bool filtered=purge && (record.State==RebirthPoiClearanceState.Cleared?Dimmed(0):record.Tier>=0&&Dimmed(Math.Min(5,record.Tier)+1));
-            icon.hiddenOnMap=filtered;
-            icon.hiddenOnCompass=filtered;
-            string label = Localization.Get(id.Prefab);
+            string label=Localization.Get(record.Identity.Prefab);
             if(!string.Equals(icon.name,label,StringComparison.Ordinal))
-            {
-                icon.name=label;
-                icon.localizedName=null;
-            }
-            icon.usingLocalizationId = false;
+            {icon.name=label;icon.localizedName=null;}
+            icon.usingLocalizationId=false;
         }
     }
 
@@ -164,6 +224,15 @@ internal static class RebirthPoiMapHoverHook
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_MapArea,Hover> hovered = new System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_MapArea,Hover>();
     private static void Postfix(XUiC_MapArea __instance)
     {
+        if(__instance is XUiC_RebirthMapArea full && full.SuppressMapHover)
+        {
+            // Native selection is also gated, but Harmony postfixes still run
+            // when a prefix skips it. Hide an already visible card as well.
+            __instance.GetChildByType<XUiC_RebirthPurgePoiPopup>()?.Show(null);
+            full.ClearMapHover();
+            hovered.GetValue(__instance, _ => new Hover()).Text=null;
+            return;
+        }
         var icon = __instance.closestMouseOverNavObject;
         var previous=hovered.GetValue(__instance, _ => new Hover());
         var popup=__instance.GetChildByType<XUiC_RebirthPurgePoiPopup>();
@@ -188,4 +257,5 @@ internal static class RebirthPoiMapRenderHook
 {
     private static void Postfix(XUiC_MapArea __instance) { RebirthPoiMapPresentation.Render(__instance); }
 }
+
 

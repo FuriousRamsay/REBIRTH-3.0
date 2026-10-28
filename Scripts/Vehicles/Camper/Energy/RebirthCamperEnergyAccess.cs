@@ -12,7 +12,7 @@ internal static class RebirthCamperEnergyAccess
     private sealed class ClientSession
     {internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayerLocal Player;internal Func<bool> Current;internal Action Release;internal XUiC_RebirthCamperEnergy View;internal bool? BoundsDesired;internal string Status;}
     private sealed class ServerSession
-    {internal Func<bool> PhysicalCurrent;internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;internal string Creation;internal RebirthStablePlayerIdentity Owner;internal Waiting Wait;internal string Status;internal bool BoundsShown;}
+    {internal Func<bool> PhysicalCurrent;internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;internal string Creation;internal RebirthStablePlayerIdentity Owner;internal Waiting Wait;internal string Status;internal bool BoundsShown;internal float NextRecoveryCheck;}
     private sealed class Waiting
     {internal RebirthCamperEnergyCommand Command;internal Guid Source;internal int Slot,BagSlot;internal bool On;internal long Revision;internal byte[] Hash;internal float Deadline;}
     private static ClientSession client;
@@ -77,19 +77,54 @@ internal static class RebirthCamperEnergyAccess
     }
     private static void Refresh(ClientSession session,string status=null)
     {
-        if(session.Current())session.View.Present(RebirthCamperEnergyRuntime.Observe(session.Vehicle),
-            RebirthCamperEnergyDeviceAdapter.ObservePoi(session.Vehicle),Busy(session.Vehicle),status??session.Status,
-            CanShowBounds(session.Vehicle,session.Player),RebirthCamperEnergyBoundsDisplay.IsShown(session.Vehicle,session.Player),RebirthCamperEnergyCapacity.ForActor(session.Player));
+        bool measure=RebirthGameBridgeFrames.IsRecording;
+        long started=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+        double runtimeMs=-1,poiMs=-1,statusMs=-1,presentMs=-1;
+        try
+        {
+            if(session.Current())
+            {
+                var snapshot=RebirthCamperEnergyRuntime.Observe(session.Vehicle);
+                long afterRuntime=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+                var poi=RebirthCamperEnergyDeviceAdapter.ObservePoi(session.Vehicle);
+                long afterPoi=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+                bool busy=Busy(session.Vehicle);
+                bool bounds=CanShowBounds(session.Vehicle,session.Player);
+                bool shown=RebirthCamperEnergyBoundsDisplay.IsShown(session.Vehicle,session.Player);
+                int capacity=RebirthCamperEnergyCapacity.ForActor(session.Player);
+                long afterStatus=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
+                session.View.Present(snapshot,poi,busy,status??session.Status,bounds,shown,capacity);
+                if(measure)
+                {
+                    long end=System.Diagnostics.Stopwatch.GetTimestamp();
+                    double ms=1000.0/System.Diagnostics.Stopwatch.Frequency;
+                    runtimeMs=(afterRuntime-started)*ms;poiMs=(afterPoi-afterRuntime)*ms;
+                    statusMs=(afterStatus-afterPoi)*ms;presentMs=(end-afterStatus)*ms;
+                    if((end-started)*ms>=12)
+                        Log.Out("[REBIRTH EnergyPerf] refresh frame="+UnityEngine.Time.frameCount+
+                            " totalMs="+((end-started)*ms).ToString("F2")+
+                            " runtimeMs="+((afterRuntime-started)*ms).ToString("F2")+
+                            " poiMs="+((afterPoi-afterRuntime)*ms).ToString("F2")+
+                            " statusMs="+((afterStatus-afterPoi)*ms).ToString("F2")+
+                            " presentMs="+((end-afterStatus)*ms).ToString("F2"));
+                }
+            }
+        }
+        finally
+        {
+            if(measure)RebirthGameBridgeFrames.RecordEnergyRefresh((System.Diagnostics.Stopwatch.GetTimestamp()-started)*1000.0/System.Diagnostics.Stopwatch.Frequency,runtimeMs,poiMs,statusMs,presentMs);
+        }
     }
     private static bool CanShowBounds(EntityVehicle vehicle,EntityPlayer player)
     {
         if(!ThreadManager.IsMainThread()||vehicle?.world==null||player==null||player.IsDead()||!ReferenceEquals(vehicle.world,player.world)||
             !ReferenceEquals(GameManager.Instance?.World,vehicle.world)||!ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle)||
-            !ReferenceEquals(vehicle.world.GetEntity(player.entityId),player)||RebirthCamperEnergyRuntime.Observe(vehicle)?.Mode!=RebirthCamperEnergyMode.Camp)return false;
+            !ReferenceEquals(vehicle.world.GetEntity(player.entityId),player)||
+            !RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp)return false;
         var owner=vehicle.GetOwner();var data=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId);
         return owner!=null&&data!=null&&(owner.Equals(data.PrimaryId)||owner.Equals(data.NativeId));
     }
-    private static bool Busy(EntityVehicle vehicle)
+    internal static bool Busy(EntityVehicle vehicle)
     {
         try
         {
@@ -161,7 +196,13 @@ internal static class RebirthCamperEnergyAccess
                 session.Status="xuiRebirthCamperEnergyOwnerWaiting";Reply(session);return;
             }
         }
-        if(command==RebirthCamperEnergyCommand.Query)RebirthCamperEnergySourceCoordinator.Resume(camper,player,owner,creation,()=>Current(session),_=>Reply(session),session.Token);
+        if(command==RebirthCamperEnergyCommand.Query&&UnityEngine.Time.realtimeSinceStartup>=session.NextRecoveryCheck)
+        {
+            // Status polling stays responsive, but durable transfer recovery
+            // need not search the journal on every quarter-second poll.
+            session.NextRecoveryCheck=UnityEngine.Time.realtimeSinceStartup+5f;
+            RebirthCamperEnergySourceCoordinator.Resume(camper,player,owner,creation,()=>Current(session),_=>Reply(session),session.Token);
+        }
         if(command!=RebirthCamperEnergyCommand.Query)session.Status=null;
         Execute(camper,player,owner,creation,()=>Current(session),command,source,slot,on,revision,()=>Reply(session),bagSlot,session.Token,reason=>session.Status=reason);Reply(session);
     }
@@ -252,6 +293,15 @@ internal static class RebirthCamperEnergyAccess
             default:return;
         }
         bool accepted=RebirthCamperEnergySourceCoordinator.Begin(vehicle,player,owner,creation,revision,action,source,slot,on,current,_=>refreshed(),bagSlot,token);
+        // Explicit bank OFF is also an explicit POI OFF request, even when a
+        // second bank in this camper remains on. Clear intent when the source
+        // command is accepted, before its asynchronous custody/save work; waiting
+        // for Consumers to notice an all-banks-off snapshot lets old ON intent
+        // survive and restart the lights. The accepted source transaction has
+        // already admitted this actor; clear only this camper's intent without
+        // rescanning POI lights or reapplying the stricter POI-button owner gate.
+        if(accepted&&command==RebirthCamperEnergyCommand.Enabled&&!on)
+            RebirthCamperEnergyDeviceAdapter.ClearAcceptedBankPoiRequest(vehicle);
         if(!accepted)refused?.Invoke("xuiRebirthCamperEnergyOwnerChanged");
         RebirthCamperEnergyGestureTrace.Write("access.source-result","command="+command+" accepted="+accepted+" slot="+slot+" bagSlot="+bagSlot+" revision="+revision);
     }

@@ -1,0 +1,12 @@
+{
+  "name": "Bare camper pickup rail collision user acceptance",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. User stages bare pickup with no body addon, standing on visible cab roof beside a former rooftop rail position. No automated spawn/teleport/modifier changes. Keep guard enabled." },
+    { "action": { "command": "target", "args": {} } },
+    { "screenshot": "bare-pickup-before-roof-walk" },
+    { "_note": "User walks roof-to-hood and through bed, including former rail posts. Confirm visible surface support without invisible roof barriers; native E targeting still available. Repeat after reload/controller replacement, body install in Travel/Camp, and legal removal. Inspect actual collider state separately; screenshots alone cannot prove collision admission." },
+    { "screenshot": "bare-pickup-after-roof-walk" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Map playable boundary, stable zoom and suppressed hover",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN; user owns game. Open the installed map at 1920x1080 and 5120x1440 with current UI scale. Zoom out to show the whole playable rectangle. Confirm a crisp purple border, solid black exterior and unchanged explored terrain/fog inside. Pan so each world edge intersects each viewport edge; no black should cover interior terrain." },
+    { "screenshot": "map-world-boundary" },
+    { "_note": "Wheel and Shift-wheel repeatedly through detailed/overview and atlas power-of-two levels; reverse quickly. Drag the slider across its full range and release outside. Use controller triggers. Terrain must remain stable during rebuild, without empty/progressive flashes or terrain/pin misalignment. Test normal and static map modes, close/reopen and a different viewport size." },
+    { "screenshot": "map-zoom-stability" },
+    { "_note": "Hover a cleared/discovered POI so its card is visible, then zoom with wheel, Shift-wheel, triggers and slider. It must disappear during interaction/easing and return only after settled hover. Repeat while panning, including holding a drag still. Verify normal settled tooltips and waypoint/context actions remain available." },
+    { "_note": "With normal authorized debug permissions, Ctrl-click/right-click the slider background/track/thumb, drag off it and release over the map. No teleport, outside-world notice, marker selection, context popup or map pan should result. A separate intentional Ctrl-click inside the playable border must still use native teleport permissions/safety. An intentional outside-border teleport remains rejected. No automated control or teleport in this scenario." },
+    { "screenshot": "map-input-suppression" },
+    { "expectNoErrors": true }
+  ]
+}

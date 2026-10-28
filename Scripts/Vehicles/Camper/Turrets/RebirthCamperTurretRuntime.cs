@@ -64,8 +64,13 @@ internal sealed partial class RebirthCamperTurretRuntime
         if(g?.Corner&&g.Corner.IsChildOf(root))return g;
         if(boundRoot!=root){foreach(var old in guns)old?.Laser?.Destroy();boundRoot=root;Array.Clear(nextBind,0,4);Array.Clear(guns,0,4);}
         if(Time.time<nextBind[corner])return null;nextBind[corner]=Time.time+2;
+        return BindDue(corner,root);
+    }
+    // Captured search predicates allocate only when a hierarchy search is due.
+    private Gun BindDue(int corner,Transform root)
+    {
         var t=root.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="REBIRTHCamperTurretSlot"+corner);if(!t)return null;
-        g=new Gun{Corner=t,Yaw=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretYaw"),Pitch=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretPitch"),Muzzle=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretMuzzle")};
+        var g=new Gun{Corner=t,Yaw=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretYaw"),Pitch=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretPitch"),Muzzle=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretMuzzle")};
         if(!g.Yaw||!g.Pitch||!g.Muzzle)return null;
         // Asset metadata keeps old bundles compatible while allowing a new
         // whole-body rig to stop before its fixed inner bearing ring.
@@ -256,7 +261,8 @@ internal sealed partial class RebirthCamperTurretRuntime
     private void Laser(Gun gun,RebirthCamperTurretSlot slot,bool visible)
     {
         if(GameManager.IsDedicatedServer)return;
-        float range=RebirthCamperTurretProfiles.Range(slot);visible&=range>0;
+        // A hidden indicator still needs Update(false), but no range query.
+        visible=visible&&RebirthCamperTurretProfiles.Range(slot)>0;
         if(gun.Laser==null&&visible)gun.Laser=new RebirthCamperTurretLaser(gun.Corner);
         // The aim indicator reaches the surface under the crosshair even beyond
         // firing range. Damage/range admission remains in the server fire path.

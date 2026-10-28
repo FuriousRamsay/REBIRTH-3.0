@@ -8,17 +8,20 @@ class Program{
  AccessTools.Missing=null;Harmony.FailAt=5;try{api.InitMod(null);throw new Exception("expected patch failure");}catch(InvalidOperationException){}
  Check(Harmony.Active==0&&Harmony.Rollbacks==1,"partial native installation rolls back its dedicated owner");
  Check(Harmony.LastId=="rebirth.purge.supply.persistence","rollback uses only supply installer identity");
- Harmony.FailAt=0;Harmony.Calls=0;api.InitMod(null);Check(Harmony.Active==11,"retry installs all eleven qualified hooks");
- api.InitMod(null);Check(Harmony.Calls==11,"successful initialization is idempotent");
+ Harmony.FailAt=0;Harmony.Calls=0;api.InitMod(null);Check(Harmony.Active==14,"retry installs all fourteen current hooks including marker persistence");
+ api.InitMod(null);Check(Harmony.Calls==14,"successful initialization is idempotent");
  Console.WriteLine("RESULT "+count+" PASS; production installer; native ABI reflection and Harmony installation explicitly doubled. Root build separately qualifies game signatures; no live installation claim.");
  }}
 static class RebirthPurgeReleasePolicy{public static bool Enabled;}
 public class Mod{}interface IModApi{void InitMod(Mod mod);}
-class PooledBinaryWriter{}class PooledBinaryReader{}enum StreamModeWrite{}enum StreamModeRead{}class DamageSource{}class DamageResponse{}class Entity{}class GameManager{}
+class PooledBinaryWriter{}class PooledBinaryReader{}enum StreamModeWrite{}enum StreamModeRead{}class DamageSource{}class DamageResponse{}class Entity{public virtual string GetLootList()=>"";}class GameManager{}
 class EntitySupplyCrate{public string GetActivationText()=>"";public void Write(PooledBinaryWriter x,StreamModeWrite y){}public void Read(byte x,PooledBinaryReader y,StreamModeRead z){}}
-class EntityAlive{public string GetLootList()=>"";public void OnLockRequestServer(int x,PooledBinaryReader y,ushort z){}public void DamageEntity(DamageSource x,int y,bool z,float w){}public void ProcessDamageResponseLocal(DamageResponse x){}}
+class EntityAlive:Entity{public void OnLockRequestServer(int x,PooledBinaryReader y,ushort z){}public void DamageEntity(DamageSource x,int y,bool z,float w){}public void ProcessDamageResponseLocal(DamageResponse x){}}
 class NetPackageBag{public void ProcessPackage(World x,GameManager y){}}class NetPackageDamageEntity{public void ProcessPackage(World x,GameManager y){}}
-class World{public void SpawnEntityInWorld(Entity x){}}class AIDirectorAirDropComponent{public void SpawnAirDrop(){}public void Tick(double x){}public void SpawnSupplyCrate(UnityEngine.Vector3 pos,ChunkManager.ChunkObserver observer){}}
+class World{public void SpawnEntityInWorld(Entity x){}}class AIDirectorAirDropComponent{public void Write(PooledBinaryWriter writer){}public void SpawnAirDrop(){}public void Tick(double x){}public void SpawnSupplyCrate(UnityEngine.Vector3 pos,ChunkManager.ChunkObserver observer){}}
+class NavObjectManager{public void RegisterNavObject(string name,Entity entity,string label,bool hidden){}public void RegisterNavObject(string name,UnityEngine.Vector3 position,string label,bool hidden,int id,Entity entity){}}
+static class RebirthPurgeSupplyMapLabel{public static void AfterRegister(){}}
+static class RebirthPurgeSupplyMarkerLabels{public static void AfterRegisterPosition(){}public static void AfterWrite(){}}
 static class RebirthPurgeSupplyCrateSerialization{public static void AfterWrite(){}public static void AfterRead(){}}
 static class RebirthPurgeSupplyAccess{public static void AfterActivationText(){}public static void BeforeLock(){}public static void BeforeBag(){}public static void BeforeDamage(){}public static void BeforeDamageResponse(){}public static void BeforeDamagePacket(){}}
 static class RebirthPurgeSupplySpawnScope{public static void BeforeSpawn(){}}

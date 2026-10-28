@@ -1,0 +1,10 @@
+{
+  "status": "UNACCEPTED_AUTHORING_SOURCE_NOT_GAME_ASSET",
+  "version": "v23",
+  "sha256": "A72F3E0ACA145B82B534ED010E30C75D0F9F83214A996215E824E57178EB8E03",
+  "source": "E:/_Haven/shared/REBIRTHTemp/ForgeFidelity/v23/forge.blend",
+  "reference": "Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+  "topology": "Closed evaluated components verified; appearance gate still open",
+  "unity": "No proof; license validation refused editor",
+  "bake": "v21 baseline, not current source export"
+}

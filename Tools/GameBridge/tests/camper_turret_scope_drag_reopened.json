@@ -1,0 +1,84 @@
+{
+  "name": "Reopened installed scope native bag and toolbelt drag (NOT RUN)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Parent-owned disposable fixture: Defense management open, guard ON and safe area; corner0 scope0 has one modGunScopeSmall, native cursor empty, filters off, backpack sellAvailable16 and toolbelt slot0 empty/unlocked. Preserve exact metadata and inspect screenshots/trace. No launch/setup is performed by this scenario."
+    },
+    {
+      "markItem": "modGunScopeSmall"
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "turretScope0_0",
+          "to.id": "sellAvailable16",
+          "strict": 1,
+          "trace": 1
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectItemDelta": {
+        "name": "modGunScopeSmall",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "screenshot": "turret_scope_to_backpack"
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "sellAvailable16",
+          "to.id": "turretScope0_0",
+          "strict": 1,
+          "trace": 1
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectItemDelta": {
+        "name": "modGunScopeSmall",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "turretScope0_0",
+          "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/0",
+          "strict": 1,
+          "trace": 1
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectItemDelta": {
+        "name": "modGunScopeSmall",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "screenshot": "turret_scope_to_toolbelt"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

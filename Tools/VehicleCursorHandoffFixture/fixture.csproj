@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs"/><Compile Include="Doubles.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Restoration/RebirthVehicleCursorDropPlan.cs" Link="ActualDropPlan.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Restoration/RebirthVehicleCursorGearWitness.cs" Link="ActualGearWitness.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Restoration/RebirthVehicleCursorGearHooks.cs" Link="ActualGearHooks.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Restoration/IRebirthVehicleCursorDestinationWitness.cs" Link="ActualWitnessInterface.cs"/>
+    <Compile Include="../../Scripts/Survivor/Network/RebirthSurvivorRequestScope.cs" Link="ActualCreationScope.cs"/>
+  </ItemGroup>
+</Project>

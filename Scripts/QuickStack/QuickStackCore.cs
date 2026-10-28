@@ -145,12 +145,19 @@ public static class QuickStackCategoryRegistry
         if (ContainsAny(evidence, "schematic", "skillbook", "perkbook", "magazine") ||
             name.StartsWith("book", StringComparison.Ordinal))
             return QuickStackCategory.BooksAndSchematics;
-        if (ContainsAny(evidence, "ammo", "ammunition", "bullet", "arrow", "crossbowbolt", "rocketammo", "fuelammo"))
-            return QuickStackCategory.Ammunition;
-        if (item.Actions != null && item.Actions.Length > 0 && item.Actions[0] is ItemActionRanged)
-            return QuickStackCategory.RangedWeapons;
-        if (ContainsAny(evidence, "melee", "club", "spear", "machete", "knife", "baton", "knuckles"))
+        // Weapon names are stronger evidence than inherited ammo tags/skill groups.
+        // For example, a hunting knife carries ammo-related definition metadata
+        // but is still a melee weapon for storage routing.
+        if (HasExactGroup(item.Groups, "Melee Weapons") ||
+            name.StartsWith("melee", StringComparison.Ordinal) ||
+            ContainsAny(name, "knife", "club", "spear", "machete", "baton", "knuckles"))
             return QuickStackCategory.MeleeWeapons;
+        // Ammo/Weapons is a shared parent group for weapons, not an ammo category.
+        if (name.StartsWith("ammo", StringComparison.Ordinal) || HasExactGroup(item.Groups, "Ammo"))
+            return QuickStackCategory.Ammunition;
+        if (HasExactGroup(item.Groups, "Ranged Weapons") ||
+            (item.Actions != null && item.Actions.Length > 0 && item.Actions[0] is ItemActionRanged))
+            return QuickStackCategory.RangedWeapons;
         if (ContainsAny(evidence, "tool", "wrench", "ratchet", "impactdriver", "pickaxe", "shovel", "chainsaw", "auger"))
             return QuickStackCategory.Tools;
         // 3.1's medicalFirstAidKit is explicitly in Group=Medical and carries
@@ -193,6 +200,14 @@ public static class QuickStackCategoryRegistry
         for (int i = 0; i < values.Length; i++)
             if (text.IndexOf(values[i], StringComparison.Ordinal) >= 0)
                 return true;
+        return false;
+    }
+
+    private static bool HasExactGroup(IEnumerable<string> groups, string expected)
+    {
+        if (groups == null) return false;
+        foreach (var group in groups)
+            if (string.Equals(group?.Trim(), expected, StringComparison.OrdinalIgnoreCase)) return true;
         return false;
     }
 }

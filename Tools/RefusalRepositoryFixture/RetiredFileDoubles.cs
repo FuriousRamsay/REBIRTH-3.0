@@ -4,7 +4,7 @@ static class RebirthGearNativePlayerFile{public static bool Valid=true;public st
 static class RebirthGearPreparationMarkerReader{public static bool Absent=true;public static bool HasNoOriginal(byte[] bytes)=>Absent;public static bool TryRead(byte[] bytes,out string marker,out Guid world,out int owned,out RebirthGearPreparationIntent intent){marker=ServerDoubles.Marker;intent=ServerDoubles.Intent;world=Guid.Empty;owned=4;return !Absent&&RebirthGearPreparationMarker.TryRead(marker,1,out world,out owned,out intent);}}
 enum RebirthGearOwnerReceipt{Rejected}
 static class RebirthGearReceiptReader{public static bool Rejected=true;public static bool Contains(byte[] bytes,string tx,RebirthGearOwnerReceipt r)=>Rejected;}
-static class RebirthPlayerDataInventory{public static object ReadSlots(PlayerDataFile f,bool bag)=>new();}
+static class RebirthGearPlayerDataInventory{public static object ReadSlots(PlayerDataFile f,bool bag)=>new();}
 public static partial class Program{
 static int retiredChecks;
 static void RetiredTests(RebirthGearPreparationRefusal refusal,RebirthGearInventorySnapshot image){
@@ -17,3 +17,4 @@ R(!RebirthGearPreparationRefusalPlayerFileWitness.HasRetired(owner,refusal),"ret
 Reset();R(!RebirthGearPreparationRefusalPlayerFileWitness.HasRetired(null,refusal)&&!RebirthGearPreparationRefusalPlayerFileWitness.HasRetired(owner,null),"retired nulls");
 }
 }
+

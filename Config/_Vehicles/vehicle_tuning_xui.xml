@@ -1,0 +1,10 @@
+<configs>
+  <append xpath="/xui">
+    <window_group name="rebirthVehicleTuning" actionset="true" defaultselected="close" close_compass_on_open="true" open_backpack_on_open="false">
+      <window name="rebirthVehicleTuningWindow"/>
+    </window_group>
+    <window_group name="rebirthVehicleTuningPreview" actionset="false" close_compass_on_open="false" open_backpack_on_open="false">
+      <window name="rebirthVehicleTuningPreviewWindow"/>
+    </window_group>
+  </append>
+</configs>

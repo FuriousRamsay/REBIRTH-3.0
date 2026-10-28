@@ -1,0 +1,22 @@
+// AUTHORED_NOT_RUN. Actual requester/scope; native packet send is adapted.
+  Fresh(true);RebirthSurvivorMode.Enabled=false;RebirthStablePlayerIdentity.Owner=new string('a',64);GenerationRequestTransport.Reset();
+  Need(RebirthHydrationGenerationClient.TryRequest(player,0)&&GenerationRequestTransport.Sends==1&&player.bag.ItemGrid.items[3].count==3&&!RebirthHydrationOwnerHold.IsHeld(player),"generation request failed or entered financial custody");
+  Need(!RebirthHydrationGenerationClient.TryRequest(player,0.1)&&GenerationRequestTransport.Sends==1,"generation request rate limit bypassed");
+  GenerationRequestTransport.MissingMapping=true;Need(!RebirthHydrationGenerationClient.TryRequest(player,1)&&GenerationRequestTransport.Sends==1,"missing request mapping sent packet");GenerationRequestTransport.MissingMapping=false;
+  bool nestedRequest=true;GenerationRequestTransport.DuringSend=()=>nestedRequest=RebirthHydrationGenerationClient.TryRequest(player,2);
+  Need(RebirthHydrationGenerationClient.TryRequest(player,2)&&!nestedRequest&&GenerationRequestTransport.Sends==2,"native callback reentered requester");GenerationRequestTransport.DuringSend=null;
+  GenerationRequestTransport.ThrowAfterSend=true;Need(!RebirthHydrationGenerationClient.TryRequest(player,3)&&GenerationRequestTransport.Sends==3,"unknown metadata send claimed success");GenerationRequestTransport.ThrowAfterSend=false;
+  Need(!RebirthHydrationGenerationClient.TryRequest(player,3.1)&&GenerationRequestTransport.Sends==3,"unknown send bypassed retry backoff");
+  GenerationRequestTransport.DuringMap=()=>SingletonMonoBehaviour<ConnectionManager>.Instance.connectionToServer[0]=new Peer();
+  Need(!RebirthHydrationGenerationClient.TryRequest(player,4)&&GenerationRequestTransport.Sends==3,"replacement peer during mapping received stale scoped request");GenerationRequestTransport.DuringMap=null;
+  Need(RebirthHydrationGenerationClient.TryRequest(player,4.1)&&GenerationRequestTransport.Sends==4,"new native session inherited old retry suppression");
+  Need(RebirthHydrationGenerationFrame.TryCreate(player.entityId,Guid.Parse(player.world.Guid),RebirthHydrationGeneration.Create(),RebirthStablePlayerIdentity.Owner,player.Died,1,out var requestProjection)&&RebirthHydrationGenerationClient.Receive(player.world,requestProjection),"request response projection unavailable");
+  Need(!RebirthHydrationGenerationClient.TryRequest(player,5)&&GenerationRequestTransport.Sends==4,"known generation kept requesting metadata");
+  Fresh(true);RebirthSurvivorMode.Enabled=true;Need(RebirthHydrationOwnerHold.TryAcquire(player,original),"retained owner fixture unavailable");
+  RebirthSurvivorMode.Enabled=false;RebirthStablePlayerIdentity.Owner=new string('a',64);GenerationRequestTransport.Reset();
+  Need(RebirthHydrationGenerationClient.TickBootstrap(10)&&GenerationRequestTransport.Sends==1&&RebirthHydrationOwnerHold.IsHeld(player),"metadata bootstrap changed held original custody or failed request");
+  Need(!RebirthHydrationGenerationClient.TickBootstrap(10.1)&&GenerationRequestTransport.Sends==1,"per-frame bootstrap repeated request");
+  RebirthHydrationGenerationClient.RetireWorld();Need(RebirthHydrationOwnerHold.IsHeld(player)&&!RebirthHydrationGenerationClient.TryRequest(player,11),"shutdown retirement released financial custody or requested retired World");
+  Need(RebirthHydrationGenerationFrame.TryCreate(player.entityId,Guid.Parse(player.world.Guid),RebirthHydrationGeneration.Create(),RebirthStablePlayerIdentity.Owner,player.Died,1,out var retiredProjection)&&!RebirthHydrationGenerationClient.Receive(player.world,retiredProjection),"late generation response revived retired World");
+  Fresh(true);RebirthSurvivorMode.Enabled=false;RebirthStablePlayerIdentity.Owner=new string('a',64);GenerationRequestTransport.Reset();
+  Need(RebirthHydrationGenerationClient.TickBootstrap(10.2)&&GenerationRequestTransport.Sends==1,"new World inherited retired projection/bootstrap delay");

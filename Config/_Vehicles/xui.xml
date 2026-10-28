@@ -2,7 +2,6 @@
   <include filename="camper_turret_xui.xml" />
   <append xpath="/xui">
     <window_group name="rebirthVehicleRestoration" close_compass_on_open="true">
-      <window name="itemInfoPanel"/>
       <window name="rebirthVehicleRestorationWindow"/>
     </window_group>
   </append>

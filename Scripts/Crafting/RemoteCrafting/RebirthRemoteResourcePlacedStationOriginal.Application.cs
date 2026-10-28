@@ -48,7 +48,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     }
     private static void BindApplicationWorld()
     {
-        var world=GameManager.Instance?.World;string save=GameIO.GetSaveGameDir();
+        var world=GameManager.Instance?.World;string save=bindingSaveDirectory.Get();
         if(ReferenceEquals(world,applicationWorld)&&save==applicationSave)return;
         foreach(var original in worldApplications.Values)original.Watch?.Dispose();
         worldApplications.Clear();applicationWorld=world;applicationSave=save;

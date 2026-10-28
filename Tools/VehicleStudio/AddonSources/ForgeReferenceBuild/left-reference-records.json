@@ -1,0 +1,23 @@
+{
+ "status":"IMAGE_SPACE_PLAN_REQUIRES_OVERLAY_AND_3D_VALIDATION",
+ "referenceSize":[1448,1086],
+ "authority":"Fresh manual observations of approved image; pixels approximate +/-8. No prior mesh input. Pixel lengths are projected lengths, not physical dimensions.",
+ "records":[
+  {"id":"near_upright","shape":"rounded timber post","axisPixels":[[202,308],[217,687]],"widthPixels":44,"frontContour":[[170,300],[193,286],[232,300],[244,677],[230,713],[189,705]],"connections":["upper_shaft_near_bearing","lower_shaft_near_bearing","near_foot"],"depth":"unresolved"},
+  {"id":"far_upright","shape":"rounded timber post, lower portion occluded","axisPixels":[[421,235],[437,337]],"widthPixels":46,"frontContour":[[390,225],[425,217],[461,237],[470,345],[444,365],[413,328]],"connections":["upper_shaft_far_bearing"],"depth":"behind bellows; hidden continuation inferred"},
+  {"id":"upper_shaft","shape":"stepped cylindrical shaft","axisPixels":[[225,307],[430,268]],"diameterPixels":25,"connections":["near_upright","far_upright"],"detail":"Visible journals, collars and domed bolt ends, not black open cylinder ends"},
+  {"id":"lower_shaft","shape":"stepped cylindrical shaft","axisPixels":[[239,668],[444,628]],"diameterPixels":24,"connections":["near_upright","far_upright"],"visibility":"right endpoint partly occluded; estimated"},
+  {"id":"fold_envelope","shape":"continuous leather fan with rounded ribs","outerContour":[[237,335],[276,323],[335,353],[399,398],[457,450],[506,484],[521,529],[495,565],[429,593],[349,624],[272,651],[248,627]],"foldRidgePaths":[[[247,346],[299,357],[369,400],[449,463],[493,499]],[[249,414],[302,425],[372,458],[447,491],[496,520]],[[250,484],[310,492],[380,518],[448,536],[496,542]],[[255,557],[318,560],[384,556],[449,553],[494,556]]],"connections":["near_upright","far_upright","throat_collar"],"depth":"must be solved with frame separation; continuous closed volume"},
+  {"id":"throat_collar","shape":"rounded rectangle surrounding finite-width throat","outerContour":[[476,482],[524,463],[553,479],[557,577],[536,606],[493,602],[477,578]],"connections":["fold_envelope","nozzle_neck"],"depth":"visible top and side faces require thickness"},
+  {"id":"nozzle_neck","shape":"short cylindrical exposed neck","axisPixels":[[550,527],[610,545]],"diameterPixels":48,"connections":["throat_collar","furnace_flange"]},
+  {"id":"furnace_flange","shape":"thick bolted circular plate viewed obliquely","centerPixels":[621,537],"outerContour":[[596,471],[630,482],[655,515],[661,549],[647,583],[624,593],[601,578],[588,536],[585,508]],"connections":["nozzle_neck","masonry_side"],"depth":"normal aligned to nozzle; elliptical projection must arise from rotation"},
+  {"id":"crucible_body","shape":"thick hollow slightly tapered vessel","axisPixels":[[520,670],[525,876]],"outerContour":[[424,654],[443,635],[486,619],[544,621],[587,634],[613,656],[624,705],[621,850],[600,889],[555,912],[488,905],[449,882],[429,839]],"innerRimContour":[[449,660],[474,644],[517,637],[558,643],[584,658],[589,676],[565,696],[514,704],[472,693],[450,678]],"connections":["upper_hoop","lower_hoop","side_link","bottom_support"],"depth":"horizontal open ring; internal floor and wall thickness inferred"},
+  {"id":"upper_hoop","shape":"broad band following vessel","centerlinePixels":[[429,704],[458,727],[515,740],[576,733],[620,709]],"widthPixels":26,"connections":["crucible_body","front_retainer","side_retainer"]},
+  {"id":"lower_hoop","shape":"broad band following vessel","centerlinePixels":[[438,850],[477,879],[532,890],[584,875],[615,849]],"widthPixels":23,"connections":["crucible_body","front_retainer","side_retainer"]},
+  {"id":"front_retainer","shape":"thick vertical bent strap","axisPixels":[[459,714],[475,885]],"widthPixels":24,"connections":["upper_hoop","lower_hoop"]},
+  {"id":"side_retainer","shape":"thick vertical bent strap","axisPixels":[[610,701],[614,859]],"widthPixels":23,"connections":["upper_hoop","lower_hoop","side_link"]},
+  {"id":"side_link","shape":"short connector with round boss","axisPixels":[[622,752],[672,773]],"diameterPixels":40,"connections":["side_retainer","masonry_side"]}
+ ],
+ "missingBefore3D":["foot outlines and supports","individual fastener centers and head profiles","band back-face continuation","rigid shared-camera fit","explicit depth and transforms for each component"],
+ "validation":"Do not send to Blender. Inspect overlay first, then solve depth/rotation and project independent 3D plan."
+}

@@ -1,0 +1,14 @@
+// AUTHORED_NOT_RUN. Do not invoke until the all-coding gate is lifted.
+import {readFile,writeFile,mkdtemp,readdir} from 'node:fs/promises';import {execFile} from 'node:child_process';import {promisify} from 'node:util';
+import {tmpdir} from 'node:os';import {join,resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
+const run=promisify(execFile),root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
+let fixture=await readFile(join(root,'Tools/GameBridge/mpA_recycler_closed_attach_fixture.cs'),'utf8');
+const source=await readFile(join(root,'Scripts/Crafting/Recycling/RebirthRecyclerPlacedSettlement.ClosedAuthority.cs'),'utf8'),key='internal bool Attach(RemoteHostOriginal original)';
+const start=source.indexOf(key);if(start<0||source.indexOf(key,start+1)>=0)throw Error('unique actual Attach required');
+let end=source.indexOf('{',start)+1,depth=1;for(;depth&&end<source.length;end++){if(source[end]==='{')depth++;else if(source[end]==='}')depth--;}
+if(depth)throw Error('unclosed actual Attach');fixture=fixture.replace('// PRODUCTION_ATTACH',source.slice(start,end));
+const temporary=await mkdtemp(join(tmpdir(),'rebirth-closed-attach-')),cs=join(temporary,'actual.cs'),exe=join(temporary,'actual.exe');await writeFile(cs,fixture);
+const sdk=process.env.REBIRTH_DOTNET_SDK_ROOT||'C:/Program Files/dotnet/sdk',versions=(await readdir(sdk)).filter(x=>/^\d+\.\d+\.\d+$/.test(x)).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+if(!versions.length)throw Error('Roslyn unavailable; source retained '+cs);
+await run('dotnet',[join(sdk,versions.at(-1),'Roslyn/bincore/csc.dll'),'/nologo','/target:exe','/out:'+exe,...['mscorlib','System','System.Core','System.Xml','System.Xml.Linq'].map(x=>'/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/'+x+'.dll'),cs],{windowsHide:true,timeout:30000});
+console.log((await run(exe,[],{windowsHide:true,timeout:30000})).stdout.trim());

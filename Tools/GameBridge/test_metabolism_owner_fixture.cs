@@ -4,7 +4,10 @@ public class EntityPlayer { public World world;public int entityId;public Stats 
 public class EntityPlayerLocal:EntityPlayer {}
 public class Stats { public Stat Food=new Stat(),Water=new Stat(); }
 public class Stat { public float Value,ModifiedMax=100;public bool Changed=true; }
-public class World { public bool Remote=true,Throw;public EntityPlayerLocal Player;public bool IsRemote(){return Remote;}public EntityPlayerLocal GetPrimaryPlayer(){if(Throw)throw new Exception();return Player;} }
+public class World { public bool Remote=true,Throw;public EntityPlayerLocal Player;public EntityPlayer GetEntity(int id){return Player?.entityId==id?Player:null;}public bool IsRemote(){return Remote;}public EntityPlayerLocal GetPrimaryPlayer(){if(Throw)throw new Exception();return Player;} }
+// Explicit native thread and authenticated creation-hold boundaries.
+public static class ThreadManager{public static bool Main=true;public static bool IsMainThread(){return Main;}}
+public static class RebirthCharacterCreationHoldService{public static bool Held;public static bool IsHeld(EntityPlayer p){return Held;}}
 public class GameManager { public static GameManager Instance=new GameManager();public World World; }
 public static class Mathf { public static float Clamp(float x,float a,float b){return Math.Max(a,Math.Min(b,x));} }
 public static class RebirthSurvivorMode { public static bool Enabled=true;public static bool IsEnabledForCurrentWorld(){return Enabled;} }
@@ -26,5 +29,12 @@ s.CreationId=second;s.Sequence=1;s.Food=60;RebirthMetabolismClientState.Receive(
 s.Sequence=1;s.Food=2;RebirthMetabolismClientState.Receive(s);A(p.Stats.Food.Value==60,"duplicate refused");
 w.Player=null;A(!RebirthMetabolismClientState.TryGet(out got)&&got.Sequence==0,"missing owner refused");w.Player=p;w.Throw=true;A(!RebirthMetabolismClientState.TryGet(out got),"exception refused");w.Throw=false;
 s.Sequence=2;s.OwnerEntityId=2;RebirthMetabolismClientState.Receive(s);A(p.Stats.Food.Value==60,"other entity refused");
+var nextWorld=new World();var nextPlayer=new EntityPlayerLocal{entityId=1,world=nextWorld};nextWorld.Player=nextPlayer;GameManager.Instance.World=nextWorld;
+A(!RebirthMetabolismClientState.TryGet(out got),"same IDs in new world cannot expose old projection");
+s.OwnerEntityId=1;s.Sequence=1;s.Food=70;RebirthMetabolismClientState.Receive(s);A(RebirthMetabolismClientState.TryGet(out got)&&got.Sequence==1,"new world lower sequence accepted");
+var replacement=new EntityPlayerLocal{entityId=1,world=nextWorld};nextWorld.Player=replacement;A(!RebirthMetabolismClientState.TryGet(out got),"same-world replaced player cannot expose old projection");
+RebirthCharacterCreationHoldService.Held=true;RebirthMetabolismClientState.Receive(s);A(!RebirthMetabolismClientState.TryGet(out got)&&replacement.Stats.Food.Value==0,"creation hold refuses reserves");
+RebirthCharacterCreationHoldService.Held=false;nextWorld.Remote=false;RebirthWorldCharacterService.Record=new RebirthWorldCharacterRecord{Origin=new Origin{CreationId=second}};
+RebirthMetabolismClientState.Receive(s);A(RebirthMetabolismClientState.TryGet(out got),"server-local direct publication preserved");
 RebirthMetabolismClientState.Clear();A(!RebirthMetabolismClientState.TryGet(out got),"clear");Console.WriteLine("PASS: actual client projection/scope methods; current owner, profile replacement, delayed/duplicate/wrong-owner packets, missing player, exceptions and clear. Native networking/stats doubled.");}
 }

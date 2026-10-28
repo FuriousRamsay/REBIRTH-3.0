@@ -12,7 +12,7 @@ public static class RebirthCamperEnergyMaintenance
     private const string PaidKey="RebirthCamperMaintenancePaid";
     private sealed class Run
     {
-        internal EntityVehicle Vehicle;internal float Next;internal Queue<Vector3i> Targets=new Queue<Vector3i>();
+        internal EntityVehicle Vehicle;internal float Next,NextOwnerProbe;internal Queue<Vector3i> Targets=new Queue<Vector3i>();
         internal Bag Bag;internal ItemStackGrid Grid;
         internal RebirthCamperTransferJournal.Record Record;internal RebirthCamperEnergyMaintenanceFrame Before,After;
         internal TileEntityPowered Tile;internal RebirthCamperEnergyMaintenanceChunkWitness Chunk;
@@ -22,6 +22,8 @@ public static class RebirthCamperEnergyMaintenance
     private static readonly Dictionary<EntityVehicle,Run> runs=new Dictionary<EntityVehicle,Run>();
     private static bool installed;
     private static World journalWorld;
+    private static string journalSaveDirectory;
+    private static bool journalSaveIsFullyQualified;
     private static RebirthCamperTransferJournal currentJournal;
     private static RebirthCamperTransferPendingIndex pendingIndex;
     public static void Install(Harmony harmony)
@@ -36,18 +38,25 @@ public static class RebirthCamperEnergyMaintenance
         string directory=GameIO.GetSaveGameDir();
         if(!ThreadManager.IsMainThread()||GameManager.Instance?.World==null||GameManager.Instance.World.IsRemote()||string.IsNullOrWhiteSpace(directory))
             throw new InvalidOperationException("Current authoritative maintenance save required.");
-        string root=Path.GetFullPath(Path.Combine(directory,"REBIRTH","CamperMaintenanceTransfers"));
         var world=GameManager.Instance.World;
+        // Only a fully qualified save path is independent of the process current directory.
+        // Live scope/authority checks above still run for every receipt lookup.
+        if(ReferenceEquals(journalWorld,world)&&currentJournal!=null&&journalSaveIsFullyQualified&&
+            string.Equals(journalSaveDirectory,directory,StringComparison.Ordinal))return currentJournal;
+        string root=Path.GetFullPath(Path.Combine(directory,"REBIRTH","CamperMaintenanceTransfers"));
         if(!ReferenceEquals(journalWorld,world)||currentJournal==null||
             !string.Equals(currentJournal.DirectoryPath,root,StringComparison.OrdinalIgnoreCase))
         {
             ClearJournalScope();currentJournal=new RebirthCamperTransferJournal(root);
             pendingIndex=new RebirthCamperTransferPendingIndex(currentJournal);journalWorld=world;
         }
+        journalSaveDirectory=directory;
+        journalSaveIsFullyQualified=Path.IsPathRooted(directory)&&
+            string.Equals(Path.GetPathRoot(directory),Path.GetPathRoot(root),StringComparison.OrdinalIgnoreCase);
         return currentJournal;
     }
     private static void ClearJournalScope()
-    {pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;}
+    {pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;journalSaveDirectory=null;journalSaveIsFullyQualified=false;}
     private static bool Current(EntityVehicle v)=>ThreadManager.IsMainThread()&&v?.world!=null&&!v.world.IsRemote()&&
         ReferenceEquals(v.world,GameManager.Instance?.World)&&ReferenceEquals(v.world.GetEntity(v.entityId),v)&&RebirthCamperRadial.IsCamper(v);
     // Bootstrap calls this BEFORE any Camp timer/resource processing.
@@ -88,7 +97,8 @@ public static class RebirthCamperEnergyMaintenance
     private static bool Eligible(EntityVehicle v,TileEntityPowered te,EntityPlayer owner)
     {
         if(te==null||!te.IsPlayerPlaced||owner==null||!ReferenceEquals(v.world.GetTileEntity(te.ToWorldPos()),te)||
-            !RebirthCamperEnergyBounds.Contains(v.position,te.ToWorldPos().ToVector3(),RebirthCamperEnergyRuntime.Observe(v).Range))return false;
+            !RebirthCamperEnergyRuntime.TryObserveMode(v,out _,out _,out float range)||
+            !RebirthCamperEnergyBounds.Contains(v.position,te.ToWorldPos().ToVector3(),range))return false;
         var persistent=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(owner.entityId);var id=v.GetOwner();
         if(persistent==null||id==null)return false;
         if(te is TileEntityPowerSource source&&source.GetOwner()!=null)return source.GetOwner().Equals(persistent.PrimaryId)||source.GetOwner().Equals(persistent.NativeId);
@@ -108,16 +118,21 @@ public static class RebirthCamperEnergyMaintenance
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
         var world=GameManager.Instance?.World;if(!installed||world==null||world.IsRemote()||!ThreadManager.IsMainThread())return;
-        foreach(var entity in world.Entities.list.ToArray())if(entity is EntityVehicle vehicle&&RebirthCamperRadial.IsCamper(vehicle))
+        foreach(var vehicle in world.Entities.list.OfType<EntityVehicle>().ToArray())if(RebirthCamperRadial.IsCamper(vehicle))
         {
             try
             {
                 Ready(vehicle);var run=runs[vehicle];
                 if(run.Record!=null){Progress(run);continue;}
-                var snapshot=RebirthCamperEnergyRuntime.Observe(vehicle);
-                if(snapshot?.Mode!=RebirthCamperEnergyMode.Camp){run.Targets.Clear();run.Next=Time.realtimeSinceStartup+IntervalSeconds;continue;}
+                if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp){run.Targets.Clear();run.Next=Time.realtimeSinceStartup+IntervalSeconds;continue;}
+                // No repair can start before the scheduled scan when the queue is empty.
+                // Pending receipts and queued targets still take their immediate paths.
+                if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.Next)continue;
+                if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.NextOwnerProbe)continue;
                 var owner=Owner(vehicle,out var creation,out var key);
-                if(owner==null||RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle)>=0||RebirthCamperEnergyRuntime.IsHeld(vehicle))continue;
+                if(owner==null){if(run.Targets.Count==0)run.NextOwnerProbe=Time.realtimeSinceStartup+1f;continue;}
+                run.NextOwnerProbe=0;
+                if(RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle)>=0||RebirthCamperEnergyRuntime.IsHeld(vehicle))continue;
                 if(Time.realtimeSinceStartup>=run.Next)
                 {
                     run.Next=Time.realtimeSinceStartup+IntervalSeconds;run.Targets.Clear();
@@ -172,7 +187,7 @@ public static class RebirthCamperEnergyMaintenance
     {
         var v=run.Vehicle;owner=Owner(v,out var creation,out var key);var receipt=run.Before.Receipt;
         if(!Current(v)||!ReferenceEquals(v.bag,run.Bag)||!ReferenceEquals(v.bag.ItemGrid,run.Grid)||owner==null||key!=receipt.Owner||creation!=receipt.Creation||v.world.worldState.Guid!=receipt.World||
-            RebirthCamperEnergyRuntime.Observe(v)?.Mode!=RebirthCamperEnergyMode.Camp)return false;
+            !RebirthCamperEnergyRuntime.TryObserveMode(v,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp)return false;
         var te=v.world.GetTileEntity(receipt.Position) as TileEntityPowered;
         if(te==null||!Eligible(v,te,owner))return false;
         run.Tile=te;var marker=RebirthCamperEnergyMaintenanceMarkers.Get(te);var block=v.world.GetBlock(receipt.Position);

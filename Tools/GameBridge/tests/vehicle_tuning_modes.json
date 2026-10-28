@@ -1,0 +1,88 @@
+{
+  "name": "Vehicle tuner approved UI mode smoke - NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Disposable local save, fresh Debug DLL/XML/atlas/activeCSV restart, dm already enabled, vehicle within15m. Physical F8/F9 tests remain manual because current bridge injects InControl actions, not raw Unity keyboard state.",
+  "steps": [
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "rbvehicletune"
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleTuning"
+    },
+    {
+      "screenshot": "tuner_edit_first"
+    },
+    {
+      "click": {
+        "id": "category1",
+        "window": "rebirthVehicleTuning"
+      }
+    },
+    {
+      "click": {
+        "id": "category0",
+        "window": "rebirthVehicleTuning"
+      }
+    },
+    {
+      "click": {
+        "id": "export",
+        "window": "rebirthVehicleTuning"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH VehicleTuning] BEGIN"
+      }
+    },
+    {
+      "click": {
+        "id": "drive",
+        "window": "rebirthVehicleTuning"
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleTuningPreview"
+    },
+    {
+      "screenshot": "tuner_drive_preview"
+    },
+    {
+      "console": "rbvehicletune hide"
+    },
+    {
+      "screenshot": "tuner_hidden"
+    },
+    {
+      "console": "rbvehicletune"
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleTuning"
+    },
+    {
+      "click": {
+        "id": "reset",
+        "window": "rebirthVehicleTuning"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "rbvehicletune close"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -45,6 +45,7 @@ public static class RebirthSurvivorUiInstaller
         contextReady &= PatchOptionalContext(typeof(RebirthContextLootClosePatch));
         contextReady &= PatchOptionalContext(typeof(RebirthContextBagStorageOpenPatch));
         contextReady &= PatchOptionalContext(typeof(RebirthContextBagStorageClosePatch));
+        PatchOptionalContext(typeof(RebirthBagStorageSlotLockBinding));
         contextReady &= PatchOptionalContext(typeof(RebirthContextNativePresentationUpdatePatch));
         contextReady &= PatchOptionalContext(typeof(RebirthContextParkedActionSetPatch));
         contextReady &= PatchOptionalContext(typeof(RebirthContextHiddenTransferPatch));

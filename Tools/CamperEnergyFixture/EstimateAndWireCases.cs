@@ -24,12 +24,12 @@ internal static partial class Program
         Assert(battery.Stacks[0].itemValue.UseTimes==9997.5f&&battery.CurrentPower==10,"battery estimate read-only");
         RebirthCamperEnergyRuntime.TryCreateBank(Item(3),out var s,out _);var panel=(PowerSolarPanel)s;cells=ItemStack.CreateArray(6);cells[0]=Item(6);panel.SetSlots(cells);panel.HasLight=true;panel.isOn=true;
         var daylight=RebirthCamperEnergyRuntimeEstimate.Evaluate(new[]{panel},20,RebirthCamperEnergyMode.Camp,solarFirst);
-        Assert(daylight.Status==RebirthCamperEnergyEstimateStatus.DaylightSupported&&daylight.Seconds==null&&daylight.SolarConditional,"daylight support never fabricated infinity");
+        Assert(daylight.Status==RebirthCamperEnergyEstimateStatus.Finite&&daylight.Seconds==0&&!daylight.SolarConditional,"solar alone cannot extend direct-load runtime");
         panel.HasLight=false;Near(RebirthCamperEnergyRuntimeEstimate.Evaluate(new[]{panel},20,RebirthCamperEnergyMode.Camp,solarFirst).Seconds,0,"obstructed solar generates no forecast energy");panel.HasLight=true;g.CurrentFuel=0;
         var generatorFirst=new[]{RebirthCamperEnergySourceKind.Generator,RebirthCamperEnergySourceKind.Solar,RebirthCamperEnergySourceKind.Battery};
         var a=RebirthCamperEnergyRuntimeEstimate.Evaluate(new PowerSource[]{g,panel},100,RebirthCamperEnergyMode.Camp,solarFirst);
         var z=RebirthCamperEnergyRuntimeEstimate.Evaluate(new PowerSource[]{g,panel},100,RebirthCamperEnergyMode.Camp,generatorFirst);
-        Assert(a.Seconds>z.Seconds&&a.SolarConditional&&z.SolarConditional,"actual priority and finite solar buffer affect estimate");
+        Assert(a.Seconds==z.Seconds&&!a.SolarConditional&&!z.SolarConditional,"solar charging is excluded from conservative direct-load estimate regardless of priority");
         Assert(RebirthCamperEnergyRuntimeEstimate.Evaluate(new[]{g},100,RebirthCamperEnergyMode.Camp,new[]{solarFirst[0],solarFirst[0],solarFirst[2]}).Status==RebirthCamperEnergyEstimateStatus.Unavailable,"ambiguous priority refused");
         var c=Start(100);Install(c,1,10);Camp(c);Advance(c,4);Assert(c.Runtime.Snapshot().EstimatedRuntimeSeconds.HasValue,"authoritative snapshot binds estimator");
         var op=Guid.NewGuid();c.Runtime.Hold(op);Assert(c.Runtime.Snapshot().RuntimeEstimateStatus==RebirthCamperEnergyEstimateStatus.Unavailable,"custody-held runtime unavailable");c.Runtime.Release(op);

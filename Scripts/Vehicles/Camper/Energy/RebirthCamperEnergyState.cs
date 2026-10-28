@@ -58,10 +58,11 @@ internal sealed class RebirthCamperEnergyState
             if(state.Version!=1&&state.Version!=2)throw new InvalidDataException("Unsupported energy version.");
             writer.SetBaseStream(stream);writer.Write(state.Version==1?0x31454352:0x32454352);writer.Write(state.Identity.ToByteArray());writer.Write(state.Revision);
             writer.Write((byte)state.Mode);writer.Write(state.Remaining);writer.Write(state.ConsumptionRemainder);writer.Write((byte)state.Sources.Count);
+            string emptyFrame=null; // Reuse only the canonical empty image within this one encoding.
             foreach(var source in state.Sources)
             {
-                writer.Write(source.Id.ToByteArray());if(state.Version>=2)writer.Write((byte)source.Position);WriteStacks(writer,new[]{source.Installed});
-                WriteStacks(writer,source.Bank.Stacks);writer.Write(source.Bank.CurrentPower);
+                writer.Write(source.Id.ToByteArray());if(state.Version>=2)writer.Write((byte)source.Position);WriteStacks(writer,new[]{source.Installed},ref emptyFrame);
+                WriteStacks(writer,source.Bank.Stacks,ref emptyFrame);writer.Write(source.Bank.CurrentPower);
                 // Do not invoke IsOn's native sound/graph callback on detached banks.
                 writer.Write(source.Bank.isOn);writer.Write(source.Bank is PowerGenerator generator?generator.CurrentFuel:(ushort)0);
                 writer.Write(source.Bank is PowerSolarPanel solar&&solar.HasLight);
@@ -125,7 +126,7 @@ internal sealed class RebirthCamperEnergyState
             if(item==null||(!item.IsEmpty()&&(item.count!=1||item.itemValue?.type!=expected.Id)))return false;
         return true;
     }
-    private static void WriteStacks(PooledBinaryWriter writer,ItemStack[] items)
+    private static void WriteStacks(PooledBinaryWriter writer,ItemStack[] items,ref string emptyFrame)
     {
         writer.Write((byte)items.Length);
         foreach(var item in items)
@@ -134,7 +135,7 @@ internal sealed class RebirthCamperEnergyState
             // Native empty UI slot shapes can retain count1/type0. Canonicalize
             // only this detached empty image; never mutate the live native slot.
             writer.Write(item.IsEmpty()?0:item.count);
-            writer.Write(RebirthNativeItemCodec.Encode(item.IsEmpty()?ItemStack.Empty.itemValue:item.itemValue));
+            writer.Write(item.IsEmpty()?(emptyFrame??(emptyFrame=RebirthNativeItemCodec.Encode(ItemStack.Empty.itemValue))):RebirthNativeItemCodec.Encode(item.itemValue));
         }
     }
     private static ItemStack[] ReadStacks(PooledBinaryReader reader,int expected)

@@ -1,0 +1,18 @@
+{
+  "name": "Camper body removal post-manual-input smoke",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. User stages empty Travel camper and tests remove/reinstall; each installed container/station/power source/turret must deny even when empty. Check localized mode/recovery reasons. Remote: fresh versus stale equipment views, cursor-held/selected/pressed part/cosmetic state, no item loss/duplication. See CamperBodyRemoval20261028/REVIEW.md. This smoke only captures screen/errors AFTER those manual interactions, not behavioral proof."
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "camper_body_removal_after_inputs"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

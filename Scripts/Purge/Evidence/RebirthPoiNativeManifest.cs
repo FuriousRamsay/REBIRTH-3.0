@@ -13,6 +13,16 @@ internal sealed class RebirthPoiNativeManifest
     private readonly HashSet<SleeperVolume> volumeSet;
     private RebirthPoiNativeManifest(World world,PrefabInstance prefab,RebirthPoiIdentity identity,SleeperVolume[] volumes)
     { World=world; Prefab=prefab; Identity=identity; Volumes=volumes; volumeSet=new HashSet<SleeperVolume>(volumes); }
+    // Biome metadata must not discard a native spawn/death witness merely
+    // because the POI centre chunk is unloaded. Callers retain fail-closed
+    // exception handling and every native room/actor/proof validation.
+    private static BiomeDefinition ResolveBiome(World world,Vector3i origin,Vector3i size)
+    {
+        var biome=world.GetBiome(origin.x+size.x/2,origin.z+size.z/2);
+        if(biome!=null)return biome;
+        var provider=world.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
+        return provider?.GetBiomeProvider()?.GetBiomeAt(origin.x+size.x/2,origin.z+size.z/2);
+    }
     public static bool TryResolve(World world,PrefabInstance prefab,out RebirthPoiNativeManifest manifest)
     {
         manifest=null;
@@ -44,7 +54,7 @@ internal sealed class RebirthPoiNativeManifest
             foreach(var volume in prefab.sleeperVolumes)
                 if(volume!=null && (volume.spawnCountMax!=0 || volume.minScript!=null) && !distinct.Contains(volume)) return false;
             var origin=prefab.boundingBoxPosition; var size=prefab.boundingBoxSize;
-            var biome=world.GetBiome(origin.x+size.x/2,origin.z+size.z/2);
+            var biome=ResolveBiome(world,origin,size);
             if(biome==null) return false;
             var identity=new RebirthPoiIdentity(prefab.prefab.PrefabName,origin.x,origin.y,origin.z,(int)prefab.rotation,size.x,size.y,size.z,biome.m_sBiomeName);
             manifest=new RebirthPoiNativeManifest(world,prefab,identity,mapped.ToArray()); return true;
@@ -81,7 +91,7 @@ internal sealed class RebirthPoiNativeManifest
             if(origin.x!=Identity.X||origin.y!=Identity.Y||origin.z!=Identity.Z||Prefab.rotation!=Identity.Rotation||
                 size.x!=Identity.SizeX||size.y!=Identity.SizeY||size.z!=Identity.SizeZ||
                 RebirthPoiIdentity.Canonical(authored.PrefabName,256)!=Identity.Prefab)return false;
-            var biome=World.GetBiome(origin.x+size.x/2,origin.z+size.z/2);
+            var biome=ResolveBiome(World,origin,size);
             if(biome==null||RebirthPoiIdentity.Canonical(biome.m_sBiomeName,64)!=Identity.Biome)return false;
             var definitions=authored.SleeperVolumeList;
             if(definitions==null||definitions.Count<1||definitions.Count>4096)return false;

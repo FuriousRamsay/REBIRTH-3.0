@@ -1,0 +1,20 @@
+{
+  "status": "REVISED_REFERENCE_FIT_NOT_GEOMETRY_ACCEPTANCE",
+  "source": "crucible-reference-recheck.json",
+  "ellipseCenterPixels": [
+    555.5,
+    664.75
+  ],
+  "ellipseRadiiPixels": [
+    88.25,
+    33.75
+  ],
+  "meanContourDistancePixels": 2.003933755332859,
+  "maxContourDistancePixels": 4.055356408719985,
+  "inferredElevationDegreesIfHorizontalCircleAndOrthographic": 22.4846721215386,
+  "earlierPlanningElevationDegrees": 24,
+  "elevationDifferenceDegrees": -1.5153278784613988,
+  "interpretation": "A circular opening is a plausible planning primitive at this elevation. Trace uncertainty, perspective and chipped rim prevent treating the fit as a camera calibration or fidelity pass.",
+  "nextRequiredCheck": "Compare this independent opening constraint with the top collar using the same camera; then specify the ceramic outer lip separately from the hoops and retainers.",
+  "blenderAllowed": false
+}

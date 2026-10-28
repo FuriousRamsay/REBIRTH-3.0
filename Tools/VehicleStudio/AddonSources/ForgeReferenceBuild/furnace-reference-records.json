@@ -1,0 +1,22 @@
+{
+ "status":"FRESH_MANUAL_TRACE_DRAFT_NOT_VALIDATED",
+ "imageSize":[1448,1086],
+ "authority":"Approximate image-space observations; no old model geometry used. Hidden surfaces and physical depths remain estimates.",
+ "records":[
+  {"id":"body_silhouette","shape":"short broad irregular stone dome","contourPixels":[[478,437],[490,372],[525,316],[584,266],[652,222],[726,196],[790,168],[1009,165],[1083,202],[1160,254],[1213,316],[1260,390],[1290,477],[1310,579],[1309,812],[1268,878],[1161,923],[1000,952],[800,941],[699,895],[620,846],[563,777],[519,687],[489,564]],"occlusions":["bellows flange","crucible","iron straps"],"depth":"unsolved"},
+  {"id":"arch_void","shape":"round-headed irregular opening","contourPixels":[[911,660],[904,584],[919,511],[945,455],[998,412],[1059,390],[1120,398],[1180,428],[1218,480],[1247,542],[1250,606],[1240,653],[1159,683],[1032,690]],"depth":"open cavity; rear wall must remain behind arch"},
+  {"id":"sill","shape":"thick irregular stone ledge","contourPixels":[[901,659],[1021,670],[1155,666],[1243,636],[1257,671],[1235,710],[1121,747],[1007,751],[912,728]],"depth":"thick solid ledge; no identical brick repeats"},
+  {"id":"collar_outer","shape":"short annulus","topEllipse":{"center":[891,103],"diameters":[220,87]},"bottomContourPixels":[[775,116],[777,160],[817,185],[907,198],[982,181],[1018,152],[1008,107]],"depth":"ring, open center; horizontal plane hypothesis"},
+  {"id":"collar_inner","shape":"recessed circular aperture","ellipse":{"center":[891,103],"diameters":[181,61]},"depth":"below rim; no flat lid"},
+  {"id":"left_front_strap","shape":"wide bent band","pathPixels":[[875,183],[827,275],[787,369],[766,494],[753,622],[755,752],[780,895],[797,960]],"widthPixels":48,"depth":"layer above stone, rounded 8-pixel apparent edge; confirm projection"},
+  {"id":"right_front_strap","shape":"wide bent band","pathPixels":[[977,160],[1101,234],[1207,365],[1267,488],[1297,626],[1295,793],[1291,850]],"widthPixels":44,"depth":"above stone; crossing order needs per-junction review"},
+  {"id":"crown_cross_band","shape":"curved broad iron strap","pathPixels":[[575,300],[679,269],[790,264],[922,270],[1059,283],[1147,313]],"widthPixels":49,"depth":"crosses front strap above masonry"},
+  {"id":"left_shoulder_band","shape":"curved shoulder strap","pathPixels":[[524,375],[572,315],[649,253],[737,210],[795,186]],"widthPixels":38,"depth":"surface following"},
+  {"id":"left_front_plate","shape":"rounded rectangular lap plate","contourPixels":[[718,698],[784,688],[806,798],[735,811]],"rivetCentersPixels":[[758,753]],"rivetDiameterPixels":43},
+  {"id":"right_front_plate","shape":"rounded rectangular lap plate","contourPixels":[[1251,613],[1307,605],[1317,696],[1261,714]],"rivetCentersPixels":[[1286,653]],"rivetDiameterPixels":34},
+  {"id":"front_left_foot","shape":"bent plate with through-hole","contourPixels":[[736,942],[786,936],[820,965],[847,987],[823,1026],[777,1044],[732,1020],[697,982]],"holeCenterPixels":[778,990],"holeDiameterPixels":24,"depth":"flat contact sole and rising strap tab"},
+  {"id":"front_right_foot","shape":"bent plate with through-hole","contourPixels":[[1236,827],[1284,820],[1300,851],[1343,869],[1336,896],[1294,914],[1244,902],[1223,869]],"holeCenterPixels":[1306,874],"holeDiameterPixels":22,"depth":"flat contact sole and rising strap tab"}
+ ],
+ "outstanding":["Individual stone outlines and closed volume profiles","Remaining band paths and plate junctions","All visible rivet centers","Rear/left support structures","Coal profiles and distribution","Shared projection fit","Numeric three-dimensional transforms and depth assumptions"],
+ "acceptance":"Contours have not yet passed overlay review. This file is not permission to generate Blender geometry."
+}

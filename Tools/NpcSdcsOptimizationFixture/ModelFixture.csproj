@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><Nullable>disable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ModelProgram.cs" /><Compile Include="ModelStubs.cs" />
+    <Compile Include="../../Scripts/NPC/Models/EModelRebirthSdcsNpc.cs" Link="ActualModel.cs" />
+    <Compile Include="../../Scripts/NPC/Models/RebirthSdcsMeshRefreshGate.cs" Link="ActualGate.cs" />
+  </ItemGroup>
+</Project>

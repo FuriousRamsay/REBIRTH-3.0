@@ -28,6 +28,8 @@ public sealed class RebirthPurgeSupplyModApi:IModApi
         // Resolve the complete set before installing any hook.
         var hooks=new List<Hook>();
         Require(hooks,typeof(NavObjectManager),nameof(NavObjectManager.RegisterNavObject),new[]{typeof(string),typeof(UnityEngine.Vector3),typeof(string),typeof(bool),typeof(int),typeof(Entity)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.AfterRegisterPosition),true);
+        Require(hooks,typeof(AIDirectorAirDropComponent),nameof(AIDirectorAirDropComponent.RefreshCrates),new[]{typeof(int)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.BeforeRefresh));
+        Require(hooks,typeof(AIDirectorAirDropComponent),nameof(AIDirectorAirDropComponent.RemoveSupplyCrate),new[]{typeof(int)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.AfterRemove),true);
         Require(hooks,typeof(AIDirectorAirDropComponent),nameof(AIDirectorAirDropComponent.Write),new[]{typeof(PooledBinaryWriter)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.AfterWrite),true);
         Require(hooks,typeof(NavObjectManager),nameof(NavObjectManager.RegisterNavObject),new[]{typeof(string),typeof(Entity),typeof(string),typeof(bool)},typeof(RebirthPurgeSupplyMapLabel),nameof(RebirthPurgeSupplyMapLabel.AfterRegister),true);
         Require(hooks,typeof(EntitySupplyCrate),nameof(EntitySupplyCrate.Write),new[]{typeof(PooledBinaryWriter),typeof(StreamModeWrite)},typeof(RebirthPurgeSupplyCrateSerialization),nameof(RebirthPurgeSupplyCrateSerialization.AfterWrite),true);

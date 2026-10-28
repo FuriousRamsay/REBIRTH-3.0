@@ -202,6 +202,10 @@ internal static class AdvancedFarmingHarvestProtocol
                 if(owner!=null&&chunk!=null&&!chunk.InProgressUnloading&&Servers.Count<4){Servers.Add(operation,new Server{Owner=owner,Record=record});Status(owner,record);}else Recovery.Enqueue(operation);
             }
         }
+        if(Servers.Count>0) PumpServerAttempts(world);
+    }
+    private static void PumpServerAttempts(World world)
+    {
         foreach(var attempt in Servers.Values.ToArray())
         {
             try

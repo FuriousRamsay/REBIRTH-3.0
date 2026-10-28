@@ -33,7 +33,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     private static void BindUploadWorld()
     {
         BindCancellationWorld();
-        var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+        var world=GameManager.Instance?.World;string directory=bindingSaveDirectory.Get();
         if(ReferenceEquals(world,uploadWorld)&&directory==uploadDirectory)return;
         foreach(var original in uploadOriginals.Values)original.Dispose();uploadOriginals.Clear();uploadWorld=world;uploadDirectory=directory;nativeUploadInvocation=null;
     }

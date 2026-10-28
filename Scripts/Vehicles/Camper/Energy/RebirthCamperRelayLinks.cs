@@ -158,7 +158,43 @@ internal static partial class RebirthCamperRelayWiring
     }
     internal static Transform Relay(EntityVehicle vehicle,int side)
         =>vehicle?.RootTransform?.GetComponentsInChildren<RebirthCamperWireTarget>(true).FirstOrDefault(t=>t.Kind==0&&t.Slot==side)?.transform;
+    private static Transform PresentationRelay(EntityVehicle vehicle,int side)
+    {
+        // Visuals owns these exact two paths. Keep the broad lookup as fallback for
+        // an absent/stale group or changed authored hierarchy; authority still uses Relay.
+        var group=RebirthCamperRelayVisuals.Group(vehicle);
+        var root=vehicle?.RootTransform;
+        if(group&&root&&group.transform.IsChildOf(root))
+        {
+            var endpoint=group.transform.Find(side==0?"Camper relay left/Camper relay wire endpoint":"Camper relay right/Camper relay wire endpoint");
+            var target=endpoint?endpoint.GetComponent<RebirthCamperWireTarget>():null;
+            if(target&&ReferenceEquals(target.Vehicle,vehicle)&&target.Kind==0&&target.Slot==side)return endpoint;
+        }
+        return Relay(vehicle,side);
+    }
+    // Stack-local presentation batch only. Never retain across updates or use for authority.
+    internal struct RelayLookup
+    {
+        private EntityVehicle owner;
+        private Transform root,first,second;
+        internal Transform Resolve(EntityVehicle vehicle,int side)
+        {
+            var current=vehicle?.RootTransform;
+            if(!ReferenceEquals(owner,vehicle)||root!=current)
+            {owner=vehicle;root=current;first=second=null;}
+            if(side==0)return first&&first.IsChildOf(root)?first:(first=PresentationRelay(vehicle,side));
+            if(side==1)return second&&second.IsChildOf(root)?second:(second=PresentationRelay(vehicle,side));
+            return Relay(vehicle,side);
+        }
+    }
     internal static bool Connected(EntityVehicle vehicle,TileEntity tile)
+    {
+        var unused=new RelayLookup();
+        return Connected(vehicle,tile,ref unused,false);
+    }
+    internal static bool Connected(EntityVehicle vehicle,TileEntity tile,ref RelayLookup presentation)
+        =>Connected(vehicle,tile,ref presentation,true);
+    private static bool Connected(EntityVehicle vehicle,TileEntity tile,ref RelayLookup presentation,bool reusePresentationRelay)
     {
         try
         {
@@ -171,7 +207,7 @@ internal static partial class RebirthCamperRelayWiring
                 if(node?.TileEntity!=null)tile=node.TileEntity;
             }
             var link=frame.Links.FirstOrDefault(l=>!l.Mounted&&l.Position==tile.ToWorldPos());
-            var relay=link==null?null:Relay(vehicle,link.Relay);
+            var relay=link==null?null:reusePresentationRelay?presentation.Resolve(vehicle,link.Relay):Relay(vehicle,link.Relay);
             return relay&&Matches(tile,link,frame.Vehicle)&&(relay.position+Origin.position-tile.ToWorldPos().ToVector3Center()).sqrMagnitude<=link.Length*link.Length;
         }
         catch{return false;}

@@ -30,8 +30,9 @@ internal static class RebirthBackpackSaleQuote
         {
             if(!view.TryGetSlot(i,out var stack))continue;
             int count=TradableCount(ui,stack); if(count<=0)continue; int type=stack.itemValue.type; reserved.TryGetValue(type,out int used); var item=stack.itemValue.ItemClass; int bundle=Math.Max(1,item.IsBlock()?Block.list[type].EconomicBundleSize:item.EconomicBundleSize); if(ui?.Trader?.TraderData!=null&&item.MaxCount*TraderInfo.TraderBuyLimit>0){int remaining=Math.Max(0,item.MaxCount*TraderInfo.TraderBuyLimit-ui.Trader.TraderData.GetPrimaryItemCount(stack.itemValue)-used);count=Math.Min(count,remaining)/bundle*bundle;} if(count<=0)continue; reserved[type]=used+count;
-            var quote=stack.Clone();quote.count=count;
-            if(!RebirthItemSaleEstimate.TryGet(ui,quote,out int price))return "—";
+            // TryGetSlot detached this stack; quote count changes cannot mutate the view.
+            stack.count=count;
+            if(!RebirthItemSaleEstimate.TryGet(ui,stack,out int price))return "—";
             total+=Math.Max(0,price);
         }
         return total.ToString("N0",CultureInfo.InvariantCulture)+" $";

@@ -200,7 +200,9 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
         // Window layout resets scale when dirty; apply the HUD scale afterwards.
         ViewComponent.UiTransform.localScale=new Vector3(DisplayScale,DisplayScale,1);
         foreach(var child in children)child.Update(dt);
-        var texture=xuiTexture.UiTransform.GetComponent<UITexture>();
+        // Native captureComponents already binds this exact UITexture for the view.
+        var texture=xuiTexture.uiTexture;
+        if(texture==null)texture=xuiTexture.UiTransform.GetComponent<UITexture>();
         if(texture!=null && opacityMaterial==null && texture.material!=null)
         {
             var shader=Shader.Find("Unlit/Transparent Colored");

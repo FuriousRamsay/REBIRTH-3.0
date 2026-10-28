@@ -12,7 +12,9 @@ class Program
   Check(RebirthPurgeSupplyAccess.AllowOpen(crate,owner),"owner can open accepted native delivery without a disk-save barrier");
   string text="Search";RebirthPurgeSupplyAccess.AfterActivationText(crate,ref text,true);
   Check(text=="Reserved for Owner\nSearch","owned delivery shows reservation without saving-state UI");
-  bool result=true;Check(RebirthPurgeSupplyAccess.BeforeLock(crate,1,ref result),"owner reaches normal native loot opening");
+  bool result=true;RebirthPurgeSupplyLoot.Ready=false;
+  Check(!RebirthPurgeSupplyAccess.BeforeLock(crate,1,ref result)&&!result,"owner cannot initialize loot before objective projection is ready");
+  RebirthPurgeSupplyLoot.Ready=true;result=true;Check(RebirthPurgeSupplyAccess.BeforeLock(crate,1,ref result),"owner reaches normal native loot opening after objectives become ready");
   var client=new ClientInfo{entityId=1,loginDone=true};manager.Clients.Map[1]=client;
   LockManager.Instance.singleLocks.Map[new LockManager.LockEntry(crate,0)]=1;
   var bag=new NetPackageBag{entityId=10,Sender=client};
@@ -24,6 +26,9 @@ class Program
   Check(text=="Reserved for Owner\nSearch","completed owned crate uses native owner projection and shared activation text");
   text="";RebirthPurgeSupplyAccess.AfterActivationText(crate,ref text,true);Check(text=="","absent native interaction is not invented by presentation");
   Check(!RebirthPurgeSupplyAccess.AllowOpen(crate,other),"another stable owner cannot loot completed reserved crate");
+  bool deniedResult=true;
+  Check(!RebirthPurgeSupplyAccess.BeforeLock(crate,other.entityId,ref deniedResult)&&!deniedResult,"nonowner native opening is refused");
+  Check(GameManager.TooltipPlayer==other&&GameManager.TooltipText=="These supplies are reserved for Owner."&&GameManager.TooltipSound=="ui_denied","denial routes localized owner feedback to rejected player");
   Check(RebirthPurgeSupplyAccess.BeforeBag(bag,world),"authenticated current owner with native lock may send normal bag update");
   bag.Sender=new ClientInfo{entityId=1,loginDone=true};
   Check(!RebirthPurgeSupplyAccess.BeforeBag(bag,world),"unregistered connection with reused player ID cannot mutate bag");
@@ -43,7 +48,7 @@ class Entity{public World world;public int entityId;public ulong WorldTimeBorn;p
 class EntityAlive:Entity{}class EntitySupplyCrate:EntityAlive{}class EntityPlayer:EntityAlive{public string Key;}
 class WorldState{public string Guid;}class EntityList{public Dictionary<int,Entity> dict=new Dictionary<int,Entity>();}
 class World{public WorldState worldState;public EntityList Entities=new EntityList();public bool IsRemote()=>false;public Entity GetEntity(int id)=>Entities.dict.TryGetValue(id,out var found)?found:null;}
-class GameManager{public static GameManager Instance;public World World;}class ClientInfo{public int entityId;public bool loginDone;}
+class GameManager{public static GameManager Instance;public World World;public static EntityPlayer TooltipPlayer;public static string TooltipText,TooltipSound;public static void ShowTooltipMP(EntityPlayer player,string text,string sound){TooltipPlayer=player;TooltipText=text;TooltipSound=sound;}}class ClientInfo{public int entityId;public bool loginDone;}
 class ClientList{public Dictionary<int,ClientInfo> Map=new Dictionary<int,ClientInfo>();public ClientInfo ForEntityId(int id)=>Map.TryGetValue(id,out var found)?found:null;}
 class ConnectionManager{public bool IsServer;public ClientList Clients=new ClientList();}
 class SingletonMonoBehaviour<T>{public static T Instance;}class ThreadManager{public static bool IsMainThread()=>true;}
@@ -52,9 +57,13 @@ class LockManager{public readonly struct LockEntry{public readonly Entity Target
  public static LockManager Instance=new LockManager();public Locks singleLocks=new Locks();public class Locks{public Dictionary<LockEntry,int> Map=new Dictionary<LockEntry,int>();public bool TryGetByValue(LockEntry entry,out int id)=>Map.TryGetValue(entry,out id);}}
 internal static class RebirthPurgeKillContributor{internal static string Identify(EntityPlayer player,World expected)=>player!=null&&ReferenceEquals(expected,player.world)&&ReferenceEquals(expected.GetEntity(player.entityId),player)?player.Key:null;}
 internal static class RebirthPurgeSupplyService{internal static IReadOnlyDictionary<string,RebirthPurgeSupplyAccount> Published;}
+// Readiness is a controlled dependency; this fixture tests access gating, not loot selection.
+internal static class RebirthPurgeSupplyLoot{internal static bool Ready=true;internal static bool ObjectivesReady(World world)=>Ready;}
 internal static class RebirthPurgeReleasePolicy{internal static bool Enabled=true;}internal class RebirthSandboxOptionManager{internal static readonly RebirthSandboxOptionManager Current=new RebirthSandboxOptionManager();internal bool IsPurge=true;}
 enum StreamModeRead{Persistency,FromServer,FromClient}enum StreamModeWrite{Persistency,ToServer,ToClient}
 class PooledBinaryWriter:BinaryWriter{public PooledBinaryWriter(Stream stream):base(stream,Encoding.UTF8,true){}}
 class PooledBinaryReader:BinaryReader{public PooledBinaryReader(Stream stream):base(stream,Encoding.UTF8,true){}}
 namespace UnityEngine.Scripting{class PreserveAttribute:Attribute{}}namespace HarmonyLib{}
-class Localization{public static string Get(string key)=>key=="xuiRebirthPurgeSupplyReserved"?"Reserved for {0}":key== "xuiRebirthPurgeSupplySaving"?"Saving earned supply delivery…":"its owner";}
+// Presentation doubles capture dispatch; native transport and name sanitization are not covered.
+class RebirthPurgeDiscoveryNotification{public static string CleanDisplayName(string value)=>value;}
+class Localization{public static string Get(string key)=>key=="xuiRebirthPurgeSupplyDenied"?"These supplies are reserved for {0}.":key=="xuiRebirthPurgeSupplyReserved"?"Reserved for {0}":key== "xuiRebirthPurgeSupplySaving"?"Saving earned supply delivery…":"its owner";}

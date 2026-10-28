@@ -1,0 +1,29 @@
+<configs>
+  <append xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']">
+    <rect name="rebirthMapZoom" controller="RebirthMapZoomSlider, RebirthUtils" pos="0,0" width="348" height="76" depth="1500" gamepad_selectable="false">
+      <sprite name="zoomBackground" width="348" height="76" sprite="menu_empty2px" type="sliced" fillcenter="true" color="24,24,29,245" globalopacitymod="0" depth="1" on_press="true" on_drag="true" on_scroll="true" />
+      <label name="zoomTitle" pos="12,-4" width="120" height="22" font_size="18" color="181,140,255,255" text_key="xuiRebirthMapZoomTitle" on_press="false" on_hover="false" depth="6" />
+      <label name="zoomSpan" pos="136,-4" width="200" height="22" font_size="18" justify="right" overflow="shrinkcontent" color="255,255,255,255" on_press="false" on_hover="false" depth="6" />
+      <sprite name="zoomTrack" pos="12,-26" width="324" height="28" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" globalopacitymod="0" on_press="true" on_drag="true" on_scroll="true" on_hover="true" tooltip_key="xuiRebirthMapZoomHint" gamepad_selectable="false" depth="4" />
+      <filledsprite name="zoomFill" pos="15,-29" width="318" height="22" type="filled" fill="0" color="150,101,215,255" globalopacitymod="0" on_press="false" on_hover="false" depth="5" />
+      <sprite name="zoomThumb" pos="8,-26" width="8" height="28" sprite="menu_empty" color="218,195,244,255" globalopacitymod="0" on_press="true" on_drag="true" on_scroll="true" on_hover="true" tooltip_key="xuiRebirthMapZoomHint" gamepad_selectable="false" depth="6" />
+      <label name="zoomDetail" pos="12,-56" width="142" height="18" font_size="14" color="210,210,218,255" text_key="xuiRebirthMapZoomDetail" on_press="false" on_hover="false" depth="6" />
+      <label name="zoomOverview" pos="194,-56" width="142" height="18" font_size="14" justify="right" color="210,210,218,255" text_key="xuiRebirthMapZoomOverview" on_press="false" on_hover="false" depth="6" />
+    </rect>
+  </append>
+  <append xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//rect[@name='mapView']">
+    <rect name="rebirthWorldBoundary" width="1412" height="764" depth="1200" on_press="false" on_drag="false" on_scroll="false" on_hover="false">
+      <texture name="worldOutsideLeft" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="0,0,0,255" globalopacitymod="0" depth="1" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldOutsideRight" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="0,0,0,255" globalopacitymod="0" depth="1" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldOutsideTop" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="0,0,0,255" globalopacitymod="0" depth="1" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldOutsideBottom" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="0,0,0,255" globalopacitymod="0" depth="1" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldBorderLeft" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="181,140,255,255" globalopacitymod="0" depth="2" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldBorderRight" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="181,140,255,255" globalopacitymod="0" depth="2" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldBorderTop" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="181,140,255,255" globalopacitymod="0" depth="2" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+      <texture name="worldBorderBottom" width="1" height="1" type="simple" border="0,0,0,0" autounload="false" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" color="181,140,255,255" globalopacitymod="0" depth="2" on_press="false" on_drag="false" on_scroll="false" on_hover="false" />
+    </rect>
+  </append>
+</configs>
+
+
+

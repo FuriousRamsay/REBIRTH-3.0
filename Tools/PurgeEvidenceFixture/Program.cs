@@ -8,18 +8,19 @@ internal static class RebirthPurgeReleasePolicy{internal static bool Enabled=>tr
 class EntityClass {public string entityClassName="zombieArlene";public static Dictionary<int,EntityClass> list=new Dictionary<int,EntityClass>{{1,new EntityClass()}};}
 class Vec { public int x,y,z; public Vec(int a=0,int b=0,int c=0){x=a;y=b;z=c;} public static Vec operator +(Vec a,Vec b)=>new Vec(a.x+b.x,a.y+b.y,a.z+b.z);public override bool Equals(object o)=>o is Vec v&&x==v.x&&y==v.y&&z==v.z;public override int GetHashCode()=>x; }
 class Definition { public Vec startPos=new Vec(),size=new Vec(10,10,10);public short spawnCountMin=1,spawnCountMax=2;public int flags;public string minScript; }
-class Prefab {public byte DifficultyTier;public bool bTraderArea;public string PrefabName="house";public List<Definition> SleeperVolumeList=new List<Definition>{new Definition()};}
+class Prefab {public FastTags<TagGroup.Poi> Tags;public byte DifficultyTier;public bool bTraderArea;public string PrefabName="house";public List<Definition> SleeperVolumeList=new List<Definition>{new Definition()};}
 class PrefabInstance {public Prefab prefab=new Prefab();public Vec boundingBoxPosition=new Vec(),boundingBoxSize=new Vec(10,10,10);public byte rotation;public List<SleeperVolume> sleeperVolumes=new List<SleeperVolume>();}
 class Biome {public string m_sBiomeName="forest";}
 class WorldState {public string Guid=System.Guid.NewGuid().ToString("N").ToUpperInvariant();}
 class World {public WorldState worldState=new WorldState();public ulong worldTime=1;public Dictionary<int,EntityAlive> Entities=new Dictionary<int,EntityAlive>();public List<SleeperVolume> Volumes=new List<SleeperVolume>(); public bool IsRemote()=>false;public EntityAlive GetEntity(int id)=>Entities.TryGetValue(id,out var e)?e:null;public int ManifestLookups;public int FindSleeperVolume(Vec min,Vec max){ManifestLookups++;return Volumes.FindIndex(v=>v.BoxMin.Equals(min)&&v.BoxMax.Equals(max));}public SleeperVolume GetSleeperVolume(int id)=>id>=0&&id<Volumes.Count?Volumes[id]:null;public Biome GetBiome(int x,int z)=>new Biome();}
 class EntityBuffs {public Dictionary<string,float> Vars=new Dictionary<string,float>();public bool HasCustomVar(string key)=>Vars.ContainsKey(key);public float GetCustomVar(string key)=>Vars[key];public void SetCustomVar(string key,float value,bool netSync){Vars[key]=value;} }
-class EntityAlive {public EntityBuffs Buffs=new EntityBuffs();public World world;public int entityId;public int entityClass=1;public bool Dead;public bool IsDead()=>Dead;}
-class EntityPlayer:EntityAlive {public bool IsSpectator;public bool IsAlive()=>!Dead;public Vec GetBlockPosition()=>new Vec();}
+class EntityAlive {public EntityBuffs Buffs=new EntityBuffs();public World world;public int entityId;public int entityClass=1;public bool Dead;public bool IsDead()=>Dead;public bool IsAlive()=>!Dead;}
+class FlyFlag { public bool Value; }
+class EntityPlayer:EntityAlive {public Vec Position=new Vec();public bool IsSpawned()=>true; public object AttachedToEntity;public FlyFlag IsFlyMode=new FlyFlag();public bool IsSpectator;public bool IsAlive()=>!Dead;public Vec GetBlockPosition()=>Position;}
 class Script {public bool Running;public bool IsRunning()=>Running;}
 class Handle {public bool IsCompleted=true;public Action onComplete;}
 class SleeperVolume {public struct RespawnData {public string className;public int spawnPointIndex;}public PrefabInstance prefabInstance;public Vec BoxMin=new Vec(),BoxMax=new Vec(10,10,10);public short spawnCountMin=1,spawnCountMax=2;public int flags,numSpawned;public bool isSpawning,isSpawned,wasCleared;public int Activated;public void UpdatePlayerTouched(World world,EntityPlayer player){Activated++;isSpawned=isSpawning=true;}public Script minScript;public Dictionary<int,RespawnData> respawnMap=new Dictionary<int,RespawnData>();public HashSet<int> pendingSpawnMap=new HashSet<int>();public Queue<Handle> pendingSpawnOps=new Queue<Handle>();}
-class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPos(int x,int z)=>Prefab;}
+class Decorator {public PrefabInstance Prefab;public PrefabInstance GetPrefabFromWorldPos(int x,int z)=>Prefab!=null&&Prefab.boundingBoxPosition.x==x&&Prefab.boundingBoxPosition.z==z?Prefab:null;public PrefabInstance GetPrefabFromWorldPosInside(int x,int z)=>Prefab!=null&&x>=Prefab.boundingBoxPosition.x&&z>=Prefab.boundingBoxPosition.z&&x<=Prefab.boundingBoxPosition.x+Prefab.boundingBoxSize.x&&z<=Prefab.boundingBoxPosition.z+Prefab.boundingBoxSize.z?Prefab:null;}
 class GameStateManager {public bool IsGameStarted()=>true;}
 class GameManager {public static GameManager Instance;public World World;public bool IsStartingGame;public GameStateManager gameStateManager=new GameStateManager();public bool IsEditMode()=>false;public Decorator Decorator=new Decorator();public Decorator GetDynamicPrefabDecorator()=>Decorator;}
 class ConnectionManager {public bool IsServer=true;}
@@ -32,12 +33,26 @@ static class Program
  static int count;static void Check(bool yes,string name){if(!yes)throw new Exception(name);count++;Console.WriteLine("PASS "+name);}
  static void Main()
  {
+  RebirthPurgePoiEligibility.Load(System.IO.Directory.GetCurrentDirectory());
   var world=new World();GameManager.Instance=new GameManager{World=world};var prefab=new PrefabInstance();var volume=new SleeperVolume{prefabInstance=prefab};prefab.sleeperVolumes.Add(volume);world.Volumes.Add(volume);GameManager.Instance.Decorator.Prefab=prefab;
   string dir=Path.Combine(Path.GetTempPath(),"rebirth-purge-evidence-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);var binding=new RebirthPoiWorldBinding(world,world.worldState.Guid,dir,()=>ReferenceEquals(GameManager.Instance.World,world));
   Check(RebirthPoiWorldStore.TryOpen(binding,out var store)==RebirthPoiStoreResult.Published,"real store opens");double time=0;var producer=new RebirthPoiNativeEvidence(()=>store,()=>time);Action pulse=()=>{time++;producer.Pulse();};
-  RebirthPoiNativeManifest.TryResolve(world,prefab,out var manifest);Check(manifest!=null,"complete authored native mapping");producer.PlayerTouch(world,new EntityPlayer{world=world});pulse();Check(store.Published.Count==1,"passive discovery saves");
+  RebirthPoiNativeManifest.TryResolve(world,prefab,out var manifest);Check(manifest!=null,"complete authored native mapping");
+  Func<bool> oldMatch=()=>RebirthPoiNativeManifest.TryResolve(world,prefab,out var rebuilt)&&manifest.Identity.Key==rebuilt.Identity.Key&&manifest.Identity.Biome==rebuilt.Identity.Biome&&manifest.Volumes.SequenceEqual(rebuilt.Volumes);
+  Action<string> compareMatch=name=>Check(manifest.StillMatches()==oldMatch(),"retained manifest equivalence: "+name);
+  compareMatch("unchanged");prefab.rotation=1;compareMatch("rotation");prefab.rotation=0;
+  prefab.boundingBoxSize=new Vec(11,10,10);compareMatch("geometry");prefab.boundingBoxSize=new Vec(10,10,10);
+  volume.flags=1;compareMatch("room flags");volume.flags=0;
+  prefab.prefab.SleeperVolumeList.Add(prefab.prefab.SleeperVolumeList[0]);compareMatch("duplicate authored room");prefab.prefab.SleeperVolumeList.RemoveAt(1);
+  var replacementRoom=new SleeperVolume{prefabInstance=prefab};world.Volumes[0]=replacementRoom;compareMatch("replacement room");world.Volumes[0]=volume;
+  prefab.sleeperVolumes.Add(replacementRoom);compareMatch("extra combat room");prefab.sleeperVolumes.Remove(replacementRoom);
+  world.Volumes.Clear();compareMatch("unloaded room");world.Volumes.Add(volume);
+  for(int warm=0;warm<20;warm++){oldMatch();manifest.StillMatches();}
+  long allocationStart=GC.GetAllocatedBytesForCurrentThread();for(int sample=0;sample<1000;sample++)oldMatch();long previousBytes=GC.GetAllocatedBytesForCurrentThread()-allocationStart;
+  allocationStart=GC.GetAllocatedBytesForCurrentThread();for(int sample=0;sample<1000;sample++)manifest.StillMatches();long retainedBytes=GC.GetAllocatedBytesForCurrentThread()-allocationStart;
+  Check(retainedBytes<previousBytes,"retained mapping reduces measured validation allocations");Console.WriteLine("ALLOCATIONS 1000 checks old="+previousBytes+" retained="+retainedBytes+" bytes; native API doubles");var interiorPlayer=new EntityPlayer{world=world,Position=new Vec(5,0,5)};Check(GameManager.Instance.Decorator.GetPrefabFromWorldPos(5,5)==null,"native origin lookup rejects interior coordinates");producer.PlayerTouch(world,interiorPlayer);pulse();Check(store.Published.Count==1,"interior player touch discovers containing POI");Check(producer.TryScannerView(world,interiorPlayer,out _,out _),"scanner resolves discovered POI from interior coordinates");interiorPlayer.Position=new Vec(11,0,5);Check(!producer.TryScannerView(world,interiorPlayer,out _,out _),"scanner rejects position beyond native POI bounds");
   volume.wasCleared=true;volume.numSpawned=1;producer.NativeDirty(world,volume);pulse();store.Published.TryGet(manifest.Identity,out var record);Check(record.State==RebirthPoiClearanceState.Discovered,"wasCleared and numSpawned alone never proof");
-  var entity=new EntityAlive{world=world,entityId=42};world.Entities.Add(42,entity);volume.respawnMap.Add(42,new SleeperVolume.RespawnData{className="zombieArlene",spawnPointIndex=0});volume.pendingSpawnMap.Add(42);volume.pendingSpawnOps.Enqueue(new Handle());producer.NativeSpawn(world,volume,entity);entity.Dead=true;var witness=producer.BeforeDeath(volume,entity);Check(witness!=null,"successful native entity plus original membership death witness");volume.respawnMap.Remove(42);producer.AfterDeath(witness);pulse();store.Published.TryGet(manifest.Identity,out record);Check(record.State==RebirthPoiClearanceState.Cleared,"retained finished async handles and historical IDs permit verified clear");producer.AfterDeath(witness);pulse();Check(store.Published.Revision==3,"duplicate death does not republish");Check(!producer.IsWithheld(manifest.Identity),"duplicate death does not replace its receipt or fault original candidate");
+  var entity=new EntityAlive{world=world,entityId=42};world.Entities.Add(42,entity);volume.respawnMap.Add(42,new SleeperVolume.RespawnData{className="zombieArlene",spawnPointIndex=0});volume.pendingSpawnMap.Add(42);volume.pendingSpawnOps.Enqueue(new Handle());producer.NativeSpawn(world,volume,entity);var witness=producer.BeforeDeath(volume,entity);Check(witness!=null,"successful native entity plus original membership death witness");volume.respawnMap.Remove(42);producer.AfterDeath(witness);Check(!entity.Dead,"native sleeper notification precedes completed death");entity.Dead=true;pulse();store.Published.TryGet(manifest.Identity,out record);Check(record.State==RebirthPoiClearanceState.Cleared,"retained finished async handles and historical IDs permit verified clear");producer.AfterDeath(witness);pulse();Check(store.Published.Revision==3,"duplicate death does not republish");Check(!producer.IsWithheld(manifest.Identity),"duplicate death does not replace its receipt or fault original candidate");
   Check(!producer.SuppressPurgeRespawn(world,volume),"None tracking retains native respawns after clear");
   RebirthSandboxOptionManager.Current.IsPurge=true;
   Check(producer.SuppressPurgeRespawn(world,volume),"Purge committed clear suppresses native respawn");
@@ -145,3 +160,17 @@ static class Program
 
 
 internal static class RebirthPurgeKillContributor {internal static Func<EntityAlive,string> Resolve;internal static string Capture(EntityAlive entity)=>Resolve?.Invoke(entity);}
+
+// Engine tag semantics doubled for isolated manifest checks.
+class TagGroup { public class Poi {} }
+struct FastTags<T> {
+ private string text;
+ public static FastTags<T> Parse(string value) => new FastTags<T>{text=value};
+ public bool Test_AnySet(FastTags<T> other) {
+  if(string.IsNullOrEmpty(text)||string.IsNullOrEmpty(other.text))return false;
+  foreach(var tag in text.Split(','))foreach(var candidate in other.text.Split(','))if(tag==candidate)return true;
+  return false;
+ }
+}
+
+internal static class RebirthPurgeDiscoveryNotification { internal static string DisplayName(EntityPlayer player)=>string.Empty; internal static void Send(RebirthPoiIdentity identity,EntityPlayer player){} }

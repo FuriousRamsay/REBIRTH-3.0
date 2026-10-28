@@ -16,6 +16,12 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private XUiController viewport, content, track, thumb;
     private XUiV_Label emptyLabel;
     private XUiC_RebirthSurvivorCharacter owner;
+    private XUiC_RebirthItemEditorHeader editorOwner;
+    private XUiC_RebirthBackpackLibrary libraryOwner;
+    private XUiC_RebirthBackpackSellStash sellStashOwner;
+    private XUiC_RebirthCamperModules modulesOwner;
+    private XUiController liveOwnersParent;
+    private bool liveOwnersReady, staticLiveOwner;
     private int itemCount, stride = 38, capacity, rowHeight = 36;
     private float pixels, target;
     private int authoredHeight;
@@ -43,12 +49,42 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private int Height { get { return viewport != null && viewport.ViewComponent != null ? Math.Max(1, viewport.ViewComponent.Size.y) : 1; } }
     private int ContentHeight { get { return itemCount == 0 ? 0 : (itemCount - 1) * stride + rowHeight; } }
     private float MaxOffset { get { return Math.Max(0, ContentHeight - Height); } }
-    private bool Live { get { return ((explicitOwner?.Invoke() == true) || (owner != null && owner.IsCharacterWindowOpen) || GetParentByType<XUiC_RebirthItemEditorHeader>()?.IsEditorOpen == true || GetParentByType<XUiC_RebirthVehicleRestoration>() != null || GetParentByType<XUiC_RebirthBackpackLibrary>()?.IsOpen == true || GetParentByType<XUiC_RebirthBackpackSellStash>()?.IsOpen == true || GetParentByType<XUiC_RebirthCamperModules>()?.IsOpen == true || GetParentByType<XUiC_RebirthJournal>() != null || GetParentByType<XUiC_QuestListWindow>() != null || GetParentByType<XUiC_RebirthPlayersList>() != null || GetChildByType<XUiC_RebirthWaypointList>() != null || GetChildByType<XUiC_RebirthInviteList>() != null || XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen == true) && ViewComponent != null && ViewComponent.UiTransform != null && ViewComponent.UiTransform.gameObject.activeInHierarchy; } }
-
+    // Controller types are fixed by the initialized XML hierarchy. Keep the
+    // owner references, but read their open flags and the view state live.
+    // OnOpen refreshes a reused/rebuilt hierarchy before child callbacks run.
+    private void CacheLiveOwners()
+    {
+        owner = GetParentByType<XUiC_RebirthSurvivorCharacter>();
+        editorOwner = GetParentByType<XUiC_RebirthItemEditorHeader>();
+        libraryOwner = GetParentByType<XUiC_RebirthBackpackLibrary>();
+        sellStashOwner = GetParentByType<XUiC_RebirthBackpackSellStash>();
+        modulesOwner = GetParentByType<XUiC_RebirthCamperModules>();
+        staticLiveOwner = GetParentByType<XUiC_RebirthVehicleRestoration>() != null
+            || GetParentByType<XUiC_RebirthJournal>() != null
+            || GetParentByType<XUiC_QuestListWindow>() != null
+            || GetParentByType<XUiC_RebirthPlayersList>() != null
+            || GetChildByType<XUiC_RebirthWaypointList>() != null
+            || GetChildByType<XUiC_RebirthInviteList>() != null;
+        liveOwnersParent = Parent;
+        liveOwnersReady = true;
+    }
+    private bool Live
+    {
+        get
+        {
+            if (!liveOwnersReady || !ReferenceEquals(liveOwnersParent, Parent)) CacheLiveOwners();
+            return ((explicitOwner?.Invoke() == true) || (owner != null && owner.IsCharacterWindowOpen)
+                || editorOwner?.IsEditorOpen == true || libraryOwner?.IsOpen == true
+                || sellStashOwner?.IsOpen == true || modulesOwner?.IsOpen == true || staticLiveOwner
+                || XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen == true)
+                && ViewComponent != null && ViewComponent.UiTransform != null
+                && ViewComponent.UiTransform.gameObject.activeInHierarchy;
+        }
+    }
     public override void Init()
     {
         base.Init();
-        owner = GetParentByType<XUiC_RebirthSurvivorCharacter>();
+        CacheLiveOwners();
         viewport = GetChildById("listViewport");
         content = GetChildById("listContent") ?? GetChildById("waypointList") ?? GetChildById("invitesList");
         track = GetChildById("listTrack");
@@ -75,6 +111,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
 
     public override void OnOpen()
     {
+        CacheLiveOwners();
         base.OnOpen();
         ResetPosition();
         RebirthScrollbarPagingNativeAdapter.RegisterCustomAuthority(nativeHost);

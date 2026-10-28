@@ -40,7 +40,7 @@
         <rect name="vehicleNativeModifiers" pos="18,-576" width="544" height="171" controller="RebirthRestorationModifiers, RebirthUtils">
 <label pos="0,0" width="544" height="26" font_size="22" text_key="xuiModifiers" color="188,132,231,255" depth="5" />
 <grid name="parts" pos="0,-30" rows="1" cols="8" cell_width="67" cell_height="60" repeat_content="true" controller="VehiclePartStackGrid">
-<rect controller="RebirthRestorationModifierSlot, RebirthUtils" style="vehicleStack, hover" width="60" height="60" on_press="true" on_hover="true" on_drag="true" allow_dropping="true" tooltip="{partname}">
+<rect controller="RebirthRestorationModifierSlot, RebirthUtils" style="vehicleStack" width="60" height="60" on_press="true" on_hover="true" on_drag="true" allow_dropping="true" tooltip="{partname}">
 <sprite name="backgroundMain" width="60" height="60" sprite="menu_empty3px" type="sliced" fillcenter="false" color="30,30,36,255" depth="2" />
 <sprite name="background" width="56" height="56" pos="2,-2" sprite="menu_empty" color="58,58,65,255" depth="1" />
 <sprite name="highlightOverlay" width="56" height="56" pos="2,-2" sprite="menu_empty" color="58,58,65,255" depth="3" />
@@ -49,7 +49,7 @@
 </rect></grid>
 <label pos="0,-96" width="544" height="26" font_size="22" text_key="xuiCosmetics" color="188,132,231,255" depth="5" />
 <grid name="cosmeticparts" pos="0,-126" rows="1" cols="1" cell_width="67" cell_height="60" repeat_content="true" controller="ItemCosmeticStackGrid">
-<rect controller="RebirthRestorationCosmeticSlot, RebirthUtils" style="vehicleStack, hover" width="60" height="60" on_press="true" on_hover="true" on_drag="true" allow_dropping="true" tooltip="{partname}">
+<rect controller="RebirthRestorationCosmeticSlot, RebirthUtils" style="vehicleStack" width="60" height="60" on_press="true" on_hover="true" on_drag="true" allow_dropping="true" tooltip="{partname}">
 <sprite name="backgroundMain" width="60" height="60" sprite="menu_empty3px" type="sliced" fillcenter="false" color="30,30,36,255" depth="2" />
 <sprite name="background" width="56" height="56" pos="2,-2" sprite="menu_empty" color="58,58,65,255" depth="1" />
 <sprite name="highlightOverlay" width="56" height="56" pos="2,-2" sprite="menu_empty" color="58,58,65,255" depth="3" />

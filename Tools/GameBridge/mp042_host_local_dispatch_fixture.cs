@@ -1,0 +1,28 @@
+// AUTHORED_NOT_RUN. Actual local send/drain/reply; authoritative Request/Result services are explicit adapters.
+using System;using System.Linq;using System.Collections.Generic;using System.Xml.Linq;
+class World{internal bool Remote;internal EntityPlayerLocal Player;internal bool IsRemote()=>Remote;internal EntityPlayerLocal GetPrimaryPlayer()=>Player;internal object GetEntity(int id)=>Player;}
+class EntityPlayer{internal World world;internal int entityId=1;}class EntityPlayerLocal:EntityPlayer{}
+class Persistent{internal object PrimaryId=new object();}
+class GameManager{internal static GameManager Instance=new GameManager();internal World World;internal Persistent Persistent;internal int Uploads;internal Persistent GetPersistentLocalPlayer()=>Persistent;internal void TriggerSendOfLocalPlayerDataFile(float delay){Uploads++;}}
+class RebirthStablePlayerIdentity{internal string StorageKey="owner-key";internal static bool TryResolveServerEntity(EntityPlayer player,out RebirthStablePlayerIdentity identity){identity=new RebirthStablePlayerIdentity();return true;}}
+static class RemoteResourceWorldIdentity{internal static bool TryGet(World world,out string id){id="source-world";return true;}}
+enum RemoteResourceClientOperation{Craft}
+static class RebirthRemoteResourceClientOriginal{internal sealed class Intent{internal Guid Operation=Guid.NewGuid();internal string Digest="digest",Creation="creation";internal ulong Epoch=1,Request=5;internal RemoteResourceClientOperation Kind;internal XElement Copy()=>new XElement("fetchClientOriginal",new XAttribute("operation",Operation));}}
+static class RebirthRemoteResourceDurableJournal{internal sealed class Record{internal Guid Operation=Guid.NewGuid();internal string Binding="binding";internal int Phase=2;internal XElement Copy()=>new XElement("source",new XAttribute("outcome",1),new XElement("removed","native-paid"));}internal static Guid Operation(string world,string owner,string creation,ulong epoch,ulong request,RemoteResourceClientOperation kind)=>Guid.NewGuid();}
+static class RebirthCamperInventorySnapshot{internal static byte[] Capture(ItemStack[] items)=>new byte[0];}class ItemStack{}
+static class NetPackageRebirthRemoteRepairOriginal{internal static int Sends;internal static void Send(int player,object owner,RebirthRemoteResourceClientOriginal.Intent original,string text){Sends++;}}
+static class NetPackageRebirthRemoteRepairResult{internal static int Sends;internal static void Send(int player,RebirthRemoteResourceClientOriginal.Intent original,string text){Sends++;}}
+class Protocol
+{
+ class Pending{internal RebirthRemoteResourceClientOriginal.Intent Original=new RebirthRemoteResourceClientOriginal.Intent();internal bool Ack;}
+ class LocalRequest{internal EntityPlayerLocal Player;internal World World;internal RebirthRemoteResourceClientOriginal.Intent Original;internal string Body;}
+ static readonly Dictionary<Guid,Pending> pending=new Dictionary<Guid,Pending>();static readonly Dictionary<Guid,LocalRequest> localRequests=new Dictionary<Guid,LocalRequest>();static int Requests,Results;static bool Live=true;
+ static bool Current(EntityPlayerLocal player,Pending value)=>Live&&ReferenceEquals(GameManager.Instance.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&pending.TryGetValue(value.Original.Operation,out var saved)&&ReferenceEquals(saved,value);
+ static void Request(EntityPlayerLocal player,string body){Requests++;var request=XElement.Parse(body);var value=pending.Values.Single();if(request.Name!="craftRequest"||(int)request.Attribute("version")!=2)throw new Exception("local route altered actual original envelope");Reply(player,value.Original,new RebirthRemoteResourceDurableJournal.Record(),false);}
+ static void Result(EntityPlayerLocal player,Guid operation,string body){Results++;var result=XElement.Parse(body);if(result.Name!="craftResult"||(string)result.Attribute("original")!=operation.ToString("N"))throw new Exception("direct result lost original binding");Send(player,pending[operation],2);}
+ // ACTUAL_SEND
+ // ACTUAL_DRAIN
+ // ACTUAL_REPLY
+ static void Need(bool value,string text){if(!value)throw new Exception(text);}
+ static void Main(){var world=new World();var player=new EntityPlayerLocal{world=world};world.Player=player;GameManager.Instance.World=world;GameManager.Instance.Persistent=null;var value=new Pending();pending.Add(value.Original.Operation,value);Send(player,value,0);Need(Requests==0&&Results==0&&localRequests.Count==1&&NetPackageRebirthRemoteRepairOriginal.Sends==0,"host-local send must enqueue same actual request without network peer");DrainLocalRequests(player,world);Need(Requests==1&&Results==1&&localRequests.Count==1&&GameManager.Instance.Uploads==0,"direct actual reply retains next stage for another update");DrainLocalRequests(player,world);Need(Requests==2&&Results==2&&localRequests.Count==1,"synchronous native service cannot recurse through unbounded stages");Live=false;DrainLocalRequests(player,world);Need(Requests==2&&localRequests.Count==0,"expired local body cannot invoke retained stage");Live=true;world.Remote=true;Send(player,value,1);Need(NetPackageRebirthRemoteRepairOriginal.Sends==0,"remote route still requires native persistent identity");GameManager.Instance.Persistent=new Persistent();Send(player,value,1);Need(NetPackageRebirthRemoteRepairOriginal.Sends==1&&localRequests.Count==0&&GameManager.Instance.Uploads==1,"remote route preserves actual native transport/save request");Console.WriteLine("MP042 host-local actual send/drain/reply: 6 topology, stage and original-envelope assertions authored; financial services remain adapters.");}
+}

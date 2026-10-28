@@ -1,0 +1,9 @@
+{
+ "status":"CORRECTED_SHOULDER_TRACE_REQUIRES_REVIEW",
+ "source":"Approved original 01-forge.png, 1448 by 1086",
+ "reason":"Earlier upper-left contour was too low, omitting the masonry behind the shoulder band.",
+ "contourPixels":[[468,363],[473,298],[525,244],[588,201],[660,174],[736,151],[790,144],[1008,145],[1086,181],[1163,233],[1226,309],[1270,389],[1295,479],[1308,597],[1300,803],[1262,873],[1162,920],[1006,950],[802,946],[697,904],[646,849],[589,772],[531,647],[492,514]],
+ "occludedSegments":"Lower-left contour passes behind bellows, flange and crucible; those segments remain inferred.",
+ "measurementUncertaintyPixels":10,
+ "blenderAllowed":false
+}

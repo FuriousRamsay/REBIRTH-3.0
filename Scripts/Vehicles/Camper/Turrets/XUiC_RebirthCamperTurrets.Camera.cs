@@ -87,7 +87,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
             turretCamera.cullingMask&= -513;turretCamera.renderingPath=RenderingPath.DeferredShading;turretCamera.clearFlags=CameraClearFlags.Color;turretCamera.targetTexture=cameraTexture;
             var view=(XUiV_Texture)GetChildById("turretCameraView").ViewComponent;view.Texture=cameraTexture;
             if(SystemInfo.graphicsDeviceVersion.Contains("OpenGL"))view.Flip=UIBasicSprite.Flip.Vertically;
-            cameraCorner=corner;previousCameraMouse=Vector2.zero;fireReleased=exitReleased=false;cameraInputCadence.Reset();pickerCorner=-1;PaintPicker();
+            cameraCorner=corner;previousCameraMouse=Vector2.zero;fireReleased=exitReleased=false;cameraInputCadence.Reset();
             var gui=xui.playerUI.playerInput.GUIActions;
             MouseAxis(gui.CameraLeft,Mouse.NegativeX);MouseAxis(gui.CameraRight,Mouse.PositiveX);MouseAxis(gui.CameraUp,Mouse.PositiveY);MouseAxis(gui.CameraDown,Mouse.NegativeY);
             Visible("turretCameraPanel",true); CameraCards(false);

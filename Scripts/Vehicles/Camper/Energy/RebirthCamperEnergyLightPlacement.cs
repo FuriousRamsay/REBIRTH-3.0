@@ -10,6 +10,7 @@ internal static class RebirthCamperEnergyLightPlacement
     private static int diagnostics;
     private static void Postfix(Block __instance,WorldBase __0,Chunk __1,Vector3i __2,BlockValue __3,PlatformUserIdentifierAbs __4)
     {
+        RebirthCamperWorldLighting.RecordPlacedPoiLight(__instance,__0,__1,__2,__3,__4);
         if(__instance is not BlockPowered powered||__instance.GetType().GetMethod(nameof(Block.OnBlockAdded))?.DeclaringType!=typeof(Block)||__4==null||__3.ischild||__1==null
             ||!ThreadManager.IsMainThread()||!(__0 is World world)||world.IsRemote()
             ||!ReferenceEquals(GameManager.Instance?.World,world)

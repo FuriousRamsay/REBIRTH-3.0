@@ -2,6 +2,7 @@ using System;
 using World=PlayerWorld;using System.IO;using System.Text;using System.Xml;
 using System.Collections.Generic;
 using System.Linq;using System.Xml.Linq;using System.Globalization;
+public static class ThreadManager{public static bool IsMainThread()=>true;}
 // Disclosed doubles: native item serialization/codec/policy are not exercised by this fixture.
 public class ItemClass {public string GetIconName(){return "packIcon";}public static ItemValue GetItem(string id,bool missing){return new ItemValue{Type=1};}public int MaxCount=5;public string GetItemName(){return "pack";}}
 public class ItemValue {
@@ -41,6 +42,28 @@ public static class RemoteResourceTransactions {
  public sealed class ConsumptionResult {public bool Success;public string FailureReason;}
  public static ConsumptionResult TryConsume(EntityPlayer player,IList<ItemStack> requirements,int multiplier,List<ItemStack> removed,bool ignored){foreach(var item in requirements)removed.Add(item.Clone());var hook=ConsumptionHook;ConsumptionHook=null;if(hook!=null)hook();return new ConsumptionResult{Success=true};}
 }
+// Historical source metadata is an explicit adapter in this broad library
+// cohort. The full real legacy store/publisher lives in the dedicated cohort.
+internal static class RemoteResourceLegacyOutcomeStore {
+ internal sealed class Entry {
+  internal World World;internal EntityPlayer Actor;internal RemoteResourceTransactionOutcome Outcome;internal bool Retired,HasInvocation;
+  internal static bool Capture(World world,EntityPlayer actor,InternalPlayerId user,ulong epoch,ulong request,RemoteResourceClientOperation kind,ItemStack[] needs,out Entry entry,ClientInfo peer=null,INetConnection connection=null){entry=new Entry{World=world,Actor=actor};return true;}
+  internal bool TryEnter(EntityPlayer actor){if(HasInvocation||Retired)return false;HasInvocation=true;return true;}
+  internal void Observe(RemoteResourceTransactionOutcome outcome){Outcome=outcome;}
+  internal bool PublishObserved()=>true;
+  internal bool TryReadWarm(EntityPlayer actor,out RemoteResourceTransactionOutcome outcome){outcome=null;if(Retired||!ReferenceEquals(Actor,actor)||!ReferenceEquals(GameManager.Instance.World,World)||!ReferenceEquals(World.Player,Actor))return false;outcome=new RemoteResourceTransactionOutcome{State=Outcome.State,Reason=Outcome.Reason,Removed=Outcome.Removed.Select(x=>x.Clone()).ToList()};return true;}
+  internal bool TryReadCurrent(out RemoteResourceTransactionOutcome outcome)=>TryReadWarm(Actor,out outcome);
+ }
+ internal static readonly List<Entry> Entries=new List<Entry>();internal static void RetireWorld(World world){foreach(var entry in Entries)if(ReferenceEquals(entry.World,world))entry.Retired=true;}internal static void PumpArchive(){}
+}
+public static class RebirthCamperInventorySnapshot {
+ public static byte[] Capture(ItemStack[] items){using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream)){writer.Write(items.Length);foreach(var item in items){writer.Write(item.count);writer.Write(RebirthNativeItemCodec.Encode(item.itemValue));}return stream.ToArray();}}
+ public static ItemStack[] Restore(byte[] bytes){using(var stream=new MemoryStream(bytes))using(var reader=new BinaryReader(stream)){var items=new ItemStack[reader.ReadInt32()];for(int index=0;index<items.Length;index++){int count=reader.ReadInt32();if(!RebirthNativeItemCodec.TryDecode(reader.ReadString(),out var value))throw new InvalidDataException();items[index]=new ItemStack(value,count);}return items;}}
+}
+public static class RebirthCamperCharacterAccess {public static string CurrentCreation(EntityPlayer player)=>RebirthWorldCharacterService.Record?.Origin?.CreationId??"fixture-creation";}
+public static class RebirthCamperStationContentsDelivery {public static bool HoldsOwner(EntityPlayerLocal player)=>false;}
+public static class RebirthConsumptionDurableDelivery {public static bool HoldsInventoryOwner(EntityPlayerLocal player)=>false;}
+public static class RebirthRemoteResourceOwnerAction {public static bool IsHeld(EntityPlayerLocal player)=>false;}
 // OUTCOME_JOURNAL_CLASS
 // Native authentication and world-identity persistence are disclosed doubles.
 public static class RebirthRemoteGearInventorySource {
@@ -94,13 +117,18 @@ public static class RebirthNativeItemCodec {
 }
 public interface INetConnection {bool IsDisconnected();}
 public class TestConnection : INetConnection {public bool Disconnected;public bool IsDisconnected(){return Disconnected;}}
-public class ConnectionManager {public bool IsServer;public INetConnection[] connectionToServer;public List<NetPackage> Sent=new List<NetPackage>();public List<int> Targets=new List<int>();public int FailSendAt;public void SendToServer(NetPackage package){SendPackage(package,-1);}public void SendPackage(NetPackage package,int _attachedToEntityId){if(FailSendAt==Sent.Count+1)throw new IOException("fixture queue failure");Sent.Add(package);Targets.Add(_attachedToEntityId);}}
+public class LegacyClients {public ClientInfo ForEntityId(int id)=>null;}
+public class ConnectionManager {public LegacyClients Clients=new LegacyClients();public bool IsServer;public INetConnection[] connectionToServer;public List<NetPackage> Sent=new List<NetPackage>();public List<int> Targets=new List<int>();public int FailSendAt;public void SendToServer(NetPackage package){SendPackage(package,-1);}public void SendPackage(NetPackage package,int _attachedToEntityId){if(FailSendAt==Sent.Count+1)throw new IOException("fixture queue failure");Sent.Add(package);Targets.Add(_attachedToEntityId);}}
 public class SingletonMonoBehaviour<T> {public static T Instance;}
 public static class RebirthGearOwnerReservation {
  public static bool Held;
  public static bool IsHeld(EntityPlayerLocal player){return Held&&player!=null;}
  public static bool BlocksInventory(object inventory,bool bag){return Held&&inventory!=null;}
  public static void ResetSession(){Held=false;}
+}
+public static class RebirthHydrationOwnerHold {
+ public static EntityPlayerLocal HeldActor;
+ public static bool IsHeld(EntityPlayerLocal player)=>player!=null&&ReferenceEquals(player,HeldActor);
 }
 public static class RebirthSurvivorClientState {public static string Creation;public static string GetProjectedCreationId(EntityPlayer player){return Creation;}}
 public enum NetPackageDirection {ToClient,ToServer,Both}
@@ -149,7 +177,8 @@ public class RebirthWorldSupportState {public XElement RemoteResourceRefundJourn
 // JOURNAL_CLASS
 // Native inventory/CVar doubles can throw after a setter mutates its slot.
 public class Buffs {public Dictionary<string,float> Vars=new Dictionary<string,float>();public float GetCustomVar(string k){return Vars.TryGetValue(k,out float n)?n:0;}public void SetCustomVar(string k,float n,bool sync){Vars[k]=n;}}
-public class PlayerWorld {public bool Remote;public bool IsRemote(){return Remote;}public EntityPlayerLocal GetPrimaryPlayer(){return Player as EntityPlayerLocal;}public EntityPlayer Player;public object GetEntity(int id){return Player!=null&&Player.entityId==id?Player:null;}}
+public class LegacyWorldState {public string Guid="library-world";}
+public class PlayerWorld {public LegacyWorldState worldState=new LegacyWorldState();public bool Remote;public bool IsRemote(){return Remote;}public EntityPlayerLocal GetPrimaryPlayer(){return Player as EntityPlayerLocal;}public EntityPlayer Player;public object GetEntity(int id){return Player!=null&&Player.entityId==id?Player:null;}}
 public static class Localization {public static string Get(string key){return key;}}
 public class NetPackagePlayerData {}
 public class GameManager {public int NativeSaves;public Action SaveHook;public void SaveLocalPlayerData(){NativeSaves++;if(SaveHook!=null)SaveHook();}public int Checkpoints;public void TriggerSendOfLocalPlayerDataFile(float delay){Checkpoints++;}public InternalPlayerId HostIdentity=new InternalPlayerId();public InternalPlayerId getPersistentPlayerID(ClientInfo ignored){return HostIdentity;}public void doSendLocalInventory(EntityPlayerLocal player){}public static int Tooltips;public static void ShowTooltip(EntityPlayerLocal player,string text){Tooltips++;}public static GameManager Instance;public PlayerWorld World;}
@@ -158,8 +187,10 @@ public class ItemInventoryData {public ItemStack itemStack;}
 public class Inventory : Slots {public int Length{get{return Items.Length;}}public ItemStack GetStackAt(int i){return Items[i];}public void CallOnToolbeltChangedInternal(){Events++;}public int PUBLIC_SLOTS{get{return Items.Length-1;}}public bool CanMoveToSlot(ItemStack stack,int i){return true;}public EntityAlive entity;public int Events;public ItemInventoryData[] slots{get{return Items.Select(s=>new ItemInventoryData{itemStack=s}).ToArray();}}public void notifyListeners(){Events++;}public void SetItem(int i,ItemValue v,int n){base.SetItem(i,new ItemStack(v,n));}}
 public class Bag : Slots {public int Events;public void onBackpackChanged(){Events++;}}
 public class EntityAlive {public bool bPlayerStatsChanged,isEntityRemote;}
-public class EntityPlayer : EntityAlive {public Slots bag,inventory=new Slots();public PlayerWorld world=new PlayerWorld();public int entityId=1;public bool Dead,Held;public bool IsDead(){return Dead;}}
+public class EntityPlayer : EntityAlive {public Slots bag,inventory=new Slots();public PlayerWorld world=new PlayerWorld();public int entityId=1,Died;public bool Dead,Held;public bool IsDead(){return Dead;}}
 public class EntityPlayerLocal : EntityPlayer {public Buffs Buffs=new Buffs();public PlayerUI PlayerUI=new PlayerUI{xui=new XUi()};public bool IsSpawned(){return true;}}
+// External native custody adapter; this fixture does not execute dog hiring.
+public static class RebirthDogLifecycleService {public static bool HasHireInventoryHold(EntityPlayerLocal player)=>false;}
 public static class RebirthSurvivorMode {public static bool IsEnabledForCurrentWorld(){return true;}}
 public static class RebirthCharacterCreationHoldService {public static bool IsHeld(EntityPlayer p){return p.Held;}}
 public static class RebirthToolbeltCapacity {public static int Owned=4;public static int GetSlotsForPlayer(EntityPlayer p){return GetOwnedSlotCount(p,p.inventory.Items.Length);}public static int GetOwnedSlotCount(EntityPlayer p,int actual){return Math.Min(Owned,actual);}}
@@ -168,7 +199,7 @@ public static class RebirthToolbeltCapacity {public static int Owned=4;public st
 public static class EntityBuffs {public const int Version=2;}
 public class BuffValue {public void Read(BinaryReader r,int version){r.ReadInt32();}}
 public class InternalPlayerId {public string CombinedString="fixture";}
-public class ClientInfo {public int entityId=1;public PlayerDataFile latestPlayerData;public InternalPlayerId InternalId=new InternalPlayerId();}
+public class ClientInfo {public bool loginDone=true,disconnecting;public INetConnection[] netConnection;public int entityId=1;public PlayerDataFile latestPlayerData;public InternalPlayerId InternalId=new InternalPlayerId();}
 public static class GameIO {public static string SaveRoot="fixture-save";public static string GetSaveGameDir(){return SaveRoot;}public static string GetPlayerDataDir(){return "fixture-only";}}
 public class PlayerDataFile {
  public bool bLoaded;public MemoryStream buffData;public Slots bag;public ItemStack[] inventory;
@@ -243,10 +274,31 @@ public enum EDragType{DragStart,DragEnd} public static class RebirthInventoryDro
 }
 public class XUiC_SimpleButton:XUiController {public event XUiEvent_OnPressEventHandler OnPressed;public void Click(){if(OnPressed!=null)OnPressed(this,0);}}
 // STUDY_INTENT_CLASS
-public static class RebirthScreenLayout{public static void GetScreenBounds(XUi ui,out Vector2i p,out Vector2i s){p=new Vector2i(0,0);s=new Vector2i(1920,1080);}} public static class XUiC_RebirthCraftingItemContext{public static string ResolveDescription(ItemStack s,XUi ui)=>"description-double";} namespace UnityEngine {public struct Vector2{}public enum KeyCode{LeftShift,RightShift}public static class Input{public static bool Shift;public static bool GetKey(KeyCode k)=>Shift;}public struct Vector3{public Vector3(float a,float b,float c){}}public static class Mathf{public static int RoundToInt(float f)=>(int)Math.Round(f);}public static class Time {public static float unscaledTime;}}
+public static class RebirthScreenLayout{public static void GetScreenBounds(XUi ui,out Vector2i p,out Vector2i s){p=new Vector2i(0,0);s=new Vector2i(1920,1080);}} public static class XUiC_RebirthCraftingItemContext{public static string ResolveDescription(ItemStack s,XUi ui)=>"description-double";} namespace UnityEngine {public struct Vector2{}public enum KeyCode{LeftShift,RightShift}public static class Input{public static bool Shift;public static bool GetKey(KeyCode k)=>Shift;}public struct Vector3{public Vector3(float a,float b,float c){}}public static class Mathf{public static int RoundToInt(float f)=>(int)Math.Round(f);}public static class Time {public static float unscaledTime,realtimeSinceStartup;}}
 public static class ItemActionStudyLiteratureRebirth {public static int Dispatches;internal static void Dispatch(EntityPlayer p,ItemValue item){Dispatches++;}}
 // LIBRARY_UI_CLASS
 public static class Check {
+ // Fixture-only historical pre-cutover seed. Actual Resolve remains unchanged
+ // and refuses fresh destructive admission; source/native storage are adapters.
+ static RemoteResourceTransactionOutcome ResolveOutcome(World world,EntityPlayer actor,InternalPlayerId user,ulong epoch,ulong request,RemoteResourceClientOperation kind,IList<ItemStack> requirements,bool query)
+ {
+  actor=world.Player??actor;actor.world=world;world.Player=actor;if(GameManager.Instance==null)GameManager.Instance=new GameManager();GameManager.Instance.World=world;
+  if(SingletonMonoBehaviour<ConnectionManager>.Instance==null)SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager();
+  SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer=true;
+  var type=typeof(RemoteResourceTransactionOutcomeJournal);var flags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;
+  type.GetMethod("BindWorld",flags).Invoke(null,new object[]{world});
+  string key=(string)type.GetMethod("BuildKey",flags).Invoke(null,new object[]{user,epoch,request,kind});
+  var outcomes=(System.Collections.IDictionary)type.GetField("Outcomes",flags).GetValue(null);
+  int maximum=(int)type.GetField("MaxEntries",flags).GetRawConstantValue();
+  if(!query&&requirements!=null&&requirements.Count>0&&!outcomes.Contains(key)&&outcomes.Count<maximum){
+   var removed=new List<ItemStack>();var native=RemoteResourceTransactions.TryConsume(actor,requirements,1,removed,false);
+   var historical=new RemoteResourceTransactionOutcome{State=native.Success?RemoteResourceTransactionOutcomeState.Success:RemoteResourceTransactionOutcomeState.Failed,Removed=removed};
+   var entry=new RemoteResourceLegacyOutcomeStore.Entry{World=world,Actor=actor,Outcome=historical,HasInvocation=true};RemoteResourceLegacyOutcomeStore.Entries.Add(entry);
+   outcomes[key]=historical;((System.Collections.IDictionary)type.GetField("Originals",flags).GetValue(null))[key]=entry;
+   using(var hash=System.Security.Cryptography.SHA256.Create())((System.Collections.IDictionary)type.GetField("OriginalRequirements",flags).GetValue(null))[key]=Convert.ToBase64String(hash.ComputeHash(RebirthCamperInventorySnapshot.Capture(requirements.ToArray())));
+  }
+  return RemoteResourceTransactionOutcomeJournal.Resolve(world,actor,user,epoch,request,kind,requirements,query);
+ }
 // ACTION_PREFIX
 // PARTIAL_STACK_PREFIX
 // BAG_ADD_PREFIX
@@ -267,10 +319,10 @@ public static class Check {
  static byte[] Evidence(string key,float value,bool duplicate=false){using(var m=new MemoryStream())using(var w=new BinaryWriter(m)){w.Write((byte)2);w.Write((ushort)1);w.Write(123);w.Write((ushort)(duplicate?2:1));w.Write(key);w.Write(value);if(duplicate){w.Write(key);w.Write(value);}w.Flush();return m.ToArray();}}
  public static void Main(){
  var outcomeWorld=new World();var outcomeUser=new InternalPlayerId{CombinedString="retained-owner"};
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
+ RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(GameManager.Instance?.World??outcomeWorld);
  object retainedHandle;RemoteResourceTransactionOutcome retainedSnapshot;
  A(!RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle),"retained lookup never creates source outcome");
- RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,1,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ ResolveOutcome(outcomeWorld,new EntityPlayer(),outcomeUser,1,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
  A(RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle),"authoritative retained removal snapshot available");
  retainedSnapshot.Removed[0].count=1;
  A(RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out var secondHandle)&&retainedSnapshot.Removed[0].count==2,"returned snapshot cannot mutate retained source outcome");
@@ -278,32 +330,30 @@ public static class Check {
  A(!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,new InternalPlayerId{CombinedString="other-owner"},1,1,RemoteResourceClientOperation.Craft,retainedHandle)&&!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,1,2,RemoteResourceClientOperation.Craft,retainedHandle)&&!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.ItemRepair,retainedHandle),"retained handle refuses changed owner request and operation");
  A(!RemoteResourceTransactionOutcomeJournal.TryGetRetained(new World(),outcomeUser,1,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out secondHandle)&&RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,retainedHandle),"foreign world lookup cannot reset original journal");
  A(!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,new object()),"invented retained handle refused");
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
- RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,1,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(GameManager.Instance?.World??outcomeWorld);
+ ResolveOutcome(outcomeWorld,new EntityPlayer(),outcomeUser,1,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
  A(!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,1,1,RemoteResourceClientOperation.Craft,retainedHandle),"reset and identical re-registration expire previous handle");
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
+ RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(GameManager.Instance?.World??outcomeWorld);
  A(!RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,0,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle)&&!RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,null,1,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle),"retained lookup refuses missing identity and zero epoch");
- RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,2,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ ResolveOutcome(outcomeWorld,new EntityPlayer(),outcomeUser,2,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
  A(RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,2,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle),"eviction candidate retained");
- for(ulong outcomeRequest=2;outcomeRequest<=2049;outcomeRequest++)RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,2,outcomeRequest,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
- A(!RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,2,1,RemoteResourceClientOperation.Craft,retainedHandle),"journal eviction expires retained handle");
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
- var replacementWorld=new World();
- RemoteResourceTransactions.ConsumptionHook=()=>{RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();RemoteResourceTransactionOutcomeJournal.Resolve(replacementWorld,new EntityPlayer(),outcomeUser,3,2,RemoteResourceClientOperation.Craft,new[]{S(1)},false);};
- var staleOutcome=RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,3,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
- A(staleOutcome.State==RemoteResourceTransactionOutcomeState.Unknown&&staleOutcome.Removed.Count==0,"old world completion cannot publish actionable removal outcome");
- A(RemoteResourceTransactionOutcomeJournal.TryGetRetained(replacementWorld,outcomeUser,3,2,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle)&&retainedSnapshot.Removed[0].count==1,"old completion preserves replacement world journal");
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
- RemoteResourceTransactions.ConsumptionHook=()=>{RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,4,1,RemoteResourceClientOperation.Craft,new[]{S(1)},false);};
- staleOutcome=RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,new EntityPlayer(),outcomeUser,4,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
- A(staleOutcome.State==RemoteResourceTransactionOutcomeState.Unknown,"reset same world and key cannot reuse previous request claim");
- A(RemoteResourceTransactionOutcomeJournal.TryGetRetained(outcomeWorld,outcomeUser,4,1,RemoteResourceClientOperation.Craft,out retainedSnapshot,out retainedHandle)&&retainedSnapshot.Removed[0].count==1,"replacement exact request outcome survives stale completion");
- RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
- Console.WriteLine("PASS 4 actual journal reset/publication race assertions; reentrant consumption hook doubles unload timing. Stale removals still need durable source reconciliation."); Console.WriteLine("PASS 11 retained outcome assertions: detached snapshot, exact identity, read-only foreign-world refusal, invented handle, reset, malformed scope and eviction; native identity/source-consumption adapters doubled. No refund delivery or source-removal durability proof."); var producerCreation=Guid.NewGuid().ToString("N");var producerPlayer=new EntityPlayer();producerPlayer.world.Player=producerPlayer;
+ for(ulong outcomeRequest=2;outcomeRequest<=2049;outcomeRequest++)ResolveOutcome(outcomeWorld,new EntityPlayer(),outcomeUser,2,outcomeRequest,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ A(RemoteResourceTransactionOutcomeJournal.MatchesRetained(outcomeWorld,outcomeUser,2,1,RemoteResourceClientOperation.Craft,retainedHandle),"capacity pressure preserves unsettled original handle instead of eviction");
+ RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(GameManager.Instance?.World??outcomeWorld);
+ // Fresh native effects no longer exist in this compatibility endpoint. Its
+ // old destructive reset-race vectors are replaced by actual fresh refusal;
+ // retained warm handle/reset coverage above uses disclosed historical seed.
+ var freshActor=outcomeWorld.Player??new EntityPlayer();freshActor.world=outcomeWorld;outcomeWorld.Player=freshActor;GameManager.Instance.World=outcomeWorld;
+ bool freshConsumed=false;RemoteResourceTransactions.ConsumptionHook=()=>freshConsumed=true;
+ var freshLegacy=RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,freshActor,outcomeUser,99,99,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ A(freshLegacy.State==RemoteResourceTransactionOutcomeState.Unknown&&!freshConsumed,"actual fresh legacy request cannot invoke source or manufacture unused proof");
+ A(RemoteResourceTransactionOutcomeJournal.Resolve(outcomeWorld,freshActor,outcomeUser,99,99,RemoteResourceClientOperation.Craft,null,true).State==RemoteResourceTransactionOutcomeState.Unknown&&!freshConsumed,"absent legacy query retains Unknown without source effect");
+ RemoteResourceTransactions.ConsumptionHook=null;
+ Console.WriteLine("PASS actual fresh legacy refusal plus historical retained-handle/reset/capacity vectors; pre-cutover source seeding/native storage are explicit adapters."); var producerCreation=Guid.NewGuid().ToString("N");var producerPlayer=new EntityPlayer();producerPlayer.world.Player=producerPlayer;
  GameManager.Instance=new GameManager{World=producerPlayer.world};
  var producerSender=new ClientInfo{entityId=producerPlayer.entityId,InternalId=outcomeUser};
  RebirthWorldCharacterService.Record=new RebirthWorldCharacterRecord{StablePlayerKey=new string('b',64),StablePlayerId=outcomeUser.CombinedString,Origin=new Origin{CreationId=producerCreation},Support=new RebirthWorldSupportState()};
- RemoteResourceTransactionOutcomeJournal.Resolve(producerPlayer.world,producerPlayer,outcomeUser,5,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ ResolveOutcome(producerPlayer.world,producerPlayer,outcomeUser,5,1,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
  RemoteResourceRefundRecord preparedRefund;bool preparedPending;int unusedChecks=0;
  A(!RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,1,RemoteResourceClientOperation.Craft,r=>false,out preparedRefund,out preparedPending)&&RebirthWorldCharacterService.Record.Support.RemoteResourceRefundJournalImage==null,"producer refuses missing unused proof without registration");
  A(RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,1,RemoteResourceClientOperation.Craft,r=>{unusedChecks++;r.TryGetStacks(out var stacks);return stacks[0].count==2;},out preparedRefund,out preparedPending)&&preparedPending&&preparedRefund!=null&&unusedChecks==1,"producer persists full authoritative removal under owner identity");
@@ -311,8 +361,8 @@ public static class Check {
  A(RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,1,RemoteResourceClientOperation.Craft,r=>true,out preparedRefund,out preparedPending)&&preparedPending&&RebirthWorldCharacterRepository.Saves==producerSaves,"producer retry retains saved exact registration without duplicate write");
  producerSender.InternalId=new InternalPlayerId{CombinedString="spoofed-owner"};
  A(!RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,1,RemoteResourceClientOperation.Craft,r=>{throw new Exception("must not verify spoofed owner");},out preparedRefund,out preparedPending),"producer rejects mismatched authenticated owner");producerSender.InternalId=outcomeUser;
- RemoteResourceTransactionOutcomeJournal.Resolve(producerPlayer.world,producerPlayer,outcomeUser,5,2,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
- A(!RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,2,RemoteResourceClientOperation.Craft,r=>{RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();return true;},out preparedRefund,out preparedPending)&&RebirthWorldCharacterRepository.Saves==producerSaves,"producer rechecks retained removal after proof callback before write");
+ ResolveOutcome(producerPlayer.world,producerPlayer,outcomeUser,5,2,RemoteResourceClientOperation.Craft,new[]{S(2)},false);
+ A(!RemoteResourceRefundProducer.TryPrepare(producerPlayer,producerSender,producerCreation,5,2,RemoteResourceClientOperation.Craft,r=>{RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(GameManager.Instance?.World??outcomeWorld);return true;},out preparedRefund,out preparedPending)&&RebirthWorldCharacterRepository.Saves==producerSaves,"producer rechecks retained removal after proof callback before write");
  RebirthWorldCharacterRepository.Saves=0;RebirthWorldCharacterRepository.SavedRefund=null;RebirthWorldCharacterService.Record=null;
  Console.WriteLine("PASS 5 actual refund producer assertions: proof refusal, exact retained grant, durable checkpoint retry, owner mismatch and callback reset; native authentication/world identity/save/unused-proof adapters doubled. No live delivery."); var refundWorld=new string('a',64);var refundOwner=new string('b',64);var refundCreation=Guid.NewGuid().ToString("N");
  var refundStack=S(2);refundStack.itemValue.Payload="exact-refund";refundStack.itemValue.Metadata["custom"]="preserved";
@@ -1296,7 +1346,7 @@ A(RebirthBackpackLibraryClientViews.Request(inboxOwner.world,1),"view request us
  reserved.inventory.ActionRunning=true;A(!RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt)&&!RebirthBackpackLibraryReservation.IsHeld(reserved),"running held action prevents new reservation");reserved.inventory.ActionRunning=false;
  reserved.PlayerUI.xui.IsUsingItemActionEntryUse=true;A(!RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"running inventory use prevents reservation");reserved.PlayerUI.xui.IsUsingItemActionEntryUse=false;
  reserved.PlayerUI.xui.DragAndDropWindow.CurrentStack=S(1);A(!RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"occupied cursor prevents reservation");reserved.PlayerUI.xui.DragAndDropWindow.CurrentStack=ItemStack.Empty.Clone();
- RemoteResourceClientTransactionCoordinator.pendingLeases.Add(1,new object());
+ RemoteResourceClientTransactionCoordinator.pendingLeases.Add(1,new RemoteResourceClientTransactionCoordinator.LeaseDouble{Actor=reserved}); // Lease admission itself is covered by mp009_scope.
  A(RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(reserved)&&
    !RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"pending remote lease prevents new library custody");
  var foreignGrantOwner=new EntityPlayerLocal{world=reserved.world};
@@ -1307,6 +1357,10 @@ A(RebirthBackpackLibraryClientViews.Request(inboxOwner.world,1),"view request us
  RemoteResourceClientTransactionCoordinator.outcomeDeliveryDepth=0;RemoteResourceClientGrantContext.Begin(new List<ItemStack>{S(1)});
  A(!RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"active grant prevents new library custody");
  RemoteResourceClientGrantContext.End();
+ RebirthHydrationOwnerHold.HeldActor=reserved;
+ A(RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(reserved)&&
+   !RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"original hydration custody prevents new library admission");
+ RebirthHydrationOwnerHold.HeldActor=null;
  Console.WriteLine("PASS pending resource admission: actual owner/world gate and library reservation reject lease, terminal delivery and active grant; lease/delivery fields doubled.");
  A(RebirthBackpackLibraryReservation.TryAcquire(reserved,ownerCreation,receipt),"reservation acquire");
  A(!Prefix(cursor),"reserved cursor mutation refused before body");

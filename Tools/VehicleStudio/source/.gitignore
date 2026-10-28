@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+Mod/*.dll
+Mod/Exports/
+Mod/Config/vehicles.xml
+*.zip
+
+__pycache__/
+*.pyc
+staging/
+work/
+*.rebirth-receipt.json
+*/backups/
+*/deployment.json

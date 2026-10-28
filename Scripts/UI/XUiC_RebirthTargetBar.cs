@@ -36,6 +36,10 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
     private bool targetHasIcon;
     private string targetIconAtlas = string.Empty;
     private string targetIcon = string.Empty;
+    private readonly string[] publishedBuffBindings = new string[MaxBuffCards * 3];
+    private bool presentationPublished, publishedHasIcon;
+    private int publishedBuffCount;
+    private string publishedIconAtlas, publishedIcon;
 
     public override void Init()
     {
@@ -57,12 +61,15 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
         nextBuffRefreshTime = 0f;
         visibleBuffCount = 0;
         targetHasIcon = false;
+        presentationPublished = false;
     }
 
     public override void Update(float _dt)
     {
         // Keep the base-game target selection/fade/boss implementation authoritative.
         base.Update(_dt);
+        // Every native early return hides the view before its binding pass.
+        bool nativeBindingsCurrent = ViewComponent?.IsVisible == true;
 
         EntityAlive target = Target;
         bool targetChanged = !ReferenceEquals(target, lastPresentedTarget);
@@ -76,11 +83,36 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
 
         targetHasIcon = ResolveTargetIcon(target, out targetIconAtlas, out targetIcon);
         RefreshBuffSnapshot(target);
-        LayoutBuffCards();
+        bool layoutChanged = LayoutBuffCards();
 
-        // Our icon/buff bindings are not known to the native target-bar dirtiness
-        // calculation, so refresh them at a modest 5 Hz while a target is displayed.
-        RefreshBindings();
+        // A visible native bar has already refreshed its bindings. Only changed
+        // custom data/layout needs a second pass after our snapshot. Hidden and
+        // native early-return cases retain the existing refresh behavior.
+        if (targetChanged || layoutChanged || !nativeBindingsCurrent || PresentationChanged())
+        {
+            RefreshBindings();
+            RememberPresentation();
+        }
+    }
+
+    private bool PresentationChanged()
+    {
+        if (!presentationPublished || publishedHasIcon != targetHasIcon || publishedBuffCount != visibleBuffCount
+            || publishedIconAtlas != targetIconAtlas || publishedIcon != targetIcon) return true;
+        for (int i = 0; i < MaxBuffCards; i++)
+            if (publishedBuffBindings[i] != buffIcons[i] || publishedBuffBindings[MaxBuffCards + i] != buffTexts[i]
+                || publishedBuffBindings[MaxBuffCards * 2 + i] != buffColors[i]) return true;
+        return false;
+    }
+
+    private void RememberPresentation()
+    {
+        Array.Copy(buffIcons, 0, publishedBuffBindings, 0, MaxBuffCards);
+        Array.Copy(buffTexts, 0, publishedBuffBindings, MaxBuffCards, MaxBuffCards);
+        Array.Copy(buffColors, 0, publishedBuffBindings, MaxBuffCards * 2, MaxBuffCards);
+        publishedHasIcon = targetHasIcon; publishedBuffCount = visibleBuffCount;
+        publishedIconAtlas = targetIconAtlas; publishedIcon = targetIcon;
+        presentationPublished = true;
     }
 
     public override bool GetBindingValueInternal(ref string value, string bindingName)
@@ -295,16 +327,18 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
         return string.Empty;
     }
 
-    private void LayoutBuffCards()
+    private bool LayoutBuffCards()
     {
         int count = visibleBuffCount;
+        bool rebound = false;
         for (int i = 0; i < MaxBuffCards; i++)
         {
             if (buffCardViews[i]?.UiTransform != null) continue;
+            rebound = true;
             XUiView resolved = GetChildById("rebirthTargetBuff" + i)?.ViewComponent;
             if (!ReferenceEquals(resolved, buffCardViews[i])) { buffCardViews[i] = resolved; lastLayoutCount = -1; }
         }
-        if (count == lastLayoutCount) return;
+        if (count == lastLayoutCount) return rebound;
         lastLayoutCount = count;
         int totalWidth = count > 0 ? count * BuffCardWidth + (count - 1) * BuffCardGap : 0;
         int startX = TargetVisualCenterX - totalWidth / 2;
@@ -320,6 +354,7 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
             if (visible)
                 view.Position = new Vector2i(startX + i * (BuffCardWidth + BuffCardGap), BuffCardY);
         }
+        return true;
     }
 
     /// <summary>

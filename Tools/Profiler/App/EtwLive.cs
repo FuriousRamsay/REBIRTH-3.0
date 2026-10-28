@@ -69,7 +69,7 @@ sealed class EtwLive : IDisposable
     IntPtr logfilePtr;
     EventRecordCallback callback;                          // kept alive for the native side
     Thread worker;
-    bool stopped;
+    volatile bool stopped;
 
     public string Error { get; private set; }
     public long EventsSeen;
@@ -121,7 +121,18 @@ sealed class EtwLive : IDisposable
             trace = OpenTraceW(logfilePtr);
             if (trace == ulong.MaxValue || trace == 0) { Error = "OpenTrace failed (error " + Marshal.GetLastWin32Error() + ")."; Stop(); return false; }
 
-            worker = new Thread(() => { try { ProcessTrace(new[] { trace }, 1, IntPtr.Zero, IntPtr.Zero); } catch { } }) { IsBackground = true, Name = "etw-frames" };
+            worker = new Thread(() =>
+            {
+                try
+                {
+                    uint result=ProcessTrace(new[] { trace }, 1, IntPtr.Zero, IntPtr.Zero);
+                    if(!stopped)Error="Frame event reader stopped (ProcessTrace error "+result+").";
+                }
+                catch(Exception e)
+                {
+                    if(!stopped)Error="Frame event reader failed: "+e.Message;
+                }
+            }) { IsBackground = true, Name = "etw-frames" };
             worker.Start();
             return true;
         }

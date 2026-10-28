@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -10,6 +10,8 @@ internal static class RebirthPurgeInformationService
     {
         internal EntityPlayerLocal Player;
         internal RebirthJournalEntry Entry;
+        internal string TopicId;
+        internal string Id => Entry?.Id ?? TopicId;
         internal string Sprite;
         internal bool Manual;
         internal float NotBefore;
@@ -29,11 +31,11 @@ internal static class RebirthPurgeInformationService
     private static readonly HashSet<string> readingOnly=new HashSet<string>(StringComparer.Ordinal);
     private static string lastBlockedReason;
     private static float nextBlockedTrace;
-    // Automatic re-queues of an intro closed unseen; capped so a deliberate fast close is never nagged. Reset on world change.
+    // Retries after external closes are bounded per session; explicit player closes never retry.
     internal static int EarlyCloseRequeues;
     internal static void Acknowledge(string id)
     {
-        foreach(var request in pending)if(request.Entry.Id==id&&request.RequestedAt>0)request.Acknowledged=true;
+        foreach(var request in pending)if(request.Id==id&&request.RequestedAt>0)request.Acknowledged=true;
     }
     internal static void Reset(){EarlyCloseRequeues=0;pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();lastBlockedReason=null;nextBlockedTrace=0;}
     private static void TraceBlocked(Pending request,string reason,float now)
@@ -41,7 +43,7 @@ internal static class RebirthPurgeInformationService
         if(request==null||now<request.NotBefore+10f||
            (lastBlockedReason==reason&&now<nextBlockedTrace))return;
         lastBlockedReason=reason;nextBlockedTrace=now+30f;
-        Log.Out("[REBIRTH Purge Information] queued="+request.Entry?.Id+" blocked="+reason);
+        Log.Out("[REBIRTH Purge Information] queued="+request.Id+" blocked="+reason);
     }
     internal static void RestoreReadingOnly(EntityPlayerLocal player,string id)
     {
@@ -49,26 +51,41 @@ internal static class RebirthPurgeInformationService
         // A late join-restoration packet must not cancel teaching already queued
         // by a live milestone or an explicit manual read.
         foreach(var request in pending)
-            if(ReferenceEquals(request.Player,player)&&request.Entry.Id==id)return;
+            if(ReferenceEquals(request.Player,player)&&request.Id==id)return;
         readingOnly.Add(id);
         RebirthJournalGuideService.SetPurgeReadingOnly(player,id,true);
     }
     internal static void Request(EntityPlayerLocal player,string id,string sprite,bool manual=false,float notBefore=0)
     {
         var entry=RebirthJournalGuideService.ObservePurgeGuide(player,id);
-        if(entry==null || !manual && (RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)))return;
-        RebirthJournalGuideService.SetPurgeReadingOnly(player,id,false);
+        if(entry==null)
+        {
+            // Preserve consumed-note intent and the one-shot first-start intro
+            // while the Journal is unavailable. Intro keeps its original deadline.
+            if((!manual&&id!="PurgeIntro")||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||
+                player==null||!ReferenceEquals(player.world,GameManager.Instance?.World)||
+                !ReferenceEquals(player.world?.GetPrimaryPlayer(),player))return;
+            var topic=RebirthPurgeInformationTopics.Find(id);
+            if(topic==null)return;
+            id=topic.Id;
+        }
+        else if(!manual && (RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)))return;
+        if(entry!=null)RebirthJournalGuideService.SetPurgeReadingOnly(player,id,false);
         // Explicit live teaching/manual reading takes precedence over silent join restoration.
         if(ReferenceEquals(readingPlayer,player))readingOnly.Remove(id);
-        foreach(var request in pending)if(request.Player==player && request.Entry.Id==id)
+        foreach(var request in pending)if(request.Player==player && request.Id==id)
         {
+            if(request.Entry==null&&entry!=null)request.Entry=entry;
+            // Automatic duplicates must not rearm an already opened manual
+            // reading (or postpone one which is still waiting to open).
+            if(!manual&&request.Manual)return;
             if(request.Acknowledged){request.Acknowledged=false;request.RequestedAt=0;request.Attempts=0;} // re-offer after a close that arrived before Pulse dequeued it
-            if(manual){request.Manual=true;request.NotBefore=0;}
+            if(manual){request.Manual=true;request.NotBefore=0;request.ExpiresAt=0;} // Manual reading is not subject to the first-start expiry.
             else request.NotBefore=Math.Max(request.NotBefore,notBefore);
             return;
         }
         float scheduled=manual?0:Math.Max(notBefore,id=="PurgeIntro"?Time.realtimeSinceStartup+5:0);
-        pending.Enqueue(new Pending{Player=player,Entry=entry,Sprite=sprite,Manual=manual,
+        pending.Enqueue(new Pending{Player=player,Entry=entry,TopicId=id,Sprite=sprite,Manual=manual,
             NotBefore=scheduled,ExpiresAt=!manual&&id=="PurgeIntro"?scheduled+60f:0});
     }
     internal static void Pulse()
@@ -110,6 +127,17 @@ internal static class RebirthPurgeInformationService
             List<RebirthJournalEntry> unread;
             if(RebirthJournalGuideService.TryGetUnlockedPurgeGuides(currentPlayer,out unread,true))
             {
+                // 2.6 gives these two reading notes on the first Purge spawn.
+                // Keep them available through the existing saved Journal instead
+                // of introducing inventory awards or extra automatic popups.
+                foreach(string id in new[]{"PurgeSupplies","PurgeScanner"})
+                    if(!unread.Exists(entry=>entry.Id==id))
+                    {
+                        var restored=RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,id);
+                        if(restored==null)return; // Journal readiness can lag behind spawn.
+                        RestoreReadingOnly(currentPlayer,id);
+                        unread.Add(restored);
+                    }
                 restoredPlayer=currentPlayer;
                 foreach(var entry in unread)
                 {
@@ -123,7 +151,7 @@ internal static class RebirthPurgeInformationService
                     if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)||RebirthJournalGuideService.IsPurgeReadingOnly(entry)||
                         ReferenceEquals(readingPlayer,currentPlayer)&&readingOnly.Contains(entry.Id))continue;
                     bool exists=false;
-                    foreach(var queued in pending)if(queued.Player==currentPlayer && queued.Entry.Id==entry.Id){exists=true;break;}
+                    foreach(var queued in pending)if(queued.Player==currentPlayer && queued.Id==entry.Id){exists=true;break;}
                     if(!exists)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite,
                         NotBefore=entry.Id=="PurgeIntro"?now+5:0});
                 }
@@ -138,12 +166,20 @@ internal static class RebirthPurgeInformationService
         if(request.RequestedAt>0)
         {
             if(now-request.RequestedAt<2f)return;
-            if(request.Attempts>=3){pending.Dequeue();Log.Out("[REBIRTH Purge Information] open never acknowledged id="+request.Entry.Id+"; offered again on next load");return;}
+            if(request.Attempts>=3){pending.Dequeue();Log.Out("[REBIRTH Purge Information] open never acknowledged id="+request.Id+"; offered again on next load");return;}
         }
         if(now<request.NotBefore)return;
         var player=request.Player;
         var world=GameManager.Instance?.World;
         if(player==null || !ReferenceEquals(player.world,world)){Reset();return;}
+        if(request.Entry==null)
+        {
+            if(!ReferenceEquals(world?.GetPrimaryPlayer(),player)){pending.Dequeue();return;}
+            request.Entry=RebirthJournalGuideService.ObservePurgeGuide(player,request.Id);
+            if(request.Entry==null){TraceBlocked(request,"journal-unavailable",now);return;}
+            RebirthJournalGuideService.SetPurgeReadingOnly(player,request.Id,false);
+            if(ReferenceEquals(readingPlayer,player))readingOnly.Remove(request.Id);
+        }
         if(!request.Manual && (RebirthJournalGuideService.IsPurgeDismissed(request.Entry)||RebirthJournalGuideService.IsRead(request.Entry))){pending.Dequeue();return;}
         if(!request.Manual && ReferenceEquals(readingPlayer,player)&&readingOnly.Contains(request.Entry.Id))
         {pending.Dequeue();return;}
@@ -163,18 +199,20 @@ internal static class RebirthPurgeInformationService
         // Do not interrupt a player near a live hostile, even if their HUD is the only UI.
         nearby.Clear();
         world.GetEntitiesInBounds(typeof(EntityAlive),
-            new Bounds(player.position,new Vector3(64,32,64)),nearby);
+            new Bounds(player.position,new Vector3(100,100,100)),nearby);
         bool unsafeToRead=false;
         foreach(var entity in nearby)
         {
             var alive=entity as EntityAlive;
             if(alive!=null && alive!=player && !alive.IsDead() &&
-                (alive.EntityClass?.bIsEnemyEntity==true || alive.GetAttackTarget()==player))
+                (alive.EntityClass?.bIsEnemyEntity==true || alive.GetAttackTarget()==player ||
+                 alive is EntityRebirthNPC && FactionManager.Instance!=null &&
+                 RebirthNpcFactionCombatResolver.Classify(FactionManager.Instance.GetRelationshipValue(alive,player))==RebirthNpcCombatDisposition.Hostile))
             {unsafeToRead=true;break;}
         }
         nearby.Clear();
         if(unsafeToRead){TraceBlocked(request,"hostile-nearby",now);return;}
-        if(XUiC_RebirthPurgeInformation.Open(ui.xui,request.Entry,request.Sprite))
+        if(XUiC_RebirthPurgeInformation.Open(ui.xui,request.Entry,request.Sprite,request.Manual))
         {request.RequestedAt=now;request.Attempts++;lastBlockedReason=null;nextBlockedTrace=0;}
         else TraceBlocked(request,"window-controller-unavailable",now);
     }
@@ -187,6 +225,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     private string sprite;
     private float openedAt;
     private bool playerClosed;
+    private bool manualReading;
     private XUiV_Label title,body;
     private XUiV_Sprite art;
     private XUiC_SimpleButton close;
@@ -223,13 +262,16 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
             // loading cover) leaves the entry unread: re-queue it (twice per session); past the cap it stays
             // undismissed and is offered on the next load.
             if(playerClosed)RebirthJournalGuideService.DismissPurge(entry);
-            else if(entry.Id!="PurgeIntro"&&RebirthPurgeInformationService.EarlyCloseRequeues<2)
+            else if((entry.Id!="PurgeIntro"||manualReading)&&RebirthPurgeInformationService.EarlyCloseRequeues<2)
             {
                 RebirthPurgeInformationService.EarlyCloseRequeues++;
-                RebirthPurgeInformationService.Request(xui.playerUI.entityPlayer,entry.Id,sprite);
+                // A manual reread may already be read/dismissed. Preserve its
+                // explicit intent instead of rejecting the retry as automatic teaching.
+                RebirthPurgeInformationService.Request(xui.playerUI.entityPlayer,entry.Id,sprite,manualReading);
             }
         }
         entry=null;
+        manualReading=false;
         base.OnClose();
     }
     private void ClosePressed(XUiController sender,int button)
@@ -248,16 +290,19 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
             RebirthJournalGuideService.Poll(xui.playerUI.entityPlayer);
             if(body!=null && body.Text!=entry.Body)body.Text=entry.Body;
         }
-        if(windowGroup?.isShowing==true && XUiUtils.HotkeysAllowedFor(viewComponent) && Time.realtimeSinceStartup-openedAt>0.25f &&
-            xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased)
+        if(windowGroup?.isShowing==true && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput() &&
+            XUiUtils.HotkeysAllowedFor(viewComponent) && Time.realtimeSinceStartup-openedAt>0.25f &&
+            xui.playerUI.playerInput.PermanentActions.Cancel.WasPressed)
             ClosePressed(this,-1);
     }
-    internal static bool Open(XUi ui,RebirthJournalEntry guide,string image)
+    internal static bool Open(XUi ui,RebirthJournalEntry guide,string image,bool manual=false)
     {
         var controller=ui?.GetChildByType<XUiC_RebirthPurgeInformation>();
         if(controller==null || controller.windowGroup==null)return false;
-        controller.entry=guide;controller.sprite=image;
-        ui.playerUI.windowManager.Open((GUIWindow)controller.windowGroup,true);
+        controller.entry=guide;controller.sprite=image;controller.manualReading=manual;
+        // Own the explicit Cancel press below: native auto-Escape closes on press,
+        // before a release handler can mark this as a deliberate dismissal.
+        ui.playerUI.windowManager.Open((GUIWindow)controller.windowGroup,true,true);
         // WindowManager schedules opening; isShowing can remain false until its next update.
         // Accept the request now so manual rereading cannot leave a duplicate queued.
         return true;

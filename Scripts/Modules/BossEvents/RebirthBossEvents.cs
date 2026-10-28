@@ -3038,7 +3038,28 @@ public static class RebirthBossEventPersistence
     private static World boundWorld;
     public static bool IsReady { get { return !loadFailed && boundWorld!=null && !boundWorld.IsRemote() && boundSavePath != null && ReferenceEquals(boundWorld,GameManager.Instance?.World) && string.Equals(boundSavePath, PathName, StringComparison.Ordinal); } }
     private static float nextSave;
-    private static string PathName { get { return Path.Combine(GameIO.GetSaveGameDir(), "RebirthBossEvents.dat"); } }
+    private sealed class SavePathCache
+    {
+        internal readonly World World;
+        internal readonly string SaveDirectory, PathName;
+        internal SavePathCache(World world,string saveDirectory,string pathName)
+        {World=world;SaveDirectory=saveDirectory;PathName=pathName;}
+    }
+    private static SavePathCache pathCache;
+    private static string PathName
+    {
+        get
+        {
+            string save=GameIO.GetSaveGameDir();var world=GameManager.Instance?.World;
+            var cached=System.Threading.Volatile.Read(ref pathCache);
+            if(cached!=null&&ReferenceEquals(cached.World,world)&&
+                string.Equals(cached.SaveDirectory,save,StringComparison.Ordinal))return cached.PathName;
+            // Preserve Path.Combine's raw-path and invalid-input semantics. IsReady
+            // still compares the live result to the bound authoritative save path.
+            string path=Path.Combine(save,"RebirthBossEvents.dat");
+            System.Threading.Volatile.Write(ref pathCache,new SavePathCache(world,save,path));return path;
+        }
+    }
 
     public static void MarkDirty() { System.Threading.Interlocked.Increment(ref changeVersion); dirty = true; }
     public static void SaveIfDue(World world)
@@ -3294,7 +3315,7 @@ public static class RebirthBossEventPersistence
     internal static bool Checkpoint(){MarkDirty();return TryFlush();}
     public static bool TryFlush(){try{Save();return !dirty&&!loadFailed;}catch(Exception ex){Log.Warning("[REBIRTH BossEvents] Flush retained: "+ex.Message);return false;}}
     public static bool CanReset {get{return !dirty&&!loadFailed;}}
-    public static bool TryResetAfterCoordinatedSave(){if(!CanReset)return false;ResetRuntimeOnly();boundSavePath=null;boundWorld=null;return true;}
+    public static bool TryResetAfterCoordinatedSave(){if(!CanReset)return false;ResetRuntimeOnly();boundSavePath=null;boundWorld=null;System.Threading.Volatile.Write(ref pathCache,null);return true;}
     private static int ReadCount(BinaryReader reader, int maximum) { int value = reader.ReadInt32(); if (value < 0 || value > maximum) throw new InvalidDataException("Invalid Boss Events record count."); return value; }
     private static void ResetRuntimeOnly() { RebirthBossEventDirector.Reset(); RebirthBossEventLifecycle.Reset(); dirty = false; nextSave = 0f; }
     private static void WriteEvent(BinaryWriter w, RebirthBossEventInstance e)
@@ -4461,12 +4482,6 @@ public sealed class RebirthBossEventHudMarkerHost : MonoBehaviour
         RebirthBossEventNativeMapMarkerService.Update();
     }
 
-    private void OnGUI()
-    {
-        // v106 has no hand-drawn Boss Event markers. Boss/support use the exact
-        // 2.6 entity nav classes, and the reward crate carries the exact 2.6
-        // FuriousRamsayDroppedLoot NavObject through its entity class.
-    }
 
     private static void DrawMarker(Camera camera, Vector3 playerPosition, Vector3 worldPosition, Color color, string glyph, float size, bool showDistance)
     {

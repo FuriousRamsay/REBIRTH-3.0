@@ -1,0 +1,13 @@
+// AUTHORED_NOT_RUN. Actual source checkpoint uses runner-local final-file IO;
+// full physiology store schema/native item services are explicit adapters.
+public static partial class RebirthMetabolismStateRepository {
+ private static readonly object Sync=new object();private static readonly Dictionary<string,RebirthMetabolismState> States=new Dictionary<string,RebirthMetabolismState>();
+ private static World scopeWorld;private static string scopePath=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"source.xml");private static int loadGeneration;private static bool serverAuthority=true;private const long MaximumStoreBytes=64L*1024*1024;
+ internal static bool SourceSaved=true,Suppress,ThrowAfter;internal static Action AfterRead;internal static int Saves;
+ internal static RebirthMetabolismState State {get=>States.TryGetValue("account",out var state)?state:null;set{States["account"]=value;scopeWorld=GameManager.Instance.World;loadGeneration++;SourceSaved=true;Suppress=ThrowAfter=false;AfterRead=null;Saves=0;}}
+ internal static bool TryGet(EntityPlayer player,out RebirthMetabolismState state){state=State;return state!=null;}
+ private static string GetStablePlayerId(EntityPlayer player)=>"account";
+ private static bool ScopeCurrentLocked()=>ReferenceEquals(scopeWorld,GameManager.Instance.World);
+ private static bool TrySave(string reason,out string error){Saves++;error=null;if(!SourceSaved)return false;if(Suppress)return true;var state=State;var item=state.HydrationSlotItem;new XDocument(new XElement("fixture",new XAttribute("creation",state.SurvivorCreationId),new XAttribute("generation",state.HydrationGenerationId),new XAttribute("count",item.count),new XAttribute("data",item.IsEmpty()?"":item.itemValue.Data),state.HydrationTransferReceipt==null?null:RebirthHydrationMetabolismReceiptCodec.Write(state.HydrationTransferReceipt,state.SurvivorCreationId))).Save(scopePath);if(ThrowAfter)throw new IOException("source save caller unknown");return true;}
+ private static Dictionary<string,RebirthMetabolismState> ReadCandidate(string path){var root=XDocument.Load(path).Root;var state=new RebirthMetabolismState{SurvivorCreationId=(string)root.Attribute("creation"),HydrationGenerationId=(string)root.Attribute("generation")??"",HydrationSlotItem=new ItemStack{count=(int)root.Attribute("count"),itemValue=new ItemValue{Data=(string)root.Attribute("data")}}};var receipt=root.Element("hydrationTransferReceipt");if(receipt!=null){if(!RebirthHydrationMetabolismReceiptCodec.TryRead(receipt,state.SurvivorCreationId,out var original))throw new InvalidDataException("fixture receipt invalid");state.HydrationTransferReceipt=original;}AfterRead?.Invoke();return new Dictionary<string,RebirthMetabolismState>{{"account",state}};}
+}

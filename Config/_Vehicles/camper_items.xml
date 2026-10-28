@@ -3,7 +3,7 @@
     <item name="rebirthCamper80sPlaceable">
       <property name="RebirthCamperRandomInitialDye" value="true" />
       <property name="Extends" value="vehicleMinibikePlaceable" />
-      <property name="Tags" value="T3,vehicle,vengine,vfuel,vlight,vstorage,varmor,vplow,canHaveCosmetic,rebirthCamperPattern,rebirthCamperBody" />
+      <property name="Tags" value="T3,vehicle,vengine,vfuel,vlight,vstorage,varmor,vplow,canHaveCosmetic,rebirthCamperPattern,rebirthCamperBody,rebirthCamperWrapCollection" />
       <property name="Meshfile" value="#@modfolder:Resources/rebirth_camper80s.unity3d?rebirthCamper80s" />
       <property name="EconomicValue" value="30000" />
       <property name="TraderStageTemplate" value="vehicleTier4" />

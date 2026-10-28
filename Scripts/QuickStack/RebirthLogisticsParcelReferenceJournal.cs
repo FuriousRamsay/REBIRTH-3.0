@@ -1,4 +1,4 @@
-using Platform;
+﻿using Platform;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -163,9 +163,9 @@ internal static class RebirthLogisticsParcelReferenceJournal
         if(root.HasElements&&(int)root.Elements().First().Attribute("old")!=endpoint.Death.OwnerEntity)throw new InvalidDataException();
         return root;
     }
-    private static bool Capacity(int incoming)
+    private static bool MetadataCapacity(int incoming,out bool pressure)
     {
-        string root=Path.Combine(GameIO.GetSaveGameDir(),"RebirthLogisticsParcelReferences");if(!Directory.Exists(root))return true;int count=0;long bytes=incoming;
+        pressure=false;string root=Path.Combine(GameIO.GetSaveGameDir(),"RebirthLogisticsParcelReferences");if(!Directory.Exists(root))return true;int count=0;long bytes=incoming;
         foreach(string directory in Directory.EnumerateDirectories(root))
         {
             if((new DirectoryInfo(directory).Attributes&FileAttributes.ReparsePoint)!=0)return false;if(Path.GetFileName(directory)=="archive")continue;
@@ -175,19 +175,64 @@ internal static class RebirthLogisticsParcelReferenceJournal
             if((new DirectoryInfo(operationDirectory).Attributes&FileAttributes.ReparsePoint)!=0||!Guid.TryParseExact(Path.GetFileName(operationDirectory),"N",out var directoryOperation)||directoryOperation==Guid.Empty||Directory.EnumerateDirectories(operationDirectory).Any())return false;
             foreach(string path in Directory.EnumerateFiles(operationDirectory,"*",SearchOption.TopDirectoryOnly))
             {
-                if(!path.EndsWith(".xml",StringComparison.Ordinal))return false;var record=ReadFile(path);string owner=(string)record.Attribute("owner");Guid operation=Guid.ParseExact((string)record.Attribute("operation"),"N");
-                if(Path.GetFileName(directory)!=owner||Path.GetFileName(Path.GetDirectoryName(path))!=operation.ToString("N")||Path.GetFileNameWithoutExtension(path)!=(string)record.Attribute("incarnation"))return false;
-                if(RebirthLogisticsTransferJournal.TryRead(owner,operation,out var terminal)&&terminal.Phase==4&&RebirthLogisticsTransferJournal.ImmutablePlanDigest(terminal)==(string)record.Attribute("binding")&&record.HasElements&&((int)record.Elements().Last().Attribute("state")==3||(int)record.Elements().Last().Attribute("state")==5))
-                {
-                    string archive=DomainPath(owner,operation,Guid.ParseExact((string)record.Attribute("incarnation"),"N"),true);if(File.Exists(archive))return false;
-                    Directory.CreateDirectory(Path.GetDirectoryName(archive));File.Move(path,archive);continue;
-                }
-                if(++count>=4096)return false;bytes+=new FileInfo(path).Length;if(bytes>33554432)return false;
+                // Quotas count unrelated history without parsing it or treating it
+                // as custody authority. Malformed XML still consumes its full bytes.
+                if(!path.EndsWith(".xml",StringComparison.Ordinal)||!Guid.TryParseExact(Path.GetFileNameWithoutExtension(path),"N",out var incarnation)||incarnation==Guid.Empty)return false;
+                var info=new FileInfo(path);if(!info.Exists||(info.Attributes&FileAttributes.ReparsePoint)!=0)return false;
+                if(++count>=4096){pressure=true;return false;}bytes+=info.Length;if(bytes>33554432){pressure=true;return false;}
             }
             }
             if(Directory.EnumerateFiles(directory).Any())return false;
         }
         return true;
+    }
+    private static bool Capacity(int incoming)
+    {
+        if(MetadataCapacity(incoming,out var pressure))return true;
+        if(!pressure)return false;
+        // Compatibility reclamation only when an old save reaches its quota.
+        // Normal publication never parses unrelated histories. Unknown/corrupt
+        // records remain charged; only the existing terminal proof permits moves.
+        ReclaimLegacyCompleted();
+        return MetadataCapacity(incoming,out _);
+    }
+    private static void ReclaimLegacyCompleted()
+    {
+        string root=Path.Combine(GameIO.GetSaveGameDir(),"RebirthLogisticsParcelReferences");int inspected=0;
+        foreach(string directory in Directory.EnumerateDirectories(root))
+        {
+            if((new DirectoryInfo(directory).Attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
+            if(Path.GetFileName(directory)=="archive")continue;
+            string owner=Path.GetFileName(directory);if(!Hex(owner))throw new InvalidDataException();
+            foreach(string operationDirectory in Directory.EnumerateDirectories(directory))
+            {
+                if((new DirectoryInfo(operationDirectory).Attributes&FileAttributes.ReparsePoint)!=0||!Guid.TryParseExact(Path.GetFileName(operationDirectory),"N",out var operation)||operation==Guid.Empty||Directory.EnumerateDirectories(operationDirectory).Any())throw new InvalidDataException();
+                foreach(string path in Directory.EnumerateFiles(operationDirectory))
+                {
+                    if(++inspected>4096)return;
+                    if(!path.EndsWith(".xml",StringComparison.Ordinal)||!Guid.TryParseExact(Path.GetFileNameWithoutExtension(path),"N",out var incarnation)||incarnation==Guid.Empty)continue;
+                    XElement history;try{history=ReadFile(path);}catch{continue;}
+                    if((string)history.Attribute("owner")!=owner||(string)history.Attribute("operation")!=operation.ToString("N")||(string)history.Attribute("incarnation")!=incarnation.ToString("N")||!history.HasElements)continue;
+                    int state=(int)history.Elements().Last().Attribute("state");if(state!=3&&state!=5)continue;
+                    if(!RebirthLogisticsTransferJournal.TryRead(owner,operation,out var terminal)||terminal.Phase!=4||RebirthLogisticsTransferJournal.ImmutablePlanDigest(terminal)!=(string)history.Attribute("binding"))continue;
+                    string archive=DomainPath(owner,operation,incarnation,true);if(File.Exists(archive)||File.Exists(path+".tmp")||File.Exists(path+".bak"))continue;
+                    Directory.CreateDirectory(Path.GetDirectoryName(archive));File.Move(path,archive);
+                }
+            }
+        }
+    }
+    // Only the addressed, validated history may be archived. Never use an
+    // unrelated record's parse or cleanup outcome as publication authority.
+    private static void ArchiveCompleted(Endpoint endpoint,XElement history)
+    {
+        if(!history.HasElements)return;
+        int state=(int)history.Elements().Last().Attribute("state");
+        if(state!=3&&state!=5)return;
+        string path=PathFor(endpoint);if(!File.Exists(path))return;
+        if(!RebirthLogisticsTransferJournal.TryRead(endpoint.Original.Owner,endpoint.Original.Operation,out var terminal)||terminal.Phase!=4||RebirthLogisticsTransferJournal.ImmutablePlanDigest(terminal)!=endpoint.Binding)return;
+        if(!XNode.DeepEquals(Read(endpoint),history))throw new InvalidDataException();
+        string archive=ArchivePath(endpoint);if(File.Exists(archive))throw new InvalidDataException();
+        Directory.CreateDirectory(Path.GetDirectoryName(archive));File.Move(path,archive);
     }
     private static bool Publish(Endpoint endpoint,XElement before,XElement next)
     {
@@ -201,10 +246,19 @@ internal static class RebirthLogisticsParcelReferenceJournal
             {row.SetAttributeValue("state",old);row.SetAttributeValue("after",previous.Attribute("after").Value);transition=XNode.DeepEquals(normalized,before);}
         }
         if(!transition)return false;
-        if(!XNode.DeepEquals(Read(endpoint),before)||!Capacity(Encoding.UTF8.GetByteCount(next.ToString(SaveOptions.DisableFormatting))))return false;
-        string path=PathFor(endpoint);byte[] bytes=Encoding.UTF8.GetBytes(next.ToString(SaveOptions.DisableFormatting));if(bytes.Length>MaximumBytes)return false;
+        if(!XNode.DeepEquals(Read(endpoint),before))return false;
+        ArchiveCompleted(endpoint,before);
+        if(!Capacity(Encoding.UTF8.GetByteCount(next.ToString(SaveOptions.DisableFormatting))))return false;
+        // Endpoint cleanup may archive its completed history. Resolve again after
+        // that move and update the authoritative copy, including an already archived
+        // history that needs another owner-reference repair after reconnecting.
+        if(!XNode.DeepEquals(Read(endpoint),before))return false;
+        string path=File.Exists(ArchivePath(endpoint))?ArchivePath(endpoint):PathFor(endpoint);
+        byte[] bytes=Encoding.UTF8.GetBytes(next.ToString(SaveOptions.DisableFormatting));if(bytes.Length>MaximumBytes)return false;
         Directory.CreateDirectory(Path.GetDirectoryName(path));using(var stream=new FileStream(path+".tmp",FileMode.CreateNew,FileAccess.Write,FileShare.None)){stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
-        if(File.Exists(path))File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);return XNode.DeepEquals(Read(endpoint),next);
+        if(File.Exists(path))File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);
+        if(!XNode.DeepEquals(Read(endpoint),next))return false;
+        ArchiveCompleted(endpoint,next);return XNode.DeepEquals(Read(endpoint),next);
     }
     private static int Owner(Endpoint endpoint,XElement history)
     {int owner=endpoint.Death.OwnerEntity;foreach(var row in history.Elements())owner=(int)row.Attribute((int)row.Attribute("state")==2||(int)row.Attribute("state")==3?"next":"old");return owner;}
@@ -515,6 +569,18 @@ internal static class RebirthLogisticsParcelReferenceJournal
         }catch{/* Unknown history/native lineage is retained, never respawned. */}
     }
     private static readonly Dictionary<string,DateTime> terminalPulses=new Dictionary<string,DateTime>(StringComparer.Ordinal);
+    private static bool TrySingleTerminalMarker(Dictionary<string,ChunkCustomData> entries,string prefix,out ChunkCustomData marker)
+    {
+        marker=null;bool found=false;
+        // Selection has no callbacks or writes; preserve the old Take(2) ambiguity fence.
+        foreach(var pair in entries)
+        {
+            if(!pair.Key.StartsWith(prefix,StringComparison.Ordinal))continue;
+            if(found){marker=null;return false;}
+            found=true;marker=pair.Value;
+        }
+        return found;
+    }
     internal static void PulseTerminalBody(EntityBackpack body)
     {
         if(!Enabled||!ThreadManager.IsMainThread()||body?.world?.IsRemote()!=false||!body.addedToChunk)return;
@@ -522,8 +588,8 @@ internal static class RebirthLogisticsParcelReferenceJournal
         {
             foreach(var old in terminalPulses.Where(pair=>pair.Value<DateTime.UtcNow.AddSeconds(-30)).Select(pair=>pair.Key).ToArray())terminalPulses.Remove(old);
             var chunk=body.world.GetChunkSync(body.chunkPosAddedEntityTo.x,body.chunkPosAddedEntityTo.z) as Chunk;if(chunk==null||chunk.InProgressUnloading)return;
-            string prefix="RebirthLogisticsBackpackV1:"+body.entityId+":";var markers=chunk.ChunkCustomData.dict.Where(pair=>pair.Key.StartsWith(prefix,StringComparison.Ordinal)).Take(2).ToArray();if(markers.Length!=1)return;
-            var marker=markers[0].Value;if(marker?.data==null||marker.data.Length>4096)return;
+            string prefix="RebirthLogisticsBackpackV1:"+body.entityId+":";
+            if(!TrySingleTerminalMarker(chunk.ChunkCustomData.dict,prefix,out var marker))return;if(marker?.data==null||marker.data.Length>4096)return;
             using(var stream=new MemoryStream(marker.data,false))using(var reader=new BinaryReader(stream))
             {
                 if(reader.ReadByte()!=1)return;var incarnation=new Guid(reader.ReadBytes(16));var op=new Guid(reader.ReadBytes(16));string owner=reader.ReadString(),key=owner+":"+op.ToString("N");
@@ -554,6 +620,7 @@ internal static class RebirthLogisticsParcelReferenceJournal
                 var chunk=body.world.GetChunkSync(endpoint.X,endpoint.Z) as Chunk;
                 if(!Native(endpoint,body,chunk)||!RebirthLogisticsLoadedBodyNotice.CanRetire(original,endpoint.Incarnation,body))continue;
                 var history=Read(endpoint);if(!MarkerCurrent(endpoint,chunk,history))continue;
+                ArchiveCompleted(endpoint,history);
                 if(endpoint.Parcel==null)RebirthLogisticsAcceptedBodyJournal.Retire(original);
                 RebirthLogisticsLoadedBodyNoticeJournal.ArchiveAcknowledgedIncarnation(original,endpoint.Incarnation,body);
                 // Metadata only, after actual body/nav ACK. Frozen plans,

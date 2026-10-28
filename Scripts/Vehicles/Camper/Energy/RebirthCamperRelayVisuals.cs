@@ -49,7 +49,11 @@ internal static class RebirthCamperRelayVisuals
         // RootTransform is a stationary factory wrapper. Authoring stripe height
         // and bank depth belong to the moving model's local coordinate system.
         var center=frame.InverseTransformPoint(battery.transform.TransformPoint(battery.center));
-        var vertices=skin.sharedMesh.vertices.Select(v=>frame.InverseTransformPoint(skin.transform.TransformPoint(v))).ToArray();
+        // Unity returns a vertex copy. Transform it in place: captured LINQ here
+        // allocates a closure at Attach entry, even when the existing-group guard returns.
+        var vertices=skin.sharedMesh.vertices;
+        for(int i=0;i<vertices.Length;i++)
+            vertices[i]=frame.InverseTransformPoint(skin.transform.TransformPoint(vertices[i]));
         var triangles=skin.sharedMesh.triangles;
         var anchors=new Vector3[2];var normals=new Vector3[2];
         for(int i=0;i<2;i++)
@@ -76,7 +80,11 @@ internal static class RebirthCamperRelayVisuals
             foreach(var collider in relay.GetComponentsInChildren<Collider>(true))collider.enabled=false;
             var renderers=relay.GetComponentsInChildren<Renderer>(true);if(renderers.Length==0){Object.Destroy(group);Wait(vehicle,binding,"native relay has no renderers");return;}
             foreach(var renderer in renderers)
-                renderer.sharedMaterials=renderer.sharedMaterials.Select(material=>materials.Convert(material,fade)).ToArray();
+            {
+                var shared=renderer.sharedMaterials;
+                for(int i=0;i<shared.Length;i++)shared[i]=materials.Convert(shared[i],fade);
+                renderer.sharedMaterials=shared;
+            }
             bool first=true;var bounds=new Bounds();
             // World AABBs grow when the truck rotates. Use actual mesh bounds
             // transformed into the relay mount so yaw cannot move the plates.

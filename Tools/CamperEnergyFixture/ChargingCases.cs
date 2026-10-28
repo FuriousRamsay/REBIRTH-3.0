@@ -98,17 +98,17 @@ internal static partial class Program
         var c=Start(20,1);Install(c,3);var id=InstallDamagedBattery(c);c.Vehicle.world.Day=false;Camp(c);
         c.Vehicle.world.Day=true;int sync=c.Vehicle.SyncCount,saves=VehicleManager.Instance.Saves;long revision=c.Runtime.Snapshot().Revision;
         Advance(c,20);
-        Assert(c.Loads[0].Supply==20&&Used(c,id)==94,"actual consumers paid first; only remaining solar charges batteries");
+        Assert(c.Loads[0].Supply==20&&Used(c,id)==98,"battery supplies consumers while solar charges it: supplied="+c.Loads[0].Supply+" used="+Used(c,id));
         Assert(c.Vehicle.SyncCount==sync+1&&VehicleManager.Instance.Saves==saves+1&&c.Runtime.Snapshot().Revision==revision+1,"charge publishes one existing state revision/sync/save");
         string frame;c.Vehicle.vehicle.Item.TryGetMetadata(RebirthCamperEnergyState.Key,out frame);
         var restored=RebirthCamperEnergyState.DecodeBase64(frame,c.Runtime.Identity);
-        Assert(restored.Version==2&&restored.Sources.Single(s=>s.Id==id).Bank.Stacks[0].itemValue.UseTimes==94,"existing v2 save frame contains charged native ItemValue");
+        Assert(restored.Version==2&&restored.Sources.Single(s=>s.Id==id).Bank.Stacks[0].itemValue.UseTimes==98,"existing v2 save frame contains charged native ItemValue");
         Assert(restored.Sources.Single(s=>s.Id==id).Bank.Stacks[0].itemValue.Metadata["retained.identity"]=="native battery","charging preserves native item metadata");
         var portable=c.Runtime.Snapshot().Revision;Assert(c.Runtime.TryPrepareRemove(portable,id,out var remove,out _),"charged source can prepare native portable image");
         Assert(remove.Removed.itemValue.TryGetMetadata(RebirthCamperEnergyState.PortableKey,out _),"portable source carries charged state through existing custody schema");
 
         var exact=Start(30,1);Install(exact,3);var exactId=InstallDamagedBattery(exact);exact.Vehicle.world.Day=false;Camp(exact);exact.Vehicle.world.Day=true;Advance(exact,20);
-        Assert(exact.Loads[0].Supply==30&&Used(exact,exactId)==100,"all solar used by demand leaves no battery charging or double spend");
+        Assert(exact.Loads[0].Supply==30&&Used(exact,exactId)==98,"solar generation never feeds the load directly: used="+Used(exact,exactId));
         var parked=Start(0,1);Install(parked,3);var parkedId=InstallDamagedBattery(parked);Advance(parked,20);
         Assert(parked.Runtime.Snapshot().Mode==RebirthCamperEnergyMode.Travel&&Used(parked,parkedId)==94,"daytime unused solar charges parked Travel batteries without active devices");
         RebirthCamperStationSaveEvidence.Pending=true;float before=Used(parked,parkedId);Advance(parked,200);RebirthCamperStationSaveEvidence.Pending=false;Advance(parked,20);

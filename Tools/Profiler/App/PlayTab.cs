@@ -91,8 +91,9 @@ sealed class PlayTab : PagePanel
         UpdateChart();
         recorder.Status += s => BeginInvoke(() =>
         {
+            if (s == "game closed" || s == "monitor unavailable") { Refill(); UpdateChart(); }
             status.Text = s + $"  ·  results: {Path.GetFileName(recorder?.ResultPath ?? "")}";
-            if ((DateTime.UtcNow - lastSummary).TotalSeconds >= 4 && recorder != null) { lastSummary = DateTime.UtcNow; FillSummary(recorder.SummaryRows()); UpdateChart(); }
+            if (recorder != null && ((DateTime.UtcNow - lastSummary).TotalSeconds >= 4 || s == "game closed" || s == "monitor unavailable")) { lastSummary = DateTime.UtcNow; FillSummary(recorder.SummaryRows()); UpdateChart(); }
         });
         recorder.Dip += _ => BeginInvoke(() => { Refill(); });
         recorder.Start(warmupSeconds);
@@ -117,6 +118,7 @@ sealed class PlayTab : PagePanel
         if (recorder == null) return;
         stop.Enabled = false;
         await recorder.Stop();
+        Refill(); UpdateChart(); FillSummary(recorder.SummaryRows());
         status.Text = $"Saved {recorder.Result.Hitches.Count} dips to {recorder.ResultPath}";
         start.Enabled = true;
         recorder = null;
@@ -127,8 +129,8 @@ sealed class PlayTab : PagePanel
     {
         List<SliceStat> s; List<PlayHitch> dips;
         lock (shown) { s = shown.SliceStats.ToList(); dips = shown.Hitches.ToList(); }
-        if (s.Count < 2) { chart.Set("Frame rate", "fps per 2 s slice", new()); return; }
-        var xs = Enumerable.Range(0, s.Count).Select(i => i * 2.0).ToArray();
+        if (s.Count < 2) { chart.Set("Frame rate", "fps per captured slice", new()); return; }
+        var xs = PlayResult.ChartSeconds(s);
         var fps = s.Select(x => Math.Min(240, 1000.0 / Math.Max(1, x.AvgMs))).ToArray();
         var lines = new List<SeriesChart.Line> { new("average fps", Theme.Accent, xs, fps) };
         if (dips.Count > 0)
@@ -164,6 +166,7 @@ sealed class PlayTab : PagePanel
         int keep = grid.CurrentRow?.Index ?? -1;
         var t = new DataTable();
         t.Columns.Add("Time", typeof(string));
+        t.Columns.Add("Classification", typeof(string));
         t.Columns.Add("Worst frame (ms)", typeof(double));
         t.Columns.Add("Lowest FPS", typeof(double));
         t.Columns.Add("Time lost (ms)", typeof(double));
@@ -173,7 +176,7 @@ sealed class PlayTab : PagePanel
         List<PlayHitch> list;
         lock (shown) list = shown.Hitches.ToList();
         foreach (var h in list.OrderByDescending(x => x.LostMs))
-            t.Rows.Add(h.Time, h.WorstMs, h.LowFps, h.LostMs, h.GcMs, h.Hint, h.Causes.Count > 0 ? h.Causes[0].Method : "");
+            t.Rows.Add(h.Time, h.ShutdownAdjacent ? "Shutdown-adjacent" : "Recorded", h.WorstMs, h.LowFps, h.LostMs, h.GcMs, h.Hint, h.Causes.Count > 0 ? h.Causes[0].Method : "");
         grid.DataSource = null;
         grid.DataSource = t;
         Theme.StyleGrid(grid);

@@ -1,0 +1,19 @@
+{
+  "status": "SAMPLED_CLEARANCE_CHECK",
+  "results": [
+    {
+      "post": "near_post",
+      "penetratingSamples": 0,
+      "minimumSignedDistance": 0.0021431793269413475,
+      "sampleCount": 62210
+    },
+    {
+      "post": "far_post",
+      "penetratingSamples": 0,
+      "minimumSignedDistance": 0.0009398143466689455,
+      "sampleCount": 62210
+    }
+  ],
+  "interpretation": "Negative distances identify intersection. Positive samples do not prove triangle-level separation; this is a planning screen.",
+  "blenderAllowed": false
+}

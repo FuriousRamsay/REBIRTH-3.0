@@ -1,0 +1,7 @@
+{
+  "status": "INFERRED_NOT_FIDELITY_PASS",
+  "depthShift": -0.06,
+  "maxRadiusTimesCurvature": 0.6266220931933808,
+  "reason": "Choose nearest tested hidden depth with radius-curvature below 0.7 and unchanged endpoint image location",
+  "remaining": "Furnace contact and complete reference silhouette unvalidated"
+}

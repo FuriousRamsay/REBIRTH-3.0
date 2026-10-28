@@ -1,0 +1,24 @@
+{
+  "status": "APPROXIMATE_DISTANCE_NOT_ACCEPTANCE",
+  "records": [
+    {
+      "id": "right_front_strap",
+      "sampleCount": 206,
+      "nearestMeshVertexPixelsMax": 14.275491514954759,
+      "median": 7.574235487250427
+    },
+    {
+      "id": "crown_diagonal_left",
+      "sampleCount": 16,
+      "nearestMeshVertexPixelsMax": 10.87492685840723,
+      "median": 6.55646854035836
+    },
+    {
+      "id": "left_shoulder_band",
+      "sampleCount": 296,
+      "nearestMeshVertexPixelsMax": 50.17886908134485,
+      "median": 16.221035095076402
+    }
+  ],
+  "limitation": "Distance to projected mesh vertices, not continuous surface"
+}

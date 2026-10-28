@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net481</TargetFramework><AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages><FrameworkPathOverride>C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.8</FrameworkPathOverride><LangVersion>latest</LangVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GenerateAssemblyInfo>false</GenerateAssemblyInfo><RebirthGameRoot>C:/Program Files (x86)/Steam/steamapps/common/7 Days To Die</RebirthGameRoot></PropertyGroup>
+<ItemGroup>
+<Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperPoiLightInteraction.cs"/>
+<Compile Include="ParentBoundaries.cs.txt"/>
+<Reference Include="Assembly-CSharp"><HintPath>$(RebirthGameRoot)/7DaysToDie_Data/Managed/Assembly-CSharp.dll</HintPath></Reference>
+<Reference Include="UnityEngine.CoreModule"><HintPath>$(RebirthGameRoot)/7DaysToDie_Data/Managed/UnityEngine.CoreModule.dll</HintPath></Reference>
+<Reference Include="UnityEngine"><HintPath>$(RebirthGameRoot)/7DaysToDie_Data/Managed/UnityEngine.dll</HintPath></Reference>
+<Reference Include="0Harmony"><HintPath>$(RebirthGameRoot)/Mods/0_TFP_Harmony/0Harmony.dll</HintPath></Reference>
+<Reference Include="netstandard"><HintPath>$(RebirthGameRoot)/7DaysToDie_Data/Managed/netstandard.dll</HintPath></Reference>
+</ItemGroup><Target Name="UseInstalledGameFramework" AfterTargets="ResolveReferences" BeforeTargets="CoreCompile">
+<ItemGroup>
+<NativeFramework Include="@(ReferencePath)" Condition="('%(ReferencePath.Filename)' == 'mscorlib' Or '%(ReferencePath.Filename)' == 'System' Or '%(ReferencePath.Filename)' == 'System.Core' Or '%(ReferencePath.Filename)' == 'netstandard') And Exists('$(RebirthGameRoot)/7DaysToDie_Data/Managed/%(ReferencePath.Filename).dll')" />
+<ReferencePath Remove="@(NativeFramework)" />
+<ReferencePath Include="@(NativeFramework->'$(RebirthGameRoot)/7DaysToDie_Data/Managed/%(Filename).dll')" />
+</ItemGroup></Target></Project>

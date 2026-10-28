@@ -10,7 +10,10 @@ public sealed class XUiC_RebirthOreSenseHud : XUiController
         timer+=dt;if(timer<RefreshInterval)return;timer=0f;base.Update(dt);
         string previousPosition=position,previousStatus=status,previousDetail=detail,previousAccent=accent;
         Refresh();
-        if(IsDirty||position!=previousPosition||status!=previousStatus||detail!=previousDetail||accent!=previousAccent)
+        // These four fields are the HUD's complete binding state. Native XUi
+        // can leave IsDirty set while an unrelated window is open; honoring it
+        // here reparses color/position bindings every refresh for a hidden HUD.
+        if(position!=previousPosition||status!=previousStatus||detail!=previousDetail||accent!=previousAccent)
             RefreshBindings();
     }
     public override void OnOpen(){base.OnOpen();Refresh();IsDirty=true;RefreshBindings();}

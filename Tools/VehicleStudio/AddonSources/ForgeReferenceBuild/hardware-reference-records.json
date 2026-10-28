@@ -1,0 +1,35 @@
+{
+ "status":"MANUAL_VISIBLE_HARDWARE_INVENTORY_UNVALIDATED",
+ "coordinateSystem":"1448x1086 original image pixels, top-left origin",
+ "uncertaintyPixels":8,
+ "headShape":"low rounded dome over washer or plate; no long cylindrical pegs",
+ "fasteners":[
+  {"id":"collar_front","center":[834,158],"diameter":46,"parent":"collar_overlap"},
+  {"id":"crown_left_back","center":[729,177],"diameter":24,"parent":"left_shoulder_band"},
+  {"id":"crown_left_cross","center":[806,258],"diameter":35,"parent":"crown_cross_band"},
+  {"id":"crown_front_cross","center":[859,280],"diameter":34,"parent":"crown_cross_band"},
+  {"id":"crown_right_cross","center":[1118,244],"diameter":32,"parent":"right_front_strap"},
+  {"id":"left_shoulder_high","center":[609,190],"diameter":32,"parent":"left_shoulder_band"},
+  {"id":"left_shoulder_low","center":[590,237],"diameter":26,"parent":"left_shoulder_band"},
+  {"id":"front_strap_upper","center":[798,445],"diameter":35,"parent":"left_front_strap"},
+  {"id":"front_strap_middle","center":[772,630],"diameter":36,"parent":"left_front_strap"},
+  {"id":"front_strap_lap","center":[779,754],"diameter":42,"parent":"left_front_plate"},
+  {"id":"front_foot_lap","center":[739,957],"diameter":41,"parent":"front_left_foot"},
+  {"id":"right_shoulder","center":[1262,385],"diameter":34,"parent":"right_front_strap"},
+  {"id":"right_lap","center":[1277,665],"diameter":39,"parent":"right_front_plate"},
+  {"id":"right_foot_lap","center":[1271,817],"diameter":37,"parent":"front_right_foot"},
+  {"id":"near_frame_top_boss","center":[185,340],"diameter":40,"parent":"near_upright"},
+  {"id":"near_frame_bottom_boss","center":[188,637],"diameter":34,"parent":"near_upright"},
+  {"id":"far_frame_top_boss","center":[432,271],"diameter":24,"parent":"far_upright"},
+  {"id":"crucible_upper_front","center":[465,734],"diameter":24,"parent":"front_retainer"},
+  {"id":"crucible_lower_front","center":[476,892],"diameter":22,"parent":"front_retainer"},
+  {"id":"crucible_side_link","center":[672,751],"diameter":33,"parent":"side_link"}
+ ],
+ "additionalShapes":[
+  {"id":"collar_overlap","contourPixels":[[805,128],[850,136],[862,182],[817,185],[800,168]],"shape":"thick rounded iron tab","thickness":"must derive from shared 3D plan"},
+  {"id":"near_foot","contourPixels":[[261,742],[294,745],[309,766],[313,790],[277,809],[235,789],[230,774]],"holeCenterPixels":[270,776],"holeDiameterPixels":22,"shape":"bent mounting foot with short upright neck"},
+  {"id":"bellows_bottom_support","contourPixels":[[285,696],[326,707],[378,744],[406,763],[405,808],[364,808],[324,780],[294,752]],"shape":"short angled block/bracket supporting assembly; part partly hidden by crucible","depth":"inferred hidden connection must be labelled"},
+  {"id":"right_side_handle","contourPixels":[[1303,435],[1322,444],[1330,475],[1328,509],[1311,534],[1299,530]],"shape":"thick open U-shaped handle attached at two points","depth":"behind side band"}
+ ],
+ "limits":"Inventory covers prominent visible heads only; small flange and throat fasteners still require individual records. Visual overlap and all three-dimensional transforms remain unvalidated."
+}

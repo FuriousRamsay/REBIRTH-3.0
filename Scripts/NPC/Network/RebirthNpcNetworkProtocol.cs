@@ -166,10 +166,14 @@ public static partial class RebirthNpcNetworkBaselineService
         RebirthNpcPendingAppearanceSnapshots.Tick();
         RebirthNpcRecoveryProjectionNetwork.TickClient();
         RetireDisconnectedBaselines();
-        if(!UseBaselineScope())return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (manager == null || !manager.IsServer || world == null) return;
+        // SendTo binds the scope when a job is queued. With no outstanding
+        // baseline, reading recovery-generation files on every game update
+        // cannot advance work and only adds synchronous disk I/O.
+        lock (Sync) if (Pending.Count == 0 && FairOrder.Count == 0 && Enqueued.Count == 0) return;
+        if(!UseBaselineScope())return;
 
         BaselineJob job = null;
         lock (Sync)

@@ -1,0 +1,35 @@
+{
+  "status": "ATTACHMENT_DEPTH_CANDIDATE_NOT_FIDELITY_PASS",
+  "crucible": {
+    "translation": [
+      -0.05691609137635435,
+      -0.1163653835800986,
+      0.05469142634037175
+    ],
+    "depthShift": 0.14061115200598176,
+    "supportedSamples": 753,
+    "maximumReferenceViewPixelDrift": 3.79421875212396e-15,
+    "clearanceAllowance": 0.035,
+    "minimumSampledPostShiftClearance": 0.035
+  },
+  "bellows": {
+    "translation": [
+      -0.032792715253861765,
+      -0.06704495682804207,
+      0.03151095459011901
+    ],
+    "depthShift": 0.08101437322460395,
+    "supportedSamples": 128,
+    "maximumReferenceViewPixelDrift": 2.5058092810295472e-15,
+    "clearanceAllowance": 0.008,
+    "minimumSampledPostShiftClearance": 0.008
+  },
+  "authority": "Depth inferred from new volume and required occlusion; not measured from single concept",
+  "limitations": [
+    "Samples against smooth envelope only, not all stones",
+    "A rigid view-depth translation also changes world height; mounting height requires review",
+    "Flange mounting back and crucible receiving bracket need physical contact verification",
+    "No proof of globally collision-free mesh"
+  ],
+  "blenderAllowed": false
+}

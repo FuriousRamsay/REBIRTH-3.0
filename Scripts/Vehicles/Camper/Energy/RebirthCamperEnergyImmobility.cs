@@ -15,7 +15,7 @@ public static class RebirthCamperEnergyImmobility
         &&vehicle?.world!=null&&!vehicle.world.IsRemote()&&ReferenceEquals(GameManager.Instance?.World,vehicle.world)
         &&ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle)&&RebirthCamperRadial.IsCamper(vehicle);
     public static bool CampClaimReady(EntityVehicle vehicle)
-        =>Live(vehicle)&&RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)&&mode==RebirthCamperEnergyMode.Camp
+        =>Live(vehicle)&&RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode)&&mode==RebirthCamperEnergyMode.Camp
             &&pins.TryGetValue(vehicle,out var pin)&&ReferenceEquals(pin.World,vehicle.world)&&ReferenceEquals(pin.Body,vehicle.vehicleRB)
             &&pin.Body!=null&&pin.Body.constraints==RigidbodyConstraints.FreezeAll
             &&(vehicle.position-pin.Position).sqrMagnitude<=0.000001f
@@ -35,13 +35,25 @@ public static class RebirthCamperEnergyImmobility
         // Preserve any independently observed native/mod constraint assignment.
         // Current native EntityVehicle has no constraints writes; it does own
         // isKinematic and that state is deliberately never overwritten here.
-        if(body.constraints!=RigidbodyConstraints.FreezeAll)pin.Restore=body.constraints;
-        body.constraints=RigidbodyConstraints.FreezeAll;
+        if(body.constraints!=RigidbodyConstraints.FreezeAll)
+        {
+            pin.Restore=body.constraints;
+            body.constraints=RigidbodyConstraints.FreezeAll;
+        }
         pin.Applying=true;
         try
         {
-            body.position=pin.Position-Origin.position;body.rotation=pin.Rotation;
-            if(!body.isKinematic){body.velocity=Vector3.zero;body.angularVelocity=Vector3.zero;}
+            // Setting an unchanged Rigidbody pose still enters native physics.
+            // Keep observing on both sides of simulation, but only correct an
+            // actual difference. Recompute local position for origin shifts.
+            var position=pin.Position-Origin.position;
+            if(!body.position.Equals(position))body.position=position;
+            if(!body.rotation.Equals(pin.Rotation))body.rotation=pin.Rotation;
+            if(!body.isKinematic)
+            {
+                if(!body.velocity.Equals(Vector3.zero))body.velocity=Vector3.zero;
+                if(!body.angularVelocity.Equals(Vector3.zero))body.angularVelocity=Vector3.zero;
+            }
             if(vehicle.position!=pin.Position)vehicle.SetPosition(pin.Position,true);
             if(vehicle.qrotation!=pin.Rotation)vehicle.SetRotation(pin.Rotation.eulerAngles);
         }
@@ -51,21 +63,21 @@ public static class RebirthCamperEnergyImmobility
     internal static void ObserveAndApply(EntityVehicle vehicle)
     {
         if(!Live(vehicle)){Release(vehicle);return;}
-        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)){Release(vehicle);return;}
+        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode)){Release(vehicle);return;}
         Apply(vehicle,mode);
     }
     internal static bool AllowPosition(EntityVehicle vehicle,Vector3 position)
     {
         if(!Live(vehicle))return true;
         if(pins.TryGetValue(vehicle,out var existing)&&existing.Applying)return true;
-        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode==RebirthCamperEnergyMode.Travel)return true;
+        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode)||mode==RebirthCamperEnergyMode.Travel)return true;
         if(!Apply(vehicle,mode)||!pins.TryGetValue(vehicle,out var pin))return false;
         return pin.Applying||position==pin.Position;
     }
     internal static bool AllowRotation(EntityVehicle vehicle,Vector3 rotation)
     {
         if(!Live(vehicle))return true;
-        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode==RebirthCamperEnergyMode.Travel)return true;
+        if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode)||mode==RebirthCamperEnergyMode.Travel)return true;
         if(pins.TryGetValue(vehicle,out var existing)&&existing.Applying)return true;
         if(!Apply(vehicle,mode)||!pins.TryGetValue(vehicle,out var pin))return false;
         return Quaternion.Angle(Quaternion.Euler(rotation),pin.Rotation)<=0.001f;

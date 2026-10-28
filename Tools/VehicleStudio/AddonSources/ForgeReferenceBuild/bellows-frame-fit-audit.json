@@ -1,0 +1,12 @@
+{
+  "status":"REJECTED_ENVELOPE_DEPTH_PLACEMENT",
+  "checkedGeometry":"bellows-volume-plan-v2.json against bellows-frame-plan.json",
+  "nearPostXRange":[-0.6477585218,-0.6235042900],
+  "farPostXRange":[-0.3474851004,-0.3232308685],
+  "envelopeRearXRange":[-0.7111653,-0.5932652],
+  "finding":"The provisional rear envelope lies around the near post instead of spanning toward the far post. A closed mesh and matching image outline did not establish assembly fit.",
+  "cause":"Envelope thickness was assigned along camera depth, independently of the physical transverse frame axis. The traced near leather profile was incorrectly treated as the full cross-sectional silhouette.",
+  "requiredCorrection":"Construct transverse width along the frame shaft axis. Anchor the broad rear between the inner post faces, then taper that width toward the throat. Distinguish visible near leather profile from the far/top board boundary in the image before generating the replacement loft.",
+  "preserve":"Keep v1 and v2 as rejected planning evidence. Do not export them to Blender.",
+  "blenderAllowed":false
+}

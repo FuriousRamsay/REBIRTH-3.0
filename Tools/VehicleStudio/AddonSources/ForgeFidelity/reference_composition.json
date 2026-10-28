@@ -1,0 +1,23 @@
+{
+  "status": "MANUAL_IMAGE_ESTIMATES_NOT_ACCEPTANCE",
+  "reference": "Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/01-forge.png",
+  "imageSize": [1448, 1086],
+  "coordinateConvention": "Normalized image coordinates, top-left origin; bounds manually estimated from visible reference, not recovered 3D dimensions",
+  "visibleBounds": {
+    "wholeAssembly": [0.110, 0.053, 0.923, 0.965],
+    "bellowsFrameAndLeather": [0.110, 0.196, 0.388, 0.673],
+    "nozzleAndFlange": [0.338, 0.417, 0.453, 0.573],
+    "crucibleWithRetainers": [0.280, 0.565, 0.480, 0.896],
+    "topCollar": [0.530, 0.053, 0.704, 0.185],
+    "hearthOpening": [0.628, 0.351, 0.877, 0.647]
+  },
+  "requiredRelations": [
+    "Crucible overlaps the lower-right portion of bellows assembly in the reference view.",
+    "Crucible rim lies below nozzle center, with visible open interior and a thick, mildly irregular rim.",
+    "Both rear timber uprights are visible; their upper cross shafts rise toward image right.",
+    "Leather has a broad curved upper shoulder, not a straight triangular top edge.",
+    "Nozzle has a collar, exposed cylindrical neck and circular bolted furnace flange.",
+    "Bellows feet attach through short supports, without a tall isolated pedestal.",
+    "Camera correspondence must be checked before changing geometry to correct image-space error."
+  ]
+}

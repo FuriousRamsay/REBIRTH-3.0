@@ -31,9 +31,9 @@ class RebirthGearTransferState {public string TransactionId="tx",CreationId="cre
 enum RebirthGearOwnerReceipt{Rejected=-1,Applied=1,Applying=2}
 static class RebirthGearReceiptReader {public static bool Contains(byte[] b,string t,RebirthGearOwnerReceipt s)=>Encoding.UTF8.GetString(b).Contains("rbGear_"+t+"="+(int)s);}
 static class RebirthGearPreparationMarkerReader {public static bool HasNoOriginal(byte[] b)=>!Encoding.UTF8.GetString(b).Contains("_rbgearintent_");}
-static class RebirthPlayerDataInventory {public static RebirthGearInventoryPlan.Stack[] ReadSlots(PlayerDataFile d,bool b)=>new[]{new RebirthGearInventoryPlan.Stack{Count=b?d.Count:0,ItemData=b?"full":""}};}
+static class RebirthGearPlayerDataInventory {public static RebirthGearInventoryPlan.Stack[] ReadSlots(PlayerDataFile d,bool b)=>new[]{new RebirthGearInventoryPlan.Stack{Count=b?d.Count:0,ItemData=b?"full":""}};}
 class RebirthGearInventorySnapshot {public RebirthGearInventoryPlan.Stack[] Bag,Belt;public static bool TryCapture(RebirthGearInventoryPlan.Stack[] b,RebirthGearInventoryPlan.Stack[] t,int n,out RebirthGearInventorySnapshot s){s=new(){Bag=b,Belt=t};return b!=null&&t!=null;}}
-static class RebirthGearNativePlayerFile {public static bool TryRead(RebirthStablePlayerIdentity o,out PlayerDataFile d){d=null;try{using var r=new BinaryReader(File.OpenRead(Path.Combine(GameIO.Root,o.CanonicalId+".ttp")));if(r.ReadChar()!='t'||r.ReadChar()!='t'||r.ReadChar()!='p'||r.ReadChar()!=0||r.ReadByte()!=62)return false;int count=r.ReadInt32();string marker=r.ReadString();if(r.BaseStream.Position!=r.BaseStream.Length)return false;d=new(){Count=count,buffData=new MemoryStream(Encoding.UTF8.GetBytes(marker))};return true;}catch{return false;}}}
+static class RebirthGearNativePlayerFile {public static bool TryRead(RebirthStablePlayerIdentity o,out PlayerDataFile d,out string failure){bool ok=TryRead(o,out d);failure=ok?null:"fixture-read";return ok;}public static bool TryRead(RebirthStablePlayerIdentity o,out PlayerDataFile d){d=null;try{using var r=new BinaryReader(File.OpenRead(Path.Combine(GameIO.Root,o.CanonicalId+".ttp")));if(r.ReadChar()!='t'||r.ReadChar()!='t'||r.ReadChar()!='p'||r.ReadChar()!=0||r.ReadByte()!=62)return false;int count=r.ReadInt32();string marker=r.ReadString();if(r.BaseStream.Position!=r.BaseStream.Length)return false;d=new(){Count=count,buffData=new MemoryStream(Encoding.UTF8.GetBytes(marker))};return true;}catch{return false;}}}
 static class RebirthGearOwnerReservation {public static bool Held=true;public static object Session;public static bool Matches(EntityPlayerLocal p,object s,RebirthGearTransferState o)=>Held&&ReferenceEquals(s,Session);}
 class Conn {public bool Disconnected;public bool IsDisconnected()=>Disconnected;}
 class ConnectionManager {public bool IsServer;public Conn[] connectionToServer;}
@@ -45,4 +45,6 @@ static class RebirthGearTerminalClient {public static bool Present=true;public s
 static class FixtureIo {public static void WriteLive(EntityPlayerLocal p){new PlayerDataFile{Count=p.bag.ItemGrid.items[0].Count,Marker=p.Buffs.CVars.ContainsKey("_rbgearintent_original")}.Save(GameIO.Root,"owner");}}
 class Map {public object SaveAsync; }
 class PlatformUserIdentifierAbs {}
+
+
 

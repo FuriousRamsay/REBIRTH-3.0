@@ -20,6 +20,25 @@ public sealed class XUiC_RebirthCamperTurretBackpackSlot:XUiC_ItemStack
         ViewComponent.EventOnPress=true;ViewComponent.EventOnHover=true;ViewComponent.EventOnDrag=true;ViewComponent.EventOnScroll=true;
         OnDrag+=(s,type,delta)=>{if(type==EDragType.DragEnd)RebirthCamperTurretAccess.ViewFor(xui)?.DropHeldAtPointer();};
     }
+    public override void OnHovered(bool over)
+    {
+        RebirthCharacterItemStatsTooltip.Hover(this,over);
+        base.OnHovered(over);
+    }
+    public override void OnClose()
+    {
+        RebirthCharacterItemStatsTooltip.Hover(this,false);
+        base.OnClose();
+    }
+    public override bool GetBindingValueInternal(ref string value,string name)
+    {
+        if(name=="tooltip")
+        {
+            var text=RebirthCharacterItemStatsTooltip.Build(this,ItemStack);
+            if(text!=null){value=text;return true;}
+        }
+        return base.GetBindingValueInternal(ref value,name);
+    }
     public override void updateItemInfoWindow(XUiC_ItemStack item)
         =>RebirthCamperTurretAccess.ViewFor(xui)?.Inspect(item);
     public override void HandleClickComplete()

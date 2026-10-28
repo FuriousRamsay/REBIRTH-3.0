@@ -672,17 +672,20 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
                     L("xuiRebirthSurvivorGearSupport", "Support"), "rb_slot_support");
             return;
         }
-        if (!force && !characterChanged && !metabolismChanged)
+        if (!force && !characterChanged && tab == Tab.Condition
+            && snapshot != null && snapshot.RebirthModeEnabled && snapshot.HasCharacter)
         {
-            if (tab == Tab.Condition && snapshot != null && snapshot.RebirthModeEnabled && snapshot.HasCharacter)
-            {
-                EntityPlayer livePlayer = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
+            if (foundMet) { metabolism = met; lastMetabolismRevision = met.Revision; }
+            hasMetabolism = foundMet;
+            EntityPlayer livePlayer = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
+            if (overviewSnapshot == null)
                 overviewSnapshot = RebirthCharacterUiSnapshotBuilder.Build(livePlayer, snapshot, hasMetabolism, metabolism, false);
-                RenderConditions();
-            }
+            else
+                RebirthCharacterUiSnapshotBuilder.RefreshConditions(overviewSnapshot, livePlayer, snapshot, hasMetabolism, metabolism);
+            RenderConditions();
             return;
         }
-
+        if (!force && !characterChanged && !metabolismChanged) return;
         // Progression is rebuilt from scratch (dozens of strings). A metabolism-only revision bump happens every
         // few ticks and does not change what the page shows, so rebuild for it at most every 2 s.
         if (!force && !characterChanged && tab == Tab.Progression && snapshot != null && overviewSnapshot != null

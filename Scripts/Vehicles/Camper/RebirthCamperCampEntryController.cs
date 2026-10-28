@@ -8,6 +8,9 @@ using UnityEngine;
 internal static class RebirthCamperCampEntryController
 {
     internal const float CampStepOffset = .1f;
+    // Authored floor top .72 and roof underside 2.44 leave 1.72 m.
+    // Keep a small collision margin rather than matching that gap exactly.
+    internal const float CampClearanceHeight = 1.66f;
     private static bool installed;
     private static readonly HashSet<EntityVehicle> vehicles = new HashSet<EntityVehicle>();
     private static readonly ConditionalWeakTable<EntityVehicle, Binding> bindings = new ConditionalWeakTable<EntityVehicle, Binding>();
@@ -22,6 +25,8 @@ internal static class RebirthCamperCampEntryController
         internal bool Active;
         internal CharacterController Controller;
         internal float StepHeight, StepOffset;
+        internal float Height;
+        internal Vector3 Center;
     }
     internal static void Install()
     {
@@ -30,6 +35,7 @@ internal static class RebirthCamperCampEntryController
         harmony.CreateClassProcessor(typeof(RebirthCamperCampEntryVehicleTick)).Patch();
         harmony.CreateClassProcessor(typeof(RebirthCamperCampEntryVehicleUnload)).Patch();
         harmony.CreateClassProcessor(typeof(RebirthCamperCampEntryMovement)).Patch();
+        harmony.CreateClassProcessor(typeof(RebirthCamperCampEntrySmoothMovement)).Patch();
         ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);
         installed = true;
     }
@@ -95,7 +101,7 @@ internal static class RebirthCamperCampEntryController
             || player.world == null || !ReferenceEquals(GameManager.Instance?.World, player.world)
             || !ReferenceEquals(player.world.GetEntity(player.entityId), player)) return default;
         var native = controller.CharacterController;
-        if (native == null || !native.enabled || controller.m_StepHeight <= CampStepOffset) return default;
+        if (native == null || !native.enabled) return default;
         var feet = native.transform.TransformPoint(native.center - Vector3.up * (native.height * .5f));
         foreach (var vehicle in vehicles)
         {
@@ -106,8 +112,22 @@ internal static class RebirthCamperCampEntryController
                 || mode != RebirthCamperEnergyMode.Camp) continue;
             var binding = Resolve(vehicle);
             if (binding == null || !NearFloor(binding, feet, native.radius)) continue;
-            var movement = new Movement { Active = true, Controller = native, StepHeight = controller.m_StepHeight, StepOffset = native.stepOffset };
-            controller.m_StepHeight = CampStepOffset;
+            var movement = new Movement
+            {
+                Active = true, Controller = native, StepHeight = controller.m_StepHeight,
+                StepOffset = native.stepOffset, Height = native.height, Center = native.center
+            };
+            if (controller.m_StepHeight > CampStepOffset)
+                controller.m_StepHeight = CampStepOffset;
+            // The authored stair/overhead clearance passes a 1.72 m capsule but
+            // blocks a 1.8 m capsule. Preserve the feet while FixedMove runs.
+            if (native.height > CampClearanceHeight)
+            {
+                var center = native.center;
+                center.y -= (native.height - CampClearanceHeight) * .5f;
+                native.height = CampClearanceHeight;
+                native.center = center;
+            }
             return movement;
         }
         return default;
@@ -116,7 +136,12 @@ internal static class RebirthCamperCampEntryController
     {
         if (!movement.Active) return;
         controller.m_StepHeight = movement.StepHeight;
-        if (movement.Controller != null) movement.Controller.stepOffset = movement.StepOffset;
+        if (movement.Controller != null)
+        {
+            movement.Controller.height = movement.Height;
+            movement.Controller.center = movement.Center;
+            movement.Controller.stepOffset = movement.StepOffset;
+        }
     }
 }
 
@@ -130,6 +155,18 @@ internal static class RebirthCamperCampEntryVehicleUnload
 
 [HarmonyPatch(typeof(vp_FPController), nameof(vp_FPController.FixedMove))]
 internal static class RebirthCamperCampEntryMovement
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Prefix(vp_FPController __instance, out RebirthCamperCampEntryController.Movement __state)
+        => __state = RebirthCamperCampEntryController.Begin(__instance);
+    private static void Finalizer(vp_FPController __instance, RebirthCamperCampEntryController.Movement __state)
+        => RebirthCamperCampEntryController.End(__instance, __state);
+}
+
+// Native SmoothMove sends a second CharacterController move after FixedMove.
+// It must use the same doorway clearance while crossing the stair and roof.
+[HarmonyPatch(typeof(vp_FPController), nameof(vp_FPController.SmoothMove))]
+internal static class RebirthCamperCampEntrySmoothMovement
 {
     [HarmonyPriority(Priority.Last)]
     private static void Prefix(vp_FPController __instance, out RebirthCamperCampEntryController.Movement __state)

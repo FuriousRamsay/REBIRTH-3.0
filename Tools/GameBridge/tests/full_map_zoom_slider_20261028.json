@@ -1,0 +1,12 @@
+{
+  "name": "Full map POI-style logarithmic zoom slider",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. User opens Map at5120x1440/current UI scale and other supported aspects. Confirm purple Detail-to-Overview slider sits inside bottom-right map edge without covering filters or sidebar." },
+    { "screenshot": "map-zoom-slider-layout" },
+    { "_note": "User clicks both endpoints and midpoint; drags track/handle; releases outside; verifies immediate map scale and visible-width label. Wheel over track/background and gamepad triggers must keep slider synchronized. Ctrl-right-click the control must not teleport; dragging it must not pan the viewport." },
+    { "screenshot": "map-zoom-slider-input" },
+    { "_note": "Close/reopen and resize/change Purge legend or static mode. Check no stale drag, clipping, lost native wheel/gamepad controls or changed valid-world teleport behavior. No automated game control/teleport in this scenario." },
+    { "expectNoErrors": true }
+  ]
+}

@@ -14,7 +14,8 @@ public static class ThreadManager{public static bool Main=true;public static boo
 public class NetPackageRebirthGearOfferFragment{}
 public static class NetPackageManager{public static bool Missing;public static T GetPackage<T>() where T:new()=>new T();public static int GetPackageId(Type t){if(Missing)throw new Exception("mapping");return 1;}}
 public class RebirthGearInventorySnapshot{public RebirthGearInventoryPlan.Stack[] Bag,Belt;public int OwnedBeltSlots=4;public bool IsUsableSource(bool b,int index)=>index>=0&&index<(b?Bag.Length:OwnedBeltSlots);}
-public enum RebirthGearTransferPhase{Prepared,OwnerApplied,GearCommitted}public class RebirthGearTransferState{}
+// Transfer model double; production vocabulary has its own authored-XML fixture.
+public enum RebirthGearTransferPhase{Prepared,OwnerApplied,GearCommitted}public class RebirthGearTransferState{public static bool IsSupportedSlot(string slot)=>slot=="backpack"||slot=="belt"||slot=="support"||slot=="walkman"||slot=="outerwear_lining";}
 public static class RebirthRemoteGearPreparation{public static bool TryReplayBoundRetained(EntityPlayer p,ClientInfo s,string marker,out RebirthGearTransferState o,out RebirthGearTransferPhase phase){phase=RebirthGearTransferPhase.Prepared;return TryReplayBound(p,s,marker,out o);}
  public static bool Replay,Prepare=true;public static int Replays,Prepares;public static Action OnPrepare,OnReplay;
  public static bool TryReplayBound(EntityPlayer p,ClientInfo s,string marker,out RebirthGearTransferState offer){Replays++;OnReplay?.Invoke();offer=null;return Replay;}

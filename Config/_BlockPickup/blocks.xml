@@ -9,23 +9,11 @@
   </append>
 
   <!--
-    Restore the 2.6 military ammunition pallets as persistent loot containers.
-    The cap inherits the base pallet's storage feature. Tile variants override
-    the loot list with the larger 2.6 ammunition roll. These source blocks are
+    Restore military ammunition pallet tile variants as persistent loot containers.
+    The base pallet is not lootable. These source blocks are
     intentionally not destroy-on-close, so after looting and emptying them they
     can be recovered as secure player storage by the general pickup resolver.
   -->
-  <append xpath="/blocks/block[@name='palletCartonMilitaryBase']">
-    <property name="Class" value="CompositeTileEntity"/>
-    <property class="CompositeFeatures">
-      <property class="TEFeatureStorage">
-        <property name="LootList" value="rebirthMilitaryAmmoPalletLarge"/>
-      </property>
-    </property>
-    <property name="RebirthPickup" value="Allow"/>
-    <property name="RebirthPreserveAfterLoot" value="true"/>
-  </append>
-
   <append xpath="/blocks/block[@name='palletCartonMilitaryTile' or @name='palletCartonMilitaryTileCovered']">
     <property class="CompositeFeatures">
       <property class="TEFeatureStorage">

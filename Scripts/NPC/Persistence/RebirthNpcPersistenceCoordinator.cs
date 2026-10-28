@@ -557,15 +557,16 @@ public sealed class RebirthNpcPersistenceStoreCommitResult
 public static class RebirthNpcPersistenceCoordinator
 {
     private static readonly object Sync = new object();
-    // Many human AI tasks ask this in one Unity frame. Cache only a missing
+    // Many human AI tasks ask this every Unity frame. Cache only a missing
     // group; an actual group is always revalidated from disk. Every in-process
-    // publication/retirement invalidates the negative observation.
+    // publication/retirement invalidates the negative observation. Its lifetime
+    // is the exact World/save, not one frame: absence is stable until a writer
+    // publishes. The recovery driver also reads disk independently.
     private static World absentRecoveryWorld;
     private static string absentRecoveryDirectory;
-    private static int absentRecoveryFrame=-1;
     internal static void InvalidateRecoveryAbsence()
     {
-        lock(Sync){absentRecoveryWorld=null;absentRecoveryDirectory=null;absentRecoveryFrame=-1;}
+        lock(Sync){absentRecoveryWorld=null;absentRecoveryDirectory=null;}
     }
     [ThreadStatic] private static bool checkpointWrite;
     internal static bool IsCheckpointWrite => checkpointWrite;
@@ -588,7 +589,11 @@ public static class RebirthNpcPersistenceCoordinator
         var next=new RecoveryFlags{World=world,Directory=directory};RecoveryScopes.Add(next);return next;
         }
     }
-    private static RecoveryFlags CurrentFlags(bool create)=>Flags(GameManager.Instance?.World,GameIO.GetSaveGameDir(),create);
+    private static RecoveryFlags CurrentFlags(bool create)
+    {
+        lock(Sync)if(!create&&RecoveryScopes.Count==0)return null;
+        return Flags(GameManager.Instance?.World,RebirthNpcSaveScope.CurrentDirectory(),create);
+    }
     private static bool recoveryActive=>CurrentFlags(false)?.Active==true;
     internal static bool HasActiveRecoveryWriterLease
     {get{lock(Sync){var scope=CurrentFlags(false);return scope?.Active==true&&scope.Owner!=null;}}}
@@ -604,18 +609,18 @@ public static class RebirthNpcPersistenceCoordinator
             if(world==null)return false;
             try
             {
-                string directory=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(directory))return false;
+                string directory=RebirthNpcSaveScope.CurrentDirectory();if(string.IsNullOrEmpty(directory))return false;
                 bool mainThread=ThreadManager.IsMainThread();
                 if(mainThread)
                     lock(Sync)
-                        if(absentRecoveryFrame==UnityEngine.Time.frameCount&&ReferenceEquals(absentRecoveryWorld,world)&&
+                        if(ReferenceEquals(absentRecoveryWorld,world)&&
                             string.Equals(absentRecoveryDirectory,directory,StringComparison.Ordinal))return false;
                 var group=RebirthNpcLiveRecoveryGroup.Read(directory);
                 if(group==null)
                 {
                     if(mainThread)
                         lock(Sync)
-                        {absentRecoveryWorld=world;absentRecoveryDirectory=directory;absentRecoveryFrame=UnityEngine.Time.frameCount;}
+                        {absentRecoveryWorld=world;absentRecoveryDirectory=directory;}
                     return false;
                 }
                 if(group.Phase!=2)return true;

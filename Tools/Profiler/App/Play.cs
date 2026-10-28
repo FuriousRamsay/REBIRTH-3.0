@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -19,8 +19,13 @@ sealed class PlayHitch
     public int Collections { get; set; }                // every Mono collection in the slice (counter), not just the ones the event callback reports
     public int GcCount { get; set; }
     public string Hint { get; set; } = "";              // window open/close methods seen in the slice
+    // Culprits are excess samples over this whole interval, not proof for one slow frame.
+    public string AttributionScope { get; set; } = "unknown";
+    public DateTime SampleStartUtc { get; set; }
+    public DateTime SampleEndUtc { get; set; }
     public List<HitchAnalysis.Culprit> Causes { get; set; } = new();
     public string SliceFile { get; set; } = "";
+    public bool ShutdownAdjacent { get; set; } // Possible teardown, retained rather than discarded.
 }
 
 /// <summary>An error or exception line that keeps coming back in the game log while recording.</summary>
@@ -35,6 +40,15 @@ sealed class LogIssue
 
 sealed class SliceStat
 {
+    public double SessionSec { get; set; }
+    public bool ShutdownAdjacent { get; set; }
+    public string PhaseEvidence { get; set; } = "legacy-unknown";
+    public string HitchSuppression { get; set; } = "legacy-unknown";
+    public bool Warmup { get; set; }
+    public string LoadingMethod { get; set; } = "";
+    public double SampleWallMs { get; set; }
+    public DateTime StartUtc { get; set; }
+    public DateTime EndUtc { get; set; }
     public string Time { get; set; } = "";
     public int Frames { get; set; }
     public double AvgMs { get; set; }
@@ -68,6 +82,7 @@ sealed class PlayResult
 {
     public string Created { get; set; } = DateTime.Now.ToString("s");
     public double Seconds { get; set; }
+    public bool GameExited { get; set; }
     public int Slices { get; set; }
     public double MedianFrameMs { get; set; }
     public int Collections { get; set; }                // Mono garbage collections during the recording (after the warm-up)
@@ -84,6 +99,22 @@ sealed class PlayResult
     public List<SegmentStat> Segments { get; set; } = new();
     /// <summary>Repeated ERR / EXC log lines seen during the recording (numbers in the text are folded together), worst first.</summary>
     public List<LogIssue> LogIssues { get; set; } = new();
+
+    // Exit is a coarse boundary, not proof that any individual frame was teardown.
+    // Keep all measurements and label the final 16 seconds only after observed exit.
+    public void MarkGameExit()
+    {
+        GameExited = true;
+        double cutoff = Seconds - 16;
+        foreach (var h in Hitches) h.ShutdownAdjacent = h.SessionSec > cutoff;
+        foreach (var s in SliceStats) s.ShutdownAdjacent = s.SessionSec > cutoff;
+    }
+
+    // Sampling/report I/O extends the nominal interval. Use observed positions for
+    // new recordings; old JSON lacks them and retains the legacy nominal axis.
+    public static double[] ChartSeconds(IReadOnlyList<SliceStat> slices) =>
+        slices.All(s => s.SessionSec > 0) ? slices.Select(s => s.SessionSec).ToArray()
+        : Enumerable.Range(0, slices.Count).Select(i => i * 2.0).ToArray();
 
     /// <summary>Average FPS, 1% low FPS and worst frame over the slices whose end falls between two clock times (HH:mm:ss).</summary>
     public string Summarise(string from, string to)
@@ -103,7 +134,11 @@ sealed class PlayResult
     public string ToText()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"Play recording {Created}: {Seconds:F0} s, {Slices} slices of 2 s, typical frame {MedianFrameMs:F0} ms, {Hitches.Count} dips");
+        sb.AppendLine($"Play recording {Created}: {Seconds:F0} s, {Slices} slices (nominal 2 s), typical frame {MedianFrameMs:F0} ms, {Hitches.Count} dips");
+        sb.AppendLine("Hitch causes describe sampled excess across the entire slice, not attribution to an individual slow frame. Phase evidence is heuristic; unclassified does not mean in-game.");
+        foreach (var group in SliceStats.GroupBy(s => s.HitchSuppression))
+            sb.AppendLine($"   hitch detection {group.Key}: {group.Count()} slices, worst retained frame {group.Max(s => s.WorstMs):F1} ms");
+        if (GameExited) sb.AppendLine($"Game exited: final 16 seconds are marked shutdown-adjacent ({Hitches.Count(h => h.ShutdownAdjacent)} dips); all measurements retained; allocation/GC totals include retained tail.");
         sb.AppendLine($"Garbage collection: {Collections} collections ({CollectionsPerMinute:F1} per minute), managed heap {HeapMB:F0} MB ({HeapUsedMB:F0} MB in use)");
         if (AllocSeconds > 0)
         {
@@ -142,7 +177,7 @@ sealed class PlayResult
         sb.AppendLine();
         foreach (var h in Hitches)
         {
-            sb.AppendLine($"[{h.Time}] +{h.SessionSec:F0}s  worst {h.WorstMs:F0} ms (typical {h.BaselineMs:F0}), lowest {h.LowFps:F0} fps, time lost {h.LostMs:F0} ms, {h.SlowFrames} slow frames");
+            sb.AppendLine($"[{h.Time}]{(h.ShutdownAdjacent ? " [shutdown-adjacent]" : "")} +{h.SessionSec:F0}s  worst {h.WorstMs:F0} ms (typical {h.BaselineMs:F0}), lowest {h.LowFps:F0} fps, time lost {h.LostMs:F0} ms, {h.SlowFrames} slow frames");
             if (h.Collections > 0) sb.AppendLine($"     Mono collections in this slice: {h.Collections}");
             if (h.GcCount > 0) sb.AppendLine($"     garbage collection: {h.GcCount} in this slice, {h.GcMs:F0} ms paused (worst {h.GcWorstMs:F0} ms)");
             if (h.Hint.Length > 0) sb.AppendLine("     window activity: " + h.Hint);
@@ -158,6 +193,7 @@ sealed class PlayRecorder
 {
     readonly Func<LiveMonitor> monitor;
     readonly string livePath;
+    LiveMonitor lastMonitor;
     readonly string mod;
     readonly string dir;
     readonly string resultPath;
@@ -176,7 +212,7 @@ sealed class PlayRecorder
 
     public PlayRecorder(Func<LiveMonitor> monitor, string livePath, string mod)
     {
-        this.monitor = monitor; this.livePath = livePath; this.mod = mod;
+        this.monitor = monitor; lastMonitor = monitor(); this.livePath = livePath; this.mod = mod;
         string outDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out"));
         string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         dir = Path.Combine(outDir, "play_" + stamp);
@@ -200,7 +236,6 @@ sealed class PlayRecorder
     void Save()
     {
         CloseSegmentForSave();
-        lock (result) result.Hitches.RemoveAll(h => h.SessionSec > result.Seconds - TailSlices * SliceSec);
         try { result.Save(resultPath); File.WriteAllText(Path.ChangeExtension(resultPath, ".txt"), result.ToText(), new UTF8Encoding(true)); } catch { }
     }
 
@@ -216,7 +251,10 @@ sealed class PlayRecorder
         {
             await Task.Delay((int)(SliceSec * 1000), ct);
             var mon = monitor();
-            if (mon == null || mon.HasExited) { Status?.Invoke("game closed"); break; }
+            if (MonitorEnded(mon))
+            {
+                Status?.Invoke(result.GameExited ? "game closed" : "monitor unavailable"); break;
+            }
             var sliceEnd = DateTime.UtcNow;
             try
             {
@@ -244,6 +282,16 @@ sealed class PlayRecorder
         Save();
     }
 
+    // The viewer may detach/dispose its monitor before our next poll. Retain the
+    // last reference to distinguish a real process exit from unavailable telemetry.
+    bool MonitorEnded(LiveMonitor current)
+    {
+        if (current != null) lastMonitor = current;
+        if (current != null && !current.HasExited) return false;
+        if (lastMonitor?.HasExited == true) lock (result) result.MarkGameExit();
+        return true;
+    }
+
     static List<double> SliceFrames(List<long> presents, long from, long to)
     {
         var d = new List<double>();
@@ -261,15 +309,13 @@ sealed class PlayRecorder
     static readonly Regex LoadOnly = new(@"^(XUiFromXml:LoadXui|ChunkProviderGenerateWorldFromRaw|WorldDecoratorPOIFromImage|GameManager:StartGame|GameManager:loadPrefabs)", RegexOptions.Compiled);
     double lastLoadSec = -1000;
 
-    // When the game closes, the engine tears down every UI controller (each unsubscribe allocates) and collects repeatedly.
-    // Totals therefore lag by TailSlices slices and the unfinished tail is dropped, so shutdown never reaches the result.
-    const int TailSlices = 8;
+    // Commit every observed slice immediately. Shutdown classification is separate
+    // from accounting, so periodic saves and manual stops cannot lose measurements.
     sealed class SliceTotals
     {
         public int Collections; public string Time = ""; public double Seconds, Session; public bool HasAlloc;
         public Dictionary<string, double> ByType = new(), BySite = new();
     }
-    readonly Queue<SliceTotals> pending = new();
 
     // ---- game log watcher -------------------------------------------------------------------------------------------
     static readonly string PlayerLog = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "The Fun Pimps", "7 Days To Die", "Player.log");
@@ -367,6 +413,7 @@ sealed class PlayRecorder
         {
             rows.Add(("Recorded", $"{result.Seconds:F0} s, typical frame {result.MedianFrameMs:F0} ms"));
             rows.Add(("Dips found", result.Hitches.Count.ToString()));
+            if (result.GameExited) rows.Add(("Shutdown-adjacent", $"{result.Hitches.Count(h => h.ShutdownAdjacent)} dips in final 16 s; totals include retained tail"));
             foreach (var li in result.LogIssues.Where(x => x.Count >= 5).Take(4))
                 rows.Add(("LOG " + (li.Message.Length > 90 ? li.Message.Substring(0, 90) : li.Message), $"{li.Count}x ({li.PerMinute:F0} per minute)"));
             rows.Add(("Garbage collections", $"{result.Collections} ({result.CollectionsPerMinute:F1} per minute)"));
@@ -428,8 +475,7 @@ sealed class PlayRecorder
                 slice.BySite[site] = slice.BySite.GetValueOrDefault(site) + a.Bytes;
             }
         }
-        pending.Enqueue(slice);
-        while (pending.Count > TailSlices) Commit(pending.Dequeue());
+        Commit(slice);
         var rates = p.Methods.GroupBy(m => m.Short).ToDictionary(g => g.Key, g => g.Sum(m => p.MainMsPerSec(m.Incl)));
         if (segment != null && !warmup)
         {
@@ -452,15 +498,26 @@ sealed class PlayRecorder
                 }
             }
         }
-        if (frames.Count < 3) return;
+        string loadingMethod = rates.FirstOrDefault(kv => kv.Value > 0 && LoadOnly.IsMatch(kv.Key)).Key ?? "";
+        if (loadingMethod.Length > 0) lastLoadSec = session;
+        bool loadCooldown = session - lastLoadSec < 30;
+        string phase = loadingMethod.Length > 0 ? "loading-method-sampled" : loadCooldown ? "post-loading-cooldown" : "unclassified";
+        string suppression = warmup ? "warmup" : loadCooldown ? phase : frames.Count < 3 ? "insufficient-frames" : "none";
         var sorted = frames.OrderBy(x => x).ToList();
-        double median = sorted[sorted.Count / 2], worst = sorted[^1];
-        var thisSlice = new SliceStat { Time = end.ToLocalTime().ToString("HH:mm:ss"), Frames = frames.Count, AvgMs = frames.Average(), MedianMs = median, P99Ms = sorted[Math.Min(sorted.Count - 1, (int)Math.Ceiling(sorted.Count * 0.99) - 1)], WorstMs = worst, Collections = (int)Math.Max(0, p.HeapCollections) };
+        double median = sorted.Count > 0 ? sorted[sorted.Count / 2] : 0, worst = sorted.Count > 0 ? sorted[^1] : 0;
+        var thisSlice = new SliceStat { SessionSec = session, Time = end.ToLocalTime().ToString("HH:mm:ss"), Frames = frames.Count, AvgMs = frames.Count > 0 ? frames.Average() : 0, MedianMs = median, P99Ms = sorted.Count > 0 ? sorted[Math.Min(sorted.Count - 1, (int)Math.Ceiling(sorted.Count * 0.99) - 1)] : 0, WorstMs = worst, Collections = (int)Math.Max(0, p.HeapCollections) };
+        thisSlice.PhaseEvidence = phase;
+        thisSlice.HitchSuppression = suppression;
+        thisSlice.Warmup = warmup;
+        thisSlice.LoadingMethod = loadingMethod;
+        thisSlice.SampleWallMs = p.WallMs;
+        thisSlice.StartUtc = start;
+        thisSlice.EndUtc = end;
         lock (result) result.SliceStats.Add(thisSlice);
-        if (segment != null && !warmup) segment.Slices.Add(thisSlice);
-        // World loading is not a hitch: skip slices that contain load-only code, and the 30 s after them.
-        if (rates.Keys.Any(k => LoadOnly.IsMatch(k))) lastLoadSec = session;
-        if (session - lastLoadSec < 30) return;
+        if (segment != null && !warmup && frames.Count >= 3) segment.Slices.Add(thisSlice);
+        // Keep raw frame evidence, even when the hitch detector excludes this interval.
+        // Absence of a sampled loading method does not establish that the player is in-game.
+        if (frames.Count < 3 || loadCooldown) return;
         double slowLimit = Math.Max(median * 2.5, 45);
         bool dip = worst >= slowLimit && !warmup;
         if (!dip)
@@ -473,6 +530,7 @@ sealed class PlayRecorder
         }
         var h = new PlayHitch
         {
+            AttributionScope = "whole-slice-sampled-excess", SampleStartUtc = start, SampleEndUtc = end,
             Time = end.ToLocalTime().ToString("HH:mm:ss"), SessionSec = session, BaselineMs = median, WorstMs = worst,
             SlowFrames = frames.Count(x => x > slowLimit), LostMs = frames.Where(x => x > slowLimit).Sum(x => x - median),
         };

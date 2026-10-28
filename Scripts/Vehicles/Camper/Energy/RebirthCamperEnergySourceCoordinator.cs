@@ -72,7 +72,12 @@ internal static class RebirthCamperEnergySourceCoordinator
             {Log.Out("[REBIRTH EnergyFlow] begin-refused action="+action+" reason=native-source-before-drift");return false;}
             // A refused in-memory hold must not leave a durable Prepared receipt
             // that blocks every later action in the Energy window.
-            if(!runtime.Hold(frame.Operation)){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-hold action="+action);return false;}
+            // Accepted bank OFF clears POI intent immediately after Begin.
+            // Keep its existing light claims until the ordinary OFF lease can
+            // be witnessed after this source hold; restoring original ON here
+            // would relinquish them as apparently foreign powered fixtures.
+            bool suspendConsumers=action!=RebirthCamperEnergySourcePlan.Action.Enabled||enabled;
+            if(!runtime.Hold(frame.Operation,suspendConsumers)){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-hold action="+action);return false;}
             try { journal.Prepare(frame.Operation,frame.Vehicle,creation,planningRevision,frame.Write(false),frame.Write(true)); }
             catch
             {

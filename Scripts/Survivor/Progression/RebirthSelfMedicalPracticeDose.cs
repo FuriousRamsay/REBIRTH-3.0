@@ -140,14 +140,47 @@ internal static class RebirthSelfMedicalPracticeDose
         catch (Exception) { return false; }
     }
 
-    static bool Pinned(MethodBase method){
-        try{
-            if(method?.DeclaringType!=typeof(ItemActionEat) || (method.Name!="consume" && method.Name!="ExecuteInstantAction")
-                || method.Module.ModuleVersionId.ToString()!="1a9a4203-3d95-4c90-b094-8926dec1ee9c")return false;
-            using(var stream=File.OpenRead(method.Module.Assembly.Location))using(var hash=SHA256.Create())
-                return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","")=="FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705";
-        }catch(Exception){return false;}
+    static bool Pinned(MethodBase method)
+    {
+        try
+        {
+            if (method?.DeclaringType != typeof(ItemActionEat) ||
+                (method.Name != "consume" && method.Name != "ExecuteInstantAction")) return false;
+            string mvid = method.Module.ModuleVersionId.ToString();
+            bool native34 = mvid == "47c87570-1f44-4ad3-872b-95a9f98d316c";
+            if (!native34 && mvid != "1a9a4203-3d95-4c90-b094-8926dec1ee9c") return false;
+            if (native34)
+            {
+                bool consume = method.Name == "consume";
+                var parameters = method.GetParameters();
+                var info = method as MethodInfo;
+                if (info == null || info.IsStatic || info.IsGenericMethod ||
+                    info.ReturnType != (consume ? typeof(void) : typeof(bool)) ||
+                    method.MetadataToken != (consume ? 0x06002FDB : 0x06002FD7)) return false;
+                if (consume)
+                {
+                    if (parameters.Length != 1 || parameters[0].ParameterType != typeof(ItemActionData)) return false;
+                }
+                else if (parameters.Length != 4 || parameters[0].ParameterType != typeof(EntityAlive) ||
+                    parameters[1].ParameterType != typeof(ItemStack) || parameters[2].ParameterType != typeof(bool) ||
+                    parameters[3].ParameterType != typeof(XUiC_ItemStack)) return false;
+                var body = method.GetMethodBody();
+                byte[] il = body?.GetILAsByteArray();
+                if (il == null || il.Length != (consume ? 464 : 522) || body.ExceptionHandlingClauses.Count != 0) return false;
+                using (var hash = SHA256.Create())
+                    if (BitConverter.ToString(hash.ComputeHash(il)).Replace("-", "") !=
+                        (consume ? "C417DB13AC2DBE440FA64EF97DD1E0C007A8DB0FDABECD36C9B978E6451D7AC2" :
+                        "B5CD857448E5263CDAB6019882D73432B5C07337D5CE5C12BA2EBB4E07242A79")) return false;
+            }
+            using (var stream = File.OpenRead(method.Module.Assembly.Location))
+            using (var hash = SHA256.Create())
+                return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "") ==
+                    (native34 ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4" :
+                    "FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705");
+        }
+        catch (Exception) { return false; }
     }
+
     static readonly Dictionary<string,int> diagnosticCounts=new Dictionary<string,int>(StringComparer.Ordinal);
     internal static void StartupDiagnostic(string method,bool applied,string reason){
         if(method!="consume" && method!="ExecuteInstantAction")return;

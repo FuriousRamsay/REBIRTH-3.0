@@ -8,14 +8,13 @@ public sealed class ConsoleCmdRebirthPurgeObservation : ConsoleCmdAbstract
 {
     public override string[] getCommands() => new[] { "rbpurgetestobserve" };
     public override string getDescription() => "Collect current Purge test evidence as JSON.";
-    public override string getHelp() => "rbpurgetestobserve (local CodexTest Bridge only).";
+    public override string getHelp() => "rbpurgetestobserve (read-only, local Game Bridge only).";
     public override void Execute(List<string> args, CommandSenderInfo sender)
     {
         var world = GameManager.Instance?.World;
         var player = world?.GetPrimaryPlayer() as EntityPlayerLocal;
         if (args.Count != 0 || sender.RemoteClientInfo != null || world == null || world.IsRemote()
-            || player == null || !RebirthGameBridge.IsRunning
-            || GamePrefs.GetString(EnumGamePrefs.GameName) != "CodexTest")
+            || player == null || !RebirthGameBridge.IsRunning)
         { SdtdConsole.Instance.Output("*** ERROR " + getHelp()); return; }
         var result = new JObject {
             ["schema"] = 1, ["observationOnly"] = true,
@@ -33,7 +32,7 @@ public sealed class ConsoleCmdRebirthPurgeObservation : ConsoleCmdAbstract
         result["visibleMarkerCount"] = RebirthPurgeScanner.ObservedMarkerCount;
         if (view != null)
             result["scanner"] = new JObject {
-                ["rooms"] = view.Rooms, ["cleared"] = view.Cleared, ["enemies"] = view.Enemies,
+                ["prefab"] = view.Prefab, ["rooms"] = view.Rooms, ["cleared"] = view.Cleared, ["enemies"] = view.Enemies,
                 ["areasLeft"] = System.Math.Max(0, view.Rooms - view.Cleared),
                 ["approximate"] = view.Approximate, ["targets"] = new JArray(view.Targets),
                 ["threshold"] = RebirthPurgeScanner.Threshold(view.Tier, view.Rooms, view.Cleared),
@@ -48,7 +47,64 @@ public sealed class ConsoleCmdRebirthPurgeObservation : ConsoleCmdAbstract
             result["revision"] = snapshot.Revision; result["recordCount"] = snapshot.Count;
         }
         var pos = player.GetBlockPosition();
-        var prefab = GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabFromWorldPosInside(pos.x, pos.z);
+        var geometricPrefab = GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabFromWorldPosInside(pos.x, pos.z);
+        // Preserve native XYZ/tag-aware ownership for strict manifest/record evidence.
+        // Scanner XZ occupancy is reported separately from native location ownership.
+        var prefab = world.GetPOIAtPosition(player.position);
+        result["scannerPlayerGates"] = new JObject {
+            ["spawned"] = player.IsSpawned(), ["alive"] = player.IsAlive(),
+            ["spectator"] = player.IsSpectator, ["mounted"] = player.AttachedToEntity != null,
+            ["flying"] = player.IsFlyMode.Value,
+            ["hudAllowed"] = RebirthPurgeHudProgress.Visible(player)
+        };
+        var scannerAuthored = prefab?.prefab;
+        if (scannerAuthored != null)
+            result["scannerNativePoi"] = new JObject {
+                ["prefab"] = scannerAuthored.PrefabName,
+                ["origin"] = new JArray(prefab.boundingBoxPosition.x, prefab.boundingBoxPosition.y, prefab.boundingBoxPosition.z),
+                ["size"] = new JArray(prefab.boundingBoxSize.x, prefab.boundingBoxSize.y, prefab.boundingBoxSize.z),
+                ["tier"] = scannerAuthored.DifficultyTier,
+                ["authoredRooms"] = scannerAuthored.SleeperVolumeList?.Count ?? 0,
+                ["loadedRooms"] = prefab.sleeperVolumes.Count,
+                ["eligibilityAvailable"] = RebirthPurgePoiEligibility.Available,
+                ["authoredAllowed"] = RebirthPurgePoiEligibility.Allows(scannerAuthored.PrefabName,
+                    scannerAuthored.bTraderArea,
+                    scannerAuthored.Tags.Test_AnySet(FastTags<TagGroup.Poi>.Parse("rwgonly")),
+                    scannerAuthored.Tags.Test_AnySet(FastTags<TagGroup.Poi>.Parse("streettile")))
+            };
+        // Native location HUD uses player.prefab + authored info volumes/tags,
+        // alongside the old first-XZ lookup used for comparison. Expose both
+        // without changing either selection or forcing native prefab refresh.
+        var scannerPoi=RebirthPurgeScannerPoi.Resolve(world,player.position);
+        result["scannerOccupancyFound"]=scannerPoi?.prefab!=null;
+        if(scannerPoi?.prefab!=null)
+        {
+            var scannerOrigin=scannerPoi.boundingBoxPosition;var scannerSize=scannerPoi.boundingBoxSize;
+            result["scannerOccupancy"]=new JObject {
+                ["prefab"]=scannerPoi.prefab.PrefabName,
+                ["origin"]=new JArray(scannerOrigin.x,scannerOrigin.y,scannerOrigin.z),
+                ["size"]=new JArray(scannerSize.x,scannerSize.y,scannerSize.z),
+                ["verticalOffset"]=player.position.y-scannerOrigin.y,
+                ["withinNativeHeight"]=player.position.y>=scannerOrigin.y&&player.position.y<scannerOrigin.y+scannerSize.y,
+                ["matchesNativeOwner"]=ReferenceEquals(scannerPoi,prefab)
+            };
+        }
+        var nativePrefab=player.prefab;
+        var nativeAuthored=nativePrefab?.prefab;
+        var locationTags=new JArray();
+        foreach(string tag in new[]{"part","streettile","navonly","hideui"})
+            if(nativeAuthored!=null&&nativeAuthored.Tags.Test_AnySet(FastTags<TagGroup.Poi>.Parse(tag)))locationTags.Add(tag);
+        bool insideInfoArea=nativeAuthored!=null&&nativePrefab.IsWithinInfoArea(player.position);
+        result["locationDiagnostic"]=new JObject {
+            ["nativePlayerPrefab"]=nativeAuthored?.PrefabName,
+            ["geometricPrefab"]=geometricPrefab?.prefab?.PrefabName,
+            ["nativeResolvedPrefab"]=prefab?.prefab?.PrefabName,
+            ["insideNativeInfoArea"]=insideInfoArea,
+            ["nativeInfoVolumeCount"]=nativeAuthored?.InfoVolumeList?.Count??0,
+            ["excludedNativeTags"]=locationTags,
+            ["standingBiome"]=player.biomeStandingOn?.m_sBiomeName,
+            ["nativePoiNameEligible"]=nativeAuthored!=null&&insideInfoArea&&locationTags.Count==0
+        };
         RebirthPoiNativeManifest manifest;
         result["insidePrefab"] = prefab?.prefab?.PrefabName;
         bool resolved = RebirthPoiNativeManifest.TryResolve(world, prefab, out manifest);

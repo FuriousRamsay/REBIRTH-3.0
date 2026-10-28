@@ -17,4 +17,7 @@
 <setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="width">12</setattribute>
 <setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="pos">2,0</setattribute>
 <setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="height">${defined(thumbheight) ? thumbheight : (defined(barheight) ? barheight : parentinnerheight)}</setattribute>
-<setattribute xpath="/templates/defaultscrollbar" name="background_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="background_color_inactive">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_inactive">[rebirthScrollbarTrack]</setattribute></if></conditional></configs>
+<setattribute xpath="/templates/defaultscrollbar" name="background_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="background_color_inactive">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_inactive">[rebirthScrollbarTrack]</setattribute></if></conditional>
+<!-- Native 3.4 added this tween; resolve dynamic channel expressions like the existing sprite color. -->
+<setattribute xpath="/templates/iconbutton/sprite/tween[@type='color']" name="end">{% color(${color_selected}) }</setattribute>
+</configs>

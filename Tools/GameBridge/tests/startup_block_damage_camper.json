@@ -1,0 +1,9 @@
+{
+  "name": "Block damage startup and camper presentation acceptance checkpoint",
+  "status": "PREPARED_NOT_RUN",
+  "preconditions": "User alone restarts the installed game and checks the complete startup log for absence of Survivor progression IL Compile Error and Fresh bootstrap Partial. User installs the camper body, checks shell visibility and hood/roof collision, and punches a block empty-handed to verify one block-name log. This checkpoint only captures the staged result; it cannot certify startup or visual acceptance automatically. No game actions are currently authorized for the agent.",
+  "steps": [
+    { "expectNoErrors": true },
+    { "screenshot": "startup_block_damage_camper_user_staged" }
+  ]
+}

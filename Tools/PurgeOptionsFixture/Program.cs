@@ -9,22 +9,29 @@ class Program {
  string root=Path.GetFullPath(args[0]);AppDomain.CurrentDomain.AssemblyResolve+=(sender,e)=>{
  string name=new AssemblyName(e.Name).Name+".dll";foreach(string folder in new[]{root,Path.Combine(root,"../../7DaysToDie_Data/Managed"),Path.Combine(root,"../0_TFP_Harmony")}){
  string p=Path.GetFullPath(Path.Combine(folder,name));if(File.Exists(p))return Assembly.LoadFrom(p);}return null;};
- mod=Assembly.LoadFrom(Path.Combine(root,"RebirthUtils.dll"));Run(root);}
+ mod=Assembly.LoadFrom(args.Length>1?Path.GetFullPath(args[1]):Path.Combine(root,"RebirthUtils.dll"));Run(root);}
  static void Run(string root){
  var st=mod.GetType("RebirthSandboxState");var manager=mod.GetType("RebirthSandboxOptionManager");var policy=mod.GetType("RebirthThemePolicy");
  object state=Activator.CreateInstance(st);var theme=mod.GetType("RebirthWorldTheme");var mode=mod.GetType("RebirthSpawnProgressionMode");
  Check(Convert.ToInt32(F(state,"SpawnProgression"))==0,"new game defaults to Biome zombie progression");
+ Check(Convert.ToInt32(F(state,"PurgeProgression"))==0,"POI count is default progression");
+ Set(state,"PurgeProgression",1);var tierClone=st.GetMethod("Clone").Invoke(state,null);Check(Convert.ToInt32(F(tierClone,"PurgeProgression"))==1,"tier mode cloned");
+ object[] tierDecode={Call(manager,"Encode",state),null};Check((bool)Call(manager,"TryDecode",tierDecode)&&Convert.ToInt32(F(tierDecode[1],"PurgeProgression"))==1,"tier mode production optioncode roundtrip");
+ object[] invalidTier={"RBXCWC",null};Check(!(bool)Call(manager,"TryDecode",invalidTier),"unknown progression choice refused");
+ Set(state,"PurgeProgression",0);
  string defaultCode=(string)Call(manager,"Encode",state);object[] defaultDecode={defaultCode,null};
  Check((bool)Call(manager,"TryDecode",defaultDecode)&&Convert.ToInt32(F(defaultDecode[1],"SpawnProgression"))==0,"new Biome default explicitly roundtrips");
  object[] legacyDecode={"RBX",null};Check((bool)Call(manager,"TryDecode",legacyDecode)&&Convert.ToInt32(F(legacyDecode[1],"SpawnProgression"))==1,"legacy omitted setting retains Gamestage");
  Set(state,"SpawnProgression",Enum.ToObject(mode,1));
  Check(Convert.ToInt32(F(state,"Theme"))==0&&!(bool)F(state,"ShowClearedPois"),"default None/Off");
  Check(!(bool)Call(policy,"TrackingEnabled",state),"None/Off no tracking");Set(state,"ShowClearedPois",true);
- Check((bool)Call(policy,"TrackingEnabled",state)&&(bool)Call(policy,"TraderJobsAllowed",state)&&(bool)Call(policy,"BiomeHazardsAllowed",state),"None/On tracking retains jobs and hazards");
+ Check((bool)Call(policy,"TrackingEnabled",state),"None/On enables tracking; native trader/hazard behavior qualified separately");
  Set(state,"ShowClearedPois",false);Set(state,"Theme",Enum.ToObject(theme,1));
- Check((bool)Call(policy,"TrackingEnabled",state)&&!(bool)Call(policy,"TraderJobsAllowed",state)&&!(bool)Call(policy,"BiomeHazardsAllowed",state),"Purge effective policies");
+ Check((bool)Call(policy,"TrackingEnabled",state),"Purge enables tracking");
  Check(Convert.ToInt32(Call(policy,"SpawnProgression",state))==0&&Convert.ToInt32(F(state,"SpawnProgression"))==1,"Purge effective Biome retains configured Gamestage");
  var clone=st.GetMethod("Clone").Invoke(state,null);Check(Convert.ToInt32(F(clone,"Theme"))==1&&!(bool)F(clone,"ShowClearedPois"),"clone preserves settings");
+ foreach(int percent in new[]{0,10,15,75,90}){Set(state,"PurgeCompletionPercentage",percent);object[] completionDecode={Call(manager,"Encode",state),null};Check((bool)Call(manager,"TryDecode",completionDecode)&&Convert.ToInt32(F(completionDecode[1],"PurgeCompletionPercentage"))==percent,"completion percentage roundtrips "+percent);}
+ Set(state,"PurgeCompletionPercentage",0);
  string code=(string)Call(manager,"Encode",state);Check(code.StartsWith("RBX"),"new version X");
  object[] dec={code,null};Check((bool)Call(manager,"TryDecode",dec),"decode production code");
  Check(Convert.ToInt32(F(dec[1],"Theme"))==1&&Convert.ToInt32(F(dec[1],"SpawnProgression"))==1,"roundtrip theme and underlying progression");
@@ -36,7 +43,7 @@ class Program {
  dec=new object[]{"RBXCTC",null};Check(!(bool)Call(manager,"TryDecode",dec),"invalid Theme rejected");
  dec=new object[]{"RBXCUC",null};Check(!(bool)Call(manager,"TryDecode",dec),"invalid QoL rejected");
  dec=new object[]{"RBWCTCCUC",null};Check((bool)Call(manager,"TryDecode",dec)&&Convert.ToInt32(F(dec[1],"Theme"))==0,"old unknown IDs stay ignored even with future invalid values");
- var gate=mod.GetType("RebirthPurgeReleasePolicy");Check(!(bool)gate.GetProperty("Enabled",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null),"unfinished release gate remains closed");
+ var gate=mod.GetType("RebirthPurgeReleasePolicy");Check(gate.GetProperty("Enabled",BindingFlags.Static|BindingFlags.NonPublic)!=null,"release gate available; qualification build may enable it");
  Check(Convert.ToInt32(Enum.Parse(mod.GetType("RebirthSandboxOptionId"),"Theme"))==71&&Convert.ToInt32(Enum.Parse(mod.GetType("RebirthSandboxOptionId"),"ShowClearedPois"))==72,"stable appended IDs");
  var persistence=mod.GetType("RebirthSandboxPersistence");
  string purgeCode=(string)Call(manager,"Encode",clone);

@@ -1,0 +1,73 @@
+{
+  "steps": [
+    {
+      "_note": "NOT_RUN. Root at EXACT reported Desert camp/tent position; camp internal prefab remains UNKNOWN. Run this same checkpoint at inside/entrance/outside after real movement, retaining separate result folders. Requires standing biome desert. No expected native POI label, scanner visibility or name eligibility is fabricated. Review cached/resolved/geometric prefab/info/tags/UI screenshot to decide whether Desert fallback is native-correct. A PASS records evidence, not a fixed naming bug."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "value": true,
+            "op": "==",
+            "field": "observationOnly"
+          },
+          {
+            "value": "desert",
+            "op": "==",
+            "field": "locationDiagnostic.standingBiome"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerPlayerGates.spawned"
+          },
+          {
+            "value": true,
+            "op": "==",
+            "field": "scannerPlayerGates.alive"
+          },
+          {
+            "value": false,
+            "op": "==",
+            "field": "scannerPlayerGates.flying"
+          }
+        ]
+      }
+    },
+    {
+      "console": "rbpurgetestobserve"
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "windowLocation"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "compass"
+        }
+      }
+    },
+    {
+      "screenshot": "purge_acceptance_desert_camp"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Purge Desert camp native naming evidence checkpoint"
+}
