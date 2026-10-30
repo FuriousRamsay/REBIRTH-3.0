@@ -1,0 +1,23 @@
+{
+  "name": "Energy console uses the actual reserve ceiling",
+  "stopOnFailure": true,
+  "preconditions": "Authorized disposable completed Rebirth character only; guard ON, God OFF, Food and Water ModifiedMax100, windows closed. Declared energytest fixture clears digestion and disables autosip. This checks console formatting, not reproduction of the severe Butcher drain. Independently compare debug-tick output to actual ceiling if enabling debug.",
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "console": "rbmet energytest 50 100 50 30" },
+    { "console": "rbmet status" },
+    { "expectLog": { "contains": "/85.0cap", "min": 1 } },
+    { "console": "rbmet debug on" },
+    { "wait": 2 },
+    { "console": "rbmet debug off" },
+    { "console": "rbmet energytest 0 0 0 30" },
+    { "console": "rbmet rates" },
+    { "expectLog": { "contains": "Energy=0.0/10.0cap", "min": 1 } },
+    { "console": "rbmet energytest 100 100 100 10" },
+    { "console": "rbmet trace stop" },
+    { "console": "rbmet autosip on" },
+    { "restore": {} },
+    { "expectNoErrors": true }
+  ]
+}

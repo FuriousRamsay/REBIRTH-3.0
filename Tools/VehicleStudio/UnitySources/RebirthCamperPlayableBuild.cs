@@ -328,7 +328,7 @@ public static class RebirthCamperPlayableBuild
             Directory.CreateDirectory(archiveOutput);
             var archiveWatch = System.Diagnostics.Stopwatch.StartNew();
             var options = r.compressionMode == "FastLZ4" ? BuildAssetBundleOptions.UncompressedAssetBundle : BuildAssetBundleOptions.ChunkBasedCompression;
-            if (BuildPipeline.BuildAssetBundles(archiveOutput, new [] { build }, options, BuildTarget.StandaloneWindows64) == null)
+            if (RebirthAssetBundlePackaging.BuildAssetBundles(archiveOutput, new [] { build }, options, BuildTarget.StandaloneWindows64) == null)
                 throw new Exception("AssetBundle build failed.");
             r.archiveBuildSeconds = archiveWatch.Elapsed.TotalSeconds;
             string archivePath = Path.Combine(archiveOutput, build.assetBundleName);

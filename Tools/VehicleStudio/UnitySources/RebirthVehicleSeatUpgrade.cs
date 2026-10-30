@@ -78,7 +78,7 @@ public static class RebirthVehicleSeatUpgrade
     {
         Directory.CreateDirectory(Output+"/Bundles");
         var builds=Names.Select(n=>new AssetBundleBuild{assetBundleName=n=="rebirthCamper80s"?"rebirth_camper80s.unity3d":n=="rebirthBuggy"?"rebirth_buggy.unity3d":"rebirth_bike.unity3d",assetNames=new[]{CurrentPrefab(n)},addressableNames=new[]{n}}).ToArray();
-        if(!BuildPipeline.BuildAssetBundles(Output+"/Bundles",builds,BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
+        if(!RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundles",builds,BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
         var proof=new List<string>();
         for(int v=0;v<Names.Length;v++)
         {

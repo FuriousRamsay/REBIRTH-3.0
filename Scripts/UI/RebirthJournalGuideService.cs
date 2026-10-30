@@ -18,6 +18,8 @@ public static class RebirthJournalGuideService
     private static readonly HashSet<string> CompletedEvidence = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     private static string path;
     private static float nextPoll;
+    private static string failedLoadPath;
+    private static float nextLoadRetry;
     private static bool writable, dirty;
     public static int Revision { get; private set; }
     public static string Error { get; private set; }
@@ -39,7 +41,7 @@ public static class RebirthJournalGuideService
 
     public static void Reset()
     {
-        path = null; nextPoll = 0f; writable = false; dirty = false; Error = null;
+        path = failedLoadPath = null; nextPoll = nextLoadRetry = 0f; writable = false; dirty = false; Error = null;
         Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
     }
 
@@ -100,6 +102,9 @@ public static class RebirthJournalGuideService
         try
         {
             string target = RebirthJournalStore.ResolvePath() + ".guides.xml";
+            // Force refreshes must not bypass a failed load's retry delay.
+            // A different character/world remains immediately loadable.
+            if(target==failedLoadPath&&Time.realtimeSinceStartup<nextLoadRetry)return;
             if (target != path)
             {
                 loading = true;
@@ -129,7 +134,7 @@ public static class RebirthJournalGuideService
                         string when=(string)e.Attribute("unlocked"); if (!string.IsNullOrEmpty(when)) Unlocked[id]=when;
                     }
                 }
-                writable=true; Error=null; loading=false; Revision++;
+                writable=true; Error=null; loading=false; failedLoadPath=null; nextLoadRetry=0f; Revision++;
             }
             if (!writable) return;
             bool needsChallenges=false, needsMetabolism=false, needsBackpack=false;
@@ -183,6 +188,7 @@ public static class RebirthJournalGuideService
             {
                 // Do not expose partially loaded preferences or overwrite the failed file.
                 // Retry transient read failures at a bounded rate instead of staying disabled.
+                failedLoadPath=path; nextLoadRetry=Time.realtimeSinceStartup+30f;
                 path=null; Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
                 nextPoll=Time.realtimeSinceStartup+30f;
             }

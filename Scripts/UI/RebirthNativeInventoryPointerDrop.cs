@@ -41,7 +41,7 @@ internal static class RebirthNativeInventoryPointerDrop
             if(pointer.GetMouseButton(UICamera.MouseButton.LeftButton)&&!state.Shift&&mouse?.dragStarted==true&&mouse.pressed
                 &&held?.IsEmpty()==false)
             {
-                if(state.HeldFrame<0)RebirthCreativeTransferTrace.Write(ui,"relay.capture",null,"source="+mouse.pressed.name);
+                if(RebirthLogSettings.UiRouteLoggingEnabled&&state.HeldFrame<0)RebirthCreativeTransferTrace.Write(ui,"relay.capture",null,"source="+mouse.pressed.name);
                 state.Player=player;state.World=player.world;state.Source=mouse.pressed;state.Cursor=ui.DragAndDropWindow;
                 state.Count=held.count;state.Item=RebirthNativeItemCodec.Encode(held.itemValue);state.HeldFrame=Time.frameCount;
             }
@@ -49,14 +49,15 @@ internal static class RebirthNativeInventoryPointerDrop
             {
                 state.Claimed=false;
                 state.Release=!state.Shift&&state.HeldFrame>=Time.frameCount-2&&state.HeldFrame<Time.frameCount&&Matches(ui,state,player,held)?Time.frameCount:-1;
-                RebirthCreativeTransferTrace.Write(ui,"relay.release",null,
+                if(RebirthLogSettings.UiRouteLoggingEnabled)
+                    RebirthCreativeTransferTrace.Write(ui,"relay.release",null,
                     "captured="+(state.HeldFrame>=0)+" captureFrame="+state.HeldFrame+" release="+state.Release+
                     " matches="+Matches(ui,state,player,held)+" shiftLatched="+state.Shift);
                 state.HeldFrame=-1;
             }
             else if(!pointer.GetMouseButton(UICamera.MouseButton.LeftButton)){state.Release=-1;state.Source=null;}
         }
-        if(RebirthCreativeTransferTrace.Active(ui)&&pointer.GetMouseButtonUp(UICamera.MouseButton.LeftButton)&&
+        if(RebirthLogSettings.UiRouteLoggingEnabled&&RebirthCreativeTransferTrace.Active(ui)&&pointer.GetMouseButtonUp(UICamera.MouseButton.LeftButton)&&
             (slot.StackLocation==XUiC_ItemStack.StackLocationTypes.Backpack||slot.StackLocation==XUiC_ItemStack.StackLocationTypes.ToolBelt))
         {
             var target=slot.ViewComponent;var targetCollider=target?.UiTransform?.GetComponent<BoxCollider>();

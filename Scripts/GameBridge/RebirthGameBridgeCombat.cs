@@ -2823,6 +2823,10 @@ public static class RebirthGameBridgeCombat
         int count = Mathf.Max(1, req.QueryInt("count", 1));
         int quality = Mathf.Clamp(req.QueryInt("quality", 1), 1, 6);
         var stack = new ItemStack(new ItemValue(proto.type, quality, quality, true), count);
+        // Water-container contents live in native Meta, not the item name. A
+        // default ItemValue leaves it zero even for the full-bucket definition.
+        if (stack.itemValue.ItemClass is ItemClassWaterContainer waterContainer)
+            stack.itemValue.Meta = waterContainer.GetInitialMetadata(stack.itemValue);
         // mods=ModA,ModB: install each into the first free mod slot of the new item; any mod that is unknown, not a modifier or has no free slot fails 409 and nothing is given.
         string modsArg = req.QueryString("mods");
         if (!string.IsNullOrEmpty(modsArg))

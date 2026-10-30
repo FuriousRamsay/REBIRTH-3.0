@@ -892,7 +892,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
 
     private void ApplyActionEntryGeometry(bool force)
     {
-        XUiController list = GetChildById("rebirthCraftingItemActionList");
+        XUiController list = (XUiController)actionList ?? GetChildById("rebirthCraftingItemActionList");
         if (list?.ViewComponent == null)
             return;
 

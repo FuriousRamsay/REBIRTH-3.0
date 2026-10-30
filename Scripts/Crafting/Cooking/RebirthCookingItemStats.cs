@@ -59,8 +59,9 @@ public static class RebirthCookingItemStats
             if (hasMoodA && (ma == null || mb == null || !SameNumber(ma.BaseMoodInfluence, mb.BaseMoodInfluence) ||
                 !string.Equals(ma.VarietyFamilyId, mb.VarietyFamilyId, StringComparison.Ordinal) ||
                 !string.Equals(ma.MoodProfileId, mb.MoodProfileId, StringComparison.Ordinal) || !ma.DietTags.SetEquals(mb.DietTags))) return false;
-            // Preserve all prepared-drink/electrical provenance checks on partial transfers too.
-            return SameOtherMetadata(a,b) && RebirthItemProvenanceAdapter.AreStackCompatible(a, b) && RebirthElectricalItemProvenance.AreStackCompatible(a, b);
+            // Both provenance predicates passed above. The intervening liquid/mood/metadata
+            // reads do not mutate either item; retain those results within this call only.
+            return SameOtherMetadata(a,b);
         }
         foreach (string key in Keys)
         {

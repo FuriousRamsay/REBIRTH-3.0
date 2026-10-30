@@ -1,0 +1,287 @@
+{
+  "name": "Player report weapon condition reaches zero and pays real repair",
+  "stopOnFailure": true,
+  "preconditions": "Only authorized disposable West Xuyofu Territory/CodexTest at observed position[-239.93,37.75,619.46], native1280x720, full UI closed, guardON, noGod. Verify live asphalt[-241,37,619] within real spear reach. Slot2 is disposable fixture slot. This replay file was derived from native45452 manual flow; not separately run as a single scenario. Abort if native item has max durability other than100 or target/held item differs. Independently compare same native seed/type/count and exact stone payment from rbfetchtestobserve captures; UI-only success does not prove identity conservation.",
+  "steps": [
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "toolbelt": 2,
+        "item": "meleeWpnSpearT0StoneSpear",
+        "quality": 1
+      }
+    },
+    {
+      "select": {
+        "slot": 2
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "y": 37,
+          "block": 1,
+          "x": -241,
+          "z": 619
+        }
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "press": {
+        "seconds": 5,
+        "action": "Primary"
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,stats"
+        }
+      }
+    },
+    {
+      "console": "rbfetchtestobserve"
+    },
+    {
+      "markItem": "resourceRockSmall"
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "item": "meleeWpnSpearT0StoneSpear"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "craftingStatValue1",
+        "text": "0% / -25%"
+      }
+    },
+    {
+      "screenshot": "weapon_zero_condition"
+    },
+    {
+      "click": {
+        "y": 301,
+        "x": 550
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": -1,
+        "name": "resourceRockSmall"
+      }
+    },
+    {
+      "click": {
+        "item": "meleeWpnSpearT0StoneSpear"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "craftingStatValue1",
+        "text": "100% / 0%"
+      }
+    },
+    {
+      "screenshot": "weapon_zero_repaired"
+    },
+    {
+      "console": "rbfetchtestobserve"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

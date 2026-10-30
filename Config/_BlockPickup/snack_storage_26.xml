@@ -1,0 +1,31 @@
+<configs>
+  <!-- Historical 2.6 conversion: ONLY the empty/broken snack props recover as
+       player storage. Native vending machines and source tile entities stay intact. -->
+  <append xpath="/blocks">
+    <block name="cntVendingMachineSnacksFullRebirthPlayer">
+      <property name="Extends" value="cntVendingMachineSnacksFull" param1="Downgrade"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="playerWoodWritableStorage"/>
+        </property>
+        <property class="TEFeatureLockable"/>
+        <property class="TEFeatureRebirthContainerName"/>
+      </property>
+      <property name="RebirthContainerSize" value="6,7"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="CustomIcon" value="cntVendingMachineSnacksFull"/>
+      <property name="DescriptionKey" value="cntSecureStorageChestDesc"/>
+      <property name="ItemTypeIcon" value="lock"/>
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <!-- Reuse existing generated-player naming/security/localization paths. -->
+      <property name="RebirthGeneratedSourceBlock" value="cntVendingMachineSnacksFull"/>
+      <property name="RebirthGeneratedPlayerStorage" value="cntVendingMachineSnacksFull"/>
+    </block>
+  </append>
+  <append xpath="/blocks/block[@name='cntVendingMachineSnacksEmpty' or @name='cntVendingMachineSnacksEmptyBroken']">
+    <property name="RebirthPickupTarget" value="cntVendingMachineSnacksFullRebirthPlayer"/>
+  </append>
+</configs>

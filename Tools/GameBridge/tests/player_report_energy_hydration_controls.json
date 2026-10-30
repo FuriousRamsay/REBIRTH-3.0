@@ -1,0 +1,17 @@
+{
+  "name": "Energy recovery hydration controls on disposable character",
+  "stopOnFailure": true,
+  "preconditions": "Authorized disposable completed character, god mode OFF, guard ON, no threats and UI closed. This clears digestion for setup and records actual traces; numeric recovery must be reviewed with character modifiers. It is not a Butcher-specific drain reproduction.",
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "console": "rbmet energytest 100 100 50 30" },
+    { "wait": 8 },
+    { "console": "rbmet rates" },
+    { "console": "rbmet energytest 50 100 50 30" },
+    { "wait": 8 },
+    { "console": "rbmet rates" },
+    { "console": ["rbmet trace stop", "rbmet autosip on"] },
+    { "expectNoErrors": true }
+  ]
+}

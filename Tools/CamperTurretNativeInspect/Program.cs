@@ -5,6 +5,33 @@ class P
 {
     static void Main(string[] args)
     {
+        if(args.Contains("vehiclelights"))
+        {
+            using var native=AssemblyDefinition.ReadAssembly("../../7DaysToDie_Data/Managed/Assembly-CSharp.dll");
+            foreach(var type in native.MainModule.Types.Where(t=>t.Name=="VPHeadlight"))
+            {
+                foreach(var field in type.Fields)Console.WriteLine("FIELD "+field.FullName);
+                foreach(var method in type.Methods.Where(m=>m.HasBody))
+                {Console.WriteLine("METHOD "+method.FullName);foreach(var instruction in method.Body.Instructions)Console.WriteLine(instruction);}
+            }
+            return;
+        }
+        if(args.Contains("vehicleradial"))
+        {
+            using var native=AssemblyDefinition.ReadAssembly("../../7DaysToDie_Data/Managed/Assembly-CSharp.dll");
+            foreach(var type in native.MainModule.Types.Where(t=>t.Name=="EntityVehicle"))
+                foreach(var method in type.Methods.Where(m=>m.HasBody&&(m.Name=="InitLocalActivationCommands"||m.Name=="ReorderActivationCommands"||m.Name=="OnEntityActivated")))
+                {Console.WriteLine("METHOD "+method.FullName);foreach(var instruction in method.Body.Instructions)Console.WriteLine(instruction);}
+            return;
+        }
+        if(args.Contains("turretfire"))
+        {
+            using var native=AssemblyDefinition.ReadAssembly("../../7DaysToDie_Data/Managed/Assembly-CSharp.dll");
+            foreach(var type in native.MainModule.Types.Where(t=>t.Name=="AutoTurretFireController"||t.Name=="EntityAlive"))
+                foreach(var method in type.Methods.Where(m=>m.HasBody&&(type.Name=="AutoTurretFireController"?m.Name=="Fire"||m.Name=="getSpread"||m.Name.Contains("fireSingleDirectionBullet"):m.Name=="DamageEntity")))
+                {Console.WriteLine("METHOD "+method.FullName);foreach(var instruction in method.Body.Instructions)Console.WriteLine(instruction);}
+            return;
+        }
         if(args.Contains("armor"))
         {
             using var own=AssemblyDefinition.ReadAssembly("RebirthUtils.dll");

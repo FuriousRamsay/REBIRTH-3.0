@@ -2,6 +2,7 @@
   <append xpath="/item_modifiers">
     <item_modifier name="modVehicleWrapMidnightCartographer" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
       <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
       <property name="DescriptionKey" value="modVehicleWrapMidnightCartographerDesc" />
       <property name="CustomIcon" value="modVehicleWrapMidnightCartographer" />
       <property name="Material" value="Mpaint" />
@@ -13,6 +14,7 @@
     </item_modifier>
     <item_modifier name="modVehicleWrapTheHungryRoad" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
       <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
       <property name="DescriptionKey" value="modVehicleWrapTheHungryRoadDesc" />
       <property name="CustomIcon" value="modVehicleWrapTheHungryRoad" />
       <property name="Material" value="Mpaint" />
@@ -552,6 +554,7 @@
     </item_modifier>
     <item_modifier name="modVehicleWrapBloodMoonExpress" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
       <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
       <property name="DescriptionKey" value="modVehicleWrapBloodMoonExpressDesc" />
       <property name="CustomIcon" value="modVehicleWrapBloodMoonExpress" />
       <property name="Material" value="Mpaint" />
@@ -563,6 +566,7 @@
     </item_modifier>
     <item_modifier name="modVehicleWrapNavezganeExplorer" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
       <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
       <property name="DescriptionKey" value="modVehicleWrapNavezganeExplorerDesc" />
       <property name="CustomIcon" value="modVehicleWrapNavezganeExplorer" />
       <property name="Material" value="Mpaint" />

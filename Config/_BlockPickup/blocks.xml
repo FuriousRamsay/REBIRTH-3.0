@@ -108,7 +108,7 @@
       <property name="CustomIcon" value="palletBrownBoxesBase"/>
       <property name="CreativeMode" value="None"/>
       <property name="Stacknumber" value="1"/>
-      <property name="ContainerSize" value="6,2"/>
+      <property name="ContainerSize" value="6,3"/>
       <property name="DowngradeBlock" value="palletBrownBoxesBaseOpen"/>
       <property name="RebirthPickup" value="Allow"/>
       <property name="RebirthPickupTarget" value="palletBrownBoxesBaseClosed"/>
@@ -126,7 +126,7 @@
       <property name="CustomIcon" value="palletBrownBoxesTile"/>
       <property name="CreativeMode" value="None"/>
       <property name="Stacknumber" value="1"/>
-      <property name="ContainerSize" value="6,2"/>
+      <property name="ContainerSize" value="6,3"/>
       <property name="DowngradeBlock" value="palletBrownBoxesTileOpen"/>
       <property name="RebirthPickup" value="Allow"/>
       <property name="RebirthPickupTarget" value="palletBrownBoxesTileClosed"/>
@@ -144,7 +144,7 @@
       <property name="CustomIcon" value="palletBrownBoxesTop"/>
       <property name="CreativeMode" value="None"/>
       <property name="Stacknumber" value="1"/>
-      <property name="ContainerSize" value="6,2"/>
+      <property name="ContainerSize" value="6,3"/>
       <property name="DowngradeBlock" value="palletBrownBoxesTopOpen"/>
       <property name="RebirthPickup" value="Allow"/>
       <property name="RebirthPickupTarget" value="palletBrownBoxesTopClosed"/>
@@ -162,7 +162,7 @@
       <property name="CustomIcon" value="palletBrownBoxesTopSmall"/>
       <property name="CreativeMode" value="None"/>
       <property name="Stacknumber" value="1"/>
-      <property name="ContainerSize" value="6,2"/>
+      <property name="ContainerSize" value="6,3"/>
       <property name="DowngradeBlock" value="palletBrownBoxesTopSmallOpen"/>
       <property name="RebirthPickup" value="Allow"/>
       <property name="RebirthPickupTarget" value="palletBrownBoxesTopSmallClosed"/>
@@ -180,11 +180,15 @@
       <property name="CustomIcon" value="palletBrownBoxesLoose"/>
       <property name="CreativeMode" value="None"/>
       <property name="Stacknumber" value="1"/>
-      <property name="ContainerSize" value="6,2"/>
+      <property name="ContainerSize" value="6,3"/>
       <property name="DowngradeBlock" value="palletBrownBoxesLooseOpen"/>
       <property name="RebirthPickup" value="Allow"/>
       <property name="RebirthPickupTarget" value="palletBrownBoxesLooseClosed"/>
       <drop event="Destroy" count="0"/>
     </block>
   </append>
+  <include filename="loot_player_sizes_26.xml"/>
+  <include filename="loot_player_additional_sizes_26.xml"/>
+  <include filename="snack_storage_26.xml"/>
+  <include filename="legacy_broken_vending_bath_storage_26.xml"/>
 </configs>

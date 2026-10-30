@@ -1292,14 +1292,17 @@ public static class RebirthGameBridgePlayer
 
     private static IEnumerator SelectRoutine(BridgeRequest req, EntityPlayerLocal p, int slot)
     {
+        ItemStack requested = p.inventory.GetItem(slot - 1);
+        string expected = requested == null || requested.IsEmpty() ? null : requested.itemValue.ItemClass.GetItemName();
         bool selected = false;
-        yield return RebirthGameBridgeNeeds.Equip(p, slot - 1, null, ok => selected = ok);
+        yield return RebirthGameBridgeNeeds.Equip(p, slot - 1, expected, ok => selected = ok);
         if (!selected)
-        { req.Fail("toolbelt selection did not take effect; close menus and check player state", 409); yield break; }
+        { req.Fail("toolbelt selection did not equip the requested item; expected " + (expected ?? "empty slot") + ", actual hand " + (p.inventory.holdingItem?.GetItemName() ?? "none") + "; close menus and check player state", 409); yield break; }
         ItemStack s = p.inventory.GetItem(p.inventory.holdingItemIdx);
         req.Complete(new JObject
         {
             ["holdingSlot"] = p.inventory.holdingItemIdx + 1,
+            ["actualHand"] = p.inventory.holdingItem?.GetItemName(),
             ["holding"] = s == null || s.IsEmpty() ? null : new JObject { ["name"] = s.itemValue.ItemClass.GetItemName(), ["count"] = s.count }
         });
     }

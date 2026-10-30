@@ -51,7 +51,7 @@ public static class RebirthCamperTurretRelease
         finally{Object.DestroyImmediate(root);}
         string bundles=Output+"/ProductionBundles";Directory.CreateDirectory(bundles);
         var build=new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Prefab},addressableNames=new[]{"rebirthCamper80s"}};
-        if(!BuildPipeline.BuildAssetBundles(bundles,new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Candidate bundle build failed");
+        if(!RebirthAssetBundlePackaging.BuildAssetBundles(bundles,new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Candidate bundle build failed");
         string path=bundles+"/rebirth_camper80s.unity3d";
         if(!BuildPipeline.GetCRCForAssetBundle(path,out uint crc))throw new Exception("Bundle CRC unavailable");
         var bundle=AssetBundle.LoadFromFile(path,crc);if(!bundle)throw new Exception("Candidate bundle cannot reopen");

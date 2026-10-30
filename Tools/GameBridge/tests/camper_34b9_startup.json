@@ -1,0 +1,12 @@
+{
+  "name": "Camper 3.4 b9 startup observation — existing disposable camper with body and wrap",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "After a fresh restart, inspect startup log for successful completion and absence of unqualified placed cancellation or unsupported station errors. Use an existing disposable truck with saved body and cosmetic. This scenario does not itself assert body visibility or the HUD bar." },
+    { "wait": 3 },
+    { "console": "rebirth playerid" },
+    { "screenshot": "camper_34b9_startup" },
+    { "expectNoErrors": true },
+    { "_note": "Manual required: inspect saved camper and wrap visible, target truck to confirm no floating health bar, remove empty body then confirm rooftop collision is absent; reinstall and verify. Do not remove occupied body. No game control was performed by the compatibility fix." }
+  ]
+}

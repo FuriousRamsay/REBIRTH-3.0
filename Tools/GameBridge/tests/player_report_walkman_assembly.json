@@ -1,0 +1,25 @@
+{
+  "name": "Walkman and Headphones assembly from two components",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Authorized disposable completed REBIRTH Survivor, empty crafting queue, inventory room for one output; no remote sources containing these components.",
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "FuriousRamsayWalkman", "count": 1 } },
+    { "give": { "item": "FuriousRamsayHeadphones", "count": 1 } },
+    { "markItem": "FuriousRamsayWalkman" },
+    { "markItem": "FuriousRamsayHeadphones" },
+    { "markItem": "rebirthGearWalkmanHeadphones" },
+    { "ui": { "action": "open", "window": "crafting" } },
+    { "action": { "command": "type", "args": { "id": "rebirthCraftingRecipeSearch", "value": "Walkman" } } },
+    { "wait": 0.5 },
+    { "click": { "recipe": "rebirthGearWalkmanHeadphones" } },
+    { "screenshot": "walkman_assembly_recipe" },
+    { "click": { "id": "btnRebirthCraftingCraft" } },
+    { "wait": 15 },
+    { "expectItemDelta": { "name": "FuriousRamsayWalkman", "op": "==", "value": -1 } },
+    { "expectItemDelta": { "name": "FuriousRamsayHeadphones", "op": "==", "value": -1 } },
+    { "expectItemDelta": { "name": "rebirthGearWalkmanHeadphones", "op": "==", "value": 1 } },
+    { "expectNoErrors": true }
+  ]
+}

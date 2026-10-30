@@ -3,6 +3,28 @@ using System;
 
 #nullable disable
 
+[HarmonyPatch(typeof(TEFeatureStorage), nameof(TEFeatureStorage.Init), new Type[] { typeof(TileEntityComposite), typeof(TileEntityFeatureData) })]
+internal static class RebirthLootCapacityParityInitBinding
+{
+    [HarmonyPostfix]
+    private static void Postfix(TEFeatureStorage __instance)
+    {
+        if (RebirthBlockPickupPatchInstaller.Active)
+            RebirthLootCapacityParity.AfterInit(__instance);
+    }
+}
+
+[HarmonyPatch(typeof(TEFeatureStorage), nameof(TEFeatureStorage.Read), new Type[] { typeof(PooledBinaryReader), typeof(StreamModeRead) })]
+internal static class RebirthLootCapacityParityReadBinding
+{
+    [HarmonyPostfix]
+    private static void Postfix(TEFeatureStorage __instance, StreamModeRead _eStreamMode)
+    {
+        if (RebirthBlockPickupPatchInstaller.Active)
+            RebirthLootCapacityParity.AfterPersistentRead(__instance, _eStreamMode);
+    }
+}
+
 // Fixed 3.1 block-pickup bindings. Only the separate subclass-override installer
 // remains dynamic because Harmony does not apply a base virtual patch to methods
 // overridden by game/mod block subclasses.

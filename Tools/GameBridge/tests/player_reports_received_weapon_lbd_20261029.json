@@ -1,0 +1,29 @@
+{
+  "name": "Player reports: cleaver and hunting rifle practical gain",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "_note": "User/lead only in disposable CodexTest, committed Survivor, guard ON. Run first locally and then from an independent connected remote player to exercise NetPackageDamageEntity on the server. Local PASS alone does not qualify received damage. Use a native loaded rifle; give/reload preparatory input must complete before fighting. No real-save or automatic game control is authorized by this authored file.",
+  "steps": [
+    {"cleararea":{"radius":40}},
+    {"restore":{}},
+    {"give":{"item":"ItemsWeaponsCleaver001_FR","quality":2,"toolbelt":1}},
+    {"select":{"slot":1}},
+    {"markSkill":"skill.knives"},
+    {"spawn":{"entity":"zombieArlene","distance":6}},
+    {"fight":{"contains":"zombie","radius":20,"maxSeconds":90}},
+    {"wait":3},
+    {"expectSkillGain":{"skill":"skill.knives","op":">","value":0}},
+    {"restore":{}},
+    {"give":{"item":"gunRifleT1HuntingRifle","quality":2,"toolbelt":1}},
+    {"give":{"item":"ammo762mmBulletBall","count":60}},
+    {"select":{"slot":1}},
+    {"key":{"name":"R"}},
+    {"wait":5},
+    {"markSkill":"skill.long_range_rifles"},
+    {"spawn":{"entity":"zombieArlene","distance":12}},
+    {"fight":{"contains":"zombie","radius":24,"maxSeconds":90}},
+    {"wait":3},
+    {"expectSkillGain":{"skill":"skill.long_range_rifles","op":">","value":0}},
+    {"expectNoErrors":true}
+  ]
+}

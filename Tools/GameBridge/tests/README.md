@@ -1,5 +1,20 @@
 # Game Bridge test scenarios
 
+`verify_liquid_shortcuts.py` replays a lead-owned native storage shortcut
+regression without game access. Prepare observed partial and full jars of the
+same drink in an authorized disposable save; capture `rbfetchtestobserve`
+before real shift-clicks from the backpack into the occupied storage, after
+both transfers, and after pressing the actual container Sort button. Discover
+slot paths from the current UI tree. Pass the before/after JSON replies and
+the full source seeds using `--before`, `--after` and `--storage-seed`.
+The checker requires exact native payload/count conservation across all
+observed inventory cells, an empty cursor, and the source identities actually
+arriving separately in storage. Thus a no-op transfer cannot pass. It does not
+qualify compatible merges, remote players or persistence. Native31712 passes
+both shift and Sort on DLL35230E; the original28116 corrupting shift and44328
+corrupting Sort fail the same checker. Raw captures are in
+`_Documentation/PlayerReports_20261029/LiquidShortcutsNative-20261029`.
+
 `npc_ai_combat_isolated_profiler.json` requires a fresh disposable `CodexTest`
 clone (`gamebridge.ps1 reset-save`) before the profiler launches. It verifies
 zero nearby survivors, spawns exactly three, teleports the player beyond the

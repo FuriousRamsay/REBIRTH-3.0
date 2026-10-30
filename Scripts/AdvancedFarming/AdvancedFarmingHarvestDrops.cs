@@ -127,7 +127,7 @@ internal static class AdvancedFarmingHarvestDrops
         string path=RegionFile.ConstructFullFilePath(regions.saveDirectory,chunk.X>>5,chunk.Z>>5,"7rg");
         using(var file=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
         {
-            if(!RebirthStationRegionPayload.TryRead(file,chunk.X&31,chunk.Z&31,out var payload)||!RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var body))return false;
+            if(!RebirthStationRegionPayload.TryRead(file,RebirthStationRegionPayload.NativeLocalIndex(chunk.X),RebirthStationRegionPayload.NativeLocalIndex(chunk.Z),out var payload)||!RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var body))return false;
             var bytes=new byte[body.Length+8];Array.Copy(payload,bytes,8);Array.Copy(body,0,bytes,8,body.Length);
             using(var hash=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-","").ToLowerInvariant()==a.Drop.Before;
         }

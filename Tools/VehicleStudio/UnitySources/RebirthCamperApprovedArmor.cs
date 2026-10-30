@@ -72,7 +72,7 @@ public static class RebirthCamperApprovedArmor
  {
   Directory.CreateDirectory(Output+"/Bundles");
   var build=new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Folder+"/rebirthCamper80s.prefab"},addressableNames=new[]{"rebirthCamper80s"}};
-  if(!BuildPipeline.BuildAssetBundles(Output+"/Bundles",new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
+  if(!RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundles",new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
   Verify();
  }
  public static void Verify()

@@ -311,6 +311,9 @@ public sealed class RebirthMetabolismState
     public float LastNutritionGainPointsPerRealMinute;
     public float LastBeverageEnergyGainPerRealMinute;
     public float LastEnergyRecoveryNutritionUsePerRealMinute;
+    public bool HasEnergyRateSample;
+    public float LastEnergyUsePerRealMinute;
+    public float LastEnergyRecoveryPerRealMinute;
     public float LastIntestinalActivityPercent;
 
     public int AllocateEntryId()

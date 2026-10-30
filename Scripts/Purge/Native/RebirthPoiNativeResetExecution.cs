@@ -41,6 +41,7 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
         try
         {
             if(store==null||originalOwner==null||clock==null||!originalOwner()||!RebirthPoiNativeResetWitnesses.IsReady)return false;
+            if(!RebirthPoiNativeEvidence.Instance.DrainForReset(store,world,prefabs))return false;
             var snapshot=store.Published;RebirthPoiNativeResetEnvelope envelope;
             if(!RebirthPoiNativeResetEnvelope.TryCaptureAuthored(snapshot,world,prefabs,transaction,caller,out envelope))return false;
             // Native iterator factory is effect-free; this exact iterator is advanced once.

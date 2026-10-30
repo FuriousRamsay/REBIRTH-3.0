@@ -58,7 +58,7 @@ public sealed class RebirthStationPublicationRecord
             string path=Path.GetFullPath(Path.Combine(root,((string)image.Attribute("region")).Replace('/',Path.DirectorySeparatorChar)));
             if(!path.StartsWith(root,StringComparison.OrdinalIgnoreCase))return false;
             byte[] payload;using(var stream=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                if(!RebirthStationRegionPayload.TryRead(stream,(int)image.Attribute("chunkX")&31,(int)image.Attribute("chunkZ")&31,out payload))return false;
+                if(!RebirthStationRegionPayload.TryRead(stream,RebirthStationRegionPayload.NativeLocalIndex((int)image.Attribute("chunkX")),RebirthStationRegionPayload.NativeLocalIndex((int)image.Attribute("chunkZ")),out payload))return false;
             if(Digest(payload)!=(string)image.Attribute("payload")||!RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var decoded))return false;
             int input=(int)image.Attribute("inputStart")-8,il=(int)image.Attribute("inputLength"),queue=(int)image.Attribute("queueStart")-8,ql=(int)image.Attribute("queueLength");
             if((long)input+il>decoded.Length||(long)queue+ql>decoded.Length)return false;

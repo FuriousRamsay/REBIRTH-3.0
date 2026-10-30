@@ -106,7 +106,7 @@ public sealed class ConsoleCmdRebirthMetabolism : ConsoleCmdAbstract
         if (cmd == "status" || cmd == "rates" || cmd == "genetics")
         {
             RebirthMetabolismSnapshot s = RebirthMetabolismService.BuildSnapshot(player);
-            Log.Out("[REBIRTH Metabolism] " + RebirthMetabolismService.FormatSnapshot(s));
+            Log.Out("[REBIRTH Metabolism] " + RebirthMetabolismService.FormatSnapshot(s, RebirthMetabolismService.GetEnergyReserveCeiling(player)));
             Log.Out("  modifiers hydrationNeed=" + P(s.HydrationRequirementMultiplier) + " nutritionNeed=" + P(s.FoodRequirementMultiplier)
                 + " fluidAbsorb=" + P(s.FluidAbsorptionMultiplier) + " fluidUse=" + P(s.FluidUtilizationMultiplier)
                 + " nutrientUse=" + P(s.NutrientUtilizationMultiplier) + " digestion=" + P(s.DigestionSpeedMultiplier)

@@ -1,5 +1,9 @@
 # Engine and surplus-solar charging for installed camper batteries
 
+## 2026-10-25 owner correction
+
+The owner subsequently required solar to recharge installed batteries without supplying lights or other consumers directly. The runtime now excludes solar from `HasUsableEnergy`, `Spend`, and dashboard direct-output/runtime accounting; the existing solar budget is used for native battery charging. A charged battery bank or fueled generator supplies POI lights. The earlier direct-load solar assertions below describe the previous implementation, not the current rule. The updated actual-source fixture passes 257 assertions, including solar-only load refusal, solar-funded charging, and duplicate-bank refusal. A disposable in-game daylight test observed battery `UseTimes` falling from 864 to 664 with the solar bank Available and no load; solar alone did not enable the POI switch. See `ENERGY_WINDOW_TRANSFER_INCIDENT_20261025.md`.
+
 Source cumulative project: current REBIRTH 3.0 workspace `zzz_REBIRTH__3_0`. Target: the same mod for 7 Days to Die 3.0 b259. Delivery type: parent agent's consolidated changed-files package. No independent archive is claimed here.
 
 The owner explicitly approved both charging paths after the earlier analysis found them absent. Batteries now recharge from the native running vehicle engine, including slow driving, and from unused daylight solar production after active consumer demand has been paid.

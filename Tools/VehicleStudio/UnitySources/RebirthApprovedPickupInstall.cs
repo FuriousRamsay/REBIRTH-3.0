@@ -140,7 +140,7 @@ public static class RebirthApprovedPickupInstall
             Output + "/approved-pickup-production.unitypackage", ExportPackageOptions.Default);
         string bundleDir = Output + "/Bundle"; Directory.CreateDirectory(bundleDir);
         var build = new AssetBundleBuild { assetBundleName = "rebirth_camper80s.unity3d", assetNames = new[] { prefabPath }, addressableNames = new[] { "rebirthCamper80s" } };
-        if (!BuildPipeline.BuildAssetBundles(bundleDir, new[] { build }, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.StandaloneWindows64))
+        if (!RebirthAssetBundlePackaging.BuildAssetBundles(bundleDir, new[] { build }, BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.StandaloneWindows64))
             throw new Exception("Asset bundle build failed");
         string bundlePath = bundleDir + "/rebirth_camper80s.unity3d";
         if (!BuildPipeline.GetCRCForAssetBundle(bundlePath, out uint crc)) throw new Exception("Bundle CRC unavailable");

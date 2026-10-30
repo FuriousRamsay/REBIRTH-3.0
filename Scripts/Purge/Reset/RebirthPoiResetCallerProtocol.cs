@@ -8,6 +8,9 @@ internal enum RebirthPoiResetProtocolState { PendingAdmission, Ready, Running, P
 // this exact operation and consume Completed, never turn child refusal into vanilla success.
 internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
 {
+    // Native integration supplies the exact captured-custody fence. Pure domain
+    // callers remain independent of game types.
+    internal static Func<RebirthPoiWorldStore,RebirthPoiWorldSnapshot,RebirthPoiIdentity,bool> AdmissionGuard;
     private readonly RebirthPoiWorldStore store;
     private readonly RebirthPoiWorldSnapshot original;
     private readonly RebirthPoiClearanceRecord originalRecord;
@@ -30,6 +33,7 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
     public object Current {get{return current;} }
     public RebirthPoiResetCallerProtocol(RebirthPoiWorldStore originalStore,RebirthPoiWorldSnapshot predecessor,RebirthPoiIdentity identity,RebirthPoiResetPlan envelope,IEnumerator originalNative,Func<double> monotonicClock)
     {
+        if(AdmissionGuard!=null&&!AdmissionGuard(originalStore,predecessor,identity))throw new ArgumentException("Unacknowledged native custody before reset predecessor.");
         if(originalStore==null||predecessor==null||identity==null||envelope==null||originalNative==null||monotonicClock==null||!ReferenceEquals(originalStore.Published,predecessor)||!predecessor.TryGet(identity,out originalRecord)||originalRecord.State==RebirthPoiClearanceState.ResetPending)throw new ArgumentException("Invalid original reset caller.");
         store=originalStore;original=predecessor;plan=envelope;native=originalNative;clock=monotonicClock;State=RebirthPoiResetProtocolState.PendingAdmission;
     }
@@ -49,6 +53,7 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
             else
             {
             if(!ReferenceEquals(record,originalRecord)){State=RebirthPoiResetProtocolState.Refused;return;}
+            if(AdmissionGuard!=null&&!AdmissionGuard(store,snapshot,originalRecord.Identity)){State=RebirthPoiResetProtocolState.Refused;return;}
             var result=store.TryBeginReset(snapshot,originalRecord.Identity,originalRecord.Epoch,plan.Transaction,plan);
             if(result==RebirthPoiStoreResult.Published||result==RebirthPoiStoreResult.Duplicate)State=RebirthPoiResetProtocolState.Ready;
             else if(result!=RebirthPoiStoreResult.Uncertain&&result!=RebirthPoiStoreResult.IoFailure&&result!=RebirthPoiStoreResult.Deferred)State=RebirthPoiResetProtocolState.Refused;

@@ -117,15 +117,22 @@ public sealed class ItemStack
 {
     public int count;public ItemValue itemValue;public ItemStack(ItemValue v,int n){itemValue=v;count=n;}
     public static readonly ItemStack Empty=new ItemStack(new ItemValue(),0);public bool IsEmpty()=>count<=0||itemValue.IsEmpty();
+    public static ItemStack[] Clone(ItemStack[] values)=>values.Select(v=>v?.Clone()).ToArray();
     public ItemStack Clone()=>new ItemStack(itemValue.Clone(),count);public bool CanStackWith(ItemStack other,bool limit)=>other?.itemValue.type==itemValue.type;
 }
 public sealed class Grid{public ItemStack[] items;}
 public class Bag{public Grid ItemGrid;public void SetSlot(int slot,ItemStack item)=>ItemGrid.items[slot]=item;}
 public sealed class Inventory:Bag{public void SetItem(int slot,ItemStack item)=>ItemGrid.items[slot]=item;}
-public sealed class EntityPlayer{public Bag bag;public Inventory inventory;public bool Busy;}
+public class EntityPlayer{public Bag bag;public Inventory inventory;public bool Busy;public World world=new World();}
+public sealed class World{public bool IsRemote()=>false;}
+public sealed class EntityPlayerLocal:EntityPlayer{public PlayerUi PlayerUI;}
+public sealed class PlayerUi{public Xui xui;}
+public sealed class Xui{public InventoryModel PlayerInventory;}
+public sealed class InventoryModel{public void SetBackpackItemStacks(ItemStack[] items){}public void SetToolbeltItemStacks(ItemStack[] items){}}
 public static class RebirthBackpackLibraryReservation{public static bool BlocksResourceUse(EntityPlayer player)=>player.Busy;}
 public static class RebirthToolbeltCapacity{public static int GetOwnedSlotCount(EntityPlayer player,int length)=>length;}
-public static class RemoteResourceTransactions{public sealed class ReturnReceipt{public bool Toolbelt;public int Slot,Remaining;public ItemStack Item;}}
+public static class RemoteResourceTransactions{public sealed class ReturnReceipt{public ReturnReceipt(EntityPlayer p){}public bool Toolbelt;public int Slot,Remaining;public ItemStack Item;}}
+public static class RebirthCookingMergeScope{public static bool NeedsCheck(ItemValue item)=>RebirthCookingItemStats.NeedsStateAwareStacking(item);}
 public sealed class RebirthConsumableDefinition{public bool IsDrink;public float ContainerCapacityMl=250,InitialVolumeMl=250,NutritionUnits,EnergyUnits,ManualSipMl=125,LiquidHydrationYield=1,FoodWaterMl;}
 public static class RebirthConsumableResolver{public static bool TryResolve(ItemValue v,out RebirthConsumableDefinition d){d=new RebirthConsumableDefinition{IsDrink=v.type==1};return v.type!=0;}}
 public static class RebirthLiquidContainerService

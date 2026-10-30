@@ -143,7 +143,7 @@ public static class RebirthCamperOwnerCorrections
         }
         BodyRoots(root);root.name="rebirthCamper80s";
         string prefab=Folder+"/rebirthCamper80s.prefab";PrefabUtility.SaveAsPrefabAsset(root,prefab);AssetDatabase.SaveAssets();Object.DestroyImmediate(root);
-        BuildPipeline.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+        RebirthAssetBundlePackaging.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
         File.WriteAllText(Output+"/build-complete.txt",prefab);
         RenderBodyIcon(prefab);
     }

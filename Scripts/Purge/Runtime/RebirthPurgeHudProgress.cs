@@ -54,7 +54,7 @@ internal static class RebirthPurgeHudProgress
     {if(!player.Buffs.HasCustomVar(key)||player.Buffs.GetCustomVar(key)!=value)player.Buffs.SetCustomVar(key,value,true);}
     internal static string BiomeColor(EntityPlayerLocal player)
     {
-        var biome=player==null?null:GameManager.Instance?.World?.GetBiome((int)player.position.x,(int)player.position.z)?.m_sBiomeName;
+        var biome=player==null?null:GameManager.Instance?.World?.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
         switch(biome)
         {
             case "pine_forest":return "58,105,70,255";
@@ -67,7 +67,7 @@ internal static class RebirthPurgeHudProgress
     }
     internal static string BiomeTextColor(EntityPlayerLocal player)
     {
-        var biome=player==null?null:GameManager.Instance?.World?.GetBiome((int)player.position.x,(int)player.position.z)?.m_sBiomeName;
+        var biome=player==null?null:GameManager.Instance?.World?.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
         // Preserve the legacy biome hues, lifted for readable text on black.
         switch(biome)
         {
@@ -82,7 +82,7 @@ internal static class RebirthPurgeHudProgress
     internal static string BiomeFill(EntityPlayerLocal player)
     {
         var world=GameManager.Instance?.World;
-        var biome=player==null?null:world?.GetBiome((int)player.position.x,(int)player.position.z)?.m_sBiomeName;
+        var biome=player==null?null:world?.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
         if(biome==null)return "0";
         int cleared,eligible,mode=RebirthPurgeObjectivePolicy.ProgressionMode;
         if(world.IsRemote())
@@ -103,7 +103,7 @@ internal static class RebirthPurgeHudProgress
     {
         if(player==null)return Localization.Get("xuiRebirthPurgeObjectivePending");
         string cleared="—",total="—",percentage="—";var world=GameManager.Instance?.World;
-        var biome=world?.GetBiome((int)player.position.x,(int)player.position.z)?.m_sBiomeName;
+        var biome=world?.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
         if(biome!=null)
         {
             if(world.IsRemote())
@@ -145,7 +145,7 @@ internal static class RebirthPurgeHudProgress
         biomeName=percentage=counts="—";
         var world=GameManager.Instance?.World;
         if(player==null||world==null)return;
-        var biome=world.GetBiome((int)player.position.x,(int)player.position.z)?.m_sBiomeName;
+        var biome=world.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
         if(biome==null)return;
         biomeName=Localization.Get("biome_"+biome);
         int cleared,eligible,mode=RebirthPurgeObjectivePolicy.ProgressionMode;

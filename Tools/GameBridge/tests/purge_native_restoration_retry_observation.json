@@ -1,0 +1,13 @@
+{
+  "name": "Purge native restoration retry observation",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "_note": "Lead-owned disposable Purge save only. Start after a genuine room enrollment and ordinary chunk unload/reload; retain original actor tokens, class/point and declared shard hashes before this flow. Guard ON. Do not reset rooms, force spawn flags or replace actors. These captures do not automatically prove a CheckSpawnPos wait or restoration. Manually compare original tokens and positive replacement receipts, native room membership, scanner fault status and no duplicate credits. Run Tools/PurgeRestorationWaitFixture separately for the exact production-source wait/refusal matrix. Existing already-faulted forensic records must not be repaired to make this pass.",
+  "steps": [
+    { "console": "rbpurgetestobserve" },
+    { "wait": 2 },
+    { "console": "rbpurgetestobserve" },
+    { "screenshot": "purge_native_restoration_retry" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -28,7 +28,7 @@ public static class RebirthCamperTurretBundle
    if(texture.width>cap||texture.height>cap||importer==null||!importer.crunchedCompression)throw new Exception("Turret texture budget/Crunch mismatch: "+path);
    report.Add("PASS texture "+path+" "+texture.width+"x"+texture.height+" "+texture.format);
   }
-  var manifest=BuildPipeline.BuildAssetBundles(output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+  var manifest=RebirthAssetBundlePackaging.BuildAssetBundles(output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
   if(!manifest)throw new Exception("Turret camper bundle build failed");
   var bundle=AssetBundle.LoadFromFile(output+"/rebirth_camper80s.unity3d");if(!bundle)throw new Exception("Bundle reopen failed");
   try

@@ -40,6 +40,36 @@ internal static class RebirthSurvivorCombatSkillPatch
     }
 }
 
+[HarmonyPatch(typeof(EntityAlive), nameof(EntityAlive.ProcessDamageResponse))]
+internal static class RebirthSurvivorReceivedCombatSkillPatch
+{
+    // Native b9 NetPackageDamageEntity calls ProcessDamageResponse, not damageEntityLocal.
+    // Observe that separate commit route without re-awarding local DamageEntity hits.
+    internal struct DamageState
+    {
+        public bool Eligible;
+        public int HealthBefore;
+        public bool PreHitStealthQualified;
+    }
+
+    private static void Prefix(EntityAlive __instance, DamageResponse _dmResponse, out DamageState __state)
+    {
+        __state = default(DamageState);
+        if (__instance == null || __instance.world == null || __instance.world.IsRemote() || __instance.IsDead()) return;
+        __state.Eligible = true;
+        __state.HealthBefore = __instance.Health;
+        __state.PreHitStealthQualified = RebirthStealthTrainingService.IsPreHitStealthQualified(__instance, _dmResponse.Source);
+    }
+
+    private static void Postfix(EntityAlive __instance, DamageResponse _dmResponse, DamageState __state, bool __runOriginal)
+    {
+        if (!__runOriginal || !__state.Eligible) return;
+        float actualHealthLoss = Math.Max(0, __state.HealthBefore - __instance.Health);
+        RebirthStatisticsService.RecordDamage(__instance, _dmResponse, _dmResponse.Source, _dmResponse.Strength, actualHealthLoss, -1f);
+        RebirthSkillEventRouter.OnCombatDamageCompleted(__instance, _dmResponse, actualHealthLoss, __state.PreHitStealthQualified, __state.HealthBefore);
+    }
+}
+
 [HarmonyPatch(typeof(Block), nameof(Block.OnBlockDestroyedBy), new System.Type[] { typeof(WorldBase), typeof(BlockValueRef), typeof(BlockValue), typeof(int), typeof(bool) })]
 internal static class RebirthSurvivorHarvestSkillPatch
 {

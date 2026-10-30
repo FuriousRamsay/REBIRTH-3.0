@@ -258,7 +258,7 @@ internal static class RebirthWorkstationReagentPublication
             string path=Path.GetFullPath(Path.Combine(root,relative.Replace('/',Path.DirectorySeparatorChar)));if(!path.StartsWith(root,RebirthStationCompletionOriginalScope.PathComparison))return false;
             RebirthWorkstationCompletionPublication.RequireNativeSaveFile(path);
             byte[] payload;using(var file=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                if(!RebirthStationRegionPayload.TryRead(file,x&31,z&31,out payload))return false;
+                if(!RebirthStationRegionPayload.TryRead(file,RebirthStationRegionPayload.NativeLocalIndex(x),RebirthStationRegionPayload.NativeLocalIndex(z),out payload))return false;
             RebirthWorkstationCompletionPublication.RequireNativeSaveFile(path);
             if(RebirthStationPublicationRecord.Digest(payload)!=(string)proof.Attribute("payload")||
                 !RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var decoded))return false;

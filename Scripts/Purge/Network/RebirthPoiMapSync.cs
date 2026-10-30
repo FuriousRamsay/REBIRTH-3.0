@@ -171,6 +171,17 @@ internal static class RebirthPoiMapSync
     internal static void Receive(World world, RebirthPoiMapFrame frame)
     {
         if (!ReferenceEquals(world, clientWorld) || receiver == null) return;
+        // A decoded server frame with our current nonce can establish that the
+        // published epoch has ended. Retire it; only a fresh nonce may replace it.
+        if (frame != null && frame.Request == clientRequest && receiver.Sequence > 0 &&
+            (frame.World != receiver.PublishedWorld || frame.Session != receiver.PublishedSession))
+        {
+            presented = null; clientRequest = Guid.NewGuid();
+            receiver = new RebirthPoiMapReceiver(clientWorld, clientRequest);
+            objectiveClient = new RebirthPurgeObjectiveClient(clientRequest);
+            clientNeedsSnapshot = true; nextClientRequest = Math.Min(nextClientRequest, Now + 1);
+            return;
+        }
         var result = receiver.Accept(world, frame);
         // Only new staged progress extends the transfer timeout. Replayed pages must
         // neither start a needless resync after publication nor postpone a stalled transfer.

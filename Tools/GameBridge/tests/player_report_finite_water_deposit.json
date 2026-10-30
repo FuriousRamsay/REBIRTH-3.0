@@ -1,0 +1,22 @@
+{
+  "name": "Finite jar deposit across native snapshot recycling",
+  "stopOnFailure": true,
+  "preconditions": "Authorized disposable CodexTest only. Stand within interaction range of the empty FuriousRamsayWaterTank at [-235,38,622], chunk [-15,38]. Toolbelt slot 3 must contain exactly one full 500mL murky jar, with no pending water operation. Keep guard on. Record all native item hashes and tank revision before use. This replay captures evidence; completion requires independently checking the conservation and terminal receipts below.",
+  "steps": [
+    {"action":{"command":"surroundings"}},
+    {"action":{"command":"select","args":{"slot":3}}},
+    {"action":{"command":"lookat","args":{"x":-235,"y":38,"z":622,"block":1}}},
+    {"console":"rbliquidobserve tank -235 38 622"},
+    {"action":{"command":"press","args":{"action":"Secondary","seconds":0.2}}},
+    {"wait":12},
+    {"console":"rbliquidobserve tank -235 38 622"},
+    {"expectNoErrors":true}
+  ],
+  "acceptanceCases": [
+    "Selected original jar becomes one empty jar; unrelated bag/belt payloads and cursor remain unchanged.",
+    "Tank gains exactly 500mL once, with its native revision advanced; no duplicated water or retained original liquid.",
+    "Owner and server records for this exact operation reach terminal state and archive. Exact saved original/output and source-publication receipts are required; input success alone is not acceptance.",
+    "After an ordinary process restart the exact tank volume and all item payloads remain unchanged.",
+    "Remote competition, failed writes, source replacement, death and other source types require separate acceptance; this case does not certify them."
+  ]
+}

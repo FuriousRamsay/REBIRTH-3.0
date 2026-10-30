@@ -9,12 +9,12 @@ using System.Runtime.CompilerServices;
 using HarmonyLib;
 using UnityEngine;
 
-internal static class RebirthCamperSink
+internal static partial class RebirthCamperSink
 {
     internal const int CapacityMl=30000;
     internal const string Key="RebirthCamperSinkV1", ReceiptPrefix="rbCamperSink_";
     internal const string CancelPrefix="rbCamperSinkCancel_";
-    private sealed class Tank {internal Guid Identity;internal long Revision;internal int Ml;internal float Query;}
+    private sealed class Tank {internal Guid Identity;internal long Revision;internal double Ml;internal float Query;}
     private sealed class Pending
     {
         internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;
@@ -93,9 +93,9 @@ internal static class RebirthCamperSink
         if(vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata(Key,out string text))
         {
             var fields=text.Split('|');
-            if(fields.Length!=4||fields[0]!="1"||!Guid.TryParse(fields[1],out var saved)||saved!=identity
+            if(fields.Length!=4||!Guid.TryParse(fields[1],out var saved)||saved!=identity
                 ||!long.TryParse(fields[2],NumberStyles.None,CultureInfo.InvariantCulture,out tank.Revision)||tank.Revision<0
-                ||!int.TryParse(fields[3],NumberStyles.None,CultureInfo.InvariantCulture,out tank.Ml)||tank.Ml<0||tank.Ml>CapacityMl)
+                ||!ReadReservoirMl(fields[0],fields[3],out tank.Ml))
                 throw new InvalidDataException("Invalid sink reservoir; retain camper data.");
         }
         tanks.Add(vehicle,tank);return tank;
@@ -124,14 +124,14 @@ internal static class RebirthCamperSink
         after=new ItemStack(value,before.count);return true;
     }
     private static RebirthCamperTransferJournal Journal()=>new RebirthCamperTransferJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","CamperSinkTransfers"));
-    private static string Projection(Tank tank)=>string.Join("|","1",tank.Identity.ToString("N"),tank.Revision.ToString(CultureInfo.InvariantCulture),tank.Ml.ToString(CultureInfo.InvariantCulture));
+    private static string Projection(Tank tank)=>string.Join("|",Math.Truncate(tank.Ml)==tank.Ml?"1":"2",tank.Identity.ToString("N"),tank.Revision.ToString(CultureInfo.InvariantCulture),tank.Ml.ToString("R",CultureInfo.InvariantCulture));
     private static void Persist(EntityVehicle vehicle,Tank tank)
     {vehicle.vehicle.GetUpdatedItemValue().SetMetadata(Key,Projection(tank));vehicle.SendSyncData(4);VehicleManager.Instance?.TriggerSave();}
     private static void Reply(EntityVehicle vehicle,Tank tank,ClientInfo sender,Guid operation=default(Guid),bool done=false,string error=null)
     {
         if(sender==null){if(operation!=Guid.Empty&&done&&local?.Operation==operation)local=null;if(error!=null)GameManager.ShowTooltip(vehicle.world.GetPrimaryPlayer(),Localization.Get(error));return;}
         if(!WorldScope(vehicle.world,out var world))return;
-        sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCamperSinkReplyV1>().Setup(vehicle.entityId,world,tank.Identity,tank.Revision,tank.Ml,operation,done,error,null));
+        sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCamperSinkReplyV1>().Setup(vehicle.entityId,world,tank.Identity,tank.Revision,(int)Math.Floor(tank.Ml),operation,done,error,null));
     }
     internal static bool Primary(Inventory inventory,int action,bool released)
     {
@@ -152,8 +152,9 @@ internal static class RebirthCamperSink
         Log.Out("[CamperSink] release action="+action+" vehicle="+vehicle.entityId+" admitted="+admitted);
         if(!admitted)return false;
         int slot=inventory.holdingItemIdx;var cells=inventory.ItemGrid.items;
-        if(slot<0||slot>=RebirthToolbeltCapacity.GetOwnedSlotCount(player,cells.Length)||!TryConversion(cells[slot],out _,out _))
+        if(slot<0||slot>=RebirthToolbeltCapacity.GetOwnedSlotCount(player,cells.Length)||!TryCurrentConversion(cells[slot],out _,out _,out _))
         {GameManager.ShowTooltip(player,Localization.Get("xuiRebirthCamperSinkVessel"));return false;}
+        if(action!=1&&RebirthWaterRefillPlan.IsTopUp(cells[slot]))return false;
         if(RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)
             ||RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)||RebirthCamperEnergyOwnerHold.Blocks(inventory)
             ||RebirthCamperStationNativeActorPayment.Blocks(inventory))return false;
@@ -225,9 +226,9 @@ internal static class RebirthCamperSink
             ||!RebirthCamperPhysicalTargets.TryGetFocused(player,out var vehicle,out var target)||target!="sink")return false;
         try
         {
-            if(!vehicle.world.IsRemote()){ml=Authority(vehicle).Ml;return true;}
+            if(!vehicle.world.IsRemote()){ml=(int)Math.Floor(Authority(vehicle).Ml);return true;}
             var tank=tanks.GetValue(vehicle,ignored=>new Tank());
-            if(tank.Identity!=Guid.Empty)ml=tank.Ml;
+            if(tank.Identity!=Guid.Empty)ml=(int)Math.Floor(tank.Ml);
             return true;
         }
         catch{return false;}
@@ -270,7 +271,7 @@ internal static class RebirthCamperSink
         try
         {
             var items=RebirthCamperEnergyItems.Read(offered,1);
-            if(items.Length!=1||!TryConversion(items[0],out var after,out int delta))yield break;
+            if(items.Length!=1||!TryCurrentConversion(items[0],out var after,out double delta,out bool refill))yield break;
             RebirthStablePlayerIdentity owner;
             if(sender==null?!RebirthStablePlayerIdentity.TryFromLocalPlatform(out owner):!RebirthStablePlayerIdentity.TryFromClientInfo(sender,out owner))yield break;
             float deadline=Time.realtimeSinceStartup+10f;bool witnessed=false;
@@ -286,11 +287,11 @@ internal static class RebirthCamperSink
                 yield return new WaitForSecondsRealtime(.25f);
             }
             if(!witnessed||!Admitted(vehicle,player,sender))yield break;
-            var tank=Authority(vehicle);int next=tank.Ml+delta;
+            var tank=Authority(vehicle);double next=tank.Ml+delta;
             if(next<0||next>CapacityMl){error=next<0?"xuiRebirthCamperSinkInsufficient":"xuiRebirthCamperSinkFull";yield break;}
             var journal=Journal();journal.AssertAvailable(tank.Identity,operation);
             if(journal.Read(operation)!=null)yield break;
-            var frame=new RebirthCamperSinkFrame{Operation=operation,Vehicle=tank.Identity,World=world,Actor=player.entityId,Slot=slot,
+            var frame=new RebirthCamperSinkFrame{Version=refill||Math.Truncate(tank.Ml)!=tank.Ml?2:1,Operation=operation,Vehicle=tank.Identity,World=world,Actor=player.entityId,Slot=slot,
                 BeforeMl=tank.Ml,AfterMl=next,Revision=tank.Revision,Owner=owner.CanonicalId,OwnerKey=owner.StorageKey,Creation=creation,Before=items[0],After=after};
             var bytes=frame.Write();journal.Prepare(operation,tank.Identity,creation,tank.Revision,bytes,bytes);
             prepared=new Pending{Vehicle=vehicle,Player=player,Sender=sender,Owner=owner,Frame=frame,Journal=journal,Directory=GameIO.GetSaveGameDir()};
@@ -306,7 +307,7 @@ internal static class RebirthCamperSink
     {
         if(operation.Player is EntityPlayerLocal localPlayer)Apply(localPlayer,operation.Frame.Write(),operation.Vehicle);
         else operation.Sender?.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCamperSinkReplyV1>()
-            .Setup(operation.Vehicle.entityId,operation.Frame.World,operation.Frame.Vehicle,operation.Frame.Revision,operation.Frame.BeforeMl,
+            .Setup(operation.Vehicle.entityId,operation.Frame.World,operation.Frame.Vehicle,operation.Frame.Revision,(int)Math.Floor(operation.Frame.BeforeMl),
                 operation.Frame.Operation,false,null,operation.Frame.Write()));
     }
     private static bool Recover(EntityVehicle vehicle,EntityPlayer player,ClientInfo sender)

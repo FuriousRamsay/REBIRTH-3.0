@@ -424,6 +424,9 @@ public class TileEntityFarmPlotRebirth : TileEntity
 public class TileEntityWaterTankRebirth : TileEntity
 {
     private const ushort WaterExchangePersistenceVersion = 0xA701;
+    private const ushort WaterPrecisionPersistenceVersion = 0xA702;
+    internal double WaterRemainderMl,WaterExchangeBeforeRemainderMl,WaterExchangeAfterRemainderMl;
+    private static bool ValidWaterRemainder(double value)=>!double.IsNaN(value)&&!double.IsInfinity(value)&&value>=0&&value<500;
     internal System.Guid WaterIncarnation;
     internal System.Guid WaterExchangeOperation;
     internal ulong WaterExchangeRevision;
@@ -456,16 +459,21 @@ public class TileEntityWaterTankRebirth : TileEntity
         try { waterMax = AdvancedFarmingBinaryCompat.ReadInt(_br); } catch { }
         try { LastProcessedWorldSeconds = AdvancedFarmingBinaryCompat.ReadInt(_br); } catch { LastProcessedWorldSeconds = timeLapsed; }
         WaterIncarnation=System.Guid.Empty;WaterExchangeOperation=System.Guid.Empty;WaterExchangeRevision=0;WaterExchangeBefore=WaterExchangeAfter=0;
+        WaterExchangeBeforeRemainderMl=WaterExchangeAfterRemainderMl=0;
         if(_eStreamMode==StreamModeRead.Persistency)
         {
+            WaterRemainderMl=WaterExchangeBeforeRemainderMl=WaterExchangeAfterRemainderMl=0;
             int version=GetLegacyForkVersion();
-            if((version&0xFF00)==0xA700&&version!=WaterExchangePersistenceVersion)throw new System.IO.InvalidDataException("Unsupported farming tank original-exchange version.");
-            if(version==WaterExchangePersistenceVersion)
+            if((version&0xFF00)==0xA700&&version!=WaterExchangePersistenceVersion&&version!=WaterPrecisionPersistenceVersion)throw new System.IO.InvalidDataException("Unsupported farming tank original-exchange version.");
+            if(version==WaterExchangePersistenceVersion||version==WaterPrecisionPersistenceVersion)
             {
                 var reader=(System.IO.BinaryReader)_br;var incarnation=reader.ReadBytes(16);var operation=reader.ReadBytes(16);
                 if(incarnation.Length!=16||operation.Length!=16)throw new System.IO.EndOfStreamException();
                 WaterIncarnation=new System.Guid(incarnation);WaterExchangeOperation=new System.Guid(operation);WaterExchangeRevision=reader.ReadUInt64();WaterExchangeBefore=reader.ReadInt32();WaterExchangeAfter=reader.ReadInt32();
-                if(WaterIncarnation==System.Guid.Empty||WaterExchangeBefore<0||WaterExchangeAfter<0||(WaterExchangeOperation==System.Guid.Empty)!=(WaterExchangeRevision==0)||WaterExchangeOperation==System.Guid.Empty&&(WaterExchangeBefore!=0||WaterExchangeAfter!=0)||WaterExchangeOperation!=System.Guid.Empty&&WaterExchangeBefore==WaterExchangeAfter)throw new System.IO.InvalidDataException("Invalid farming tank original-exchange identity.");
+                if(version==WaterPrecisionPersistenceVersion)
+                {WaterRemainderMl=reader.ReadDouble();WaterExchangeBeforeRemainderMl=reader.ReadDouble();WaterExchangeAfterRemainderMl=reader.ReadDouble();
+                    if(!ValidWaterRemainder(WaterRemainderMl)||!ValidWaterRemainder(WaterExchangeBeforeRemainderMl)||!ValidWaterRemainder(WaterExchangeAfterRemainderMl))throw new System.IO.InvalidDataException("Invalid farming tank water precision.");}
+                if(WaterIncarnation==System.Guid.Empty||WaterExchangeBefore<0||WaterExchangeAfter<0||(WaterExchangeOperation==System.Guid.Empty)!=(WaterExchangeRevision==0)||WaterExchangeOperation==System.Guid.Empty&&(WaterExchangeBefore!=0||WaterExchangeAfter!=0||WaterExchangeBeforeRemainderMl!=0||WaterExchangeAfterRemainderMl!=0)||WaterExchangeOperation!=System.Guid.Empty&&WaterExchangeBefore==WaterExchangeAfter&&WaterExchangeBeforeRemainderMl==WaterExchangeAfterRemainderMl)throw new System.IO.InvalidDataException("Invalid farming tank original-exchange identity.");
             }
         }
 #if DEBUG
@@ -476,20 +484,22 @@ public class TileEntityWaterTankRebirth : TileEntity
 
     public override void write(PooledBinaryWriter stream, StreamModeWrite _eStreamMode)
     {
+        if(_eStreamMode==StreamModeWrite.Persistency&&(!ValidWaterRemainder(WaterRemainderMl)||!ValidWaterRemainder(WaterExchangeBeforeRemainderMl)||!ValidWaterRemainder(WaterExchangeAfterRemainderMl)))throw new System.IO.InvalidDataException("Invalid farming tank water precision.");
         if(_eStreamMode==StreamModeWrite.Persistency&&!stream.BaseStream.CanSeek)throw new System.IO.IOException("Farming tank persistence requires a seekable tile-entity stream.");
         long versionPosition=_eStreamMode==StreamModeWrite.Persistency?stream.BaseStream.Position:0L;
         base.write(stream, _eStreamMode);
         if(_eStreamMode==StreamModeWrite.Persistency)
         {
             if(WaterIncarnation==System.Guid.Empty)WaterIncarnation=System.Guid.NewGuid();
-            long payload=stream.BaseStream.Position;stream.BaseStream.Position=versionPosition;AdvancedFarmingBinaryCompat.WriteUShort(stream,WaterExchangePersistenceVersion);stream.BaseStream.Position=payload;
+            long payload=stream.BaseStream.Position;stream.BaseStream.Position=versionPosition;AdvancedFarmingBinaryCompat.WriteUShort(stream,WaterRemainderMl==0&&WaterExchangeBeforeRemainderMl==0&&WaterExchangeAfterRemainderMl==0?WaterExchangePersistenceVersion:WaterPrecisionPersistenceVersion);stream.BaseStream.Position=payload;
         }
         AdvancedFarmingBinaryCompat.WriteInt(stream, waterCount);
         AdvancedFarmingBinaryCompat.WriteInt(stream, timeLapsed);
         AdvancedFarmingBinaryCompat.WriteInt(stream, waterMax);
         AdvancedFarmingBinaryCompat.WriteInt(stream, LastProcessedWorldSeconds);
         if(_eStreamMode==StreamModeWrite.Persistency)
-        {var writer=(System.IO.BinaryWriter)stream;writer.Write(WaterIncarnation.ToByteArray());writer.Write(WaterExchangeOperation.ToByteArray());writer.Write(WaterExchangeRevision);writer.Write(WaterExchangeBefore);writer.Write(WaterExchangeAfter);}
+        {var writer=(System.IO.BinaryWriter)stream;writer.Write(WaterIncarnation.ToByteArray());writer.Write(WaterExchangeOperation.ToByteArray());writer.Write(WaterExchangeRevision);writer.Write(WaterExchangeBefore);writer.Write(WaterExchangeAfter);
+            if(WaterRemainderMl!=0||WaterExchangeBeforeRemainderMl!=0||WaterExchangeAfterRemainderMl!=0){if(!ValidWaterRemainder(WaterRemainderMl)||!ValidWaterRemainder(WaterExchangeBeforeRemainderMl)||!ValidWaterRemainder(WaterExchangeAfterRemainderMl))throw new System.IO.InvalidDataException("Invalid farming tank water precision.");writer.Write(WaterRemainderMl);writer.Write(WaterExchangeBeforeRemainderMl);writer.Write(WaterExchangeAfterRemainderMl);}}
 #if DEBUG
         if (AdvancedFarmingDebug.SaveLoad)
             AdvancedFarmingDebug.Log("saveload", "write WaterTank water=" + waterCount + "/" + waterMax + " timeLapsed=" + timeLapsed + " lastProcessed=" + LastProcessedWorldSeconds);

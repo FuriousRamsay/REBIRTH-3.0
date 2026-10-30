@@ -26,6 +26,7 @@ internal static class RebirthPurgeInformationService
     private static float next;
     private static EntityPlayerLocal restoredPlayer;
     private static EntityPlayerLocal restoredSupplyPlayer;
+    private static EntityPlayerLocal restoredManualPlayer;
     private static object restoredReceipts;
     private static EntityPlayerLocal readingPlayer;
     private static readonly HashSet<string> readingOnly=new HashSet<string>(StringComparer.Ordinal);
@@ -37,7 +38,7 @@ internal static class RebirthPurgeInformationService
     {
         foreach(var request in pending)if(request.Id==id&&request.RequestedAt>0)request.Acknowledged=true;
     }
-    internal static void Reset(){EarlyCloseRequeues=0;pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();lastBlockedReason=null;nextBlockedTrace=0;}
+    internal static void Reset(){EarlyCloseRequeues=0;pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredManualPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();lastBlockedReason=null;nextBlockedTrace=0;}
     private static void TraceBlocked(Pending request,string reason,float now)
     {
         if(request==null||now<request.NotBefore+10f||
@@ -57,6 +58,10 @@ internal static class RebirthPurgeInformationService
     }
     internal static void Request(EntityPlayerLocal player,string id,string sprite,bool manual=false,float notBefore=0)
     {
+        // A late UI close can outlive its world or primary player. Reject it
+        // before the Journal resolves the current recipient's saved context.
+        if(player==null||!ReferenceEquals(player.world,GameManager.Instance?.World)||
+            !ReferenceEquals(player.world?.GetPrimaryPlayer(),player))return;
         var entry=RebirthJournalGuideService.ObservePurgeGuide(player,id);
         if(entry==null)
         {
@@ -70,6 +75,7 @@ internal static class RebirthPurgeInformationService
             id=topic.Id;
         }
         else if(!manual && (RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)))return;
+        if(manual)RebirthPurgeTeachingIntent.RetainManual(player,id);
         if(entry!=null)RebirthJournalGuideService.SetPurgeReadingOnly(player,id,false);
         // Explicit live teaching/manual reading takes precedence over silent join restoration.
         if(ReferenceEquals(readingPlayer,player))readingOnly.Remove(id);
@@ -91,17 +97,27 @@ internal static class RebirthPurgeInformationService
     internal static void Pulse()
     {
         if(!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge)
-        {if(pending.Count>0 || restoredPlayer!=null)Reset();return;}
+        {if(pending.Count>0 || restoredPlayer!=null || restoredManualPlayer!=null)Reset();return;}
         var currentPlayer=GameManager.Instance?.World?.GetPrimaryPlayer();
         var receipts=RebirthPurgeMilestoneService.PublishedAll;
+        bool manualRecovery=currentPlayer!=null&&currentPlayer.IsSpawned()&&!ReferenceEquals(restoredManualPlayer,currentPlayer);
         bool supplyRecovery=currentPlayer!=null&&!ReferenceEquals(restoredSupplyPlayer,currentPlayer)&&
             currentPlayer.Buffs.GetCustomVar("_rbPurgeSupplyKnown")==1&&
             currentPlayer.Buffs.GetCustomVar("_rbPurgeSupplyDeliveredAny")==1;
         if(pending.Count==0 && ReferenceEquals(restoredPlayer,currentPlayer) &&
-            (receipts==null || ReferenceEquals(restoredReceipts,receipts))&&!supplyRecovery)return;
+            (receipts==null || ReferenceEquals(restoredReceipts,receipts))&&!supplyRecovery&&!manualRecovery)return;
         float now=Time.realtimeSinceStartup;
         if(now<next)return;
         next=now+.5f;
+        if(manualRecovery)
+        {
+            // An explicit consumed-note reread survives normal session reset,
+            // including already read/dismissed guides and the manual intro.
+            foreach(var topic in RebirthPurgeInformationTopics.All)
+                if(RebirthPurgeTeachingIntent.ManualPending(currentPlayer,topic.Id))
+                    Request(currentPlayer,topic.Id,topic.Sprite,true);
+            restoredManualPlayer=currentPlayer;
+        }
         if(supplyRecovery)
         {
             var entry=RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,"PurgeSupplyUpdate");
@@ -256,18 +272,25 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     public override void OnClose()
     {
         // Dismissal is an explicit player action; see below.
-        if(entry?.Authored==true)
+        var player=xui?.playerUI?.entityPlayer;
+        if(entry?.Authored==true&&player!=null&&
+            ReferenceEquals(player.world,GameManager.Instance?.World)&&
+            ReferenceEquals(player.world?.GetPrimaryPlayer(),player))
         {
             // Only the player's Close button/Escape dismisses, whatever the elapsed time. An external close (other UI,
             // loading cover) leaves the entry unread: re-queue it (twice per session); past the cap it stays
             // undismissed and is offered on the next load.
-            if(playerClosed)RebirthJournalGuideService.DismissPurge(entry);
+            if(playerClosed)
+            {
+                RebirthJournalGuideService.DismissPurge(entry);
+                RebirthPurgeTeachingIntent.Retire(player,entry.Id);
+            }
             else if((entry.Id!="PurgeIntro"||manualReading)&&RebirthPurgeInformationService.EarlyCloseRequeues<2)
             {
                 RebirthPurgeInformationService.EarlyCloseRequeues++;
                 // A manual reread may already be read/dismissed. Preserve its
                 // explicit intent instead of rejecting the retry as automatic teaching.
-                RebirthPurgeInformationService.Request(xui.playerUI.entityPlayer,entry.Id,sprite,manualReading);
+                RebirthPurgeInformationService.Request(player,entry.Id,sprite,manualReading);
             }
         }
         entry=null;

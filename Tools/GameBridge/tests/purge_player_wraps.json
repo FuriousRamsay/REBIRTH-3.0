@@ -1,0 +1,12 @@
+{
+  "name": "Purge player wraps observation smoke — requires configured EOS and fresh starter",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Prepare a disposable fresh Purge save for a configured EOS. Manually verify the truck cosmetic is one assigned wrap, backpack has every other distinct valid assignment exactly once, and no assigned wrap is lost. This smoke does not assert cosmetic or inventory counts." },
+    { "console": "rebirth playerid" },
+    { "wait": 3 },
+    { "screenshot": "purge_player_wraps_initial" },
+    { "expectNoErrors": true },
+    { "_note": "Manual required: save/reload and dismount/reenter must not regrant; full backpack extras wait for space; non-Purge/unassigned keeps dye. Remote client must receive its own assignments. Game control has not been authorized or run by this change." }
+  ]
+}

@@ -89,6 +89,7 @@ internal static class RebirthPurgeTruckStart
             pending=!settled;
             if(!pending&&player.IsSpawned())
             {
+                RebirthPurgePlayerWraps.Tick(true);
                 XUiC_ProgressWindow.Close(player.PlayerUI);player.bIntroAnimActive=false;player.EnableCamera(true);player.SetControllable(true);
                 clientOwnsProgress=false;
                 clientState=5; // Retire this first-entry lease; later dismounts are ordinary gameplay.
@@ -238,6 +239,7 @@ internal static class RebirthPurgeTruckStart
         // This client event also runs after the one-time truck handoff has finished.
         // Keep the existing journal-backed information queue alive on first entry and reload.
         if(!GameManager.IsDedicatedServer)RebirthPurgeInformationService.Pulse();
+        RebirthPurgePlayerWraps.Tick();
         if(jobs.Count==0)return;
         foreach(var pair in jobs.ToArray())
         {
@@ -276,6 +278,7 @@ internal static class RebirthPurgeTruckStart
                     RebirthVehicleEntityFactory.AssignOwner(vehicle,p);Step(job,"truck.owner-and-bare-state-confirmed");
                     int maximum=vehicle.vehicle.GetUpdatedItemValue().MaxUseTimes;RebirthVehicleEntityFactory.ApplyRestoredState(vehicle,maximum,maximum,1f);
                     PrepareStarterParts(vehicle,job.World);
+                    RebirthPurgePlayerWraps.Prepare(vehicle,record.Owner);
                     vehicle.SetLocked(true);
                     if(!vehicle.IsLocked())throw new InvalidOperationException("Starter truck lock did not take effect.");
                     vehicle.vehicle.GetUpdatedItemValue().SetMetadata("RebirthPurgeStarterOwner",record.Owner);
@@ -305,6 +308,7 @@ internal static class RebirthPurgeTruckStart
                 if(!vehicle.isEntityRemote&&!job.Stability.Observe(now,Stable(vehicle)))
                 {Step(job,"wait.attached-truck-grounded-and-stable",vehicle);continue;}
                 Step(job,"driver.attached");
+                if(p is EntityPlayerLocal)RebirthPurgePlayerWraps.Tick(true);
                 if(p is EntityPlayerLocal local){local.bIntroAnimActive=false;local.SetControllable(true);}
                 Step(job,"gameplay.enable");record.Stage=2;Write(record);VehicleManager.Instance.TriggerSave();Reveal(job);
                 if(p is EntityPlayerLocal introPlayer)RebirthPurgeInformationTopics.Request(introPlayer,"PurgeIntro",false,Time.realtimeSinceStartup+5);

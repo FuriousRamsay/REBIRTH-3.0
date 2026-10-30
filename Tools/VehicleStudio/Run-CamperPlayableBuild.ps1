@@ -37,6 +37,7 @@ try {
     }
     if(@(Get-Process -Name Unity -ErrorAction SilentlyContinue).Count -gt 0){throw 'An existing Unity process is running; no process will be stopped.'}
     if((Get-Content (Join-Path $ProjectPath 'ProjectSettings\ProjectVersion.txt') -Raw) -notmatch '(?m)^m_EditorVersion:\s*2022\.3\.62f2\s*$'){throw 'Wrong Unity version.'}
+    & (Join-Path $PSScriptRoot '../AssetBundle/Stage-CrunchPackaging.ps1') -ProjectPath $ProjectPath
     $prior=Get-Content -LiteralPath $FirstBundleResult -Raw | ConvertFrom-Json
     $rearSelection=Get-Content -LiteralPath $RearLampSelection -Raw | ConvertFrom-Json
     if($rearSelection.status -cne 'PASS_GEOMETRY_PROPOSAL_NOT_LIGHTING_ACCEPTANCE' -or $rearSelection.rearTriangles -le 0){throw 'Qualified rear geometry receipt required.'}

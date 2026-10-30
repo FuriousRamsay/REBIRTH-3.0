@@ -31,10 +31,11 @@ internal static class RebirthNpcNativeStableIdentityCodec
     }
     internal static void InstallNativeGuard()
     {
-        if(NativeGuardInstalled)return;
         if(NativeWrite==null||BoundPrefix==null)throw new InvalidOperationException("Exact native NPC ECD writer guard unavailable");
-        new Harmony(HarmonyId).CreateClassProcessor(typeof(NativeWriteBound)).Patch();
-        if(!NativeGuardInstalled)throw new InvalidOperationException("Native NPC ECD writer guard installation not verified");
+        var harmony=new Harmony(HarmonyId);
+        if(!NativeGuardInstalled)harmony.CreateClassProcessor(typeof(NativeWriteBound)).Patch();
+        RebirthNpcRetiredNativeLineage.Install(harmony);
+        if(!NativeGuardInstalled||!RebirthNpcRetiredNativeLineage.GuardsInstalled)throw new InvalidOperationException("Native NPC ECD writer guard installation not verified");
     }
     [HarmonyPatch(typeof(EntityCreationData),"write")]
     private static class NativeWriteBound

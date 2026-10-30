@@ -7,6 +7,10 @@ internal static class RebirthCamperWrapCatalog
     internal const string ItemPrefix = "modVehicleWrap";
     private static readonly HashSet<string> Ids = new HashSet<string>(StringComparer.Ordinal)
     {
+        "MissBanjo",
+        "FuriousRamsay",
+        "HeyWeps",
+        "PurpleLlama",
         "MidnightCartographer",
         "TheHungryRoad",
         "DeadZoneRunner",

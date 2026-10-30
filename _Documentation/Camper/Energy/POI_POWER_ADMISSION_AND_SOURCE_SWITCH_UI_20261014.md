@@ -36,9 +36,13 @@ Remote radial checks the observation's world, vehicle and exact currently contai
 
 The existing two-line POI status label localizes PrefabName through Localization.Get and marks only the location name light purple ([D0A0FF]). It continues showing actual metered demand. If supply is unavailable/insufficient it additionally shows prospective watts required and available, or a waiting explanation for an older observation with unknown requirements. The POI ON button and dispatch path use the same gate as the server. The OFF button remains usable after loss of supply.
 
+The Travel-mode screenshot follow-up corrects the previous misleading fallback to “No eligible nearby POI lighting.” ObservePoi now identifies only the containing POI name/footprint before the Camp gate; it still returns before enumerating powered nodes or ordinary lights outside Camp. RequiredWatts remains unknown (-1), and no zero count is presented as an assessment. In Travel the label shows the localized contained POI plus an Enter Camp instruction. Deploying/Packing show a neutral requirement that assessment/power occur in Camp. An outside-POI message is distinct from either mode restriction. Once in Camp, zero actual supported lights produces the explicit assessed no-eligible message; positive counts retain actual metered demand plus required/available supply if insufficient. Missing observations use the existing waiting status. No new wire fields are needed. TryObservePoiEligibility retains its Camp-only eligibility meaning for compass/radial callers; cheap name observation outside Camp does not grant eligibility or admission.
+
 Source cards and selected-source status explain missing engines, fuel, batteries, battery charge, solar cells or sunlight instead of showing only an unexplained Empty/Disabled value. Source toggle captions use Turn Generator On/Off, Turn Battery Bank On/Off or Turn Solar Bank On/Off. They retain Enabled command semantics and do not perform Remove. Existing source slots, refueling and source/component transfer paths are untouched.
 
 Localization is supplied by the parent task. Required keys: xuiRebirthCamperEnergyTurnSourceOnFormat; TurnSourceOffFormat; Generator; BatteryBank; SolarBank; NoEngines; NoFuel; NoBatteries; NoCharge; NoSolarCells; NoSunlight; SourceOff; PoiPowerNeededFormat; PoiPowerUnknown (all with the xuiRebirthCamperEnergy prefix). No localization file was edited by this subtask.
+
+Travel-status follow-up additionally requires xuiRebirthCamperEnergyPoiEnterCamp, PoiTransition, PoiOutside and PoiNoEligibleFormat (same prefix). PoiTransition should describe the Camp requirement without promising Packing will automatically enter Camp.
 
 ## Requirement traceability
 
@@ -53,7 +57,10 @@ Localization is supplied by the parent task. Required keys: xuiRebirthCamperEner
 | Preserve native world-light/trader and Camp constraints | Existing eligibility/ownership checks remain | No global lighting changes | PASS |
 | Require camper inside POI footprint | DeviceAdapter.NearestPoi, ContainedProjection, TryObservePoiOn | Legacy poiRange field retained only for payload/config compatibility | PASS |
 | Match radial ON capacity gate locally/remotely | RadialPermission.Prefix; CanTurnPoiLightsOn, PublishPoiPowerObservation | Separate cosmetic observation key; normal server admission retained | PASS |
+| Distinguish mode restriction from absent lights/power | ObservePoi cheap location before Camp gate; UI PoiStatusText branches | Existing observation schema; parent localization only; no outside-Camp light scans | PASS |
 
 Files changed cumulatively for this issue: Scripts/Vehicles/Camper/Energy/XUiC_RebirthCamperEnergy.cs; RebirthCamperEnergyDeviceAdapter.cs; RebirthCamperEnergySnapshotWire.cs; Scripts/Vehicles/Camper/RebirthCamperRadial.cs; Config/RebirthCamperEnergy.xml (comments only); this document. The containment/radial follow-up touches only DeviceAdapter, Radial, configuration comments and this document.
+
+The Travel-status follow-up touches only DeviceAdapter, Energy UI and this document. Relevant source review also confirmed XUiC_RebirthCompassWindow already limits its eligibility observation to Camp.
 
 Compilation: not performed. Tests: not performed. In-game validation: not performed. Source/API and all production wire callers statically reviewed. UI rendering, native output behavior and multiplayer round trips remain unvalidated. Final localization integration, cumulative conformance/build, packaging and completion confirmation belong to the parent task.

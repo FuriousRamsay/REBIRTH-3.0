@@ -281,7 +281,7 @@ public static class RebirthCamperArmorPlow
     public static void Build()
     {
         Directory.CreateDirectory(Output+"/Bundles");var builds=new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Folder+"/rebirthCamper80s.prefab"},addressableNames=new[]{"rebirthCamper80s"}}};
-        if(!BuildPipeline.BuildAssetBundles(Output+"/Bundles",builds,BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Build failed");
+        if(!RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundles",builds,BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Build failed");
         RenderAndVerify();
     }
     public static void RefitSkin()

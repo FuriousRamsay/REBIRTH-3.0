@@ -9939,7 +9939,7 @@ xuiRebirthPurgeDiscoveryHelpBody,"Your efforts have cleared more zombie-infested
 xuiRebirthPurgeIntroTitle,The Purge
 xuiRebirthPurgeIntroBody,"The helicopter blades whirred to a stop as you hit the ground, the wind whipping dust and debris around your feet. [91b9bd]The streets were eerily quiet[-]... long since cleared of the undead, but the shadows inside the buildings told a different story.\nYou'd heard the rumors: [c4bc93]the real danger lurked behind closed doors[-]... a deathtrap even for the most seasoned soldiers.\n\nArmed with basic supplies, your mission is to [8dad87]clear the remaining zombies[-] from occupied locations across the [94b092]Pine Forest[-], [bdbf9f]Desert[-], [a3a3a3]Snow[-], [999577]Wasteland[-], and [887a99]Burnt Forest[-]. Each biome has its own clearing objective, and your progress is shared.\n\nDiscovery milestones reveal more locations on your map. Credited kills from cleared locations earn supply drops. Watch the Purge display as you push deeper into the world. [ababab]The real fight is just beginning[-]."
 xuiRebirthPurgeScannerTitle,Threat Scanner
-xuiRebirthPurgeScannerBody,"A [bd9cd6]Threat Scanner Module[-] has been integrated into your communication system, giving you the ability to [e8d0a5]estimate the number of hostiles[-] in an occupied location. It needs no equipped tool.\n\nBut the module isn't without its flaws... it may [c97777]miss threats[-] in rooms that have not awakened. A quiet room or an absent marker does not prove the building is clear.\n\nWhen a location has more than two rooms and is nearly cleared, the scanner activates eligible remaining sleepers and shows markers within 50 metres. Tiers 0 to 3 allow one uncleared room; tier 4 allows two; tier 5 allows three; tiers 6 and above allow four.\n\nStay focused, keep progressing, and use the room and enemy display together with the shared map markers to finish the job."
+xuiRebirthPurgeScannerBody,"A [bd9cd6]Threat Scanner Module[-] has been integrated into your communication system, giving you the ability to [e8d0a5]estimate the number of hostiles[-] in an occupied location. It needs no equipped tool.\n\nBut the module isn't without its flaws... it may [c97777]miss threats[-] in rooms that have not awakened. A quiet room or an absent marker does not prove the building is clear.\n\nWhen a location is nearly cleared, the scanner activates eligible remaining sleepers and shows markers within 50 metres. Tiers 0 to 3 require more than two rooms and allow one uncleared room; tier 4 allows two uncleared rooms; tier 5 allows three; tiers 6 and above allow four.\n\nStay focused, keep progressing, and use the room and enemy display together with the shared map markers to finish the job."
 xuiRebirthPurgeSupplyUpdateTitle,Supply Drop Update
 xuiRebirthPurgeSupplyUpdateBody,"Congratulations on earning [bd9cd6]your first supply drop[-]! Follow the airdrop marker to collect your reserved supplies. Your progress is commendable, but we have an important update regarding your objectives.\n\nMoving forward, [dfe889]each future supply drop[-] requires [b4eba2]5[-] additional credited kills. The added requirement stops rising at 150; with the default base cost of 75, the maximum unmodified requirement is 225.\n\nBe aware: stronger undead will emerge as time passes. Keep clearing occupied locations, check the Purge display for your remaining requirement, and adapt your strategy as the fight grows harder.\n\nYour journey is just beginning. Stay vigilant and keep moving. This briefing remains in your Journal."
 xuiRebirthPurgeDesertTitle,Purge Field Briefing: Desert
@@ -10272,7 +10272,7 @@ inpActRebirthToggleVehicleCameraName,Switch Vehicle Camera
 inpActRebirthToggleVehicleCameraDesc,Switch between third-person and first-person while seated in any vehicle.
 xuiRebirthVehicleCameraUnavailable,This seat has no available first-person camera anchor.
 xuiRebirthCamperSinkGauge,Sink: {0} / {1} L\nLeft / right click: transfer held water
-xuiRebirthCamperSinkVessel,"Hold full murky-water jars or water buckets, or empty jars or buckets."
+xuiRebirthCamperSinkVessel,"Right-click with a partial water jar to top up. Use full murky-water jars or water buckets to deposit, or empty jars or buckets to draw."
 xuiRebirthCamperSinkBusy,Sink transfer pending.
 xuiRebirthCamperSinkFull,The sink reservoir has insufficient free capacity.
 xuiRebirthCamperSinkInsufficient,The sink reservoir does not contain enough water.
@@ -11946,3 +11946,41 @@ xuiRebirthMapZoomDetail,Detail
 xuiRebirthMapZoomOverview,Overview
 xuiRebirthMapZoomSpan,{0:0.0} km wide
 xuiRebirthMapZoomHint,Click or drag to zoom; the wheel and controller triggers still work.
+modVehicleWrapPurpleLlama,Purple Llama Vehicle Wrap
+modVehicleWrapPurpleLlamaDesc,"Purple Llama: cooking for the crew, clearing zombies and taking a well-earned break. Purple and orange accents on charcoal survival scenes. Your beef isn't going in my stew. Install in the 80s Camper Truck cosmetic slot, replacing dye."
+modVehicleWrapFuriousRamsay,FuriousRamsay Vehicle Wrap
+modVehicleWrapFuriousRamsayDesc,"The creator watches the apocalypse unfold. Purple and cyan scenes of late-night development, suffering survivors and popcorn. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapMissBanjo,MissBanjo Vehicle Wrap
+modVehicleWrapMissBanjoDesc,"MissBanjo: kitten protector, IT scavenger and shameless loot goblin. Purple, teal and blue survival scenes. Install in the camper cosmetic slot."
+xuiRebirthWeaponMeleeDps,Melee DPS
+xuiRebirthWeaponRangedDps,Ranged DPS
+xuiRebirthWeaponExplosiveDps,Explosive DPS
+xuiRebirthWeaponCondition,Condition
+xuiRebirthWeaponBlockWear,Wear (block damage)
+xuiRebirthWeaponReloadTime,Reload time
+xuiRebirthWeaponConditionWear,Condition / block
+modVehicleWrapHeyWeps,HeyWeps Vehicle Wrap
+modVehicleWrapHeyWepsDesc,"Blue and steel gray submarine survival. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish."
+
+rbPoiSleepersDescription,"Request gradual native sleeper activation in your current Purge POI."
+rbPoiSleepersHelp,"poisleepers start [force] | stop | status\nRequires an authenticated player in a fully registered, unfinished Purge POI.\nStart requires 85% of rooms cleared or populated; force bypasses only that gate.\nTwo rooms per 0.25 seconds; no markers, chunk loading, kills or clearance are granted.\nAll subcommands, including force, retain the native console permission level (default 0)."
+rbPoiSleepersRefused,"refused: {0}"
+rbPoiSleepersAuth,"requires the current authenticated server-side player; a dedicated console cannot choose another player."
+rbPoiSleepersMode,"requires active Purge mode."
+rbPoiSleepersPlayer,"requires a living, spawned player on foot, not flying or spectating."
+rbPoiSleepersAlready,"already running; stop your request before restarting."
+rbPoiSleepersLimit,"request limit reached; retry after another request finishes."
+rbPoiSleepersNotReady,"current POI is not fully registered and published; enter normally and retry when ready."
+rbPoiSleepersUnavailable,"current POI is cleared, resetting, withheld or otherwise unavailable."
+rbPoiSleepersNoRequest,"no active request for you."
+rbPoiSleepersStopped,"stopped your request; already requested native spawning is not undone."
+rbPoiSleepersChanged,"cancelled: player, POI, room registration or evidence ownership changed"
+rbPoiSleepersBudget,"stopped at the 120-second request budget"
+rbPoiSleepersBatchChanged,"cancelled: native ownership changed during the batch"
+rbPoiSleepersComplete,"request queue complete; ordinary native spawning may still be pending"
+rbPoiSleepersProgress,"requires 85% of rooms cleared or populated ({0}/{1}); force uses the same console permission."
+rbPoiSleepersStarted,"started for {0}; {1}/{2} rooms progressed."
+rbPoiSleepersStartedForce,"started for {0}; {1}/{2} rooms progressed (force bypassed only the progress gate)."
+rbPoiSleepersRunning,"{0}: running; examined {1}/{2}, native activation requests {3}."
+rbPoiSleepersFinished,"{0}; native activation requests {1}. No clearance granted."
+rbPoiSleepersCancelled,"cancelled: {0}"

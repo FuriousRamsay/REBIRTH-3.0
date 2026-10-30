@@ -157,7 +157,7 @@ internal sealed class RebirthStationCompletionExpectationProjection
         if(!path.StartsWith(root,RebirthStationCompletionOriginalScope.PathComparison))return false;
         byte[] payload;
         using(var stream=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-            if(!RebirthStationRegionPayload.TryRead(stream,(int)published.Attribute("chunkX")&31,(int)published.Attribute("chunkZ")&31,out payload))return false;
+            if(!RebirthStationRegionPayload.TryRead(stream,RebirthStationRegionPayload.NativeLocalIndex((int)published.Attribute("chunkX")),RebirthStationRegionPayload.NativeLocalIndex((int)published.Attribute("chunkZ")),out payload))return false;
         if(RebirthStationPublicationRecord.Digest(payload)!=(string)published.Attribute("payload")||
             !RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var decoded))return false;
         var spans=new byte[4][];

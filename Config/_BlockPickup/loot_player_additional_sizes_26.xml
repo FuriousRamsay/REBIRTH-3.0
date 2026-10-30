@@ -1,0 +1,21 @@
+<configs>
+  <!-- Exact additional 2.6 picked-up capacities from full250 definition audit; preserve natural loot lists. -->
+  <append xpath="/blocks/block[@name='cntShelvesMetalEmpty']"><property name="RebirthContainerSize" value="9,7"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryMetalShelvesEmpty']"><property name="RebirthContainerSize" value="9,7"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryMetalShelvesFull']"><property name="RebirthContainerSize" value="9,7"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedWhite']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedRed']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedYellow']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedGreen']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedBlue']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntRollingToolBoxClosedGrey']"><property name="RebirthContainerSize" value="8,4"/></append>
+  <append xpath="/blocks/block[@name='cntChemPileLarge']"><property name="RebirthContainerSize" value="6,5"/></append>
+  <append xpath="/blocks/block[@name='traderMilitaryGoodsA']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='traderMilitaryGoodsB']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='traderMilitaryGoodsC']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='traderMilitaryGoodsD']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryGoodsA']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryGoodsB']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryGoodsC']"><property name="RebirthContainerSize" value="7,4"/></append>
+  <append xpath="/blocks/block[@name='cntMilitaryGoodsD']"><property name="RebirthContainerSize" value="7,4"/></append>
+</configs>

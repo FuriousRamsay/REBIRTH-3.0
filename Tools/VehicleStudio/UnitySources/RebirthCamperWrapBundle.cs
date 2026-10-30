@@ -47,7 +47,7 @@ public static class RebirthCamperWrapBundle
     if(mesh.sharedMaterial.shader.name!="REBIRTH/CamperReferenceWrap" || !mesh.sharedMaterial.GetTexture("_Artwork") || mesh.sharedMaterial.GetFloat("_PatternEnabled")!=0)throw new Exception("Native cosmetic wrap material/default None did not persist.");
    var build=new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{r.prefab}};
    string archive=Path.Combine(output,"UncompressedSource");Directory.CreateDirectory(archive);
-   if(BuildPipeline.BuildAssetBundles(archive,new[]{build},BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64)==null)throw new Exception("Wrap bundle build failed.");
+   if(RebirthAssetBundlePackaging.BuildAssetBundles(archive,new[]{build},BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64)==null)throw new Exception("Wrap bundle build failed.");
    string original=Path.Combine(archive,build.assetBundleName);
    if(!BuildPipeline.GetCRCForAssetBundle(original,out r.crc)||r.crc==0)throw new Exception("Native CRC unavailable.");
    r.bundle=Path.Combine(output,build.assetBundleName);

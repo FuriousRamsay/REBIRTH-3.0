@@ -101,6 +101,7 @@ internal sealed class RebirthMapOverview
     private static void Bind(XUiC_RebirthMapArea map,Texture2D shown)
     {
         if(map.xuiTexture.Texture==shown)return;
+        RebirthMapTextureBinding.Commit(map,shown);
         map.xuiTexture.Texture=shown;
         // Texture's native setter only marks dirty. Our update runs after the
         // child view update, so commit the actual UITexture before UV globals
@@ -281,18 +282,71 @@ internal static class RebirthMapZoomInput
     }
 }
 
-[HarmonyPatch(typeof(XUiC_MapArea),"onMapScrolled")]
-internal static class RebirthMapResponsiveWheel
+// Only the main-map texture is retargeted, and only when it owns its draw call.
+// NGUI's normal material-backed setter removes the widget from its panel even
+// for a one-widget call. Updating its cached texture + native property block is
+// the same fast path NGUI uses without a material, avoiding panel reattachment.
+internal static class RebirthMapTextureBinding
 {
-    private static void Prefix(XUiC_MapArea __instance,out float __state)
-    {__state=__instance.targetZoomScale>0?__instance.targetZoomScale:__instance.zoomScale;if(__instance is XUiC_RebirthMapArea map)map.Interaction.Zoom();}
-    private static void Postfix(XUiC_MapArea __instance,float _delta,float __state)
+    private static readonly AccessTools.FieldRef<UITexture,Texture> textureField=Resolve();
+    private static AccessTools.FieldRef<UITexture,Texture> Resolve()
     {
-        if(__instance is XUiC_RebirthMapArea)
-            __instance.targetZoomScale=RebirthMapZoomInput.WheelTarget(__state,__instance.zoomScale,_delta,InputUtils.ShiftKeyPressed,RebirthMapOverview.Limit(__instance));
+        try{return AccessTools.FieldRefAccess<UITexture,Texture>("mTexture");}
+        catch{return null;} // Unknown NGUI versions retain the native fallback.
+    }
+    internal static bool Commit(XUiC_RebirthMapArea map,Texture texture)
+    {
+        var widget=map.xuiTexture?.uiTexture;var draw=widget?.drawCall;
+        if(textureField==null||widget==null||draw==null||draw.widgetCount!=1)return false;
+        textureField(widget)=texture;
+        draw.mainTexture=texture; // Native MaterialPropertyBlock; no panel detach.
+        return true;
     }
 }
 
+[HarmonyPatch(typeof(XUiC_MapArea),"onMapScrolled")]
+internal static class RebirthMapResponsiveWheel
+{
+    internal struct WheelState {internal float Pending;internal bool Accepted;}
+    [HarmonyPriority(Priority.First)]
+    private static bool Prefix(XUiC_MapArea __instance,out WheelState __state)
+    {
+        __state=new WheelState{Pending=__instance.targetZoomScale>0?__instance.targetZoomScale:__instance.zoomScale,Accepted=true};
+        var map=__instance as XUiC_RebirthMapArea;
+        if(map==null)return true;
+        if(HasHoverPopup(map)){__state.Accepted=false;return false;}
+        map.Interaction.Zoom();return true;
+    }
+    private static bool HasHoverPopup(XUiC_RebirthMapArea map)
+    {
+        if(!map.isOpen||!map.bMapInitialized||map.ZoomSlider?.BlocksMapInput==true)return false;
+        var popup=map.GetChildByType<XUiC_RebirthPurgePoiPopup>();
+        bool card=popup?.ViewComponent?.IsVisible==true;
+        bool native=map.bMapCursorSet&&!string.IsNullOrEmpty(map.xui?.ToolTipWindow?.ToolTip);
+        if(!card&&!native)return false;
+        var cursor=map.xui.playerUI.CursorController.GetScreenPosition();
+        var point=map.LocalPointer(cursor);
+        if(point.x<0||point.x>map.ActiveCanvasWidth||point.y>0||point.y< -map.ActiveCanvasHeight)return false;
+        var icon=map.closestMouseOverNavObject;
+        if(icon!=null)
+        {
+            GameObject sprite;
+            var camera=map.xui.playerUI.uiCamera?.cachedCamera;
+            return camera!=null&&map.keyToNavSprite.TryGetValue(icon.Key,out sprite)&&sprite!=null&&sprite.activeInHierarchy
+                &&Vector3.Distance(cursor,camera.WorldToScreenPoint(sprite.transform.position))<=20f;
+        }
+        // Native MapObject tooltip ownership is refreshed/cleared by its normal
+        // update each frame. No visibility latch survives hover close/reopen.
+        return native;
+    }
+    private static void Postfix(XUiC_MapArea __instance,float _delta,WheelState __state,bool __runOriginal)
+    {
+        // Harmony postfixes execute even after a prefix skips the original.
+        if(!__runOriginal||!__state.Accepted)return;
+        if(__instance is XUiC_RebirthMapArea)
+            __instance.targetZoomScale=RebirthMapZoomInput.WheelTarget(__state.Pending,__instance.zoomScale,_delta,InputUtils.ShiftKeyPressed,RebirthMapOverview.Limit(__instance));
+    }
+}
 [HarmonyPatch(typeof(XUiC_MapArea),"teleportPlayerOnMap")]
 internal static class RebirthMapTeleportBounds
 {
@@ -315,6 +369,7 @@ internal static class RebirthMapTeleportBounds
         return false;
     }
 }
+
 
 
 

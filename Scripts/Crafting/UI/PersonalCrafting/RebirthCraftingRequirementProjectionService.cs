@@ -116,9 +116,10 @@ public static class RebirthCraftingRequirementProjectionService
         {
             ItemStack stack = stacks[i];
             if (stack == null || stack.IsEmpty() || stack.itemValue == null) continue;
-            // Native quality admission matches item type, not quality/wear metadata.
-            if (qualityIngredient ? stack.itemValue.type != required.type :
-                !RebirthCraftingIngredientQuantity.SameRecipeIdentity(stack.itemValue, required)) continue;
+            // Recipe payment matches ingredient type and explicit serving requirements.
+            // Merge equality is stricter: liquid volume/provenance describe a physical
+            // stack, not the recipe template. Use the payment predicate for stock too.
+            if (!RemoteResourceTransactions.MatchesConsumable(stack, required)) continue;
             if (qualityIngredient)
             {
                 if (stack.itemValue.HasModSlots && stack.itemValue.HasMods()) continue;

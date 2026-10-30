@@ -170,14 +170,23 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
             if(sort)carried.Sort((a,b)=>StringComparer.CurrentCultureIgnoreCase.Compare(a.Name,b.Name));
             bagRow=Math.Min(bagRow,Math.Max(0,(carried.Count+19)/20-3));
             if(selected!=null)
-                selected=selected.Stored?catalogue.Find(c=>c.Index==selected.Index&&c.Id==selected.Id&&c.Audio==selected.Audio&&c.SlotId==selected.SlotId)
-                    :carried.Find(c=>c.Fingerprint==selected.Fingerprint);
+                selected=FindSelection(selected.Stored?catalogue:carried,selected);
             Text(capacity,library.Count+" / "+(audioTab?RebirthAudiobookLibraryPersistence.Capacity:RebirthMusicLibraryService.Capacity));
             Text(bagCount,carried.Count.ToString());DrawDetails();
             textRevision=nextText;definitions=nextDefinitions;culture=nextCulture;
         }
         projectionDirty=false;
         RefreshPlayback(player);
+    }
+    private static Cassette FindSelection(List<Cassette> items,Cassette selection)
+    {
+        for(int i=0;i<items.Count;i++)
+        {
+            var item=items[i];
+            if(selection.Stored?item.Index==selection.Index&&item.Id==selection.Id&&item.Audio==selection.Audio&&item.SlotId==selection.SlotId
+                :item.Fingerprint==selection.Fingerprint)return item;
+        }
+        return null;
     }
     private void RefreshPlayback(EntityPlayerLocal player)
     {
@@ -199,9 +208,10 @@ public sealed class XUiC_RebirthMusicLibrary : XUiController
             cell.Display?.Show(Stack(item));
             var definition=item==null?null:ItemClass.GetItemClass(item.Id,false);
             if(cell.Icon!=null){cell.Icon.IsVisible=definition!=null;if(definition!=null)cell.Icon.SpriteName=definition.GetIconName();}
-            Text(cell.Title,item==null?"":Name(item.Id));Text(cell.Count,item==null||item.Count<2?"":item.Count.ToString());
+            string name=item==null?"":Name(item.Id);
+            Text(cell.Title,name);Text(cell.Count,item==null||item.Count<2?"":item.Count.ToString());
             if(cell.Selection!=null)cell.Selection.IsVisible=Same(selected,item);
-            cell.Button.ViewComponent.ToolTip=item==null?"":Name(item.Id);
+            cell.Button.ViewComponent.ToolTip=name;
         }
     }
     private static bool Same(Cassette a,Cassette b)=>a!=null&&b!=null&&a.Stored==b.Stored&&a.Audio==b.Audio&&(a.Stored?a.Index==b.Index&&a.Id==b.Id:a.Fingerprint==b.Fingerprint);

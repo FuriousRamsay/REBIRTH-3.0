@@ -19,6 +19,7 @@ $tool=Join-Path $PSScriptRoot 'UnitySources/RebirthVehicleDeliveryPipeline.cs'
 $destination=Join-Path $project 'Assets/Editor/RebirthVehicleDeliveryPipeline.cs'
 New-Item -ItemType Directory -Force -Path (Split-Path $destination)|Out-Null
 Copy-Item -LiteralPath $tool -Destination $destination
+& (Join-Path $PSScriptRoot '../AssetBundle/Stage-CrunchPackaging.ps1') -ProjectPath $project
 New-Item -ItemType Directory -Force -Path $policy.output|Out-Null
 $log=Join-Path $policy.output ('build-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'.log')
 $arguments='-batchmode -nographics -quit -projectPath "'+$project+'" -executeMethod RebirthVehicleDeliveryPipeline.Run -vehiclePolicy "'+$policyFile+'" -logFile "'+$log+'"'

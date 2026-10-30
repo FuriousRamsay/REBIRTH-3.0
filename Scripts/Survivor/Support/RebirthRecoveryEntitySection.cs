@@ -7,7 +7,9 @@ public static class RebirthRecoveryEntitySection
     public static bool TryLocate(byte[] payload,uint version,out int x,out int y,out int z,out int count,out int offset)
     {
         x=y=z=count=offset=0;
-        if(payload==null||payload.Length>RebirthRecoveryChunkPayload.MaximumExpandedBytes||version<32||version>46)return false;
+        // Installed b9 chunk47 retains the qualified persisted prefix through the entity count.
+        // Keep unknown future layouts closed; the downstream ECD38 readers are unchanged.
+        if(payload==null||payload.Length>RebirthRecoveryChunkPayload.MaximumExpandedBytes||version<32||version>47)return false;
         try
         {
             using(var stream=new MemoryStream(payload,false))using(var reader=new BinaryReader(stream))

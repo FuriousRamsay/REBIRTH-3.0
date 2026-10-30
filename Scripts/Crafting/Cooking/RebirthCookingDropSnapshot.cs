@@ -45,7 +45,7 @@ internal static class RebirthCookingDropSnapshot
             if(bytes>budget.MaximumSnapshotBytes||!budget.TryReserveAllocation(6L*bytes+2L*RebirthStationRegionPayload.MaximumPayloadBytes+256*1024,out allocation))return false;
             byte[] payload;
             using(var stream=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                if(!RebirthStationRegionPayload.TryRead(stream,x&31,z&31,out payload))return false;
+                if(!RebirthStationRegionPayload.TryRead(stream,RebirthStationRegionPayload.NativeLocalIndex(x),RebirthStationRegionPayload.NativeLocalIndex(z),out payload))return false;
             if(!current()||!RebirthStationChunkInflate.TryDecode(payload,bytes-8,out var decoded)||decoded.Length!=bytes-8||decoded.Length<12||
                 BitConverter.ToInt32(decoded,0)!=x||BitConverter.ToInt32(decoded,4)!=0||BitConverter.ToInt32(decoded,8)!=z)return false;
             var snapshot=new byte[bytes];snapshot[0]=116;snapshot[1]=116;snapshot[2]=99;snapshot[4]=47;Buffer.BlockCopy(decoded,0,snapshot,8,decoded.Length);

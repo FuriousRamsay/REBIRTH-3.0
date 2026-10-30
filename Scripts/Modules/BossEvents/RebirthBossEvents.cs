@@ -160,6 +160,8 @@ public static class RebirthBossEventRegistry
     public static void RegisterEntity(int id, RebirthBossEventEntityState state) { if (id >= 0 && state != null) Entities[id] = state; }
     public static bool TryGetEntity(int id, out RebirthBossEventEntityState state) { return Entities.TryGetValue(id, out state); }
     public static bool TryGet(Guid id, out RebirthBossEventInstance e) { return Events.TryGetValue(id, out e); }
+    // Diagnostic-only dictionary lookup; never clones, compacts or rehydrates.
+    internal static bool TryObserveArchived(Guid id,out RebirthBossEventInstance e) { return ArchivedEvents.TryGetValue(id,out e); }
     public static bool HasActiveOwner(string stableId)
     {
         if (string.IsNullOrEmpty(stableId)) return false;
@@ -3046,6 +3048,14 @@ public static class RebirthBossEventPersistence
         {World=world;SaveDirectory=saveDirectory;PathName=pathName;}
     }
     private static SavePathCache pathCache;
+    // Raw diagnostic snapshot: deliberately does not call IsReady/PathName.
+    internal static bool ObserveBinding(World world,out string savedPath,out string cachedDirectory,out bool failed,out bool cachedPathMatches)
+    {
+        var cached=System.Threading.Volatile.Read(ref pathCache);
+        savedPath=boundSavePath;cachedDirectory=cached?.SaveDirectory;failed=loadFailed;
+        cachedPathMatches=cached!=null&&ReferenceEquals(cached.World,world)&&string.Equals(cached.PathName,boundSavePath,StringComparison.Ordinal);
+        return ReferenceEquals(boundWorld,world)&&boundWorld!=null;
+    }
     private static string PathName
     {
         get
@@ -3340,7 +3350,7 @@ public static class RebirthBossEventPersistence
         if (fileVersion >= 4)
             e.RewardEntityId = r.ReadInt32();
         e.LastObservedWorldTime = r.ReadUInt64(); e.MissingBossSinceWorldTime = r.ReadUInt64(); e.FailureReason = r.ReadString();
-        if(fileVersion>=9){e.NativeBatchPrepared=r.ReadBoolean();int originals=ReadCount(r,580);var operations=new HashSet<Guid>();var nativeIds=new HashSet<int>();for(int i=0;i<originals;i++){var original=new RebirthBossSpawnOriginal{Operation=new Guid(r.ReadBytes(16)),EntityId=r.ReadInt32(),EntityClass=r.ReadInt32(),Role=r.ReadInt32(),Phase=r.ReadByte(),Position=ReadVector3(r),NativeProof=r.ReadString(),Killed=r.ReadBoolean()};int preparedLength=ReadCount(r,262144);original.PreparedNative=r.ReadBytes(preparedLength);if(original.PreparedNative.Length!=preparedLength)throw new InvalidDataException("Invalid frozen original boss entity");original.RemovalInvoking=r.ReadBoolean();original.NativeRemoved=r.ReadBoolean();original.RemovalX=r.ReadInt32();original.RemovalZ=r.ReadInt32();original.RemovalProof=r.ReadString();original.AdoptionVersion=r.ReadByte();original.Abandoned=r.ReadBoolean();original.WorldTimeBorn=r.ReadUInt64();original.DeathPublished=r.ReadBoolean();original.DeathProof=r.ReadString();original.ParentOperation=new Guid(r.ReadBytes(16));original.SupportLootClass=r.ReadString();original.SupportLootPosition=ReadVector3(r);original.DeathProofKind=r.ReadByte();int deadLength=ReadCount(r,262144);original.DeadRemovalFrame=r.ReadBytes(deadLength);if(original.DeadRemovalFrame.Length!=deadLength)throw new EndOfStreamException();original.DeadRemovalHash=r.ReadString();if(deadLength==0)original.DeadRemovalFrame=null;if(original.DeathProofKind>2||original.DeathPublished&&(original.DeathProofKind==0||original.DeathProofKind==2&&(!original.NativeRemoved||!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeathProof!=RebirthBossNativePublication.RemovedDeathProof(original)))||original.DeadRemovalFrame!=null&&!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeadRemovalFrame==null&&original.DeadRemovalHash.Length!=0)throw new InvalidDataException("Invalid native removed-death witness");if(original.SupportLootClass.Length>128||!Finite(original.SupportLootPosition.x)||!Finite(original.SupportLootPosition.y)||!Finite(original.SupportLootPosition.z))throw new InvalidDataException("Invalid support native original");if(original.DeathPublished&&(!original.Killed||original.Phase!=3||original.DeathProof.Length!=64)||!RebirthBossNativePublication.ValidProof(original.DeathProof)||original.Abandoned&&original.Phase!=0||original.AdoptionVersion>1||original.NativeRemoved&&(!original.RemovalInvoking||original.Phase!=3||original.RemovalProof.Length!=64)||original.RemovalProof.Length!=0&&original.RemovalProof.Length!=64)throw new InvalidDataException("Invalid original boss removal publication");if(!RebirthBossNativePublication.ValidPrepared(original)||!RebirthBossNativePublication.ValidProof(original.NativeProof)||!RebirthBossNativePublication.ValidProof(original.RemovalProof)||original.Operation==Guid.Empty||!operations.Add(original.Operation)||original.EntityId<0||!nativeIds.Add(original.EntityId)||original.EntityClass<0||original.Role<0||original.Role>4||original.Phase>3||!Finite(original.Position.x)||!Finite(original.Position.y)||!Finite(original.Position.z)||original.NativeProof.Length!=0&&original.NativeProof.Length!=64||original.Phase==3&&original.NativeProof.Length!=64)throw new InvalidDataException("Invalid original boss native publication.");e.SpawnOriginals.Add(original);}}
+        if(fileVersion>=9){e.NativeBatchPrepared=r.ReadBoolean();int originals=ReadCount(r,580);var operations=new HashSet<Guid>();var nativeIds=new HashSet<int>();for(int i=0;i<originals;i++){var original=new RebirthBossSpawnOriginal{Operation=new Guid(r.ReadBytes(16)),EntityId=r.ReadInt32(),EntityClass=r.ReadInt32(),Role=r.ReadInt32(),Phase=r.ReadByte(),Position=ReadVector3(r),NativeProof=r.ReadString(),Killed=r.ReadBoolean()};int preparedLength=ReadCount(r,262144);original.PreparedNative=r.ReadBytes(preparedLength);if(original.PreparedNative.Length!=preparedLength)throw new InvalidDataException("Invalid frozen original boss entity");original.RemovalInvoking=r.ReadBoolean();original.NativeRemoved=r.ReadBoolean();original.RemovalX=r.ReadInt32();original.RemovalZ=r.ReadInt32();original.RemovalProof=r.ReadString();original.AdoptionVersion=r.ReadByte();original.Abandoned=r.ReadBoolean();original.WorldTimeBorn=r.ReadUInt64();original.DeathPublished=r.ReadBoolean();original.DeathProof=r.ReadString();original.ParentOperation=new Guid(r.ReadBytes(16));original.SupportLootClass=r.ReadString();original.SupportLootPosition=ReadVector3(r);original.DeathProofKind=r.ReadByte();int deadLength=ReadCount(r,262144);original.DeadRemovalFrame=r.ReadBytes(deadLength);if(original.DeadRemovalFrame.Length!=deadLength)throw new EndOfStreamException();original.DeadRemovalHash=r.ReadString();if(deadLength==0)original.DeadRemovalFrame=null;if(original.DeathProofKind>2||original.DeathPublished&&(original.DeathProofKind==0||original.DeathProofKind==2&&(!original.NativeRemoved||!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeathProof!=RebirthBossNativePublication.RemovedDeathProof(original)))||original.DeadRemovalFrame!=null&&!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeadRemovalFrame==null&&original.DeadRemovalHash.Length!=0)throw new InvalidDataException("Invalid native removed-death witness");if(original.SupportLootClass.Length>128||!Finite(original.SupportLootPosition.x)||!Finite(original.SupportLootPosition.y)||!Finite(original.SupportLootPosition.z))throw new InvalidDataException("Invalid support native original");if(original.DeathPublished&&(!original.Killed||original.Phase!=3||original.DeathProof.Length!=64)||!RebirthBossNativePublication.ValidProof(original.DeathProof)||original.Abandoned&&original.Phase!=0||original.AdoptionVersion>1||original.NativeRemoved&&(!original.RemovalInvoking||original.Phase!=3||original.RemovalProof.Length!=64)||original.RemovalProof.Length!=0&&original.RemovalProof.Length!=64)throw new InvalidDataException("Invalid original boss removal publication");if(!RebirthBossNativePublication.ValidPrepared(original)||!RebirthBossNativePublication.ValidProof(original.NativeProof)||!RebirthBossNativePublication.ValidProof(original.RemovalProof)||original.Operation==Guid.Empty||!operations.Add(original.Operation)||original.EntityId<0||!nativeIds.Add(original.EntityId)||(EntityClass.list==null||EntityClass.GetEntityClass(original.EntityClass)==null)||original.Role<0||original.Role>4||original.Phase>3||!Finite(original.Position.x)||!Finite(original.Position.y)||!Finite(original.Position.z)||original.NativeProof.Length!=0&&original.NativeProof.Length!=64||original.Phase==3&&original.NativeProof.Length!=64)throw new InvalidDataException("Invalid original boss native publication.");e.SpawnOriginals.Add(original);}}
         return e;
     }
 
@@ -3505,10 +3515,7 @@ public static class RebirthBossEventRewardService
             if (world.worldTime < e.RewardExpiresWorldTime)
                 return;
 
-            if(original!=null&&!RebirthBossNativePublication.BeginRemoval(world,e,original,crate))return;
-            world.RemoveEntity(
-                crate.entityId,
-                EnumRemoveEntityReason.Despawned);
+            if(!RebirthBossNativePublication.RemoveOriginal(world,e,original,crate))return;
             if(world.GetEntity(crate.entityId)==null)MarkRemoved(world, e);
             return;
         }
@@ -5040,7 +5047,7 @@ public static class RebirthBossEventTestTools
                 if(original.Role==4)continue;
                 if(original.Phase==0){original.Abandoned=true;RebirthBossEventPersistence.Checkpoint();continue;}
                 if(original.NativeRemoved)continue;var entity=world.GetEntity(original.EntityId);
-                if(entity!=null&&RebirthBossNativePublication.BeginRemoval(world,e,original,entity))world.RemoveEntity(entity.entityId,EnumRemoveEntityReason.Despawned);
+                if(entity!=null)RebirthBossNativePublication.RemoveOriginal(world,e,original,entity);
             }
             if(e.RewardBlockPlaced&&e.RewardEntityId<0){e.RewardExpiresWorldTime=0;RebirthBossEventRewardService.Update(world,e);RebirthBossEventPersistence.Checkpoint();}
             if(notifyOwner)RebirthBossEventOwnerNetwork.Send(world,e,RebirthBossEventOwnerUpdateKind.Cancelled);
@@ -8109,6 +8116,7 @@ public sealed class RebirthBossEventModApi : IModApi
         if(installationComplete)return;
         RebirthDamageAdapterInstaller.Install();
         RebirthBossEventRewardAccessInstaller.Install();
+        RebirthBossRewardMarkers.Install();
         RebirthBossNativePublication.Install(new Harmony("rebirth.boss.original.publication.v1"));
 #if DEBUG
         RebirthBossEventHealthTraceInstaller.Install();
@@ -8133,6 +8141,7 @@ public sealed class RebirthBossEventModApi : IModApi
         if (!data.AsServer)
             return;
 
+        RebirthBossRewardMarkers.Begin();
         pendingWorldLoad=true;
     }
     private static bool pendingWorldLoad;
@@ -8218,10 +8227,12 @@ public sealed class RebirthBossEventModApi : IModApi
         RebirthBossNativePublication.Pump(world);
         RebirthBossEventLifecycle.Update(world);
         RebirthBossEventOwnerNetwork.Update(world);
+        RebirthBossRewardMarkers.Update(world);
         if (world != null && world.GetPrimaryPlayer() != null) RebirthBossEventHudMarkerHost.Ensure();
     }
     private static void OnWorldShutdown(ref ModEvents.SWorldShuttingDownData data)
     {
+        RebirthBossRewardMarkers.Stop(GameManager.Instance?.World);
         try
         {
             World world =
@@ -8263,6 +8274,7 @@ public sealed class RebirthBossEventModApi : IModApi
     }
     private static void OnShutdown(ref ModEvents.SGameShutdownData data)
     {
+        RebirthBossRewardMarkers.Stop(GameManager.Instance?.World);
         if(!RebirthBossEventPersistence.TryResetAfterCoordinatedSave())return;
         RebirthBossEventWorldHooks.Reset();
         RebirthBossEventOwnerNetwork.Reset();

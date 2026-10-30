@@ -1,0 +1,12 @@
+{
+  "name": "Survivor world-switch spawn observation — staged manually with disposable saves",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Manual prerequisite: load disposable save A, return to menu without restarting the game, create fresh disposable Purge save B, select Survivor profile and click Spawn. Verify the player enters B and repository scope is current. Do not operate the owner's real saves." },
+    { "wait": 3 },
+    { "console": "rebirth playerid" },
+    { "screenshot": "survivor_world_switch_spawn" },
+    { "expectNoErrors": true },
+    { "_note": "Observation smoke does not automate menu/world creation or assert repository identity. Inspect startup/creation log and actual in-game arrival. Native game verification has not been run." }
+  ]
+}

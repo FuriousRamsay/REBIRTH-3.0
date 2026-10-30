@@ -298,7 +298,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         int fuelY=-244;
         // Reserve the warning rows below the scrollable unlock list, including when
         // tools and fuel are both missing. Neither warning may cover an unlock entry.
-        var knowledge=GetChildById("rebirthCraftingSelectedRecipeKnowledge")?.ViewComponent;
+        var knowledge=(XUiView)knowledgeLabel??GetChildById("rebirthCraftingSelectedRecipeKnowledge")?.ViewComponent;
         if(knowledge!=null)knowledge.Size=new Vector2i(knowledge.Size.x,missingTool&&missingFuel?140:168);
         if(icon!=null)icon.Position=new Vector2i(icon.Position.x,missingFuel?-216:-244);
         if(label!=null)label.Position=new Vector2i(label.Position.x,missingFuel?-216:-244);

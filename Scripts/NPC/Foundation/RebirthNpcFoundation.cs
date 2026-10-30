@@ -912,12 +912,16 @@ public abstract partial class EntityRebirthNPC : EntityNPC
         if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this))
             throw new InvalidOperationException("Retained original native NPC body cannot be rewritten with offworld legacy identity framing");
         bool publishIdentity=world!=null&&ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this);
+        RebirthNpcStableId retiredIdentity=default;
+        bool retiredWriter=!publishIdentity&&this is EntityRebirthHumanoidNPC retired&&RebirthNpcRetiredNativeLineage.TryGet(retired,out retiredIdentity);
+        publishIdentity|=retiredWriter;
         if(publishIdentity&&!RebirthNpcNativeStableIdentityCodec.NativeGuardInstalled)throw new InvalidOperationException("Native NPC ECD bound guard must be positively installed before RBI1 publication");
-        var stable=publishIdentity?StableIdentityForNativeWrite:default(RebirthNpcStableId);
+        var stable=retiredWriter?retiredIdentity:publishIdentity?StableIdentityForNativeWrite:default(RebirthNpcStableId);
         if(publishIdentity&&stable.IsEmpty)throw new InvalidOperationException("Retained legacy native identity cannot publish before its original binding resolves");
         base.Write(writer,streamMode);
         // Off-world construction has no published native incarnation yet and
-        // keeps legacy framing. Only this exact current native body emits RBI1.
+        // keeps legacy framing. Current bodies and positively bound retired
+        // bodies in their exact native save writer emit RBI1.
         if(!publishIdentity)return;
         RebirthNpcNativeStableIdentityCodec.Write(writer,stable);
         RebirthNpcRuntimeNativeAdoption.ObserveWrite(this,writer,runtimeAdoption);
@@ -1312,7 +1316,10 @@ public abstract partial class EntityRebirthNPC : EntityNPC
         // entity has disappeared (the drone path already updates its native owner list).
         if(ReferenceEquals(originalWorld,GameManager.Instance?.World)&&originalRuntime!=null&&
             RebirthNpcRuntimeRegistry.TryGet(unloadedEntityId,out var registered)&&ReferenceEquals(registered,originalRuntime))
+        {
+            if(this is EntityRebirthHumanoidNPC human)RebirthNpcRetiredNativeLineage.Capture(human,originalWorld,originalRuntime);
             RebirthNpcLifecycle.OnEntityDeactivated(unloadedEntityId, false);
+        }
     }
     internal bool TryCompleteDeferredDomainRegistration()
     {

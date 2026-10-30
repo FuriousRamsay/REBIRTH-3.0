@@ -16,10 +16,12 @@ internal static class RebirthSelectedItemRows
         int nativeIndex=0;
         bool nativeCompare=display!=null&&nativeComparison!=null&&!nativeComparison.IsEmpty()&&
             XUiM_ItemStack.CanCompare(stack.itemValue.ItemClass,nativeComparison.itemValue.ItemClass);
+        bool weapon=!consumable&&RebirthWeaponDetailRows.TryGet(xui,stack,nativeCompare?nativeComparison:null,0,out _,out _);
         for(int i=0;i<count;i++)
         {
             string titleText="",valueText="";
-            if(consumable)
+            if(weapon)RebirthWeaponDetailRows.TryGet(xui,stack,nativeCompare?nativeComparison:null,i,out titleText,out valueText);
+            else if(consumable)
             {
                 if(i<consumableRows.Count){titleText=consumableRows[i].Title;valueText=consumableRows[i].Value;}
             }
@@ -38,9 +40,8 @@ internal static class RebirthSelectedItemRows
                     break;
                 }
             }
-            if(RebirthWeaponDetailRows.TryGet(xui,stack,nativeCompare?nativeComparison:null,i,out var weaponTitle,out var weaponText))
-            {titleText=weaponTitle;valueText=weaponText;}
             names[i]=titleText;values[i]=valueText;
         }
     }
 }
+

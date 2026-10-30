@@ -183,20 +183,41 @@ internal static class RebirthCamperOwnCollision
             AddBarePart(state,"right bed side",new Vector3(.79f,.94f,-1.59f),new Vector3(.095f,.40f,2.31f));
             AddBarePart(state,"tailgate",new Vector3(0,.94f,-2.755f),new Vector3(1.58f,.40f,.075f));
         }
-        if(state.HoodSupports.Count==2)return;
         foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
         {
             if(node.name!="Camp hood exterior"&&node.name!="Camp front cab exterior")continue;
+            if(!node.IsChildOf(state.Body.transform))continue;
             var source=node.GetComponent<MeshCollider>();if(source==null||source.sharedMesh==null)continue;
-            bool exists=false;foreach(var support in state.HoodSupports)if(support.name=="REBIRTH travel "+node.name)exists=true;
-            if(exists)continue;
-            var go=new GameObject("REBIRTH travel "+node.name);go.layer=node.gameObject.layer;
-            go.transform.SetParent(node.parent,false);go.transform.localPosition=node.localPosition;
-            go.transform.localRotation=node.localRotation;go.transform.localScale=node.localScale;
-            go.transform.SetParent(state.Model,true);
-            var clone=go.AddComponent<MeshCollider>();clone.enabled=false;clone.sharedMesh=source.sharedMesh;
-            clone.convex=source.convex;clone.sharedMaterial=source.sharedMaterial;state.HoodSupports.Add(clone);
+            MeshCollider clone=null;
+            foreach(var support in state.HoodSupports)if(support!=null&&support.name=="REBIRTH travel "+node.name){clone=support;break;}
+            if(clone==null)
+            {
+                var go=new GameObject("REBIRTH travel "+node.name);go.layer=node.gameObject.layer;
+                clone=go.AddComponent<MeshCollider>();clone.enabled=false;clone.sharedMesh=source.sharedMesh;
+                clone.convex=source.convex;clone.sharedMaterial=source.sharedMaterial;state.HoodSupports.Add(clone);
+            }
+            // Repair existing clones too: a loading-time world offset must not
+            // survive the existing five-second rebind just because two were found.
+            AlignHoodSupport(clone.transform,node,state.Model,state.Body.transform);
         }
+    }
+    internal static bool AlignHoodSupport(Transform support,Transform source,Transform model,Transform physics)
+    {
+        // Model can already have its saved pose while native Physics is still at
+        // the origin. Compose authored LOCAL ancestors, never their transient
+        // world separation. The current hood/front-cab chain is WalkIn -> Physics.
+        Matrix4x4 pose=Matrix4x4.identity;
+        for(var part=source;part!=physics;part=part.parent)
+        {
+            if(part==null)return false;
+            pose=Matrix4x4.TRS(part.localPosition,part.localRotation,part.localScale)*pose;
+        }
+        Vector3 position=pose.GetColumn(3),scale=pose.lossyScale;
+        Quaternion rotation=pose.rotation;
+        if(support.parent==model&&support.localPosition==position&&support.localRotation==rotation&&support.localScale==scale)return false;
+        if(support.parent!=model)support.SetParent(model,false);
+        support.localPosition=position;support.localRotation=rotation;support.localScale=scale;
+        return true;
     }
     internal static void ApplyBodyGuardrails(bool hasBody,GameObject guardrails)
     {

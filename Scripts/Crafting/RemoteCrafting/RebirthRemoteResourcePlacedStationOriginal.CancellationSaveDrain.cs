@@ -91,7 +91,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
         {
             string path=RegionFile.ConstructFullFilePath(token.Manager.saveDirectory,original.Chunk.X>>5,original.Chunk.Z>>5,"7rg");
             using(var stream=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                return lease.Current&&RebirthStationRegionPayload.MatchesWrittenPayload(stream,original.Chunk.X&31,original.Chunk.Z&31,saved.Payload)&&lease.Current;
+                return lease.Current&&RebirthStationRegionPayload.MatchesWrittenPayload(stream,RebirthStationRegionPayload.NativeLocalIndex(original.Chunk.X),RebirthStationRegionPayload.NativeLocalIndex(original.Chunk.Z),saved.Payload)&&lease.Current;
         }
     }
 }

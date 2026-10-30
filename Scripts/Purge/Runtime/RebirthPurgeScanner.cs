@@ -271,6 +271,9 @@ internal static class RebirthPurgeScanner
         if(quest==null)return false;
         var local=player as EntityPlayerLocal;
         if(local!=null)return local.ZombieCompassBounds.Contains(point);
+        // POI geometry alone (for example a fetch-only quest) never populates
+        // the native local clear-sleeper bounds. Apply that prerequisite remotely.
+        if(quest.Objectives==null||!quest.Objectives.Any(objective=>objective is ObjectiveClearSleepers))return false;
         // ObjectiveClearSleepers builds the local rectangle from these native
         // quest fields. Remote EntityPlayer has no ZombieCompassBounds member.
         Vector3 position=Vector3.zero,size=Vector3.zero;
@@ -313,7 +316,7 @@ internal static class RebirthPurgeScanner
         // the independently paged map projection catches up after a reset.
         if(map!=null&&map.TryGetValue(current.PoiKey,out record)&&(record.Epoch>current.Epoch||record.Epoch==current.Epoch&&record.State!=RebirthPoiClearanceState.Discovered))return false;
         var prefab=RebirthPurgeScannerPoi.Resolve(world,player.position);
-        return prefab?.prefab!=null&&prefab.prefab.PrefabName==current.Prefab&&prefab.boundingBoxPosition.x==current.X&&
+        return prefab?.prefab!=null&&string.Equals(prefab.prefab.PrefabName,current.Prefab,StringComparison.OrdinalIgnoreCase)&&prefab.boundingBoxPosition.x==current.X&&
             prefab.boundingBoxPosition.y==current.Y&&prefab.boundingBoxPosition.z==current.Z;
     }
     // Explicit Bridge observation uses the existing projection without advancing it.

@@ -6,6 +6,10 @@ using System.IO;
 // This extracts bytes only; it proves neither station contents nor disk durability.
 public static class RebirthStationRegionPayload
 {
+    // Match current native RegionFileSectorBased.GetOffsetFromXz exactly.
+    // Negative coordinates use remainder + 31, not Euclidean modulo.
+    public static int NativeLocalIndex(int chunkCoordinate)
+    { return chunkCoordinate % 32 + (chunkCoordinate < 0 ? 31 : 0); }
     public const int SectorBytes=4096;
     public const int MaximumPayloadBytes=255*SectorBytes-16;
     private static byte[] ReadExact(Stream source,int count)

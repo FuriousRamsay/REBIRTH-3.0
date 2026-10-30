@@ -2,84 +2,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// Passive observer of the exact qualified native restoration branch. It does not
-// activate sleepers, mutate native spawn membership, or authorize reload clearing.
+// One original native replacement. Missing ledger readiness never creates a new participant.
 internal sealed class RebirthPoiNativeRestorationWitness
 {
-    private readonly RebirthPoiWorldStore store;
-    private readonly RebirthPoiWorldSnapshot predecessor;
-    private readonly RebirthPoiClearanceRecord record;
-    private readonly RebirthPoiNativeManifest manifest;
-    private readonly SleeperVolume volume;
-    private readonly RebirthPoiActorObservation actor;
+    internal readonly World World;
+    internal readonly SleeperVolume Volume;
+    internal readonly RebirthPoiActorObservation Actor;
+    private readonly Func<bool> current;
     private readonly HashSet<int> initialIds;
-    private readonly int volumeId,initialSpawned,initialTick,initialPending;
+    private readonly int originalId,initialSpawned,initialTick,initialPending,initialRespawnCount,point;
+    private readonly string className;
     private readonly Guid receipt=Guid.NewGuid();
     private int successor=-1;
-    private bool completedUpdate,failed;
-    private RebirthPoiNativeRestorationWitness(RebirthPoiWorldStore owner,RebirthPoiWorldSnapshot snapshot,RebirthPoiClearanceRecord original,RebirthPoiNativeManifest mapping,SleeperVolume nativeVolume,int nativeId,RebirthPoiActorObservation participant)
-    {store=owner;predecessor=snapshot;record=original;manifest=mapping;volume=nativeVolume;volumeId=nativeId;actor=participant;initialIds=new HashSet<int>(volume.respawnMap.Keys);initialSpawned=volume.numSpawned;initialTick=SleeperVolume.TickSpawnCount;initialPending=volume.pendingSpawnMap.Count;}
-    private bool Current()
+    private bool completed,failed;
+    internal bool NativeDeferred { get; private set; }
+    internal RebirthPoiNativeRestorationWitness(World world,SleeperVolume volume,int id,SleeperVolume.RespawnData native,RebirthPoiActorObservation actor,Func<bool> isCurrent)
     {
-        RebirthPoiClearanceRecord current;string descriptor;
-        RebirthPoiVolumeObservation observedVolume;RebirthPoiActorObservation observedActor;
-        return !failed&&ThreadManager.IsMainThread()&&predecessor.Binding.IsCurrent&&ReferenceEquals(predecessor.Binding.Scope,manifest.World)&&manifest.StillMatches()&&
-            store.Published!=null&&store.Published.TryGet(record.Identity,out current)&&current.Epoch==record.Epoch&&
-            current.State==RebirthPoiClearanceState.Discovered&&current.Observations!=null&&
-            current.Observations.Generation==record.Observations.Generation&&
-            current.Observations.Volumes.TryGetValue(volumeId,out observedVolume)&&
-            current.Observations.EffectiveGeneration(observedVolume)==record.Observations.EffectiveGeneration(record.Observations.Volumes[volumeId])&&
-            observedVolume.Actors.TryGetValue(actor.Token,out observedActor)&&!observedActor.Dead&&
-            observedActor.CausalDigest==actor.CausalDigest&&
-            ReferenceEquals(manifest.World.GetSleeperVolume(volumeId),volume)&&manifest.TryGetDescriptor(volume,out descriptor)&&descriptor==record.Observations.Volumes[volumeId].Descriptor;
+        World=world;Volume=volume;originalId=id;className=native.className;point=native.spawnPointIndex;Actor=actor;current=isCurrent;
+        initialIds=new HashSet<int>(volume.respawnMap.Keys);initialSpawned=volume.numSpawned;
+        initialTick=SleeperVolume.TickSpawnCount;initialPending=volume.pendingSpawnMap.Count;
+        initialRespawnCount=volume.respawnList?.Count??0;
     }
-    public static bool TryBegin(RebirthPoiWorldStore store,RebirthPoiNativeManifest manifest,SleeperVolume volume,int volumeId,out RebirthPoiNativeRestorationWitness witness)
-    {
-        witness=null;
-        try
-        {
-            if(!ThreadManager.IsMainThread()||store==null||store.HasPending||store.Published==null||!store.Published.Binding.IsCurrent||manifest==null||!ReferenceEquals(store.Published.Binding.Scope,manifest.World)||!manifest.StillMatches()||volume==null||!manifest.Volumes.Contains(volume)||!ReferenceEquals(manifest.World.GetSleeperVolume(volumeId),volume)||volume.spawnDelay>1||volume.spawnsAvailable==null||volume.respawnList==null||volume.respawnList.Count==0)return false;
-            RebirthPoiClearanceRecord record;RebirthPoiVolumeObservation observations;
-            if(!store.Published.TryGet(manifest.Identity,out record)||record.State!=RebirthPoiClearanceState.Discovered||record.Observations==null||!record.Observations.Volumes.TryGetValue(volumeId,out observations))return false;
-            string descriptor;if(!manifest.TryGetDescriptor(volume,out descriptor)||descriptor!=observations.Descriptor)return false;
-            int oldId=volume.respawnList[volume.respawnList.Count-1];SleeperVolume.RespawnData native;
-            if(manifest.World.GetEntity(oldId)!=null||volume.pendingSpawnMap.Contains(oldId)||!volume.respawnMap.TryGetValue(oldId,out native)||native.spawnPointIndex<0)return false;
-            var matches=observations.Actors.Values.Where(a=>a.EntityId==oldId&&!a.Dead&&a.ClassName==native.className&&a.SpawnPoint==native.spawnPointIndex).ToArray();if(matches.Length!=1)return false;
-            witness=new RebirthPoiNativeRestorationWitness(store,store.Published,record,manifest,volume,volumeId,matches[0]);return true;
-        }
-        catch{return false;}
-    }
-    // Called after THIS original UpdateSpawn returns successfully, never from a timer scan.
+    private bool Scope()=>!failed&&ThreadManager.IsMainThread()&&ReferenceEquals(GameManager.Instance?.World,World)&&!World.IsRemote();
     public bool FinishOriginalUpdate()
     {
-        if(completedUpdate||!Current()){failed=true;return false;}
-        completedUpdate=true;
-        var added=volume.respawnMap.Keys.Where(id=>!initialIds.Contains(id)).ToArray();SleeperVolume.RespawnData native;
-        if(volume.respawnMap.ContainsKey(actor.EntityId)||added.Length!=1||initialIds.Any(id=>id!=actor.EntityId&&!volume.respawnMap.ContainsKey(id))||
-            volume.numSpawned!=initialSpawned||SleeperVolume.TickSpawnCount!=initialTick+1||volume.pendingSpawnMap.Count!=initialPending+1||
-            !volume.pendingSpawnMap.Contains(added[0])||!volume.respawnMap.TryGetValue(added[0],out native)||native.className!=actor.ClassName||native.spawnPointIndex!=actor.SpawnPoint||added[0]<=actor.EntityId)
+        if(completed||!Scope())return false;completed=true;
+        // Native CheckSpawnPos may reject a temporarily unavailable position and
+        // put the untouched original back on the queue. This is not a replacement.
+        if(point>=0&&initialRespawnCount>0&&Volume.spawnDelay==2&&
+            Volume.respawnList!=null&&Volume.respawnList.Count==initialRespawnCount&&
+            Volume.respawnList[initialRespawnCount-1]==originalId&&
+            initialIds.SetEquals(Volume.respawnMap.Keys)&&
+            Volume.respawnMap.TryGetValue(originalId,out var retained)&&
+            retained.className==className&&retained.spawnPointIndex==point&&
+            Volume.numSpawned==initialSpawned&&SleeperVolume.TickSpawnCount==initialTick&&
+            Volume.pendingSpawnMap.Count==initialPending&&!Volume.pendingSpawnMap.Contains(originalId)&&
+            Volume.spawnsAvailable!=null&&Volume.spawnsAvailable.Contains(point)&&World.GetEntity(originalId)==null)
+        { NativeDeferred=true;return false; }
+        var added=Volume.respawnMap.Keys.Where(id=>!initialIds.Contains(id)).ToArray();
+        if(Volume.respawnMap.ContainsKey(originalId)||added.Length!=1||initialIds.Any(id=>id!=originalId&&!Volume.respawnMap.ContainsKey(id))||
+            Volume.numSpawned!=initialSpawned||SleeperVolume.TickSpawnCount!=initialTick+1||Volume.pendingSpawnMap.Count!=initialPending+1||
+            !Volume.pendingSpawnMap.Contains(added[0])||!Volume.respawnMap.TryGetValue(added[0],out var native)||
+            native.className!=className||native.spawnPointIndex!=point||added[0]<=originalId)
         {failed=true;return false;}
         successor=added[0];return true;
     }
-    internal int SuccessorEntityId {get{return successor;}}
-    // Actual AddEnemyToWorld postfix must supply the exact successfully world-added actor.
-    public bool TryCompleteActualSpawn(EntityAlive entity,out RebirthPoiPartialObservation successorObservation)
+    internal int SuccessorEntityId=>successor;
+    internal bool TryCompleteActualSpawn(EntityAlive entity,out RebirthPoiActorObservation observation)
     {
-        successorObservation=null;
+        observation=null;
         try
         {
-            if(!completedUpdate||successor<0||!Current()||entity==null||entity.IsDead()||entity.entityId!=successor||!ReferenceEquals(entity.world,manifest.World)||!ReferenceEquals(manifest.World.GetEntity(successor),entity)||!volume.respawnMap.ContainsKey(successor))return false;
-            EntityClass nativeClass;if(!EntityClass.list.TryGetValue(entity.entityClass,out nativeClass)||nativeClass.entityClassName!=actor.ClassName)return false;
-            if(!RebirthPoiNativeActorStamp.TryAssignVerifiedRestoration(entity,actor.Token,out var assigned)||assigned!=actor.Token)return false;
-            // Other rooms may complete restoration before this async callback. Rebase
-            // only while this exact actor/generation is unchanged; retain their receipts.
-            RebirthPoiClearanceRecord latest;
-            if(!store.Published.TryGet(record.Identity,out latest))return false;
-            var replacement=actor.RestoreVerifiedNativeParticipant(successor,receipt);var original=latest.Observations;
-            if(original.Revision==long.MaxValue)return false;
-            successorObservation=new RebirthPoiPartialObservation(original.Generation,original.Epoch,original.Revision+1,original.Volumes.Values.Select(v=>v.NativeVolumeId!=volumeId?v:new RebirthPoiVolumeObservation(v.NativeVolumeId,v.Descriptor,v.Actors.Values.Select(a=>a.Token==actor.Token?replacement:a),original.EffectiveGeneration(v))));
-            return successorObservation.IsSuccessorOf(original)&&Current();
+            if(!completed||!Scope()||Actor==null||Actor.Dead||Actor.EntityId!=originalId||Actor.ClassName!=className||Actor.SpawnPoint!=point||
+                current==null||!current()||entity==null||entity.IsDead()||entity.entityId!=successor||!ReferenceEquals(entity.world,World)||
+                !ReferenceEquals(World.GetEntity(successor),entity)||!Volume.respawnMap.TryGetValue(successor,out var native)||native.className!=className||
+                native.spawnPointIndex!=point||!EntityClass.list.TryGetValue(entity.entityClass,out var nativeClass)||nativeClass.entityClassName!=className)return false;
+            if(!RebirthPoiNativeActorStamp.TryAssignVerifiedRestoration(entity,Actor.Token,out var assigned)||assigned!=Actor.Token)return false;
+            observation=Actor.RestoreVerifiedNativeParticipant(successor,receipt);return current();
         }
-        catch{failed=true;successorObservation=null;return false;}
+        catch{failed=true;return false;}
     }
 }

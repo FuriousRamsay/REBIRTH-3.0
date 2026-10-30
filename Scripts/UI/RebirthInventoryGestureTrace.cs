@@ -23,6 +23,7 @@ internal static class RebirthInventoryGestureTrace
     }
     internal static void Write(XUiC_ItemStack slot,string phase,bool ran=true)
     {
+        if(!RebirthLogSettings.UiRouteLoggingEnabled)return;
         if(slot?.xui?.playerUI?.entityPlayer==null||emitted>=2000)return;
         float now=Time.realtimeSinceStartup;
         if(now-window>=1){window=now;inWindow=0;}
@@ -49,9 +50,9 @@ internal static class RebirthInventoryGestureTrace
 internal static class RebirthCreativeNativeSwapTrace
 {
     private static void Prefix(XUiC_Creative2Stack __instance)
-        =>RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.before",__instance);
+        {if(RebirthLogSettings.UiRouteLoggingEnabled)RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.before",__instance);}
     private static void Postfix(XUiC_Creative2Stack __instance,bool __runOriginal)
-        =>RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.after",__instance,"nativeRan="+__runOriginal);
+        {if(RebirthLogSettings.UiRouteLoggingEnabled)RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.after",__instance,"nativeRan="+__runOriginal);}
 }
 
 // Owner-requested Creative transfer probe. Input-edge only and bounded, so the
@@ -66,9 +67,10 @@ internal static class RebirthCreativeTransferTrace
         return workspace?.IsWorkspaceOpen==true&&ReferenceEquals(workspace.xui,ui);
     }
     internal static void Open(XUi ui)
-    {emitted=0;inSecond=0;second=Time.realtimeSinceStartup;Write(ui,"open",null,"root=rebirthCreativeRoot");}
+    {if(!RebirthLogSettings.UiRouteLoggingEnabled)return;emitted=0;inSecond=0;second=Time.realtimeSinceStartup;Write(ui,"open",null,"root=rebirthCreativeRoot");}
     internal static void Write(XUi ui,string phase,XUiC_ItemStack slot=null,string detail=null)
     {
+        if(!RebirthLogSettings.UiRouteLoggingEnabled)return;
         if(ui==null||!Active(ui)||emitted>=300)return;
         float now=Time.realtimeSinceStartup;
         if(now-second>=1f){second=now;inSecond=0;}
@@ -115,12 +117,14 @@ internal static class RebirthInventoryGestureBoundaryTrace
     [HarmonyPriority(Priority.First)]
     private static void Prefix(XUiC_ItemStack __instance,MethodBase __originalMethod)
     {
+        if(!RebirthLogSettings.UiRouteLoggingEnabled)return;
         RebirthInventoryGestureTrace.Write(__instance,__originalMethod.Name+".before");
         RebirthCreativeTransferTrace.Write(__instance.xui,__originalMethod.Name+".before",__instance);
     }
     [HarmonyPriority(Priority.Last)]
     private static void Postfix(XUiC_ItemStack __instance,MethodBase __originalMethod,bool __runOriginal)
     {
+        if(!RebirthLogSettings.UiRouteLoggingEnabled)return;
         RebirthInventoryGestureTrace.Write(__instance,__originalMethod.Name+".after",__runOriginal);
         RebirthCreativeTransferTrace.Write(__instance.xui,__originalMethod.Name+".after",__instance,"nativeRan="+__runOriginal);
         if(!__runOriginal&&described.Add(__originalMethod))
@@ -136,6 +140,7 @@ internal static class RebirthInventoryPointerTrace
 {
     private static void Postfix(XUiC_ItemStack __instance)
     {
+        if(!RebirthLogSettings.UiRouteLoggingEnabled)return;
         var cursor=__instance.xui?.playerUI?.CursorController;
         if(!__instance.isOver||cursor==null)return;
         if(cursor.GetMouseButtonUp(UICamera.MouseButton.LeftButton))

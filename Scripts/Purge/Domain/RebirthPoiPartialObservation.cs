@@ -110,11 +110,12 @@ internal sealed class RebirthPoiPartialObservation
         if(map.Count==0||budget>RebirthPoiClearanceCodec.MaximumCharacters-4096)throw new ArgumentException("Partial observation encoded budget exhausted.");
         Generation=generation;Epoch=epoch;Revision=revision;ConservativeCharacters=(int)budget;Volumes=new ReadOnlyDictionary<int,RebirthPoiVolumeObservation>(map);
     }
-    // A successor cannot replace manifest/generation, forget actors or undo a witnessed death.
+    // Positive producers may append observed rooms. They cannot replace an existing
+    // room binding/generation, forget actors or undo a witnessed death.
     public bool IsSuccessorOf(RebirthPoiPartialObservation original)
     {
         if(original==null)return Revision==1;
-        if(Generation!=original.Generation||Epoch!=original.Epoch||original.Revision==long.MaxValue||Revision!=original.Revision+1||Volumes.Count!=original.Volumes.Count)return false;
+        if(Generation!=original.Generation||Epoch!=original.Epoch||original.Revision==long.MaxValue||Revision!=original.Revision+1||Volumes.Count<original.Volumes.Count)return false;
         foreach(var pair in original.Volumes)
         {
             RebirthPoiVolumeObservation volume;

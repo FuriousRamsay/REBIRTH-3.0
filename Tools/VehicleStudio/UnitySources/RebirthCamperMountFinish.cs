@@ -75,7 +75,7 @@ public static class RebirthCamperMountFinish
   Render(new Vector3(-6,5.4f,-8),new Vector3(0,1.9f,-1.2f),3.4f,"vehicle-rear-quarter");
   Object.DestroyImmediate(root);
   Directory.CreateDirectory(Output+"/Bundle");
-  var manifest=BuildPipeline.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+  var manifest=RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
   if(!manifest)throw new Exception("Bundle build failed");
   var bundle=AssetBundle.LoadFromFile(Output+"/Bundle/rebirth_camper80s.unity3d");if(!bundle)throw new Exception("Bundle reopen failed");
   try

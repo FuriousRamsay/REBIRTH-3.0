@@ -54,8 +54,7 @@ public static partial class RebirthWorldCharacterRepository
                 foreach(var pair in Cache)
                 {
                     if(pair.Value==null||pair.Value.Dirty||
-                        !XNode.DeepEquals(Serialize(pair.Value).Root,
-                            XDocument.Load(Path.Combine(scopePath,pair.Key+".xml")).Root))return false;
+                        !MatchesPersistedRecord(pair.Value,Path.Combine(scopePath,pair.Key+".xml")))return false;
                 }
             }
             catch{return false;}
@@ -67,6 +66,18 @@ public static partial class RebirthWorldCharacterRepository
         return true;
     }
     public static bool CanResetAfterFlush(){lock(Sync)return CanRetireLocked();}
+    private static bool MatchesPersistedRecord(RebirthWorldCharacterRecord record,string path)
+    {
+        var expected=Serialize(record);
+        var stored=XDocument.Load(path);
+        if(XNode.DeepEquals(expected.Root,stored.Root))return true;
+        // A clean loaded record can serialize equivalent numeric/default values
+        // differently from the original file. Compare through the SAME parser;
+        // never ignore a real field difference or rewrite the original save here.
+        if(!TryDeserialize(stored,out var saved,out var error)||saved==null||!saved.IsComplete||
+            saved.StablePlayerKey!=record.StablePlayerKey||saved.StablePlayerId!=record.StablePlayerId)return false;
+        return XNode.DeepEquals(expected.Root,Serialize(saved).Root);
+    }
     internal static string ResetDiagnostic()
     {
         lock(Sync)
@@ -93,7 +104,7 @@ public static partial class RebirthWorldCharacterRepository
             try
             {
                 foreach(var pair in Cache)
-                    if(!XNode.DeepEquals(Serialize(pair.Value).Root,XDocument.Load(GetPath(pair.Key)).Root))return false;
+                    if(!MatchesPersistedRecord(pair.Value,GetPath(pair.Key)))return false;
                 return ScopeCurrentLocked();
             }
             catch{return false;}

@@ -1,0 +1,15 @@
+<configs>
+  <!-- REBIRTH 2.6 basic bandage: six health through native medical regeneration. -->
+  <remove xpath="/items/item[@name='medicalBandage']/property[@class='Action0']/requirement[@name='CVarCompare' and @cvar='lacerationBleedingStatus']"/>
+  <append xpath="/items/item[@name='medicalBandage']">
+    <effect_group name="RebirthBasicBandageHealing26" tiered="false">
+      <triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="medicalRegHealthAmount" operation="add" value="6"/>
+      <triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="medRegHealthIncSpeed" operation="set" value="@$medicRegHealthIncreaseSpeed"/>
+      <triggered_effect trigger="onSelfPrimaryActionEnd" action="AddBuff" buff="buffProcessConsumables"/>
+      <triggered_effect trigger="onSelfSecondaryActionEnd" action="ModifyCVar" target="other" cvar="medicalRegHealthAmount" operation="add" value="6"/>
+      <triggered_effect trigger="onSelfSecondaryActionEnd" action="ModifyCVar" target="other" cvar="medRegHealthIncSpeed" operation="set" value="2"/>
+      <triggered_effect trigger="onSelfSecondaryActionEnd" action="AddBuff" target="other" buff="buffProcessConsumables"/>
+      <display_value name="foodHealthAmount" value="6"/>
+    </effect_group>
+  </append>
+</configs>

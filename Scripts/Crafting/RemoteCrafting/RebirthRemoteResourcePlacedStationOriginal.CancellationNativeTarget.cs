@@ -22,10 +22,13 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
         Guid module=assembly.ManifestModule.ModuleVersionId;
         // Each identity is a reviewed image pair, never an independent MVID/hash allowlist.
         // 3.4b6 guarded methods match the qualified 3.3 source; see Compatibility34 evidence.
+        // 3.4b9 lifecycle was reviewed separately; see Compatibility34b9/NativeReview.
         string expectedImage=module==new Guid("1a9a4203-3d95-4c90-b094-8926dec1ee9c")
             ? "FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705"
             : module==new Guid("47c87570-1f44-4ad3-872b-95a9f98d316c")
-                ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4" : null;
+                ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4"
+                : module==new Guid("b181c006-3dca-4211-80fe-9efc360eeb10")
+                    ? "086755F825EEE6ABD4A13789F2F428D9043D36C8C54EBB3B38A9518B4A5146FC" : null;
         if(expectedImage==null)
             throw new NotSupportedException("Unqualified placed cancellation native lifecycle module.");
         using(var input=File.OpenRead(assembly.Location))using(var sha=SHA256.Create())

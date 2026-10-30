@@ -49,5 +49,53 @@
       <property name="RebirthCamperWrapId" value="CaptStress" />
     </item_modifier>
   
+      <item_modifier name="modVehicleWrapPurpleLlama" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapPurpleLlamaDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapPurpleLlama" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="PurpleLlama" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapFuriousRamsay" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapFuriousRamsayDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapFuriousRamsay" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="FuriousRamsay" />
+    </item_modifier>
+      <item_modifier name="modVehicleWrapMissBanjo" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapMissBanjoDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapMissBanjo" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="MissBanjo" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapHeyWeps" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapHeyWepsDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapHeyWeps" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="HeyWeps" />
+    </item_modifier>
   </append>
 </configs>

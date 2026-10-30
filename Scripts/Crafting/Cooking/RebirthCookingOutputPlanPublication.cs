@@ -16,7 +16,7 @@ internal static class RebirthCookingOutputPlanPublication
         internal XUiC_RecipeStack Card;internal Func<bool> Current;internal string Key;
         internal RebirthStationSnapshotEvidence.Request Placed;
         internal RebirthCamperStationSaveEvidence.Request Mobile;
-        internal bool Published;internal float Expires;
+        internal volatile bool Published;internal float Expires;
         public void Dispose(){Placed?.Dispose();Mobile?.Dispose();Placed=null;Mobile=null;}
     }
     private sealed class Query
@@ -132,6 +132,10 @@ internal static class RebirthCookingOutputPlanPublication
             };
             watch.Placed=RebirthStationSnapshotEvidence.Watch(world,chunk,position.x>>4,position.z>>4,scope,station,(inputs,queue)=>expected.MatchesSerializedQueue(queue),terminal);
             if(watch.Placed==null)return null;
+            // The exact queue/terminal spans have already passed native disk readback.
+            // Preserve that result before the writer recycles its pooled snapshot;
+            // main-thread Published still requires the original current scope.
+            watch.Placed.OnPublished=(generation,digest)=>watch.Published=true;
             lock(chunk)
             {
                 if(!scope()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting)
@@ -146,7 +150,7 @@ internal static class RebirthCookingOutputPlanPublication
     }
     private static bool Published(Watch watch)
     {
-        if(!watch.Current())return false;if(watch.Published)return true;
+        if(!watch.Current())return false;if(watch.Published){watch.Dispose();return watch.Current();}
         bool observed=watch.Mobile!=null?RebirthCamperStationSaveEvidence.TryObserve(watch.Mobile,out _):
             watch.Placed!=null&&RebirthStationSnapshotEvidence.TryGetPublished(watch.Placed,out _);
         if(observed){watch.Published=true;watch.Dispose();}return observed&&watch.Current();

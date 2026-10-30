@@ -20,6 +20,9 @@ public static partial class RebirthStationSnapshotEvidence
         internal object World, Chunk, Tile; internal Func<bool> Observe; internal Func<byte[],byte[],bool> ValidateStation; internal Func<byte[],byte[],bool> ValidateTerminal; internal int ThreadId; internal int X, Z; internal bool Closed;
         internal string Diagnostic="watching"; internal object Snapshot; internal long Generation; internal bool Published; internal Publication Proof; internal PublishedSnapshot SnapshotProof;
         internal IRebirthStationSnapshotByteBudget Budget;
+        // Optional detached receipt, delivered only after exact native disk readback.
+        // A writer may recycle its pooled snapshot before the next main-thread tick.
+        internal Action<long,string> OnPublished;
         internal Request(object world,object chunk,int x,int z,Func<bool> observe){World=world;Chunk=chunk;X=x;Z=z;Observe=observe;ThreadId=System.Threading.Thread.CurrentThread.ManagedThreadId;}
         public void Dispose(){lock(gate){Closed=true;requests.Remove(this);Invalidate(Snapshot);DisposeEntityEvidence(this);Snapshot=null;World=null;}}
     }
@@ -160,8 +163,19 @@ public static partial class RebirthStationSnapshotEvidence
     internal static void MarkPublished(Request request,object snapshot,long generation,string path=null,string digest=null)
     {lock(gate){if(request!=null&&!request.Closed&&request.Snapshot==snapshot&&request.Generation==generation&&
         states.TryGetValue(snapshot,out var s)&&s.Generation==generation&&s.Request==request&&s.Bytes!=null){request.Published=true;
+        request.Diagnostic="published";
         if(path!=null&&digest!=null)request.SnapshotProof=new PublishedSnapshot(path,digest,request.X,request.Z,generation);
-        if(path!=null&&digest!=null&&s.InputLength>0&&s.QueueLength>0)request.Proof=new Publication(path,digest,request.X,request.Z,s.InputStart,s.InputLength,s.QueueStart,s.QueueLength,s.OutputStart,s.OutputLength,s.CompletionStart,s.CompletionLength);}}}
+        if(path!=null&&digest!=null&&s.InputLength>0&&s.QueueLength>0)request.Proof=new Publication(path,digest,request.X,request.Z,s.InputStart,s.InputLength,s.QueueStart,s.QueueLength,s.OutputStart,s.OutputLength,s.CompletionStart,s.CompletionLength);
+        if(path!=null&&digest!=null&&request.OnPublished!=null)
+        {
+            var notify=request.OnPublished;request.OnPublished=null;
+            // An optional consumer cannot interrupt the shared positive readback.
+            // Its own failed receipt remains unaccepted and may retry separately.
+            try{using(var hash=System.Security.Cryptography.SHA256.Create())
+                notify(generation,BitConverter.ToString(hash.ComputeHash(s.Bytes)).Replace("-","").ToLowerInvariant());}
+            catch{request.Diagnostic="published-notification-failed";}
+        }
+        }}}
     public static bool HasPublished(Request request)
     {lock(gate){return request!=null&&!request.Closed&&request.Published;}}    public sealed class Publication
     {

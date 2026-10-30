@@ -87,8 +87,8 @@ public sealed class ConsoleCmdRebirthFetchObservation : ConsoleCmdAbstract
                 ["ownerInventory"] = new JObject{["schema"]=1,
                     ["bagPayload"]=Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(player.bag.ItemGrid.items)),
                     ["beltPayload"]=Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(player.inventory.ItemGrid.items)),
-                    ["bagLocks"]=bagLocks==null?null:new JArray(bagLocks),
-                    ["beltLocks"]=player.inventory.ItemGrid.SlotLocks==null?null:new JArray(player.inventory.ItemGrid.SlotLocks),
+                    ["bagLocks"]=LocksJson(bagLocks),
+                    ["beltLocks"]=LocksJson(player.inventory.ItemGrid.SlotLocks),
                     ["cursorPayload"]=windowManager==null||LocalPlayerUI.GetUIForPlayer(player)?.xui?.DragAndDropWindow==null?null:
                         Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(new[]{LocalPlayerUI.GetUIForPlayer(player).xui.DragAndDropWindow.CurrentStack}))},
                 ["backpack"] = bag, ["toolbelt"] = belt, ["cursor"] = cursorJson,
@@ -137,6 +137,14 @@ public sealed class ConsoleCmdRebirthFetchObservation : ConsoleCmdAbstract
         }
         catch (Exception error)
         { SdtdConsole.Instance.Output("*** ERROR fetch observation: " + error.GetType().Name + ": " + error.Message); }
+    }
+
+    private static JArray LocksJson(PackedBoolArray locks)
+    {
+        if (locks == null) return null;
+        var result = new JArray();
+        for (int i = 0; i < locks.Length; i++) result.Add(locks[i]);
+        return result;
     }
 
     private static JArray Slots(ItemStack[] slots, string location, List<ItemStack> packages)

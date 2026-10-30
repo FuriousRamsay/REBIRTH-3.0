@@ -67,7 +67,7 @@ public static class RebirthCamperCampFadeBuild
         var door=Find(root,"REBIRTHRearDoorPivot");var dc=Target(door,"rear_door");manifest.Add("rear_door\t"+PathOf(dc.transform));
         SetPresentation(root,0,false);PrefabUtility.SaveAsPrefabAsset(root,Prefab);AssetDatabase.SaveAssets();
         File.WriteAllLines(Output+"/interaction-targets.tsv",manifest);
-        var result=BuildPipeline.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+        var result=RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
         if(result==null)throw new Exception("Bundle build failed");
         File.WriteAllText(Output+"/build-receipt.txt","Built source prefab + Windows bundle; 19 station/power targets + rear door; source and installed original preserved.\n"+DateTime.UtcNow.ToString("O"));
     }

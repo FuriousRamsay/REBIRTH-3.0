@@ -69,7 +69,7 @@ public static class RebirthStationPublicationEvidence
             write.Scope.Request.Diagnostic="writer-readback";
             if(error!=null)return;
             using(var file=SdFile.Open(write.Region.fullFilePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-                if(RebirthStationRegionPayload.MatchesWrittenPayload(file,write.Scope.X&31,write.Scope.Z&31,write.Payload))
+                if(RebirthStationRegionPayload.MatchesWrittenPayload(file,RebirthStationRegionPayload.NativeLocalIndex(write.Scope.X),RebirthStationRegionPayload.NativeLocalIndex(write.Scope.Z),write.Payload))
                     RebirthStationSnapshotEvidence.MarkPublished(write.Scope.Request,write.Scope.Snapshot,write.Scope.Generation,
                         write.Region.fullFilePath,RebirthStationPublicationRecord.Digest(write.Payload));
         }catch{ /* Missing or changed evidence leaves the preparation pending. */ }

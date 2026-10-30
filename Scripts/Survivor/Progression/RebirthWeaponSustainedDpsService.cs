@@ -106,6 +106,10 @@ public static class RebirthWeaponSustainedDpsService
 
     private sealed class RuntimeReloadStart
     {
+        public EntityPlayerLocal Owner;
+        public ItemActionRanged Action;
+        public ItemActionRanged.ItemActionDataRanged Data;
+        public ItemValue Item;
         public string Key = string.Empty;
         public string ItemName = string.Empty;
         public float StartedAt;
@@ -1258,19 +1262,39 @@ public static class RebirthWeaponSustainedDpsService
         catch { return 0; }
     }
 
-    public static void OnRuntimeReloadStarted(EntityPlayer player)
+    private static bool TryResolveRuntimeReload(ItemActionRanged action, ItemActionData actionData,
+        out EntityPlayerLocal player, out ItemValue held, out ItemActionRanged.ItemActionDataRanged data)
     {
-        if (player == null || player.inventory == null) return;
-        ItemValue held = player.inventory.holdingItemItemValue;
-        if (held == null || held.IsEmpty() || held.ItemClass == null) return;
+        data = actionData as ItemActionRanged.ItemActionDataRanged;
+        player = data?.invData?.holdingEntity as EntityPlayerLocal;
+        held = data?.invData?.itemValue;
+        if (action == null || player == null || player.isEntityRemote || player.inventory == null ||
+            held == null || held.IsEmpty() || held.ItemClass?.Actions == null ||
+            actionData.indexInEntityOfAction != 0 || held.ItemClass.Actions.Length == 0 ||
+            !ReferenceEquals(held.ItemClass.Actions[0], action) ||
+            !ReferenceEquals(player.inventory.holdingItemData, data.invData) ||
+            !ReferenceEquals(player.inventory.holdingItemItemValue, held) ||
+            data.invData.actionData == null || data.invData.actionData.Count == 0 ||
+            !ReferenceEquals(data.invData.actionData[0], data)) return false;
+        return true;
+    }
+
+    public static void OnRuntimeReloadStarted(ItemActionRanged action, ItemActionData actionData)
+    {
+        if (!TryResolveRuntimeReload(action, actionData, out var player, out var held, out var data)) return;
         string skillId = RebirthProgressionRuntimeConfig.ClassifyCombat(held);
         if (!RebirthWeaponFamilySkillService.IsRangedSkill(skillId)) return;
         string key = BuildReloadMeasurementKey(player, held, skillId);
         float effectiveMultiplier = ResolveEffectiveReloadMultiplier(player, held, skillId, true);
         lock (Gate)
         {
+            if (ActiveReloads.TryGetValue(player.entityId, out var existing) &&
+                ReferenceEquals(existing.Owner, player) && ReferenceEquals(existing.Action, action) &&
+                ReferenceEquals(existing.Data, data) && ReferenceEquals(existing.Item, held) &&
+                existing.Key == key && Time.realtimeSinceStartup - existing.StartedAt <= 30f) return;
             ActiveReloads[player.entityId] = new RuntimeReloadStart
             {
+                Owner = player, Action = action, Data = data, Item = held,
                 Key = key,
                 ItemName = held.ItemClass.GetItemName() ?? string.Empty,
                 StartedAt = Time.realtimeSinceStartup,
@@ -1287,16 +1311,31 @@ public static class RebirthWeaponSustainedDpsService
         }
     }
 
-    public static void OnRuntimeReloadCompleted(EntityPlayer player)
+    public static void OnRuntimeReloadCancelled(ItemActionRanged action, ItemActionData actionData)
     {
+        var player = actionData?.invData?.holdingEntity as EntityPlayerLocal;
         if (player == null) return;
+        lock (Gate)
+            if (ActiveReloads.TryGetValue(player.entityId, out var start) &&
+                ReferenceEquals(start.Owner, player) && ReferenceEquals(start.Action, action) &&
+                ReferenceEquals(start.Data, actionData)) ActiveReloads.Remove(player.entityId);
+    }
+
+    public static void OnRuntimeReloadCompleted(ItemActionRanged action, ItemActionData actionData)
+    {
+        var owner = actionData?.invData?.holdingEntity as EntityPlayerLocal;
+        if (owner == null) return;
         RuntimeReloadStart start = null;
         lock (Gate)
         {
-            ActiveReloads.TryGetValue(player.entityId, out start);
-            ActiveReloads.Remove(player.entityId);
+            if (!ActiveReloads.TryGetValue(owner.entityId, out start) ||
+                !ReferenceEquals(start.Owner, owner) || !ReferenceEquals(start.Action, action) ||
+                !ReferenceEquals(start.Data, actionData)) return;
+            ActiveReloads.Remove(owner.entityId);
         }
-        if (start == null) return;
+        if (!TryResolveRuntimeReload(action, actionData, out var player, out var held, out var data) ||
+            !ReferenceEquals(start.Item, held) || data.isReloadCancelled || data.isWeaponReloadCancelled ||
+            start.Key != BuildReloadMeasurementKey(player, held, RebirthProgressionRuntimeConfig.ClassifyCombat(held))) return;
         float elapsed = Time.realtimeSinceStartup - start.StartedAt;
         if (!Finite(elapsed) || elapsed < 0.05f || elapsed > 30f) return;
         float multiplier = Mathf.Max(0.05f, start.EffectiveReloadMultiplier);
@@ -1648,24 +1687,16 @@ public static class RebirthRangedReloadStartTimingPatch
 {
     private static MethodBase ResolveTarget()
     {
-        MethodInfo[] methods = typeof(ItemActionRanged).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        for (int i = 0; i < methods.Length; i++)
-            if (methods[i] != null && string.Equals(methods[i].Name, "ReloadGun", StringComparison.Ordinal)) return methods[i];
-        return null;
+        return typeof(ItemActionRanged).GetMethod("ReloadGun", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            null, new[] { typeof(ItemActionData) }, null);
     }
 
     private static bool Prepare() { return ResolveTarget() != null; }
     private static MethodBase TargetMethod() { return ResolveTarget(); }
 
-    private static void Prefix(ItemActionRanged __instance)
+    private static void Prefix(ItemActionRanged __instance, ItemActionData __0)
     {
-        if (__instance == null || GameManager.Instance == null || GameManager.Instance.World == null) return;
-        EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
-        if (player == null || player.inventory == null) return;
-        ItemValue held = player.inventory.holdingItemItemValue;
-        if (held == null || held.IsEmpty() || held.ItemClass == null || held.ItemClass.Actions == null || held.ItemClass.Actions.Length == 0) return;
-        if (!(__instance is ItemActionRanged)) return;
-        RebirthWeaponSustainedDpsService.OnRuntimeReloadStarted(player);
+        RebirthWeaponSustainedDpsService.OnRuntimeReloadStarted(__instance, __0);
     }
 }
 
@@ -1674,25 +1705,31 @@ public static class RebirthRangedReloadCompleteTimingPatch
 {
     private static MethodBase ResolveTarget()
     {
-        MethodInfo[] methods = typeof(ItemActionRanged).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        for (int i = 0; i < methods.Length; i++)
-            if (methods[i] != null && string.Equals(methods[i].Name, "CompleteReload", StringComparison.Ordinal)) return methods[i];
-        return null;
+        return typeof(ItemActionRanged).GetMethod("CompleteReload", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            null, new[] { typeof(ItemActionRanged.ItemActionDataRanged) }, null);
     }
 
     private static bool Prepare() { return ResolveTarget() != null; }
     private static MethodBase TargetMethod() { return ResolveTarget(); }
 
-    private static void Postfix(ItemActionRanged __instance)
+    private static void Postfix(ItemActionRanged __instance, ItemActionRanged.ItemActionDataRanged __0)
     {
-        if (__instance == null || GameManager.Instance == null || GameManager.Instance.World == null) return;
-        EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
-        if (player == null || player.inventory == null) return;
-        ItemValue held = player.inventory.holdingItemItemValue;
-        if (held == null || held.IsEmpty() || held.ItemClass == null || held.ItemClass.Actions == null || held.ItemClass.Actions.Length == 0) return;
-        if (!(__instance is ItemActionRanged)) return;
-        RebirthWeaponSustainedDpsService.OnRuntimeReloadCompleted(player);
+        RebirthWeaponSustainedDpsService.OnRuntimeReloadCompleted(__instance, __0);
     }
+}
+
+[HarmonyPatch(typeof(ItemActionRanged), "CancelReload", new[] { typeof(ItemActionData), typeof(bool) })]
+public static class RebirthRangedReloadCancelTimingPatch
+{
+    private static void Prefix(ItemActionRanged __instance, ItemActionData __0)
+        => RebirthWeaponSustainedDpsService.OnRuntimeReloadCancelled(__instance, __0);
+}
+
+[HarmonyPatch(typeof(ItemActionRanged), "StopHolding", new[] { typeof(ItemActionData) })]
+public static class RebirthRangedReloadStopTimingPatch
+{
+    private static void Prefix(ItemActionRanged __instance, ItemActionData __0)
+        => RebirthWeaponSustainedDpsService.OnRuntimeReloadCancelled(__instance, __0);
 }
 
 

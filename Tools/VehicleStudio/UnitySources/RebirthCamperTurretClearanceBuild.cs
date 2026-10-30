@@ -72,7 +72,7 @@ public static class RebirthCamperTurretClearanceBuild
    var slot=source.GetComponentsInChildren<Transform>(true).Single(t=>t.name=="REBIRTHCamperTurretSlot"+i);
    if(slot.gameObject.activeSelf||!slot.GetComponentsInChildren<Transform>(true).Any(t=>t.name=="TurretMuzzle"))throw new Exception("Turret installation contract changed");
   }
-  var manifest=BuildPipeline.BuildAssetBundles(output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+  var manifest=RebirthAssetBundlePackaging.BuildAssetBundles(output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{prefab}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
   if(!manifest)throw new Exception("Bundle failed");
   var bundle=AssetBundle.LoadFromFile(output+"/rebirth_camper80s.unity3d");if(!bundle||!bundle.LoadAsset<GameObject>("rebirthCamper80s"))throw new Exception("Bundle reopen failed");bundle.Unload(true);
   AssetDatabase.ExportPackage(prefab,output+"/CamperTurretClearance.unitypackage",ExportPackageOptions.IncludeDependencies|ExportPackageOptions.Recurse);

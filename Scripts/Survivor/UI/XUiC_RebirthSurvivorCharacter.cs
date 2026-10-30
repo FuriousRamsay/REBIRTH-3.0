@@ -657,6 +657,17 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
             foundMet = true;
         }
         bool metabolismChanged = foundMet != hasMetabolism || (foundMet && met.Revision != lastMetabolismRevision);
+        // These pages own their live projections. A metabolism-only change cannot
+        // affect RenderAll here; navigation still forces a fresh character model.
+        if (!force && !characterChanged && snapshot != null && overviewSnapshot != null &&
+            snapshot.RebirthModeEnabled && snapshot.HasCharacter &&
+            (tab == Tab.Metabolism || tab == Tab.Statistics || tab == Tab.Survival ||
+             tab == Tab.HordeNight || tab == Tab.Purge))
+        {
+            if (foundMet) { metabolism = met; lastMetabolismRevision = met.Revision; }
+            hasMetabolism = foundMet;
+            return;
+        }
         if (!force && !characterChanged && tab == Tab.Overview && snapshot != null && snapshot.RebirthModeEnabled && snapshot.HasCharacter && overviewSnapshot != null)
         {
             if(foundMet){metabolism=met;lastMetabolismRevision=met.Revision;}

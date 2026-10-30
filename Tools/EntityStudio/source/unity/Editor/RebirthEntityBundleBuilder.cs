@@ -84,7 +84,7 @@ namespace RebirthEntityStudio
             Directory.CreateDirectory(staging);
             string[] tagMapPaths=authoringManifest!=null&&!string.IsNullOrEmpty(authoringManifest.tagMapAssetPath)?new[]{authoringManifest.tagMapAssetPath}:Array.Empty<string>();
             var build=new AssetBundleBuild{assetBundleName=bundleFile,assetNames=new[]{prefabAssetPath}.Concat(tierMaterialPaths).Concat(extraTexturePaths).Concat(tagMapPaths).Distinct(StringComparer.Ordinal).ToArray()};
-            AssetBundleManifest manifest=BuildPipeline.BuildAssetBundles(staging,new[]{build},BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64);
+            AssetBundleManifest manifest=RebirthAssetBundlePackaging.BuildAssetBundles(staging,new[]{build},BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64);
             if(manifest==null||!manifest.GetAllAssetBundles().Contains(bundleFile,StringComparer.OrdinalIgnoreCase))
                 throw new InvalidDataException("Unity did not produce the requested entity AssetBundle.");
 

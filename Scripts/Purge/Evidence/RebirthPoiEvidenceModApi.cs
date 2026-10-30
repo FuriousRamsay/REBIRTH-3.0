@@ -12,6 +12,7 @@ public sealed class RebirthPoiEvidenceModApi : IModApi
     { if(!RebirthPurgeReleasePolicy.Enabled||installed) return;
         try
         {
+        RebirthPoiResetCallerProtocol.AdmissionGuard=RebirthPoiNativeEvidence.Instance.ResetPredecessorCurrent;
         RebirthPoiEvidenceHooks.Install();
         if(!starting){ModEvents.GameStarting.RegisterHandler(OnStarting);starting=true;}
         if(!update){ModEvents.GameUpdate.RegisterHandler(OnUpdate);update=true;}
@@ -23,8 +24,8 @@ public sealed class RebirthPoiEvidenceModApi : IModApi
     }
     private static void OnStarting(ref ModEvents.SGameStartingData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
     private static void OnUpdate(ref ModEvents.SGameUpdateData data){ if(!installed||!RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled) return; RebirthPoiNativeRestorationConnection.Pulse();RebirthPoiNativeEvidence.Instance.Pulse();}
-    private static void OnWorldShutdown(ref ModEvents.SWorldShuttingDownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
-    private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
+    private static void OnWorldShutdown(ref ModEvents.SWorldShuttingDownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.PrepareShutdown(); RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
+    private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.PrepareShutdown(); RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
 }
 internal static class RebirthPoiEvidenceHooks
 {
@@ -93,3 +94,4 @@ internal static class RebirthPoiEvidenceHooks
     }
     private static void Reset(SleeperVolume __instance,World __0){if(RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled)RebirthPoiNativeEvidence.Instance.NativeReset(__0,__instance);}
 }
+

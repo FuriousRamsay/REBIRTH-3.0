@@ -170,7 +170,8 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     }
     // Keep the existing statistics budget; sale value has its own additional row.
     private const int StatisticsRowCapacity = 16;
-    private readonly RowViews[] rows = new RowViews[StatisticsRowCapacity + 3];
+    private const int PopupRowCapacity = 31;
+    private readonly RowViews[] rows = new RowViews[PopupRowCapacity];
     private XUiController surface, singleHeader, comparisonHeader;
     private XUiV_Texture background;
     private XUiView frame;
@@ -212,7 +213,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             frame != null && divider != null && singleIcon != null && singleName != null && singleQuality != null &&
             xmlName != null && footer != null && rows.All(r => r.Root != null && r.Fill != null && r.Icon != null &&
                 r.Title != null && r.Value != null && r.SelectedValue != null && r.Details != null && r.SelectedDetails != null);
-        if (!configured) Log.Warning("[REBIRTH Item Popup] shared template is incomplete; apply Fix25 source and XML together.");
+        if (!configured) Log.Warning("[REBIRTH Item Popup] shared template is incomplete; apply matching weapon UI source and template patch together.");
     }
     private T View<T>(string id) where T : XUiView => GetChildById(id)?.ViewComponent as T;
     private void HideAndReset()
@@ -298,14 +299,17 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             fingerprint = fingerprint * 31 + RebirthConsumableItemPresentation.LiquidFingerprint(stack);
             if (compare) fingerprint = fingerprint * 31 + RebirthConsumableItemPresentation.LiquidFingerprint(baseline);
             EntityPlayer popupPlayer = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
+            fingerprint = fingerprint * 31 + RebirthWeaponDetailRows.ItemStateStamp(stack);
+            if(compare)fingerprint=fingerprint*31+RebirthWeaponDetailRows.ItemStateStamp(baseline);
             fingerprint = fingerprint * 31 + RebirthWeaponSustainedDpsService.GetDisplayFingerprint(popupPlayer, stack.itemValue);
             if (compare) fingerprint = fingerprint * 31 + RebirthWeaponSustainedDpsService.GetDisplayFingerprint(popupPlayer, baseline.itemValue);
         }
         if (fingerprint == lastFingerprint && renderedComparison == compare && renderedFood == food && renderedWidth > 0)
         { PositionPopup(source, renderedWidth, renderedHeight); SetPopupVisible(true); return; }
 
+        bool weaponRows=false;
         var data = food ? BuildFoodRows(stack, compare ? baseline : null)
-            : BuildStatRows(stack, compare ? baseline : null);
+            : BuildStatRows(stack, compare ? baseline : null,out weaponRows);
         if (!food) AppendDamageModifiers(data, stack, compare ? baseline : null);
         // Native price calculation uses the normal markdown when no trader is selected.
         // This is an estimate: trader-specific rates and acceptance can differ.
@@ -320,13 +324,14 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             });
         }
         // Reserve the final two rows so the category section cannot be truncated by stats.
-        if (data.Count > rows.Length - 2) data.RemoveRange(rows.Length - 2, data.Count - (rows.Length - 2));
+        int bodyCapacity=weaponRows?rows.Length-2:StatisticsRowCapacity+1;
+        if (data.Count > bodyCapacity) data.RemoveRange(bodyCapacity, data.Count-bodyCapacity);
         data.Add(new RowData { Title = Localization.Get("xuiRebirthQuickStackItemCategoryTitle"), Value = "", Heading = true, Height = 38 });
         string categoryName = QuickStackCategoryRegistry.GetDisplayName(QuickStackCategoryRegistry.Get(stack.itemValue.type));
         data.Add(new RowData { Title = compare ? "" : categoryName, Value = compare ? categoryName : "",
             SelectedValue = compare ? QuickStackCategoryRegistry.GetDisplayName(QuickStackCategoryRegistry.Get(baseline.itemValue.type)) : "",
             FullWidth = !compare, Height = 38 });
-        int width = compare ? 586 : 440;
+        int width = compare ? (weaponRows?730:586) : 440;
         int headerBottom = compare ? 180 : 106;
         int rowTop = headerBottom + (showXmlName ? 38 : 0) + 10;
         int contentHeight = data.Sum(r => r.Height);
@@ -346,6 +351,26 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         xmlName.SetTextImmediately(showXmlName ? stack.itemValue.ItemClass.GetItemName() : "");
         if (compare)
         {
+            if(weaponRows)
+            {
+            Rect(comparisonHeader.ViewComponent,0,0,730,180);
+            Rect(GetChildById("comparisonPopupTitle")?.ViewComponent,14,-8,702,26);
+            Rect(GetChildById("statsPopupHoveredHeading")?.ViewComponent,200,-36,242,22);
+            Rect(GetChildById("statsPopupSelectedHeading")?.ViewComponent,480,-36,236,22);
+            Rect(GetChildById("statsPopupSelectedSlot")?.ViewComponent,480,-62,75,75);
+            Rect(GetChildById("statsPopupName")?.ViewComponent,200,-140,242,36);
+            Rect(GetChildById("statsPopupComparison")?.ViewComponent,480,-140,236,36);
+            }
+            else
+            {
+            Rect(comparisonHeader.ViewComponent,0,0,586,180);
+            Rect(GetChildById("comparisonPopupTitle")?.ViewComponent,14,-8,558,26);
+            Rect(GetChildById("statsPopupHoveredHeading")?.ViewComponent,200,-36,170,22);
+            Rect(GetChildById("statsPopupSelectedHeading")?.ViewComponent,416,-36,156,22);
+            Rect(GetChildById("statsPopupSelectedSlot")?.ViewComponent,416,-62,75,75);
+            Rect(GetChildById("statsPopupName")?.ViewComponent,200,-140,170,36);
+            Rect(GetChildById("statsPopupComparison")?.ViewComponent,416,-140,156,36);
+            }
             Set("statsPopupName", stack.itemValue.ItemClass.GetLocalizedItemName());
             Set("statsPopupComparison", baseline.itemValue.ItemClass.GetLocalizedItemName());
             GetChildById("statsPopupSlot").RefreshBindingsSelfAndChildren();
@@ -364,6 +389,18 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             singleQuality.Color = quality == "Burnt" || quality == "Overcooked"
                 ? new Color32(204,107,100,255) : new Color32(181,140,255,255);
         }
+        if(compare)
+        {
+            RebirthSelectedDurability.CopyNativePresentation(GetChildById("statsPopupSlot"),source,false,stack);
+            RebirthSelectedDurability.CopyNativePresentation(GetChildById("statsPopupSelectedSlot"),RebirthCharacterItemStatsTooltip.Selected,false,baseline);
+        }
+        else
+        {
+            GetChildById("singlePopupSlot").RefreshBindingsSelfAndChildren();
+            RebirthSelectedDurability.CopyNativePresentation(GetChildById("singlePopupSlot"),source,false,stack);
+        }
+        int hoverValueWidth=compare?(weaponRows?260:204):202;
+        int selectedValueX=weaponRows?462:402,selectedValueWidth=weaponRows?240:156;
         int y = rowTop;
         for (int i = 0; i < rows.Length; i++)
         {
@@ -376,15 +413,15 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             row.Icon.IsVisible = !compare && !d.Heading && !d.FullWidth;
             if (!compare) { row.Icon.UIAtlas = d.Atlas; row.Icon.SpriteName = d.Icon; }
             Rect(row.Title, compare ? 0 : 38, -4, compare ? 178 : 162, d.Height - 6);
-            Rect(row.Value, compare ? 186 : 202, -4, compare ? 204 : 202, d.Height - 6);
+            Rect(row.Value, compare ? 186 : 202, -4, hoverValueWidth, d.Height - 6);
             row.SelectedValue.IsVisible = compare;
-            Rect(row.SelectedValue, 402, -4, 156, d.Height - 6);
+            Rect(row.SelectedValue, selectedValueX, -4, selectedValueWidth, d.Height - 6);
             row.Title.Color = d.Heading ? new Color32(181,140,255,255) : new Color32(255,255,255,255);
             if (d.Heading || d.FullWidth) Rect(row.Title, 0, -4, rowWidth, d.Height - 6);
             row.Title.SetTextImmediately(d.Title);
             bool dps = d.Title.IndexOf("DPS", StringComparison.Ordinal) >= 0;
-            SetStatValue(row.Value, row.Details, d.Value, compare ? 186 : 202, compare ? 204 : 202, d.Height, dps, true);
-            SetStatValue(row.SelectedValue, row.SelectedDetails, d.SelectedValue, 402, 156, d.Height, dps, compare);
+            SetStatValue(row.Value, row.Details, d.Value, compare ? 186 : 202, hoverValueWidth, d.Height, dps, true);
+            SetStatValue(row.SelectedValue, row.SelectedDetails, d.SelectedValue, selectedValueX, selectedValueWidth, d.Height, dps, compare);
             y += d.Height;
         }
         footer.IsVisible = food || data.Count == 0;
@@ -401,30 +438,56 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     // Query the game's item/mod effects with each target material. Neutral targets are omitted.
     // This section belongs exclusively to the shared hover card, never selected-item panels.
     private static readonly string[] DamageTargets = { "earth", "stone", "metal", "organic", "wood", "cloth", "water", "terrGravel", "head" };
-    private static float TargetModifier(ItemValue item, string target)
+    private static float TargetModifier(ItemValue item, string target, bool power = false)
     {
         if (item == null || item.IsEmpty()) return 0f;
-        var tags = item.ItemClass.ItemTags | FastTags<TagGroup.Global>.Parse("primary,physicalDamage");
-        float baseline = EffectManager.GetValue(PassiveEffects.DamageModifier, item, 1f, tags: tags,
+        // DamageModifier includes flat damage additions (native rifles add 25+
+        // head damage). Native Hit evaluates it against damage, not against 1.
+        // Starting at 1 incorrectly displayed +25 damage as +2500 percent.
+        if (!RebirthWeaponSustainedDpsService.TryGetDisplayProfile(null, item, out var profile) || profile == null) return 0f;
+        float damage;
+        if(target=="head")damage=profile.Melee?(power?profile.PowerDamagePerAttack:profile.NormalDamagePerAttack):profile.DamagePerAttack;
+        else if(profile.Melee)damage=power?profile.PowerBlockDamagePerAttack:profile.NormalBlockDamagePerAttack;
+        else
+        {
+            // Ranged profiles keep entity damage PER PROJECTILE; they do not
+            // populate the melee-only block fields. Query effective block damage
+            // with the native primary action base and item/ammunition effects.
+            var action=item.ItemClass.Actions!=null&&item.ItemClass.Actions.Length>0?item.ItemClass.Actions[0] as ItemActionAttack:null;
+            damage=EffectManager.GetValue(PassiveEffects.BlockDamage,item,action?.damageBlock??0f,
+                tags:item.ItemClass.ItemTags|FastTags<TagGroup.Global>.Parse("primary"),
+                calcEquipment:false,calcHoldingItem:false,calcProgression:false,calcBuffs:false,useMods:true);
+        }
+        if (damage <= 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return 0f;
+        var tags = item.ItemClass.ItemTags | FastTags<TagGroup.Global>.Parse(power?"secondary,physicalDamage":"primary,physicalDamage");
+        float baseline = EffectManager.GetValue(PassiveEffects.DamageModifier, item, damage, tags: tags,
             calcEquipment: false, calcHoldingItem: false, calcProgression: false, calcBuffs: false, useMods: true);
-        float targeted = EffectManager.GetValue(PassiveEffects.DamageModifier, item, 1f,
+        float targeted = EffectManager.GetValue(PassiveEffects.DamageModifier, item, damage,
             tags: tags | FastTags<TagGroup.Global>.Parse(target),
             calcEquipment: false, calcHoldingItem: false, calcProgression: false, calcBuffs: false, useMods: true);
-        return (targeted - baseline) * 100f;
+        return baseline > 0f && !float.IsInfinity(baseline) && !float.IsNaN(targeted) && !float.IsInfinity(targeted) ? (targeted / baseline - 1f) * 100f : 0f;
     }
     private static string ModifierText(float value) => Math.Abs(value) < .05f ? "" :
         (value > 0 ? "[77CC77]+" : "[EE7777]") + value.ToString("0.#", CultureInfo.InvariantCulture) + "%[-]";
+    private static string ModifierCell(float value,bool paired,float power)
+        =>(ModifierText(value).Length==0?"0%":ModifierText(value))+(paired?" ("+(ModifierText(power).Length==0?"0%":ModifierText(power))+")":"");
     private static void AppendDamageModifiers(List<RowData> data, ItemStack stack, ItemStack selected)
     {
-        if (!RebirthWeaponSustainedDpsService.TryGetDisplayProfile(null, stack.itemValue, out var unused)) return;
+        if (!RebirthWeaponSustainedDpsService.TryGetDisplayProfile(null, stack.itemValue, out var modifierProfile)) return;
+        RebirthWeaponSustainedDpsService.Profile otherModifierProfile=null;
+        bool otherKnown=selected==null||RebirthWeaponSustainedDpsService.TryGetDisplayProfile(null,selected.itemValue,out otherModifierProfile);
         var modifiers = new List<RowData>();
         foreach (string target in DamageTargets)
         {
             float value = TargetModifier(stack.itemValue, target);
             float other = TargetModifier(selected?.itemValue, target);
-            if (Math.Abs(value) < .05f && Math.Abs(other) < .05f) continue;
+            bool paired=modifierProfile.Melee&&modifierProfile.HasPowerAttack;
+            float power=paired?TargetModifier(stack.itemValue,target,true):0f;
+            bool otherPaired=otherModifierProfile?.Melee==true&&otherModifierProfile.HasPowerAttack;
+            float otherPower=otherPaired?TargetModifier(selected?.itemValue,target,true):0f;
+            if (Math.Abs(value) < .05f && Math.Abs(other) < .05f && Math.Abs(power)<.05f && Math.Abs(otherPower)<.05f) continue;
             modifiers.Add(new RowData { Title = Localization.Get("xuiRebirthDamageTarget_" + target),
-                Value = ModifierText(value), SelectedValue = ModifierText(other) });
+                Value = ModifierCell(value,paired,power), SelectedValue = selected==null?"":!otherKnown?"—":ModifierCell(other,otherPaired,otherPower) });
         }
         if (modifiers.Count == 0) return;
         data.Add(new RowData { Title = Localization.Get("xuiRebirthDamageModifiers"), Value = "", Heading = true, Height = 38 });
@@ -443,21 +506,17 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         return result;
     }
 
-    private List<RowData> BuildStatRows(ItemStack stack, ItemStack selected)
+    private List<RowData> BuildStatRows(ItemStack stack, ItemStack selected,out bool weaponRows)
     {
+        weaponRows=false;
         var result = new List<RowData>();
-        // Selected panels and hover cards use exactly the same stat rows.
-        if (RebirthWeaponDetailRows.TryGet(xui, stack, null, 0, out var firstTitle, out var firstValue))
+        // Align the complete card by semantic row key, not by list position.
+        // A different display type can omit or insert native stats.
+        if(RebirthWeaponDetailRows.TryBuildComparison(xui,stack,selected,out var completeRows))
         {
-            for (int row = 0; row < 7; row++)
-            {
-                if (!RebirthWeaponDetailRows.TryGet(xui, stack, null, row, out var title, out var value) || string.IsNullOrEmpty(title)) continue;
-                string selectedValue = "";
-                if (selected != null && RebirthWeaponDetailRows.TryGet(xui, selected, null, row, out var selectedTitle, out var comparisonValue) && selectedTitle == title)
-                    selectedValue = comparisonValue;
-                result.Add(new RowData { Title = title, Value = value, SelectedValue = selectedValue, Height = 34,
-                    Icon = title.IndexOf("Stamina", StringComparison.OrdinalIgnoreCase) >= 0 ? "ui_game_symbol_run" : "ui_game_symbol_tool" });
-            }
+            weaponRows=true;
+            foreach(var row in completeRows)result.Add(new RowData{Title=row.Title,Value=row.Value,SelectedValue=row.SelectedValue,Height=34,
+                Icon=row.Key.IndexOf("Stamina",StringComparison.OrdinalIgnoreCase)>=0?"ui_game_symbol_run":"ui_game_symbol_tool"});
             return result;
         }
         EntityPlayer player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
@@ -749,7 +808,7 @@ public sealed class XUiC_RebirthStatsSlotVisual : XUiController
         var source = selectedPreview
             ? RebirthCharacterItemStatsTooltip.Selected
             : RebirthCharacterItemStatsTooltip.Hovered;
-        if (source is XUiC_ItemStack || source is XUiC_EquipmentStack || source is XUiC_AssembleWindow)
+        if (source != null)
         {
             var stack = RebirthCharacterItemStatsTooltip.Stack(source);
             var item = stack?.itemValue;
@@ -758,7 +817,9 @@ public sealed class XUiC_RebirthStatsSlotVisual : XUiController
             {
                 case "itemicon": value = has ? item.GetPropertyOverride("CustomIcon",item.ItemClass.GetIconName()) : ""; return true;
                 case "iconcolor": value = "255,255,255,255"; return true;
-                case "hasdurability": value = (has && item.ItemClass.ShowQualityBar).ToString(); return true;
+                case "hasdurability": value = RebirthPreviewItemState.Project(item).Visible.ToString(); return true;
+                case "haspermadurability": value=RebirthPreviewItemState.Project(item).DamageVisible.ToString();return true;
+                case "removeddurabilityfill": value=RebirthPreviewItemState.Project(item).Maximum.ToString(CultureInfo.InvariantCulture);return true;
                 case "durabilitycolor": var color = (Color32)QualityInfo.GetQualityColor(has ? item.Quality : 0); value = color.r+","+color.g+","+color.b+",255"; return true;
                 case "durabilityfill": value = has && item.MaxUseTimes > 0 ? ((item.MaxUseTimes-item.UseTimes)/item.MaxUseTimesUI).ToString(System.Globalization.CultureInfo.InvariantCulture) : "1"; return true;
                 case "itemcount": value = has ? (item.ItemClass.ShowQualityBar ? item.Quality.ToString() : stack.count > 1 ? stack.count.ToString() : "") : ""; return true;
@@ -811,3 +872,12 @@ public sealed class XUiC_RebirthPopupSection : XUiController
         base.Update(dt);
     }
 }
+
+
+
+
+
+
+
+
+

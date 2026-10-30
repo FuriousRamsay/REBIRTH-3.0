@@ -55,6 +55,7 @@ public static partial class RebirthMetabolismService
         if (state.RuntimeEntityId != player.entityId)
         {
             state.RuntimeEntityId = player.entityId;
+            state.HasEnergyRateSample = false;
             RebirthMetabolismStateRepository.PrepareOnlineState(player);
             NormalizeLoadedLiquidStacks(player);
             RemoveLegacyFoodWaterStatusBuffs(player);
@@ -169,6 +170,12 @@ public static partial class RebirthMetabolismService
             player.Stats.Food.Value = player.Stats.Food.Value - foodUsePerRealMinute * deltaRealMinutes;
 
         float energyRecoveryPerRealMinute = ProcessEnergy(player, state, mods, energyUsePerRealMinute, deltaRealMinutes);
+        // Owner snapshots must publish the same completed-tick rates as the simulation/trace.
+        // Recomputing from the smoothed activity drops direct Stamina costs and estimates a
+        // recovery rate that may not have been paid (Food/cap-limited, god mode, etc.).
+        state.LastEnergyUsePerRealMinute = IsGodModeActive(player) ? 0f : energyUsePerRealMinute * Mathf.Max(0f, mods.EnergyUse);
+        state.LastEnergyRecoveryPerRealMinute = energyRecoveryPerRealMinute;
+        state.HasEnergyRateSample = true;
 
         float intestinalFluidAbsorptionRate = RebirthMetabolismConfig.BaseIntestinalFluidAbsorptionMlPerRealMinute * mods.FluidAbsorption;
         float solidGastricRate = RebirthMetabolismConfig.BaseSolidGastricEmptyingMlPerRealMinute * mods.DigestionSpeed;
@@ -252,7 +259,7 @@ public static partial class RebirthMetabolismService
         }
 
         if (DebugEnabled)
-            Log.Out("[REBIRTH Metabolism] tick " + FormatSnapshot(snapshot));
+            Log.Out("[REBIRTH Metabolism] tick " + FormatSnapshot(snapshot, GetEnergyReserveCeiling(player)));
         if (DebugEnabled || traceActive)
         {
             LogDetailedTickTrace(player, state, snapshot, deltaRealSeconds,
@@ -903,6 +910,14 @@ public static partial class RebirthMetabolismService
         return Mathf.Lerp(RebirthMetabolismConfig.StaminaRegenAtZeroEnergy, RebirthMetabolismConfig.StaminaRegenAtCriticalEnergy, c);
     }
 
+    // Native local ladder attachment is separate from CurrentMovementTag in 3.4.
+    // Only walking intent adds a fallback: idle attachment keeps its existing cost.
+    private static bool IsClimbingMovement(EntityPlayer player, FastTags<TagGroup.Global> tag)
+    {
+        return tag.Test_AnySet(TagClimbing) ||
+            (tag.Test_AnySet(TagWalking) && player is EntityPlayerLocal local && local.IsOnLadder());
+    }
+
     private static void ResolveActivity(EntityPlayer player, RebirthMetabolismState state, float deltaRealMinutes,
         out float hydrationMlPerReal60Minutes, out float energyUsePerRealMinute)
     {
@@ -910,7 +925,7 @@ public static partial class RebirthMetabolismService
         FastTags<TagGroup.Global> tag = player.CurrentMovementTag;
         if (tag.Test_AnySet(TagSwimmingRun)) target = 4f;
         else if (tag.Test_AnySet(TagRunning)) target = 3f;
-        else if (tag.Test_AnySet(TagSwimming) || tag.Test_AnySet(TagClimbing)) target = 2.5f;
+        else if (tag.Test_AnySet(TagSwimming) || IsClimbingMovement(player, tag)) target = 2.5f;
         else if (tag.Test_AnySet(TagJumping)) target = 2f;
         else if (tag.Test_AnySet(TagWalking)) target = 1f;
 
@@ -1508,7 +1523,12 @@ public static partial class RebirthMetabolismService
     {
         RebirthMetabolismState state = RebirthMetabolismStateRepository.GetOrCreate(player);
         if (IsServerAuthority && state != null && IsGodModeActive(player))
+        {
             state.Energy = RebirthMetabolismConfig.EnergyMax;
+            state.LastEnergyUsePerRealMinute = state.LastEnergyRecoveryPerRealMinute = 0f;
+            state.LastEnergyRecoveryNutritionUsePerRealMinute = 0f;
+            state.HasEnergyRateSample = true;
+        }
         RebirthMetabolismModifiers mods = RebirthMetabolismModifierResolver.Resolve(player, state);
         float aH, aF, hH, cF, iH, iF, d;
         ResolveActivityNoMutation(player, state, out aH, out aF);
@@ -1519,8 +1539,12 @@ public static partial class RebirthMetabolismService
         float food = (RebirthMetabolismConfig.BaseFoodNeedUnitsPerReal60Minutes * mods.FoodRequirement + cF + iF)
             * mods.TotalNutritionDemand;
         float capacity = Mathf.Max(100f, mods.StomachCapacity);
-        float energyUse = RebirthEfficientMovementService.Apply(player, aF) * mods.EnergyUse;
-        float energyRecovery = EstimateEnergyRecoveryPerRealMinute(player, state, mods);
+        float energyUse = state != null && state.HasEnergyRateSample
+            ? state.LastEnergyUsePerRealMinute : RebirthEfficientMovementService.Apply(player, aF) * mods.EnergyUse;
+        float energyRecovery = state != null && state.HasEnergyRateSample
+            ? state.LastEnergyRecoveryPerRealMinute : EstimateEnergyRecoveryPerRealMinute(player, state, mods);
+        if (state != null && state.HasEnergyRateSample)
+            food += state.LastEnergyRecoveryNutritionUsePerRealMinute * 60f;
         return BuildSnapshot(player, state, mods, hyd, food, energyUse, energyRecovery,
             RebirthMetabolismConfig.BaseIntestinalFluidAbsorptionMlPerRealMinute * mods.FluidAbsorption,
             RebirthMetabolismConfig.BaseSolidGastricEmptyingMlPerRealMinute * mods.DigestionSpeed,
@@ -1530,6 +1554,7 @@ public static partial class RebirthMetabolismService
 
     private static void ResolveActivityNoMutation(EntityPlayer player, RebirthMetabolismState state, out float hydration, out float energyUsePerRealMinute)
     {
+        // Read the processed/smoothed activity; native ladder classification is resolved in ResolveActivity.
         float a = state != null ? state.SmoothedActivity : 0f;
         if (a < 0.5f) { hydration = 0f; energyUsePerRealMinute = 0f; }
         else if (a < 1.5f) { hydration = 25f; energyUsePerRealMinute = RebirthMetabolismConfig.EnergyLightUsePerRealMinute; }
@@ -2181,7 +2206,7 @@ public static partial class RebirthMetabolismService
         if (tag.Test_AnySet(TagSwimmingRun)) return "swimmingRun";
         if (tag.Test_AnySet(TagRunning)) return "running";
         if (tag.Test_AnySet(TagSwimming)) return "swimming";
-        if (tag.Test_AnySet(TagClimbing)) return "climbing";
+        if (IsClimbingMovement(player, tag)) return "climbing";
         if (tag.Test_AnySet(TagJumping)) return "jumping";
         if (tag.Test_AnySet(TagWalking)) return "walking";
         return "idle/other";
@@ -2250,13 +2275,13 @@ public static partial class RebirthMetabolismService
             + " energy=" + snapshot.PendingEnergy.ToString("0.00", CultureInfo.InvariantCulture));
     }
 
-    public static string FormatSnapshot(RebirthMetabolismSnapshot s)
+    public static string FormatSnapshot(RebirthMetabolismSnapshot s, float energyCeiling)
     {
         return "Hydration=" + s.Hydration.ToString("0.0", CultureInfo.InvariantCulture) + "/" + s.HydrationMax.ToString("0.0", CultureInfo.InvariantCulture)
             + " pending=" + s.PendingHydration.ToString("0.0", CultureInfo.InvariantCulture)
             + " Nutrition=" + s.Food.ToString("0.0", CultureInfo.InvariantCulture) + "/" + s.FoodMax.ToString("0.0", CultureInfo.InvariantCulture)
             + " pending=" + s.PendingFood.ToString("0.0", CultureInfo.InvariantCulture)
-            + " Energy=" + s.Energy.ToString("0.0", CultureInfo.InvariantCulture) + "/" + (s.EnergyMax * Mathf.Min(s.HydrationMax > 0.001f ? Mathf.Clamp01(s.Hydration / s.HydrationMax) : 0f, s.FoodMax > 0.001f ? Mathf.Clamp01(s.Food / s.FoodMax) : 0f)).ToString("0.0", CultureInfo.InvariantCulture) + "cap"
+            + " Energy=" + s.Energy.ToString("0.0", CultureInfo.InvariantCulture) + "/" + energyCeiling.ToString("0.0", CultureInfo.InvariantCulture) + "cap"
             + " Stomach=" + s.FullnessMl.ToString("0", CultureInfo.InvariantCulture) + "/" + s.StomachCapacityMl.ToString("0", CultureInfo.InvariantCulture) + "ml"
             + " (water=" + s.StomachFluidMl.ToString("0", CultureInfo.InvariantCulture) + ", solids=" + s.StomachSolidMl.ToString("0", CultureInfo.InvariantCulture) + ")"
             + " gutWater=" + s.IntestinalFluidMl.ToString("0.0", CultureInfo.InvariantCulture) + "ml"

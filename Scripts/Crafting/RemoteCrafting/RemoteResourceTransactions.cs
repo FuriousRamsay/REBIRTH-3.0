@@ -529,6 +529,7 @@ public static partial class RemoteResourceTransactions
         return stack != null && !stack.IsEmpty() && stack.count > 0 &&
                stack.itemValue.type == required.type &&
                (!required.HasMetadata("rebirth.cooking.fullIngredient") || RebirthCookingItemStats.FullIngredient(stack.itemValue)) &&
+               RebirthWaterQualityPolicy.SatisfiesRecipeGrade(stack.itemValue,required) &&
                (!stack.itemValue.HasModSlots || !stack.itemValue.HasMods());
     }
 

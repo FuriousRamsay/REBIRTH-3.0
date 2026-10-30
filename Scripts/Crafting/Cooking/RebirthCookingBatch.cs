@@ -94,6 +94,7 @@ public static class RebirthCookingBatch
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingPartialMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingTransferCountCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingSortCompatibility));
+        RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingGridCompactionCompatibility));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingMouseMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingSingleMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingRecipeLookupPostInit));

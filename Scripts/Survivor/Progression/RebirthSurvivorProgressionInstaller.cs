@@ -82,6 +82,7 @@ public static class RebirthSurvivorProgressionInstaller
         string beastmaster=RebirthBeastmasterService.Install(HarmonyInstance);
         string specialPanthers=RebirthSpecialPantherService.Install();
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorCombatSkillPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorReceivedCombatSkillPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthProgressionPointMessaging));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthChallengeCategoryPresentation));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthVanillaChallengeTrackerPresentation));
@@ -93,6 +94,8 @@ public static class RebirthSurvivorProgressionInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedProfileEquipmentStatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedReloadStartTimingPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedReloadCompleteTimingPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedReloadCancelTimingPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedReloadStopTimingPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorHarvestSkillPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthPhase8HarvestCollectedOutputPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorResourceHarvestEffectContextPatch));

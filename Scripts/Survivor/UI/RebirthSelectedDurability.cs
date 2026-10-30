@@ -185,6 +185,14 @@ public static class RebirthSelectedDurability
         if(referenceStack==null)CopyState(targetViews.Damage,actualViews.Damage);
         var inspected=inspectedStack;
         var value=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue;
+        if(referenceStack!=null&&value!=null&&!value.IsEmpty())
+        {
+            // Geometry can come from another slot, but preview state must come
+            // from this exact item (including custom BindStackHover sources).
+            var state=RebirthPreviewItemState.Project(value);
+            if(targetViews.Track!=null){targetViews.Track.IsVisible=state.Visible;targetViews.Track.Fill=state.Maximum;}
+            if(targetViews.Fill!=null){targetViews.Fill.IsVisible=state.Visible;targetViews.Fill.Fill=state.Fill;CommitRailColor(targetViews.Fill,state.Tint);}
+            if(targetViews.Damage!=null)targetViews.Damage.IsVisible=state.DamageVisible;        }
         if(RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink)
         {
             if(targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(value,definition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));}
@@ -393,3 +401,23 @@ public sealed class ConsoleCmdRebirthContextDetailObservation:ConsoleCmdAbstract
         catch(Exception error){SdtdConsole.Instance.Output("*** ERROR context detail observation: "+error.Message);}
     }
 }
+
+
+// Pure item-data projection for previews whose geometry comes from another slot.
+internal struct RebirthPreviewItemState
+{
+    internal bool Visible,DamageVisible;
+    internal float Fill,Maximum;
+    internal Color Tint;
+    internal static RebirthPreviewItemState Project(ItemValue item)
+    {
+        if(item==null||item.IsEmpty()||item.ItemClass==null)return default;
+        bool show=item.ItemClass.ShowQualityBar;
+        float maximum=Math.Max(1,item.MaxUseTimesUI);
+        return new RebirthPreviewItemState{Visible=show,DamageVisible=show&&EntityPlayerLocal.PermaDegrationOn&&item.MaxDurabilityModifier<1f,
+            Fill=item.MaxUseTimes>0?Mathf.Clamp01((item.MaxUseTimes-item.UseTimes)/maximum):1f,
+            Maximum=EntityPlayerLocal.PermaDegrationOn?Mathf.Clamp01(item.MaxDurabilityModifier):1f,Tint=QualityInfo.GetQualityColor(item.Quality)};
+    }
+}
+
+

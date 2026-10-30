@@ -9,13 +9,14 @@ using Audio;
 /// focused draw-from-storage support for Advanced Farming tanks and dew collectors.
 /// </summary>
 [Preserve]
-public class ItemActionCollectWaterRebirth : ItemActionCollectWater
+public class ItemActionCollectWaterRebirth : ItemActionWaterRefillRebirth
 {
     public override void ExecuteAction(ItemActionData actionData, bool released)
     {
         if (!AdvancedFarmingRuntimePolicy.Enabled)
         {
-            base.ExecuteAction(actionData, released);
+            if(actionData?.invData?.item?.GetItemName()=="drinkJarEmpty")base.ExecuteAction(actionData,released);
+            else ExecuteNativeCollect(actionData,released);
             return;
         }
 
@@ -25,7 +26,8 @@ public class ItemActionCollectWaterRebirth : ItemActionCollectWater
         ItemInventoryData invData = actionData.invData;
         if (!AdvancedFarmingItemWaterExchange.TryGetAdvancedWaterStorage(invData, out Vector3i blockPos, out BlockValue blockValue, out TileEntityWaterTankRebirth tank))
         {
-            base.ExecuteAction(actionData, released);
+            if(actionData?.invData?.item?.GetItemName()=="drinkJarEmpty")base.ExecuteAction(actionData,released);
+            else ExecuteNativeCollect(actionData,released);
             return;
         }
 

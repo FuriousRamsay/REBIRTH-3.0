@@ -1164,4 +1164,7 @@
 </append>
 <setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">294,2</setattribute>
 <include filename="../_Vehicles/camper_station_navigation.xml" />
-<conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/><include filename="../_Recycling/controls.xml"/></if></conditional></configs>
+<conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/><include filename="../_Recycling/controls.xml"/></if></conditional>
+<include filename="../_WeaponUi/hover_rows.xml" />
+</configs>
+

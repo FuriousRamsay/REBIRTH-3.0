@@ -153,18 +153,18 @@
   </entry>
   <entry id="PurgeDesert" trigger="purge-information">
     <title>xuiRebirthPurgeDesertTitle</title>
-    <body>xuiRebirthPurgeBiomeHelpBody</body>
+    <body>xuiRebirthPurgeDesertBody</body>
   </entry>
   <entry id="PurgeSnow" trigger="purge-information">
     <title>xuiRebirthPurgeSnowTitle</title>
-    <body>xuiRebirthPurgeBiomeHelpBody</body>
+    <body>xuiRebirthPurgeSnowBody</body>
   </entry>
   <entry id="PurgeWasteland" trigger="purge-information">
     <title>xuiRebirthPurgeWastelandTitle</title>
-    <body>xuiRebirthPurgeBiomeHelpBody</body>
+    <body>xuiRebirthPurgeWastelandBody</body>
   </entry>
   <entry id="PurgeBurntForest" trigger="purge-information">
     <title>xuiRebirthPurgeBurntForestTitle</title>
-    <body>xuiRebirthPurgeBiomeHelpBody</body>
+    <body>xuiRebirthPurgeBurntForestBody</body>
   </entry>
 </journal>

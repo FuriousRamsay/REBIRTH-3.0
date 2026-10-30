@@ -148,7 +148,7 @@ internal sealed class RebirthStationCompletionPublication
         spans=null;string root=Root(saveRoot),path=Path.GetFullPath(Path.Combine(root,((string)node.Attribute("region")).Replace('/',Path.DirectorySeparatorChar)));
         if(!path.StartsWith(root,StringComparison.OrdinalIgnoreCase))return false;
         byte[] payload;using(var stream=SdFile.Open(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
-            if(!RebirthStationRegionPayload.TryRead(stream,(int)node.Attribute("chunkX")&31,(int)node.Attribute("chunkZ")&31,out payload))return false;
+            if(!RebirthStationRegionPayload.TryRead(stream,RebirthStationRegionPayload.NativeLocalIndex((int)node.Attribute("chunkX")),RebirthStationRegionPayload.NativeLocalIndex((int)node.Attribute("chunkZ")),out payload))return false;
         if(Digest(payload)!=(string)node.Attribute("payload")||!RebirthStationChunkInflate.TryDecode(payload,RebirthStationSnapshotEvidence.MaximumSnapshotBytes,out var decoded))return false;
         spans=new byte[4][];
         for(int i=0;i<4;i++){int start=(int)node.Attribute(Spans[i]+"Start")-8,length=(int)node.Attribute(Spans[i]+"Length");

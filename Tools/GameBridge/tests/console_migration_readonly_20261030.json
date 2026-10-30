@@ -1,0 +1,17 @@
+{
+  "name": "Redesigned legacy console read-only smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable save only, new console command DLL installed and restarted, guard ON. Capture and inspect native console output: map unique playable types/tier order, nearby instance bounds/page/filter, memory-ranked resident textures/streaming columns and exact loaded bundle inventory. Script success alone does not prove output semantics, remote permissions or native source attribution. No spawns, resets, unloads or inventory changes.",
+  "steps": [
+    {"console": "listprefabs help"},
+    {"console": "listprefabs map * 1"},
+    {"console": "listprefabs 64 * 1"},
+    {"console": "listprefabs 0"},
+    {"console": "rta bundles * 1"},
+    {"console": "rta textures * 1"},
+    {"console": "rebirthtexaudit assets __missing_bundle__"},
+    {"console": "rta clean"},
+    {"expectNoErrors": true}
+  ]
+}

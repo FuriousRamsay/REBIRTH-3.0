@@ -15,7 +15,7 @@ public static class RebirthCamperSeatsBuild
     {
         if(File.Exists(Output+"/rebirth_camper80s.unity3d"))throw new Exception("Refuse overwrite of preserved candidate");
         Validate(AssetDatabase.LoadAssetAtPath<GameObject>(Source),AssetDatabase.LoadAssetAtPath<GameObject>(Baseline));Directory.CreateDirectory(Output);ExportSourceMeshes();
-        if(!BuildPipeline.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Source}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
+        if(!RebirthAssetBundlePackaging.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Source}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
         File.WriteAllText(Output+"/build-only.txt","Built candidate from "+Source+". Independent geometry decode/comparison and VerifyExisting are still required. Not installed.");
     }
     [Serializable] public class SourceMesh {public string name,path;public Vector3[] vertices;public int[] triangles;public Vector2[] uv;}
@@ -49,7 +49,7 @@ public static class RebirthCamperSeatsBuild
         Validate(source,baseline);
         Directory.CreateDirectory(Output);
         if(File.Exists(Output+"/rebirth_camper80s.unity3d"))throw new Exception("Preserve existing bundle; select a new output folder before rebuilding");
-        if(!BuildPipeline.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Source}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
+        if(!RebirthAssetBundlePackaging.BuildAssetBundles(Output,new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{Source}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64))throw new Exception("Bundle build failed");
         VerifyExisting();
     }
     public static void VerifyExisting()

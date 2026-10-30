@@ -81,6 +81,7 @@ internal static class RebirthPurgeDiscoveryService
                     // combat census positively qualifies it; pending native resets wait.
                     if(existing.ResetOnly)
                     {
+                        if(existing.State==RebirthPoiClearanceState.ResetPending)continue;
                         var result=store.TryDiscover(snapshot,entry.Identity);
                         if(result!=RebirthPoiStoreResult.Published&&result!=RebirthPoiStoreResult.Duplicate)
                         { pending.Add(entry.Identity);return; }
@@ -97,6 +98,8 @@ internal static class RebirthPurgeDiscoveryService
         RebirthPoiClearanceRecord retained;
         if(pending.Count==1&&snapshot.TryGet(pending[0],out retained)&&retained.ResetOnly)
         {
+            // An in-flight native reset is revisited by the periodic census sweep.
+            if(retained.State==RebirthPoiClearanceState.ResetPending){pending.Clear();return;}
             var promoted=store.TryDiscover(snapshot,pending[0]);
             if(promoted==RebirthPoiStoreResult.Published||promoted==RebirthPoiStoreResult.Duplicate)pending.Clear();
             return;

@@ -244,6 +244,7 @@ public class XUiC_RebirthMetabolismWindow : XUiController
     private float nextRefresh;
     private RebirthMetabolismSnapshot snapshot;
     private bool hasSnapshot;
+    private string lastFeedbackMessage = string.Empty;
 
     public override void Init()
     {
@@ -281,8 +282,9 @@ public class XUiC_RebirthMetabolismWindow : XUiController
             nextRefresh = Time.realtimeSinceStartup + 0.20f;
             RefreshSnapshot(false);
             string message = RebirthMetabolismUiFeedback.CurrentMessage;
-            if (!string.IsNullOrEmpty(message))
+            if (!string.Equals(message, lastFeedbackMessage, StringComparison.Ordinal))
             {
+                lastFeedbackMessage = message;
                 IsDirty = true;
                 RefreshBindings();
             }
@@ -391,6 +393,8 @@ public class XUiC_RebirthMetabolismWindow : XUiController
         snapshot = next;
         hasSnapshot = true;
         lastRevision = next.Revision;
+        // Snapshot refresh already renders feedback; only text changes need a separate pass.
+        lastFeedbackMessage = RebirthMetabolismUiFeedback.CurrentMessage;
         IsDirty = true;
         RefreshBindings();
     }

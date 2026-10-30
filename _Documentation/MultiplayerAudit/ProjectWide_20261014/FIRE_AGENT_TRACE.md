@@ -99,3 +99,5 @@ Assembly-CSharp.dll SHA-256 FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B5
 - `E:/_Haven/shared/REBIRTHTemp/FireAgentNative20261015/MinEventActionBase.cs` — 0CD690FA454D34EC672518519B600F99D0A5C89226F6FCB23FB67AF629B2FE40
 - `E:/_Haven/shared/REBIRTHTemp/FireAgentNative20261015/MinEventActionTargetedBase.cs` — D75EE624F48DA7BA13C2E33DF701818ED47288BEC626F5F8CC5513B072873052
 - `E:/_Haven/shared/REBIRTHTemp/FireAgentNative20261015/MinEffectController.cs` — 476F77E262498E1B593CA6792B728D1DED1266A25ADCA5EA21A7AACA2E9CAD01
+
+Parent source correction now implemented in ItemActionRangedRebirthExtinguisher + RebirthExtinguisherHitContext: successful original ray-hit event receives the actual hit.pos with entity/block context scoped/restored in finally. See MP002_PARENT_CONTINUATION.md for exact source evidence and unrun fixture scope. This supersedes only the earlier statement that hit-context correction was unimplemented. Authenticated remote original transport and undefined buff handling remain open; MP002 stays NOT_FULLY_CODED.

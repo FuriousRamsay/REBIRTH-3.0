@@ -20,6 +20,7 @@ for row in manifest:
     assets.append(rel)
 (project/'Assets/Editor').mkdir(parents=True,exist_ok=True)
 shutil.copyfile(Path(__file__).parent/'BuildTraderVoices.cs',project/'Assets/Editor/BuildTraderVoices.cs')
+shutil.copyfile(root/'Tools/AssetBundle/Unity/RebirthAssetBundlePackaging.cs',project/'Assets/Editor/RebirthAssetBundlePackaging.cs')
 (project/'ProjectSettings').mkdir(exist_ok=True)
 (project/'ProjectSettings/ProjectVersion.txt').write_text('m_EditorVersion: 2022.3.62f2\n')
 (project/'Assets/voice_assets.json').write_text(json.dumps({'paths':assets}))

@@ -1,0 +1,112 @@
+<configs>
+  <append xpath="/templates/rebirth_item_stats_popup/panel[@name='characterStatsPopup']">
+    <rect name="statsPopupRow19" controller="RebirthPopupSection, RebirthUtils" pos="18,-762" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow20" controller="RebirthPopupSection, RebirthUtils" pos="18,-796" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow21" controller="RebirthPopupSection, RebirthUtils" pos="18,-830" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow22" controller="RebirthPopupSection, RebirthUtils" pos="18,-864" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow23" controller="RebirthPopupSection, RebirthUtils" pos="18,-898" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow24" controller="RebirthPopupSection, RebirthUtils" pos="18,-932" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow25" controller="RebirthPopupSection, RebirthUtils" pos="18,-966" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow26" controller="RebirthPopupSection, RebirthUtils" pos="18,-1000" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow27" controller="RebirthPopupSection, RebirthUtils" pos="18,-1034" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow28" controller="RebirthPopupSection, RebirthUtils" pos="18,-1068" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow29" controller="RebirthPopupSection, RebirthUtils" pos="18,-1102" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+    <rect name="statsPopupRow30" controller="RebirthPopupSection, RebirthUtils" pos="18,-1136" width="404" height="34" visible="false">
+      <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0" />
+      <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0" />
+      <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0" />
+      <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" />
+      <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+    </rect>
+  </append>
+</configs>

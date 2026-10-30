@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Linq;
 using HarmonyLib;
 
 internal static class RebirthCookingMergeScope
@@ -21,6 +23,7 @@ public static class RebirthCookingPartialMergeScope
     {
         yield return RequireTarget(typeof(Bag), "TryStackItem", typeof(int), typeof(ItemStack));
         yield return RequireTarget(typeof(Inventory), "TryStackItem", typeof(int), typeof(ItemStack));
+        yield return RequireTarget(typeof(TEFeatureStorage), "TryStackItem", typeof(int), typeof(ItemStack));
         // Current native capacity query calls CanStackPartlyWith -> patched CanStackWith.
         yield return RequireTarget(typeof(Inventory), "CanTakeItem", typeof(ItemStack));
         yield return RequireTarget(typeof(XUiM_PlayerInventory), "TryStackItem", typeof(int), typeof(ItemStack), typeof(ItemStack[]));
@@ -41,6 +44,33 @@ public static class RebirthCookingPartialMergeScope
     }
     static void Prefix(ItemStack _itemStack, out ItemValue __state) { __state=Incoming; Incoming=_itemStack?.itemValue; }
     static void Finalizer(ItemValue __state) { Incoming=__state; }
+
+    // Storage must carry the incoming value at the merge call itself. Its native
+    // capacity-only call can otherwise bypass the separately detoured leaf method.
+    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, MethodBase __originalMethod)
+    {
+        var code=instructions.Select(instruction=>new CodeInstruction(instruction)).ToList();
+        if(__originalMethod.DeclaringType!=typeof(TEFeatureStorage))return code;
+        var capacity=AccessTools.Method(typeof(ItemStack),nameof(ItemStack.CanStackPartly),new[]{typeof(int).MakeByRefType()});
+        var checks=code.Select((instruction,index)=>new{instruction,index})
+            .Where(entry=>entry.instruction.Calls(capacity)).ToArray();
+        if(checks.Length!=1 || __originalMethod.GetMethodBody().ExceptionHandlingClauses.Count!=0)
+            throw new InvalidOperationException("Storage liquid merge call shape changed.");
+        int at=checks[0].index;
+        var incoming=new CodeInstruction(OpCodes.Ldarg_2);
+        incoming.labels.AddRange(code[at].labels);code[at].labels.Clear();
+        code[at].opcode=OpCodes.Call;
+        code[at].operand=AccessTools.Method(typeof(RebirthCookingPartialMergeScope),nameof(StorageCanStackPartly));
+        code.Insert(at,incoming);
+        return code;
+    }
+    private static bool StorageCanStackPartly(ItemStack target,ref int count,ItemStack incoming)
+    {
+        if((RebirthCookingMergeScope.NeedsCheck(target?.itemValue)||RebirthCookingMergeScope.NeedsCheck(incoming?.itemValue)) &&
+            !RebirthCookingItemStats.Compatible(target?.itemValue,incoming?.itemValue))return false;
+        RebirthLiquidStackCapacityPatch.Apply(target?.itemValue?.ItemClass);
+        return target.CanStackPartly(ref count);
+    }
 }
 [HarmonyPatch(typeof(ItemStack), nameof(ItemStack.CanStackPartly))]
 public static class RebirthCookingPartialMergeCheck
@@ -98,6 +128,34 @@ public static class RebirthCookingSortCompatibility
             }
         }
         __result=StackSortUtil.SortStacks(_stacks,_ignoreSlots,_ignoredSlots);return false;
+    }
+}
+[HarmonyPatch(typeof(ItemStackGrid),nameof(ItemStackGrid.CompactSlots))]
+public static class RebirthCookingGridCompactionCompatibility
+{
+    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,MethodBase __originalMethod)
+    {
+        var code=instructions.Select(instruction=>new CodeInstruction(instruction)).ToList();
+        var body=__originalMethod.GetMethodBody();
+        var stacks=body.LocalVariables.Where(local=>local.LocalType==typeof(ItemStack)).ToArray();
+        var minimum=AccessTools.Method(typeof(Utils),nameof(Utils.FastMin),new[]{typeof(int),typeof(int)});
+        var calls=code.Select((instruction,index)=>new{instruction,index}).Where(entry=>entry.instruction.Calls(minimum)).ToArray();
+        if(stacks.Length!=2 || calls.Length!=1 || body.ExceptionHandlingClauses.Count!=0)
+            throw new InvalidOperationException("Native storage compaction shape changed.");
+        int at=calls[0].index;
+        // Keep native compaction, locks, sorting and notifications. Only refuse
+        // the proposed count transfer when it would erase item state.
+        var target=CodeInstruction.LoadLocal(stacks[0].LocalIndex);
+        target.labels.AddRange(code[at].labels);code[at].labels.Clear();
+        code[at].operand=AccessTools.Method(typeof(RebirthCookingGridCompactionCompatibility),nameof(CompatibleCount));
+        code.InsertRange(at,new[]{target,CodeInstruction.LoadLocal(stacks[1].LocalIndex)});
+        return code;
+    }
+    private static int CompatibleCount(int incomingCount,int capacity,ItemStack target,ItemStack incoming)
+    {
+        if((RebirthCookingMergeScope.NeedsCheck(target?.itemValue)||RebirthCookingMergeScope.NeedsCheck(incoming?.itemValue)) &&
+            !RebirthCookingItemStats.Compatible(target?.itemValue,incoming?.itemValue))return 0;
+        return Utils.FastMin(incomingCount,capacity);
     }
 }
 [HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.HandleStackSwap))]

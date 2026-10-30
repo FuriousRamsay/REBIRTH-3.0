@@ -142,9 +142,23 @@ public static class QuickStackCategoryRegistry
         // Authored knowledge items are a hard override because their names/tags commonly
         // contain the thing they teach (tool/ammo/medical/vehicle). They must never be
         // routed as that taught item merely because a broader substring matched first.
-        if (ContainsAny(evidence, "schematic", "skillbook", "perkbook", "magazine") ||
-            name.StartsWith("book", StringComparison.Ordinal))
+        // Capability tags such as magazine/drumMagazine/perkBookAutoWeapons
+        // describe firearms too. Knowledge identity comes from authored item
+        // names or the exact resolved reading groups, never those capability tags.
+        if (ContainsAny(name, "schematic", "skillbook", "perkbook", "skillmagazine") ||
+            name.StartsWith("book", StringComparison.Ordinal) ||
+            HasExactGroup(item.Groups, "Books") || HasExactGroup(item.Groups, "SchematicsOnly"))
             return QuickStackCategory.BooksAndSchematics;
+        // Installable modifiers inherit tool/medical/weapon capability metadata.
+        // Native runtime identity outranks those heuristics, but never knowledge.
+        if (item is ItemClassModifier)
+            return QuickStackCategory.ItemModifiers;
+        // Native harvesting/repair tools use meleeTool* names but still perform
+        // melee actions. Keep this authored family ahead of generic melee weapons.
+        // *Parts are authored crafting components, not usable tools; leave their
+        // existing route unchanged in this weapon/tool identity correction.
+        if (name.StartsWith("meleetool", StringComparison.Ordinal) && !name.EndsWith("parts", StringComparison.Ordinal))
+            return QuickStackCategory.Tools;
         // Weapon names are stronger evidence than inherited ammo tags/skill groups.
         // For example, a hunting knife carries ammo-related definition metadata
         // but is still a melee weapon for storage routing.

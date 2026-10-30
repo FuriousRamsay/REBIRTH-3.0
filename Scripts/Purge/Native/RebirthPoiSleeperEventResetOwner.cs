@@ -89,6 +89,7 @@ internal static class RebirthPoiSleeperEventResetOwner
                 }
                 if(!lease.Current||Now>=deadline)yield break;
             }
+            if(!RebirthPoiNativeEvidence.Instance.DrainForReset(store,lease.World,lease.Volumes.Select(v=>v.prefabInstance)))yield break;
             if(!Capture(lease,store))yield break;
             lease.Batch=new RebirthPoiResetBatchCallerProtocol(store,store.Published,lease.Groups.Select(g=>g.Entry),Native(lease),()=>Now);
             while(lease.Current&&Now<deadline&&!lease.Batch.TryAdmitBeforeMutation())

@@ -1,0 +1,20 @@
+{
+  "name": "Basic bandage heals without bleeding",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Authorized disposable completed Survivor only, guard on, no health regeneration buffs or unrelated medicine. Source XML separately verifies exact base6 health; character medicine modifiers may scale gameplay recovery.",
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "medicalBandage", "count": 1, "toolbelt": 1 } },
+    { "action": { "command": "damage", "args": { "amount": 20, "type": "Bashing" } } },
+    { "markItem": "medicalBandage" },
+    { "select": { "slot": 1 } },
+    { "wait": 1.2 },
+    { "press": { "action": "Primary", "seconds": 0.2 } },
+    { "wait": 8 },
+    { "expectItemDelta": { "name": "medicalBandage", "op": "==", "value": -1 } },
+    { "action": { "command": "state", "args": { "sections": "player,stats,buffs,cvars" } } },
+    { "screenshot": "basic_bandage26_after_use" },
+    { "expectNoErrors": true }
+  ]
+}

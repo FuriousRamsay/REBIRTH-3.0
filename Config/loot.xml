@@ -175,4 +175,5 @@
     <item name="ModCharismaCharismaticNature" loot_prob_template="veryLow"/>
     <item name="ModCharismaDaringAdventurer" loot_prob_template="veryLow"/>
   </append>
+  <include filename="_Survivor/loot_sizes_26.xml"/>
 </configs>

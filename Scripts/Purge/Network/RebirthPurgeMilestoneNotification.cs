@@ -69,11 +69,17 @@ internal static class RebirthPurgeMilestoneNotification
         var topic=TeachingTopic(notice.Biome,notice.Tier);
         if(topic!=null)
         {
-            if(RebirthJournalGuideService.ObservePurgeGuide(player,topic.Id)==null)return false;
+            // Retain this actual recipient's live intent before Journal admission.
+            RebirthPurgeTeachingIntent.Retain(player,topic.Id);
+            var guide=RebirthJournalGuideService.ObservePurgeGuide(player,topic.Id);
+            if(guide==null)return false;
             RebirthPurgeInformationTopics.UnlockReadingRecipe(player,topic);
             // 2.6 offers eligible information before its eight-second toolbelt
             // report delay. The information service still owns UI/safety gating.
             RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite);
+            if(!RebirthPurgeTeachingIntent.ManualPending(player,topic.Id)&&
+                (RebirthJournalGuideService.IsRead(guide)||RebirthJournalGuideService.IsPurgeDismissed(guide)))
+                RebirthPurgeTeachingIntent.Retire(player,topic.Id);
         }
         notice.Primed=true;return true;
     }
@@ -81,6 +87,8 @@ internal static class RebirthPurgeMilestoneNotification
     {
         var topic=TeachingTopic(biome,tier);
         if(topic==null)return true;
+        // Native player data (including retained CVars) precedes completed spawn.
+        if(player==null||!player.IsSpawned())return false;
         List<RebirthJournalEntry> unlocked;
         if(!RebirthJournalGuideService.TryGetUnlockedPurgeGuides(player,out unlocked,true))return false;
         bool existed=unlocked.Exists(entry=>entry.Id==topic.Id);
@@ -88,7 +96,15 @@ internal static class RebirthPurgeMilestoneNotification
         if(guide==null)return false;
         // Only newly restored reading material is silent. Existing pending live
         // teaching must remain eligible for recovery after a reload.
-        if(!existed||RebirthJournalGuideService.IsPurgeReadingOnly(guide))
+        if(RebirthPurgeTeachingIntent.ManualPending(player,topic.Id))
+            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,true);
+        else if(RebirthPurgeTeachingIntent.Pending(player,topic.Id))
+        {
+            if(RebirthJournalGuideService.IsRead(guide)||RebirthJournalGuideService.IsPurgeDismissed(guide))
+                RebirthPurgeTeachingIntent.Retire(player,topic.Id);
+            else RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite);
+        }
+        else if(!existed||RebirthJournalGuideService.IsPurgeReadingOnly(guide))
             RebirthPurgeInformationService.RestoreReadingOnly(player,topic.Id);
         RebirthPurgeInformationTopics.UnlockReadingRecipe(player,topic);
         return true;

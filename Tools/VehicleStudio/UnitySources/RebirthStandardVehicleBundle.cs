@@ -28,7 +28,7 @@ public static class RebirthStandardVehicleBundle
             string archive=Path.Combine(output,"UncompressedSource");Directory.CreateDirectory(archive);
             string name="rebirth_"+kind.ToLowerInvariant()+".unity3d";
             var builds=new[]{new AssetBundleBuild {assetBundleName=name,assetNames=new[]{prefabPath}}};
-            if(BuildPipeline.BuildAssetBundles(archive,builds,BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64)==null)
+            if(RebirthAssetBundlePackaging.BuildAssetBundles(archive,builds,BuildAssetBundleOptions.UncompressedAssetBundle,BuildTarget.StandaloneWindows64)==null)
                 throw new InvalidDataException("Bundle build failed");
             uint crc;if(!BuildPipeline.GetCRCForAssetBundle(Path.Combine(archive,name),out crc))throw new InvalidDataException("CRC missing");
             string bundlePath=Path.Combine(output,name);

@@ -1,0 +1,98 @@
+<configs>
+  <!-- Separate player storage; never change a world prop's tile-entity class. -->
+  <append xpath="/blocks">
+    <block name="cntVendingMachineWaterRebirthPlayer">
+      <property name="Extends" value="cntVendingMachineWater" param1="Downgrade,RebirthPickupTarget"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage"><property name="LootList" value="playerWoodWritableStorage"/></property>
+        <property class="TEFeatureLockable"/>
+        <property class="TEFeatureRebirthContainerName"/>
+      </property>
+      <property name="RebirthContainerSize" value="6,7"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="CustomIcon" value="cntVendingMachineWater"/>
+      <property name="DescriptionKey" value="cntSecureStorageChestDesc"/>
+      <property name="ItemTypeIcon" value="lock"/>
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthGeneratedSourceBlock" value="cntVendingMachineWater"/>
+      <property name="RebirthGeneratedPlayerStorage" value="cntVendingMachineWater"/>
+    </block>
+    <block name="cntVendingMachineEnergyRebirthPlayer">
+      <property name="Extends" value="cntVendingMachineEnergy" param1="Downgrade,RebirthPickupTarget"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage"><property name="LootList" value="playerWoodWritableStorage"/></property>
+        <property class="TEFeatureLockable"/>
+        <property class="TEFeatureRebirthContainerName"/>
+      </property>
+      <property name="RebirthContainerSize" value="6,7"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="CustomIcon" value="cntVendingMachineEnergy"/>
+      <property name="DescriptionKey" value="cntSecureStorageChestDesc"/>
+      <property name="ItemTypeIcon" value="lock"/>
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthGeneratedSourceBlock" value="cntVendingMachineEnergy"/>
+      <property name="RebirthGeneratedPlayerStorage" value="cntVendingMachineEnergy"/>
+    </block>
+    <block name="cntVendingMachine2RebirthPlayer">
+      <property name="Extends" value="cntVendingMachine2" param1="Downgrade,RebirthPickupTarget"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage"><property name="LootList" value="playerWoodWritableStorage"/></property>
+        <property class="TEFeatureLockable"/>
+        <property class="TEFeatureRebirthContainerName"/>
+      </property>
+      <property name="RebirthContainerSize" value="6,7"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="CustomIcon" value="cntVendingMachine2"/>
+      <property name="DescriptionKey" value="cntSecureStorageChestDesc"/>
+      <property name="ItemTypeIcon" value="lock"/>
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthGeneratedSourceBlock" value="cntVendingMachine2"/>
+      <property name="RebirthGeneratedPlayerStorage" value="cntVendingMachine2"/>
+    </block>
+    <block name="decoClawFootBathTubRebirthPlayer">
+      <property name="Extends" value="decoClawFootBathTub" param1="Downgrade,RebirthPickupTarget"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage"><property name="LootList" value="playerWoodWritableStorage"/></property>
+        <property class="TEFeatureLockable"/>
+        <property class="TEFeatureRebirthContainerName"/>
+      </property>
+      <property name="RebirthContainerSize" value="6,4"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="CustomIcon" value="decoClawFootBathTub"/>
+      <property name="DescriptionKey" value="cntSecureStorageChestDesc"/>
+      <property name="ItemTypeIcon" value="lock"/>
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthGeneratedSourceBlock" value="decoClawFootBathTub"/>
+      <property name="RebirthGeneratedPlayerStorage" value="decoClawFootBathTub"/>
+    </block>
+  </append>
+  <!-- The soda broken prop is also an inheritance parent. Do not leak its
+       new result into working vending, snack props, or technical helpers.
+       Preserve existing exclusions and each child's own explicit bindings. -->
+  <append xpath="/blocks/block/property[@name='Extends' and @value='cntVendingMachine2Broken' and @param1 and string-length(@param1)&gt;0]/@param1">,RebirthPickupTarget</append>
+  <setattribute xpath="/blocks/block/property[@name='Extends' and @value='cntVendingMachine2Broken' and (not(@param1) or @param1='')]" name="param1">RebirthPickupTarget</setattribute>
+  <append xpath="/blocks/block[@name='cntVendingMachineWaterBroken']">
+    <property name="RebirthPickupTarget" value="cntVendingMachineWaterRebirthPlayer"/>
+  </append>
+  <append xpath="/blocks/block[@name='cntVendingMachineEnergyBroken']">
+    <property name="RebirthPickupTarget" value="cntVendingMachineEnergyRebirthPlayer"/>
+  </append>
+  <append xpath="/blocks/block[@name='cntVendingMachine2Broken']">
+    <property name="RebirthPickupTarget" value="cntVendingMachine2RebirthPlayer"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoClawFootBathTub']">
+    <property name="RebirthPickupTarget" value="decoClawFootBathTubRebirthPlayer"/>
+  </append>
+</configs>

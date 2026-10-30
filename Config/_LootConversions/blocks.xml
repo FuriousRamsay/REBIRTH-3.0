@@ -1,4 +1,4 @@
-﻿<configs>
+<configs>
   <!-- REBIRTH 2.6 parity: decorative/industrial blocks restored as lootable storage
        using the 3.1 CompositeTileEntity storage architecture. -->
 
@@ -115,6 +115,9 @@
 
   <!-- Ice machine: use the native 3.1 freezer loot definition. -->
   <append xpath="/blocks/block[@name='cntIceMachine']">
+    <!-- Old ice machines used FuriousRamsayFreezer (final6x7), unlike the
+         shared current shamwayFreezer loot list. Preserve current loot rolls. -->
+    <property name="RebirthLootContainerSize" value="6,7" />
     <property name="Class" value="CompositeTileEntity" />
     <property class="CompositeFeatures">
       <property class="TEFeatureStorage">
@@ -128,4 +131,6 @@
   <append xpath="/blocks/block[@name='controlPanelBase01']">
     <property name="EconomicValue" value="75" />
   </append>
+  <!-- Exact 2.6 locked-wall-safe 6x4; other shared safe grids unchanged. -->
+  <append xpath="/blocks/block[@name='cntWallSafe']"><property name="RebirthLootContainerSize" value="6,4" /></append>
 </configs>

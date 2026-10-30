@@ -18,7 +18,7 @@ internal static class AdvancedFarmingHarvestPublication
         internal Func<bool> Original;internal Func<bool> ProviderCurrent;
         internal RebirthStationSnapshotEvidence.Request Request;internal float Started;
         internal Guid Source;
-        internal Proof Proof;
+        internal volatile Proof Proof;
         internal bool Scope()=>ThreadManager.IsMainThread()&&ReferenceEquals(GameManager.Instance?.World,World)&&!World.IsRemote()&&World.worldState?.Guid==WorldId&&GameIO.GetSaveGameDir()==Directory&&ProviderCurrent();
         internal bool Postimage()=>Scope()&&ReferenceEquals(World.GetChunkSync(Chunk.X,Chunk.Z),Chunk)&&!Chunk.InProgressUnloading&&Original();
     }
@@ -62,6 +62,9 @@ internal static class AdvancedFarmingHarvestPublication
             var current=attempt;
             attempt.Request=RebirthStationSnapshotEvidence.Watch(world,attempt.Chunk,attempt.Chunk.X,attempt.Chunk.Z,current.Postimage);
             if(attempt.Request==null)return false;attempt.Started=UnityEngine.Time.realtimeSinceStartup;
+            // Preserve this exact successfully read-back generation before the native
+            // writer returns its snapshot to the pool. Never retain the pooled object.
+            attempt.Request.OnPublished=(generation,digest)=>current.Proof=new Proof{Operation=operation,Source=source,World=current.WorldId,X=position.x,Y=position.y,Z=position.z,Digest=digest,Generation=generation};
             lock(attempt.Chunk)
             {
                 var chunk=attempt.Chunk;

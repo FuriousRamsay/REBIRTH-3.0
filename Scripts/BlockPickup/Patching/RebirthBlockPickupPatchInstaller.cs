@@ -150,6 +150,7 @@ public static class RebirthBlockPickupPatchInstaller
 
     private static void InstallExplicitBindings()
     {
+        RebirthLootCapacityParity.Load();
         Type[] patchClasses =
         {
             typeof(RebirthBlockPickupBlocksCreateBinding),
@@ -163,6 +164,8 @@ public static class RebirthBlockPickupPatchInstaller
             typeof(RebirthBlockPickupClientBinding),
             typeof(RebirthBlockPickupStorageDestroyBinding),
             typeof(RebirthBlockPickupStorageAddedBinding),
+            typeof(RebirthLootCapacityParityReadBinding),
+            typeof(RebirthLootCapacityParityInitBinding),
             typeof(RebirthBlockPickupCompositeActivationTextBinding),
             typeof(RebirthBlockPickupItemBindingValueBinding),
             typeof(RebirthBlockPickupItemCanStackBinding)

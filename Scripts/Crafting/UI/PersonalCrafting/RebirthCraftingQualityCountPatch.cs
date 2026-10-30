@@ -68,7 +68,7 @@ public static class RebirthCraftingQualityCountPatch
             for (int s = 0; s < stacks.Count; s++)
             {
                 ItemStack stack = stacks[s];
-                if (stack == null || stack.IsEmpty() || stack.itemValue == null || !RebirthCraftingIngredientQuantity.SameRecipeIdentity(stack.itemValue, demand.Item)) continue;
+                if (!RemoteResourceTransactions.MatchesConsumable(stack, demand.Item)) continue;
                 if (demand.Quality)
                 {
                     if (stack.itemValue.HasModSlots && stack.itemValue.HasMods()) continue;

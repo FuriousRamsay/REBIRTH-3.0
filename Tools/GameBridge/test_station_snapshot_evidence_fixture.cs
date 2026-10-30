@@ -21,6 +21,41 @@ class Check
  frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,1,-2,true);RebirthStationSnapshotEvidence.Serialized(chunk,stream);RebirthStationSnapshotEvidence.Finish(frame,stream,null);A(RebirthStationSnapshotEvidence.TryCopy(request,out bytes),"retry capture");RebirthStationSnapshotEvidence.Invalidate(snapshot);A(!RebirthStationSnapshotEvidence.TryCopy(request,out bytes),"pool reset invalidates");
  frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,1,-2,true);RebirthStationSnapshotEvidence.Serialized(chunk,stream);request.Dispose();RebirthStationSnapshotEvidence.Finish(frame,stream,null);A(!RebirthStationSnapshotEvidence.TryCopy(request,out bytes),"disposed request cannot publish");
  }
+ using(var request=RebirthStationSnapshotEvidence.Watch(world,chunk,9,10)){
+ int notified=0;long receivedGeneration=0;string receivedDigest=null;
+ request.OnPublished=(g,d)=>{notified++;receivedGeneration=g;receivedDigest=d;};
+ var frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,9,10,true);var stream=Image();
+ RebirthStationSnapshotEvidence.Serialized(chunk,stream);RebirthStationSnapshotEvidence.Finish(frame,stream,null);
+ RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation+1,"path","digest");
+ A(notified==0,"wrong generation cannot emit detached receipt");
+ RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation);
+ A(notified==0,"missing native readback path/digest cannot emit detached receipt");
+ RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");
+ long publishedGeneration=request.Generation;string expected;
+ using(var hash=System.Security.Cryptography.SHA256.Create())expected=System.BitConverter.ToString(hash.ComputeHash(Image().ToArray())).Replace("-","").ToLowerInvariant();
+ A(notified==1&&receivedGeneration==publishedGeneration&&receivedDigest==expected,"exact published serialized image emitted once");
+ RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");
+ A(notified==1,"duplicate publication cannot emit another receipt");
+ RebirthStationSnapshotEvidence.Invalidate(snapshot);
+ A(!RebirthStationSnapshotEvidence.HasPublished(request)&&!RebirthStationSnapshotEvidence.TryCopy(request,out bytes),"pooled evidence still invalidates");
+ A(receivedGeneration==publishedGeneration&&receivedDigest==expected,"detached receipt survives immediate native pool return");
+ }
+ using(var request=RebirthStationSnapshotEvidence.Watch(world,chunk,9,10)){
+ bool notified=false;request.OnPublished=(g,d)=>notified=true;
+ var frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,9,10,true);var stream=Image();
+ RebirthStationSnapshotEvidence.Serialized(chunk,stream);RebirthStationSnapshotEvidence.Finish(frame,stream,null);
+ request.Dispose();RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");
+ A(!notified,"closed watch cannot emit a detached receipt");
+ }
+ using(var request=RebirthStationSnapshotEvidence.Watch(world,chunk,9,10)){
+ request.OnPublished=(g,d)=>{throw new System.InvalidOperationException("refusing observer");};
+ var frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,9,10,true);var stream=Image();
+ RebirthStationSnapshotEvidence.Serialized(chunk,stream);RebirthStationSnapshotEvidence.Finish(frame,stream,null);
+ RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");
+ RebirthStationSnapshotEvidence.PublishedSnapshot receipt;
+ A(RebirthStationSnapshotEvidence.HasPublished(request)&&RebirthStationSnapshotEvidence.TryGetPublishedSnapshot(request,out receipt)&&RebirthStationSnapshotEvidence.TryCopy(request,out bytes),"observer exception cannot erase positive shared readback");
+ A(request.OnPublished==null&&request.Diagnostic=="published-notification-failed","failed observer retired once without a domain receipt");
+ }
  for(int mutation=0;mutation<3;mutation++){
  var tile=new object();using(var request=RebirthStationSnapshotEvidence.Watch(world,chunk,4,5,null,tile,(input,queue)=>input.Length==2&&input[1]==7&&queue.Length==2&&queue[1]==9)){
  var frame=RebirthStationSnapshotEvidence.Begin(snapshot,chunk,world,4,5,true);var stream=new System.IO.MemoryStream();stream.Write(new byte[]{116,116,99,0,47,0,0,0},0,8);
@@ -40,8 +75,9 @@ class Check
  if(mutation==4){stream.Position=10;stream.WriteByte(99);}stream.Position=0;
  RebirthStationSnapshotEvidence.Serialized(chunk,stream);RebirthStationSnapshotEvidence.Finish(frame,stream,null);
  A(RebirthStationSnapshotEvidence.TryCopy(request,out bytes)==(mutation==0),"terminal exact output/receipt spans: missing, duplicate, rewritten, stream or validator failures refused");
- if(mutation==0){RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");RebirthStationSnapshotEvidence.Publication proof;A(RebirthStationSnapshotEvidence.TryGetPublished(request,out proof)&&proof.OutputStart==10&&proof.OutputLength==1&&proof.CompletionStart==11&&proof.CompletionLength==1,"terminal publication retains offsets");}
+ if(mutation==0){bool completeInsideCallback=false;request.OnPublished=(g,d)=>{RebirthStationSnapshotEvidence.Publication p;completeInsideCallback=RebirthStationSnapshotEvidence.TryGetPublished(request,out p)&&p.OutputLength==1&&p.CompletionLength==1;};RebirthStationSnapshotEvidence.MarkPublished(request,snapshot,request.Generation,"path","digest");RebirthStationSnapshotEvidence.Publication proof;A(RebirthStationSnapshotEvidence.TryGetPublished(request,out proof)&&proof.OutputStart==10&&proof.OutputLength==1&&proof.CompletionStart==11&&proof.CompletionLength==1,"terminal publication retains offsets");A(completeInsideCallback,"full shared proof exists before optional consumer runs");}
  }} var holds=new RebirthStationSnapshotEvidence.Request[4];for(int i=0;i<4;i++)holds[i]=RebirthStationSnapshotEvidence.Watch(world,chunk,i,0);A(RebirthStationSnapshotEvidence.Watch(world,chunk,9,0)==null,"bounded requests");foreach(var r in holds)r.Dispose();
+ CookingPublicationProbe.Run();
  System.Console.WriteLine("PASS actual snapshot evidence lifecycle: generation, detached payload, world/chunk/stream identity, skipped/failed serialization, reset/dispose, bounded watches");
  }
 }

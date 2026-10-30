@@ -26,9 +26,60 @@ internal static class RebirthCamperWrapAppearance
     private static AssetBundle bundle;
     private static readonly Dictionary<string,AssetBundle> DedicatedBundles=new Dictionary<string,AssetBundle>(StringComparer.Ordinal);
     private static readonly HashSet<string> DedicatedAttempts=new HashSet<string>(StringComparer.Ordinal);
-    internal static bool UsesNativeBodyLayout(string id)=>id=="GenmaSaotome"||id=="CaptStress";
+    // Only promote an original catalogue ID here after its complete twelve-panel
+    // set is staged for native review. Deploy this list with reviewed bundles;
+    // all unconverted IDs retain the original collection route.
+    private static readonly HashSet<string> NativeBodyIds=new HashSet<string>(StringComparer.Ordinal)
+    {
+        "MissBanjo",
+        "FuriousRamsay",
+        "HeyWeps",
+        "DeadZoneRunner",
+        "JensClinic",
+        "RektsLastNerve",
+        "HughsHeavySupply",
+        "BobsSalvageRoute",
+        "JoelsFrontierFaith",
+        "PoppysOddities",
+        "RektsHarvestHauler",
+        "HughsWinterOutpost",
+        "BobsTowService",
+        "JoelsDesertMission",
+        "JensNightShift",
+        "RektsNoRefunds",
+        "HughsBrassStandard",
+        "JoelsTradingCaravan",
+        "BobsCopperheadGarage",
+        "ShamwaySupperRun",
+        "PopNPillsHouseCall",
+        "MoPowerServiceVan",
+        "PassNGasRoadCrew",
+        "WorkingStiffsToolRun",
+        "DishongExecutiveFleet",
+        "BoarandCorn",
+        "CrackABookBookmobile",
+        "ZoesSalonCruiser",
+        "RedMesaDispatch",
+        "SavageCountryOutfitter",
+        "NavezganeGeneralHospital",
+        "FatHawaiianFeast",
+        "ProwlinPetesRescue",
+        "TheLastSunsetMotel",
+        "NavezganePostalRoute",
+        "PurpleLlama",
+        "GenmaSaotome", "CaptStress", "MidnightCartographer", "TheHungryRoad", "BloodMoonExpress", "NavezganeExplorer"
+    };
+    internal static bool UsesNativeBodyLayout(string id)=>id!=null&&NativeBodyIds.Contains(id);
+    internal static int NativeBodyLayoutVersion(string id)=>!UsesNativeBodyLayout(id)?0:
+        id=="GenmaSaotome"?1:2;
+    internal static bool IsLayeredTexture(string stem)
+    {
+        if(stem.StartsWith("UndeadChill",StringComparison.Ordinal))return true;
+        foreach(string id in NativeBodyIds)if(stem.StartsWith(id,StringComparison.Ordinal))return true;
+        return false;
+    }
     internal static bool IsLayered(string id)=>id=="UndeadChill"||id=="UndeadChillAfterHours"||UsesNativeBodyLayout(id);
-    internal static string DedicatedBundleName(string id)=>id=="CaptStress"?"rebirth_captstress.unity3d":id=="GenmaSaotome"?"rebirth_genma_saotome.unity3d":id=="UndeadChill"?"rebirth_undead_chill.unity3d":"rebirth_undead_chill_after_hours.unity3d";
+    internal static string DedicatedBundleName(string id)=>id=="MidnightCartographer"?"rebirth_midnight_cartographer.unity3d":id=="CaptStress"?"rebirth_captstress.unity3d":id=="GenmaSaotome"?"rebirth_genma_saotome.unity3d":id=="UndeadChill"?"rebirth_undead_chill.unity3d":id=="UndeadChillAfterHours"?"rebirth_undead_chill_after_hours.unity3d":"rebirth_wrap_"+id.ToLowerInvariant()+".unity3d";
     private static bool attempted;
     private static bool registered;
     private static int generation;
@@ -195,7 +246,7 @@ internal static class RebirthCamperWrapAppearance
                 ||IsLayered(id);
             material.SetFloat("_WrapFrontPanel",frontPanel?1f:0f);
             bool fullCoverage=IsLayered(id);
-            if(material.HasProperty("_WrapLayoutVariant"))material.SetFloat("_WrapLayoutVariant",UsesNativeBodyLayout(id)?1:0);
+            if(material.HasProperty("_WrapLayoutVariant"))material.SetFloat("_WrapLayoutVariant",NativeBodyLayoutVersion(id));
             if(material.HasProperty("_GenmaNativeBody12V2"))material.SetFloat("_GenmaNativeBody12V2",UsesNativeBodyLayout(id)?1:0);
             if(material.HasProperty("_WrapBaseCoat"))material.SetVector("_WrapBaseCoat",id=="UndeadChillAfterHours"?new Vector4(.008f,.033f,.036f,1):new Vector4(.012f,.014f,.014f,1));
             material.SetFloat("_WrapFullCoverage",fullCoverage?1f:0f);

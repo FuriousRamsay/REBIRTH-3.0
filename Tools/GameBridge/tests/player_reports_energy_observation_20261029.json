@@ -1,0 +1,11 @@
+{
+  "name": "Player reports: Energy rate observation",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "_note": "User/lead controlled disposable fixture only, guard stays ON. While the user performs the reported sprint/ladder/cleaver flow, opt in with rbmet trace 120 and inspect completed-tick use/recovery/ceiling and Nutrition/Hydration before/after. Capture the Energy tooltip immediately after exertion and during idle recovery, compare actual tick trace and projected rates. Repeat at Hydration100/75/50/25 and different Nutrition reserves, including near cap. These read-only steps alone do not prove dynamic rate correctness, the reported69-point drop, or independent multiplayer behavior.",
+  "steps": [
+    {"action":{"command":"state","args":{"Sections":"player,stats,world"}}},
+    {"screenshot":"player_report_energy_observation"},
+    {"expectNoErrors":true}
+  ]
+}

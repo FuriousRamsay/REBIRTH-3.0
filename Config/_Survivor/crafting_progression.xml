@@ -7,6 +7,7 @@
     <policy id="external" meaning="reserved for compatibility recipes not owned by this manifest" />
   </policy_contract>
   <recipes>
+    <recipe id="rebirthGearWalkmanHeadphones" policy="universal" source="rebirth" source_status="target_recipe_verified" implementation="policy_declared" family="equipment.utility" decision_status="owner_requested_20261029" />
     <recipe id="rebirthRageCapsule" policy="gated" source="rebirth" source_status="target_recipe_verified" implementation="existing_capability" family="medical" decision_status="approved" primary_skill="skill.chemistry" capability="capability.recipe.rebirthragecapsule" improvisation_category="chemistry" />
     <recipe id="ammo44MagnumBulletAP" policy="gated" source="native_b259_capture" source_status="target_recipe_verified" implementation="existing_capability" family="gunsmithing.general" decision_status="approved" primary_skill="skill.gunsmithing" capability="capability.recipe.ammo44magnumbulletap" knowledge="schematic.gunsmithing.specialty_ammo" improvisation_category="gunsmithing" />
     <recipe id="ammo44MagnumBulletBall" policy="gated" source="native_b259_capture" source_status="target_recipe_verified" implementation="existing_capability" family="gunsmithing.ammunition" decision_status="approved_chunk_c" primary_skill="skill.gunsmithing" capability="capability.recipe.ammo44magnumbulletball" knowledge="schematic.gunsmithing.standard_ammo" improvisation_category="gunsmithing" />

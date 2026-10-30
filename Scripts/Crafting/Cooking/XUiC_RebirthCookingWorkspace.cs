@@ -453,6 +453,11 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
     private string Method => RebirthCookingHeatRules.ImprovisedMethod(station.Workstation,
         slots.Take(9).Where(slot => slot != null).Select(slot => slot.ItemStack));
     private string UnknownIcon => station.IsMilling ? ItemClass.GetItem(station.Workstation).ItemClass?.GetIconName() ?? "FR_MortarPestle_icon" : "rebirthImprovised"+Method+variation.ToString("00");
+    // Type totals must exclude water whose stored profile cannot satisfy its own
+    // authored grade. Retain full-container and downstream identity/provenance checks.
+    private static int UsableCount(ItemStack stack)
+        =>stack==null||stack.IsEmpty()||!RebirthCookingItemStats.FullIngredient(stack.itemValue)||
+            !RebirthWaterQualityPolicy.SatisfiesRecipeGrade(stack.itemValue,stack.itemValue)?0:stack.count;
     private void ReadInventoryCounts()
     {
         long profile=RebirthCookingDiagnostics.Begin();
@@ -471,7 +476,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         }
         foreach(var stack in available)
         {
-            if(stack==null||stack.IsEmpty()||!RebirthCookingItemStats.FullIngredient(stack.itemValue))continue;
+            if(UsableCount(stack)==0)continue;
             inventoryStateFingerprint=unchecked(inventoryStateFingerprint*31+FingerprintStack(stack));
             inventoryCounts.TryGetValue(stack.itemValue.type,out int count);
             long combined=(long)count+stack.count;inventoryCounts[stack.itemValue.type]=combined>int.MaxValue?int.MaxValue:(int)combined;
@@ -489,7 +494,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         for(int i=0;i<slots.Length;i++)
         {
             var stack=slots[i]?.ItemStack;
-            if(stack!=null&&!stack.IsEmpty()&&stack.itemValue.type==item.type&&RebirthCookingItemStats.FullIngredient(stack.itemValue))count+=stack.count;
+            if(stack!=null&&!stack.IsEmpty()&&stack.itemValue.type==item.type)count+=UsableCount(stack);
         }
         return count;
     }
@@ -795,7 +800,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         {
             bool valid=i<alternatives.Length; string id=valid?alternatives[i]:"";
             bool used=valid&&ghosts.Where((g,j)=>j!=slot&&g!=null).Any(g=>g.itemValue.type==ItemClass.GetItem(id).type);
-            Caption("choice"+i, valid?used?string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingSubstitutionUsed", "{0} — already used"),Localization.Get(id)):string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingSubstitutionAvailable", "{0} ({1})"),Localization.Get(id),xui.PlayerInventory.GetItemCount(ItemClass.GetItem(id))):"");
+            Caption("choice"+i, valid?used?string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingSubstitutionUsed", "{0} — already used"),Localization.Get(id)):string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingSubstitutionAvailable", "{0} ({1})"),Localization.Get(id),Available(ItemClass.GetItem(id))):"");
             if(Find("choiceIcon"+i)?.ViewComponent is XUiV_Sprite icon){icon.SpriteName=valid?ItemClass.GetItem(id).ItemClass?.GetIconName()??"":"";icon.IsVisible=valid;}
             Show("choice"+i,valid); Enable("choice"+i,valid&&!used);
         }
@@ -1211,6 +1216,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(inputs.Count==0){blocker=RebirthSurvivorUiText.L("xuiRebirthCookingPullOrAddFirst", "Pull or add ingredients first.");return false;}
         if(selected!=null&&!Matches(selected,inputs,true)){blocker=RebirthSurvivorUiText.L("xuiRebirthCookingLoadRequestedServings", "Load all ingredients for the requested servings.");return false;}
         if(inputs.Any(i=>!RebirthCookingItemStats.FullIngredient(i.itemValue))){blocker=RebirthSurvivorUiText.L("xuiRebirthCookingFullContainersOnly", "Drink ingredients must be in full containers.");return false;}
+        if(inputSnapshot.Any(s=>!s.IsEmpty()&&UsableCount(s)==0)){blocker=Localization.Get("xuiRebirthStationExactMaterialsRequired");return false;}
         if(inputSnapshot.Any(s=>!s.IsEmpty()&&s.count<batch)||inputSnapshot.Where(s=>!s.IsEmpty()).GroupBy(s=>s.itemValue.type).Any(g=>g.Count()>1)){blocker=RebirthSurvivorUiText.L("xuiRebirthCookingOneSlotPerIngredient", "Use each ingredient type in one slot, with enough for the batch.");return false;}
         recipe=BatchRecipe(ActiveMagazine);
         if(station.IsMilling)
@@ -1337,7 +1343,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
             var value=!loaded.IsEmpty()?loaded.itemValue:g?.itemValue;
             Text("millingIngredientName"+i, value?.ItemClass == null ? "" : Localization.Get(value.ItemClass.GetItemName()));
             Show("millingIngredientName"+i, milling && value != null);
-            int have=value==null?0:InventoryCount(value)+(loaded.IsEmpty()?0:loaded.count),need=g==null?(!loaded.IsEmpty()?Math.Max(1,loaded.count/batch)*batch:0):(TryGhostQuantity(i,batch,out int requiredTotal)?requiredTotal:int.MaxValue);
+            int have=value==null?0:InventoryCount(value)+UsableCount(loaded),need=g==null?(!loaded.IsEmpty()?Math.Max(1,loaded.count/batch)*batch:0):(TryGhostQuantity(i,batch,out int requiredTotal)?requiredTotal:int.MaxValue);
             Text("need"+i,value==null?"":need+" ["+(have>=need?"70C47E":"E05D5D")+"]("+have+")[-]");
             var sub=!station.IsMilling&&selected!=null&&i<selected.ingredients.Count?RebirthCookingCatalogue.Get(selected.GetName()):null;
             Show("sub"+i,AvailableSubstitutes(i).Length>0);
@@ -1491,6 +1497,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
     {
         // The native queue stores the concrete ingredient list, so cancellation refunds substitutions.
         if(!station.IsMilling&&station.craftingQueue.GetRecipesToCraft().Any(e=>e.GetRecipe()!=null)){status=RebirthSurvivorUiText.L("xuiRebirthCookingTakeCurrentBatch", "Take the current batch before starting another.");AbandonRegistration(recipe);return;}
+        if(slots.Any(s=>!s.ItemStack.IsEmpty()&&UsableCount(s.ItemStack)==0)){status=Localization.Get("xuiRebirthStationExactMaterialsRequired");AbandonRegistration(recipe);return;}
         var totals=new List<int>(recipe.ingredients.Count);
         foreach(var ingredient in recipe.ingredients)
         {

@@ -1,0 +1,93 @@
+{
+  "name": "Natural murky source right-click top-up (observed CodexTest fixture)",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable save ONLY. Stage player within2m of observed ground[-248,38,627], clear threats, guard ON, autosip temporarily off, empty toolbelt1/2. Do not use in another world or at unverified coordinates. Scenario captures real actions; inspect rbliquidobserve for boiled375->murky500 with unchanged count/seed. Execution success alone is not purity acceptance. Restore autosip and quit in parent finally.",
+  "steps": [
+    {
+      "cleararea": {
+        "radius": 80
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "count": 1,
+        "toolbelt": 2,
+        "item": "bucketRiverWater"
+      }
+    },
+    {
+      "select": {
+        "slot": 2
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": -247.9,
+          "z": 627.5,
+          "y": 38.15
+        }
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Secondary"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,inventory"
+        }
+      }
+    },
+    {
+      "give": {
+        "count": 1,
+        "toolbelt": 1,
+        "item": "drinkJarBoiledWater"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "console": "rbliquidobserve"
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Secondary"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "console": "rbliquidobserve"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

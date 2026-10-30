@@ -240,7 +240,7 @@ namespace RebirthVehicleInspector.UnityTools
             var builds = new [] { new AssetBundleBuild {
                 assetBundleName = normalized,
                 assetNames = new [] { prefabAssetPath } } };
-            AssetBundleManifest manifest = BuildPipeline.BuildAssetBundles(outputFolder, builds,
+            AssetBundleManifest manifest = RebirthAssetBundlePackaging.BuildAssetBundles(outputFolder, builds,
                 BuildAssetBundleOptions.None, target);
             if (manifest == null) throw new IOException("Unity AssetBundle build failed; inspect Console.");
             string built = Path.GetFullPath(Path.Combine(outputFolder, normalized));

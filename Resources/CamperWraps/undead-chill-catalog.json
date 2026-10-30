@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "count": 7,
+  "extendsCollectionTotal": 207,
+  "wraps": [
+    {
+      "id": "UndeadChill",
+      "name": "Undead Chill",
+      "item": "modVehicleWrapUndeadChill",
+      "displayName": "Undead Chill Vehicle Wrap",
+      "description": "Undead Chill: Headphone skull with teal ponytail and roses on the hood; cozy skeleton gamer at a streaming desk along the truck; charcoal, dusty-rose and sage botanical strips on the camper. Install in the camper cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "hood": "headphone skull with teal ponytail and roses",
+      "side": "cozy skeleton gamer at a streaming desk",
+      "band": "charcoal, dusty-rose and sage botanical strips",
+      "artwork": "Resources/CamperWraps/Artwork/UndeadChill.png"
+    },
+    {
+      "id": "UndeadChillAfterHours",
+      "name": "Undead Chill: Afterlife After Hours",
+      "item": "modVehicleWrapUndeadChillAfterHours",
+      "displayName": "Undead Chill: Afterlife After Hours Vehicle Wrap",
+      "description": "Afterlife After Hours: petrol-teal night garden, coral moths and a headphone skull; a hammock gamer on one side and a beanbag gamer on the other. Install in the camper cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "hood": "headphone skull, coral moth and crescent moon",
+      "side": "hammock gamer and sleepy rabbit on the left; beanbag gamer and moon console on the right",
+      "band": "petrol-teal night garden, coral moths and ivory moonflowers",
+      "artwork": "Resources/CamperWraps/Artwork/UndeadChillAfterHours.png"
+    },
+    {
+      "id": "GenmaSaotome",
+      "name": "Genma Saotome",
+      "item": "modVehicleWrapGenmaSaotome",
+      "displayName": "Genma Saotome Vehicle Wrap",
+      "description": "Panda martial arts meet prehistoric attitude: a jade T-rex hood, Genma panda rear door, a playful showdown and a peaceful tea break. Install in the camper cosmetic slot.",
+      "artwork": "Resources/CamperWraps/Artwork/GenmaSaotome.png"
+    },
+    {
+      "id": "CaptStress",
+      "name": "CaptStress",
+      "item": "modVehicleWrapCaptStress",
+      "displayName": "CaptStress Vehicle Wrap",
+      "description": "Scotch, copper stills, charred casks and a survivor taking a well-earned dram after horde night. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "artwork": "Resources/CamperWraps/Artwork/CaptStress.png"
+    },
+    {
+      "id": "PurpleLlama",
+      "name": "Purple Llama",
+      "item": "modVehicleWrapPurpleLlama",
+      "displayName": "Purple Llama Vehicle Wrap",
+      "description": "Purple Llama: cooking for the crew, clearing zombies and taking a well-earned break. Purple and orange accents on charcoal survival scenes. Your beef isn't going in my stew. Install in the 80s Camper Truck cosmetic slot, replacing dye.",
+      "artwork": "Resources/CamperWraps/Artwork/PurpleLlama.png"
+    },
+    {
+      "id": "FuriousRamsay",
+      "name": "FuriousRamsay",
+      "item": "modVehicleWrapFuriousRamsay",
+      "displayName": "FuriousRamsay Vehicle Wrap",
+      "description": "The creator watches the apocalypse unfold. Purple and cyan scenes of late-night development, suffering survivors and popcorn. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "artwork": "Resources/CamperWraps/Artwork/FuriousRamsay.png"
+    },
+    {
+      "id": "MissBanjo",
+      "name": "MissBanjo",
+      "item": "modVehicleWrapMissBanjo",
+      "displayName": "MissBanjo Vehicle Wrap",
+      "description": "MissBanjo: kitten protector, IT scavenger and shameless loot goblin. Purple, teal and blue survival scenes. Install in the camper cosmetic slot.",
+      "artwork": "Resources/CamperWraps/Artwork/MissBanjo.png"
+    },
+    {
+      "id": "HeyWeps",
+      "name": "HeyWeps",
+      "item": "modVehicleWrapHeyWeps",
+      "displayName": "HeyWeps Vehicle Wrap",
+      "description": "Blue and steel gray submarine survival. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "artwork": "Resources/CamperWraps/Artwork/HeyWeps.png"
+    }
+  ]
+}

@@ -44,6 +44,7 @@
 
   <!-- Restrictive Healing / Prevent Healing Overlap: all direct medical-item use enters one shared policy before vanilla consumption/effects. -->
   <set xpath="/items/item[@name='medicalBandage']/property[@class='Action0']/property[@name='Class']/@value">ItemActionUseMedRebirthBleeding, RebirthUtils</set>
+  <include filename="_Healing/basic_bandage.xml"/>
   <set xpath="/items/item[@name='medicalAloeCream']/property[@class='Action0']/property[@name='Class']/@value">ItemActionUseMedRebirth, RebirthUtils</set>
 
 

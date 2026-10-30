@@ -25,7 +25,7 @@ class Manager {public string saveDirectory;public object regionFileAccess=new Re
 class ChunkProviderGenerateWorld {public Manager m_RegionFileManager=new Manager();}
 static class RegionFile {public static string ConstructFullFilePath(string directory,int x,int z,string extension)=>Path.Combine(directory,"fake.7rg");}
 static class SdFile {public static Stream Open(string path,FileMode mode,FileAccess access,FileShare share)=>File.Open(path,mode,access,share);}
-static class RebirthStationRegionPayload {public static bool TryRead(Stream stream,int x,int z,out byte[] bytes){bytes=null;return false;}}
+static class RebirthStationRegionPayload { public static int NativeLocalIndex(int coordinate){return coordinate%32+(coordinate<0?31:0);}public static bool TryRead(Stream stream,int x,int z,out byte[] bytes){bytes=null;return false;}}
 static class RebirthStationChunkInflate {public static bool TryDecode(byte[] bytes,int maximum,out byte[] body){body=null;return false;}}
 static class RebirthStationSnapshotEvidence {public const int MaximumSnapshotBytes=8388608;}
 static class AdvancedFarmingHarvestPublication {

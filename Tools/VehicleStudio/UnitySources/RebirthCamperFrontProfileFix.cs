@@ -141,7 +141,7 @@ public static class RebirthCamperFrontProfileFix
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
         Directory.CreateDirectory(Output+"/Bundle");
         string asset=Folder+"/rebirthCamper80s.prefab";
-        var manifest=BuildPipeline.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{asset}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+        var manifest=RebirthAssetBundlePackaging.BuildAssetBundles(Output+"/Bundle",new[]{new AssetBundleBuild{assetBundleName="rebirth_camper80s.unity3d",assetNames=new[]{asset}}},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
         if(!manifest)throw new Exception("Candidate bundle build failed.");
         VerifyExisting();
     }

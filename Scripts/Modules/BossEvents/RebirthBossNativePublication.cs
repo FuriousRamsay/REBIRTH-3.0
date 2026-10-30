@@ -9,13 +9,22 @@ using HarmonyLib;
 // Missing chunks/entities/captures never authorize another spawn or a reward.
 internal static class RebirthBossNativePublication
 {
-    private sealed class Bound {internal World World;internal string Directory;internal RebirthBossEventInstance Event;internal RebirthBossSpawnOriginal Original;internal Entity Entity;internal RebirthStationSnapshotEvidence.Request Watch;internal Chunk Chunk;internal float Started;internal bool Death;}
+    private sealed class Bound {internal World World;internal string Directory;internal RebirthBossEventInstance Event;internal RebirthBossSpawnOriginal Original;internal Entity Entity;internal RebirthStationSnapshotEvidence.Request Watch;internal RebirthBossPublicationCapture Capture;internal Chunk Chunk;internal float Started;internal bool Death;}
     private static readonly Dictionary<Entity,Bound> bound=new Dictionary<Entity,Bound>();
-    private sealed class Removing {internal World World;internal RebirthBossEventInstance Event;internal RebirthBossSpawnOriginal Original;internal Chunk Chunk;internal RebirthStationSnapshotEvidence.Request Watch;internal float Started;}
+    private sealed class Removing {internal World World;internal RebirthBossEventInstance Event;internal RebirthBossSpawnOriginal Original;internal Chunk Chunk;internal RebirthStationSnapshotEvidence.Request Watch;internal RebirthBossPublicationCapture Capture;internal float Started;}
     private static readonly Dictionary<Guid,Removing> removing=new Dictionary<Guid,Removing>();
     private static World scope;private static string directory;private static float nextUpdate;private static int reservedFloor;private static bool idsIndexed;
+    private static bool retirementInstalled;
+    private static void StopWatch(Bound item){var capture=item.Capture;var watch=item.Watch;item.Capture=null;item.Watch=null;item.Chunk=null;if(capture!=null)capture.Dispose();else watch?.Dispose();}
+    private static void StopWatch(Removing item){var capture=item.Capture;var watch=item.Watch;item.Capture=null;item.Watch=null;item.Chunk=null;if(capture!=null)capture.Dispose();else watch?.Dispose();}
     internal static void Install(Harmony harmony)
     {
+        if(!retirementInstalled)
+        {
+            ModEvents.WorldShuttingDown.RegisterHandler(RetireWorld);
+            ModEvents.GameShutdown.RegisterHandler(RetireGame);
+            retirementInstalled=true;
+        }
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthStationSnapshotUpdatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthStationChunkSerializedPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthStationSnapshotResetPatch));
@@ -23,7 +32,12 @@ internal static class RebirthBossNativePublication
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthStationRegionPublishedPatch));
     }
     private static void Scope(World world)
-    {if(ReferenceEquals(scope,world)&&directory==GameIO.GetSaveGameDir())return;foreach(var item in bound.Values)item.Watch?.Dispose();bound.Clear();foreach(var item in removing.Values)item.Watch?.Dispose();removing.Clear();nextUpdate=0f;reservedFloor=0;idsIndexed=false;scope=world;directory=GameIO.GetSaveGameDir();}
+    {if(ReferenceEquals(scope,world)&&directory==GameIO.GetSaveGameDir())return;RetireObservations();scope=world;directory=GameIO.GetSaveGameDir();}
+    // Resource retirement only. Original receipts/IDs remain in their registry.
+    private static void RetireWorld(ref ModEvents.SWorldShuttingDownData data){RetireObservations();}
+    private static void RetireGame(ref ModEvents.SGameShutdownData data){RetireObservations();}
+    private static void RetireObservations()
+    {foreach(var item in bound.Values)StopWatch(item);bound.Clear();foreach(var item in removing.Values)StopWatch(item);removing.Clear();scope=null;directory=null;nextUpdate=0f;reservedFloor=0;idsIndexed=false;}
     internal static string Key(RebirthBossSpawnOriginal original)=>"rebirth.boss.original."+original.Operation.ToString("N");
     internal static byte[] Stamp(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original)
     {using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream,Encoding.UTF8,true)){writer.Write((byte)1);writer.Write(world.worldState.Guid);writer.Write(e.EventId.ToByteArray());writer.Write(e.Progression.OwnerStableId);writer.Write(original.Operation.ToByteArray());writer.Write(original.EntityId);writer.Write(original.EntityClass);writer.Write(original.Role);writer.Write(original.WorldTimeBorn);writer.Flush();return stream.ToArray();}}
@@ -99,11 +113,13 @@ internal static class RebirthBossNativePublication
     }
     private static bool Current(Bound item)
     {
-        if(!ThreadManager.IsMainThread()||!RebirthBossEventPersistence.IsReady||!ReferenceEquals(scope,item.World)||item.Directory!=GameIO.GetSaveGameDir()||!ReferenceEquals(GameManager.Instance?.World,item.World)||!ReferenceEquals(item.World.GetEntity(item.Original.EntityId),item.Entity)||item.Entity.entityClass!=item.Original.EntityClass||(item.Entity is EntityContainerAbs container&&container.bRemoved)||item.Entity.IsMarkedForUnload()||!item.Entity.addedToChunk)return false;
+        if(!ThreadManager.IsMainThread()||!RebirthBossEventPersistence.IsReady||!OriginalCurrent(item.Event,item.Original)||!ReferenceEquals(scope,item.World)||item.Directory!=GameIO.GetSaveGameDir()||!ReferenceEquals(GameManager.Instance?.World,item.World)||!ReferenceEquals(item.World.GetEntity(item.Original.EntityId),item.Entity)||item.Entity.entityClass!=item.Original.EntityClass||(item.Entity is EntityContainerAbs container&&container.bRemoved)||item.Entity.IsMarkedForUnload()||!item.Entity.addedToChunk)return false;
         if(item.Entity is EntityAlive alive&&!AliveIdentity(alive,item.Original,false))return false;
         if(item.Death&&(!item.Original.Killed||!(item.Entity is EntityAlive corpse)||corpse.Health>0))return false;
         return item.Chunk==null||ReferenceEquals(item.World.GetChunkSync(item.Chunk.X,item.Chunk.Z),item.Chunk)&&!item.Chunk.InProgressUnloading&&item.Entity.chunkPosAddedEntityTo.x==item.Chunk.X&&item.Entity.chunkPosAddedEntityTo.z==item.Chunk.Z;
     }
+    private static bool OriginalCurrent(RebirthBossEventInstance encounter,RebirthBossSpawnOriginal original)
+    {return encounter!=null&&RebirthBossEventRegistry.TryGet(encounter.EventId,out var registered)&&ReferenceEquals(registered,encounter)&&encounter.SpawnOriginals.Count<=580&&encounter.SpawnOriginals.Contains(original);}
     internal static bool Matches(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original,Entity entity)
     {
         if(world==null||entity==null||!ReferenceEquals(entity.world,world)||entity.entityId!=original.EntityId||entity.entityClass!=original.EntityClass||entity.WorldTimeBorn!=original.WorldTimeBorn)return false;
@@ -117,7 +133,7 @@ internal static class RebirthBossNativePublication
     internal static void ReserveOriginalIds()
     {if(!idsIndexed){foreach(var e in RebirthBossEventRegistry.SnapshotEvents())foreach(var original in e.SpawnOriginals)if(original.EntityId<int.MaxValue)reservedFloor=Math.Max(reservedFloor,original.EntityId+1);idsIndexed=true;}if(reservedFloor>EntityFactory.nextEntityID)EntityFactory.nextEntityID=reservedFloor;}
     internal static void ObserveWorld(World world)
-    {try{Scope(world);if(world?.IsRemote()==false&&RebirthBossEventPersistence.IsReady)ReserveOriginalIds();}catch{foreach(var item in bound.Values)item.Watch?.Dispose();foreach(var item in removing.Values)item.Watch?.Dispose();bound.Clear();removing.Clear();scope=null;directory=null;nextUpdate=0f;}}
+    {try{Scope(world);if(world?.IsRemote()==false&&RebirthBossEventPersistence.IsReady)ReserveOriginalIds();}catch{RetireObservations();}}
     internal static void Pump(World world)
     {
         if(world?.IsRemote()!=false||!RebirthBossEventPersistence.IsReady)return;Scope(world);if(UnityEngine.Time.realtimeSinceStartup<nextUpdate)return;nextUpdate=UnityEngine.Time.realtimeSinceStartup+1f;
@@ -134,33 +150,55 @@ internal static class RebirthBossNativePublication
         foreach(var e in RebirthBossEventRegistry.SnapshotEvents())if(e.State==RebirthBossEventState.Spawning&&e.NativeBatchPrepared&&e.SpawnOriginals.Count!=0&&!e.SpawnOriginals.Exists(value=>value.Role<=2&&value.Phase<2)){e.State=RebirthBossEventState.Active;RebirthBossEventPersistence.Checkpoint();}
         foreach(var item in bound.Values.ToArray())try
         {
-            if(item.Original.Phase==3&&!item.Death||!Current(item)){item.Watch?.Dispose();bound.Remove(item.Entity);continue;}
+            if(item.Original.Phase==3&&!item.Death||!Current(item)){StopWatch(item);bound.Remove(item.Entity);continue;}
             if(item.Watch!=null)
             {
-                if(RebirthStationSnapshotEvidence.HasPublished(item.Watch)&&RebirthStationSnapshotEvidence.TryCopy(item.Watch,out var bytes)&&TryPublishedEntity(bytes,item.Chunk.X,item.Chunk.Z,item.Original,Key(item.Original),Stamp(world,item.Event,item.Original),out string proof,false,item.Death))
+                if(item.Capture!=null&&item.Capture.TryProof(world,item.Chunk,item.Event,item.Original,out string proof))
                 {
                     if(item.Death){item.Original.DeathPublished=true;item.Original.DeathProof=proof;item.Original.DeathProofKind=1;}else{item.Original.NativeProof=proof;item.Original.Phase=3;}
                     if(!RebirthBossEventPersistence.Checkpoint()){if(item.Death){item.Original.DeathPublished=false;item.Original.DeathProof=string.Empty;item.Original.DeathProofKind=0;}else{item.Original.Phase=2;item.Original.NativeProof=string.Empty;}continue;}
-                    item.Watch.Dispose();bound.Remove(item.Entity);continue;
+                    StopWatch(item);bound.Remove(item.Entity);continue;
                 }
-                if(UnityEngine.Time.realtimeSinceStartup-item.Started>15f){item.Watch.Dispose();item.Watch=null;item.Chunk=null;}continue;
+                if(item.Capture?.ScopeValid==false||item.Capture?.Superseded==true||UnityEngine.Time.realtimeSinceStartup-item.Started>15f){StopWatch(item);}continue;
             }
             var chunk=world.GetChunkSync(item.Entity.chunkPosAddedEntityTo.x,item.Entity.chunkPosAddedEntityTo.z) as Chunk;var provider=world.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;var regions=provider?.m_RegionFileManager;
             if(chunk==null||chunk.InProgressUnloading||regions==null||!(regions.regionFileAccess is RegionFileAccessSectorBased)||!EnsureStamp(item,chunk))continue;
             var access=regions.regionFileAccess;string saveDirectory=Path.GetFullPath(regions.saveDirectory);item.Chunk=chunk;
             Func<bool> current=()=>Current(item)&&ReferenceEquals(world.ChunkCache?.ChunkProvider,provider)&&ReferenceEquals(provider.m_RegionFileManager,regions)&&ReferenceEquals(regions.regionFileAccess,access)&&Path.GetFullPath(regions.saveDirectory)==saveDirectory;
             item.Watch=RebirthStationSnapshotEvidence.Watch(world,chunk,chunk.X,chunk.Z,current,item.Entity);if(item.Watch==null){item.Chunk=null;continue;}item.Started=UnityEngine.Time.realtimeSinceStartup;
-            lock(chunk){if(!current()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting){item.Watch.Dispose();item.Watch=null;item.Chunk=null;continue;}chunk.InProgressSaving=true;}
+            item.Capture=new RebirthBossPublicationCapture(item.Watch,world,chunk,item.Event,item.Original,item.Directory,current,false,item.Death);
+            lock(chunk){if(!current()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting){StopWatch(item);continue;}chunk.InProgressSaving=true;}
             try{if(current())regions.SaveChunkSnapshot(chunk,true);}finally{lock(chunk)chunk.InProgressSaving=false;}
         }
-        catch{item.Watch?.Dispose();item.Watch=null;item.Chunk=null;/* Preserve original invocation and source custody. */}
+        catch{StopWatch(item);/* Preserve original invocation and source custody. */}
     }
     internal static bool BeginRemoval(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original,Entity entity)
     {
-        if(original.Phase!=3||original.NativeRemoved||!Matches(world,e,original,entity)||!entity.addedToChunk)return false;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||!ReferenceEquals(GameManager.Instance?.World,world)||
+           !RebirthBossEventPersistence.IsReady||!OriginalCurrent(e,original)||original==null||original.Phase!=3||original.Abandoned||original.NativeRemoved||
+           original.NativeProof?.Length!=64||!ValidProof(original.NativeProof)||entity==null||!ReferenceEquals(world.GetEntity(original.EntityId),entity)||
+           !Matches(world,e,original,entity)||!entity.addedToChunk)return false;
+        int x=entity.chunkPosAddedEntityTo.x,z=entity.chunkPosAddedEntityTo.z;
+        if(original.RemovalInvoking&&(original.RemovalX!=x||original.RemovalZ!=z))return false;
+        var chunk=world.GetChunkSync(x,z) as Chunk;
+        if(chunk==null||chunk.InProgressUnloading||chunk.X!=x||chunk.Z!=z||
+           !EnsureStamp(new Bound{World=world,Event=e,Original=original,Entity=entity},chunk))return false;
         if(original.RemovalInvoking)return RebirthBossEventPersistence.Checkpoint();
-        original.RemovalInvoking=true;original.RemovalX=entity.chunkPosAddedEntityTo.x;original.RemovalZ=entity.chunkPosAddedEntityTo.z;
+        original.RemovalInvoking=true;original.RemovalX=x;original.RemovalZ=z;
         return RebirthBossEventPersistence.Checkpoint();
+    }
+    internal static bool RemoveOriginal(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original,Entity entity)
+    {
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||!ReferenceEquals(GameManager.Instance?.World,world)||
+           !RebirthBossEventPersistence.IsReady||!OriginalCurrent(e,original)||entity==null||!ReferenceEquals(world.GetEntity(original.EntityId),entity))return false;
+        if(entity is EntityContainerAbs&&(original.Role!=3||entity.entityClass!=EntityClass.FromString("RB_EventLootContainer")||entity.GetType()!=typeof(EntityLootContainer)))return false;
+        if(!BeginRemoval(world,e,original,entity))return false;
+        // Native container IsMarkedForUnload also requires bRemoved. The public
+        // container retirement API establishes it; World.RemoveEntity alone only
+        // sets the base mark and can leave the container in Chunk.entityLists.
+        if(original.Role==3&&entity is EntityLootContainer crate&&!crate.bRemoved)crate.removeBackpack("old");
+        world.RemoveEntity(entity.entityId,EnumRemoveEntityReason.Despawned);
+        return world.GetEntity(original.EntityId)==null;
     }
     internal static void ObserveRemoved(World world,Entity entity,EnumRemoveEntityReason reason)
     {
@@ -181,37 +219,39 @@ internal static class RebirthBossNativePublication
                 // A crash after native absence publication may precede the domain
                 // membership update. Reconcile that update without another effect.
                 if(original.Role==3?e.RewardEntityId>=0||e.RewardBlockPlaced:RebirthBossEventRegistry.TryGetEntity(original.EntityId,out _)||e.SupportEntityIds.Contains(original.EntityId)||e.RegularEntityIds.Contains(original.EntityId))RebirthBossEventRewardService.CompleteOriginalRemoval(world,e,original);
-                if(removing.TryGetValue(original.Operation,out var retired)){retired.Watch?.Dispose();removing.Remove(original.Operation);}
+                if(removing.TryGetValue(original.Operation,out var retired)){StopWatch(retired);removing.Remove(original.Operation);}
                 continue;
             }
             if(!original.RemovalInvoking||original.NativeRemoved||original.Phase!=3)continue;
             var live=world.GetEntity(original.EntityId);
-            if(live!=null){if(original.DeadRemovalFrame!=null&&(!(live is EntityAlive corpse)||corpse.Health>0))continue;if(Matches(world,e,original,live)&&RebirthBossEventPersistence.Checkpoint())world.RemoveEntity(live.entityId,EnumRemoveEntityReason.Despawned);continue;}
+            if(live!=null){if(original.DeadRemovalFrame!=null&&(!(live is EntityAlive corpse)||corpse.Health>0))continue;RemoveOriginal(world,e,original,live);continue;}
             if(!removing.ContainsKey(original.Operation))removing[original.Operation]=new Removing{World=world,Event=e,Original=original};
         }
         foreach(var item in removing.Values.ToArray())try
         {
             var original=item.Original;
+            if(!OriginalCurrent(item.Event,original)){StopWatch(item);removing.Remove(original.Operation);continue;}
             Func<bool> current=()=>ReferenceEquals(GameManager.Instance?.World,world)&&RebirthBossEventPersistence.IsReady&&original.RemovalInvoking&&!original.NativeRemoved&&original.Phase==3&&world.GetEntity(original.EntityId)==null&&item.Chunk!=null&&!item.Chunk.InProgressUnloading&&ReferenceEquals(world.GetChunkSync(original.RemovalX,original.RemovalZ),item.Chunk)&&item.Chunk.ChunkCustomData.dict.TryGetValue(Key(original),out var marker)&&marker.data!=null&&marker.data.SequenceEqual(Stamp(world,item.Event,original));
             if(item.Watch!=null)
             {
-                if(current()&&RebirthStationSnapshotEvidence.HasPublished(item.Watch)&&RebirthStationSnapshotEvidence.TryCopy(item.Watch,out var bytes)&&TryPublishedEntity(bytes,original.RemovalX,original.RemovalZ,original,Key(original),Stamp(world,item.Event,original),out string proof,true))
+                if(current()&&item.Capture!=null&&item.Capture.TryProof(world,item.Chunk,item.Event,original,out string proof))
                 {
                     original.NativeRemoved=true;original.RemovalProof=proof;
                     if(!RebirthBossEventPersistence.Checkpoint()){original.NativeRemoved=false;original.RemovalProof=string.Empty;continue;}
                     string death=RemovedDeathProof(original);if(death!=null&&!original.DeathPublished){original.DeathProof=death;original.DeathProofKind=2;original.DeathPublished=true;if(!RebirthBossEventPersistence.Checkpoint()){original.DeathPublished=false;original.DeathProofKind=0;original.DeathProof=string.Empty;continue;}}
-                    item.Watch.Dispose();removing.Remove(original.Operation);RebirthBossEventRewardService.CompleteOriginalRemoval(world,item.Event,original);continue;
+                    StopWatch(item);removing.Remove(original.Operation);RebirthBossEventRewardService.CompleteOriginalRemoval(world,item.Event,original);continue;
                 }
-                if(!current()||UnityEngine.Time.realtimeSinceStartup-item.Started>15f){item.Watch.Dispose();item.Watch=null;item.Chunk=null;}continue;
+                if(!current()||item.Capture?.ScopeValid==false||item.Capture?.Superseded==true||UnityEngine.Time.realtimeSinceStartup-item.Started>15f){StopWatch(item);}continue;
             }
             item.Chunk=world.GetChunkSync(original.RemovalX,original.RemovalZ) as Chunk;var chunk=item.Chunk;var provider=world.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;var regions=provider?.m_RegionFileManager;
             if(!current()||regions==null||!(regions.regionFileAccess is RegionFileAccessSectorBased))continue;
             var access=regions.regionFileAccess;string path=Path.GetFullPath(regions.saveDirectory);Func<bool> providerCurrent=()=>current()&&ReferenceEquals(world.ChunkCache?.ChunkProvider,provider)&&ReferenceEquals(provider.m_RegionFileManager,regions)&&ReferenceEquals(regions.regionFileAccess,access)&&Path.GetFullPath(regions.saveDirectory)==path;
             item.Watch=RebirthStationSnapshotEvidence.Watch(world,chunk,chunk.X,chunk.Z,providerCurrent,item);if(item.Watch==null)continue;item.Started=UnityEngine.Time.realtimeSinceStartup;
-            lock(chunk){if(!providerCurrent()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting){item.Watch.Dispose();item.Watch=null;continue;}chunk.InProgressSaving=true;}
+            item.Capture=new RebirthBossPublicationCapture(item.Watch,world,chunk,item.Event,original,directory,providerCurrent,true);
+            lock(chunk){if(!providerCurrent()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting){StopWatch(item);continue;}chunk.InProgressSaving=true;}
             try{if(providerCurrent())regions.SaveChunkSnapshot(chunk,true);}finally{lock(chunk)chunk.InProgressSaving=false;}
         }
-        catch{item.Watch?.Dispose();item.Watch=null;item.Chunk=null;}
+        catch{StopWatch(item);}
     }
     internal static void AdoptLegacy(World world)
     {
@@ -222,7 +262,7 @@ internal static class RebirthBossNativePublication
             foreach(var pair in RebirthBossEventRegistry.SnapshotEntities())
             {
                 var state=pair.Value;if(state.EventId!=e.EventId)continue;var entity=world.GetEntity(pair.Key) as EntityAlive;
-                if(entity==null||entity.IsDead()||entity.entityClass<0||!ReferenceEquals(entity.world,world)){unknown=true;break;}
+                if(entity==null||entity.IsDead()||(EntityClass.list==null||EntityClass.GetEntityClass(entity.entityClass)==null)||!ReferenceEquals(entity.world,world)){unknown=true;break;}
                 for(int i=0;i<8;i++)if(entity.Buffs==null||entity.Buffs.GetCustomVar("rebirthBossOriginal"+i)!=0f)unknown=true;
                 if(unknown)break;
                 selected.Add(Tuple.Create(entity,new RebirthBossSpawnOriginal{Operation=Guid.NewGuid(),EntityId=entity.entityId,EntityClass=entity.entityClass,Role=(int)state.Role,Position=entity.position,Phase=0,AdoptionVersion=1}));

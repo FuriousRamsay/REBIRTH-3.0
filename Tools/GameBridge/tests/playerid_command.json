@@ -1,0 +1,8 @@
+{
+  "name": "Read-only player ID command smoke (inspect console output against persistent player ID)",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "rebirth playerid" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -14,6 +14,14 @@ public static class RebirthItemStatColors
         return Tokens.Replace(text, match => match.Value[0] == '['
             ? match.Value : "[FF0000]" + match.Value + "[-]");
     }
+    // Native comparison already encodes better/worse, including lower-is-better
+    // negative deltas. Normalize its icon without recoloring those deltas red.
+    public static string FormatComparison(string text)
+    {
+        if(string.IsNullOrEmpty(text))return text;
+        string star=Format("[sp=ui_stat]");
+        return text.Replace("[FFD700][sp=ui_stat][-]","[sp=ui_stat]").Replace("[sp=ui_stat]",star);
+    }
     public static string MarkDerived(string text, ItemValue item, params PassiveEffects[] inputs)
     {
         if (item != null && inputs != null)
@@ -35,3 +43,4 @@ public static class RebirthItemStatColors
         return text;
     }
 }
+

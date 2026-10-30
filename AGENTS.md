@@ -1,3 +1,7 @@
+## Current wrap authoring standard (Owner update, 2026-10-29)
+
+For EVERY wrap panel, compose full-bleed artwork for the verified canonical template and safe areas, uniformly scale/crop if needed without stretching, then apply the exact immutable paintability mask deterministically at native dimensions. Retain sources and transform/hash records; verify alpha, actual coverage, transparent RGB cleanup and panel rotations. Keep focal subjects clear of openings and joins. Native vehicle renders still required. This supersedes all older overflow-and-cut / generator-exact-dimension prohibitions below; see operating directives section 10.1.4. Do not regenerate or reinstall approved art merely because this workflow changed.
+
 # Agent notes for REBIRTH 3.0
 
 Project directives: read `_Documentation/REBIRTH_PROJECT_OPERATING_DIRECTIVES.md` before changing anything.
@@ -111,3 +115,10 @@ Notes:
 - Moving the real mouse over the focused game window hands the cursor back to the user.
 - Game log: `%USERPROFILE%\AppData\LocalLow\The Fun Pimps\7 Days To Die\Player.log`.
 - Design notes: `_Documentation/GameBridge/README.md`.
+
+
+Owner artwork directive (2026-10-28): NO REPAIRS; redo the entire defective panel directly on the verified native template. Correct and verify an incomplete template first, including curved surfaces, without changing the mesh. Correct mapping errors in mapping. No patching, cloning, inpainting, repair underlayers or overflow-and-cut. Preserve unaffected approved panels and the approved quality/style. This supersedes earlier local/pixel-locked repair permission. See section 10.1.1.
+
+Owner-approved standard (2026-10-28): corrected BodySurfaces-default hood1024x1012 / Z.48..2.06 plus truck-front-face lip is mandatory for future wraps. Old1024x948 hood is retired. No diagnostic pink in final exports/renders/icons; verify curved-edge coverage in native views. See section10.1.3 and Templates/BodySurfaces-default/STANDARD.json.
+
+Corrected tailgate standard130:1088x512,Y.45..1.25,depth.20m; native grid132 verifies fullcoverage. New replacements use layout2; installed specialwraps remainlayout1. Redo whole affected panels, no fitting/repairs.

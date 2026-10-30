@@ -27,7 +27,7 @@ public static class BuildTraderVoices
         Directory.CreateDirectory("Build");
         var build=new AssetBundleBuild {assetBundleName="rebirth_trader_voices.unity3d",assetNames=paths,
             addressableNames=paths.Select(Path.GetFileNameWithoutExtension).ToArray()};
-        var result=BuildPipeline.BuildAssetBundles("Build",new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
+        var result=RebirthAssetBundlePackaging.BuildAssetBundles("Build",new[]{build},BuildAssetBundleOptions.ChunkBasedCompression,BuildTarget.StandaloneWindows64);
         if(result==null)throw new Exception("Bundle build failed");
         var bundle=AssetBundle.LoadFromFile("Build/"+build.assetBundleName);
         if(bundle==null||bundle.GetAllAssetNames().Length!=3600)throw new Exception("Bundle asset count mismatch");

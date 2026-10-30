@@ -10,7 +10,7 @@
   Commands:
     help                                 Show this help
     build                                Build RebirthUtils.dll (Debug)
-    launch  [-Reset] [-NoBuild] [-NoWait] [-World W] [-Save S]
+    launch  [-Reset] [-NewSave] [-NoBuild] [-NoWait] [-World W] [-Save S]
                                          Build, (re)create test save if needed, start game, wait until in-game
     restart [-Reset] [-NoBuild]          Quit the running game, then launch
     wait    [-Timeout 900]               Wait until the player is in-game
@@ -84,6 +84,7 @@ param(
     [string] $World,
     [string] $Save,
     [switch] $Reset,
+    [switch] $NewSave,
     [switch] $NoBuild,
     [switch] $NoWait,
     [int] $Timeout = 900,
@@ -302,6 +303,13 @@ function Set-StartTime {
 
 function Start-Game($cfg) {
     if (Get-GameProcess) { Fail 'the game is already running (use restart)' }
+    if ($NewSave) {
+        # Let the native new-game automation create a fresh character/save.
+        # Never clone a committed character or overwrite an existing save.
+        $target = [IO.Path]::GetFullPath((Join-Path (Join-Path $SavesRoot $cfg.world) $cfg.save))
+        if (Test-Path -LiteralPath $target) { Fail '-NewSave requires a missing disposable save; choose a new name' }
+        $cfg.baselineSave = $null
+    }
     if (-not $NoBuild) { Invoke-Build $cfg }
     Reset-TestSave $cfg $Reset.IsPresent
     if (Test-Path $SessionFile) { Remove-Item $SessionFile -Force }
@@ -1075,6 +1083,7 @@ function Invoke-TestFile([string] $file) {
 
 $script:cfg = Get-Config
 $cfg = $script:cfg
+if ($NewSave -and $Command.ToLowerInvariant() -ne 'launch') { Fail '-NewSave is only supported with launch' }
 switch ($Command.ToLowerInvariant()) {
     'help'       { Get-Help $PSCommandPath -Detailed | Out-String | Write-Host }
     'build'      { Invoke-Build $cfg }
