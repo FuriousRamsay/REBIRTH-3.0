@@ -48,7 +48,7 @@ internal static partial class RebirthProductiveEarnedUiCoordinator
         public void Dispose(){Retention?.Dispose();Retention=null;Native=Image=After=TerminalReceipt=null;Rows=PreviousUi=null;Cards=null;Definitions=Grids=null;Owners=null;}
     }
     private static readonly System.Collections.Generic.Dictionary<XUiC_CraftingQueue,QueueHandoff> handoffs=new System.Collections.Generic.Dictionary<XUiC_CraftingQueue,QueueHandoff>();
-    internal static bool HasRecipientQueueHandoff=>handoffs.Values.Any(value=>value.Binding.RecipientSource!=null||value.Binding.LocalOwnerSource!=null);
+    internal static bool HasRecipientQueueHandoff=>handoffs.Count>0&&handoffs.Values.Any(value=>value.Binding.RecipientSource!=null||value.Binding.LocalOwnerSource!=null);
     [ThreadStatic]private static QueueHandoff rotating,handoffSync;
     internal static bool CanAdvanceQueueHandoff(XUiC_RecipeStack card)
     {

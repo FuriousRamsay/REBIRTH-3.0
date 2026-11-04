@@ -26,7 +26,26 @@ public static class RebirthCharacterCreationHoldService
     private static readonly HashSet<int> ReadyEntities = new HashSet<int>();
     private static readonly Harmony Harmony = new Harmony("rebirth.survivor.creation-hold.3.1");
     private static bool installed;
+    private static bool editModeSkipLogged;
     private static float nextAnchorEnforcementTime;
+
+    internal static bool IsEditModeActive()
+    {
+        GameManager manager = GameManager.Instance;
+        return manager != null && manager.IsEditMode();
+    }
+
+    private static bool SkipForEditMode()
+    {
+        if (!IsEditModeActive()) return false;
+        if (!editModeSkipLogged)
+        {
+            editModeSkipLogged = true;
+            if (RebirthLogSettings.SpawnFlowLoggingEnabled)
+                RebirthLogSettings.TraceSpawnFlow("creation hold skipped because edit mode is active");
+        }
+        return true;
+    }
 
     public static string Install()
     {
@@ -56,7 +75,7 @@ public static class RebirthCharacterCreationHoldService
 
     public static bool IsHeld(EntityPlayer player)
     {
-        if (player == null || !RebirthSurvivorMode.IsEnabledForCurrentWorld()) return false;
+        if (SkipForEditMode() || player == null || !RebirthSurvivorMode.IsEnabledForCurrentWorld()) return false;
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         bool server = connection != null && connection.IsServer;
@@ -105,12 +124,13 @@ public static class RebirthCharacterCreationHoldService
 
     public static bool IsHeldEntityId(int entityId)
     {
-        if (entityId <= 0 || GameManager.Instance == null || GameManager.Instance.World == null) return false;
+        if (SkipForEditMode() || entityId <= 0 || GameManager.Instance == null || GameManager.Instance.World == null) return false;
         return IsHeld(GameManager.Instance.World.GetEntity(entityId) as EntityPlayer);
     }
 
     public static void OnCharacterCommitted(EntityPlayer player, RebirthStablePlayerIdentity identity)
     {
+        if (SkipForEditMode()) return;
         if (player == null) return;
         lock (Sync)
         {
@@ -130,6 +150,11 @@ public static class RebirthCharacterCreationHoldService
 
     public static bool TryGetAnchor(int entityId, out Vector3 anchor)
     {
+        if (SkipForEditMode())
+        {
+            anchor = Vector3.zero;
+            return false;
+        }
         lock (Sync)
         {
             HoldEntry entry;
@@ -150,7 +175,7 @@ public static class RebirthCharacterCreationHoldService
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if (connection == null || !connection.IsServer || GameManager.Instance == null || GameManager.Instance.World == null) return;
+        if (SkipForEditMode() || connection == null || !connection.IsServer || GameManager.Instance == null || GameManager.Instance.World == null) return;
         float now = Time.realtimeSinceStartup;
         if (now < nextAnchorEnforcementTime) return;
         nextAnchorEnforcementTime = now + 0.25f;
@@ -175,6 +200,7 @@ public static class RebirthCharacterCreationHoldService
 
     private static void OnPlayerSpawnedInWorld(ref ModEvents.SPlayerSpawnedInWorldData data)
     {
+        if (SkipForEditMode()) return;
         if (!RebirthWorldCharacterRepository.IsServerAuthority || !RebirthSurvivorMode.IsEnabledForCurrentWorld())
             return;
         EntityPlayer player = GameManager.Instance != null && GameManager.Instance.World != null
@@ -218,6 +244,7 @@ public static class RebirthCharacterCreationHoldService
 
     private static void Enter(EntityPlayer player, RebirthStablePlayerIdentity identity, RespawnType reason)
     {
+        if (SkipForEditMode()) return;
         HoldEntry entry = new HoldEntry
         {
             StableKey = identity != null ? identity.StorageKey : string.Empty,
@@ -244,6 +271,7 @@ public static class RebirthCharacterCreationHoldService
 
     internal static void OnDisconnected(ClientInfo info)
     {
+        if (SkipForEditMode()) return;
         if (info == null) return;
         lock (Sync)
         {
@@ -259,6 +287,7 @@ public static class RebirthCharacterCreationHoldService
             Entries.Clear();
             ReadyEntities.Clear();
             nextAnchorEnforcementTime = 0f;
+            editModeSkipLogged = false;
         }
     }
 }
@@ -269,6 +298,7 @@ public static class RebirthCharacterCreationHoldMovePatch
     [HarmonyPrefix]
     public static bool Prefix(PlayerMoveController __instance)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         EntityPlayerLocal player = __instance != null ? __instance.entityPlayerLocal : null;
         // Native Update advances updateRespawn before gameplay movement. Do not
         // block it before Spawned: creation UI itself waits for that event.
@@ -285,6 +315,7 @@ public static class RebirthCharacterCreationHoldNetworkMovePatch
     [HarmonyPrefix]
     public static bool Prefix(NetPackageEntityPosAndRot __instance, World _world)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection == null || !connection.IsServer || _world == null || __instance == null) return true;
         EntityPlayer player = _world.GetEntity(__instance.entityId) as EntityPlayer;
@@ -298,6 +329,7 @@ public static class RebirthCharacterCreationHoldUseItemPatch
     [HarmonyPrefix]
     public static bool Prefix(EntityAlive __instance, ref bool __result)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         EntityPlayer player = __instance as EntityPlayer;
         if (player == null || !RebirthCharacterCreationHoldService.IsHeld(player)) return true;
         __result = false;
@@ -311,6 +343,7 @@ public static class RebirthCharacterCreationHoldPlayerDamagePatch
     [HarmonyPrefix]
     public static bool Prefix(EntityPlayer __instance, ref int __result)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         if (__instance == null || !RebirthCharacterCreationHoldService.IsHeld(__instance)) return true;
         __result = 0;
         return false;
@@ -323,6 +356,7 @@ public static class RebirthCharacterCreationHoldLocalDamagePatch
     [HarmonyPrefix]
     public static bool Prefix(EntityPlayerLocal __instance, ref int __result)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         if (__instance == null || !RebirthCharacterCreationHoldService.IsHeld(__instance)) return true;
         __result = 0;
         return false;
@@ -335,6 +369,7 @@ public static class RebirthCharacterCreationHoldBlockActivationPatch
     [HarmonyPrefix]
     public static bool Prefix(EntityPlayerLocal __4, ref bool __result)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         EntityPlayerLocal player = __4;
         if (player == null || !RebirthCharacterCreationHoldService.IsHeld(player)) return true;
         __result = false;
@@ -348,6 +383,7 @@ public static class RebirthCharacterCreationHoldAttackTargetPatch
     [HarmonyPrefix]
     public static void Prefix(ref EntityAlive _attackTarget)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         EntityPlayer player = _attackTarget as EntityPlayer;
         if (player != null && RebirthCharacterCreationHoldService.IsHeld(player)) _attackTarget = null;
     }
@@ -394,6 +430,7 @@ public static class RebirthCharacterCreationHoldNativeXpPatch
     [HarmonyPrefix]
     public static bool Prefix(Progression __instance)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return true;
         EntityPlayer player = __instance != null ? __instance.parent as EntityPlayer : null;
         return player == null || !RebirthCharacterCreationHoldService.IsHeld(player);
     }
@@ -403,5 +440,9 @@ public static class RebirthCharacterCreationHoldNativeXpPatch
 public static class RebirthCharacterCreationHoldDisconnectPatch
 {
     [HarmonyPrefix]
-    public static void Prefix(ClientInfo _cInfo) { RebirthCharacterCreationHoldService.OnDisconnected(_cInfo); }
+    public static void Prefix(ClientInfo _cInfo)
+    {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
+        RebirthCharacterCreationHoldService.OnDisconnected(_cInfo);
+    }
 }

@@ -710,9 +710,17 @@ public static class RebirthBlockPickupEmptyVariantGenerator
         if(candidates != null && candidates.Count > 0)
         {
             if(Localization.Dictionary.TryGetValue(candidates[0],out var first)&&first!=null&&
-                candidates.All(name=>Localization.Dictionary.TryGetValue(name,out var row)&&row!=null&&first.SequenceEqual(row)))return candidates[0];
+                candidates.All(name=>Localization.Dictionary.TryGetValue(name,out var row)&&SameLocalizationCells(first,row)))return candidates[0];
         }
         return Localization.Exists("xuiStorage")?"xuiStorage":string.Empty;
+    }
+
+    private static bool SameLocalizationCells(string[] first,string[] second)
+    {
+        if(first==null||second==null||first.Length!=second.Length)return false;
+        for(int i=0;i<first.Length;i++)
+            if(!string.Equals(first[i],second[i],StringComparison.Ordinal))return false;
+        return true;
     }
 
     private static void RefreshGeneratedStorageNames(Dictionary<string,XElement> blocks, GenerationLookup lookup)

@@ -27,6 +27,7 @@ public static class RebirthStatisticsService
 
     private static readonly Harmony HarmonyInstance = new Harmony("rebirth.survivor.statistics.3.1");
     private static readonly Dictionary<int, RuntimeState> Runtime = new Dictionary<int, RuntimeState>();
+    private static readonly HashSet<int> LivePlayerIds = new HashSet<int>();
     private static readonly List<RebirthStatisticsMilestoneDefinition> Milestones = new List<RebirthStatisticsMilestoneDefinition>();
     private static bool installed;
     private sealed class HistorySelection { internal int Page,Day; }
@@ -79,7 +80,7 @@ public static class RebirthStatisticsService
         RebirthStatisticsClientState.Reset();
     }
 
-    private static void ResetRuntime() { Runtime.Clear(); historySelections=new ConditionalWeakTable<EntityPlayer,HistorySelection>(); nextTick = 0f; RebirthHordeNightStatisticsRuntime.Reset(); RebirthMolotovDamageAttribution.Reset(); }
+    private static void ResetRuntime() { Runtime.Clear(); LivePlayerIds.Clear(); historySelections=new ConditionalWeakTable<EntityPlayer,HistorySelection>(); nextTick = 0f; RebirthHordeNightStatisticsRuntime.Reset(); RebirthMolotovDamageAttribution.Reset(); }
     public static void ResetRuntimeForPlayer(EntityPlayer player) { if (player != null) Runtime.Remove(player.entityId); }
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
@@ -550,7 +551,20 @@ public static class RebirthStatisticsService
     }
     private static int GetWorldDay(EntityPlayer p){return p!=null&&p.world!=null?GameUtils.WorldTimeToDays(p.world.GetWorldTime()):0;}
     private static float HorizontalDistance(Vector3 a,Vector3 b){float x=a.x-b.x,z=a.z-b.z;return Mathf.Sqrt(x*x+z*z);}
-    private static void Prune(List<EntityPlayer> players){HashSet<int> live=new HashSet<int>();for(int i=0;i<players.Count;i++)if(players[i]!=null)live.Add(players[i].entityId);List<int> rm=new List<int>();foreach(var k in Runtime.Keys)if(!live.Contains(k))rm.Add(k);for(int i=0;i<rm.Count;i++)Runtime.Remove(rm[i]);}
+    private static void Prune(List<EntityPlayer> players)
+    {
+        if(Runtime.Count==0)return;
+        LivePlayerIds.Clear();
+        for(int i=0;i<players.Count;i++)if(players[i]!=null)LivePlayerIds.Add(players[i].entityId);
+        List<int> removed=null;
+        foreach(var id in Runtime.Keys)
+            if(!LivePlayerIds.Contains(id))
+            {
+                if(removed==null)removed=new List<int>();
+                removed.Add(id);
+            }
+        if(removed!=null)for(int i=0;i<removed.Count;i++)Runtime.Remove(removed[i]);
+    }
 
     private static bool EvaluateMilestones(RebirthStatisticsRecord r,int day)
     {

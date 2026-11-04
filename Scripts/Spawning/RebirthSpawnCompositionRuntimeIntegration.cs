@@ -332,7 +332,8 @@ public static class RebirthSpawnEntityGroupResolverPatch
             return;
 
         EntityClass selectedClass = EntityClass.GetEntityClass(__result);
-        if (!RebirthSpawnCompositionService.IsForbiddenRestrictedSpawnEntity(selectedClass))
+        bool animalSleeper=active.Surface==RebirthSpawnSurface.Sleeper&&IsNonZombieAnimal(selectedClass);
+        if (!animalSleeper&&!RebirthSpawnCompositionService.IsForbiddenRestrictedSpawnEntity(selectedClass))
             return;
 
         GameRandom authoritativeRandom = random;
@@ -358,8 +359,10 @@ public static class RebirthSpawnEntityGroupResolverPatch
                     delegate { return (double)authoritativeRandom.RandomFloat; },
                     out replacementTrace) &&
                 replacementTrace != null &&
+                (!animalSleeper||!IsNonZombieAnimal(EntityClass.GetEntityClass(replacementTrace.EntityClassId)))&&
                 !RebirthSpawnCompositionService.IsForbiddenRestrictedSpawnEntity(replacementTrace.EntityClassId))
             {
+                if(animalSleeper)Log.Out("[RebirthSpawn] sleeper animal replaced group="+_sEntityGroupName+" original="+selectedClass.entityClassName+" replacement="+replacementTrace.EntityName+" prefab="+active.PrefabName);
                 __result = replacementTrace.EntityClassId;
                 lastClassId = replacementTrace.EntityClassId;
                 return;
@@ -378,6 +381,9 @@ public static class RebirthSpawnEntityGroupResolverPatch
             lastClassId = fallbackId;
         }
     }
+    private static readonly FastTags<TagGroup.Global> ZombieTag=FastTags<TagGroup.Global>.Parse("zombie");
+    internal static bool IsNonZombieAnimal(EntityClass definition)
+        =>definition!=null&&definition.bIsAnimalEntity&&!definition.Tags.Test_AnySet(ZombieTag);
 }
 
 [HarmonyPatch(typeof(XUiC_CharacterFrameWindow), nameof(XUiC_CharacterFrameWindow.GetBindingValueInternal))]

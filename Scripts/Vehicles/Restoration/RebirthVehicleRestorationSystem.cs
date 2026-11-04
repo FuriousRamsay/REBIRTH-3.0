@@ -3492,6 +3492,7 @@ public sealed class NetPackageRebirthVehicleAssemblySnapshot : NetPackage
 public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
 {
     private static readonly string[] BackgroundIds = { "background", "highlightOverlay" };
+    private readonly XUiV_Sprite[] backgroundViews = new XUiV_Sprite[BackgroundIds.Length];
     private bool hovered;
     private XUiC_RebirthVehicleRestoration owner;
     private RebirthVehicleSlotDefinition definition;
@@ -3504,13 +3505,18 @@ public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
         base.Update(dt);
         Color color = hovered
             ? (Color)new Color32(76,55,100,255) : new Color32(58,58,65,255);
-        foreach (string id in BackgroundIds)
+        for (int i = 0; i < BackgroundIds.Length; i++)
         {
-            var fill = GetChildById(id)?.ViewComponent as XUiV_Sprite;
+            var fill = backgroundViews[i] ?? (backgroundViews[i] = GetChildById(BackgroundIds[i])?.ViewComponent as XUiV_Sprite);
             if (fill == null) continue;
             if (fill.SpriteName != "menu_empty") fill.SpriteName = "menu_empty";
             if (fill.Color != color || fill.Sprite?.color != color) fill.SetColorImmediately(color);
         }
+    }
+    public override void Cleanup()
+    {
+        for (int i = 0; i < backgroundViews.Length; i++) backgroundViews[i] = null;
+        base.Cleanup();
     }
     public string RestorationSlotId { get { return definition != null ? definition.SlotId : string.Empty; } }
     public string ExpectedItemName { get { return definition != null ? definition.ItemName : string.Empty; } }
@@ -5306,12 +5312,13 @@ public sealed class XUiC_RebirthRestorationModifiers : XUiC_AssembleWindow
 [Preserve]
 public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
 {
+    private XUiV_Sprite highlightView;
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
     public override void Update(float dt)
     {
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
-        var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
+        var fill=highlightView ?? (highlightView=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite);
         if(fill!=null)
         {
             Color color=isOver&&ViewComponent?.UiTransformIsHovered==true?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);
@@ -5319,6 +5326,7 @@ public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
             if(fill.Sprite!=null&&fill.Sprite.color!=color)fill.SetColorImmediately(color);
         }
     }
+    public override void Cleanup(){highlightView=null;base.Cleanup();}
     public override bool CanRemove()
     {
         if(!base.CanRemove())return false;
@@ -5332,12 +5340,13 @@ public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
 [Preserve]
 public sealed class XUiC_RebirthRestorationCosmeticSlot : XUiC_ItemCosmeticStack
 {
+    private XUiV_Sprite highlightView;
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
     public override void Update(float dt)
     {
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
-        var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
+        var fill=highlightView ?? (highlightView=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite);
         if(fill!=null)
         {
             Color color=isOver&&ViewComponent?.UiTransformIsHovered==true?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);
@@ -5345,4 +5354,5 @@ public sealed class XUiC_RebirthRestorationCosmeticSlot : XUiC_ItemCosmeticStack
             if(fill.Sprite!=null&&fill.Sprite.color!=color)fill.SetColorImmediately(color);
         }
     }
+    public override void Cleanup(){highlightView=null;base.Cleanup();}
 }

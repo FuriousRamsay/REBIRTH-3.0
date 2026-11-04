@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "count": 7,
-  "extendsCollectionTotal": 207,
+  "count": 10,
+  "extendsCollectionTotal": 209,
   "wraps": [
     {
       "id": "UndeadChill",
@@ -72,6 +72,22 @@
       "displayName": "HeyWeps Vehicle Wrap",
       "description": "Blue and steel gray submarine survival. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
       "artwork": "Resources/CamperWraps/Artwork/HeyWeps.png"
+    },
+    {
+      "id": "Viper",
+      "name": "Viper",
+      "item": "modVehicleWrapViper",
+      "displayName": "Viper Vehicle Wrap",
+      "description": "Viper: combat architect and veteran firefighter. Muted navy, olive and gunmetal fortress-building scenes, military hardware and dark humour. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "artwork": "Resources/CamperWraps/Artwork/Viper.png"
+    },
+    {
+      "id": "StallionsDen",
+      "name": "StallionsDen",
+      "item": "modVehicleWrapStallionsDen",
+      "displayName": "Stallion's Den Vehicle Wrap",
+      "description": "Stallion\u2019s Den: hospitality for him, absolute misery for visiting survivors. Black and crimson nightclub luxury, cruel POI design and dark humour. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish.",
+      "artwork": "Resources/CamperWraps/Artwork/StallionsDen.png"
     }
   ]
 }

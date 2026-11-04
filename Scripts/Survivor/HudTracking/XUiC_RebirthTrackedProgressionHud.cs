@@ -43,6 +43,8 @@ public sealed class XUiC_RebirthTrackedProgressionHud : XUiController
     private readonly XUiController[] progressBackgroundControllers = new XUiController[AuthoredRows];
     private readonly XUiV_Sprite[] progressFills = new XUiV_Sprite[AuthoredRows];
     private readonly Dictionary<string, PreviousDisplay> previous = new Dictionary<string, PreviousDisplay>(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> retainedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    private readonly List<string> retiredKeys = new List<string>();
 
     private XUiController overflowRow;
     private XUiV_Label overflowLabel;
@@ -213,11 +215,13 @@ public sealed class XUiC_RebirthTrackedProgressionHud : XUiController
                 }
             }
             // Bound obsolete pulse state rather than retaining every historically selected ID.
-            var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (RebirthHudTrackDisplay display in resolvedCache) if (display.Id != null) keep.Add(display.Id.Key);
-            var remove = new List<string>();
-            foreach (string key in previous.Keys) if (!keep.Contains(key)) remove.Add(key);
-            foreach (string key in remove) previous.Remove(key);
+            retainedKeys.Clear();
+            foreach (RebirthHudTrackDisplay display in resolvedCache) if (display.Id != null) retainedKeys.Add(display.Id.Key);
+            retiredKeys.Clear();
+            foreach (string key in previous.Keys) if (!retainedKeys.Contains(key)) retiredKeys.Add(key);
+            foreach (string key in retiredKeys) previous.Remove(key);
+            retiredKeys.Clear();
+            retainedKeys.Clear();
         }
         if (!trackingEnabled) { HideAndReport(); return; }
         List<RebirthHudTrackDisplay> resolved = resolvedCache;

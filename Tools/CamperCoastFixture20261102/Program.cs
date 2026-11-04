@@ -1,0 +1,2 @@
+using System;
+class Program {static void Main(){int n=0;void Check(float got,float want){n++;if(Math.Abs(got-want)>.001f)throw new Exception(got+" != "+want);}var b=RebirthCamperCoastPolicy.Brake;Check(b(0,6000,0,0),60);Check(b(12000,6000,0,0),12000);Check(b(0,6000,1,1750),0);Check(b(0,6000,-1,-750),0);Check(b(0,6000,0,1),0);Check(b(0,0,0,0),0);Check(b(0,float.NaN,0,0),0);Check(b(0,6000,float.NaN,0),0);Check(b(0,10000,0,0),100);Console.WriteLine("PASS "+n+" extracted production policy checks; no native driving acceptance.");}}

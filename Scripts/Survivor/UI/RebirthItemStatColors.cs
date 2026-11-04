@@ -8,9 +8,12 @@ public static class RebirthItemStatColors
     {
         if (string.IsNullOrEmpty(text)) return text;
         // Use the registered native inline stat symbol; arbitrary atlas sprite names are not text symbols.
-        var tint = XUiBindingHelper.StatBoostedColor;
-        string star = "[" + tint.r.ToString("X2") + tint.g.ToString("X2") + tint.b.ToString("X2") + "][t][sp=ui_stat][/t][-]";
-        text = text.Replace("[FFD700][sp=ui_stat][-]", "[sp=ui_stat]").Replace("[sp=ui_stat]", star);
+        if (text.Contains("[sp=ui_stat]"))
+        {
+            var tint = XUiBindingHelper.StatBoostedColor;
+            string star = "[" + tint.r.ToString("X2") + tint.g.ToString("X2") + tint.b.ToString("X2") + "][t][sp=ui_stat][/t][-]";
+            text = text.Replace("[FFD700][sp=ui_stat][-]", "[sp=ui_stat]").Replace("[sp=ui_stat]", star);
+        }
         return Tokens.Replace(text, match => match.Value[0] == '['
             ? match.Value : "[FF0000]" + match.Value + "[-]");
     }

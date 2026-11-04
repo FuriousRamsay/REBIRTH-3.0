@@ -17,7 +17,7 @@ public static class RebirthNativeItemCodec
                 writer.SetBaseStream(stream);
                 ItemValue.Write(value, writer);
                 writer.Flush();
-                return Convert.ToBase64String(stream.ToArray());
+                return Convert.ToBase64String(stream.GetBuffer(), 0, checked((int)stream.Length));
             }
             finally { writer.Encoding = previous; }
         }

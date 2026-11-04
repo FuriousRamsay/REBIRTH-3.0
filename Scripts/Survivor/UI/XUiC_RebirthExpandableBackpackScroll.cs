@@ -525,17 +525,16 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
         if(ViewComponent==null||ViewComponent.UiTransform==null)return;
 
-        Transform content=ViewComponent.UiTransform.parent;
-        if(content==null)return;
-
-        Transform background=content.Find("backgroundMain")??content.Find("sprBackground");
-        if(background==null)return;
-
-        Collider collider=background.GetComponent<Collider>();
-        if(collider==null)return;
-
-        if(blockingBackgroundCollider==null)
+        Collider collider=blockingBackgroundCollider;
+        Transform background=null;
+        if(collider==null)
         {
+            Transform content=ViewComponent.UiTransform.parent;
+            if(content==null)return;
+            background=content.Find("backgroundMain")??content.Find("sprBackground");
+            if(background==null)return;
+            collider=background.GetComponent<Collider>();
+            if(collider==null)return;
             blockingBackgroundCollider=collider;
             blockingBackgroundColliderWasEnabled=collider.enabled;
         }
@@ -547,7 +546,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         {
             blockingBackgroundColliderLogged=true;
             if (diagnosticLogging) Log.Out("[REBIRTH BackpackScroll] INPUT_BLOCKER_DISABLED"
-                +" path="+BuildTransformPath(background)
+                +" path="+BuildTransformPath(background!=null?background:collider.transform)
                 +" collider="+collider.GetType().Name
                 +" wasEnabled="+blockingBackgroundColliderWasEnabled);
         }
@@ -564,7 +563,8 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         // target above every ItemStack. Mouse-wheel scrolling no longer needs this collider: the
         // raw-wheel fallback is already strictly scoped to the backpack geometry. Disable this
         // surface so NGUI raycasts can reach each native XUiC_ItemStack collider again.
-        Collider collider=ViewComponent.UiTransform.GetComponent<Collider>();
+        Collider collider=blockingScrollSurfaceCollider;
+        if(collider==null)collider=ViewComponent.UiTransform.GetComponent<Collider>();
         if(collider==null)return;
 
         if(blockingScrollSurfaceCollider==null)
@@ -1198,7 +1198,8 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         // UiTransform.localPosition caused the scroll displacement to be applied twice in-game:
         // at max offset (~224 px) the effective movement was roughly ~448 px, which placed the
         // final row at the TOP of the viewport instead of the bottom.
-        inventory.ViewComponent.Position=target;
+        if(inventory.ViewComponent.Position!=target)
+            inventory.ViewComponent.Position=target;
     }
 
     private int GetThumbHeight()

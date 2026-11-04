@@ -21,8 +21,9 @@ internal static class RebirthPurgeDiscoveryNotification
         var world = GameManager.Instance?.World;
         if (!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge ||
             identity == null || world == null || world.IsRemote() || discoverer == null ||
-            !discoverer.IsSpawned() || discoverer.IsDead() || discoverer.IsSpectator || discoverer.AttachedToEntity != null ||
-            discoverer.IsFlyMode.Value || RebirthPurgeKillContributor.Identify(discoverer, world) == null) return;
+            !discoverer.IsSpawned() || discoverer.IsDead() || discoverer.IsSpectator ||
+            discoverer.IsFlyMode.Value || discoverer.AttachedToEntity != null ||
+            RebirthPurgeKillContributor.Identify(discoverer, world) == null) return;
         string name = DisplayName(discoverer);
         RebirthPurgePoiHistory.Discover(identity,name);
         Show(identity.Prefab, identity.Biome, name);
@@ -37,9 +38,16 @@ internal static class RebirthPurgeDiscoveryNotification
         if (!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge) return;
         var player = GameManager.Instance?.World?.GetPrimaryPlayer();
         if (player == null) return;
-        GameManager.ShowTooltip(player, string.Format(Localization.Get("xuiRebirthPurgePoiDiscoveredNotice"),
-            discoverer, Localization.Get(prefab), Localization.Get("biome_" + biome)));
+        string message = string.Format(Localization.Get("xuiRebirthPurgePoiDiscoveredNotice"),
+            discoverer, Localization.Get(prefab), Localization.Get("biome_" + biome));
+        GameManager.ShowTooltip(player, message);
+#if PURGE_QUALIFICATION
+        RebirthPurgeFeedbackTrace.Record("discovery-tooltip", prefab, biome, message);
+#endif
         Audio.Manager.PlayInsidePlayerHead("purge_cleared");
+#if PURGE_QUALIFICATION
+        RebirthPurgeFeedbackTrace.Record("discovery-audio", prefab, biome, "purge_cleared");
+#endif
     }
 }
 

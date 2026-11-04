@@ -8,20 +8,25 @@ public sealed class ConsoleCmdRebirthPurgeTestSetup : ConsoleCmdAbstract
 {
     private static World owner;
     private static bool needs, agenda, explore, heal, supply, glance;
+    private static bool DisposableSave()
+    {
+        string save=GamePrefs.GetString(EnumGamePrefs.GameName);
+        return save=="CodexTest"||save=="CodexTestPurgeRegression20261102"||save=="CodexTestPurgeFresh20261102";
+    }
     internal static bool SuppressHostileAnimals(World world) => ReferenceEquals(owner, world)
         && world != null && !world.IsRemote() && RebirthGameBridge.IsRunning
-        && GamePrefs.GetString(EnumGamePrefs.GameName) == "CodexTest";
+        && DisposableSave();
     public override string[] getCommands() => new[] { "rbpurgetestsetup" };
     public override string getDescription() => "Configure the disposable Purge test environment.";
-    public override string getHelp() => "rbpurgetestsetup on|off|status (CodexTest only).";
+    public override string getHelp() => "rbpurgetestsetup animals|on|off|status (authorized disposable Purge test saves only; animals preserves guard/heal/reload).";
     public override void Execute(List<string> args, CommandSenderInfo sender)
     {
         var world = GameManager.Instance?.World;
         if (sender.RemoteClientInfo != null || world == null || world.IsRemote()
-            || !RebirthGameBridge.IsRunning || GamePrefs.GetString(EnumGamePrefs.GameName) != "CodexTest"
+            || !RebirthGameBridge.IsRunning || !DisposableSave()
             || args.Count != 1)
-        { SdtdConsole.Instance.Output("*** ERROR requires local disposable CodexTest Bridge and on|off|status."); return; }
-        if (args[0] == "on")
+        { SdtdConsole.Instance.Output("*** ERROR requires local disposable Purge Bridge and animals|on|off|status."); return; }
+        if (args[0] == "on"||args[0]=="animals")
         {
             if (owner != null && !ReferenceEquals(owner, world))
             { SdtdConsole.Instance.Output("*** ERROR restore the previous setup before changing worlds."); return; }
@@ -33,9 +38,12 @@ public sealed class ConsoleCmdRebirthPurgeTestSetup : ConsoleCmdAbstract
                 RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.bridge.purge.testsetup"), typeof(AnimalFilter));
                 owner = world;
             }
-            RebirthGameBridgeNeeds.Enabled = false; RebirthGameBridgeAgenda.Enabled = false;
-            RebirthGameBridgeWorld.ExploreEnabled = false; RebirthGameBridgeCombat.InstinctHeal = false;
-            RebirthGameBridgeCombat.InstinctSupply = false; RebirthGameBridgeCombat.GlanceWhenIdle = false;
+            if(args[0]=="on")
+            {
+                RebirthGameBridgeNeeds.Enabled = false; RebirthGameBridgeAgenda.Enabled = false;
+                RebirthGameBridgeWorld.ExploreEnabled = false; RebirthGameBridgeCombat.InstinctHeal = false;
+                RebirthGameBridgeCombat.InstinctSupply = false; RebirthGameBridgeCombat.GlanceWhenIdle = false;
+            }
         }
         else if (args[0] == "off")
         {

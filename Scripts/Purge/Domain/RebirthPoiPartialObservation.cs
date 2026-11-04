@@ -136,11 +136,21 @@ internal sealed class RebirthPoiPartialObservation
         if(!plan.IsAuthored&&plan.Volumes.Any(id=>!Volumes.ContainsKey(id)))return null;
         try
         {
+            Dictionary<string,RebirthPoiAuthoredResetExpectation> authoredByDescriptor=null;
+            HashSet<int> resetVolumeIds=null;
+            if(plan.IsAuthored)
+            {
+                authoredByDescriptor=new Dictionary<string,RebirthPoiAuthoredResetExpectation>(StringComparer.Ordinal);
+                foreach(var expected in plan.Authored)
+                    if(expected.Kind==RebirthPoiAuthoredResetKind.Sleeper)authoredByDescriptor.Add(expected.Descriptor,expected);
+            }
+            else resetVolumeIds=new HashSet<int>(plan.Volumes);
             var result=new List<RebirthPoiVolumeObservation>();var requiredPrior=new HashSet<Guid>();var mapped=new HashSet<string>(StringComparer.Ordinal);
             foreach(var old in Volumes.Values)
             {
-                RebirthPoiAuthoredResetExpectation authored=plan.IsAuthored?plan.Authored.SingleOrDefault(e=>e.Kind==RebirthPoiAuthoredResetKind.Sleeper&&e.Descriptor==old.Descriptor):null;
-                bool affected=plan.IsAuthored?authored!=null:plan.Volumes.Contains(old.NativeVolumeId);
+                RebirthPoiAuthoredResetExpectation authored=null;
+                if(plan.IsAuthored)authoredByDescriptor.TryGetValue(old.Descriptor,out authored);
+                bool affected=plan.IsAuthored?authored!=null:resetVolumeIds.Contains(old.NativeVolumeId);
                 if(!affected){result.Add(new RebirthPoiVolumeObservation(old.NativeVolumeId,old.Descriptor,old.Actors.Values,EffectiveGeneration(old)));continue;}
                 string key=plan.IsAuthored?authored.Key:"1:"+old.NativeVolumeId.ToString(System.Globalization.CultureInfo.InvariantCulture);RebirthPoiAuthoredRuntimeBinding runtime=null;
                 if(bindings!=null&&(!bindings.Bindings.TryGetValue(key,out runtime)||runtime.Descriptor!=old.Descriptor))return null;
@@ -164,7 +174,8 @@ internal sealed class RebirthPoiPartialObservation
     public string Canonical {get {return Write(this).ToString(SaveOptions.DisableFormatting);} }
     internal static XElement Write(RebirthPoiPartialObservation value)
     {
-        var node=new XElement("observations",new XAttribute("version",value.Volumes.Values.SelectMany(v=>v.Actors.Values).Any(a=>a.Contributor!=null)?6:5),new XAttribute("generation",value.Generation.ToString("N")),new XAttribute("epoch",value.Epoch),new XAttribute("revision",value.Revision));
+        var node=new XElement("observations",new XAttribute("version",5),new XAttribute("generation",value.Generation.ToString("N")),new XAttribute("epoch",value.Epoch),new XAttribute("revision",value.Revision));
+        bool hasContributor=false;
         foreach(var volume in value.Volumes.Values.OrderBy(v=>v.NativeVolumeId))
         {
             var child=new XElement("volume",new XAttribute("id",volume.NativeVolumeId),new XAttribute("descriptor",volume.Descriptor),new XAttribute("generation",value.EffectiveGeneration(volume).ToString("N")));
@@ -175,11 +186,12 @@ internal sealed class RebirthPoiPartialObservation
                 if(actor.Checkpoint!=null)item.Add(new XElement("checkpoint",new XAttribute("count",actor.Checkpoint.Count),new XAttribute("original",actor.Checkpoint.OriginalEntityId),new XAttribute("last",actor.Checkpoint.LastEntityId),new XAttribute("digest",actor.Checkpoint.Digest)));
                 foreach(var restoration in actor.Restorations)item.Add(new XElement("restore",new XAttribute("receipt",restoration.Receipt.ToString("N")),new XAttribute("from",restoration.FromEntityId),new XAttribute("to",restoration.ToEntityId)));
                 if(actor.Dead)item.Add(new XElement("death",new XAttribute("receipt",actor.DeathReceipt.ToString("N")),new XAttribute("time",actor.DeathTime),actor.TerminalKind==RebirthPoiActorTerminalKind.NativeDespawn?new XAttribute("kind",2):null));
-                if(actor.Contributor!=null)item.Add(new XElement("contributor",new XAttribute("version",1),new XAttribute("key",actor.Contributor)));
+                if(actor.Contributor!=null){hasContributor=true;item.Add(new XElement("contributor",new XAttribute("version",1),new XAttribute("key",actor.Contributor)));}
                 child.Add(item);
             }
             node.Add(child);
         }
+        if(hasContributor)node.SetAttributeValue("version",6);
         return node;
     }
     internal static RebirthPoiPartialObservation Read(XElement node)

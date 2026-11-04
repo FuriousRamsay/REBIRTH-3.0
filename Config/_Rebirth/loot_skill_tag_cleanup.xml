@@ -1,0 +1,9 @@
+<configs>
+  <!-- Vanilla attribute chips do not belong to REBIRTH character progression.
+       Apply last, including Purge and Twitch loot added by other layers. -->
+  <remove xpath="/lootcontainers//item[@name='modArmorPerception' or @name='modArmorStrength' or @name='modArmorFortitude' or @name='modArmorAgility' or @name='modArmorIntellect']"/>
+  <!-- Native book/magazine groups are redirected to REBIRTH learning loot in
+       this mode. Cut their junk-only references after all replacements. -->
+  <remove xpath="/lootcontainers/lootgroup[starts-with(@name, 'groupJunk')]/item[@group='booksAllScaled' or @group='skillMagazines' or @group='rebirthLiteratureDistribution']"/>
+  <removeattribute xpath="/lootcontainers//item[@tags and (contains(translate(@tags, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'skill') or contains(translate(@tags, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'csm') or contains(translate(@tags, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'perk'))]/@tags"/>
+</configs>

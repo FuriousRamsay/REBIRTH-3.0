@@ -1,0 +1,12 @@
+{
+  "name": "Player Help entry and modal window",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "action": { "command": "click", "args": { "text": "Player Help" } } },
+    { "wait": 1 },
+    { "screenshot": "player-help-modal-cursor-crosshair-review" },
+    { "action": { "command": "click", "args": { "text": "CLOSE" } } },
+    { "expectNoErrors": true }
+  ]
+}

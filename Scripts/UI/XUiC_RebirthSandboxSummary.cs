@@ -313,6 +313,18 @@ public class XUiC_RebirthSandboxSummary : XUiController
         }
         if (changes.Count == 0 && !string.Equals(RebirthSandboxOptionManager.Encode(state), RebirthSandboxOptionManager.Encode(defaults), StringComparison.Ordinal))
             changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthOptions") + ":[-] " + Localization.Get("xuiRebirthChanged") + "[-]");
+        if (state.SeekerMode != defaults.SeekerMode)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerMode") + ":[-] " + Localization.Get(new[] { "xuiSeekerNever", "xuiSeekerNotQuesting", "xuiSeekerNotHordeNight", "xuiSeekerAlways" }[(int)state.SeekerMode]) + "[-]");
+        if (state.SeekerRewards != defaults.SeekerRewards)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerRewards") + ":[-] " + Localization.Get(state.SeekerRewards ? "xuiYes" : "xuiNo") + "[-]");
+        if (state.SeekerNotifications != defaults.SeekerNotifications)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerNotifications") + ":[-] " + Localization.Get(state.SeekerNotifications ? "xuiYes" : "xuiNo") + "[-]");
+        if (state.SeekerFrequency != defaults.SeekerFrequency)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerFrequency") + ":[-] " + state.SeekerFrequency + "%[-]");
+        if (state.SeekerRestriction != defaults.SeekerRestriction)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerRestriction") + ":[-] " + Localization.Get(new[] { "xuiSeekerRestrictionAnywhere", "xuiSeekerRestrictionQuesting", "xuiSeekerRestrictionNotQuesting", "xuiSeekerRestrictionOutdoors", "xuiSeekerRestrictionOutdoorsNotQuesting", "xuiSeekerRestrictionOff" }[(int)state.SeekerRestriction]) + "[-]");
+        if (state.SeekerHordeDay != defaults.SeekerHordeDay)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerHordeDay") + ":[-] " + Localization.Get(state.SeekerHordeDay ? "xuiYes" : "xuiNo") + "[-]");
         changedOptions = string.Join("\n", changes.ToArray());
 
         IsDirty = true;

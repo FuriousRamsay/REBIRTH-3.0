@@ -391,7 +391,7 @@ public static class AdvancedFarmingLightService
         if (s_lightCache.TryGetValue(cacheKey, out CachedLightResult cached))
         {
             int cacheAgeSeconds = now - cached.WorldSeconds;
-            int cacheLifetimeSeconds = GetLightCacheLifetimeSeconds(cached.Pos, cached.Result.RequiredLightLevel);
+            int cacheLifetimeSeconds = CacheSeconds;
             if (cacheAgeSeconds >= 0
                 && cacheAgeSeconds <= cacheLifetimeSeconds
                 && cached.PolicyVersion == policyVersion
@@ -526,7 +526,7 @@ public static class AdvancedFarmingLightService
             TrustedCropSunWithoutCover = exposure.TrustedCropSunWithoutCover,
             CacheHit = false,
             CacheAgeSeconds = 0,
-            CacheLifetimeSeconds = GetLightCacheLifetimeSeconds(plantPos, required),
+            CacheLifetimeSeconds = CacheSeconds,
             HasSunLight = hasNaturalSun,
             HasBlockLight = rawBlock,
             HasOpenSky = hasOpenSky
@@ -563,7 +563,7 @@ public static class AdvancedFarmingLightService
         s_cacheRemovalScratch.Clear();
         foreach (KeyValuePair<long, CachedLightResult> pair in s_lightCache)
         {
-            if (now - pair.Value.WorldSeconds > GetLightCacheLifetimeSeconds(pair.Value.Pos, pair.Value.Result.RequiredLightLevel))
+            if (now - pair.Value.WorldSeconds > CacheSeconds)
                 s_cacheRemovalScratch.Add(pair.Key);
         }
 
@@ -584,7 +584,7 @@ public static class AdvancedFarmingLightService
         foreach (KeyValuePair<long, CachedCoverPresence> pair in s_coverPresenceCache)
         {
             int age = now - pair.Value.WorldSeconds;
-            if (age < 0 || age > GetCoverPresenceCacheLifetimeSeconds(pair.Value.Pos))
+            if (age < 0 || age > CoverPresenceCacheSeconds)
                 s_cacheRemovalScratch.Add(pair.Key);
         }
 
@@ -617,37 +617,6 @@ public static class AdvancedFarmingLightService
                 if (chunk == null || (chunk is Chunk loaded && loaded.InProgressUnloading)) return false;
             }
         return true;
-    }
-
-    private static int GetLightCacheLifetimeSeconds(Vector3i pos, int required)
-    {
-        return CacheSeconds + PositiveModulo(HashPosition(pos) ^ required, CacheJitterSeconds);
-    }
-
-    private static int GetCoverPresenceCacheLifetimeSeconds(Vector3i pos)
-    {
-        return CoverPresenceCacheSeconds + PositiveModulo(HashPosition(pos) ^ 0x51f15e, CoverPresenceCacheJitterSeconds);
-    }
-
-    private static int PositiveModulo(int value, int divisor)
-    {
-        if (divisor <= 0)
-            return 0;
-
-        int result = value % divisor;
-        return result < 0 ? result + divisor : result;
-    }
-
-    private static int HashPosition(Vector3i pos)
-    {
-        unchecked
-        {
-            int hash = 216613626;
-            hash = (hash ^ pos.x) * 16777619;
-            hash = (hash ^ pos.y) * 16777619;
-            hash = (hash ^ pos.z) * 16777619;
-            return hash;
-        }
     }
 
     public static bool HasUnblockedNaturalLightColumn(WorldBase world, Vector3i plantPos)
@@ -1004,7 +973,7 @@ public static class AdvancedFarmingLightService
         int cachedAge = 0;
         if (s_coverPresenceCache.TryGetValue(key, out CachedCoverPresence cached)
             && (cachedAge = now - cached.WorldSeconds) >= 0
-            && cachedAge <= GetCoverPresenceCacheLifetimeSeconds(cached.Pos)
+            && cachedAge <= CoverPresenceCacheSeconds
             && cached.PolicyVersion == policyVersion)
         {
             return cached.HasCover;

@@ -49,9 +49,15 @@ internal static class RebirthWeaponDetailRows
     private static float Other(RebirthWeaponSustainedDpsService.Profile p,Func<RebirthWeaponSustainedDpsService.Profile,float> read)=>p==null?float.NaN:read(p);
     private static string Pair(float normal,float power,float otherNormal,float otherPower,bool paired,bool negative=false)
         =>CompareNumber(normal,otherNormal,negative)+(paired?" ("+CompareNumber(power,otherPower,negative)+")":"");
-    private static string Boost(string text,ItemValue item,params PassiveEffects[] effects)
+    private static string Boost(string text,ItemValue item,PassiveEffects first,PassiveEffects? second=null,
+        PassiveEffects? third=null,PassiveEffects? fourth=null,PassiveEffects? fifth=null)
     {
-        foreach(var effect in effects)if(item.GetStatPercent(effect,true)!=1f)return RebirthItemStatColors.Format("[sp=ui_stat]")+text;
+        if(item.GetStatPercent(first,true)!=1f
+            ||second.HasValue&&item.GetStatPercent(second.Value,true)!=1f
+            ||third.HasValue&&item.GetStatPercent(third.Value,true)!=1f
+            ||fourth.HasValue&&item.GetStatPercent(fourth.Value,true)!=1f
+            ||fifth.HasValue&&item.GetStatPercent(fifth.Value,true)!=1f)
+            return RebirthItemStatColors.Format("[sp=ui_stat]")+text;
         return text;
     }
     internal static float Condition(ItemValue item)=>item==null||item.MaxUseTimes<=0?1f:Mathf.Clamp01(item.PercentUsesLeft);

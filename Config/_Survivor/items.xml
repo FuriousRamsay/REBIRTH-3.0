@@ -1501,7 +1501,7 @@
     </item>
     <item name="rebirthFirearmCleaningKit">
       <property name="CreativeMode" value="None" />
-      <property name="CustomIcon" value="resourceRepairKit" />
+      <property name="CustomIcon" value="FuriousRamsayGunRepairKit" />
       <property name="DescriptionKey" value="rebirthFirearmCleaningKitDesc" />
       <property name="Extends" value="resourceRepairKit" />
       <property name="Stacknumber" value="20" />

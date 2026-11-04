@@ -169,11 +169,11 @@ public static class RebirthSelectedDurability
         if (target == null || source == null || ReferenceEquals(target,source)) return; if(referenceStack!=null&&referenceStack.IsEmpty())return;
         var inspectedStack=referenceStack??(source as XUiC_ItemStack)?.ItemStack;
         var geometry=GeometrySlot(target,source);
-        var sourceIcon=geometry.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
-        var targetIcon=target.GetChildById(infoWindow?"itemPreview":"itemIcon")?.ViewComponent as XUiV_Sprite;
-        if(sourceIcon==null||targetIcon==null)return;
         var sourceViews=NativeCache.GetValue(geometry,c=>new NativeViews(c,false));
         var targetViews=NativeCache.GetValue(target,c=>new NativeViews(c,infoWindow));
+        var sourceIcon=sourceViews.Icon;
+        var targetIcon=targetViews.Icon;
+        if(sourceIcon==null||targetIcon==null)return;
         var actualViews=NativeCache.GetValue(source,c=>new NativeViews(c,false));
         float ratio=targetIcon.Size.x/(float)Math.Max(1,sourceIcon.Size.x);
         Vector2 from=TopLeft(sourceIcon),to=TopLeft(targetIcon);
@@ -236,9 +236,10 @@ public static class RebirthSelectedDurability
     }
     private sealed class NativeViews
     {
-        internal XUiV_Sprite Track,Fill,Damage;internal XUiV_Label Count;
+        internal XUiV_Sprite Icon,Track,Fill,Damage;internal XUiV_Label Count;
         internal NativeViews(XUiController root,bool info)
         {
+            Icon=root.GetChildById(info?"itemPreview":"itemIcon")?.ViewComponent as XUiV_Sprite;
             Count=root.GetChildById(info?"durabilityValue":"stackValue")?.ViewComponent as XUiV_Label;
             if(info){Track=root.GetChildById("removedurabilityBar")?.ViewComponent as XUiV_Sprite;Fill=root.GetChildById("durabilityBar")?.ViewComponent as XUiV_Sprite;Damage=root.GetChildById("durabilityBackground")?.ViewComponent as XUiV_Sprite;}
             else if(root.Children!=null)foreach(var child in root.Children)

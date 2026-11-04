@@ -13,6 +13,7 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
     private readonly RebirthVehicleTuningSession.Control[] displayed=new RebirthVehicleTuningSession.Control[4];
     private readonly RebirthVehicleTuningSession.Control[] editing=new RebirthVehicleTuningSession.Control[4];
     private readonly int[] editEpoch=new int[4];
+    private readonly string[] editText=new string[4];
     private readonly XUiC_TextInput[] inputs=new XUiC_TextInput[4];
     private readonly XUiController[] sliderTracks=new XUiController[4];
     private readonly XUiV_Sprite[] thumbs=new XUiV_Sprite[4];
@@ -45,7 +46,12 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
                 inputs[i]=GetChildById("row"+i+"Value") as XUiC_TextInput;
                 if(inputs[i]==null)throw new InvalidOperationException("Tuner numeric input missing: "+i);
                 inputs[i].VkPropagatesEvents=false;
-                inputs[i].OnInputSelectedHandler+=(sender,selected)=>{if(selected){editing[slot]=displayed[slot];editEpoch[slot]=epoch;}};
+                inputs[i].OnInputSelectedHandler+=(sender,selected)=>
+                {
+                    if(refreshing)return;
+                    if(selected){editing[slot]=displayed[slot];editEpoch[slot]=epoch;editText[slot]=inputs[slot].Text;}
+                    else try{CommitText(slot);}catch(Exception error){status=error.Message;RefreshBindings();}
+                };
                 // Native OnSubmit only removes focus when no delayed handler is registered.
                 // Commit in the same native UIInput submit event, never to a recycled row next frame.
                 EventDelegate.Add(inputs[i].UIInput.onSubmit,()=>Submit(slot,inputs[slot].Text));
@@ -88,7 +94,7 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
     private void Button(string id,Action action)
     {
         var button=GetChildById(id);if(button==null)throw new InvalidOperationException("Tuner control missing: "+id);
-        button.OnPress+=(sender,key)=>{if(key!=0&&key!=-1)return;try{if(heldSlider>=0){ReleaseSlider();Show();}action();}catch(Exception error){status=error.Message;RefreshBindings();}};
+        button.OnPress+=(sender,key)=>{if(key!=0&&key!=-1)return;try{CommitEdits();action();}catch(Exception error){status=error.Message;RefreshBindings();}};
     }
     private void NeedSession()
     {if(session==null||!session.Valid||!ReferenceEquals(session,RebirthVehicleTuningUi.Session))throw new InvalidOperationException(Localization.Get("xuiRbVehicleTune6"));}
@@ -102,14 +108,14 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
     private void Scroll(XUiController sender,float delta)
     {
         if(refreshing||RebirthVehicleTuningUi.Transitioning||delta==0||RebirthVehicleTuningUi.Mode!=RebirthVehicleTuningUi.State.Edit)return;
-        ReleaseSlider();
+        CommitEdits();
         first=Math.Max(0,Math.Min(Math.Max(0,filtered.Count-4),first+(delta>0?-1:1)));Show();
     }
     private void ListChanged()
     {
         if(refreshing||RebirthVehicleTuningUi.Transitioning||listScroll==null)return;
         int next=Mathf.RoundToInt(listScroll.ScrollBar.value*Math.Max(0,filtered.Count-4));
-        if(next!=first){ReleaseSlider();first=next;Show();}
+        if(next!=first){CommitEdits();first=next;Show();}
     }
     private void Slider(int slot,bool commit=false)
     {
@@ -137,16 +143,36 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
     }
     private void ReleaseSlider(){heldSlider=-1;heldControl=null;}
     private void FinishSlider(int slot)
-    {try{Slider(slot,true);}finally{ReleaseSlider();Show();}}
+    {
+        try{if(heldSlider==slot)CommitEdits();}
+        catch(Exception error){status=error.Message;}
+        finally{ReleaseSlider();Show();}
+    }
+    private void CommitText(int slot)
+    {
+        if(refreshing||editEpoch[slot]!=epoch||editing[slot]==null||
+            !ReferenceEquals(editing[slot],displayed[slot])||!ReferenceEquals(session,RebirthVehicleTuningUi.Session))return;
+        string text=inputs[slot].Text;
+        if(string.Equals(text,editText[slot],StringComparison.Ordinal))return;
+        NeedSession();editing[slot].ApplyText(text);editText[slot]=text;
+        status=Localization.Get(editing[slot].Proposal?"xuiRbVehicleTune11":"xuiRbVehicleTune12");
+    }
+    private void CommitEdits()
+    {
+        if(session==null||!session.Valid||!ReferenceEquals(session,RebirthVehicleTuningUi.Session))return;
+        for(int slot=0;slot<4;slot++)CommitText(slot);
+        if(heldSlider>=0&&ReferenceEquals(heldControl,displayed[heldSlider]))
+        {
+            // Commit the last drag sample; the pointer may already be over Drive/Close.
+            heldControl.Apply(heldNumber);ReleaseSlider();
+        }
+    }
     private void Submit(int slot,string text)
     {
-        // Closing/escape must never commit unsubmitted text as focus is removed.
-        var actions=xui?.playerUI?.playerInput;
-        if(Input.GetKeyDown(KeyCode.Escape)||(actions!=null&&(actions.PermanentActions.Cancel.WasPressed||actions.GUIActions.Cancel.WasPressed)))return;
         // Selection epoch and owner must still match this synchronous submit.
         if(refreshing||RebirthVehicleTuningUi.Transitioning||RebirthVehicleTuningUi.Mode!=RebirthVehicleTuningUi.State.Edit||editEpoch[slot]!=epoch||
             !ReferenceEquals(editing[slot],displayed[slot])||displayed[slot]==null||!ReferenceEquals(session,RebirthVehicleTuningUi.Session))return;
-        try{NeedSession();displayed[slot].ApplyText(text);status=Localization.Get(displayed[slot].Proposal?"xuiRbVehicleTune11":"xuiRbVehicleTune12");Show();}
+        try{CommitText(slot);Show();}
         catch(Exception error){status=error.Message;Show();}
     }
     private static void SetBar(XUiV_ScrollBar view,float value)
@@ -208,7 +234,11 @@ public sealed class XUiC_RebirthVehicleTuning:XUiController
         Bind(RebirthVehicleTuningUi.Session);status="";Layout(true);Show();
     }
     public override void OnClose()
-    {ReleaseSlider();base.OnClose();epoch++;RebirthVehicleTuningUi.NativeClosed(RebirthVehicleTuningUi.State.Edit);}
+    {
+        try{CommitEdits();}
+        catch(Exception error){Log.Warning("[REBIRTH VehicleTuning] invalid pending edit on close: "+error.Message);}
+        ReleaseSlider();base.OnClose();epoch++;RebirthVehicleTuningUi.NativeClosed(RebirthVehicleTuningUi.State.Edit);
+    }
     public override void Cleanup()
     {RebirthVehicleTuningUi.End();base.Cleanup();}
     public override void Update(float dt)
@@ -289,9 +319,13 @@ public sealed class XUiC_RebirthVehicleTuningPreview:XUiController
         var body=session.Entity.vehicleRB;float actual;
         if(body!=null){var v=body.velocity;actual=Mathf.Sqrt(v.x*v.x+v.z*v.z)*3.6f;}
         else actual=Mathf.Abs(session.Entity.vehicle.CurrentForwardVelocity)*3.6f;
-        speed=actual.ToString("0",CultureInfo.InvariantCulture)+" km/h";
-        limit=session.ForwardLimitKmh.ToString("0.#",CultureInfo.InvariantCulture)+" km/h";
-        acceleration=session.AccelerationPercent.ToString("0.#",CultureInfo.InvariantCulture)+" %";
+        string nextSpeed=actual.ToString("0",CultureInfo.InvariantCulture)+" km/h";
+        string nextLimit=session.ForwardLimitKmh.ToString("0.#",CultureInfo.InvariantCulture)+" km/h";
+        string nextAcceleration=session.AccelerationPercent.ToString("0.#",CultureInfo.InvariantCulture)+" %";
+        if(speed==nextSpeed&&limit==nextLimit&&acceleration==nextAcceleration)return;
+        speed=nextSpeed;
+        limit=nextLimit;
+        acceleration=nextAcceleration;
         RefreshBindings();
     }
     public override bool GetBindingValueInternal(ref string value,string name)

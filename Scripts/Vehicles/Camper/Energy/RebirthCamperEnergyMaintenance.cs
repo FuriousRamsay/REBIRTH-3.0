@@ -20,6 +20,7 @@ public static class RebirthCamperEnergyMaintenance
         internal string LastReason;
     }
     private static readonly Dictionary<EntityVehicle,Run> runs=new Dictionary<EntityVehicle,Run>();
+    private static readonly List<EntityVehicle> vehicleSnapshot=new List<EntityVehicle>();
     private static bool installed;
     private static World journalWorld;
     private static string journalSaveDirectory;
@@ -118,32 +119,41 @@ public static class RebirthCamperEnergyMaintenance
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
         var world=GameManager.Instance?.World;if(!installed||world==null||world.IsRemote()||!ThreadManager.IsMainThread())return;
-        foreach(var vehicle in world.Entities.list.OfType<EntityVehicle>().ToArray())if(RebirthCamperRadial.IsCamper(vehicle))
+        vehicleSnapshot.Clear();
+        try
         {
-            try
+            foreach(var entity in world.Entities.list)
+                if(entity is EntityVehicle vehicle)vehicleSnapshot.Add(vehicle);
+            for(int i=0;i<vehicleSnapshot.Count;i++)
             {
-                Ready(vehicle);var run=runs[vehicle];
-                if(run.Record!=null){Progress(run);continue;}
-                if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp){run.Targets.Clear();run.Next=Time.realtimeSinceStartup+IntervalSeconds;continue;}
-                // No repair can start before the scheduled scan when the queue is empty.
-                // Pending receipts and queued targets still take their immediate paths.
-                if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.Next)continue;
-                if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.NextOwnerProbe)continue;
-                var owner=Owner(vehicle,out var creation,out var key);
-                if(owner==null){if(run.Targets.Count==0)run.NextOwnerProbe=Time.realtimeSinceStartup+1f;continue;}
-                run.NextOwnerProbe=0;
-                if(RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle)>=0||RebirthCamperEnergyRuntime.IsHeld(vehicle))continue;
-                if(Time.realtimeSinceStartup>=run.Next)
+                var vehicle=vehicleSnapshot[i];
+                if(!RebirthCamperRadial.IsCamper(vehicle))continue;
+                try
                 {
-                    run.Next=Time.realtimeSinceStartup+IntervalSeconds;run.Targets.Clear();
-                    if(PowerManager.HasInstance)foreach(var node in PowerManager.Instance.PowerItemDictionary.Values)
-                        if(node?.TileEntity is TileEntityPowered te&&PoweredAdmission(vehicle,te,owner))run.Targets.Enqueue(node.Position);
+                    Ready(vehicle);var run=runs[vehicle];
+                    if(run.Record!=null){Progress(run);continue;}
+                    if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp){run.Targets.Clear();run.Next=Time.realtimeSinceStartup+IntervalSeconds;continue;}
+                    // No repair can start before the scheduled scan when the queue is empty.
+                    // Pending receipts and queued targets still take their immediate paths.
+                    if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.Next)continue;
+                    if(run.Targets.Count==0&&Time.realtimeSinceStartup<run.NextOwnerProbe)continue;
+                    var owner=Owner(vehicle,out var creation,out var key);
+                    if(owner==null){if(run.Targets.Count==0)run.NextOwnerProbe=Time.realtimeSinceStartup+1f;continue;}
+                    run.NextOwnerProbe=0;
+                    if(RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle)>=0||RebirthCamperEnergyRuntime.IsHeld(vehicle))continue;
+                    if(Time.realtimeSinceStartup>=run.Next)
+                    {
+                        run.Next=Time.realtimeSinceStartup+IntervalSeconds;run.Targets.Clear();
+                        if(PowerManager.HasInstance)foreach(var node in PowerManager.Instance.PowerItemDictionary.Values)
+                            if(node?.TileEntity is TileEntityPowered te&&PoweredAdmission(vehicle,te,owner))run.Targets.Enqueue(node.Position);
+                    }
+                    while(run.Targets.Count>0)
+                    {var pos=run.Targets.Dequeue();if(Prepare(run,owner,creation,key,pos))break;}
                 }
-                while(run.Targets.Count>0)
-                {var pos=run.Targets.Dequeue();if(Prepare(run,owner,creation,key,pos))break;}
+                catch(Exception ex){if(runs.TryGetValue(vehicle,out var run))Warn(run,"exception-"+ex.GetType().Name);}
             }
-            catch(Exception ex){if(runs.TryGetValue(vehicle,out var run))Warn(run,"exception-"+ex.GetType().Name);}
         }
+        finally{vehicleSnapshot.Clear();}
     }
     private static bool Prepare(Run run,EntityPlayer owner,string creation,string key,Vector3i pos)
     {
@@ -191,7 +201,9 @@ public static class RebirthCamperEnergyMaintenance
         var te=v.world.GetTileEntity(receipt.Position) as TileEntityPowered;
         if(te==null||!Eligible(v,te,owner))return false;
         run.Tile=te;var marker=RebirthCamperEnergyMaintenanceMarkers.Get(te);var block=v.world.GetBlock(receipt.Position);
-        return marker!=null&&(marker.Encode().SequenceEqual(run.Before.Receipt.Encode())||marker.Encode().SequenceEqual(run.After.Receipt.Encode()))&&
+        if(marker==null)return false;
+        var markerBytes=marker.Encode();
+        return (markerBytes.SequenceEqual(run.Before.Receipt.Encode())||markerBytes.SequenceEqual(run.After.Receipt.Encode()))&&
             block.rawData==receipt.BlockRaw;
     }
     private static void Progress(Run run)

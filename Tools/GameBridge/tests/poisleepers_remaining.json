@@ -1,0 +1,15 @@
+{
+  "name": "Remaining sleeper helper in a naturally progressed POI",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Precondition: disposable Purge POI with at least85percent rooms cleared or populated, remaining live restored sleepers. Manual/profiler test only when game ownership permits." },
+    { "console": "poisleepers start" },
+    { "wait": 3 },
+    { "console": "poisleepers status" },
+    { "screenshot": "poisleepers-restored-actors-tracking" },
+    { "console": "poisleepers stop" },
+    { "wait": 1 },
+    { "screenshot": "poisleepers-stopped" },
+    { "expectNoErrors": true }
+  ]
+}

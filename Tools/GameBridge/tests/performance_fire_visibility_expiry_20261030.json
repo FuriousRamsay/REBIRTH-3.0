@@ -1,0 +1,12 @@
+{
+  "name":"Fire visibility report expiry observation smoke",
+  "status":"AUTHORED_NOT_RUN",
+  "stopOnFailure":true,
+  "preconditions":"Authorized disposable host/client fixture only; guard ON. Existing native fire diagnostics must independently capture a real visibility report and its expiry when its sender stops reporting. This read-only dwell does not create reports, disconnect players, certify authority or measure FPS. Source boundary checks cover precise expiry and mutations separately. No user game/server control is authorized by this file.",
+  "steps":[
+    {"action":{"command":"state","args":{"Sections":"player,world"}}},
+    {"wait":4},
+    {"action":{"command":"state","args":{"Sections":"player,world"}}},
+    {"expectNoErrors":true}
+  ]
+}

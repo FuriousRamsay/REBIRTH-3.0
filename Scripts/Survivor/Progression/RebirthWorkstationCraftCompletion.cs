@@ -98,7 +98,18 @@ internal static partial class RebirthWorkstationCraftCompletion
         ++serial;
         Credit(world.GetEntity(w.Owner) as EntityPlayer,w.Tile,w.Recipe,"wc1:"+session+":"+(++sequence));
     }
-    private static int Count(ItemStack[] slots,int type)=>slots==null?0:slots.Where(s=>s!=null&&!s.IsEmpty()&&s.itemValue.type==type).Sum(s=>s.count);
+    private static int Count(ItemStack[] slots,int type)
+    {
+        if(slots==null)return 0;
+        int total=0;
+        for(int i=0;i<slots.Length;i++)
+        {
+            ItemStack stack=slots[i];
+            if(stack!=null&&!stack.IsEmpty()&&stack.itemValue.type==type)
+                total=checked(total+stack.count);
+        }
+        return total;
+    }
     private static EntityPlayer Sender(NetPackage packet,World current)
     {
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;

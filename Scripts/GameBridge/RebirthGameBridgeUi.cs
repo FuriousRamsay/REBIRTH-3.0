@@ -637,7 +637,8 @@ public static class RebirthGameBridgeUi
         if (cam == null || v == null || v.UiTransform == null) return false;
         try
         {
-            Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(v.UiTransform);
+            bool collider;
+            Bounds b = InteractionBounds(v,out collider);
             if (b.size.sqrMagnitude <= 0f) return false;
             Vector3 min = cam.WorldToScreenPoint(b.min), max = cam.WorldToScreenPoint(b.max);
             center = new Vector2((min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f);
@@ -658,6 +659,15 @@ public static class RebirthGameBridgeUi
             foreach (XUiWindowGroup g in VisibleGroups(ui))
                 if (!arr.Any(t => (string)t == g.Id)) arr.Add(g.Id);
         return arr;
+    }
+
+    // A button's decorative child sprites can extend beyond its actual hit box.
+    // NGUI routes input through the enabled native collider, not the union of
+    // those widgets. Keep widget bounds for views without an active press collider.
+    private static Bounds InteractionBounds(XUiView view,out bool nativeCollider)
+    {
+        nativeCollider=view.EventOnPress&&view.collider!=null&&view.collider.enabled&&view.collider.gameObject.activeInHierarchy;
+        return nativeCollider?view.collider.bounds:NGUIMath.CalculateAbsoluteWidgetBounds(view.UiTransform);
     }
 
     private static List<Node> Collect(string windowFilter, bool includeAll)
@@ -794,7 +804,8 @@ public static class RebirthGameBridgeUi
         {
             try
             {
-                Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(v.UiTransform);
+                bool collider;
+                Bounds b = InteractionBounds(v,out collider);
                 if (b.size.sqrMagnitude > 0f)
                 {
                     Vector3 min = cam.WorldToScreenPoint(b.min), max = cam.WorldToScreenPoint(b.max);
@@ -804,6 +815,7 @@ public static class RebirthGameBridgeUi
                     {
                         Rect r = node.ScreenRect;
                         o["rect"] = new JArray(Mathf.RoundToInt(r.xMin), Mathf.RoundToInt(Screen.height - r.yMax), Mathf.RoundToInt(r.width), Mathf.RoundToInt(r.height));
+                        o["boundsSource"] = collider?"native-press-collider":"widgets";
                     }
                 }
             }
@@ -974,12 +986,12 @@ public static class RebirthGameBridgeUi
             Node selected = Collect(req.QueryString("window"), true).FirstOrDefault(n => n.Path == selectedPath);
             if (selected == null)
             { req.Fail("Selected UI node changed before the click. Select it again.", 409); yield break; }
-            if (selected.Controller is XUiC_ItemStack)
+            if (selected.Controller is XUiC_ItemStack||selected.View?.EventOnPress==true&&selected.View.collider!=null&&selected.View.collider.enabled)
             {
                 Transform slotRoot = selected.View?.UiTransform;
                 Transform hit = UICamera.hoveredObject != null ? UICamera.hoveredObject.transform : null;
                 if (slotRoot == null || hit == null || (hit != slotRoot && !hit.IsChildOf(slotRoot)))
-                { req.Fail("Selected item slot is clipped or covered. Scroll it into view before clicking.", 409); yield break; }
+                { req.Fail("Selected UI control is clipped or covered; native hover did not reach it.", 409); yield break; }
             }
         }
         RebirthGameBridgeInput.Shift = shift; RebirthGameBridgeInput.Control = ctrl; RebirthGameBridgeInput.Alt = alt;

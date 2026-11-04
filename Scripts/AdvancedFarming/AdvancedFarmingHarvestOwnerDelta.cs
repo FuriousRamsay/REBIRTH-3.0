@@ -36,9 +36,22 @@ internal static partial class AdvancedFarmingHarvestOwnerDelta
         foreach(var type in new[]{typeof(AdvancedFarmingHarvestDeliveryGridSlot),typeof(AdvancedFarmingHarvestDeliveryGridBulk),typeof(AdvancedFarmingHarvestDeliveryGridAdd),typeof(AdvancedFarmingHarvestDeliveryGridCount),typeof(AdvancedFarmingHarvestDeliveryDecItem),typeof(AdvancedFarmingHarvestDeliveryBagAdd),typeof(AdvancedFarmingHarvestDeliveryBagPartial),typeof(AdvancedFarmingHarvestDeliveryHeldUse),typeof(AdvancedFarmingHarvestDeliveryActions),typeof(AdvancedFarmingHarvestDeliverySlotGesture),typeof(AdvancedFarmingHarvestDeliveryCursorSet),typeof(AdvancedFarmingHarvestDeliveryCursorGesture)})
             RebirthHarmonyBootstrap.PatchClassOnce(harmony,type);
     }
-    internal static bool HasOwnHold(EntityPlayerLocal player)=>player!=null&&player.IsSpawned()&&!player.IsDead()&&Attempts.Values.Any(attempt=>ReferenceEquals(attempt.Player,player)&&ReferenceEquals(attempt.World,GameManager.Instance?.World)&&ReferenceEquals(attempt.World,player.world)&&attempt.Plan.Deaths==player.Died);
+    internal static bool HasOwnHold(EntityPlayerLocal player)
+    {
+        if(player==null||!player.IsSpawned()||player.IsDead())return false;
+        foreach(var attempt in Attempts.Values)
+            if(ReferenceEquals(attempt.Player,player)&&ReferenceEquals(attempt.World,GameManager.Instance?.World)&&
+                ReferenceEquals(attempt.World,player.world)&&attempt.Plan.Deaths==player.Died)return true;
+        return false;
+    }
     internal static bool IsHeld(EntityPlayerLocal player)=>HasOwnHold(player);
-    internal static bool Blocks(ItemStackGrid grid)=>grid!=null&&Attempts.Values.Any(a=>HasOwnHold(a.Player)&&(ReferenceEquals(a.Bag,grid)||ReferenceEquals(a.Belt,grid)));
+    internal static bool Blocks(ItemStackGrid grid)
+    {
+        if(grid==null)return false;
+        foreach(var attempt in Attempts.Values)
+            if((ReferenceEquals(attempt.Bag,grid)||ReferenceEquals(attempt.Belt,grid))&&HasOwnHold(attempt.Player))return true;
+        return false;
+    }
     internal static bool Consume(ItemStackGrid grid,int slot,ItemStack value)
     {var current=permit;if(current==null)return false;if(current.Used||!ReferenceEquals(current.Grid,grid)||current.Slot!=slot||!ReferenceEquals(current.Value,value)||!current.Current())return false;current.Used=true;return true;}
     private static string Cells(ItemStack[] values)

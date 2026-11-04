@@ -78,6 +78,8 @@
 	  <Compile Remove="Scripts\TileEntity\**" />
 	  <Compile Remove="Scripts\XUIC\**" />
 	  <Compile Remove="Tools\**" />
+      <!-- Retained wrap authoring references include standalone C# fixtures, not game sources. -->
+      <Compile Remove="VehicleWrapReference\**" />
       <!-- Entity Studio authoring sources also staged at the mod root belong to
            the Unity editor, not the game runtime assembly. -->
       <Compile Remove="RebirthNurseCandidateBuild.cs;RebirthNurseEntityConfig.cs;RebirthNurseNativePhysics.cs;RebirthNurseReplacement.cs;RebirthNurseReviewCapture.cs;RebirthNurseSourcePreservation.cs" />

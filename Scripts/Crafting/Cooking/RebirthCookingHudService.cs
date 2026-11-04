@@ -171,10 +171,10 @@ public sealed class XUiC_RebirthCookingHud : XUiController
             SetPosition(card.Root.ViewComponent, new Vector2i(-255 + left, 247 + (i / columns) * 64));
             Layout(card, width, columns > 1);
             Job job = jobs[i];
-            string status = job.Status.StartsWith("OVERCOOKING", StringComparison.Ordinal) ? "Burning" : job.Status.StartsWith("READY", StringComparison.Ordinal) ? "Ready" : job.Status == "BURNT" ? "Burnt" : job.Status.StartsWith("PAUSED", StringComparison.Ordinal) ? "Paused" : "Cooking";
+            string status = job.Status.StartsWith("OVERCOOKING", StringComparison.Ordinal) ? "Burning" : job.Status.StartsWith("EVAPORATING", StringComparison.Ordinal) ? "Evaporating" : job.Status.StartsWith("EVAPORATED", StringComparison.Ordinal) ? "Evaporated" : job.Status.StartsWith("READY", StringComparison.Ordinal) ? "Ready" : job.Status == "BURNT" ? "Burnt" : job.Status.StartsWith("PAUSED", StringComparison.Ordinal) ? "Paused" : "Cooking";
             string timer = job.Time; int suffix = timer.IndexOf(" to ", StringComparison.Ordinal); if (suffix >= 0) timer = timer.Substring(0, suffix);
             SetText(card.Name, job.Name); SetText(card.Status, status.ToUpperInvariant()); SetText(card.Time, timer.TrimStart('0').TrimStart(':'));
-            Color tint = status == "Ready" ? new Color32(32,76,40,240) : status == "Burning" ? new Color32(115,48,30,240) : new Color32(16,16,20,235);
+            Color tint = status == "Ready" ? new Color32(32,76,40,240) : status == "Burning" ? new Color32(115,48,30,240) : status == "Evaporating" ? new Color32(45,78,105,240) : new Color32(16,16,20,235);
             if (card.Background != null) card.Background.SetColorImmediately(tint);
             if (card.Icon != null && card.Icon.SpriteName != job.Icon) card.Icon.SpriteName = job.Icon;
             if (card.Root.ViewComponent.ToolTip != job.Position) card.Root.ViewComponent.ToolTip = job.Position;

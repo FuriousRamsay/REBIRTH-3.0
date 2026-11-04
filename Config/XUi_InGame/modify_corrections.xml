@@ -1,0 +1,12 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/windows/window[@name='rebirthModifyEditor']/rect[@name='editorHeader']/button[@name='editorBack']"/>
+      <remove xpath="/windows/window[@name='rebirthModifyEditor']/rect[@name='editorHeader']/label[@text='BACK']"/>
+      <remove xpath="/windows/window[@name='rebirthModifyEditor']/rect[@name='editorHeader']/sprite[@fillcenter='false']"/>
+      <remove xpath="/windows/window[@name='rebirthCosmeticsEditor']/rect[@name='editorHeader']/button[@name='editorBack']"/>
+      <remove xpath="/windows/window[@name='rebirthCosmeticsEditor']/rect[@name='editorHeader']/label[@text='BACK']"/>
+      <remove xpath="/windows/window[@name='rebirthCosmeticsEditor']/rect[@name='editorHeader']/sprite[@fillcenter='false']"/>
+    </if>
+  </conditional>
+</configs>

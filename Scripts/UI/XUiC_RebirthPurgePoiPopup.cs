@@ -16,13 +16,14 @@ public sealed class XUiC_RebirthPurgePoiPopup:XUiController
     private Texture2D ownedPicture;
     private string picturePath;
     private XUiV_Sprite background,border,tierIcon,statusBackground,statusIcon;
-    private XUiV_Label title,tier,biome,coordinates,status,discoverer,contributors,discoveredTime,purgedTime;
+    private XUiV_Label title,tier,biome,coordinates,status,discoverer,contributors,discoveredTime,purgedTime,areasValue,entitiesValue;
     public override void Init()
     {
         base.Init();map=GetParentByType<XUiC_MapArea>();picture=GetChildById("poiPopupPicture")?.ViewComponent as XUiV_Texture;
         background=Sprite("poiPopupBackground");border=Sprite("poiPopupBorder");tierIcon=Sprite("poiPopupTierIcon");statusBackground=Sprite("poiPopupStatusBg");statusIcon=Sprite("poiPopupStatusIcon");
         title=Label("poiPopupTitle");tier=Label("poiPopupTier");biome=Label("poiPopupBiome");coordinates=Label("poiPopupCoordinates");status=Label("poiPopupStatus");
         discoverer=Label("poiPopupDiscoverer");contributors=Label("poiPopupContributors");discoveredTime=Label("poiPopupDiscoveredTime");purgedTime=Label("poiPopupPurgedTime");
+        areasValue=Label("poiPopupAreasValue");entitiesValue=Label("poiPopupEntitiesValue");
         if(ViewComponent!=null)ViewComponent.IsVisible=false;
     }
     public override void OnClose(){Show(null);base.OnClose();}
@@ -53,8 +54,8 @@ public sealed class XUiC_RebirthPurgePoiPopup:XUiController
             bool discoveryKnown=discoveryNames.Length>0||record.DiscoveredAt>0;
             Set(discoverer,string.Join("\n",discoveryNames.Select(n=>"[EBD276]"+n+"[-]")));
             Set(contributors,string.Join("\n",names.Length==0?new[]{L("xuiRebirthPurgeHistoryUnknown")}:names.Select(n=>"[EBD276]"+n+"[-]").ToArray()));
-            Set(Label("poiPopupAreasValue"),record.AreasLeft<0?"—":record.AreasLeft.ToString(CultureInfo.InvariantCulture));
-            Set(Label("poiPopupEntitiesValue"),record.EstimatedEntities<0?"—":(record.Approximate?"~":"")+record.EstimatedEntities.ToString(CultureInfo.InvariantCulture));
+            Set(areasValue,record.AreasLeft<0?"—":record.AreasLeft.ToString(CultureInfo.InvariantCulture));
+            Set(entitiesValue,record.EstimatedEntities<0?"—":(record.Approximate?"~":"")+record.EstimatedEntities.ToString(CultureInfo.InvariantCulture));
             Set(discoveredTime,TimeText(record.DiscoveredAt));Set(purgedTime,TimeText(record.PurgedAt));
             int discoveryHeight=discoveryKnown?Math.Max(30,30*discoveryNames.Length):0;
             int purgeHeight=purged?Math.Max(30,30*names.Length):0;
@@ -85,8 +86,8 @@ public sealed class XUiC_RebirthPurgePoiPopup:XUiController
         int areas=record.AreasLeft,entities=record.EstimatedEntities;bool approximate=record.Approximate;
         if(RebirthPoiMapSync.PresentationMatchesTransport&&record.State==RebirthPoiClearanceState.Discovered&&scan!=null&&scan.PoiKey==record.Identity.Key&&scan.Epoch==record.Epoch)
         {areas=Math.Max(0,scan.Rooms-scan.Cleared);entities=scan.Enemies;approximate=scan.Approximate;}
-        Set(Label("poiPopupAreasValue"),areas<0?"—":areas.ToString(CultureInfo.InvariantCulture));
-        Set(Label("poiPopupEntitiesValue"),entities<0?"—":entities.ToString(CultureInfo.InvariantCulture)+(approximate?"+":""));
+        Set(areasValue,areas<0?"—":areas.ToString(CultureInfo.InvariantCulture));
+        Set(entitiesValue,entities<0?"—":entities.ToString(CultureInfo.InvariantCulture)+(approximate?"+":""));
         var transform=map?.ViewComponent?.UiTransform;var camera=xui?.playerUI?.camera;
         if(transform==null||camera==null){ViewComponent.IsVisible=false;awaitingPlacement=true;placementFrame=-1;return;}
         var ray=camera.ScreenPointToRay((Vector3)xui.playerUI.CursorController.GetScreenPosition());float distance;

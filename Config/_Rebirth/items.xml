@@ -4,6 +4,8 @@
   <include filename="../_Cooking/items.xml"/>
   <include filename="../_Cooking/improvised_items.xml"/>
   <include filename="vanilla_literature_items.xml"/>
+  <include filename="literature_bundle_items.xml"/>
+  <include filename="weapon_dps_metadata.xml"/>
   <include filename="gun_repair_items.xml"/>
   <include filename="electrical_repair_items.xml"/>
 </configs>

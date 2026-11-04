@@ -186,6 +186,7 @@ internal static class RebirthTheorySoloLockpickService
     {
         var world=GameManager.Instance?.World;if(world==null||world.IsRemote()||!ReferenceEquals(world,currentWorld)||!ReferenceEquals(world.worldState,currentState)){Bindings.Clear();activeTransition=null;activeTimerSetup=null;currentWorld=null;currentState=null;return;}
         float now=Time.realtimeSinceStartup;if(!Finite(now)||now<nextRetry)return;nextRetry=now+1;
+        if(Bindings.Count==0)return;
         foreach(var pair in Bindings.ToArray()){var b=pair.Value;if(!Current(b,true)){Bindings.Remove(pair.Key);continue;}if(b.Completed)TrySaveCompleted(b);else if(now>b.Expires)Bindings.Remove(pair.Key);}
     }
     private static Vector3i Position(Binding b)=>new Vector3i(b.Original.X,b.Original.Y,b.Original.Z);

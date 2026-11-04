@@ -6,6 +6,8 @@
 	<include filename="_Fire/blocks.xml"/>
 
 	<include filename="_Farming/blocks.xml"/>
+	<include filename="_Wood/blocks.xml"/>
+	<include filename="_Wood/native_block_materials.xml"/>
 	<include filename="_BlockPickup/blocks.xml"/>
 	<include filename="_LootConversions/blocks.xml"/>
 	<include filename="_Crowbar/blocks.xml"/>
@@ -79,4 +81,5 @@
   <include filename="_Workstations/blocks.xml"/>
   <include filename="_Recycling/blocks.xml"/>
   <include filename="_Workstations/birdnest_blocks.xml"/>
+  <include filename="_Economy/block_prices.xml"/>
 </configs>

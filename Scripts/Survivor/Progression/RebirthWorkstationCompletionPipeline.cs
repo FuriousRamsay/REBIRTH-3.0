@@ -811,35 +811,35 @@ internal static partial class RebirthWorkstationCompletionPipeline
         try
         {
             SweepPendingNativeWorld(world);
-            foreach(var old in frames.Values.Where(value=>!ReferenceEquals(value.Observation.World,world)).ToArray())
+            if(frames.Count>0)foreach(var old in frames.Values.Where(value=>!ReferenceEquals(value.Observation.World,world)).ToArray())
             {
                 if(cards.TryGetValue(old.Observation.Card,out var retainedCard)&&ReferenceEquals(retainedCard,old))cards.Remove(old.Observation.Card);
                 frames.Remove(old.Observation.Operation);old.Closed=true;old.LocalBefore?.Dispose();old.LocalBefore=null;
                 old.CachedReentry?.Dispose();old.CachedReentry=null;old.Observation.Dispose();old.NativeOriginal?.ReleaseFrame();old.NativeViewerEffect?.ReleaseFrame();
             }
             PumpNativeViewers(world);RebirthProductiveEarnedUiDeferredTransport.NativeViewerPds.Sweep();RebirthProductiveEarnedUiDeferredTransport.PumpAuthorityNative(world);
-            foreach(var old in frames.Values.Where(value=>value.LocalBefore!=null&&!ReferenceEquals(value.Observation.World,world)).ToArray())
+            if(frames.Count>0)foreach(var old in frames.Values.Where(value=>value.LocalBefore!=null&&!ReferenceEquals(value.Observation.World,world)).ToArray())
             {old.LocalBefore.Dispose();old.LocalBefore=null;}
             PumpOutgoing();
             PumpRemoteNativeOwnerQueries(world);
             PumpSameOwnerTerminalQueries(world);
             PumpColdNativeNotices(world);
-            if(!world.IsRemote())foreach(var source in nativeHostOriginals.Values.ToArray())
+            if(!world.IsRemote()&&nativeHostOriginals.Count>0)foreach(var source in nativeHostOriginals.Values.ToArray())
                 RebirthProductiveEarnedUiDeferredTransport.TrySealRemoteNativeStation(source);
             RebirthProductiveEarnedUiQueueOwner.Pump();
             RebirthProductiveEarnedUiOwnerFile.PumpNativeTerminals();
             RebirthProductiveEarnedUiDeferredTransport.PumpRecipients();
             RebirthWorkstationReagentPublication.Sweep();
             PumpCachedOwnerEffects(world);
-            foreach(var original in frames.Values.Where(value=>value.Observation.FullBoundary&&value.ConfirmedOriginal==null).ToArray())
+            if(frames.Count>0)foreach(var original in frames.Values.Where(value=>value.Observation.FullBoundary&&value.ConfirmedOriginal==null).ToArray())
             {ObserveCachedCustody(original);if(original.Observation.World.IsRemote())ResumePhysicalNativePackets(original,RemoteNativePhase.CachedBoundary);}
-            foreach(var cache in cachedCustodies.Values.Where(value=>value.World!=null&&(!value.Physical||!value.Saved&&value.OwnerSavedImage!=null)).ToArray())cache.TrySave();
-            foreach(var cache in cachedCustodies.Values.Where(value=>value.World!=null&&value.Physical).ToArray())TryPublishCachedSettledNotice(cache);
+            if(cachedCustodies.Count>0)foreach(var cache in cachedCustodies.Values.Where(value=>value.World!=null&&(!value.Physical||!value.Saved&&value.OwnerSavedImage!=null)).ToArray())cache.TrySave();
+            if(cachedCustodies.Count>0)foreach(var cache in cachedCustodies.Values.Where(value=>value.World!=null&&value.Physical).ToArray())TryPublishCachedSettledNotice(cache);
             RebirthProductiveEarnedUiDeferredTransport.PumpCachedPrimaryHolds(world);
             PumpCachedPhysicalSources(world);
             PumpCachedUnusedCloses(world);
             RecoverConfirmedIntents(world);
-            foreach(var frame in frames.Values.ToArray())
+            if(frames.Count>0)foreach(var frame in frames.Values.ToArray())
             {
                 if(frame.ConfirmedOriginal==null||frame.ConfirmedOriginal.WorldGuid!=RebirthWorkstationCompletionOutbox.CurrentGuid(world))continue;
                 if(!frame.Observation.World.IsRemote()&&!frame.NativeAccepted)continue;
@@ -880,9 +880,12 @@ internal static partial class RebirthWorkstationCompletionPipeline
     }
     private static void RecoverConfirmedIntents(World world)
     {
-        string role=world.IsRemote()?"client":"server",folder=Path.Combine(RebirthWorkstationCompletionOutbox.Root(role),"intents");
+        string role=world.IsRemote()?"client":"server",root=RebirthWorkstationCompletionOutbox.ScopePath(role),folder=Path.Combine(root,"intents"),
+            identity=root+"|"+RebirthWorkstationCompletionOutbox.CurrentGuid(world);
+        if(!RebirthWorkstationCompletionEmptyRecovery.ShouldScan(world,identity,folder))return;
+        RebirthWorkstationCompletionPublication.RequireSafeDirectory(root);
         RebirthWorkstationCompletionPublication.RequireSafeDirectory(folder);
-        if(!Directory.Exists(folder))return;
+        if(!Directory.Exists(folder)){RebirthWorkstationCompletionEmptyRecovery.ObservedEmpty(world,identity,folder);return;}
         int count=0;
         foreach(string path in Directory.EnumerateFiles(folder,"*.xml"))
         {
@@ -907,6 +910,7 @@ internal static partial class RebirthWorkstationCompletionPipeline
             }
             catch{} // retain this exact uncertain primary; other originals continue
         }
+        if(count==0)RebirthWorkstationCompletionEmptyRecovery.ObservedEmpty(world,identity,folder);
     }
 }
 

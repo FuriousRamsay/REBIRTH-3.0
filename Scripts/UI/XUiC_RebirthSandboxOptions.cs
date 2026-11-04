@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -920,6 +920,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             BossEventNotifications = workingBossEventNotifications,
             DisableHiringRestrictions = workingDisableHiringRestrictions,
             SmartLooting = workingSmartLooting,
+            SeekerMode = workingSeekerMode,
+            SeekerRewards = workingSeekerRewards,
+            SeekerNotifications = workingSeekerNotifications,
+            SeekerFrequency = workingSeekerFrequency,
+            SeekerRestriction = workingSeekerRestriction,
+            SeekerHordeDay = workingSeekerHordeDay,
             ProtectCrate = workingProtectCrate
         };
     }
@@ -995,6 +1001,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         workingProtectCrate = state.ProtectCrate;
         workingDisableHiringRestrictions = state.DisableHiringRestrictions;
         workingSmartLooting = state.SmartLooting;
+        workingSeekerMode = state.SeekerMode;
+        workingSeekerRewards = state.SeekerRewards;
+        workingSeekerNotifications = state.SeekerNotifications;
+        workingSeekerFrequency = state.SeekerFrequency;
+        workingSeekerRestriction = state.SeekerRestriction;
+        workingSeekerHordeDay = state.SeekerHordeDay;
         InvalidateWorkingProjection();
     }
 
@@ -1900,6 +1912,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.ProtectCrate, ref workingProtectCrate);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.DisableHiringRestrictions, ref workingDisableHiringRestrictions);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SmartLooting, ref workingSmartLooting);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.SeekerMode, ref workingSeekerMode, RebirthSeekerMode.Never, RebirthSeekerMode.Always);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SeekerRewards, ref workingSeekerRewards);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SeekerNotifications, ref workingSeekerNotifications);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.SeekerFrequency, ref workingSeekerFrequency, SeekerFrequencyValues);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.SeekerRestriction, ref workingSeekerRestriction, RebirthSeekerRestriction.Anywhere, RebirthSeekerRestriction.Off);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SeekerHordeDay, ref workingSeekerHordeDay);
         changed |= RandomizeEnumOption(RebirthSandboxOptionId.BossEvents, ref workingBossEventStartLevel, RebirthBossEventStartLevel.Off, RebirthBossEventStartLevel.PlayerLevel30);
         if (RebirthBossEventStartLevelPolicy.IsEnabled(workingBossEventStartLevel))
         {
@@ -2047,6 +2065,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxProtectCrate != null) cbxProtectCrate.OnValueChanged += ProtectCrate_OnValueChanged;
         if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.OnValueChanged += DisableHiringRestrictions_OnValueChanged;
         if (cbxSmartLooting != null) cbxSmartLooting.OnValueChanged += SmartLooting_OnValueChanged;
+        if (cbxSeekerMode != null) cbxSeekerMode.OnValueChanged += SeekerMode_OnValueChanged;
+        if (cbxSeekerRewards != null) cbxSeekerRewards.OnValueChanged += SeekerRewards_OnValueChanged;
+        if (cbxSeekerNotifications != null) cbxSeekerNotifications.OnValueChanged += SeekerNotifications_OnValueChanged;
+        if (cbxSeekerFrequency != null) cbxSeekerFrequency.OnValueChanged += SeekerFrequency_OnValueChanged;
+        if (cbxSeekerRestriction != null) cbxSeekerRestriction.OnValueChanged += SeekerRestriction_OnValueChanged;
+        if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.OnValueChanged += SeekerHordeDay_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged += BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged += BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged += BossEventMaximumPerDay_OnValueChanged;
@@ -2140,6 +2164,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxProtectCrate != null) cbxProtectCrate.OnValueChanged -= ProtectCrate_OnValueChanged;
         if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.OnValueChanged -= DisableHiringRestrictions_OnValueChanged;
         if (cbxSmartLooting != null) cbxSmartLooting.OnValueChanged -= SmartLooting_OnValueChanged;
+        if (cbxSeekerMode != null) cbxSeekerMode.OnValueChanged -= SeekerMode_OnValueChanged;
+        if (cbxSeekerRewards != null) cbxSeekerRewards.OnValueChanged -= SeekerRewards_OnValueChanged;
+        if (cbxSeekerNotifications != null) cbxSeekerNotifications.OnValueChanged -= SeekerNotifications_OnValueChanged;
+        if (cbxSeekerFrequency != null) cbxSeekerFrequency.OnValueChanged -= SeekerFrequency_OnValueChanged;
+        if (cbxSeekerRestriction != null) cbxSeekerRestriction.OnValueChanged -= SeekerRestriction_OnValueChanged;
+        if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.OnValueChanged -= SeekerHordeDay_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged -= BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged -= BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged -= BossEventMaximumPerDay_OnValueChanged;
@@ -2508,6 +2538,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             PopulateBoolean(cbxProtectCrate, workingProtectCrate);
             PopulateBoolean(cbxDisableHiringRestrictions, workingDisableHiringRestrictions);
             PopulateBoolean(cbxSmartLooting, workingSmartLooting);
+            PopulateSeekerOptions();
             if (cbxBossEvents != null)
             {
                 cbxBossEvents.Elements.Clear();
@@ -2711,6 +2742,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             if (cbxProtectCrate != null) cbxProtectCrate.SelectedIndex = workingProtectCrate ? 1 : 0;
             if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.SelectedIndex = workingDisableHiringRestrictions ? 1 : 0;
             if (cbxSmartLooting != null) cbxSmartLooting.SelectedIndex = workingSmartLooting ? 1 : 0;
+            if (cbxSeekerMode != null) cbxSeekerMode.SelectedIndex = (int)workingSeekerMode;
+            if (cbxSeekerRewards != null) cbxSeekerRewards.SelectedIndex = workingSeekerRewards ? 1 : 0;
+            if (cbxSeekerNotifications != null) cbxSeekerNotifications.SelectedIndex = workingSeekerNotifications ? 1 : 0;
+            if (cbxSeekerFrequency != null) cbxSeekerFrequency.SelectedIndex = workingSeekerFrequency / 10;
+            if (cbxSeekerRestriction != null) cbxSeekerRestriction.SelectedIndex = (int)workingSeekerRestriction;
+            if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.SelectedIndex = workingSeekerHordeDay ? 1 : 0;
             if (cbxBossEvents != null) cbxBossEvents.SelectedIndex = (int)workingBossEventStartLevel;
             if (cbxBossEventFrequency != null) cbxBossEventFrequency.SelectedIndex = (int)workingBossEventFrequency;
             if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.SelectedIndex = GetValueIndex(BossEventMaximumPerDayRandomizerValues, workingBossEventMaximumPerDay, 1);

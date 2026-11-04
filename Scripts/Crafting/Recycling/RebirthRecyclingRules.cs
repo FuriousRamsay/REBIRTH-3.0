@@ -73,9 +73,13 @@ public static class RebirthRecyclerRules
     }
     public static bool Supports(string station)
     {
-        string normalized = NormalizeStationId(station);
-        return normalized == "sonjarecyclerstation" || normalized == "sonjaammorecyclerstation"
-            || normalized == "workbenchshredder001_fr" || normalized == "sonjaoutfitdesigner";
+        if (string.IsNullOrEmpty(station)) return false;
+        station = station.Trim();
+        if (station.StartsWith("workstation_", StringComparison.OrdinalIgnoreCase)) station = station.Substring(12);
+        return string.Equals(station, "sonjarecyclerstation", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(station, "sonjaammorecyclerstation", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(station, "workbenchshredder001_fr", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(station, "sonjaoutfitdesigner", StringComparison.OrdinalIgnoreCase);
     }
     public static void SetConfigPath(string path)
     {
@@ -229,8 +233,8 @@ public static class RebirthRecyclerRules
     }
     public static bool ToolsHealthy(ItemStack[] tools, RebirthRecyclerRule rule, out IReadOnlyList<string> missing, out IReadOnlyList<string> broken)
     {
-        var absent = new List<string>(); var damaged = new List<string>();
-        if (rule == null) { missing = absent.AsReadOnly(); broken = damaged.AsReadOnly(); return false; }
+        List<string> absent = null, damaged = null;
+        if (rule == null) { missing = Array.Empty<string>(); broken = Array.Empty<string>(); return false; }
         foreach (string requirement in rule.RequiredTools)
         {
             bool present = false, healthy = false;
@@ -241,8 +245,11 @@ public static class RebirthRecyclerRules
                 present = true;
                 if (stack.itemValue.MaxUseTimes <= 0 || stack.itemValue.UseTimes < stack.itemValue.MaxUseTimes) healthy = true;
             }
-            if (!present) absent.Add(requirement); else if (!healthy) damaged.Add(requirement);
+            if (!present) (absent ??= new List<string>()).Add(requirement);
+            else if (!healthy) (damaged ??= new List<string>()).Add(requirement);
         }
-        missing = absent.AsReadOnly(); broken = damaged.AsReadOnly(); return absent.Count == 0 && damaged.Count == 0;
+        missing = absent?.AsReadOnly() ?? (IReadOnlyList<string>)Array.Empty<string>();
+        broken = damaged?.AsReadOnly() ?? (IReadOnlyList<string>)Array.Empty<string>();
+        return absent == null && damaged == null;
     }
 }

@@ -313,4 +313,5 @@
        authored +50 carry stat. Physical bag length remains owned by Survivor gear. -->
   <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@operation">base_add</set>
   <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@value">50</set>
+  <include filename="_Seeker/buffs.xml"/>
 </configs>

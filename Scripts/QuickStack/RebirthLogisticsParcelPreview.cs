@@ -898,8 +898,11 @@ internal sealed class RebirthLogisticsParcelCoordinator:IDisposable
         foreach(var body in bodies.Where(value=>value.Frame!=null))states.Add(body,Edit(record,body,body.Frame,body.Marker));
         void Capture(Body changed)
         {
-            var count=states.Count(pair=>pair.Key.X==changed.X&&pair.Key.Z==changed.Z);frames.References(count);
-            stages.Add(new Stage{X=changed.X,Z=changed.Z,Edits=states.Where(pair=>pair.Key.X==changed.X&&pair.Key.Z==changed.Z).Select(pair=>pair.Value).ToArray()});
+            var edits=new List<RebirthLogisticsParcelPreview.Edit>();
+            foreach(var pair in states)
+                if(pair.Key.X==changed.X&&pair.Key.Z==changed.Z)edits.Add(pair.Value);
+            frames.References(edits.Count);
+            stages.Add(new Stage{X=changed.X,Z=changed.Z,Edits=edits.ToArray()});
             var position=new UnityEngine.Vector2Int(changed.X,changed.Z);if(!used.Contains(position))used.Add(position);
         }
         foreach(var body in bodies.Where(value=>value.Frame==null))

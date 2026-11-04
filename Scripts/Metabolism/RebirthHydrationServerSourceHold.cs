@@ -129,8 +129,9 @@ internal static partial class RebirthHydrationServerSourceHold
         var expected=settled?plan.GearAfter:plan.GearBefore;
         if(count!=expected.Count||(count==0?string.Empty:RebirthNativeItemCodec.Encode(item.itemValue))!=expected.ItemData)return false;
         var container=original.Equip?plan.GearAfter:plan.GearBefore;
-        if(!RebirthNativeItemCodec.TryDecode(container.ItemData,out var value)||!RebirthConsumableResolver.TryResolve(value,out var definition)||
-            definition==null||!definition.IsDrink||!definition.HydrationEquippable)return false;
+        if(!RebirthNativeItemCodec.TryDecode(container.ItemData,out var value)||value==null||value.ItemClass==null)return false;
+        if(original.Equip&&(!RebirthConsumableResolver.TryResolve(value,out var definition)||definition==null||
+            !definition.IsDrink||!definition.HydrationEquippable))return false;
         if(original.Equip&&RebirthSurvivorMode.IsEnabledForCurrentWorld())
         {
             if(!RebirthWorldCharacterService.TryGet(player,out var character)||character?.Support==null)return false;

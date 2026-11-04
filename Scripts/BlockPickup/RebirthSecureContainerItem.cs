@@ -29,6 +29,9 @@ public static class RebirthSecureContainerItem
         string bindingName,
         ref bool handled)
     {
+        if (bindingName != "hasitemtypeicon" && bindingName != "itemtypeicon")
+            return;
+
         if (controller == null || controller.itemStack == null ||
             controller.itemStack.IsEmpty() ||
             !IsMarked(controller.itemStack.itemValue))

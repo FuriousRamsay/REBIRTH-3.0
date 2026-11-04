@@ -518,7 +518,6 @@ public static class RemoteResourceRegistry
         int maxX = Mathf.FloorToInt((center.x + radius) / BucketSize);
         int minZ = Mathf.FloorToInt((center.z - radius) / BucketSize);
         int maxZ = Mathf.FloorToInt((center.z + radius) / BucketSize);
-        HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
         for (int bucketX = minX; bucketX <= maxX; bucketX++)
         {
             for (int bucketZ = minZ; bucketZ <= maxZ; bucketZ++)
@@ -527,7 +526,6 @@ public static class RemoteResourceRegistry
                 if (!buckets.TryGetValue(BucketKey(bucketX, bucketZ), out ids)) continue;
                 foreach (string id in ids)
                 {
-                    if (!seen.Add(id)) continue;
                     RemoteResourceRegistration registration;
                     if (!byId.TryGetValue(id, out registration) || registration.Kind != kind) continue;
                     if ((registration.Position.ToVector3() - center).sqrMagnitude <= radiusSquared) result.Add(registration);

@@ -38,6 +38,7 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
         base.OnOpen();
         ActiveInstance = this;
         RefreshToolPreviews();
+        RefreshFuelPreviews();
         new RebirthPersonalCraftingLayoutService(Presentation).Apply(true);
         var header=GetChildById("windowNonPagingHeader")?.ViewComponent;if(header!=null)header.IsVisible=false;
         xui.playerUI.windowManager.Open("toolbelt",false);
@@ -90,6 +91,21 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
                 slot.RequiredItemOnly = true;
                 slot.IsDirty = true;
             }
+    }
+    private void RefreshFuelPreviews()
+    {
+        var preview = GetChildById("slot_preview");
+        if (preview == null) return;
+        string fuel = WorkstationData?.TileEntity?.block?.Properties.GetString("FuelType");
+        var item = string.IsNullOrEmpty(fuel) ? null : ItemClass.GetItemClass(fuel);
+        SetFuelPreview(preview, item?.GetIconName() ?? "resourceWood");
+    }
+    private static void SetFuelPreview(XUiController node, string icon)
+    {
+        if (node.ViewComponent is XUiV_Sprite sprite && node.ViewComponent.ID == "slot")
+            sprite.SpriteName = icon;
+        if (node.Children != null)
+            foreach (var child in node.Children) SetFuelPreview(child, icon);
     }
     public override void OnClose()
     {

@@ -15,6 +15,7 @@ public sealed class ConsoleCmdRebirthMetabolism : ConsoleCmdAbstract
              + "rbmet trace stop\n"
              + "rbmet set hydration <0-100>\nrbmet set nutrition <0-100>\nrbmet set food <0-100> (legacy alias)\nrbmet set digestivehealth <0-100>\nrbmet set energy <0-100>\n"
              + "rbmet energytest <hydration> <nutrition> [energy=50] [traceSeconds=120]  (cap = Nutrition x Hydration efficiency; minimum sustainable cap 10)\n"
+             + "rbmet emptyneeds   (self: zero Nutrition, Hydration, Energy; clear all digestion; disable Auto Sip)\n"
              + "rbmet clearstomach\nrbmet ingest water <ml>\nrbmet ingest food <nutrition> <volumeMl> [waterMl]\n"
              + "rbmet autosip on|off";
     }
@@ -36,6 +37,34 @@ public sealed class ConsoleCmdRebirthMetabolism : ConsoleCmdAbstract
         RebirthMetabolismService.EnsurePlayerReady(player);
         RebirthMetabolismState state = RebirthMetabolismStateRepository.GetOrCreate(player);
         if (state == null) { Log.Warning("[REBIRTH Metabolism] player state unavailable."); return; }
+
+        if (cmd == "emptyneeds")
+        {
+            if (p.Count != 1 || !RebirthMetabolismService.IsServerAuthority || player.Stats?.Food == null || player.Stats.Water == null)
+            {
+                Log.Warning("[REBIRTH Metabolism] emptyneeds requires a local authoritative player and no arguments.");
+                return;
+            }
+            // IngestionEntries owns intake residue, stomach and intestinal material. Clear it as
+            // one authoritative state change so no old serving replenishes this controlled test.
+            int clearedEntries = state.IngestionEntries.Count;
+            state.IngestionEntries.Clear();
+            player.Stats.Food.Value = 0f;
+            player.Stats.Water.Value = 0f;
+            state.Energy = 0f;
+            state.AutoSipEnabled = false;
+            state.AutoSipCooldownRemainingRealSeconds = 0f;
+            state.SmoothedActivity = 0f;
+            state.LastStamina = player.Stats.Stamina.Value;
+            state.HasEnergyRateSample = false;
+            state.Touch();
+            RebirthMetabolismService.SendSnapshotToOwner(player, true);
+            Log.Out("[REBIRTH Metabolism] emptyneeds entity=" + player.entityId
+                + " Nutrition=0 Hydration=0 Energy=0 digestionEntriesCleared=" + clearedEntries
+                + " AutoSip=off; equipped drink retained. Eat and drink to observe recovery."
+                + " Zero Hydration can cause health loss until replenished.");
+            return;
+        }
 
         if (cmd == "trace")
         {

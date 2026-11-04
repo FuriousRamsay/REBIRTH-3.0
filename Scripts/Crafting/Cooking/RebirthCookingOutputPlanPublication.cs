@@ -307,7 +307,8 @@ internal static class RebirthCookingOutputPlanPublication
         {
             nextWatchSweep=now+.25f;
             for(int i=local.Count-1;i>=0;i--)if(now>=local[i].Expires||!StillCurrent(local[i])){local[i].Dispose();local.RemoveAt(i);}
-            foreach(var id in server.Where(pair=>now>=pair.Value.Expires||!StillCurrent(pair.Value)).Select(pair=>pair.Key).ToArray()){server[id].Dispose();server.Remove(id);}
+            if(server.Count>0)
+                foreach(var id in server.Where(pair=>now>=pair.Value.Expires||!StillCurrent(pair.Value)).Select(pair=>pair.Key).ToArray()){server[id].Dispose();server.Remove(id);}
         }
         for(int i=queries.Count-1;i>=0;i--)
         {

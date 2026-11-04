@@ -107,8 +107,15 @@ internal static partial class RebirthCookingMillingPublication
         {
             if(!ReferenceEquals(source.World,GameManager.Instance?.World)){source.Dispose();staticMillingSources.Remove(source);continue;}
             if(source.Adopted||!source.Current())continue;
-            var matches=source.Prefixes.Where(value=>value.Native?.Current()==true).ToArray();if(matches.Length!=1)continue;
-            var prefix=matches[0];var station=prefix.Native.Tile;var chunk=station?.GetChunk();if(station==null||chunk==null||pending.Count>=4)continue;
+            StaticNativePrefix prefix=null;
+            foreach(var candidate in source.Prefixes)
+            {
+                if(candidate.Native?.Current()!=true)continue;
+                if(prefix!=null){prefix=null;break;}
+                prefix=candidate;
+            }
+            if(prefix==null)continue;
+            var station=prefix.Native.Tile;var chunk=station?.GetChunk();if(station==null||chunk==null||pending.Count>=4)continue;
             if(!RebirthProductiveEarnedObservationBudget.TryRetainDetached(checked(16L*(source.Intent.Length+source.Before.Length+source.Output.Length+source.QueueAfter.Length)+65536),out var memory))continue;
             Original original=null;
             try

@@ -1,0 +1,33 @@
+{
+  "name": "Existing passive Purge sleepers (prepared, NOT RUN)",
+  "stopOnFailure": true,
+  "preconditions": [
+    "Authorized profiler-launched disposable save; player inside farm_05 with two loaded alive passive zombie sleepers and progress gate satisfied.",
+    "Actual approach/combat/clearance and persistence require native observation after this diagnostic scenario.",
+    "Inspect activation/audit sleeping, passive, attackTarget, targetTicks and distanceToPlayer; confirm target persists throughout the approach without a repeated start.",
+    "After command status reports no activation request, inspect retained100m command markers, then explicit stop and actual leave cleanup. Do not confuse marker presence with model visibility."
+  ],
+  "steps": [
+    {
+      "console": "poisleepers audit"
+    },
+    {
+      "console": "poisleepers start"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectLog": {
+        "contains": "[poisleepers] activated actor=",
+        "min": 2
+      }
+    },
+    {
+      "console": "poisleepers status"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

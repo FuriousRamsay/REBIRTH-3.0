@@ -10,7 +10,9 @@ internal static partial class AdvancedFarmingHarvestSettlement
 {
     private const string SourcePrefix="RebirthHarvestSourceV1:";
     private const string CommitPrefix="RebirthHarvestCommitV1:";
-    internal sealed class SourceBefore { internal BlockValue Block;internal TileEntity Tile;internal object NativeMutation; }
+    // Chunk.SetBlock is global; keep the Harmony snapshot on the stack instead of
+    // allocating a reference object for every block mutation in the world.
+    internal struct SourceBefore { internal bool Captured;internal BlockValue Block;internal TileEntity Tile;internal object NativeMutation; }
     private static string SourceKey(Vector3i local)=>SourcePrefix+local.x+":"+local.y+":"+local.z;
     private static bool SourceChunk(WorldBase world,Vector3i position,out Chunk chunk,out Vector3i local)
     {
@@ -79,7 +81,7 @@ internal static partial class AdvancedFarmingHarvestSettlement
     {if(!ReferenceEquals(GameManager.Instance?.World,world)||world.IsRemote()||!SourceChunk(world,position,out var chunk,out _))return;string key=CommitPrefix+operation.ToString("N");if(chunk.ChunkCustomData.dict.ContainsKey(key)){chunk.ChunkCustomData.Remove(key);chunk.isModified=true;}}
     internal static void SourceCommitted(Chunk chunk,WorldBase world,Vector3i local,SourceBefore before)
     {
-        if(chunk==null||world==null||before==null)return;
+        if(chunk==null||world==null||!before.Captured)return;
         var after=chunk.GetBlock(local);
         string key=SourceKey(local);
         if(before.Block.Block is not BlockPlantGrowingRebirth&&before.Block.Block is not BlockWildCropPickupRebirth&&after.Block is not BlockPlantGrowingRebirth&&after.Block is not BlockWildCropPickupRebirth&&!chunk.ChunkCustomData.dict.ContainsKey(key))return;
@@ -97,7 +99,7 @@ internal static partial class AdvancedFarmingHarvestSettlement
 internal static class AdvancedFarmingHarvestSourceCommit
 {
     private static void Prefix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,out AdvancedFarmingHarvestSettlement.SourceBefore __state)
-    {var local=new Vector3i(__1,__2,__3);__state=new AdvancedFarmingHarvestSettlement.SourceBefore{Block=__instance.GetBlock(local),Tile=__instance.GetTileEntity(local)};__state.NativeMutation=AdvancedFarmingHarvestSettlement.EnterNativeMutation(__instance,__0,local,__state);}
+    {var local=new Vector3i(__1,__2,__3);__state=new AdvancedFarmingHarvestSettlement.SourceBefore{Captured=true,Block=__instance.GetBlock(local),Tile=__instance.GetTileEntity(local)};__state.NativeMutation=AdvancedFarmingHarvestSettlement.EnterNativeMutation(__instance,__0,local,__state);}
     private static void Postfix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,bool __runOriginal,AdvancedFarmingHarvestSettlement.SourceBefore __state)
     {var local=new Vector3i(__1,__2,__3);AdvancedFarmingHarvestSettlement.ObserveNativeMutation(__instance,__0,local,__runOriginal,__state.NativeMutation);AdvancedFarmingHarvestSettlement.SourceCommitted(__instance,__0,local,__state);}
     private static Exception Finalizer(Chunk __instance,WorldBase __0,int __1,int __2,int __3,AdvancedFarmingHarvestSettlement.SourceBefore __state,Exception __exception)

@@ -202,6 +202,7 @@ internal static class RebirthWorkstationCompletionPublication
             try
             {
                 string full=QualifiedPath(path),identity=Identity(image);byte[] bytes=Bytes(image);
+                RebirthWorkstationCompletionEmptyRecovery.BeforePublication(GameManager.Instance?.World,full);
                 if(!XNode.DeepEquals(image,Parse(bytes)))return false;
                 if(owned.TryGetValue(full,out var previous))
                 {

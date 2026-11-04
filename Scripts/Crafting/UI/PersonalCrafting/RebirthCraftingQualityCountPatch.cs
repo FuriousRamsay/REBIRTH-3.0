@@ -78,6 +78,7 @@ public static class RebirthCraftingQualityCountPatch
             }
             int count = demand.PerBatch <= 0 ? 10000 : (int)Math.Min(10000L, available / demand.PerBatch);
             maximum = Math.Min(maximum, count);
+            if (maximum == 0) break;
         }
         __result = Math.Max(0, maximum);
         return false;

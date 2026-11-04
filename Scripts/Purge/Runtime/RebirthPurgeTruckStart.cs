@@ -13,7 +13,7 @@ public sealed class RebirthPurgeTruckStartModApi:IModApi
 }
 internal static class RebirthPurgeTruckStart
 {
-    internal static bool Enabled=>RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge;
+    internal static bool Enabled=>GameManager.Instance?.IsEditMode()!=true&&RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge;
     [ThreadStatic] internal static bool FreshRemoteRequest;
     [ThreadStatic] internal static EntityPlayerLocal IntroOwner;
     private sealed class StartRecord
@@ -21,16 +21,28 @@ internal static class RebirthPurgeTruckStart
         public string World,Owner;public int Vehicle,Stage;public float X,Y,Z,Heading;
         [JsonIgnore] public Vector3 Position=>new Vector3(X,Y,Z);
     }
-    private sealed class Job {internal World World;internal EntityPlayer Player;internal StartRecord Record;internal float ReadyAt,Next,LastLog;internal string Step,Failure;internal bool OwnsProgress,OwnsCamera,NativeSpawnObserved,Ready,AttachmentVerified;internal readonly RebirthPurgeStartStability Stability=new RebirthPurgeStartStability();}
+    private sealed class Job {internal int PlacementAttempts,SiteRevision;internal float SiteStarted,NextSiteSearch;internal bool SiteRejected;internal World World;internal EntityPlayer Player;internal StartRecord Record;internal float ReadyAt,Next,LastLog;internal string Step,Failure;internal bool OwnsProgress,OwnsCamera,NativeSpawnObserved,Ready,AttachmentVerified;internal readonly RebirthPurgeStartStability Stability=new RebirthPurgeStartStability();}
     private static readonly Dictionary<int,Job> jobs=new Dictionary<int,Job>();
     private static readonly Dictionary<int,int> finished=new Dictionary<int,int>();
     private static readonly HashSet<int> preparing=new HashSet<int>();
     private static readonly HashSet<int> nativeSpawnObserved=new HashSet<int>();
     private static readonly Dictionary<int,float> nextPreparation=new Dictionary<int,float>(),nextReply=new Dictionary<int,float>();
+    private static PlayerMoveController localMove;private static int clientSiteRevision;
     private static World clientWorld;private static int clientActor,clientVehicle;private static byte clientState;private static float clientNext;private static bool clientOwnsProgress;
     private static readonly RebirthPurgeStartStability clientStability=new RebirthPurgeStartStability();
     private static float nextClientGroundingLog;
     private static bool installed;
+    internal static string Diagnostic(EntityPlayerLocal player)
+    {
+        if(player==null)return "no-player";
+        jobs.TryGetValue(player.entityId,out var job);
+        return "enabled="+Enabled+", pending="+jobs.Count+", preparing="+preparing.Contains(player.entityId)+
+            ", nativeSpawnObserved="+nativeSpawnObserved.Contains(player.entityId)+", clientState="+clientState+
+            ", handoff="+StartHandoffActive(player)+", step="+(job?.Step??"none")+", stage="+(job?.Record?.Stage??-1)+
+            ", vehicle="+(job?.Record?.Vehicle??0)+", placementAttempts="+(job?.PlacementAttempts??0)+
+            ", siteRevision="+(job?.SiteRevision??clientSiteRevision)+", failure="+(job?.Failure??"none")+
+            ", attached="+(player.AttachedToEntity?.entityId??0);
+    }
     private static string RecordPath=>Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PurgeRoadStart","initial-truck.json");
     private static string Owner(EntityPlayer player)=>GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId)?.PrimaryId?.CombinedString
         ??(player is EntityPlayerLocal?GameManager.Instance.getPersistentPlayerID(null)?.CombinedString:null);
@@ -70,7 +82,7 @@ internal static class RebirthPurgeTruckStart
         ModEvents.PlayerSpawnedInWorld.RegisterHandler(Spawned);ModEvents.GameUpdate.RegisterHandler(Update);
         ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);
     }
-    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data){Log.Out("[PurgeTruckStart] step=shutdown pending="+jobs.Count);jobs.Clear();finished.Clear();preparing.Clear();nativeSpawnObserved.Clear();nextPreparation.Clear();nextReply.Clear();clientWorld=null;clientActor=clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
+    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data){Log.Out("[PurgeTruckStart] step=shutdown pending="+jobs.Count);jobs.Clear();finished.Clear();preparing.Clear();RebirthPurgeForestRoad.Reset();nativeSpawnObserved.Clear();nextPreparation.Clear();nextReply.Clear();localMove=null;clientSiteRevision=0;clientWorld=null;clientActor=clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
     private static void Step(Job job,string step,EntityVehicle inspect=null)
     {float now=Time.realtimeSinceStartup;if(job.Step==step&&now-job.LastLog<5)return;job.Step=step;job.LastLog=now;Log.Out("[PurgeTruckStart] step="+step+" player="+job.Player.entityId+" vehicle="+job.Record.Vehicle+" stage="+job.Record.Stage+" position="+job.Player.position);if(inspect!=null)Stable(inspect,true);}
     internal static void PresentStart(EntityPlayerLocal player)
@@ -90,10 +102,12 @@ internal static class RebirthPurgeTruckStart
             if(!pending&&player.IsSpawned())
             {
                 RebirthPurgePlayerWraps.Tick(true);
-                XUiC_ProgressWindow.Close(player.PlayerUI);player.bIntroAnimActive=false;player.EnableCamera(true);player.SetControllable(true);
+                XUiC_ProgressWindow.Close(player.PlayerUI);player.bIntroAnimActive=false;
+                player.PlayerUI?.windowManager?.ReEnableHUD();
+                player.EnableCamera(true);player.SetControllable(true);
                 clientOwnsProgress=false;
                 clientState=5; // Retire this first-entry lease; later dismounts are ordinary gameplay.
-                RebirthPurgeInformationTopics.Request(player,"PurgeIntro",false,Time.realtimeSinceStartup+5);
+                RebirthPurgeInformationService.RevealIntro(player);
             }
         }
         if(!pending)return;
@@ -119,17 +133,26 @@ internal static class RebirthPurgeTruckStart
     private static void Reveal(Job job)
     {
         if(job.OwnsCamera&&job.Player is EntityPlayerLocal player)
-        {if(job.OwnsProgress)XUiC_ProgressWindow.Close(player.PlayerUI);player.bIntroAnimActive=false;player.EnableCamera(true);player.SetControllable(true);}
+        {
+            if(job.OwnsProgress)XUiC_ProgressWindow.Close(player.PlayerUI);
+            player.bIntroAnimActive=false;
+            // This verified first-entry handoff owns the reveal. Native
+            // showUILater otherwise keeps the HUD fully hidden for four seconds,
+            // and GUIWindowManager silently refuses information windows then.
+            player.PlayerUI?.windowManager?.ReEnableHUD();
+            player.EnableCamera(true);player.SetControllable(true);
+        }
     }
     internal static bool BeforeWorldReady(PlayerMoveController controller)
     {
         var player=controller.entityPlayerLocal;var world=player?.world;
         if(!Enabled||world==null||player.IsSpawned()||
             (controller.respawnReason!=RespawnType.NewGame&&controller.respawnReason!=RespawnType.EnterMultiplayer))return true;
+        localMove=controller;
         if(world.IsRemote())
         {
             if(!ReferenceEquals(clientWorld,world)||clientActor!=player.entityId)
-            {clientWorld=world;clientActor=player.entityId;clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
+            {clientSiteRevision=0;clientWorld=world;clientActor=player.entityId;clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
             QueryClient(player);
             if(clientState==1)return true; // Authority confirms no starter claim for this player.
             var replica=world.GetEntity(clientVehicle) as EntityVehicle;
@@ -140,6 +163,32 @@ internal static class RebirthPurgeTruckStart
         if(!jobs.TryGetValue(player.entityId,out var job))return !preparing.Contains(player.entityId);
         var vehicle=job.Record.Vehicle>0?world.GetEntity(job.Record.Vehicle) as EntityVehicle:null;
         return job.Failure==null&&job.Record.Stage>=1&&job.Ready&&vehicle!=null&&vehicle.ModelTransform!=null&&vehicle.RootTransform!=null;
+    }
+    internal static void RelocateClient(World world,int actor,Guid id,int revision,Vector3 position,float heading)
+    {
+        if(!ThreadManager.IsMainThread()||world==null||!world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||!ReferenceEquals(world,clientWorld)||clientActor!=actor||
+            !Guid.TryParse(GamePrefs.GetString(EnumGamePrefs.GameGuidClient),out var current)||current!=id||revision<=clientSiteRevision||clientState>=3)return;
+        var player=world.GetPrimaryPlayer();
+        if(player?.entityId!=actor||player.IsSpawned()||localMove?.entityPlayerLocal!=player)return;
+        if(float.IsNaN(position.x)||float.IsNaN(position.y)||float.IsNaN(position.z)||float.IsInfinity(position.x)||float.IsInfinity(position.y)||float.IsInfinity(position.z)||float.IsNaN(heading)||float.IsInfinity(heading))return;
+        var valid=world.ClampToValidWorldPos(position);if((valid-position).sqrMagnitude>.01f)return;
+        clientSiteRevision=revision;localMove.spawnPosition=new SpawnPosition(position,heading);player.SetPosition(position,true);clientStability.Reset();
+    }
+    private static bool RelocateSite(Job job,float now)
+    {
+        if(now<job.NextSiteSearch)return false;
+        job.NextSiteSearch=now+5;
+        if(!job.SiteRejected){RebirthPurgeForestRoad.RejectSite(job.World,job.Record.Position);job.SiteRejected=true;}
+        if(!RebirthPurgeForestRoad.Find(job.World,out var road)||!RebirthPurgeForestRoad.PlayerAnchor(job.World,road,out var anchor))
+        {RebirthPurgeForestRoad.RetryFailedSearch(job.World);Step(job,"wait.new-road-site");return false;}
+        var old=job.Record.Position;
+        job.Record.X=road.position.x;job.Record.Y=road.position.y;job.Record.Z=road.position.z;job.Record.Heading=road.heading;
+        job.SiteRevision++;job.PlacementAttempts=0;job.SiteStarted=now;job.SiteRejected=false;job.Stability.Reset();
+        if(job.Player is EntityPlayerLocal local&&localMove?.entityPlayerLocal==local)localMove.spawnPosition=anchor;
+        job.Player.SetPosition(anchor.position,true);
+        if(File.Exists(RecordPath))Write(job.Record);
+        Log.Out("[PurgeTruckStart] step=road.new-site revision="+job.SiteRevision+" from="+old+" to="+road.position+" minimumSeparation=256");
+        job.Next=now+.5f;return true;
     }
     private static void QueryClient(EntityPlayerLocal player)
     {
@@ -161,6 +210,8 @@ internal static class RebirthPurgeTruckStart
         byte state=1;int vehicleId=0;
         if(jobs.TryGetValue(actor,out var job))
         {
+            if(job.SiteRevision>0&&job.Record.Stage==0&&job.Record.Vehicle==0&&RebirthPurgeForestRoad.PlayerAnchor(world,new SpawnPosition(job.Record.Position,job.Record.Heading),out var anchor))
+                sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthPurgeStartRelocateV1>().Setup(actor,id,job.SiteRevision,anchor));
             vehicleId=job.Record.Vehicle;var vehicle=world.GetEntity(vehicleId) as EntityVehicle;
             state=(byte)(job.Failure==null&&job.Record.Stage>=1&&job.Ready&&vehicle!=null&&vehicle.ModelTransform!=null?3:2);
         }
@@ -236,10 +287,6 @@ internal static class RebirthPurgeTruckStart
         player.world?.IsRemote()==true&&ReferenceEquals(clientWorld,player.world)&&clientActor==player.entityId&&clientState>=2&&clientState<=4);
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
-        // This client event also runs after the one-time truck handoff has finished.
-        // Keep the existing journal-backed information queue alive on first entry and reload.
-        if(!GameManager.IsDedicatedServer)RebirthPurgeInformationService.Pulse();
-        RebirthPurgePlayerWraps.Tick();
         if(jobs.Count==0)return;
         foreach(var pair in jobs.ToArray())
         {
@@ -256,20 +303,28 @@ internal static class RebirthPurgeTruckStart
                 {
                     if(record.Vehicle>0&&VehicleManager.Instance.vehiclesUnloaded.Any(v=>v.id==record.Vehicle))continue;
                     if(record.Stage>0){if(now-job.ReadyAt>120)throw new InvalidOperationException("Saved starter truck is unavailable; refusing a duplicate.");continue;}
+                    if(job.SiteStarted==0)job.SiteStarted=now;
+                    if(RebirthPurgeStartPlacementPolicy.Relocate(job.PlacementAttempts,now-job.SiteStarted))
+                    {RelocateSite(job,now);continue;}
                     if(job.World.GetChunkFromWorldPos(new Vector3i(record.Position))==null){Step(job,"wait.road-chunk");continue;}
                     Step(job,"road.footprint-check");
-                    if(!Clear(job.World,record,p))
+                    job.PlacementAttempts++;
+                    bool roadClear=Clear(job.World,record,p,out bool clearing);
+                    if(clearing){Step(job,"wait.road-decoration-cleanup");job.Next=now+.5f;continue;}
+                    if(!roadClear)
                     {
                         bool relocated=false;
-                        for(int distance=8;distance<=64&&!relocated;distance+=8)foreach(int sign in new[]{1,-1})
+                        for(int distance=8;distance<=64&&!relocated;distance+=2)foreach(int sign in new[]{1,-1})
                         {
                             if(!RebirthPurgeForestRoad.Nearby(job.World,record.Position,record.Heading,distance*sign,out var alternate))continue;
                             var probe=new StartRecord{X=alternate.position.x,Y=alternate.position.y,Z=alternate.position.z,Heading=record.Heading};
-                            if(!Clear(job.World,probe,p))continue;
+                            bool alternateClear=Clear(job.World,probe,p,out clearing);
+                            if(!alternateClear&&!clearing)continue;
                             record.X=probe.X;record.Y=probe.Y;record.Z=probe.Z;relocated=true;
                             Log.Out("[PurgeTruckStart] step=road.obstacle-avoided offset="+(distance*sign)+" position="+record.Position);break;
                         }
                         if(!relocated){Step(job,"wait.clear-loaded-road-footprint");job.Next=now+2;continue;}
+                        if(clearing){Step(job,"wait.road-decoration-cleanup");job.Next=now+.5f;continue;}
                     }
                     Step(job,"truck.create-bare");
                     vehicle=RebirthVehicleEntityFactory.Create(job.World,"rebirthCamper80s",record.Position,new Vector3(0,record.Heading,0));
@@ -311,8 +366,8 @@ internal static class RebirthPurgeTruckStart
                 if(p is EntityPlayerLocal)RebirthPurgePlayerWraps.Tick(true);
                 if(p is EntityPlayerLocal local){local.bIntroAnimActive=false;local.SetControllable(true);}
                 Step(job,"gameplay.enable");record.Stage=2;Write(record);VehicleManager.Instance.TriggerSave();Reveal(job);
-                if(p is EntityPlayerLocal introPlayer)RebirthPurgeInformationTopics.Request(introPlayer,"PurgeIntro",false,Time.realtimeSinceStartup+5);
                 finished[p.entityId]=record.Vehicle;preparing.Remove(p.entityId);jobs.Remove(pair.Key);
+                if(p is EntityPlayerLocal introPlayer)RebirthPurgeInformationService.RevealIntro(introPlayer);
                 Log.Out("[PurgeTruckStart] Initial truck ready on a rural pine-forest road; driver attached.");
             }
             catch(Exception e){job.Failure=e.Message;Log.Error("[PurgeTruckStart] Handoff stopped under loading cover without creating another truck: "+e.Message);}
@@ -344,8 +399,9 @@ internal static class RebirthPurgeTruckStart
         return RebirthPurgeStartStability.Accept(loaded,grounded,rigidbody.velocity.sqrMagnitude,rigidbody.angularVelocity.sqrMagnitude,
             vehicle.PhysicsTransform.up.y,poseError,position.y-height);
     }
-    private static bool Clear(World world,StartRecord record,EntityPlayer owner)
+    private static bool Clear(World world,StartRecord record,EntityPlayer owner,out bool clearing)
     {
+        clearing=false;var decorations=new Dictionary<Vector3i,BlockValue>();
         var rotation=Quaternion.Euler(0,record.Heading,0);
         // Nearby-road relocation must preserve the staging separation too; an
         // alternate 8m behind the truck would otherwise enclose the staged actor.
@@ -370,12 +426,29 @@ internal static class RebirthPurgeTruckStart
             for(int y=Mathf.FloorToInt(terrain);y<=Mathf.CeilToInt(record.Y+4);y++)
             {
                 var block=world.GetBlock(x,y,z);
-                // Multiblock wreck child cells can carry an air block type.
-                if(block.ischild)return false;
+                var at=new Vector3i(x,y,z);
+                if(block.ischild)
+                {
+                    if(block.Block?.multiBlockPos==null)return false;
+                    at=block.Block.multiBlockPos.GetParentPos(at,block);block=world.GetBlock(at);
+                    if(block.isair||block.ischild)return false;
+                    if(!RebirthPurgeStartPlacementPolicy.Removable(block.Block.GetBlockName(),block.Block.IsTerrainDecoration,block.Block.Properties.GetString("Shape")))return false;
+                }
                 if(block.isair)continue;
                 if(y<=Mathf.CeilToInt(terrain)&&block.Block.shape.IsTerrain())continue;
+                if(RebirthPurgeStartPlacementPolicy.Removable(block.Block.GetBlockName(),block.Block.IsTerrainDecoration,block.Block.Properties.GetString("Shape")))
+                {decorations[at]=block;continue;}
                 Log.Out("[PurgeTruckStart] step=road.obstruction block="+block.Block.GetBlockName()+" position="+new Vector3i(x,y,z));return false;
             }
+        }
+        if(decorations.Count>0)
+        {
+            foreach(var decoration in decorations)if(!world.GetBlock(decoration.Key).Equals(decoration.Value))return false;
+            foreach(var decoration in decorations)
+                world.SetBlockRPC(new BlockChangeInfo((BlockValueRef)decoration.Key,BlockValue.Air,true,false));
+            clearing=true;
+            Log.Out("[PurgeTruckStart] step=road.decorations-cleared count="+decorations.Count+" position="+record.Position);
+            return false; // Let native collision rebuild, then repeat full clearance before creating a truck.
         }
         foreach(var entity in world.Entities.list)
         {
@@ -425,7 +498,7 @@ internal static class RebirthPurgeFreshRemoteRequest
 internal static class RebirthPurgeInitialWorldReadiness
 {
     private static void Postfix(PlayerMoveController __instance,ref bool __result)
-    {if(__result)__result=RebirthPurgeTruckStart.BeforeWorldReady(__instance);}
+    {if(__result&&(__instance.respawnReason==RespawnType.NewGame||__instance.respawnReason==RespawnType.EnterMultiplayer))__result=RebirthPurgeTruckStart.BeforeWorldReady(__instance);}
 }
 [HarmonyPatch]
 internal static class RebirthPurgeInitialRevive
@@ -446,12 +519,12 @@ internal static class RebirthPurgeInitialIntroScope
 internal static class RebirthPurgeNativeSpawnTrace
 {
     private static float next;
-    private static void Postfix(PlayerMoveController __instance){if(RebirthPurgeTruckStart.Enabled)RebirthPurgeTruckStart.PresentStart(__instance.entityPlayerLocal);}
+    private static void Postfix(PlayerMoveController __instance){var player=__instance.entityPlayerLocal;if(RebirthPurgeTruckStart.StartHandoffActive(player))RebirthPurgeTruckStart.PresentStart(player);}
     [HarmonyPriority(Priority.First)]
     private static void Prefix(PlayerMoveController __instance)
     {
         var player=__instance.entityPlayerLocal;
-        if(!RebirthPurgeTruckStart.Enabled||player==null||player.IsSpawned()||Time.realtimeSinceStartup<next)return;
+        if(!RebirthPurgeTruckStart.Enabled||player==null||!RebirthPurgeTruckStart.StartHandoffActive(player)||player.IsSpawned()||Time.realtimeSinceStartup<next)return;
         next=Time.realtimeSinceStartup+5;
         Log.Out("[PurgeTruckStart] step=wait.native-respawn player="+player.entityId+" reason="+__instance.respawnReason+" timer="+__instance.respawnTime+" position="+player.position+" uiReady="+player.PlayerUI.xui.IsReady);
     }

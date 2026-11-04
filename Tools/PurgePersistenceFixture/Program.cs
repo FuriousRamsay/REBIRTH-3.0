@@ -10,7 +10,10 @@ class GameManager { public static GameManager Instance; public World World; }
 class ConnectionManager { public bool IsServer=true; }
 class SingletonMonoBehaviour<T> { public static T Instance; }
 class ThreadManager { public static bool IsMainThread()=>true; }
-class GameIO { public static string Path; public static string GetSaveGameDir()=>Path; }
+class GameIO { public static string Path; public static string GetSaveGameDir()=>Path; public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>Path; }
+class Platform { public enum UserDataStorageType { Local } }
+enum EnumGamePrefs { GameSaveStorageType, GameWorld, GameName }
+static class GamePrefs { public static int GetInt(EnumGamePrefs pref)=>0; public static string GetString(EnumGamePrefs pref)=>pref.ToString(); }
 static class Program
 {
     static int checks;
@@ -18,8 +21,36 @@ static class Program
     static string Root()=>System.IO.Path.Combine(System.IO.Path.GetTempPath(),"rebirth-purge-fixture-"+Guid.NewGuid().ToString("N"));
     static RebirthPoiWorldBinding Bind(string root,Func<bool> current=null) { Directory.CreateDirectory(root); return new RebirthPoiWorldBinding(new object(),Guid.NewGuid().ToString("N").ToUpperInvariant(),root,current??(()=>true)); }
     static RebirthPoiIdentity Poi(int i)=>new RebirthPoiIdentity(new string('p',256),i,30,0,0,1,1,1,new string('b',64));
+    static void AnimalPolicyTests()
+    {
+        foreach(var name in new[]{"animalChicken","animalRabbit","animalStag","animalDoe"})
+            Check(!RebirthPoiCombatantPolicy.IsRequired(name),"harmless actor excluded: "+name);
+        foreach(var name in new[]{"zombieArlene","animalZombieBear","animalZombieDog","animalBoar","animalWolf","unknownFutureClass"})
+            Check(RebirthPoiCombatantPolicy.IsRequired(name),"combat/unknown actor retained: "+name);
+        var binding=Bind(Root());
+        Check(RebirthPoiWorldStore.TryOpen(binding,out var store)==RebirthPoiStoreResult.Published,"animal fixture opens durable store");
+        var poi=Poi(9001);
+        Check(store.TryDiscover(store.Published,poi)==RebirthPoiStoreResult.Published,"animal fixture discovery");
+        var chicken=new RebirthPoiActorObservation(Guid.NewGuid(),501,"animalChicken",0);
+        var zombie=new RebirthPoiActorObservation(Guid.NewGuid(),502,"zombieArlene",1,Guid.NewGuid(),42,contributor:new string('a',64));
+        var observations=new RebirthPoiPartialObservation(Guid.NewGuid(),0,1,new[]{new RebirthPoiVolumeObservation(1,new string('b',64),new[]{chicken,zombie})});
+        Check(store.TryObservePartial(store.Published,poi,0,observations)==RebirthPoiStoreResult.Published,"live chicken and dead zombie retained");
+        var proof=new RebirthPoiClearEvidence(Guid.NewGuid(),1,1,1,0,0,false,43);
+        Check(store.TryClear(store.Published,poi,0,proof)==RebirthPoiStoreResult.Published,"living chicken does not block proven combat clearance");
+        Check(RebirthPoiWorldStore.TryOpen(binding,out var reloaded)==RebirthPoiStoreResult.Published&&reloaded.Published.TryGet(poi,out var record)&&record.State==RebirthPoiClearanceState.Cleared&&record.Observations.Volumes[1].Actors[chicken.Token].DeathReceipt==Guid.Empty,"reload preserves clearance and living chicken without fabricated death");
+        poi=Poi(9002);
+        Check(store.TryDiscover(store.Published,poi)==RebirthPoiStoreResult.Published,"live zombie fixture discovery");
+        var liveZombie=new RebirthPoiActorObservation(Guid.NewGuid(),503,"zombieArlene",1);
+        observations=new RebirthPoiPartialObservation(Guid.NewGuid(),0,1,new[]{new RebirthPoiVolumeObservation(2,new string('b',64),new[]{chicken,liveZombie})});
+        Check(store.TryObservePartial(store.Published,poi,0,observations)==RebirthPoiStoreResult.Published,"live zombie observation published");
+        Check(store.TryClear(store.Published,poi,0,proof)!=RebirthPoiStoreResult.Published,"living zombie still blocks clearance");
+        var deadChicken=new RebirthPoiActorObservation(Guid.NewGuid(),504,"animalChicken",0,Guid.NewGuid(),42,contributor:new string('a',64));
+        observations=new RebirthPoiPartialObservation(Guid.NewGuid(),0,1,new[]{new RebirthPoiVolumeObservation(3,new string('b',64),new[]{deadChicken})});
+        Check(RebirthPoiSupplyCredits.TryCredit(null,observations,out var credits)&&credits==null,"harmless animal death earns no purge supply credit");
+    }
     static void Main(string[] args)
     {
+        AnimalPolicyTests();
         string root=Root(); var binding=Bind(root); RebirthPoiWorldStore store;
         Check(RebirthPoiWorldStore.TryOpen(binding,out store)==RebirthPoiStoreResult.Published,"first save publishes original empty manifest");
         var initial=store.Published;

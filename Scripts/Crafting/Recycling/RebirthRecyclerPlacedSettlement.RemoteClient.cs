@@ -67,10 +67,22 @@ internal static partial class RebirthRecyclerPlacedSettlement
     private static bool CanAdvanceRemoteRecyclerOwner(Original source)=>!source.World.IsRemote()||recyclerClients.Any(value=>ReferenceEquals(value.Source,source)&&value.Live()&&!value.Unknown&&value.Stage>=3);
     private static bool RecyclerClientOwnerHeld(EntityPlayerLocal actor)=>recyclerClients.Any(value=>!value.Acknowledged&&!ReferenceEquals(value,startingRecyclerOwner)&&
         ReferenceEquals(value.Source?.Actor,actor)&&value.Source.OwnerLineageCurrent());
-    private static bool RecyclerClientStationHeld(TileEntityWorkstation station)=>recyclerClients.Any(value=>!value.Acknowledged&&ReferenceEquals(value.Source?.World,GameManager.Instance?.World)&&
-        (ReferenceEquals(value.Source.Station,station)||ReferenceEquals(value.UnqualifiedStation,station))&&ReferenceEquals(value.Source.World.GetTileEntity(station.ToWorldPos()),station))||
-        joinedRecyclerOwners.Any(value=>ReferenceEquals(value.World,GameManager.Instance?.World)&&value.Current()&&value.UnqualifiedStations.Values.Any(candidate=>ReferenceEquals(candidate,station))&&
-            ReferenceEquals(value.World.GetTileEntity(station.ToWorldPos()),station));
+    private static bool RecyclerClientStationHeld(TileEntityWorkstation station)
+    {
+        foreach(var value in recyclerClients)
+            if(!value.Acknowledged&&ReferenceEquals(value.Source?.World,GameManager.Instance?.World)&&
+                (ReferenceEquals(value.Source.Station,station)||ReferenceEquals(value.UnqualifiedStation,station))&&
+                ReferenceEquals(value.Source.World.GetTileEntity(station.ToWorldPos()),station))return true;
+        foreach(var value in joinedRecyclerOwners)
+        {
+            if(!ReferenceEquals(value.World,GameManager.Instance?.World)||!value.Current())continue;
+            bool contains=false;
+            foreach(var candidate in value.UnqualifiedStations.Values)
+                if(ReferenceEquals(candidate,station)){contains=true;break;}
+            if(contains&&ReferenceEquals(value.World.GetTileEntity(station.ToWorldPos()),station))return true;
+        }
+        return false;
+    }
     internal static bool BeginRemoteAction(EntityPlayerLocal actor,TileEntityWorkstation station,Guid operation,Guid request,string purpose,int slot,int units,
         ItemStack[] input,RecipeQueueItem[] queue,IList<ItemStack> returns,ItemStack[] output,ItemStack[] tools,Func<bool> current,out string reason,bool cycle=false,float seconds=0)
     {

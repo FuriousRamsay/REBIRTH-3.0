@@ -47,7 +47,7 @@ internal static partial class RebirthProductiveEarnedUiCoordinator
         PumpQueueHandoffs();
         if(!RebirthProductiveEarnedUiOriginal.Enabled)return;
         RebirthProductiveEarnedUiQueueOwner.Pump();
-        foreach(var original in originals.Values.ToArray())
+        if(originals.Count>0)foreach(var original in originals.Values.ToArray())
         {
             try
             {

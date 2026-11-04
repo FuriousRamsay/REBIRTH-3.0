@@ -11,9 +11,11 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
     private float nextInspectionRefresh;
     private XUiV_Sprite inspectedIcon;
     private XUiV_Label inspectedName, inspectedDescription;
+    private XUiView[] cellWrappers, lockOverlays;
     private RebirthCompactSelectedItem details;
     private XUiC_SimpleButton modifyButton;
     private XUiView modifyIcon;
+    private XUiView filterButton, theoryButton, sellButton, sortButton, lockButton;
     public XUiC_ItemStack SelectedItem => xui?.DragAndDropWindow?.IsEmpty() == false
         ? xui.DragAndDropWindow.ItemStackControl as XUiC_ItemStack : selected;
     // The existing native preview widget also displays an installed vehicle part,
@@ -26,13 +28,24 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
         // every bag index shifted by one and the last controller had no editorCell wrapper (NRE in
         // SetStacks). Keep only the real backpack cells; their order and count match editorCell0..N.
         itemControllers = Array.FindAll(itemControllers, c => c is XUiC_RebirthEditorBackpackSlot);
+        cellWrappers = new XUiView[itemControllers.Length];
+        lockOverlays = new XUiView[itemControllers.Length];
         scroll = GetChildByType<XUiC_RebirthCharacterOverviewList>();
+        // This reused backpack owns its list's lifetime, including when hosted by
+        // a native power-source group rather than the Modify/vehicle window.
+        // Without this binding the list skips all child rendering and input updates.
+        scroll?.BindOwner(() => open);
         inspectedIcon = GetChildById("editorBagItemIcon")?.ViewComponent as XUiV_Sprite;
         inspectedName = GetChildById("editorBagItemName")?.ViewComponent as XUiV_Label;
         inspectedDescription = GetChildById("editorBagItemDescription")?.ViewComponent as XUiV_Label;
         details = new RebirthCompactSelectedItem(this,"editorBag");
         modifyButton = GetChildById("editorBagModify") as XUiC_SimpleButton;
         modifyIcon = GetChildById("editorModifyIcon")?.ViewComponent;
+        filterButton = GetChildById("editorBagFilter")?.ViewComponent;
+        theoryButton = GetChildById("rbBackpackTheorySection")?.ViewComponent;
+        sellButton = GetChildById("rbBackpackSellSection")?.ViewComponent;
+        sortButton = GetChildById("editorBagSort")?.ViewComponent;
+        lockButton = GetChildById("editorBagLock")?.ViewComponent;
         GetChildById("editorBagFilter").OnPress += (sender, button) => {
             if (!CanOperate(button)) return;
             filtered = !filtered; SetStacks(GetSlots()); scroll?.ResetPosition();
@@ -84,6 +97,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
     public override void OnOpen() {
         open = true; selected = null; inspectionStack = null; nextInspectionRefresh = 0f; base.OnOpen();
         details?.Render(null,null);
+        LayoutToolbar();
         if (GetParentByType<XUiC_RebirthVehicleRestoration>() != null)
             SetInspectionText(inspectedDescription, Localization.Get("xuiRebirthVehicleNoSelection"));
     }
@@ -91,12 +105,36 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
     public override void Update(float dt) {
         if (!open) return;
         base.Update(dt);
+        LayoutToolbar();
         if (lockMode) PersistLocks();
         if (selected != null && UnityEngine.Time.realtimeSinceStartup >= nextInspectionRefresh) Inspect(selected);
         bool canModify = CanModify();
         if (modifyButton != null) { modifyButton.ViewComponent.IsVisible = canModify; modifyButton.Enabled = canModify; }
         if (modifyIcon != null) modifyIcon.IsVisible = canModify;
         RebirthSelectedDurability.Render(this, "editorBagDurability", selected);
+    }
+    private void LayoutToolbar()
+    {
+        if (scroll?.ViewComponent == null) return;
+        int columns = Math.Max(1, scroll.ViewComponent.Size.x / 71);
+        // Align the controls with the final visible bag cell. Optional library buttons
+        // occupy space only while they are shown, in both Modify and vehicle panels.
+        int x = scroll.ViewComponent.Position.x + (columns - 1) * 71 + 69 - 14;
+        PlaceToolbarButton(lockButton, ref x);
+        PlaceToolbarButton(sortButton, ref x);
+        PlaceToolbarButton(sellButton, ref x);
+        PlaceToolbarButton(theoryButton, ref x);
+        PlaceToolbarButton(filterButton, ref x);
+    }
+    private static void PlaceToolbarButton(XUiView view, ref int x)
+    {
+        if (view == null || !view.IsVisible) return;
+        if (view.Position.x != x)
+        {
+            view.Position = new Vector2i(x, view.Position.y);
+            view.TryUpdatePosition();
+        }
+        x -= 38;
     }
     public override void SetStacks(ItemStack[] stacks)
     {
@@ -111,7 +149,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
         {
             itemControllers[i].ViewComponent.IsVisible = i < stacks.Length;
             bool show = i < stacks.Length && (!filtered || stacks[i]?.itemValue?.ItemClass is ItemClassModifier);
-            var wrapper = GetChildById("editorCell" + i).ViewComponent;
+            var wrapper = cellWrappers[i] ?? (cellWrappers[i] = GetChildById("editorCell" + i).ViewComponent);
             wrapper.IsVisible = show;
             if (wrapper.UiTransform != null) wrapper.UiTransform.gameObject.SetActive(show);
             if (show) {
@@ -121,7 +159,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
                     (i / 11 - visible / columns) * 71);
                 wrapper.TryUpdatePosition(); visible++;
             }
-            var lockOverlay = itemControllers[i].GetChildById("rectSlotLock")?.ViewComponent;
+            var lockOverlay = lockOverlays[i] ?? (lockOverlays[i] = itemControllers[i].GetChildById("rectSlotLock")?.ViewComponent);
             if (lockOverlay != null) lockOverlay.IsVisible = show && lockMode;
             // The source lives in the closed Character/Crafting surface. Mirror its native
             // assembly lock here so that editing cannot move the source out from under it.
@@ -206,6 +244,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
 public sealed class XUiC_RebirthEditorBackpackSlot : XUiC_ItemStack
 {
     private XUiV_Sprite slotBackground, slotHighlight;
+    private bool? vehicleServiceDrop;
     private static readonly UnityEngine.Color32 NormalColor = new UnityEngine.Color32(30,30,36,255);
     private static readonly UnityEngine.Color32 LockedColor = new UnityEngine.Color32(31,31,36,255);
     private static readonly UnityEngine.Color32 AvailableColor = new UnityEngine.Color32(58,58,65,255);
@@ -230,7 +269,9 @@ public sealed class XUiC_RebirthEditorBackpackSlot : XUiC_ItemStack
     public override void updateItemInfoWindow(XUiC_ItemStack stack) { }
     public override void Update(float dt)
     {
-        if(GetParentByType<XUiC_RebirthVehicleFrame>()!=null||GetParentByType<XUiC_RebirthVehicleRestoration>()!=null)RebirthVehicleServicePointerDrop.Arm(this);
+        if(!vehicleServiceDrop.HasValue)
+            vehicleServiceDrop=GetParentByType<XUiC_RebirthVehicleFrame>()!=null||GetParentByType<XUiC_RebirthVehicleRestoration>()!=null;
+        if(vehicleServiceDrop.Value)RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         if (slotBackground != null && slotBackground.Color != (UnityEngine.Color)NormalColor)
             slotBackground.SetColorImmediately(NormalColor);

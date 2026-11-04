@@ -299,7 +299,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
     }
     private int GetVisibleRelationshipCount(bool incoming)
     {
-        if(incoming&&(string.Equals(preparedFocusId,BackgroundsHomeId,StringComparison.OrdinalIgnoreCase)||backgroundBrowserPinned))return IsNodeTypeEnabled(RebirthProgressionGraphNodeType.Background)?GetBackgroundNodes().Count:0;
+        if(incoming&&(string.Equals(preparedFocusId,BackgroundsHomeId,StringComparison.OrdinalIgnoreCase)||backgroundBrowserPinned))return IsNodeTypeEnabled(RebirthProgressionGraphNodeType.Background)?GetBackgroundNodeCount():0;
         if(projection==null)return 0;
         int count=0;
         for(int i=0;i<projection.Slots.Count;i++)
@@ -722,6 +722,26 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         result.Sort(delegate(RebirthProgressionGraphNode a,RebirthProgressionGraphNode b){return string.Compare(RebirthProgressionExplorerSearchService.ResolveDisplayName(a),RebirthProgressionExplorerSearchService.ResolveDisplayName(b),StringComparison.CurrentCultureIgnoreCase);});
         return result;
     }
+    private static int GetBackgroundNodeCount()
+    {
+        // Native scrolling needs only the count each frame; sorting localized names is for rendering.
+        int count=0;
+        RebirthSurvivorDefinitionBundle bundle=RebirthSurvivorDefinitionRegistry.Bundle;
+        if(bundle!=null&&bundle.Backgrounds!=null)
+        {
+            for(int i=0;i<bundle.Backgrounds.Count;i++)
+            {
+                RebirthBackgroundDefinition bg=bundle.Backgrounds[i];
+                if(bg==null)continue;
+                RebirthProgressionGraphNode node;
+                if(RebirthProgressionGraphRegistry.TryGetNode(bg.Id,out node)&&node!=null)count++;
+            }
+        }
+        if(count!=0)return count;
+        RebirthProgressionGraphNode[] all=RebirthProgressionGraphRegistry.GetNodesSnapshot();
+        for(int i=0;i<all.Length;i++)if(all[i]!=null&&all[i].Type==RebirthProgressionGraphNodeType.Background)count++;
+        return count;
+    }
     private bool IsNodeTypeEnabled(RebirthProgressionGraphNodeType type){return enabledNodeTypes.Contains(type);}
     private void LegendType_OnPressed(XUiController sender,int mouseButton)
     {
@@ -895,8 +915,8 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
     }
     private XUiV_Label Label(string id){XUiController c=GetChildById(id);return c!=null?c.ViewComponent as XUiV_Label:null;}
     private XUiV_Sprite Sprite(string id){XUiController c=GetChildById(id);return c!=null?c.ViewComponent as XUiV_Sprite:null;}
-    private static void Set(XUiV_Label l,string value){if(l!=null)l.Text=value??string.Empty;}
-    private static void SetVisible(XUiController c,bool visible){if(c!=null&&c.ViewComponent!=null)c.ViewComponent.IsVisible=visible;}
+    private static void Set(XUiV_Label l,string value){if(l!=null){string text=value??string.Empty;if(l.Text!=text)l.Text=text;}}
+    private static void SetVisible(XUiController c,bool visible){if(c?.ViewComponent!=null&&c.ViewComponent.IsVisible!=visible)c.ViewComponent.IsVisible=visible;}
     private static string L(string key,string fallback){string v=Localization.Get(key??string.Empty);return string.IsNullOrEmpty(v)||v==key?fallback:v;}
 
     private static bool TryGetNativeScrollValue(XUiController controller,out float value)

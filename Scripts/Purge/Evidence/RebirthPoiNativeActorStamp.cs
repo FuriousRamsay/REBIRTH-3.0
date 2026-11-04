@@ -5,6 +5,7 @@ using System;
 internal static class RebirthPoiNativeActorStamp
 {
     private const string Prefix="_rbPoiActorGuid";
+    private static readonly string[] Keys={Prefix+"0",Prefix+"1",Prefix+"2",Prefix+"3",Prefix+"4",Prefix+"5",Prefix+"6",Prefix+"7"};
     internal static bool TryRead(EntityAlive entity,out Guid token)
     {
         token=Guid.Empty;
@@ -12,7 +13,7 @@ internal static class RebirthPoiNativeActorStamp
         byte[] bytes=new byte[16];
         for(int i=0;i<8;i++)
         {
-            string key=Prefix+i;
+            string key=Keys[i];
             if(!entity.Buffs.HasCustomVar(key))return false;
             float value=entity.Buffs.GetCustomVar(key);
             if(float.IsNaN(value)||float.IsInfinity(value)||value<1||value>65536||value!=(float)Math.Floor(value))return false;
@@ -29,9 +30,9 @@ internal static class RebirthPoiNativeActorStamp
             !(entity.world is World world)||world.IsRemote()||GameManager.Instance==null||
             !ReferenceEquals(GameManager.Instance.World,world)||!ReferenceEquals(world.GetEntity(entity.entityId),entity))return false;
         if(TryRead(entity,out token))return true;
-        for(int i=0;i<8;i++)if(entity.Buffs.HasCustomVar(Prefix+i))return false;
+        for(int i=0;i<8;i++)if(entity.Buffs.HasCustomVar(Keys[i]))return false;
         var original=Guid.NewGuid();byte[] bytes=original.ToByteArray();
-        for(int i=0;i<8;i++)entity.Buffs.SetCustomVar(Prefix+i,(bytes[2*i]|bytes[2*i+1]<<8)+1,false);
+        for(int i=0;i<8;i++)entity.Buffs.SetCustomVar(Keys[i],(bytes[2*i]|bytes[2*i+1]<<8)+1,false);
         return TryRead(entity,out token)&&token==original;
     }
     internal static bool TryAssignVerifiedRestoration(EntityAlive entity,Guid expected,out Guid token)
@@ -41,8 +42,8 @@ internal static class RebirthPoiNativeActorStamp
             !(entity.world is World world)||world.IsRemote()||GameManager.Instance==null||
             !ReferenceEquals(GameManager.Instance.World,world)||!ReferenceEquals(world.GetEntity(entity.entityId),entity))return false;
         if(TryRead(entity,out token))return token==expected;
-        for(int i=0;i<8;i++)if(entity.Buffs.HasCustomVar(Prefix+i))return false;
-        byte[] bytes=expected.ToByteArray();for(int i=0;i<8;i++)entity.Buffs.SetCustomVar(Prefix+i,(bytes[2*i]|bytes[2*i+1]<<8)+1,false);
+        for(int i=0;i<8;i++)if(entity.Buffs.HasCustomVar(Keys[i]))return false;
+        byte[] bytes=expected.ToByteArray();for(int i=0;i<8;i++)entity.Buffs.SetCustomVar(Keys[i],(bytes[2*i]|bytes[2*i+1]<<8)+1,false);
         return TryRead(entity,out token)&&token==expected;
     }
 }

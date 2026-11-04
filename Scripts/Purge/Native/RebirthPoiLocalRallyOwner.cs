@@ -31,7 +31,7 @@ internal static class RebirthPoiLocalRallyOwner
         internal readonly List<Tuple<PrefabInstance,QuestLockInstance,QuestLockInstance>> Locks=new List<Tuple<PrefabInstance,QuestLockInstance,QuestLockInstance>>();
         internal RebirthPoiNativeResetExecution Execution;
         internal bool NativeStarted;
-        internal bool Current => leases.TryGetValue(Objective,out var original)&&ReferenceEquals(original,this)&&(Request!=null?Request.IsOriginalCurrent:Authenticated.IsOriginalCurrent)&&ReferenceEquals(GameManager.Instance?.World,World)&&(Party!=null?Party.IsCurrent&&SameShared(EligibleShared,Party.Eligible):SameShared(Shared,Quest.GetSharedWithIDList())&&SameShared(EligibleShared,EligibleParty(Quest)));
+        internal bool Current => leases.TryGetValue(Objective,out var original)&&ReferenceEquals(original,this)&&(Request!=null?Request.IsOriginalCurrent:Authenticated.IsOriginalCurrent)&&ReferenceEquals(GameManager.Instance?.World,World)&&(Party!=null?Party.IsCurrent&&SameShared(EligibleShared,Party.Eligible):SameShared(Shared,Quest.GetSharedWithIDList())&&SameEligibleParty(EligibleShared,Quest));
     }
     private static readonly Dictionary<ObjectiveRallyPoint,Lease> leases=new Dictionary<ObjectiveRallyPoint,Lease>();
     internal static int[] EligibleParty(Quest quest)
@@ -45,6 +45,23 @@ internal static class RebirthPoiLocalRallyOwner
         }).Select(player=>player.entityId).ToArray();
     }
     private static bool SameShared(int[] original,int[] current) { return original==null?current==null:current!=null&&original.SequenceEqual(current); }
+    private static bool SameEligibleParty(int[] original,Quest quest)
+    {
+        if(quest.sharedWithList==null)return original==null;
+        if(original==null)return false;
+        Rect area=quest.GetLocationRect();var owner=quest.OwnerJournal.OwnerPlayer;
+        int index=0;
+        foreach(var player in quest.sharedWithList)
+        {
+            if(player==null)continue;
+            bool eligible;
+            if(area==Rect.zero)eligible=Vector3.Distance(owner.position,player.position)<15f;
+            else {Vector3 point=player.position;point.y=point.z;eligible=area.Contains(point);}
+            if(!eligible)continue;
+            if(index>=original.Length||original[index++]!=player.entityId)return false;
+        }
+        return index==original.Length;
+    }
     private static double Now => (double)Stopwatch.GetTimestamp()/Stopwatch.Frequency;
     internal static void Reset() { leases.Clear(); }
     internal static bool TryStart(ObjectiveRallyPoint objective,Vector3 position)

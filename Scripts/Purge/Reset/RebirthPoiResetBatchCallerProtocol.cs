@@ -17,6 +17,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
     private readonly RebirthPoiWorldStore store;
     private readonly RebirthPoiWorldSnapshot predecessor;
     private readonly IEnumerator native;
+    private readonly Guid transaction;
     private readonly Dictionary<string,RebirthPoiResetCallerProtocol> children=new Dictionary<string,RebirthPoiResetCallerProtocol>(StringComparer.Ordinal);
     private readonly Dictionary<string,RebirthPoiResetBatchEntry> entries;
     private readonly Dictionary<string,long> epochs=new Dictionary<string,long>(StringComparer.Ordinal);
@@ -34,7 +35,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
     {
         if(originalStore==null||snapshot==null||affected==null||originalNative==null||clock==null||!ReferenceEquals(originalStore.Published,snapshot))throw new ArgumentException("Invalid original reset batch.");
         var list=affected.ToArray();if(list.Length==0||list.Length>RebirthPoiClearanceLedger.MaximumRecords||list.Any(e=>e==null)||list.Select(e=>e.Identity.Key).Distinct(StringComparer.Ordinal).Count()!=list.Length||list.Select(e=>e.Plan.Transaction).Distinct().Count()!=1)throw new ArgumentException("Invalid complete original reset list.");
-        store=originalStore;predecessor=snapshot;native=originalNative;entries=list.ToDictionary(e=>e.Identity.Key,StringComparer.Ordinal);
+        store=originalStore;predecessor=snapshot;native=originalNative;transaction=list[0].Plan.Transaction;entries=list.ToDictionary(e=>e.Identity.Key,StringComparer.Ordinal);
         foreach(var entry in list){RebirthPoiClearanceRecord record;if(!snapshot.TryGet(entry.Identity,out record))throw new ArgumentException("Original batch POI missing.");epochs.Add(entry.Identity.Key,record.Epoch);children.Add(entry.Identity.Key,new RebirthPoiResetCallerProtocol(store,snapshot,entry.Identity,entry.Plan,new ChildIterator(this),clock));}
         State=RebirthPoiResetProtocolState.PendingAdmission;
     }
@@ -86,7 +87,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
         public void Reset(){throw new NotSupportedException();}
     }
     private RebirthPoiResetCallerProtocol For(RebirthPoiIdentity identity,object scope,Guid tx)
-    {if(!ReferenceEquals(scope,predecessor.Binding.Scope)||tx!=entries.Values.First().Plan.Transaction)return null;RebirthPoiResetCallerProtocol child;if(!advanced||ended||failed)return null;if(identity==null||!children.TryGetValue(identity.Key,out child)){Unknown();return null;}return child;}
+    {if(!ReferenceEquals(scope,predecessor.Binding.Scope)||tx!=transaction)return null;RebirthPoiResetCallerProtocol child;if(!advanced||ended||failed)return null;if(identity==null||!children.TryGetValue(identity.Key,out child)){Unknown();return null;}return child;}
     public void ChunkRemoved(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkRemoved(scope,tx,key,success);}
     public void ChunkCopied(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkCopied(scope,tx,key,success);}
     public void ChunkRegenerated(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkRegenerated(scope,tx,key,success);}
@@ -112,7 +113,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
                 record.State==RebirthPoiClearanceState.ResetPending)return false;
         }
         if(completion==null)completion=new RebirthPoiResetBatchCompletion(predecessor.Binding.Scope,published.WorldId,
-            entries.Values.First().Plan.Transaction,published.Revision,entries.Values);
+            transaction,published.Revision,entries.Values);
         outcome=completion;return true;
     }
     internal void AbortUncertain(Exception error=null){Unknown(error);}

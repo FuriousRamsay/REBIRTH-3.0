@@ -97,7 +97,7 @@ internal static class RebirthCamperCampEntryController
     internal static Movement Begin(vp_FPController controller)
     {
         var player = controller.localPlayer;
-        if (!ThreadManager.IsMainThread() || player == null || player.IsDead() || controller.MotorFreeFly
+        if (!ThreadManager.IsMainThread() || vehicles.Count == 0 || player == null || player.IsDead() || controller.MotorFreeFly
             || player.world == null || !ReferenceEquals(GameManager.Instance?.World, player.world)
             || !ReferenceEquals(player.world.GetEntity(player.entityId), player)) return default;
         var native = controller.CharacterController;

@@ -98,7 +98,15 @@ internal static partial class RebirthProductiveEarnedRemoteHost
     internal static Func<bool> AcceptedCurrent(TileEntityWorkstation station,RebirthProductiveEarnedArtifact.Prepared artifact)
         =>IsAcceptedUpload(station,artifact)?new Func<bool>(uploading.AfterCurrent):null;
     internal static bool BlocksQueue(TileEntityWorkstation station)
-        =>RebirthProductiveEarnedUiCoordinator.Blocks(station)||RebirthProductiveEarnedCoordinator.HoldsAdoptedNativeTick(station)||(RebirthProductiveEarnedCoordinator.Enabled||RebirthProductiveEarnedUiOriginal.Enabled)&&(EarlyBlocks(station)||pending.Values.Any(value=>ReferenceEquals(value.World,GameManager.Instance?.World)&&ReferenceEquals(value.Station,station)));
+    {
+        if(RebirthProductiveEarnedUiCoordinator.Blocks(station)||RebirthProductiveEarnedCoordinator.HoldsAdoptedNativeTick(station))return true;
+        if(!RebirthProductiveEarnedCoordinator.Enabled&&!RebirthProductiveEarnedUiOriginal.Enabled)return false;
+        if(EarlyBlocks(station))return true;
+        var world=GameManager.Instance?.World;
+        foreach(var value in pending.Values)
+            if(ReferenceEquals(value.World,world)&&ReferenceEquals(value.Station,station))return true;
+        return false;
+    }
     internal static bool TryDescribe(EntityPlayer actor,ClientInfo sender,TileEntityWorkstation station,string creation,out Guid birth)
     {
         birth=Guid.Empty;

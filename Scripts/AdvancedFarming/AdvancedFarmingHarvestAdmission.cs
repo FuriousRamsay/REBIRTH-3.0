@@ -156,7 +156,16 @@ internal static class AdvancedFarmingHarvestAdmission
         catch(Exception error){Log.Warning("[REBIRTH Farming] original harvest admission retained: "+error.GetType().Name);return false;}
     }
     internal static void Retired(AdvancedFarmingHarvestReceipt.Record receipt)
-    {if(receipt?.State!=AdvancedFarmingHarvestReceipt.Phase.Retired)return;AdvancedFarmingHarvestReceipt.ArchiveRetired(receipt);ArchiveClaim(receipt);pendingOriginals.Remove(receipt.Operation);if(reservedSources==null)return;foreach(var key in new System.Collections.Generic.List<Guid>(reservedSources.Keys))if(reservedSources[key]==receipt.Operation)reservedSources.Remove(key);indexedCount=System.Linq.Enumerable.Count(System.Linq.Enumerable.Distinct(reservedSources.Values));}
+    {
+        if(receipt?.State!=AdvancedFarmingHarvestReceipt.Phase.Retired)return;
+        AdvancedFarmingHarvestReceipt.ArchiveRetired(receipt);ArchiveClaim(receipt);pendingOriginals.Remove(receipt.Operation);
+        if(reservedSources==null)return;
+        List<Guid> retiring=null;
+        foreach(var pair in reservedSources)
+            if(pair.Value==receipt.Operation)(retiring??=new List<Guid>()).Add(pair.Key);
+        if(retiring!=null)foreach(var key in retiring)reservedSources.Remove(key);
+        indexedCount=System.Linq.Enumerable.Count(System.Linq.Enumerable.Distinct(reservedSources.Values));
+    }
     internal static bool PositivelyClaimedByOther(World world,AdvancedFarmingHarvestReceipt.Record receipt)
     {
         if(world==null||receipt==null||world.IsRemote()||!Index(world))return false;

@@ -159,7 +159,7 @@ internal static class AdvancedFarmingHarvestProtocol
     {
         if(world==null)return;
         SetWorld(world);AdvancedFarmingHarvestEvents.Pump(world);
-        foreach(var attempt in Clients.Values.ToArray())
+        if(Clients.Count>0)foreach(var attempt in Clients.Values.ToArray())
         {
             if(!Local(attempt))continue;
             try

@@ -49,7 +49,7 @@ internal static class RebirthHealingDoseCheckpoint
         RebirthSelfMedicalPracticeAwards.PrepareDoseRecovery(scope);
         // Reserve/commit changes queue state, not this native dictionary; use a
         // bounded detached list because submission may immediately retire a CVar.
-        var recovered=new List<KeyValuePair<string,string>>();
+        List<KeyValuePair<string,string>> recovered=null;
         foreach(var entry in player.Buffs.CVars)
         {
             if(entry.Value!=1f||!entry.Key.StartsWith(Prefix,StringComparison.OrdinalIgnoreCase))continue;
@@ -58,9 +58,11 @@ internal static class RebirthHealingDoseCheckpoint
                 !string.Equals(parts[1],scope.Definition,StringComparison.OrdinalIgnoreCase)||
                 !Guid.TryParseExact(parts[2],"N",out var receipt)||receipt==Guid.Empty||
                 !RebirthDifficultyPractice.HasTreatment(parts[3]))continue;
+            if(recovered==null)recovered=new List<KeyValuePair<string,string>>();
             recovered.Add(new KeyValuePair<string,string>(parts[3],receipt.ToString("N")));
             if(recovered.Count>=Capacity)break;
         }
+        if(recovered==null)return;
         foreach(var dose in recovered)
         {
             var reservation=RebirthSelfMedicalPracticeAwards.Reserve(scope,dose.Key,dose.Value);

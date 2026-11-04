@@ -30,7 +30,7 @@ public static class RebirthCamperEnergyRuntimeEstimate
     {
         var unknown=new RebirthCamperEnergyRuntimeEstimateResult();
         if(banks==null||priority==null||!Finite(demand)||demand<0||mode!=RebirthCamperEnergyMode.Camp||!Finite(carry)||carry<0||carry>=1)return unknown;
-        var order=priority.ToArray();if(order.Length!=3||order.Distinct().Count()!=3||order.Any(k=>!Enum.IsDefined(typeof(RebirthCamperEnergySourceKind),k)))return unknown;
+        var order=priority.ToArray();if(order.Length!=3||order[0]==order[1]||order[0]==order[2]||order[1]==order[2]||order.Any(k=>!Enum.IsDefined(typeof(RebirthCamperEnergySourceKind),k)))return unknown;
         if(demand==0)return new RebirthCamperEnergyRuntimeEstimateResult{Status=RebirthCamperEnergyEstimateStatus.Idle};
         var reserve=new double[3];
         foreach(var bank in banks)

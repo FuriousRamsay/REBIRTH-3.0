@@ -955,11 +955,28 @@ internal static partial class RebirthRepairOriginalCorrection
             nextScan=UnityEngine.Time.realtimeSinceStartup+2f;
             try
             {
-                string directory=Path.Combine(GameIO.GetSaveGameDir(),"rebirth","repair-original","owner");if(Directory.Exists(directory))foreach(string path in Directory.EnumerateFiles(directory,"*.xml").Take(100001))
-                {if(Clients.Values.Count(CanPumpOriginal)>=16)break;try{if(new FileInfo(path).Length>MaximumImage*12L)continue;var r=Decode(ReadRepairText(path));if(Clients.ContainsKey(r.Operation)||(r.Published||r.CancelConfirmed||r.BaseOnlyConfirmed)&&File.Exists(path+".done")&&ReadRepairText(path+".done")==Encode(r))continue;var c=new Client{Receipt=r,World=world,Player=owner,Directory=GameIO.GetSaveGameDir()};if(CanPumpOriginal(c))Clients.Add(r.Operation,c);}catch{/* Preserve the corrupt primary; continue unrelated original receipts. */}}
+                string directory=Path.Combine(GameIO.GetSaveGameDir(),"rebirth","repair-original","owner");
+                if(Directory.Exists(directory))
+                {
+                    int activeCount=Clients.Values.Count(CanPumpOriginal);
+                    foreach(string path in Directory.EnumerateFiles(directory,"*.xml").Take(100001))
+                    {
+                        if(activeCount>=16)break;
+                        try
+                        {
+                            if(new FileInfo(path).Length>MaximumImage*12L)continue;
+                            var r=Decode(ReadRepairText(path));
+                            if(Clients.ContainsKey(r.Operation)||(r.Published||r.CancelConfirmed||r.BaseOnlyConfirmed)&&File.Exists(path+".done")&&ReadRepairText(path+".done")==Encode(r))continue;
+                            var c=new Client{Receipt=r,World=world,Player=owner,Directory=GameIO.GetSaveGameDir()};
+                            if(CanPumpOriginal(c)){Clients.Add(r.Operation,c);activeCount++;}
+                        }
+                        catch{/* Preserve the corrupt primary; continue unrelated original receipts. */}
+                    }
+                }
             }
             catch(Exception failure){Log.Warning("[REBIRTH Repair] owner journal recovery retained: "+failure.GetType().Name);}
         }
+        if(Clients.Count==0)return;
         foreach(var c in Clients.Values.ToArray())
         {
             if(!PublishPendingOutcome(c))continue;

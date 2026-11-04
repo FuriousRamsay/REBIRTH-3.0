@@ -34,9 +34,7 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
     private int selected=-1,page;
     private RebirthBackpackSellStashView displayed;
     private readonly List<int> available=new List<int>();
-    private readonly List<ItemStack> availableImages=new List<ItemStack>();
     private readonly XUiV_Label[] availableLabels=new XUiV_Label[169];
-    private readonly ItemStack[] bagImages=new ItemStack[169];
     private readonly XUiController[] bagControls=new XUiController[169]; private readonly XUiV_Sprite[] bagIcons=new XUiV_Sprite[169];
     private string feedback;
     private bool requestOutstanding;
@@ -355,12 +353,12 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
             if(displayed==null||view==null||displayed.CreationId!=view.CreationId||displayed.GearRevision!=view.GearRevision)selected=-1;
             displayed=view;
         }
-        available.Clear();availableImages.Clear();var bag=player?.bag?.ItemGrid.items;
+        available.Clear();var bag=player?.bag?.ItemGrid.items;
         for(int i=0;i<169;i++)
         {
             bool exists=bag!=null&&i<bag.Length;
             if(exists)available.Add(i);
-            var cell=exists?bag[i]:null;bagImages[i]=cell?.Clone();var item=cell!=null&&!cell.IsEmpty()?cell.itemValue.ItemClass:null;
+            var cell=exists?bag[i]:null;var item=cell!=null&&!cell.IsEmpty()?cell.itemValue.ItemClass:null;
             var control=bagControls[i];if(control?.ViewComponent!=null)control.ViewComponent.IsVisible=exists;
             var icon=bagIcons[i];
             if(icon!=null){icon.IsVisible=item!=null;if(item!=null)icon.SpriteName=item.GetIconName();}

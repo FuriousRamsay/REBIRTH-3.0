@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -84,11 +84,21 @@ public enum RebirthSandboxOptionId
     PurgeCompletionPercentage = 73,
     PurgeProgression = 74,
     DisableHiringRestrictions = 75,
-    SmartLooting = 76
+    SmartLooting = 76,
+    SeekerMode = 77,
+    SeekerRewards = 78,
+    SeekerNotifications = 79,
+    SeekerFrequency = 80,
+    SeekerRestriction = 81,
+    SeekerHordeDay = 82
 }
 
 
 
+
+public enum RebirthSeekerMode { Never = 0, NotQuesting = 1, NotHordeNight = 2, Always = 3 }
+
+public enum RebirthSeekerRestriction { Anywhere = 0, OnlyQuesting = 1, NotQuesting = 2, OutdoorsOnly = 3, OutdoorsAndNotQuesting = 4, Off = 5 }
 
 public enum RebirthWorldTheme { None = 0, Purge = 1 }
 
@@ -480,6 +490,12 @@ public sealed class RebirthSandboxState
     public bool ProtectCrate = true;
     public bool DisableHiringRestrictions = false;
     public bool SmartLooting = true;
+    public RebirthSeekerMode SeekerMode = RebirthSeekerMode.Always;
+    public bool SeekerRewards = true;
+    public bool SeekerNotifications = true;
+    public int SeekerFrequency = 100;
+    public RebirthSeekerRestriction SeekerRestriction = RebirthSeekerRestriction.Anywhere;
+    public bool SeekerHordeDay = true;
 
     public RebirthSandboxState Clone()
     {
@@ -552,6 +568,12 @@ public sealed class RebirthSandboxState
             BossEventNotifications = BossEventNotifications,
             DisableHiringRestrictions = DisableHiringRestrictions,
             SmartLooting = SmartLooting,
+            SeekerMode = SeekerMode,
+            SeekerRewards = SeekerRewards,
+            SeekerNotifications = SeekerNotifications,
+            SeekerFrequency = SeekerFrequency,
+            SeekerRestriction = SeekerRestriction,
+            SeekerHordeDay = SeekerHordeDay,
             ProtectCrate = ProtectCrate
         };
     }
@@ -706,6 +728,12 @@ public sealed class RebirthSandboxOptionManager
     public bool BossEventNotifications { get { return currentState.BossEventNotifications; } }
     public bool DisableHiringRestrictions { get { return currentState.DisableHiringRestrictions; } }
     public bool SmartLooting { get { return currentState.SmartLooting; } }
+    public RebirthSeekerMode SeekerMode { get { return currentState.SeekerMode; } }
+    public bool SeekerRewards { get { return currentState.SeekerRewards; } }
+    public bool SeekerNotifications { get { return currentState.SeekerNotifications; } }
+    public int SeekerFrequency { get { return currentState.SeekerFrequency; } }
+    public RebirthSeekerRestriction SeekerRestriction { get { return currentState.SeekerRestriction; } }
+    public bool SeekerHordeDay { get { return currentState.SeekerHordeDay; } }
     public bool ProtectCrate { get { return currentState.ProtectCrate; } }
     public int Revision { get { return revision; } }
     public string CurrentCode { get { return Encode(currentState); } }
@@ -1263,6 +1291,12 @@ public sealed class RebirthSandboxOptionManager
     }
     public void SetProtectCrate(bool value, bool applyRuntime) { if (currentState.ProtectCrate == value) return; currentState.ProtectCrate = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
     public void SetSmartLooting(bool value, bool applyRuntime) { if (currentState.SmartLooting == value) return; currentState.SmartLooting = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerMode(RebirthSeekerMode value, bool applyRuntime) { if (value < RebirthSeekerMode.Never || value > RebirthSeekerMode.Always) value = RebirthSeekerMode.Always; if (currentState.SeekerMode == value) return; currentState.SeekerMode = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerRewards(bool value, bool applyRuntime) { if (currentState.SeekerRewards == value) return; currentState.SeekerRewards = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerNotifications(bool value, bool applyRuntime) { if (currentState.SeekerNotifications == value) return; currentState.SeekerNotifications = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerFrequency(int value, bool applyRuntime) { value = Math.Max(0, Math.Min(200, value / 10 * 10)); if (currentState.SeekerFrequency == value) return; currentState.SeekerFrequency = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerRestriction(RebirthSeekerRestriction value, bool applyRuntime) { if (value < RebirthSeekerRestriction.Anywhere || value > RebirthSeekerRestriction.Off) value = RebirthSeekerRestriction.Anywhere; if (currentState.SeekerRestriction == value) return; currentState.SeekerRestriction = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSeekerHordeDay(bool value, bool applyRuntime) { if (currentState.SeekerHordeDay == value) return; currentState.SeekerHordeDay = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
     public void SetDisableHiringRestrictions(bool value, bool applyRuntime) { if (currentState.DisableHiringRestrictions == value) return; currentState.DisableHiringRestrictions = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
 
     public void SetCompanionCardStyle(RebirthCompanionCardStyle value, bool applyRuntime)
@@ -1513,6 +1547,12 @@ public sealed class RebirthSandboxOptionManager
         if (!state.ProtectCrate) result += IndexToAlpha2((int)RebirthSandboxOptionId.ProtectCrate) + IndexToAlpha(0);
         if (state.DisableHiringRestrictions) result += IndexToAlpha2((int)RebirthSandboxOptionId.DisableHiringRestrictions) + IndexToAlpha(1);
         if (!state.SmartLooting) result += IndexToAlpha2((int)RebirthSandboxOptionId.SmartLooting) + IndexToAlpha(0);
+        if (state.SeekerMode != RebirthSeekerMode.Always) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerMode) + IndexToAlpha((int)state.SeekerMode);
+        if (!state.SeekerRewards) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerRewards) + IndexToAlpha(0);
+        if (!state.SeekerNotifications) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerNotifications) + IndexToAlpha(0);
+        if (state.SeekerFrequency != 100) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerFrequency) + IndexToAlpha(state.SeekerFrequency / 10);
+        if (state.SeekerRestriction != RebirthSeekerRestriction.Anywhere) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerRestriction) + IndexToAlpha((int)state.SeekerRestriction);
+        if (!state.SeekerHordeDay) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerHordeDay) + IndexToAlpha(0);
         if (state.GuardDistance != RebirthCompanionDistancePolicy.GuardDefault)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.GuardDistance) + IndexToAlpha(RebirthCompanionDistancePolicy.GuardDistanceToIndex(state.GuardDistance));
         if (state.FullControlDistance != RebirthCompanionDistancePolicy.FullControlDefault)
@@ -1894,6 +1934,12 @@ public sealed class RebirthSandboxOptionManager
             else if (optionIndex == (int)RebirthSandboxOptionId.ProtectCrate) { if (valueIndex > 1) return false; decoded.ProtectCrate = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.DisableHiringRestrictions) { if (valueIndex > 1) return false; decoded.DisableHiringRestrictions = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.SmartLooting) { if (valueIndex > 1) return false; decoded.SmartLooting = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerMode) { if (valueIndex > 3) return false; decoded.SeekerMode = (RebirthSeekerMode)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerRewards) { if (valueIndex > 1) return false; decoded.SeekerRewards = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerNotifications) { if (valueIndex > 1) return false; decoded.SeekerNotifications = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerFrequency) { if (valueIndex > 20) return false; decoded.SeekerFrequency = valueIndex * 10; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerRestriction) { if (valueIndex > 5) return false; decoded.SeekerRestriction = (RebirthSeekerRestriction)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SeekerHordeDay) { if (valueIndex > 1) return false; decoded.SeekerHordeDay = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.ReservedCompanionInventory)
             {
                 // v244 briefly exposed Companion Inventory as values 0..2. The option has

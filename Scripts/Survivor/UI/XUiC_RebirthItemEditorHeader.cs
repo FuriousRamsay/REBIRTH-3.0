@@ -15,11 +15,7 @@ public sealed class XUiC_RebirthItemEditorHeader : XUiC_WindowNonPagingHeader
     {
         base.Init();
         RebirthPersonalCraftingHudSuppressionInstaller.EnsureInstalled();
-        GetChildById("editorBack").OnPress += (sender, button) =>
-        {
-            var manager = xui.playerUI.windowManager;
-            manager.Close(manager.IsWindowOpen("cosmetics") ? "cosmetics" : "assemble");
-        };
+
     }
 
     public override void OnOpen()

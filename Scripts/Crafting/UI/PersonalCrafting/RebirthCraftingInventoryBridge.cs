@@ -65,10 +65,14 @@ public static class RebirthCraftingInventoryBridge
 
     public static int GetEncumberedUsedSlotCount(XUi xui)
     {
+        return GetEncumberedUsedSlotCount(xui, GetUsedSlotCount(xui));
+    }
+
+    public static int GetEncumberedUsedSlotCount(XUi xui, int used)
+    {
         // The player's encumbrance count is the number of occupied backpack slots above the
         // effective unencumbered CarryCapacity, not the number of authored physical cells that
         // happen to sit beyond a particular array index. Example: 33 used / 27 capacity = 6.
-        int used = GetUsedSlotCount(xui);
         int physical = GetPhysicalSlotCount(xui);
         EntityPlayer player = xui?.playerUI?.entityPlayer;
         int unencumbered = player == null ? physical : player.CarryCapacity;

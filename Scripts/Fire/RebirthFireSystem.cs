@@ -786,6 +786,7 @@ public sealed class RebirthFireService
         new Dictionary<long, HashSet<Vector3i>>();
     private readonly Dictionary<int, Dictionary<Vector3i, float>> visibilityByPlayer =
         new Dictionary<int, Dictionary<Vector3i, float>>();
+    private float nextVisibilityPrune;
     private readonly HashSet<Vector3i> simulationSelection = new HashSet<Vector3i>();
     private readonly Dictionary<Vector3i, ulong> lastSimulatedWorldTime =
         new Dictionary<Vector3i, ulong>();
@@ -797,7 +798,6 @@ public sealed class RebirthFireService
         new List<RebirthFireDeltaEntry>(64);
     private readonly List<BlockChangeInfo> blockChanges =
         new List<BlockChangeInfo>(RebirthFireDefaults.MaxBlockChangesPerRpc);
-    private readonly List<Vector3i> requestPositions = new List<Vector3i>(128);
 
     private int revision;
     private int processedLastUpdate;
@@ -1274,6 +1274,7 @@ public sealed class RebirthFireService
         cooldowns.Clear();
         firePositionsByChunk.Clear();
         visibilityByPlayer.Clear();
+        nextVisibilityPrune = 0f;
         simulationSelection.Clear();
         lastSimulatedWorldTime.Clear();
         simulationCandidates.Clear();
@@ -1401,11 +1402,16 @@ public sealed class RebirthFireService
     {
         simulationSelection.Clear();
         simulationCandidates.Clear();
+        bool hasNeverRunCandidates = false;
 
         foreach (RebirthFireState state in fires.Values)
         {
             if (HasActiveSimulationVisibility(state.Position))
+            {
                 simulationCandidates.Add(state);
+                if (!hasNeverRunCandidates && !lastSimulatedWorldTime.ContainsKey(state.Position))
+                    hasNeverRunCandidates = true;
+            }
         }
 
         simulationEligibleLastWindow = simulationCandidates.Count;
@@ -1414,7 +1420,9 @@ public sealed class RebirthFireService
         // First spend at most eight of the unchanged 64 slots on the newest visible
         // positions that have never simulated. This makes a newly ignited second POI
         // start progressing promptly without allowing it to monopolize the window.
-        simulationCandidates.Sort(delegate(RebirthFireState left, RebirthFireState right)
+        // With no never-run candidates this pass reserves nothing; the fairness
+        // sort below still determines the complete final ordering.
+        if (hasNeverRunCandidates) simulationCandidates.Sort(delegate(RebirthFireState left, RebirthFireState right)
         {
             bool leftNever = !lastSimulatedWorldTime.ContainsKey(left.Position);
             bool rightNever = !lastSimulatedWorldTime.ContainsKey(right.Position);
@@ -2047,6 +2055,8 @@ public sealed class RebirthFireService
             visibilityByPlayer[playerEntityId] = map;
         }
         map.Clear();
+        // A report replaces the whole map with one timestamp. Pruning relies on
+        // this invariant; individual fire removals only delete entries.
         float now = Time.realtimeSinceStartup;
         float maximumDistance = RebirthFireVisualManager.FireRenderDistance + 8f;
         float maximumDistanceSquared = maximumDistance * maximumDistance;
@@ -2089,17 +2099,24 @@ public sealed class RebirthFireService
         if (visibilityByPlayer.Count == 0)
             return;
         float now = Time.realtimeSinceStartup;
+        // Visibility decisions use each report's exact timestamp. This sweep
+        // only retires stale maps; it need not traverse every player each frame.
+        if (now < nextVisibilityPrune)
+            return;
+        nextVisibilityPrune = now + 1f;
         List<int> emptyPlayers = null;
         foreach (KeyValuePair<int, Dictionary<Vector3i, float>> player in visibilityByPlayer)
         {
-            requestPositions.Clear();
+            bool expired = false;
             foreach (KeyValuePair<Vector3i, float> report in player.Value)
             {
-                if (now - report.Value > 3f || !fires.ContainsKey(report.Key))
-                    requestPositions.Add(report.Key);
+                expired = now - report.Value > 3f;
+                break;
             }
-            for (int i = 0; i < requestPositions.Count; i++)
-                player.Value.Remove(requestPositions[i]);
+            // RecordVisibility admits only active fires; RemoveInternal deletes
+            // their visibility immediately and ClearAll also clears every map.
+            if (expired)
+                player.Value.Clear();
             if (player.Value.Count == 0)
             {
                 if (emptyPlayers == null)
@@ -2541,6 +2558,7 @@ public sealed class RebirthFireModApi : IModApi
     private static void OnGameStarting(ref ModEvents.SGameStartingData data)
     {
         RebirthFireProfileRegistry.Clear();
+        NetPackageRebirthFireRequestBatch.ResetRateBudget();
         RebirthFireService.Instance.ClearAll(false);
         RebirthFireVisualManager.ClearAll();
         RebirthFirePersistence.ResetSession();
@@ -2580,6 +2598,7 @@ public sealed class RebirthFireModApi : IModApi
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (manager == null || manager.IsServer)
             RebirthFirePersistence.SaveSafely("shutdown save");
+        NetPackageRebirthFireRequestBatch.ResetRateBudget();
         RebirthFireService.Instance.ClearAll(false);
         RebirthFireVisualManager.ClearAll();
     }

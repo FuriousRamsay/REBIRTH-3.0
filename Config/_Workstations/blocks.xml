@@ -387,12 +387,14 @@
   <append xpath="/blocks/block[@name='chemistryStation']">
     <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedChemistryStation" />
   </append>
+  <conditional><if cond="character_progression('Rebirth')">
   <append xpath="/blocks/block[@name='WorkbenchGasStove001_FR']">
     <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedGasStove" />
   </append>
   <append xpath="/blocks/block[@name='WorkbenchIronOven001_FR']">
     <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedIronOven001_FR" />
   </append>
+  </if></conditional>
   <remove xpath="/blocks/block[@name='cntForgeWorkstationBroken']" />
   <remove xpath="/blocks/block[@name='cntCollapsedWorkbench']" />
   <remove xpath="/blocks/block[@name='cntCollapsedWorkbenchEmpty']" />

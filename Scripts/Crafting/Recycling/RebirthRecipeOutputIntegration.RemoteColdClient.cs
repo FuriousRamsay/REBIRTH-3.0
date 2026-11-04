@@ -198,21 +198,31 @@ public static partial class RebirthRecipeOutputIntegration
         if(HasPendingUiOutput(card))return true;
         PumpRemoteOutputColdDiscovery();var scan=loaded.Scan;
         if(scan?.Complete!=true)return false;
-        var matches=scan.Candidates.Where(value=>!value.Attached&&!value.QueueTerminalSaved&&value.MatchesCard(card)).ToArray();
-        if(matches.Length==0)return !scan.Holds.Any(value=>MatchesRemoteOutputColdHold(value,card));if(matches.Length!=1)return false;
+        RemoteOutputColdClient match=null;
+        foreach(var candidate in scan.Candidates)
+        {
+            if(candidate.Attached||candidate.QueueTerminalSaved||!candidate.MatchesCard(card))continue;
+            if(match!=null)return false; // Ambiguous saved originals cannot release this card.
+            match=candidate;
+        }
+        if(match==null)
+        {
+            foreach(var hold in scan.Holds)if(MatchesRemoteOutputColdHold(hold,card))return false;
+            return true;
+        }
         // An old cache requires its actual reissued retained Action/ticket.
         // The native Add/direct restart dispatcher cannot supply that source.
-        if(matches[0].ExternalCached)
+        if(match.ExternalCached)
         {
             if(RebirthProductiveEarnedUiDeferredTransport.TryGetRemoteCachedPrimaryGrant(card.GetParentByType<XUiC_WorkstationWindowGroup>(),out var grant))
-                if(matches[0].TryBindRetainedCachedGrant(grant))
+                if(match.TryBindRetainedCachedGrant(grant))
                 {
-                    RebirthWorkstationCompletionPipeline.RequestRetainedCachedOutputRestart(matches[0]);
-                    if(matches[0].RetainedCached.HostPrefixRestored)return RebirthWorkstationCompletionPipeline.TryAttachRetainedCachedOutput(matches[0]);
+                    RebirthWorkstationCompletionPipeline.RequestRetainedCachedOutputRestart(match);
+                    if(match.RetainedCached.HostPrefixRestored)return RebirthWorkstationCompletionPipeline.TryAttachRetainedCachedOutput(match);
                 }
             return false;
         }
-        return RebirthWorkstationCompletionPipeline.TryResumeRemoteOutputCold(card,matches[0]);
+        return RebirthWorkstationCompletionPipeline.TryResumeRemoteOutputCold(card,match);
     }
     private static void PumpRemoteOutputColdDiscovery()
     {
@@ -232,8 +242,14 @@ public static partial class RebirthRecipeOutputIntegration
                 var candidate=RemoteOutputColdClient.Read(loaded,scan.Files.Current)??RemoteOutputColdClient.Read(loaded,scan.Files.Current,true);if(candidate!=null)scan.Candidates.Add(candidate);
             }
         }
-        foreach(var candidate in scan.Candidates.Where(value=>value.FinalCallbackSaved&&!value.Attached&&!value.QueueTerminalSaved).Take(4))
+        int queried=0;
+        for(int i=0;i<scan.Candidates.Count&&queried<4;i++)
+        {
+            var candidate=scan.Candidates[i];
+            if(!candidate.FinalCallbackSaved||candidate.Attached||candidate.QueueTerminalSaved)continue;
+            queried++;
             RebirthWorkstationCompletionPipeline.QueryRemoteOutputFinalTerminal(candidate);
+        }
     }
     private static bool ResumeRemoteOutputColdObservation(OwningObservation observed)
     {

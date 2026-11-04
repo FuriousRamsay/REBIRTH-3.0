@@ -46,7 +46,7 @@ internal static class RebirthPlacedOriginalFootprintPublication
                 {
                     if(RebirthStationSnapshotEvidence.HasPublished(w.Request)&&RebirthStationSnapshotEvidence.TryCopy(w.Request,out var bytes))
                     {
-                        string hash=null;bool valid=true;foreach(var c in w.Cells)if(!RebirthPlacedOriginalPublication.TrySnapshot(bytes,w.Chunk.X,w.Chunk.Z,c.Position,c.After,Key(r),Image(r),out hash,RebirthOriginalNativeBlockIdentity.NativeKey(c.Position),Convert.FromBase64String(c.Marker))){valid=false;break;}
+                        string hash=null;bool valid=true;string snapshotKey=Key(r);byte[] snapshotImage=Image(r);foreach(var c in w.Cells)if(!RebirthPlacedOriginalPublication.TrySnapshot(bytes,w.Chunk.X,w.Chunk.Z,c.Position,c.After,snapshotKey,snapshotImage,out hash,RebirthOriginalNativeBlockIdentity.NativeKey(c.Position),Convert.FromBase64String(c.Marker))){valid=false;break;}
                         if(valid){w.Proof=hash;w.Request.Dispose();w.Request=null;proofs.Add(hash);continue;}
                     }
                     if(UnityEngine.Time.realtimeSinceStartup-w.Started<=15f)return false;w.Request.Dispose();w.Request=null;

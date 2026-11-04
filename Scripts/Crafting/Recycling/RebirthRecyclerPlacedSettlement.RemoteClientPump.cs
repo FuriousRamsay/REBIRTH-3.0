@@ -8,6 +8,7 @@ internal static partial class RebirthRecyclerPlacedSettlement
 {
     private static void PumpRecyclerClients(World world)
     {
+        if(recyclerClients.Count==0)return;
         foreach(var client in recyclerClients.ToArray())
         {
             if(!ReferenceEquals(client.Source.World,world)){recyclerClients.Remove(client);client.Dispose();continue;}

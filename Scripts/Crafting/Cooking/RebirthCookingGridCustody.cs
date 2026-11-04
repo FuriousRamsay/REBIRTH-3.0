@@ -21,6 +21,7 @@ internal static partial class RebirthCookingGridCustody
     }
     private sealed class Permit{internal object Target;internal int Slot;internal ItemStack Value;internal bool Used;internal Intent Intent;}
     private static readonly List<Intent> Active=new List<Intent>();
+    private static readonly List<Intent> ActiveSnapshot=new List<Intent>();
     private static Permit permit;
     private static bool installed;
     private static World bootstrapWorld;private static EntityPlayerLocal bootstrapPlayer;private static string bootstrapCreation;private static int bootstrapDeaths=-1;
@@ -48,7 +49,12 @@ internal static partial class RebirthCookingGridCustody
         ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&
         ReferenceEquals(player.world.GetEntity(player.entityId),player)&&player.IsSpawned()&&!player.IsDead();
     private static bool Same(ItemStack a,ItemStack b)=>RebirthStationGridIngredients.IsSameStackSnapshot(a,b);
-    private static bool Same(ItemStack[] a,ItemStack[] b)=>a!=null&&b!=null&&a.Length==b.Length&&a.Select((item,index)=>Same(item,b[index])).All(value=>value);
+    private static bool Same(ItemStack[] a,ItemStack[] b)
+    {
+        if(a==null||b==null||a.Length!=b.Length)return false;
+        for(int i=0;i<a.Length;i++)if(!Same(a[i],b[i]))return false;
+        return true;
+    }
     internal static bool IsHeld(EntityPlayerLocal player)
     {
         if(player==null||!player.IsSpawned()||player.IsDead())return false;
@@ -655,8 +661,13 @@ internal static partial class RebirthCookingGridCustody
         if(!ReferenceEquals(connection,intent.Connection)||channels==null||channel<0||channel>=channels.Length||!ReferenceEquals(channels[channel],intent.Peer))return;
         intent.ServerPhase=Math.Max(intent.ServerPhase,phase);
     }
-    private static bool Compatible(ItemStack[] live,ItemStack[] before,ItemStack[] after)=>live!=null&&live.Length==before.Length&&live.Length==after.Length&&
-        live.Select((item,index)=>Same(item,before[index])||Same(item,after[index])).All(value=>value);
+    private static bool Compatible(ItemStack[] live,ItemStack[] before,ItemStack[] after)
+    {
+        if(live==null||live.Length!=before.Length||live.Length!=after.Length)return false;
+        for(int i=0;i<live.Length;i++)
+            if(!Same(live[i],before[i])&&!Same(live[i],after[i]))return false;
+        return true;
+    }
     private static void Apply(Intent intent,bool projectGrid=true)
     {
         if(!Current(intent))throw new InvalidOperationException("Original cooking owner scope changed.");
@@ -687,7 +698,10 @@ internal static partial class RebirthCookingGridCustody
     {
         Bootstrap(GameManager.Instance?.World?.GetPrimaryPlayer());
         if(Active.Count==0)return;
-        foreach(var intent in Active.ToArray())
+        ActiveSnapshot.Clear();ActiveSnapshot.AddRange(Active);
+        try
+        {
+        foreach(var intent in ActiveSnapshot)
         {
             try
             {
@@ -762,6 +776,8 @@ internal static partial class RebirthCookingGridCustody
             }
             catch(Exception error){intent.Workspace?.CustodyStatus("Original cooking grid custody retained: "+error.GetType().Name);}
         }
+        }
+        finally{ActiveSnapshot.Clear();}
         AdvanceDetachedSourceReturns();
     }
 }

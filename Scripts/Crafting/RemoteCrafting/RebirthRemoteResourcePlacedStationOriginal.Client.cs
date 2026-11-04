@@ -56,8 +56,10 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
                 if(IsCandidate(original)&&(RebirthRemoteResourceClientOriginal.Current(player,original)||EndedClientScope(player,original))&&!clientJobs.ContainsKey(original.Operation)&&clientJobs.Count<32)
                     clientJobs.Add(original.Operation,new ClientJob{Original=original,Stage=1});
         }
+        if(clientJobs.Count==0)return;
         foreach(var job in clientJobs.Values.ToArray())
         {
+            if(job.Stage>=0&&now<job.Next)continue;
             bool ended=EndedClientScope(player,job.Original);
             if(!ended&&job.Stage<0){PumpCapturedBefore(job);continue;}
             if(now<job.Next||!ended&&!RebirthRemoteResourceClientOriginal.Current(player,job.Original))continue;

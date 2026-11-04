@@ -437,8 +437,9 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
 
     private static void SetText(XUiV_Label label, string text)
     {
-        if (label != null)
-            label.Text = text ?? string.Empty;
+        string value=text??string.Empty;
+        if (label != null && label.Text != value)
+            label.Text = value;
     }
 
     private void RefreshDetails()
@@ -448,9 +449,9 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
 
         PersistentPlayerData ppd = playersList != null ? playersList.SelectedPlayerData : null;
         bool hasSelection = ppd != null;
-        if (content != null && content.ViewComponent != null)
+        if (content != null && content.ViewComponent != null && content.ViewComponent.IsVisible != hasSelection)
             content.ViewComponent.IsVisible = hasSelection;
-        if (emptyHint != null && emptyHint.ViewComponent != null)
+        if (emptyHint != null && emptyHint.ViewComponent != null && emptyHint.ViewComponent.IsVisible == hasSelection)
             emptyHint.ViewComponent.IsVisible = !hasSelection;
         if (!hasSelection)
             return;
@@ -585,7 +586,11 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
         bool hasView = selected != null && view != null;
         string displayName = hasView && !string.IsNullOrEmpty(view.Name) ? view.Name : Localization.Get("xuiRebirthGroupUnnamed");
         SetText(groupReadOnlyName, displayName);
-        if (groupReadOnlyName != null) groupReadOnlyName.Color = hasView ? RebirthPartyIdentityService.GetColor(view.ColorId) : new Color32(160,160,160,255);
+        if (groupReadOnlyName != null)
+        {
+            Color color=hasView ? RebirthPartyIdentityService.GetColor(view.ColorId) : new Color32(160,160,160,255);
+            if(groupReadOnlyName.Color!=color)groupReadOnlyName.Color=color;
+        }
 
         bool canEdit = isLocal && hasView && view.CanEdit;
         int selectedEntityId = selected != null ? selected.entityId : -1;
@@ -595,7 +600,7 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
         bool sameIdentityChanged = !identityChanged && editorRevision != incomingRevision;
         if (groupNameInput != null)
         {
-            groupNameInput.Enabled = canEdit;
+            if(groupNameInput.Enabled!=canEdit)groupNameInput.Enabled = canEdit;
             if (identityChanged || (!editorDirty && sameIdentityChanged))
             {
                 groupNameInput.Text = hasView ? (view.Name ?? string.Empty) : string.Empty;
@@ -603,14 +608,19 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
             }
             else if (editorDirty && sameIdentityChanged) editorConflict = true;
         }
-        if (groupSaveButton != null && groupSaveButton.ViewComponent != null) groupSaveButton.ViewComponent.Enabled = canEdit;
+        if (groupSaveButton != null && groupSaveButton.ViewComponent != null && groupSaveButton.ViewComponent.Enabled != canEdit) groupSaveButton.ViewComponent.Enabled = canEdit;
         for (int i = 0; i < groupColorButtons.Length; ++i)
-            if (groupColorButtons[i] != null && groupColorButtons[i].ViewComponent != null) groupColorButtons[i].ViewComponent.Enabled = canEdit;
+            if (groupColorButtons[i] != null && groupColorButtons[i].ViewComponent != null && groupColorButtons[i].ViewComponent.Enabled != canEdit) groupColorButtons[i].ViewComponent.Enabled = canEdit;
 
         if(identityChanged || (!editorDirty && sameIdentityChanged)) selectedGroupColor=hasView?view.ColorId:0;
-        if(groupColorButton?.ViewComponent!=null)groupColorButton.ViewComponent.Enabled=canEdit;
-        if(groupColorSwatch!=null)groupColorSwatch.Color=RebirthPartyIdentityService.GetColor(selectedGroupColor);
-        for (int i = 0; i < groupColorSelections.Length; ++i) if (groupColorSelections[i] != null) groupColorSelections[i].IsVisible = i == selectedGroupColor;
+        if(groupColorButton?.ViewComponent!=null&&groupColorButton.ViewComponent.Enabled!=canEdit)groupColorButton.ViewComponent.Enabled=canEdit;
+        if(groupColorSwatch!=null)
+        {
+            Color color=RebirthPartyIdentityService.GetColor(selectedGroupColor);
+            if(groupColorSwatch.Color!=color)groupColorSwatch.Color=color;
+        }
+        for (int i = 0; i < groupColorSelections.Length; ++i)
+            if (groupColorSelections[i] != null && groupColorSelections[i].IsVisible != (i == selectedGroupColor)) groupColorSelections[i].IsVisible = i == selectedGroupColor;
 
         string permission = editorConflict ? RebirthSurvivorUiText.L("xuiRebirthGroupChangedWhileEditing","Group identity changed while you were editing. Your draft was preserved; save to replace it or change selection to discard it.") : !isLocal ? Localization.Get("xuiRebirthGroupViewOnly")
             : (!hasView ? Localization.Get("xuiRebirthGroupSyncing")

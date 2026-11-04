@@ -176,9 +176,9 @@ public static class RebirthWorkstationFuelPreservation
             var row=station.Queue[i];if(row?.Recipe==null||row.Multiplier<=0)continue;
             if(RebirthCookingHeat.Managed(row.Recipe)&&RebirthCookingBatch.NeedsHeat(row.Recipe)&&RebirthCookingHeat.Ready(row.Recipe))
             {
-                // Manual cooking deliberately keeps a real overcook/burn interval.
+                // Manual cooking keeps the remaining food burn or drink evaporation interval.
                 // A prepared collection freezes that original result instead.
-                if(!RebirthCookingHeat.Burnt(row.Recipe)&&!RebirthCookingOutputDelivery.HasPrepared(row.Recipe))
+                if(!RebirthCookingHeat.Burnt(row.Recipe)&&!RebirthCookingHeat.Evaporated(row.Recipe)&&!RebirthCookingOutputDelivery.HasPrepared(row.Recipe))
                 {state.State=ProductiveWorkState.Active;state.RemainingSeconds=Math.Max(0,RebirthCookingHeatRules.BurnAfter(RebirthCookingHeat.Text(row.Recipe,"method"))-RebirthCookingHeat.Number(row.Recipe,"overdue"));}
                 else state.State=ProductiveWorkState.Blocked;
             }

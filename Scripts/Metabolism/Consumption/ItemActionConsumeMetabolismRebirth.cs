@@ -1,6 +1,9 @@
 using UnityEngine.Scripting;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using UnityEngine;
 
 #nullable disable
 
@@ -12,6 +15,7 @@ using System;
 [Preserve]
 public class ItemActionConsumeMetabolismRebirth : ItemActionEat
 {
+    private static readonly Dictionary<int, float> animationStartTimes = new Dictionary<int, float>();
     public override bool ExecuteInstantAction(EntityAlive ent, ItemStack stack, bool isHeldItem, XUiC_ItemStack stackController)
     {
         EntityPlayer player = ent as EntityPlayer;
@@ -43,18 +47,37 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
             base.OnHoldingUpdate(actionData);
             return;
         }
-        if (PercentDone(actionData) >= 1f) CompleteConsumption(actionData);
+        if (actionData is ItemActionEat.MyInventoryData eatData && eatData.bEatingStarted &&
+            actionData.invData.holdingEntity is EntityPlayer player && !animationStartTimes.ContainsKey(player.entityId))
+        {
+            animationStartTimes[player.entityId] = Time.realtimeSinceStartup;
+            Log.Out("[REBIRTH ConsumeAnimation] start entity=" + player.entityId
+                + " item=" + actionData.invData.itemStack.itemValue.ItemClass?.Name);
+        }
+        if (PercentDone(actionData) >= 1f) CompleteConsumption(actionData, "time-fallback");
     }
 
     // Both the native ConsumeComplete animation event and the native time-based fallback
     // enter here. Claim bEatingStarted BEFORE dispatch; a second completion is a no-op.
     // The server's existing ConsumeAt path owns volume, stomach capacity, empty replacement,
     // inventory mutation and food effects. No second vanilla whole-item consumption follows.
-    internal void CompleteConsumption(ItemActionData actionData)
+    internal void CompleteConsumption(ItemActionData actionData, string completionSource)
     {
         var data = actionData as ItemActionEat.MyInventoryData;
         if (data == null || !data.bEatingStarted) return;
+        float completionPercent = PercentDone(actionData);
         data.bEatingStarted = false;
+        if (actionData.invData?.holdingEntity is EntityPlayer animationPlayer)
+        {
+            float began;
+            bool timed = animationStartTimes.TryGetValue(animationPlayer.entityId, out began);
+            animationStartTimes.Remove(animationPlayer.entityId);
+            Log.Out("[REBIRTH ConsumeAnimation] complete entity=" + animationPlayer.entityId
+                + " item=" + actionData.invData.itemStack?.itemValue?.ItemClass?.Name
+                + " source=" + completionSource
+                + " elapsed=" + (timed ? (Time.realtimeSinceStartup - began).ToString("0.00", CultureInfo.InvariantCulture) : "unknown")
+                + "s percent=" + completionPercent.ToString("0.00", CultureInfo.InvariantCulture));
+        }
         if (actionData.invData?.holdingEntity is EntityPlayer player &&
             actionData.invData.itemStack != null && !actionData.invData.itemStack.IsEmpty())
             Dispatch(player, actionData.invData.itemStack.itemValue, false);
@@ -62,6 +85,14 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
 
     public override void StopHolding(ItemActionData data)
     {
+        if (data?.invData?.holdingEntity is EntityPlayer player && animationStartTimes.TryGetValue(player.entityId, out float began))
+        {
+            Log.Out("[REBIRTH ConsumeAnimation] stopped entity=" + player.entityId
+                + " item=" + data.invData.itemStack?.itemValue?.ItemClass?.Name
+                + " elapsed=" + (Time.realtimeSinceStartup - began).ToString("0.00", CultureInfo.InvariantCulture) + "s"
+                + " pending=" + ((data as ItemActionEat.MyInventoryData)?.bEatingStarted == true));
+            animationStartTimes.Remove(player.entityId);
+        }
         base.StopHolding(data);
         ItemActionEat.MyInventoryData eatData = data as ItemActionEat.MyInventoryData;
         if (eatData != null)
@@ -99,7 +130,7 @@ public static class RebirthMetabolismAnimatedCompletionPatch
         if (__0?.invData?.itemStack == null) return false;
         if (!RebirthConsumableResolver.TryResolve(__0.invData.itemStack.itemValue, out var definition))
             return true;
-        action.CompleteConsumption(__0);
+        action.CompleteConsumption(__0, "native-event");
         return false;
     }
 }

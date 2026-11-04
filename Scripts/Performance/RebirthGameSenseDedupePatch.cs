@@ -53,7 +53,10 @@ public static class RebirthGameSenseDedupePatch
                 // An event name and one simple value, optionally with a context frame (only plain calls are ever dropped); anything else is left alone.
                 if (ps.Length < 2 || ps.Length > 3 || ps[0].ParameterType != typeof(string) || !(ps[1].ParameterType.IsPrimitive || ps[1].ParameterType == typeof(string)))
                     continue;
-                harmony.Patch(m, prefix: new HarmonyMethod(typeof(RebirthGameSenseDedupePatch).GetMethod(nameof(Prefix), BindingFlags.Static | BindingFlags.Public)));
+                string prefix = ps.Length == 3 && ps[1].ParameterType == typeof(int)
+                    && ps[2].ParameterType.FullName == "SteelSeries.GameSense.AbstractContextFrame" && !ps[2].ParameterType.IsValueType
+                    ? nameof(PrefixInt) : nameof(Prefix);
+                harmony.Patch(m, prefix: new HarmonyMethod(typeof(RebirthGameSenseDedupePatch).GetMethod(prefix, BindingFlags.Static | BindingFlags.Public)));
                 patched++;
             }
             return "[REBIRTH Perf] GameSense dedupe: patched " + patched + " of the SendEvent overloads " + string.Join(" ", seen.ToArray());
@@ -73,7 +76,18 @@ public static class RebirthGameSenseDedupePatch
             return true;
         if (__args.Length > 2 && __args[2] != null)
             return true;   // a message that carries a context frame always goes out
-        string value = __args[1].ToString();
+        return ShouldSend(name, __args[1].ToString());
+    }
+
+    public static bool PrefixInt(string __0, int __1, object __2)
+    {
+        if (__0 == null || __2 != null)
+            return true;
+        return ShouldSend(__0, __1.ToString());
+    }
+
+    private static bool ShouldSend(string name, string value)
+    {
         float now = Time.unscaledTime;
         lock (Sync)
         {

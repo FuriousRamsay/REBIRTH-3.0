@@ -1,5 +1,11 @@
 <configs>
   <append xpath="/recipes">
+    <recipe name="FuriousRamsayGeneratorBank" count="1" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true" craft_time="120">
+      <ingredient name="FuriousRamsayCollapsedGeneratorBank" count="1" />
+      <ingredient name="resourceForgedIron" count="5" />
+      <ingredient name="resourceMechanicalParts" count="15" />
+      <ingredient name="resourceElectricParts" count="10" />
+    </recipe>
     <recipe name="FuriousRamsayGeneratorBank" count="1" craft_area="workbench" always_unlocked="true" craft_time="120">
       <ingredient name="resourceForgedIron" count="25"/>
       <ingredient name="resourceMechanicalParts" count="30"/>

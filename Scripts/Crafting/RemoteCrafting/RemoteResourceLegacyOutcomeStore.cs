@@ -219,6 +219,7 @@ internal static class RemoteResourceLegacyOutcomeStore
     {
         if(!ThreadManager.IsMainThread()||UnityEngine.Time.realtimeSinceStartup<nextArchive)return;
         nextArchive=UnityEngine.Time.realtimeSinceStartup+1f;
+        if(live.Count==0){archiveOffset=0;return;}
         var entries=live.Where(value=>value.IsRetired).ToArray();int count=Math.Min(8,entries.Length);
         for(int index=0;index<count;index++)entries[(archiveOffset+index)%entries.Length].FinishRetiredArchive();
         archiveOffset=(archiveOffset+count)%Math.Max(1,entries.Length);

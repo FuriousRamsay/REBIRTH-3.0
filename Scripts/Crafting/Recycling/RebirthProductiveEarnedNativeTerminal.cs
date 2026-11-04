@@ -12,7 +12,7 @@ internal static partial class RebirthProductiveEarnedCoordinator
         if(!Enabled||!ThreadManager.IsMainThread())return;ObserveWorld();
         PumpLoadedNativeCleanup();
         RebirthProductiveEarnedSavedNativeSource.PumpStartupRefill();
-        foreach(var original in retained.Values.ToArray())
+        if(retained.Count>0)foreach(var original in retained.Values.ToArray())
             if(original.OutputTimerObserved)TryFinishNativeTerminal(original);
     }
     internal sealed class NativeTerminal:IDisposable

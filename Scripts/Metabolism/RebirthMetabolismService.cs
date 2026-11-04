@@ -7,6 +7,9 @@ using UnityEngine;
 
 public static partial class RebirthMetabolismService
 {
+    // Below this per-entry volume, the gastric transfer floor can no longer advance
+    // a meal-bound liquid at the normal one-second tick. Retire only exhausted entries.
+    private const float IngestionResidualVolumeMl = 0.05f;
     private static readonly FastTags<TagGroup.Global> TagWalking = FastTags<TagGroup.Global>.Parse("walking");
     private static readonly FastTags<TagGroup.Global> TagRunning = FastTags<TagGroup.Global>.Parse("running");
     private static readonly FastTags<TagGroup.Global> TagSwimming = FastTags<TagGroup.Global>.Parse("swimming");
@@ -18,6 +21,11 @@ public static partial class RebirthMetabolismService
     private static float nextPersistenceSaveRealTime;
     private static readonly Dictionary<int, float> debugTraceUntilRealTime = new Dictionary<int, float>();
     private static readonly Dictionary<int, long> snapshotSequences = new Dictionary<int, long>();
+    private static readonly Dictionary<int, float> nextLowEnergyDiagnostic = new Dictionary<int, float>();
+    private static World lowEnergyDiagnosticWorld;
+    private static readonly Dictionary<int, float> digestionDiagnosticUntil = new Dictionary<int, float>();
+    private static readonly Dictionary<int, float> nextDigestionDiagnostic = new Dictionary<int, float>();
+    private static World digestionDiagnosticWorld;
 
     public static bool IsServerAuthority
     {
@@ -129,6 +137,9 @@ public static partial class RebirthMetabolismService
         float traceIntestinalFluidBefore = captureTrace ? GetIntestinalFluidMl(state) : 0f;
         float traceIntestinalSolidBefore = captureTrace ? GetIntestinalSolidMl(state) : 0f;
         float traceIntestinalNutritionBefore = captureTrace ? GetIntestinalNutritionUnits(state) : 0f;
+        float energyDiagnosticBefore = state.Energy;
+        float energyDiagnosticStaminaBefore = state.LastStamina;
+        float energyDiagnosticActivityBefore = state.SmoothedActivity;
 
         float activityHydrationMlPerReal60Minutes;
         float energyUsePerRealMinute;
@@ -170,6 +181,7 @@ public static partial class RebirthMetabolismService
             player.Stats.Food.Value = player.Stats.Food.Value - foodUsePerRealMinute * deltaRealMinutes;
 
         float energyRecoveryPerRealMinute = ProcessEnergy(player, state, mods, energyUsePerRealMinute, deltaRealMinutes);
+        float energyAfterWorkAndRecovery = state.Energy;
         // Owner snapshots must publish the same completed-tick rates as the simulation/trace.
         // Recomputing from the smoothed activity drops direct Stamina costs and estimates a
         // recovery rate that may not have been paid (Food/cap-limited, god mode, etc.).
@@ -210,6 +222,9 @@ public static partial class RebirthMetabolismService
         // Enforce the same reserve ceiling after the whole intestinal absorption stage so a drink
         // can never leave Energy above what the newly absorbed Hydration/Nutrition can support.
         ClampEnergyToReserveCeiling(player, state);
+        LogEnergyDiagnostic(player,state,nowReal,deltaRealSeconds,energyDiagnosticBefore,energyAfterWorkAndRecovery,
+            energyDiagnosticStaminaBefore,energyDiagnosticActivityBefore,energyUsePerRealMinute,energyRecoveryPerRealMinute,
+            mods.EnergyUse,mods.EnergyRecovery);
         beverageEnergyAdded = Mathf.Max(0f, state.Energy - energyBeforeIntestinalAbsorption);
 
         float perMinute = deltaRealMinutes > 0.00001f ? 1f / deltaRealMinutes : 0f;
@@ -223,6 +238,9 @@ public static partial class RebirthMetabolismService
         float fluidActivity = intestinalFluidAbsorptionRate > 0.001f ? state.LastFluidAbsorbedMlPerRealMinute / intestinalFluidAbsorptionRate : 0f;
         float nutritionActivity = intestinalNutrientAbsorptionRate > 0.001f ? state.LastNutritionAbsorbedUnitsPerRealMinute / intestinalNutrientAbsorptionRate : 0f;
         state.LastIntestinalActivityPercent = Mathf.Clamp01(Mathf.Max(fluidActivity, nutritionActivity));
+
+        LogDigestionDiagnostic(player, state, nowReal, mods, gastricFluidMovedMl, gastricSolidMovedMl,
+            fluidAbsorbedMl, nutritionAbsorbedUnits, energyUsePerRealMinute, energyRecoveryPerRealMinute);
 
         ProcessDigestiveHealth(player, state, mods, digestiveDamagePerReal60Minutes, deltaRealMinutes);
         CleanupEntries(state);
@@ -270,6 +288,103 @@ public static partial class RebirthMetabolismService
                 gastricFluidMovedMl, gastricSolidMovedMl, fluidAbsorbedMl, nutritionAbsorbedUnits,
                 hydrationPointsAdded, nutritionPointsAdded, beverageEnergyAdded);
         }
+    }
+
+    // Bounded owner-side diagnostic. It distinguishes ordinary exertion, recovery,
+    // reserve-ceiling clamp, and an unexplained delta without logging every tick.
+    private static void LogEnergyDiagnostic(EntityPlayer player,RebirthMetabolismState state,float now,float seconds,
+        float before,float afterWork,float priorStamina,float priorActivity,float useRate,float recoveryRate,
+        float useModifier,float recoveryModifier)
+    {
+        if(player==null||state==null||player.Stats==null)return;
+        if(!ReferenceEquals(lowEnergyDiagnosticWorld,player.world))
+        {lowEnergyDiagnosticWorld=player.world;nextLowEnergyDiagnostic.Clear();}
+        bool lost=before-state.Energy>0.75f;
+        bool hasReserves=player.Stats.Food.Value>=60f&&player.Stats.Water.Value>=60f;
+        bool lowWithReserves=state.Energy<20f&&hasReserves;
+        bool decliningWithReserves=state.Energy<before-0.01f&&hasReserves;
+        if(!lost&&(!(lowWithReserves||decliningWithReserves)||nextLowEnergyDiagnostic.TryGetValue(player.entityId,out var due)&&now<due))return;
+        nextLowEnergyDiagnostic[player.entityId]=now+30f;
+        Log.Out("[REBIRTH EnergyAudit] entity="+player.entityId
+            +" reason="+(lost?"drop":decliningWithReserves?"declining-with-reserves":"low-with-reserves")
+            +" dt="+seconds.ToString("0.00",CultureInfo.InvariantCulture)
+            +" movement="+DescribeMovement(player)
+            +" activity="+priorActivity.ToString("0.00",CultureInfo.InvariantCulture)+"->"+state.SmoothedActivity.ToString("0.00",CultureInfo.InvariantCulture)
+            +" stamina="+priorStamina.ToString("0.0",CultureInfo.InvariantCulture)+"->"+player.Stats.Stamina.Value.ToString("0.0",CultureInfo.InvariantCulture)
+            +" energy="+before.ToString("0.00",CultureInfo.InvariantCulture)+"->"+afterWork.ToString("0.00",CultureInfo.InvariantCulture)+"->"+state.Energy.ToString("0.00",CultureInfo.InvariantCulture)
+            +" useRate="+(useRate*Mathf.Max(0f,useModifier)).ToString("0.00",CultureInfo.InvariantCulture)
+            +" recoveryRate="+recoveryRate.ToString("0.00",CultureInfo.InvariantCulture)
+            +" recoveryModifier="+recoveryModifier.ToString("0.00",CultureInfo.InvariantCulture)
+            +" ceiling="+GetEnergyReserveCeiling(player).ToString("0.0",CultureInfo.InvariantCulture)
+            +" nutrition="+player.Stats.Food.Value.ToString("0.0",CultureInfo.InvariantCulture)
+            +" hydration="+player.Stats.Water.Value.ToString("0.0",CultureInfo.InvariantCulture)
+            +" revision="+state.Revision);
+    }
+
+    // Admission and three minutes of sparse stage samples explain where a serving is held.
+    // The existing rbmet trace remains available for a short, deliberate per-tick capture.
+    private static void StartDigestionDiagnostic(EntityPlayer player, RebirthIngestionEntry entry)
+    {
+        if (player == null || entry == null) return;
+        if (!ReferenceEquals(digestionDiagnosticWorld, player.world))
+        {
+            digestionDiagnosticWorld = player.world;
+            digestionDiagnosticUntil.Clear();
+            nextDigestionDiagnostic.Clear();
+        }
+        float now = Time.realtimeSinceStartup;
+        digestionDiagnosticUntil[player.entityId] = now + 180f;
+        nextDigestionDiagnostic[player.entityId] = now + 15f;
+        Log.Out("[REBIRTH DigestionAudit] admit entity=" + player.entityId
+            + " entry=" + entry.EntryId + " item=" + entry.SourceItemName
+            + " kind=" + entry.Kind
+            + " stomachLiquidMl=" + entry.RemainingFluidVolumeMl.ToString("0.0", CultureInfo.InvariantCulture)
+            + " stomachSolidMl=" + entry.RemainingSolidVolumeMl.ToString("0.0", CultureInfo.InvariantCulture)
+            + " fluidHoldS=" + entry.FluidHoldSecondsRemaining.ToString("0.0", CultureInfo.InvariantCulture)
+            + " solidHoldS=" + entry.SolidHoldSecondsRemaining.ToString("0.0", CultureInfo.InvariantCulture)
+            + " nutritionUnits=" + entry.RemainingNutritionUnits.ToString("0.0", CultureInfo.InvariantCulture));
+    }
+
+    private static void LogDigestionDiagnostic(EntityPlayer player, RebirthMetabolismState state, float now,
+        RebirthMetabolismModifiers mods, float gastricLiquidMl, float gastricSolidMl,
+        float absorbedLiquidMl, float absorbedNutritionUnits, float energyUseRate, float energyRecoveryRate)
+    {
+        if (player == null || state == null || player.Stats == null ||
+            !ReferenceEquals(digestionDiagnosticWorld, player.world) ||
+            !digestionDiagnosticUntil.TryGetValue(player.entityId, out float until)) return;
+        if (now > until)
+        {
+            digestionDiagnosticUntil.Remove(player.entityId);
+            nextDigestionDiagnostic.Remove(player.entityId);
+            Log.Out("[REBIRTH DigestionAudit] end entity=" + player.entityId + " reason=timeout");
+            return;
+        }
+        if (nextDigestionDiagnostic.TryGetValue(player.entityId, out float due) && now < due) return;
+        nextDigestionDiagnostic[player.entityId] = now + 15f;
+        float ceiling = GetEnergyReserveCeiling(player);
+        float foodFloor = player.Stats.Food.ModifiedMax * RebirthMetabolismConfig.EnergyRecoveryFoodFloorPercent;
+        string energyGate = state.Energy >= ceiling - 0.001f ? "cap" :
+            player.Stats.Food.Value <= foodFloor ? "nutrition-floor" :
+            GetEnergyRecoveryFactor(state.SmoothedActivity) <= 0f ? "activity" : "available";
+        Log.Out("[REBIRTH DigestionAudit] sample entity=" + player.entityId
+            + " entries=" + state.IngestionEntries.Count
+            + " stomachLiquidMl=" + GetFluidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
+            + " stomachSolidMl=" + GetSolidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
+            + " intestineLiquidMl=" + GetIntestinalFluidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
+            + " intestineSolidMl=" + GetIntestinalSolidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
+            + " gastricHoldS=" + GetGastricHoldSecondsRemaining(state).ToString("0.0", CultureInfo.InvariantCulture)
+            + " movedLiquidMl=" + gastricLiquidMl.ToString("0.00", CultureInfo.InvariantCulture)
+            + " movedSolidMl=" + gastricSolidMl.ToString("0.00", CultureInfo.InvariantCulture)
+            + " absorbedLiquidMl=" + absorbedLiquidMl.ToString("0.00", CultureInfo.InvariantCulture)
+            + " absorbedNutritionUnits=" + absorbedNutritionUnits.ToString("0.00", CultureInfo.InvariantCulture)
+            + " hydration=" + player.Stats.Water.Value.ToString("0.0", CultureInfo.InvariantCulture)
+            + " nutrition=" + player.Stats.Food.Value.ToString("0.0", CultureInfo.InvariantCulture)
+            + " energy=" + state.Energy.ToString("0.0", CultureInfo.InvariantCulture)
+            + " cap=" + ceiling.ToString("0.0", CultureInfo.InvariantCulture)
+            + " energyGate=" + energyGate
+            + " energyUsePerMin=" + (energyUseRate * Mathf.Max(0f, mods.EnergyUse)).ToString("0.0", CultureInfo.InvariantCulture)
+            + " energyRecoveryPerMin=" + energyRecoveryRate.ToString("0.0", CultureInfo.InvariantCulture)
+            + " activity=" + state.SmoothedActivity.ToString("0.0", CultureInfo.InvariantCulture));
     }
 
     private static void RemoveLegacyFoodWaterStatusBuffs(EntityPlayer player)
@@ -582,6 +697,7 @@ public static partial class RebirthMetabolismService
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
             ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,consumed,true);
             MergeOrAddEntry(state, entry);
+            StartDigestionDiagnostic(player, entry);
             if(externalCommit == null && untouchedSiblings!=null&&!untouchedSiblings.IsEmpty())
             {
                 ItemStack remainder=untouchedSiblings;
@@ -657,6 +773,7 @@ public static partial class RebirthMetabolismService
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
             ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,0f,false);
             MergeOrAddEntry(state, entry);
+            StartDigestionDiagnostic(player, entry);
             ConsumeNativeEffect(player, stack.itemValue, false);
             ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-food");
             // Dry food can have a real hydration cost; zero food water alone is not thirst.
@@ -794,7 +911,7 @@ public static partial class RebirthMetabolismService
         // prepared-meal snapshot applies while its nutrients are present.
         float preparedEfficiency = GetPreparedMealEnergyEfficiencyMultiplier(state);
         float hydrationRecoveryMultiplier = GetEnergyRecoveryHydrationMultiplier(player);
-        float requested = RebirthMetabolismConfig.EnergyRecoveryPerRealMinute * recoveryFactor * hydrationRecoveryMultiplier
+        float requested = RebirthMetabolismConfig.EnergyRecoveryPerRealMinute * GetLowEnergyRecoveryMultiplier(state.Energy) * recoveryFactor * hydrationRecoveryMultiplier
             * Mathf.Max(0f, mods.EnergyRecovery) * preparedEfficiency * deltaRealMinutes;
         requested = Mathf.Min(requested, Mathf.Max(0f, ceilingBeforeWork - state.Energy));
         float foodCostPerEnergy = Mathf.Max(0f, RebirthMetabolismConfig.FoodUnitsPerEnergyRecovered) / Mathf.Max(1f, preparedEfficiency);
@@ -835,6 +952,14 @@ public static partial class RebirthMetabolismService
         return best;
     }
 
+    // Absolute reserve keeps low-Energy recovery fast even at a low sustainable cap.
+    // Existing Nutrition cost, activity, hydration and cap gates remain authoritative.
+    private static float GetLowEnergyRecoveryMultiplier(float energy)
+    {
+        float deficit = 1f - Mathf.Clamp01(energy / Mathf.Max(1f, RebirthMetabolismConfig.EnergyMax));
+        return 1f + 2f * deficit * deficit;
+    }
+
     private static float GetEnergyRecoveryFactor(float activity)
     {
         activity = Mathf.Max(0f, activity);
@@ -853,6 +978,7 @@ public static partial class RebirthMetabolismService
         if (player.Stats.Food.Value <= foodFloor || state.Energy >= ceiling - 0.001f)
             return 0f;
         return RebirthMetabolismConfig.EnergyRecoveryPerRealMinute
+            * GetLowEnergyRecoveryMultiplier(state.Energy)
             * GetPreparedMealEnergyEfficiencyMultiplier(state)
             * GetEnergyRecoveryFactor(state.SmoothedActivity)
             * GetEnergyRecoveryHydrationMultiplier(player)
@@ -1180,7 +1306,11 @@ public static partial class RebirthMetabolismService
                     halfTime = Mathf.Max(1f, halfTime);
                     float fraction = 1f - Mathf.Exp(-0.69314718056f * activeSeconds / halfTime);
                     float beforeFluid = entry.RemainingFluidVolumeMl;
-                    float movedFluid = Mathf.Clamp(beforeFluid * fraction, 0f, beforeFluid);
+                    // Finish the asymptotic tail instead of leaving a sub-millilitre
+                    // amount permanently below the per-tick transfer floor.
+                    float movedFluid = beforeFluid <= IngestionResidualVolumeMl
+                        ? beforeFluid
+                        : Mathf.Clamp(beforeFluid * fraction, 0f, beforeFluid);
                     if (movedFluid > 0.0001f)
                     {
                         entry.RemainingFluidVolumeMl -= movedFluid;
@@ -1462,10 +1592,11 @@ public static partial class RebirthMetabolismService
         for (int i = state.IngestionEntries.Count - 1; i >= 0; i--)
         {
             RebirthIngestionEntry e = state.IngestionEntries[i];
-            if (e == null || (e.RemainingFluidVolumeMl <= 0.01f && e.RemainingSolidVolumeMl <= 0.01f &&
+            if (e == null || (e.RemainingFluidVolumeMl <= IngestionResidualVolumeMl && e.RemainingSolidVolumeMl <= IngestionResidualVolumeMl &&
                 e.RemainingNutritionUnits <= 0.01f && e.RemainingEnergyUnits <= 0.01f &&
-                e.IntestinalFluidVolumeMl <= 0.01f && e.IntestinalSolidVolumeMl <= 0.01f &&
-                e.IntestinalNutritionUnits <= 0.01f && e.IntestinalEnergyUnits <= 0.01f))
+                e.IntestinalFluidVolumeMl <= IngestionResidualVolumeMl && e.IntestinalSolidVolumeMl <= IngestionResidualVolumeMl &&
+                e.IntestinalNutritionUnits <= 0.01f && e.IntestinalEnergyUnits <= 0.01f &&
+                (e.PreparedDrinkSpecialEffectActivated || e.PreparedDrinkSpecialEffectDurationSeconds <= 0f)))
                 state.IngestionEntries.RemoveAt(i);
         }
     }
@@ -1982,6 +2113,12 @@ public static partial class RebirthMetabolismService
     {
         message=string.Empty;
         return player?.inventory!=null&&TryEquipHydrationAt(player,false,player.inventory.holdingItemIdx,out message);
+    }
+
+    public static bool EquipHydrationFromBackpackSlot(EntityPlayer player,int slot,out string message)
+    {
+        message=string.Empty;
+        return TryEquipHydrationAt(player,true,slot,out message);
     }
 
     public static bool EquipMatchingHydrationContainer(EntityPlayer player,int type,ushort seed,out string message)

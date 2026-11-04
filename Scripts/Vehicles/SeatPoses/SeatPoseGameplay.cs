@@ -63,6 +63,7 @@ namespace Rebirth.Vehicles.Authoring
         readonly List<SeatPoseRig> rigs = new List<SeatPoseRig>();
         readonly List<SeatPoseBones> bones = new List<SeatPoseBones>();
         readonly List<SeatPoseProfile> profiles = new List<SeatPoseProfile>();
+        readonly List<Animator> activeAnimatorScratch = new List<Animator>();
         Animator[] animators = new Animator[0];
         EntityVehicle owner;
         Transform model;
@@ -79,7 +80,7 @@ namespace Rebirth.Vehicles.Authoring
             if (!Actor || Actor.IsDead() || GameManager.Instance?.World != Actor.world || !(Actor.AttachedToEntity is EntityVehicle vehicle)) { Release(); return; }
             if (SeatPoseGameplay.IsAuthoring?.Invoke(Actor) == true) { Stop(); nextBind = 0; return; }
             if (owner != vehicle || slot != vehicle.FindAttachSlot(Actor) || model != Actor.ModelTransform ||
-                revision != SeatPoseGameplay.Revision || animators.Any(a => !a || !a.isActiveAndEnabled))
+                revision != SeatPoseGameplay.Revision || AnyAnimatorUnavailable())
             { Stop(); nextBind = 0; }
             foreach (var b in bones) b.RemoveOffsets();
             if (Applied && Actor.GetVehicleAnimation() != profiles[0].basePose)
@@ -88,8 +89,21 @@ namespace Rebirth.Vehicles.Authoring
             if (Time.unscaledTime < nextBind) return;
             nextBind = Time.unscaledTime + .5f;
             var avatar = Actor.emodel?.avatarController as AvatarMultiBodyController;
-            var active = avatar?.BodyAnimators.Select(b => b.Animator).Where(a => a && a.isActiveAndEnabled).Distinct().ToArray() ?? new Animator[0];
-            if (active.Length == animators.Length && active.SequenceEqual(animators) && revision == SeatPoseGameplay.Revision) return;
+            activeAnimatorScratch.Clear();
+            if (avatar != null)
+                foreach (var body in avatar.BodyAnimators)
+                {
+                    var animator = body.Animator;
+                    if (animator && animator.isActiveAndEnabled && !activeAnimatorScratch.Contains(animator))
+                        activeAnimatorScratch.Add(animator);
+                }
+            bool unchanged = activeAnimatorScratch.Count == animators.Length && revision == SeatPoseGameplay.Revision;
+            if (unchanged)
+                for (int i = 0; i < animators.Length; i++)
+                    if (!activeAnimatorScratch[i].Equals(animators[i])) { unchanged = false; break; }
+            if (unchanged) { activeAnimatorScratch.Clear(); return; }
+            var active = activeAnimatorScratch.ToArray();
+            activeAnimatorScratch.Clear();
             Stop();
             owner = vehicle; slot = vehicle.FindAttachSlot(Actor); model = Actor.ModelTransform; revision = SeatPoseGameplay.Revision; animators = active;
             if (slot < 0 || !model || !vehicle.ModelTransform || active.Length == 0) return;
@@ -118,6 +132,12 @@ namespace Rebirth.Vehicles.Authoring
                 // repeating half-second failure loop for an incompatible profile.
                 UnityEngine.Debug.LogWarning("[REBIRTH Seat Profile] " + error.Message);
             }
+        }
+        bool AnyAnimatorUnavailable()
+        {
+            for (int i = 0; i < animators.Length; i++)
+                if (!animators[i] || !animators[i].isActiveAndEnabled) return true;
+            return false;
         }
         void LateUpdate()
         {
@@ -151,6 +171,7 @@ namespace Rebirth.Vehicles.Authoring
             }
             for (int i = 0; i < overlays.Count; i++) if (overlays[i]) overlays[i].enabled = overlayStates[i];
             overlays.Clear(); overlayStates.Clear();
+            activeAnimatorScratch.Clear();
             animators = new Animator[0]; revision = -1;
         }
         internal void Release() { if (Released) return; Released = true; Stop(); enabled = false; Destroy(this); }

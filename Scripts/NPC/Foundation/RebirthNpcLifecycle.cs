@@ -173,10 +173,9 @@ public static class RebirthNpcLifecycle
         var incoming=GameManager.Instance?.World;
         if(incoming==null)return;
         RebirthNpcSaveQuarantineBundle.RetireEndedClientProjections();
-        // Remote clients have projections, not NPC save ownership. Native world
-        // replacement and PrepareWorldScope already reset their old projections;
-        // the audit's server-side original-custody gate must not veto a join.
-        if(incoming.IsRemote())return;
+        // TryAdmitWorld has a separate typed client-projection transfer. It must
+        // run before PrepareWorldScope consumes its boundary receipt; a remote
+        // early return would fall back to unsafe legacy resets on the next join.
         if(!RebirthNpcSaveQuarantineBundle.AdmissionEnabled)return;
         World original;string directory;lock(Sync){original=activeWorldReference;directory=activeSaveDirectory;}
         if(!RebirthNpcSaveQuarantineBundle.TryAdmitWorld(original,directory,incoming,out var error))
@@ -413,16 +412,18 @@ public static class RebirthNpcLifecycle
 
         if (GameManager.Instance.World.IsRemote())
         {
-            // A multiplayer client has projections, not authority to publish NPC sidecars.
-            ResetUnexpectedWorldScopedState(false);
+            // A multiplayer client owns no NPC sidecars. Its live projection /
+            // callback group must remain anchored until the next native World
+            // boundary can capture and retire it with the existing typed bundle.
+            // Generic resets neither prove transport retirement nor preserve
+            // outstanding callback/financial custody.
             lock (Sync)
             {
-                ActiveEntityIds.Clear(); activeWorldReference = null; activeSaveDirectory = string.Empty;
                 completedShutdownWorld=stoppingWorld;
                 completedShutdownSave=stoppingSave;
                 if (gameShutdown) gameStopCount++; else worldStopCount++;
                 state = gameShutdown ? RebirthNpcLifecycleState.GameStopping : RebirthNpcLifecycleState.BootstrapRegistered;
-                lastTransition = "client-world-stopped";
+                lastTransition = "client-world-awaiting-typed-retirement";
             }
             return;
         }

@@ -494,8 +494,9 @@ public sealed class XUiC_RebirthLogistics : XUiController
         int total = rows != null ? rows.Count : 0;
         itemScrollIndex = ClampScrollIndex(itemScrollIndex, total, itemRows.Length);
         int visibleCount = rows != null ? Math.Min(itemRows.Length, Math.Max(0, total - itemScrollIndex)) : 0;
-        QuickStackUiDiagnostics.Write("render items total=" + total + " offset=" + itemScrollIndex +
-            " visible=" + visibleCount + " excluded=" + excludedSelections.Count);
+        if (QuickStackUiDiagnostics.Enabled)
+            QuickStackUiDiagnostics.Write("render items total=" + total + " offset=" + itemScrollIndex +
+                " visible=" + visibleCount + " excluded=" + excludedSelections.Count);
         suppressSelectionEvents = true;
         suppressQuantityEvents = true;
         try
@@ -550,9 +551,10 @@ public sealed class XUiC_RebirthLogistics : XUiController
                 }
                 view.Root.ViewComponent.IsVisible = true;
 
-                QuickStackUiDiagnostics.Write("item slot=" + slot + " dataIndex=" + dataIndex +
-                    " itemType=" + row.ItemType + " count=" + row.Count +
-                    " selectable=" + selectable + " key='" + (row.SelectionKey ?? string.Empty) + "'");
+                if (QuickStackUiDiagnostics.Enabled)
+                    QuickStackUiDiagnostics.Write("item slot=" + slot + " dataIndex=" + dataIndex +
+                        " itemType=" + row.ItemType + " count=" + row.Count +
+                        " selectable=" + selectable + " key='" + (row.SelectionKey ?? string.Empty) + "'");
                 ValidateItemControlState(slot, dataIndex, row, view, selectable);
                 TraceItemControlState("render", slot, dataIndex, row, view);
             }
@@ -1082,9 +1084,10 @@ public sealed class XUiC_RebirthLogistics : XUiController
             }
             view.Root.ViewComponent.IsVisible = true;
 
-            QuickStackUiDiagnostics.Write("target slot=" + slot + " dataIndex=" + dataIndex +
-                " id='" + (row.Id ?? string.Empty) + "' selected=" + selected +
-                " selectable=" + canSelectTarget + " name='" + (row.Name ?? string.Empty) + "'");
+            if (QuickStackUiDiagnostics.Enabled)
+                QuickStackUiDiagnostics.Write("target slot=" + slot + " dataIndex=" + dataIndex +
+                    " id='" + (row.Id ?? string.Empty) + "' selected=" + selected +
+                    " selectable=" + canSelectTarget + " name='" + (row.Name ?? string.Empty) + "'");
         }
 
         for (int slot = visibleCount; slot < targetRows.Length; slot++)
@@ -1279,16 +1282,12 @@ public sealed class XUiC_RebirthLogistics : XUiController
             reason += " invalid-combo-range=" + view.Count.Min + ".." + view.Count.Max + ";";
         }
 
-        XUiView[] views =
+        for (int i = 0; i < 4; i++)
         {
-            view.Root != null ? view.Root.ViewComponent : null,
-            view.Include != null ? view.Include.ViewComponent : null,
-            view.Count != null ? view.Count.ViewComponent : null,
-            view.CountDisplay
-        };
-        for (int i = 0; i < views.Length; i++)
-        {
-            XUiView current = views[i];
+            XUiView current = i == 0 ? view.Root?.ViewComponent
+                : i == 1 ? view.Include?.ViewComponent
+                : i == 2 ? view.Count?.ViewComponent
+                : view.CountDisplay;
             if (current == null || current.UiTransform == null) continue;
             if (!IsFinite(current.UiTransform.localPosition) || !IsFinite(current.UiTransform.localScale))
             {

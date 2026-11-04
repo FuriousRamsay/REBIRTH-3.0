@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/buffs">
+    <buff name="FuriousRamsaySpawnSeekerMinions" hidden="true" remove_on_death="true">
+      <update_rate value="8" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummySpawnSeekerMinions" operation="set" value="randomint(0,4)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerMinions, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummySpawnSeekerMinions" operation="Equals" value="0" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummySpawnSeekerMinions2" operation="set" value="randomint(0,3)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerMinions, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummySpawnSeekerMinions" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummySpawnSeekerMinions2" operation="Equals" value="0" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier1" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier2" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier3" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier4" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier5" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier6" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlTier7" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <update_rate value="5" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayMutantAlert" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".dummyMutantGrowl" operation="set" value="randomint(1,50)" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="30" buff="FuriousRamsayMutantGrowlPlayerDamage" target_tags="player">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="PlaySound" sound="FuriousRamsayMutantAlert">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthSeekerRoar, RebirthUtils">
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="GT" value="0" />
+          <requirement name="CVarCompare" cvar=".dummyMutantGrowl" operation="LT" value="25" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMutantGrowlPlayerDamage" hidden="true" remove_on_death="true">
+      <stack_type value="replace" />
+      <duration value="3" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" target="self" action="ShakeCamera" shake_speed="2.65" shake_amplitude="70" shake_time="1.5">
+						</triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="rebirthSeekerTaintedRegen" hidden="true">
+      <stack_type value="ignore" />
+      <duration value="2000000000" />
+      <update_rate value="2.5" />
+      <effect_group>
+        <requirement name="!HasBuff" buff="buffRadiatedRegenBlock15,buffRadiatedRegenBlock30,buffRadiatedRegenBlock45,buffRadiatedRegenBlock60,buffRadiatedRegenBlock75,buffRadiatedRegenBlock90" />
+        <passive_effect name="HealthChangeOT" operation="base_add" value="@TaintedRegenAmount" />
+      </effect_group>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RemoveBuff" buff="rebirthSeekerTaintedRegen">
+          <requirement name="StatComparePercCurrentToMax" stat="health" operation="GTE" value=".8" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="rebirthSeekerKamikazeTriggerTier1" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" target="self" stat="Health" operation="add" value="-10" />
+      </effect_group>
+    </buff>
+    <buff name="rebirthSeekerKamikazeTriggerTier2" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" target="self" stat="Health" operation="add" value="-20" />
+      </effect_group>
+    </buff>
+    <buff name="rebirthSeekerKamikazeTriggerTier3" hidden="true" remove_on_death="true">
+      <stack_type value="ignore" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" target="self" stat="Health" operation="add" value="-30" />
+      </effect_group>
+    </buff>
+  </append>
+</configs>

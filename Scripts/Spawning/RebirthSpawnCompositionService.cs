@@ -215,6 +215,9 @@ public static class RebirthSpawnCompositionService
         {
             RebirthEntityRule e = data.Entities[i];
             if (!e.Contexts.Contains(context.Surface)) continue;
+            if (RebirthSeekerPolicy.IsSeeker(e.Name) &&
+                (!RebirthSeekerPolicy.Allows(context.Surface == RebirthSpawnSurface.BloodMoon, false)
+                 || context.GameStage < e.MinGs || context.GameStage > e.MaxGs)) continue;
             if (!IsRuntimeEntityRegistered(e)) continue;
             if (IsRestrictedNoSpecialSurface(context.Surface) && IsForbiddenRestrictedSpawnEntity(e.Id)) continue;
             if (context.ProgressionMode == RebirthSpawnProgressionMode.Gamestage && (context.GameStage < e.MinGs || context.GameStage > e.MaxGs)) continue;

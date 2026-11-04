@@ -1,0 +1,14 @@
+{
+  "name": "Diet catalogue live-tag filter smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable world/profile creation UI only, Diet step already open, guard ON where applicable. Compare allowed/restricted food counts, names, icons and filtering against the matching baseline after real filter clicks. No profile save/confirmation, diet assignment or consumable use occurs. This UI smoke does not qualify native item reload/enrichment, nutrition/Energy behavior, allocation or FPS. Never run against the user's game/profile or capture NPC profiling.",
+  "steps": [
+    {"screenshot":"diet_tags_before_filter"},
+    {"action":{"command":"click","args":{"id":"btnDietFoodFilter1"}}},
+    {"screenshot":"diet_tags_filtered"},
+    {"action":{"command":"click","args":{"id":"btnDietFoodFilter0"}}},
+    {"screenshot":"diet_tags_restored_filter"},
+    {"expectNoErrors":true}
+  ]
+}

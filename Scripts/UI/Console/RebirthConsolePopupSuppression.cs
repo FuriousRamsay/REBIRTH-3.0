@@ -165,6 +165,10 @@ public static class RebirthConsolePlayerMovementGuardPatch
     [HarmonyPriority(Priority.First)]
     public static bool Prefix(PlayerMoveController __instance)
     {
+        // Native Update owns updateRespawn and its readiness/timeouts too.
+        // Console input exclusivity must never suspend that loading lifecycle.
+        var player=__instance!=null?__instance.entityPlayerLocal:null;
+        if(player==null||!player.IsSpawned())return true;
         if (!RebirthConsoleInputGuardRuntime.BlocksGameplayInput())
             return true;
 

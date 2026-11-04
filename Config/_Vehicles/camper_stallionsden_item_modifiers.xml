@@ -1,0 +1,16 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="modVehicleWrapStallionsDen" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehicleWrapStallionsDenDesc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="modVehicleWrapStallionsDen" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="StallionsDen" />
+    </item_modifier>
+  </append>
+</configs>

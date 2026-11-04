@@ -194,8 +194,12 @@ public sealed class XUiC_RebirthContainerWorkspace : XUiController
         int amount = xui.PlayerInventory.CurrencyAmount;
         if (amount != lastCurrency) { lastCurrency = amount; SetText(currency, amount.ToString("N0") + " $"); }
         ItemStack[] bag = session.GetSlots(true);
-        if (bag != null) SetText(capacity, RebirthCraftingInventoryBridge.GetUsedSlotCount(xui) + "/" + bag.Length +
-            "  •  " + RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui) + " ENCUMBERED");
+        if (bag != null)
+        {
+            int used = RebirthCraftingInventoryBridge.GetUsedSlotCount(xui);
+            SetText(capacity, used + "/" + bag.Length +
+                "  •  " + RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui, used) + " ENCUMBERED");
+        }
         bool leftMode = session.LockMode(false), rightMode = session.LockMode(true);
         if (leftMode != lastLeftLock) { lastLeftLock = leftMode; left.Invalidate(); }
         if (rightMode != lastRightLock) { lastRightLock = rightMode; right.Invalidate(); }
@@ -497,11 +501,15 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
         // Like Crafting, move one content transform inside a native clipped panel.
         // Do NOT enable/disable, recolor, reposition or rebind individual slots on a scroll.
         if (!CanScroll) { targetPixelOffset = pixelOffset; return; }
+        float previousOffset = pixelOffset;
         bool pagingNow = RebirthScrollbarPagingPolicy.Enabled;
         if (pagingMode != pagingNow) { pagingMode = pagingNow; dragging = false; }
         if (RebirthScrollbarPagingPolicy.Enabled) targetPixelOffset = pixelOffset = RebirthScrollbarPagingPolicy.SnapAbsolute(targetPixelOffset, MaxPixelOffset, visibleRows * CellPitch, true);
         if (Mathf.Abs(pixelOffset - targetPixelOffset) < .05f) pixelOffset = targetPixelOffset;
         else pixelOffset = Mathf.Lerp(pixelOffset, targetPixelOffset, Mathf.Clamp01(dt * 16f));
+        // Sync and direct scroll changes render the thumb themselves. Idle frames have no
+        // change to present, so avoid repeated scrollbar layout and view updates.
+        if (pixelOffset == previousOffset) return;
         ApplyScrollPosition(); UpdateScrollbar();
     }
     private void ConfigureViewport()

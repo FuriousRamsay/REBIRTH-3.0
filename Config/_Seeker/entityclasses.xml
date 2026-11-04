@@ -1,0 +1,701 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/entity_classes">
+    <entity_class name="rebirthSeekerKamikazeMaster" extends="zombieSpider">
+      <property name="Tags" value="entity,zombie,perkAT04,kamikaze,FuriousRamsayKamikaze,template" />
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+      <property name="WalkType" value="6" />
+      <property name="CrouchType" value="0" />
+      <property name="DismemberMultiplierLegs" value="0" />
+      <property name="LegCrawlerThreshold" value="0" />
+      <property name="LegCrippleThreshold" value="0" />
+      <property name="KnockdownProneDamageThreshold" value="0" />
+      <property name="KnockdownKneelDamageThreshold" value="0" />
+      <property name="LegsExplosionDamageMultiplier" value="2" />
+      <property name="ArmsExplosionDamageMultiplier" value="2" />
+      <property name="HeadExplosionDamageMultiplier" value="2" />
+      <property name="ChestExplosionDamageMultiplier" value="2" />
+      <property name="ExplodeHealthThreshold" value="0.6" />
+      <property name="ExplodeDelay" value="3" />
+      <property name="SoundExplodeWarn" value="FuriousRamsayKamikaze" />
+      <property name="SoundTick" value="demolitionz_beep,.5,.9" />
+      <property name="SoundRandom" value="Enemies/Base_Zombie_Male/zombiemaleroam" />
+      <property name="SoundAlert" value="FuriousRamsayKamikaze" />
+      <property name="SoundSense" value="FuriousRamsayKamikaze" />
+      <property name="SoundHurt" value="Enemies/Base_Zombie_Male/zombiemalepain" />
+      <property name="SoundDeath" value="Enemies/Base_Zombie_Male/zombiemaledeath" />
+      <property name="SoundAttack" value="Enemies/Base_Zombie_Male/zombiemaleattack" />
+      <property name="SoundSleeperSense" value="sleepersense" />
+      <property name="SoundSleeperBackToSleep" value="sleeperbacktosleep" />
+      <property name="JumpMaxDistance" value="4, 10" />
+      <effect_group name="FuriousRamsayVisualEffects">
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Melee/Knives/boneShivPrefab.prefab" local_offset="-0.05,0.1,-0.04" local_rotation="81,230,180" parent_transform="Head" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Ranged/TimedCharge/timedChargePrefab.prefab" local_offset="-0.02,.25,.05" local_rotation="90,0,0" parent_transform="Spine1" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Ranged/TimedCharge/timedChargePrefab.prefab" local_offset="-0.01,.14,-.1" local_rotation="-90,0,0" parent_transform="Spine2" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="ParticleIndex" value="13" />
+        <property name="RadiusBlocks" value="7" />
+        <property name="RadiusEntities" value="6" />
+        <property class="DamageBonus">
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="earth" value="0" />
+          <property name="wood" value="1" />
+          <property name="water" value="0" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker000" extends="zombieTemplateMale">
+      <property name="SizeScale" value="1" />
+      <property name="StaticSizeScale" value="1" />
+      <property name="Tags" value="entity,template" />
+      <property name="Mesh" value="#@modfolder:Resources/FR_Mutants.unity3d?Mutant002_FR" />
+      <property name="PhysicsBody" value="rebirthSeekerBody" />
+      <property name="Mass" value="215" />
+      <property name="Weight" value="69" />
+      <property name="LookAtAngle" value="0" />
+      <property name="AINoiseSeekDist" value="300" />
+      <property name="SightRange" value="300" />
+      <property name="MaxViewAngle" value="360" />
+      <property name="WalkType" value="3" />
+      <property name="MoveSpeed" value="0.2" />
+      <property name="MoveSpeedAggro" value="0.4, 0.6" />
+      <property name="MoveSpeedRand" value=".0,.2" />
+      <property name="MoveSpeedPanic" value="0.2" />
+      <property name="NavObject" value="FuriousRamsaySeeker" />
+      <property name="DismemberMultiplierHead" value="0" />
+      <property name="DismemberMultiplierArms" value="0" />
+      <property name="DismemberMultiplierLegs" value="0" />
+      <property name="DismemberTag_L_HeadGore" value="Prefabs/HeadGore" data="rot=90,0,0" />
+      <property name="DismemberTag_L_LeftUpperLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_LeftLowerLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_RightUpperLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_RightLowerLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_LeftUpperArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_LeftLowerArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_RightUpperArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_RightLowerArmGore" value="Prefabs/UpperArmGore" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="TimeStayAfterDeath" value="10" />
+      <property name="LootDropEntityClass" value="Seeker001EntityLootContainer" />
+      <property name="LootDropProb" value="1" />
+      <property name="SoundRandom" value="" />
+      <property name="SoundAlert" value="" />
+      <property name="SoundSense" value="" />
+      <property name="SoundHurt" value="FuriousRamsayMutantHit" />
+      <property name="SoundDeath" value="FuriousRamsayMutantDeath" />
+      <property name="SoundAttack" value="FuriousRamsayMutantAttack" />
+      <effect_group name="Base Effects">
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsaySpawnSeekerMinions" />
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeeker, RebirthUtils" />
+    </entity_class>
+    <entity_class name="Seeker001" extends="FuriousRamsaySeeker000">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker001,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker002" />
+      <property name="LootDropEntityClass" value="SeekerBossEntityLootContainer" />
+      <property name="Mesh" value="#@modfolder:Resources/FR_Mutants.unity3d?Mutant001_FR" />
+      <property name="GamestageStart" value="40" />
+      <property name="GamestageEnd" value="60" />
+      <property name="HordeNightChance" value="10" />
+      <property name="SpecialSpawn" value="1" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="8000" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="16" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier1" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="250" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="13" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker001" extends="FuriousRamsaySeeker000">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker001,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker002" />
+      <property name="LootDropEntityClass" value="Seeker001EntityLootContainer" />
+      <property name="GamestageStart" value="40" />
+      <property name="GamestageEnd" value="60" />
+      <property name="HordeNightChance" value="10" />
+      <property name="SpecialSpawn" value="1" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="3750" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="16" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier1" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="250" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="13" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker002" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker002,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker002" />
+      <property name="LootDropEntityClass" value="Seeker002EntityLootContainer" />
+      <property name="GamestageStart" value="50" />
+      <property name="GamestageEnd" value="70" />
+      <property name="HordeNightChance" value="15" />
+      <property name="SpecialSpawn" value="1" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="4375" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="18" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier2" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="300" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker003" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker003,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker003" />
+      <property name="LootDropEntityClass" value="Seeker003EntityLootContainer" />
+      <property name="GamestageStart" value="60" />
+      <property name="GamestageEnd" value="80" />
+      <property name="HordeNightChance" value="20" />
+      <property name="SpecialSpawn" value="2" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="5000" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="20" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier3" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="350" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker004" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker004,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker004" />
+      <property name="LootDropEntityClass" value="Seeker004EntityLootContainer" />
+      <property name="GamestageStart" value="70" />
+      <property name="GamestageEnd" value="90" />
+      <property name="HordeNightChance" value="30" />
+      <property name="SpecialSpawn" value="2" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="6250" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="22" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier4" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="400" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker005" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker005,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker005" />
+      <property name="LootDropEntityClass" value="Seeker005EntityLootContainer" />
+      <property name="GamestageStart" value="80" />
+      <property name="GamestageEnd" value="100" />
+      <property name="HordeNightChance" value="35" />
+      <property name="SpecialSpawn" value="3" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="7500" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="24" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier5" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="450" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker006" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker006,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker006" />
+      <property name="LootDropEntityClass" value="Seeker006EntityLootContainer" />
+      <property name="GamestageStart" value="90" />
+      <property name="GamestageEnd" value="110" />
+      <property name="HordeNightChance" value="40" />
+      <property name="SpecialSpawn" value="3" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="8750" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="26" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier6" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="500" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="FuriousRamsaySeeker007" extends="FuriousRamsaySeeker000">
+      <property name="Tags" value="entity,boss,seeker,melee,FuriousRamsaySeeker007,BreakTopBlocks,reducedHNloot" />
+      <property name="HandItem" value="FuriousRamsayMeleeHandSeeker007" />
+      <property name="LootDropEntityClass" value="Seeker007EntityLootContainer" />
+      <property name="GamestageStart" value="100" />
+      <property name="GamestageEnd" value="0" />
+      <property name="HordeNightChance" value="45" />
+      <property name="SpecialSpawn" value="3" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="10000" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="28" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="FuriousRamsayMutantGrowlTier7" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="BlastPower" value="0" />
+        <property name="RadiusBlocks" value="3" />
+        <property name="RadiusEntities" value="4" />
+        <property name="BlockDamage" value="550" />
+        <property name="EntityDamage" value="135" />
+        <property name="ParticleIndex" value="9" />
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+          <property name="water" value="0" />
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="wood" value="1" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="Seeker001EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker001LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker002EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker002LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker003EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker003LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker004EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker004LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker005EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker005LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker006EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker006LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="Seeker007EntityLootContainer">
+      <property name="Mesh" value="@:Entities/LootContainers/zpackRedPrefab.prefab" />
+      <property name="TintColor" value="FF0000" />
+      <property name="ModelType" value="Custom" />
+      <property name="Prefab" value="Backpack" />
+      <property name="Class" value="EntityLootContainer" />
+      <property name="Parent" value="Backpack" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="TimeStayAfterDeath" value="3600" />
+      <property name="LootList" value="FuriousRamsaySeeker007LootContainer" />
+      <property name="Faction" value="none" />
+    </entity_class>
+    <entity_class name="SeekerBossEntityLootContainer" extends="EntityLootContainerStrong">
+      <property name="LootList" value="SeekerBossEntityLootContainer" />
+    </entity_class>
+    <entity_class name="rebirthSeekerCop" extends="zombieFatCop">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="SizeScale" value="1.2" />
+      <property name="StaticSizeScale" value="1.2" />
+      <property name="Tags" value="entity,zombie,walker,melee,FuriousRamsayZombie016,particleY,pxUp,pxRotX" />
+      <property name="ModelType" value="Standard" />
+      <property name="Mesh" value="#@modfolder:Resources/SeekerMinions.unity3d?Zombie016_FR" />
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+      <property name="Mass" value="320" />
+      <property name="Weight" value="70" />
+      <property name="PushFactor" value="20" />
+      <property name="HasDeathAnim" value="true" />
+      <property name="RootMotion" value="true" />
+      <property name="SoundRandom" value="Enemies/Base_Zombie_Male2/zombiemale2roam" />
+      <property name="SoundAlert" value="Enemies/Base_Zombie_Male2/zombiemale2alert" />
+      <property name="SoundAttack" value="Enemies/Base_Zombie_Male2/zombiemale2attack" />
+      <property name="SoundHurt" value="Enemies/Base_Zombie_Male2/zombiemale2pain" />
+      <property name="SoundDeath" value="Enemies/Base_Zombie_Male2/zombiemale2death" />
+      <property name="SoundSense" value="Enemies/Base_Zombie_Male2/zombiemale2sense" />
+      <property name="SoundFootstepModifier" value="bear_footstep" />
+      <property name="KnockdownProneDamageThreshold" value="0" />
+      <property name="KnockdownKneelDamageThreshold" value="0" />
+      <property name="LegCrawlerThreshold" value="0" />
+      <property name="LegCrippleThreshold" value="0" />
+      <property name="DismemberMultiplierLegs" value="0" />
+      <property name="LegsExplosionDamageMultiplier" value="2" />
+      <property name="ArmsExplosionDamageMultiplier" value="2" />
+      <property name="HeadExplosionDamageMultiplier" value="2" />
+      <property name="ChestExplosionDamageMultiplier" value="2" />
+      <property name="MoveSpeedAggro" value="0.2, 1.1" />
+      <property name="JumpMaxDistance" value=".8, 1.1" />
+      <property name="HandItem" value="meleeHandZombieCop" />
+      <property name="LootDropProb" value="0.2" />
+      <property name="ExperienceGain" value="750" />
+      <property name="LootDropEntityClass" value="EntityLootContainerStrong" />
+      <property name="ExplodeHealthThreshold" value="0.2" />
+      <property name="ExplodeDelay" value="3" />
+      <property name="StompsSpikes" value="true" />
+      <property name="SoundExplodeWarn" value="Enemies/Base_Zombie_Male2/zombiemale2alert" />
+      <property name="SpreadFire" value="false" />
+      <property name="PhysicsBody" value="rebirthSeekerBody" />
+      <property name="LootList" value="zPackStrong" />
+      <property name="LookAtAngle" value="0" />
+      <property name="WalkType" value="3" />
+      <property name="DismemberTag_L_HeadGore" value="Prefabs/HeadGore" data="rot=90,0,0" />
+      <property name="DismemberTag_L_LeftUpperLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_LeftLowerLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_RightUpperLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_RightLowerLegGore" value="Prefabs/UpperLegGore" />
+      <property name="DismemberTag_L_LeftUpperArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_LeftLowerArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_RightUpperArmGore" value="Prefabs/UpperArmGore" />
+      <property name="DismemberTag_L_RightLowerArmGore" value="Prefabs/UpperArmGore" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="450" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="$varFuriousRamsayOpenDoors" operation="set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="35" />
+      </effect_group>
+      <property class="Explosion">
+        <property name="ParticleIndex" value="9" />
+        <property name="RadiusBlocks" value="7" />
+        <property name="RadiusEntities" value="6" />
+        <property name="BlockDamage" value="350" />
+        <property name="EntityDamage" value="80" />
+        <property class="DamageBonus">
+          <property name="stone" value="1" />
+          <property name="metal" value="1" />
+          <property name="earth" value="0" />
+          <property name="wood" value="1" />
+          <property name="water" value="0" />
+        </property>
+      </property>
+    </entity_class>
+    <entity_class name="rebirthSeekerCopFeral" extends="rebirthSeekerCop">
+      <property name="Tags" value="entity,zombie,walker,melee,FuriousRamsayZombie016,particleY,pxUp,pxRotX,feral" />
+      <property name="DismemberMultiplierHead" value=".7" />
+      <property name="DismemberMultiplierArms" value=".7" />
+      <property name="DismemberMultiplierLegs" value=".7" />
+      <property name="PainResistPerHit" value=".7" />
+      <property name="HandItem" value="meleeHandZombieCop" />
+      <property name="ExperienceGain" value="750" />
+      <property name="LootDropProb" value=".03" />
+      <property name="ExplodeHealthThreshold" value="0.15" />
+      <property name="Mesh" value="#@modfolder:Resources/SeekerMinions.unity3d?Zombie016_Feral_FR" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="750" />
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+    </entity_class>
+    <entity_class name="rebirthSeekerCopRadiated" extends="rebirthSeekerCop">
+      <property name="Tags" value="entity,zombie,walker,melee,FuriousRamsayZombie016,particleY,pxUp,pxRotX,feral,radiated" />
+      <property name="DismemberMultiplierHead" value=".4" />
+      <property name="DismemberMultiplierArms" value=".4" />
+      <property name="DismemberMultiplierLegs" value=".4" />
+      <property name="PainResistPerHit" value=".7" />
+      <property name="HandItem" value="meleeHandZombieCop" />
+      <property name="ExperienceGain" value="1350" />
+      <property name="ExplodeHealthThreshold" value="0.1" />
+      <property name="Mesh" value="#@modfolder:Resources/SeekerMinions.unity3d?Zombie016_Radiated_FR" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="1100" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="ModifyCVar" target="self" cvar="RadiatedRegenAmount" operation="set" value="4" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="AddBuff" target="self" buff="buffRadiatedRegen" />
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+    </entity_class>
+    <entity_class name="rebirthSeekerCopTainted" extends="rebirthSeekerCop">
+      <property name="Tags" value="entity,zombie,walker,melee,FuriousRamsayZombie016,particleY,pxUp,pxRotX,feral,tainted" />
+      <property name="DismemberMultiplierHead" value=".2" />
+      <property name="DismemberMultiplierArms" value=".2" />
+      <property name="DismemberMultiplierLegs" value=".2" />
+      <property name="PainResistPerHit" value="1.1" />
+      <property name="HandItem" value="meleeHandZombieCop" />
+      <property name="ExperienceGain" value="1500" />
+      <property name="Mesh" value="#@modfolder:Resources/SeekerMinions.unity3d?Zombie016_Tainted_FR" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="2000" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="ModifyCVar" target="self" cvar="TaintedRegenAmount" operation="set" value="20" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="AddBuff" target="self" buff="rebirthSeekerTaintedRegen" />
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+    </entity_class>
+    <entity_class name="rebirthSeekerKamikaze" extends="zombieSpider">
+      <property name="JumpMaxDistance" value="4, 10" />
+      <property name="SoundSleeperBackToSleep" value="sleeperbacktosleep" />
+      <property name="SoundSleeperSense" value="sleepersense" />
+      <property name="SoundAttack" value="Enemies/Base_Zombie_Male/zombiemaleattack" />
+      <property name="SoundDeath" value="Enemies/Base_Zombie_Male/zombiemaledeath" />
+      <property name="SoundHurt" value="Enemies/Base_Zombie_Male/zombiemalepain" />
+      <property name="SoundSense" value="FuriousRamsayKamikaze" />
+      <property name="SoundAlert" value="FuriousRamsayKamikaze" />
+      <property name="SoundRandom" value="Enemies/Base_Zombie_Male/zombiemaleroam" />
+      <property name="SoundTick" value="demolitionz_beep,.5,.9" />
+      <property name="SoundExplodeWarn" value="FuriousRamsayKamikaze" />
+      <property name="ExplodeDelay" value="3" />
+      <property name="ChestExplosionDamageMultiplier" value="2" />
+      <property name="HeadExplosionDamageMultiplier" value="2" />
+      <property name="ArmsExplosionDamageMultiplier" value="2" />
+      <property name="LegsExplosionDamageMultiplier" value="2" />
+      <property name="KnockdownKneelDamageThreshold" value="0" />
+      <property name="KnockdownProneDamageThreshold" value="0" />
+      <property name="LegCrippleThreshold" value="0" />
+      <property name="LegCrawlerThreshold" value="0" />
+      <property name="DismemberMultiplierLegs" value="0" />
+      <property name="CrouchType" value="0" />
+      <property name="WalkType" value="6" />
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+      <property name="Tags" value="entity,zombie,perkAT04,kamikaze,FuriousRamsayKamikaze" />
+      <property name="GamestageStart" value="1" />
+      <property name="GamestageEnd" value="60" />
+      <property name="HordeNightChance" value="50" />
+      <property name="PainResistPerHit" value=".5" />
+      <property name="ExplodeHealthThreshold" value="0.5" />
+      <passive_effect name="JumpStrength" operation="base_set" value="0.3" />
+      <property name="LootList" value="zPackStrong" />
+      <property name="HandItem" value="meleeHandZombie01" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="400" />
+        <passive_effect name="HealthMax" operation="perc_set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="20" />
+        <passive_effect name="StaminaMax" operation="base_set" value="10000" />
+        <passive_effect name="StaminaChangeOT" operation="base_add" value="10" />
+      </effect_group>
+      <effect_group name="FuriousRamsayKamikaze">
+        <triggered_effect trigger="onSelfDamagedOther" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier1" />
+        <triggered_effect trigger="onSelfDamagedBlock" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier1">
+					
+				</triggered_effect>
+      </effect_group>
+      <effect_group name="FuriousRamsayVisualEffects">
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Melee/Knives/boneShivPrefab.prefab" local_offset="-0.05,0.1,-0.04" local_rotation="81,230,180" parent_transform="Head" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Ranged/TimedCharge/timedChargePrefab.prefab" local_offset="-0.02,.25,.05" local_rotation="90,0,0" parent_transform="Spine1" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="@:Other/Items/Weapons/Ranged/TimedCharge/timedChargePrefab.prefab" local_offset="-0.01,.14,-.1" local_rotation="-90,0,0" parent_transform="Spine2" />
+      </effect_group>
+      <property class="Explosion">
+        <property class="DamageBonus">
+          <property name="water" value="0" />
+          <property name="wood" value="1" />
+          <property name="earth" value="0" />
+          <property name="metal" value="1" />
+          <property name="stone" value="1" />
+        </property>
+        <property name="ParticleIndex" value="13" />
+        <property name="RadiusBlocks" value="7" />
+        <property name="RadiusEntities" value="6" />
+        <property name="BlockDamage" value="250" />
+        <property name="EntityDamage" value="250" />
+      </property>
+    </entity_class>
+    <entity_class name="rebirthSeekerKamikazeFeral" extends="rebirthSeekerKamikazeMaster">
+      <property name="Tags" value="entity,zombie,perkAT04,feral,kamikaze,FuriousRamsayKamikazeFeral" />
+      <property name="DismemberMultiplierHead" value=".7" />
+      <property name="DismemberMultiplierArms" value=".7" />
+      <property name="DismemberMultiplierLegs" value=".7" />
+      <property name="PainResistPerHit" value=".7" />
+      <property name="Mesh" value="@:Entities/Zombies/Spider/ZSpiderFeral.prefab" />
+      <property name="GamestageStart" value="40" />
+      <property name="GamestageEnd" value="100" />
+      <property name="HordeNightChance" value="75" />
+      <property name="ExplodeHealthThreshold" value="0.4" />
+      <property name="LootList" value="zPackStrong" />
+      <property name="HandItem" value="meleeHandZombieFeral" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="650" />
+        <passive_effect name="HealthMax" operation="perc_set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="20" />
+        <passive_effect name="StaminaMax" operation="base_set" value="10000" />
+        <passive_effect name="StaminaChangeOT" operation="base_add" value="10" />
+      </effect_group>
+      <effect_group name="FuriousRamsayKamikaze">
+        <triggered_effect trigger="onSelfDamagedOther" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier2" />
+        <triggered_effect trigger="onSelfDamagedBlock" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier2">
+					
+				</triggered_effect>
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+      <property class="Explosion">
+        <property name="RadiusBlocks" value="7" />
+        <property name="BlockDamage" value="500" />
+        <property name="RadiusEntities" value="6" />
+        <property name="EntityDamage" value="500" />
+      </property>
+    </entity_class>
+    <entity_class name="rebirthSeekerKamikazeRadiated" extends="rebirthSeekerKamikazeMaster">
+      <property name="Tags" value="entity,zombie,perkAT04,radiated,kamikaze,FuriousRamsayKamikazeRadiated" />
+      <property name="DismemberMultiplierHead" value=".4" />
+      <property name="DismemberMultiplierArms" value=".4" />
+      <property name="DismemberMultiplierLegs" value=".4" />
+      <property name="PainResistPerHit" value=".9" />
+      <property name="ExperienceGain" value="1200" />
+      <property name="Mesh" value="@:Entities/Zombies/Spider/ZSpiderRadiated.prefab" />
+      <property name="GamestageStart" value="70" />
+      <property name="GamestageEnd" value="0" />
+      <property name="HordeNightChance" value="100" />
+      <property name="ExplodeHealthThreshold" value="0.3" />
+      <property name="LootList" value="zPackStrong" />
+      <property name="HandItem" value="meleeHandZombieFeral" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="1000" />
+        <passive_effect name="HealthMax" operation="perc_set" value="1" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="20" />
+        <passive_effect name="StaminaMax" operation="base_set" value="10000" />
+        <passive_effect name="StaminaChangeOT" operation="base_add" value="10" />
+      </effect_group>
+      <effect_group name="FuriousRamsayKamikaze">
+        <triggered_effect trigger="onSelfDamagedOther" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier3" />
+        <triggered_effect trigger="onSelfDamagedBlock" action="AddBuff" buff="rebirthSeekerKamikazeTriggerTier3">
+					
+				</triggered_effect>
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+      <property class="Explosion">
+        <property name="RadiusBlocks" value="7" />
+        <property name="BlockDamage" value="1000" />
+        <property name="RadiusEntities" value="6" />
+        <property name="EntityDamage" value="1000" />
+      </property>
+    </entity_class>
+    <entity_class name="rebirthSeekerKamikazeTainted" extends="rebirthSeekerKamikaze">
+      <property name="Tags" value="entity,zombie,walker,melee,FuriousRamsayKamikaze,particleY,pxUp,pxRotX,feral,tainted" />
+      <property name="DismemberMultiplierHead" value=".2" />
+      <property name="DismemberMultiplierArms" value=".2" />
+      <property name="DismemberMultiplierLegs" value=".2" />
+      <property name="PainResistPerHit" value="1.1" />
+      <property name="HandItem" value="meleeHandZombieFeral" />
+      <property name="ExperienceGain" value="1500" />
+      <property name="LootList" value="zPackStrong" />
+      <property name="TintColor" value="#b583eb" />
+      <property name="TintShaderProperties" value="_EmissiveColor" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="2000" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="ModifyCVar" target="self" cvar="TaintedRegenAmount" operation="set" value="20" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="AddBuff" target="self" buff="rebirthSeekerTaintedRegen" />
+      </effect_group>
+      <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
+    </entity_class>
+  </append>
+</configs>

@@ -290,6 +290,10 @@ def main():
         )
         row["artwork"] = f"Resources/CamperWraps/Artwork/{row['id']}.png"
         row["status"] = "artwork-present-unqualified" if (ROOT / row["artwork"]).is_file() else "artwork-pending"
+    # Owner removal20261031: never recreate these excluded registrations.
+    excluded_ids = {'MermaidsWake', 'DragonsHoard', 'MoonlitWitch', 'PhoenixReborn', 'SteampunkDispatch', 'VampiresVelvet', 'SuperheroDelivery', 'LunarSurveyor', 'UnderseaLaboratory', 'GoblinMarket', 'NecromancersGrimoire', 'ForestDryad', 'DinosaurSafari', 'DeepSpaceCourier', 'AlienBotanist', 'MarsRustRunner'}
+    ROWS[:] = [row for row in ROWS if row["id"] not in excluded_ids]
+    assert len(ROWS) ==184
     out = ROOT / "Resources/CamperWraps"
     out.mkdir(parents=True, exist_ok=True)
     (out / "catalog.json").write_text(json.dumps({"version": 1, "count": len(ROWS), "wraps": ROWS}, indent=2) + "\n", encoding="utf-8")
@@ -306,10 +310,10 @@ def main():
         '        var values = new Dictionary<string,string>(StringComparer.Ordinal);\n'
         '        foreach (string id in Ids) values.Add(ItemPrefix + id, id);\n'
         '        return values;\n    }\n'
-        '    internal static bool Contains(string id) => id != null && Ids.Contains(id);\n'
+        '    internal static bool Contains(string id) => id != null && (Ids.Contains(id) || RebirthCamperWrapComparison.Contains(id));\n'
         '    internal static string FromItem(string name)\n    {\n'
         '        string id;\n'
-        '        return name != null && Items.TryGetValue(name, out id) ? id : null;\n    }\n}\n', encoding='utf-8')
+        '        return name != null && Items.TryGetValue(name, out id) ? id : RebirthCamperWrapComparison.FromItem(name);\n    }\n}\n', encoding='utf-8')
     # Standalone targeted patch: never replace cumulative modifiers or localization.
     configs = ET.Element("configs")
     append = ET.SubElement(configs, "append", xpath="/item_modifiers")

@@ -14,6 +14,46 @@ internal static class RebirthPurgeSupplyCrateSerialization
         internal int EntityId;internal ulong Born;
     }
     private static ConditionalWeakTable<EntitySupplyCrate,Entry> entries=new ConditionalWeakTable<EntitySupplyCrate,Entry>();
+    private sealed class Audit
+    {
+        internal string ReadMode,WriteMode,WriteDecision;
+        internal bool Parsed,ExistingAtRead;
+        internal long ReadBefore,ReadAfter;
+        internal int Reads,Writes;
+    }
+    private static readonly ConditionalWeakTable<EntitySupplyCrate,Audit> audits=new ConditionalWeakTable<EntitySupplyCrate,Audit>();
+    private static readonly object auditGate=new object();
+    private static readonly System.Collections.Generic.Dictionary<int,Newtonsoft.Json.Linq.JObject> lastWrites=new System.Collections.Generic.Dictionary<int,Newtonsoft.Json.Linq.JObject>();
+    private static void RememberWrite(EntitySupplyCrate crate,Audit audit)
+    {
+        if(ReferenceEquals(crate,null)||audit==null)return;
+        Entry entry;bool known=entries.TryGetValue(crate,out entry);
+        var row=new Newtonsoft.Json.Linq.JObject{["diagnosticOnly"]=true,["utc"]=DateTime.UtcNow.ToString("o"),["mode"]=audit.WriteMode,
+            ["decision"]=audit.WriteDecision,["entryPresent"]=known,["authoritative"]=known&&entry.Authoritative,
+            ["idMatches"]=known&&entry.EntityId==crate.entityId,["birthMatches"]=known&&entry.Born==crate.WorldTimeBorn,
+            ["entryBorn"]=known?new Newtonsoft.Json.Linq.JValue(entry.Born):null,["nativeBorn"]=crate.WorldTimeBorn};
+        lock(auditGate){if(lastWrites.Count>=128&&!lastWrites.ContainsKey(crate.entityId))lastWrites.Clear();lastWrites[crate.entityId]=row;}
+    }
+    // Explicit observer only: no authority repair, identifier rebinding or packet dispatch.
+    internal static Newtonsoft.Json.Linq.JObject CaptureAudit(EntitySupplyCrate crate,string player)
+    {
+        if(crate==null)return null;
+        Entry entry;Audit audit;bool known=entries.TryGetValue(crate,out entry);audits.TryGetValue(crate,out audit);
+        Guid native;bool worldParsed=Guid.TryParseExact((crate.world as World)?.worldState?.Guid,"N",out native);
+        Entity registered;bool registeredSame=crate.world!=null&&crate.world.Entities.dict.TryGetValue(crate.entityId,out registered)&&ReferenceEquals(registered,crate);
+        Newtonsoft.Json.Linq.JObject lastWrite;lock(auditGate){lastWrite=lastWrites.TryGetValue(crate.entityId,out var priorWrite)?(Newtonsoft.Json.Linq.JObject)priorWrite.DeepClone():null;}
+        return new Newtonsoft.Json.Linq.JObject {
+            ["entryPresent"]=known,["authoritative"]=known&&entry.Authoritative,["savedSource"]=known&&entry.SavedSource,
+            ["idMatches"]=known&&entry.EntityId==crate.entityId,["birthMatches"]=known&&entry.Born==crate.WorldTimeBorn,
+            ["entryBorn"]=known?new Newtonsoft.Json.Linq.JValue(entry.Born):null,["nativeBorn"]=crate.WorldTimeBorn,
+            ["ownerMatches"]=known&&entry.Stamp.Player==player,["worldMatches"]=known&&worldParsed&&entry.Stamp.World==native,
+            ["registeredSame"]=registeredSame,["currentWorld"]=ReferenceEquals(GameManager.Instance?.World,crate.world),
+            ["lastReadMode"]=audit?.ReadMode,["readTrailerParsed"]=audit?.Parsed??false,["existingAtRead"]=audit?.ExistingAtRead??false,
+            ["readBefore"]=audit?.ReadBefore??-1,["readAfter"]=audit?.ReadAfter??-1,["reads"]=audit?.Reads??0,
+            ["lastWriteMode"]=audit?.WriteMode,["lastWriteDecision"]=audit?.WriteDecision,["writes"]=audit?.Writes??0,
+            ["lastWriteByEntityIdDiagnosticOnly"]=lastWrite
+        };
+    }
     internal static void Reset()=>entries=new ConditionalWeakTable<EntitySupplyCrate,Entry>();
     internal static bool TryAttach(EntitySupplyCrate crate,RebirthPurgeSupplyCrateStamp stamp,object nativeOwner,Func<bool> current)=>
         Attach(crate,stamp,nativeOwner,current,false);
@@ -62,17 +102,28 @@ internal static class RebirthPurgeSupplyCrateSerialization
     }
     internal static void AfterWrite(EntitySupplyCrate __instance,PooledBinaryWriter _bw,StreamModeWrite _eStreamMode,bool __runOriginal)
     {
+        Audit audit=null;if(!ReferenceEquals(__instance,null)&&RebirthPurgeFeedbackTrace.Allowed){audit=audits.GetOrCreateValue(__instance);audit.Writes++;audit.WriteMode=_eStreamMode.ToString();audit.WriteDecision="gated";}
+        try {
         if(!__runOriginal||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||_bw==null||_eStreamMode==StreamModeWrite.ToServer)return;
-        Entry entry;Guid native;if(__instance==null||!entries.TryGetValue(__instance,out entry)||!entry.Authoritative||entry.EntityId!=__instance.entityId||entry.Born!=__instance.WorldTimeBorn||!Guid.TryParseExact((__instance.world as World)?.worldState?.Guid,"N",out native)||native!=entry.Stamp.World)return;
+        if(audit!=null)audit.WriteDecision="entry-or-identity-refused";
+        // Native cached chunks serialize a managed component after Unity destroyed
+        // its GameObject. Unity's overloaded == null must not discard that data.
+        // Original stamp authority and exact native identity/world remain required.
+        Entry entry;Guid native;if(ReferenceEquals(__instance,null)||!entries.TryGetValue(__instance,out entry)||!entry.Authoritative||entry.EntityId!=__instance.entityId||entry.Born!=__instance.WorldTimeBorn||!Guid.TryParseExact((__instance.world as World)?.worldState?.Guid,"N",out native)||native!=entry.Stamp.World)return;
         // EntityCreationData frames each entity blob with an unsigned16-bit length.
         // Refuse oversized append instead of truncating or changing the native envelope.
         if(!_bw.BaseStream.CanSeek||_bw.BaseStream.Length>ushort.MaxValue-RebirthPurgeSupplyCrateStamp.EncodedLength)throw new InvalidOperationException("Supply crate blob exceeds native serialization capacity.");
         entry.Stamp.Write(_bw);
+        if(audit!=null)audit.WriteDecision="trailer-written";
+        } finally {RememberWrite(__instance,audit);}
     }
     internal static void AfterRead(EntitySupplyCrate __instance,PooledBinaryReader _br,StreamModeRead _eStreamMode,bool __runOriginal)
     {
         if(!__runOriginal||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||__instance==null||_br==null||_eStreamMode==StreamModeRead.FromClient)return;
-        RebirthPurgeSupplyCrateStamp stamp;if(!RebirthPurgeSupplyCrateStamp.TryRead(_br,out stamp))return;
+        Audit audit=RebirthPurgeFeedbackTrace.Allowed?audits.GetOrCreateValue(__instance):null;
+        if(audit!=null){audit.Reads++;audit.ReadMode=_eStreamMode.ToString();audit.ExistingAtRead=entries.TryGetValue(__instance,out var prior);audit.ReadBefore=_br.BaseStream.CanSeek?_br.BaseStream.Position:-1;}
+        RebirthPurgeSupplyCrateStamp stamp;bool parsed=RebirthPurgeSupplyCrateStamp.TryRead(_br,out stamp);
+        if(audit!=null){audit.Parsed=parsed;audit.ReadAfter=_br.BaseStream.CanSeek?_br.BaseStream.Position:-1;}if(!parsed)return;
         var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         bool authoritative=_eStreamMode==StreamModeRead.Persistency; // Source retained; current server/world authority is checked on use.
         Entry existing;

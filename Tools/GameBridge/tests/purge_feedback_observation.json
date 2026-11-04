@@ -1,0 +1,10 @@
+{
+  "name": "Purge feedback observation in disposable fixtures",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "CodexTest-prefixed disposable save only. This arms native audio observation and captures the existing bounded feedback trace. It does not discover/clear a POI by itself. Use actual on-foot boundary traversal and native combat between before/after observations; require exact POI identities, native death receipts, UI screenshots and one feedback pair per live transition. Load/re-enter controls must add no feedback. Actual sounds must have advancing native clip samples; dispatch counts alone are insufficient. Guard remains ON." },
+    { "console": "rbpurgetestobserve" },
+    { "console": "rbpurgeaudiotrace start 120" },
+    { "expectNoErrors": true }
+  ]
+}

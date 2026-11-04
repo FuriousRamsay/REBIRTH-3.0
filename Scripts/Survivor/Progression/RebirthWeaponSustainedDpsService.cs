@@ -57,6 +57,7 @@ public static class RebirthWeaponSustainedDpsService
         public int MagazineSize = 1;
         public int AmmoPerAttack = 1;
         public float ReloadSeconds;
+        public string ReloadSource = string.Empty;
         public float BurstDps;
         public float SustainedDps;
         public int AttacksInWindow;
@@ -113,6 +114,7 @@ public static class RebirthWeaponSustainedDpsService
         public string Key = string.Empty;
         public string ItemName = string.Empty;
         public float StartedAt;
+        public double StartedGameTime;
         public float EffectiveReloadMultiplier = 1f;
     }
 
@@ -122,6 +124,47 @@ public static class RebirthWeaponSustainedDpsService
     private static readonly HashSet<string> ReloadProfileDebugKeys = new HashSet<string>(StringComparer.Ordinal);
     private static readonly Dictionary<int, RuntimeReloadStart> ActiveReloads = new Dictionary<int, RuntimeReloadStart>();
     private static readonly Dictionary<string, float> MeasuredBaseReloadSeconds = new Dictionary<string, float>(StringComparer.Ordinal);
+    private sealed class ReloadTimingObservation
+    {
+        public string Item = string.Empty;
+        public float WallSeconds;
+        public double GameSeconds;
+        public float NormalizedBase;
+        public bool Accepted;
+        public int AcceptedCount, RejectedCount;
+    }
+    // Weak keys: diagnostics cannot keep a disconnected player/world alive.
+    private static ConditionalWeakTable<EntityPlayer, ReloadTimingObservation> ReloadTimingObservations = new ConditionalWeakTable<EntityPlayer, ReloadTimingObservation>();
+
+    public static Newtonsoft.Json.Linq.JObject CaptureReloadTiming(EntityPlayer player)
+    {
+        lock (Gate)
+        {
+            if (player == null || !ReloadTimingObservations.TryGetValue(player, out var sample)) return null;
+            return new Newtonsoft.Json.Linq.JObject {
+                ["item"] = sample.Item, ["wallSeconds"] = sample.WallSeconds,
+                ["gameSeconds"] = sample.GameSeconds, ["accepted"] = sample.Accepted,
+                ["normalizedBase"] = sample.Accepted ? new Newtonsoft.Json.Linq.JValue(sample.NormalizedBase) : null,
+                ["acceptedCount"] = sample.AcceptedCount, ["rejectedCount"] = sample.RejectedCount,
+                ["reason"] = sample.Accepted ? "matching-clocks" : "invalid-or-divergent-clocks"
+            };
+        }
+    }
+
+    internal static bool TryNormalizeReloadSample(float wallSeconds, double gameSeconds, float multiplier, out float normalized)
+    {
+        normalized = 0f;
+        if (!Finite(wallSeconds) || wallSeconds < 0.05f || wallSeconds > 30f ||
+            double.IsNaN(gameSeconds) || double.IsInfinity(gameSeconds) || gameSeconds < 0.05 ||
+            !Finite(multiplier) || multiplier <= 0f) return false;
+        // Animation/game time is capped during a long frame and stops while paused.
+        // Do not teach wall-clock stalls as weapon reload downtime, nor substitute an
+        // assumed animation duration. Keep the prior valid sample/fallback instead.
+        // Allow ordinary frame-boundary skew (250 ms or 10% of the cycle).
+        if (Math.Abs(wallSeconds - gameSeconds) > Math.Max(0.25, wallSeconds * 0.1)) return false;
+        normalized = wallSeconds * Mathf.Max(0.05f, multiplier);
+        return Finite(normalized) && normalized > 0f;
+    }
 
     private static readonly object Gate = new object();
     // Keep the same cache identity without formatting strings on every UI/cache hit.
@@ -182,6 +225,7 @@ public static class RebirthWeaponSustainedDpsService
             nextCombatSettlement = 0f;
             ActiveReloads.Clear();
             MeasuredBaseReloadSeconds.Clear();
+            ReloadTimingObservations = new ConditionalWeakTable<EntityPlayer, ReloadTimingObservation>();
             ReloadProfileDebugKeys.Clear();
         }
     }
@@ -722,16 +766,24 @@ public static class RebirthWeaponSustainedDpsService
         float measuredBaseReload;
         bool hasMeasuredReload = TryGetMeasuredBaseReloadSeconds(player, item, skillId, out measuredBaseReload);
         float animationBaseReload = 0f;
-        bool hasAnimationReload = !hasMeasuredReload && liveHeld && TryGetHeldReloadAnimationSeconds(player, item, skillId, out animationBaseReload);
+        // Exact item/controller metadata also works for cold inventory comparisons.
+        // Shared controllers expose unrelated weapons' reload clips, so do not let
+        // that heuristic replace a verified item binding. Completed native reload
+        // measurements remain authoritative over the metadata fallback.
+        float metadataBaseReload = ReadAction0Numeric(item.ItemClass, 0f, "RebirthDpsReloadSeconds");
+        bool hasAnimationReload = !hasMeasuredReload && metadataBaseReload <= 0f && liveHeld && TryGetHeldReloadAnimationSeconds(player, item, skillId, out animationBaseReload);
         // ReloadSpeedMultiplier is the Animator reload-speed parameter: a larger value makes the
         // animation finish sooner. Keep a neutral/base cycle here and divide by the current live
         // speed multiplier. That lets Bandolier, equipment, buffs and weapon-family skill changes
         // alter the displayed/normalization reload time before another real reload is performed.
-        float neutralReload = hasMeasuredReload ? measuredBaseReload : (hasAnimationReload ? animationBaseReload : baseReload);
+        float neutralReload = ResolveRangedReloadBase(hasMeasuredReload ? measuredBaseReload : 0f,
+            metadataBaseReload, hasAnimationReload ? animationBaseReload : 0f, baseReload);
+        p.ReloadSource = hasMeasuredReload ? "measured" : metadataBaseReload > 0f ? "metadata"
+            : hasAnimationReload ? "animation" : baseReload > 0f ? "authored" : "unresolved";
         float reload = neutralReload > 0f ? neutralReload / Mathf.Max(0.05f, reloadSpeedMultiplier) : 0f;
         if (ReloadTimingDebug && liveHeld)
         {
-            string reloadSource = hasMeasuredReload ? "measured" : (hasAnimationReload ? "animation" : (baseReload > 0f ? "authored" : "unresolved"));
+            string reloadSource = p.ReloadSource;
             LogReloadProfileProbe(player, item, skillId, signature, reloadSource, baseReload,
                 hasAnimationReload ? animationBaseReload : 0f, hasMeasuredReload ? measuredBaseReload : 0f,
                 reloadSpeedMultiplier, reload);
@@ -945,6 +997,14 @@ public static class RebirthWeaponSustainedDpsService
         if (item == null || item.ItemClass == null || item.ItemClass.Actions == null || index < 0 || index >= item.ItemClass.Actions.Length || item.ItemClass.Actions[index] == null) return 0f;
         try { return Mathf.Max(0f, item.ItemClass.Actions[index].Delay); }
         catch { return Mathf.Max(0f, ReadNumeric(item.ItemClass.Actions[index], 0f, "Delay", "delay", "ActionDelay", "actionDelay")); }
+    }
+
+    internal static float ResolveRangedReloadBase(float measured, float metadata, float animation, float authored)
+    {
+        if (Finite(measured) && measured > 0f) return measured;
+        if (Finite(metadata) && metadata > 0f) return metadata;
+        if (Finite(animation) && animation > 0f) return animation;
+        return Finite(authored) && authored > 0f ? authored : 0f;
     }
 
     private static float ReadReloadSeconds(ItemClass itemClass, object action)
@@ -1298,6 +1358,7 @@ public static class RebirthWeaponSustainedDpsService
                 Key = key,
                 ItemName = held.ItemClass.GetItemName() ?? string.Empty,
                 StartedAt = Time.realtimeSinceStartup,
+                StartedGameTime = Time.timeAsDouble,
                 EffectiveReloadMultiplier = effectiveMultiplier
             };
         }
@@ -1337,11 +1398,28 @@ public static class RebirthWeaponSustainedDpsService
             !ReferenceEquals(start.Item, held) || data.isReloadCancelled || data.isWeaponReloadCancelled ||
             start.Key != BuildReloadMeasurementKey(player, held, RebirthProgressionRuntimeConfig.ClassifyCombat(held))) return;
         float elapsed = Time.realtimeSinceStartup - start.StartedAt;
-        if (!Finite(elapsed) || elapsed < 0.05f || elapsed > 30f) return;
+        double gameElapsed = Time.timeAsDouble - start.StartedGameTime;
         float multiplier = Mathf.Max(0.05f, start.EffectiveReloadMultiplier);
         // Runtime elapsed is neutralDuration / ReloadSpeedMultiplier, so recover the neutral
         // cycle by multiplying. The neutral value can then be reused with future live modifiers.
-        float normalizedBase = elapsed * multiplier;
+        bool accepted = TryNormalizeReloadSample(elapsed, gameElapsed, multiplier, out float normalizedBase);
+        lock (Gate)
+        {
+            var sample = ReloadTimingObservations.GetOrCreateValue(player);
+            sample.Item = start.ItemName;
+            sample.WallSeconds = elapsed;
+            sample.GameSeconds = gameElapsed;
+            sample.NormalizedBase = normalizedBase;
+            sample.Accepted = accepted;
+            if (accepted) sample.AcceptedCount++; else sample.RejectedCount++;
+        }
+        if (!accepted)
+        {
+            if (ReloadTimingDebug)
+                Log.Out("[REBIRTH RELOAD TIMING] REJECT item='" + start.ItemName + "' wall=" + elapsed.ToString("0.###", CultureInfo.InvariantCulture) +
+                    "s game=" + gameElapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s reason=invalid-or-divergent-clocks");
+            return;
+        }
         lock (Gate)
         {
             MeasuredBaseReloadSeconds[start.Key] = normalizedBase;
@@ -1352,6 +1430,7 @@ public static class RebirthWeaponSustainedDpsService
             Log.Out("[REBIRTH RELOAD TIMING] COMPLETE item='" + start.ItemName +
                 "' entity=" + player.entityId.ToString(CultureInfo.InvariantCulture) +
                 " measuredEffective=" + elapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s" +
+                " gameElapsed=" + gameElapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s" +
                 " effectiveMultiplier=" + multiplier.ToString("0.###", CultureInfo.InvariantCulture) +
                 " normalizedBase=" + normalizedBase.ToString("0.###", CultureInfo.InvariantCulture) + "s");
     }
@@ -1553,7 +1632,15 @@ public static class RebirthWeaponSustainedDpsService
         if (player == null || item == null || profile == null || !profile.Valid) return;
         string key = RecentHeldKey(player, item);
         if (RecentHeld.Count > 128) RecentHeld.Clear();
-        RecentHeld[key] = new CacheEntry { Signature = profile.Signature, LiveHeld = true, BuiltAt = now, Profile = profile };
+        if (!RecentHeld.TryGetValue(key, out var entry) || entry == null)
+            RecentHeld[key] = new CacheEntry { Signature = profile.Signature, LiveHeld = true, BuiltAt = now, Profile = profile };
+        else
+        {
+            entry.Signature = profile.Signature;
+            entry.LiveHeld = true;
+            entry.BuiltAt = now;
+            entry.Profile = profile;
+        }
     }
 
     private static int BuildSignature(EntityPlayer player, ItemValue item, string skillId, bool liveHeld)
@@ -1579,6 +1666,9 @@ public static class RebirthWeaponSustainedDpsService
         }
     }
 
+    [ThreadStatic] private static List<string> signatureMetadataKeys;
+    [ThreadStatic] private static bool signatureMetadataKeysBusy;
+
     private static int BuildItemSignature(ItemValue value)
     {
         if (value == null || value.IsEmpty()) return 0;
@@ -1593,14 +1683,32 @@ public static class RebirthWeaponSustainedDpsService
             hash = hash * 31 + value.SelectedAmmoTypeIndex;
             if (value.Metadata != null && value.Metadata.Count > 0)
             {
-                List<string> keys = new List<string>(value.Metadata.Keys);
-                keys.Sort(StringComparer.Ordinal);
-                for (int i = 0; i < keys.Count; i++)
+                // Preserve the original sorted-key signature without allocating a
+                // new list on each held-profile refresh. Nested calls get a private
+                // list so metadata hashing cannot overwrite an outer traversal.
+                bool reuse = !signatureMetadataKeysBusy;
+                List<string> keys = reuse ? (signatureMetadataKeys ??= new List<string>()) : new List<string>(value.Metadata.Count);
+                if (reuse) signatureMetadataKeysBusy = true;
+                try
                 {
-                    string key = keys[i] ?? string.Empty;
-                    object metadata = value.Metadata[key];
-                    hash = hash * 31 + StringComparer.Ordinal.GetHashCode(key);
-                    hash = hash * 31 + (metadata != null ? metadata.GetHashCode() : 0);
+                    keys.AddRange(value.Metadata.Keys);
+                    keys.Sort(StringComparer.Ordinal);
+                    for (int i = 0; i < keys.Count; i++)
+                    {
+                        string key = keys[i] ?? string.Empty;
+                        object metadata = value.Metadata[key];
+                        hash = hash * 31 + StringComparer.Ordinal.GetHashCode(key);
+                        hash = hash * 31 + (metadata != null ? metadata.GetHashCode() : 0);
+                    }
+                }
+                finally
+                {
+                    keys.Clear();
+                    if (reuse)
+                    {
+                        if (keys.Capacity > 256) signatureMetadataKeys = null;
+                        signatureMetadataKeysBusy = false;
+                    }
                 }
             }
             ItemValue[] mods = value.modifications;

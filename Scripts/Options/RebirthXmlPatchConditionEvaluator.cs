@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using NCalc;
 using System;
 using System.Globalization;
@@ -143,6 +143,12 @@ public static class RebirthXmlOptionConditionResolver
             case "protectcrate": value = s.ProtectCrate; return true;
             case "disablehiringrestrictions": value = s.DisableHiringRestrictions; return true;
             case "smartlooting": value = s.SmartLooting; return true;
+            case "seekermode": value = s.SeekerMode; return true;
+            case "seekerrewards": value = s.SeekerRewards; return true;
+            case "seekernotifications": value = s.SeekerNotifications; return true;
+            case "seekerfrequency": value = s.SeekerFrequency; return true;
+            case "seekerrestriction": value = s.SeekerRestriction; return true;
+            case "seekerhordeday": value = s.SeekerHordeDay; return true;
             default: return false;
         }
     }

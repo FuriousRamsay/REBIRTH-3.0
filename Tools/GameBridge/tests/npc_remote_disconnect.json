@@ -1,0 +1,14 @@
+{
+  "name": "Remote native disconnect with live NPC projections",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable remote client only, in-world with native NPC baseline/capacity received, no window open, guard ON and safe surroundings. This checks disconnect only. Rejoin the SAME process to the owned server separately and inspect lifecycle/network reports and errors; a menu pass alone is not transaction qualification." },
+    { "console": "rbnpc lifecycle" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectWindowOpen": "ingameMenu" },
+    { "action": { "command": "click", "args": { "id": "btnExit", "window": "ingameMenu" } } },
+    { "wait": 1 },
+    { "expectWindowOpen": "mainMenu" },
+    { "expectNoErrors": true }
+  ]
+}

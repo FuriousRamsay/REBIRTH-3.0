@@ -1,0 +1,11 @@
+<configs>
+  <!-- Display/training metadata only; native reload gameplay is unchanged.
+       Installed b9 FPPlayerController -> fpvPipeMachineGunReload ->
+       FP_PipeMachineGun_Reload clip -804819656921162737, 3.46666694s,
+       speed 1, ReloadSpeed parameter, normalized exit .85 + transition .15.
+       The separate weapon-model clip is only 2.9s and is not the full cycle.
+       Proof: _Documentation/PlayerReports_20261102/PipeMachineGunDps/. -->
+  <append xpath="/items/item[@name='gunMGT0PipeMachineGun']/property[@class='Action0']">
+    <property name="RebirthDpsReloadSeconds" value="3.466667"/>
+  </append>
+</configs>

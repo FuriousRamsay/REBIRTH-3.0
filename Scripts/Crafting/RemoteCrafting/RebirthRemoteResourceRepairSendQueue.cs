@@ -14,7 +14,7 @@ internal sealed class RebirthRemoteResourceRepairSendQueue
     private readonly List<Job> jobs=new List<Job>();private long bytes;private int offset;
     internal int Count=>jobs.Count;
     internal long RetainedBytes=>bytes;
-    internal bool IsQueued(string key)=>jobs.Exists(job=>job.Key==key);
+    internal bool IsQueued(string key){for(int i=0;i<jobs.Count;i++)if(jobs[i].Key==key)return true;return false;}
     internal bool Enqueue(string key,RebirthRemoteResourceFragments.Body body,Func<bool> current,Func<bool> ready,Action<int> send)
     {
         if(string.IsNullOrEmpty(key)||key.Length>2048||body==null||current==null||ready==null||send==null)return false;

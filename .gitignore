@@ -518,9 +518,6 @@ FodyWeavers.xsd
 !/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/*.png
 !/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/ApprovedVehicleAddons/*.png
 /Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/10-recycling-station.png
-!/_Documentation/
-!/_Documentation/VehicleStudio/
-!/_Documentation/VehicleStudio/FORGE_FIDELITY_GATE_20261012.md
 # Reference-measured fidelity plans and reusable stage requirements.
 !/Tools/VehicleStudio/AddonSources/model-fidelity-workflow.json
 !/Tools/VehicleStudio/AddonSources/ForgeFidelity/geometry-plan.json
@@ -536,3 +533,13 @@ FodyWeavers.xsd
 !/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/*.py
 
 !/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/independent-comparison-brief.txt
+
+# Owner correction 2026-11-04: keep documentation local, outside Git.
+/_Documentation/
+
+# Reusable wrap compression tools; generated candidates/reviews remain local.
+!/Tools/WrapBundleOptimization20261104/
+!/Tools/WrapBundleOptimization20261104/*.py
+!/Tools/WrapBundleOptimization20261104/README.md
+!/Tools/WrapBundleOptimization20261104/Unity/
+!/Tools/WrapBundleOptimization20261104/Unity/*.cs

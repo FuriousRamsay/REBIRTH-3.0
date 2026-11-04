@@ -1,0 +1,36 @@
+{
+  "name": "Purge shared information window and approved intro — visual acceptance capture",
+  "stopOnFailure": true,
+  "notes": "NOT RUN. Separately authorized disposable host save with Purge enabled. Inspect screenshot/art/title/button and four text accents; automatic PASS only checks open/errors. Owner controls game.",
+  "steps": [
+    {
+      "give": {
+        "item": "FuriousRamsayInfo_Purge1Intro",
+        "toolbelt": 1
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "action": "Primary",
+        "seconds": 2
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_intro_undimmed_20261102"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

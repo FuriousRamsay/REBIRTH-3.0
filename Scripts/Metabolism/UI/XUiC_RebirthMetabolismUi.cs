@@ -532,17 +532,12 @@ public class XUiC_RebirthMetabolismWindow : XUiController
                 value = string.IsNullOrEmpty(snapshot.ActiveIntakeItemName) ? "true" : "false";
                 return true;
             case "rbmet_intake_amount":
-                value = snapshot.ActiveIntakeRemainingMl > 0.05f ? One(snapshot.ActiveIntakeRemainingMl) + " mL still processing" : "--";
+                value = snapshot.ActiveIntakeRemainingMl > 0.05f ? string.Format(Localization.Get("xuiRebirthMetabolismIntakeRemainingMl"), One(snapshot.ActiveIntakeRemainingMl)) : "--";
                 return true;
             case "rbmet_intake_summary":
-                if (snapshot.PendingHydration > 0.05f && snapshot.PendingFood > 0.05f)
-                    value = "H +" + One(snapshot.PendingHydration) + "  •  N +" + One(snapshot.PendingFood);
-                else if (snapshot.PendingHydration > 0.05f)
-                    value = "Hydration +" + One(snapshot.PendingHydration);
-                else if (snapshot.PendingFood > 0.05f)
-                    value = "Nutrition +" + One(snapshot.PendingFood);
-                else
-                    value = "No reserve pending";
+                value = string.Format(Localization.Get("xuiRebirthMetabolismIntakeVolumesMl"),
+                    One(snapshot.StomachFluidMl + snapshot.IntestinalFluidMl),
+                    One(snapshot.StomachSolidMl + snapshot.IntestinalSolidMl));
                 return true;
             case "rbmet_intake_pending":
                 value = "Stomach " + Num(snapshot.FullnessMl) + " mL  •  Gut " + Num(snapshot.IntestinalFluidMl + snapshot.IntestinalSolidMl) + " mL";
@@ -684,6 +679,12 @@ public class XUiC_RebirthMetabolismWindow : XUiController
             case "rbmet_slot_fill": value = snapshot.HydrationSlotCapacityMl > 0f ? Math.Max(0f, Math.Min(1f, snapshot.HydrationSlotVolumeMl / snapshot.HydrationSlotCapacityMl)).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture) : "0"; return true;
             case "rbmet_slot_liquid": value = string.IsNullOrEmpty(snapshot.HydrationSlotLiquidProfile) ? "--" : snapshot.HydrationSlotLiquidProfile; return true;
             case "rbmet_autosip": value = snapshot.AutoSipEnabled ? Localization.Get("xuiRebirthMetabolismAutoSipOn") : Localization.Get("xuiRebirthMetabolismAutoSipOff"); return true;
+            case "rbmet_autosip_detail":
+                float projectedRatio = snapshot.HydrationMax > 0.001f
+                    ? Math.Max(0f, Math.Min(1f, snapshot.ProjectedHydration / snapshot.HydrationMax)) : 0f;
+                value = string.Format(Localization.Get("xuiRebirthMetabolismAutoSipDetail"),
+                    Pct(projectedRatio), Pct(RebirthMetabolismConfig.AutoSipStartProjectedPercent));
+                return true;
             case "rbmet_feedback": value = RebirthMetabolismUiFeedback.CurrentMessage; return true;
             default: return base.GetBindingValueInternal(ref value, bindingName);
         }

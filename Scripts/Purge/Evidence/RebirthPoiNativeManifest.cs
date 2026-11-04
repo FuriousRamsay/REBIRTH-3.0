@@ -45,7 +45,7 @@ internal sealed class RebirthPoiNativeManifest
                 int id=world.FindSleeperVolume(minimum,maximum); if(id<0) return false;
                 var volume=world.GetSleeperVolume(id);
                 if(volume==null || !ReferenceEquals(volume.prefabInstance,prefab) || !volume.BoxMin.Equals(minimum) || !volume.BoxMax.Equals(maximum) ||
-                    volume.spawnCountMin!=definition.spawnCountMin || volume.spawnCountMax!=definition.spawnCountMax || volume.flags!=definition.flags ||
+                    volume.spawnCountMin!=definition.spawnCountMin || volume.spawnCountMax!=definition.spawnCountMax || !RebirthPoiSleeperShapePolicy.FlagsMatch(volume.flags,definition.flags) ||
                     !distinct.Add(volume)) return false;
                 mapped.Add(volume);
             }
@@ -68,10 +68,10 @@ internal sealed class RebirthPoiNativeManifest
         try
         {
             if(volume==null||!Volumes.Contains(volume)||!StillMatches())return false;
-            var definitions=Prefab.prefab.SleeperVolumeList;int matches=0;string script=string.Empty;
-            for(int i=0;i<definitions.Count;i++){var d=definitions[i];if((Prefab.boundingBoxPosition+d.startPos).Equals(volume.BoxMin)&&(Prefab.boundingBoxPosition+d.startPos+d.size).Equals(volume.BoxMax)){matches++;script=d.minScript??string.Empty;}}
+            var definitions=Prefab.prefab.SleeperVolumeList;int matches=0;string script=string.Empty;int authoredFlags=0;
+            for(int i=0;i<definitions.Count;i++){var d=definitions[i];if((Prefab.boundingBoxPosition+d.startPos).Equals(volume.BoxMin)&&(Prefab.boundingBoxPosition+d.startPos+d.size).Equals(volume.BoxMax)){matches++;script=d.minScript??string.Empty;authoredFlags=d.flags;}}
             if(matches!=1||script.Length>4096)return false;var f=System.Globalization.CultureInfo.InvariantCulture;
-            string shape=Identity.Key+"|"+volume.BoxMin.x.ToString(f)+","+volume.BoxMin.y.ToString(f)+","+volume.BoxMin.z.ToString(f)+"|"+volume.BoxMax.x.ToString(f)+","+volume.BoxMax.y.ToString(f)+","+volume.BoxMax.z.ToString(f)+"|"+volume.flags.ToString(f)+"|"+volume.spawnCountMin.ToString(f)+"|"+volume.spawnCountMax.ToString(f)+"|"+script.Length.ToString(f)+":"+script;
+            string shape=Identity.Key+"|"+volume.BoxMin.x.ToString(f)+","+volume.BoxMin.y.ToString(f)+","+volume.BoxMin.z.ToString(f)+"|"+volume.BoxMax.x.ToString(f)+","+volume.BoxMax.y.ToString(f)+","+volume.BoxMax.z.ToString(f)+"|"+authoredFlags.ToString(f)+"|"+volume.spawnCountMin.ToString(f)+"|"+volume.spawnCountMax.ToString(f)+"|"+script.Length.ToString(f)+":"+script;
             using(var hash=System.Security.Cryptography.SHA256.Create())descriptor=BitConverter.ToString(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(shape))).Replace("-","").ToLowerInvariant();return true;
         }
         catch{return false;}
@@ -107,7 +107,7 @@ internal sealed class RebirthPoiNativeManifest
                 if(!ReferenceEquals(volume,Volumes[mapped++])||volume==null||!ReferenceEquals(volume.prefabInstance,Prefab)||
                     !volume.BoxMin.Equals(minimum)||!volume.BoxMax.Equals(maximum)||
                     volume.spawnCountMin!=definition.spawnCountMin||volume.spawnCountMax!=definition.spawnCountMax||
-                    volume.flags!=definition.flags)return false;
+                    !RebirthPoiSleeperShapePolicy.FlagsMatch(volume.flags,definition.flags))return false;
             }
             if(mapped==0||mapped!=Volumes.Length)return false;
             foreach(var volume in Prefab.sleeperVolumes)
@@ -233,14 +233,24 @@ internal sealed class RebirthPoiNativeManifest
             using(var hash=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(shape))).Replace("-","").ToLowerInvariant();
         }
         internal bool KnownDescriptor(string descriptor)
-        {return BindIdentity()&&shapes.Count(s=>s.Combat&&Descriptor(s)==descriptor)==1;}
+        {
+            if(!BindIdentity())return false;
+            bool found=false;
+            foreach(var shape in shapes)
+                if(shape.Combat&&Descriptor(shape)==descriptor)
+                {if(found)return false;found=true;}
+            return found;
+        }
         internal bool TryRoom(SleeperVolume volume,out int id,out string descriptor)
         {
             descriptor=null;id=-1;
             if(!AuthoredCurrent()||volume==null||!ReferenceEquals(volume.prefabInstance,Prefab))return false;
-            var matching=shapes.Where(s=>s.Combat&&(origin+s.Start).Equals(volume.BoxMin)&&(origin+s.Start+s.Size).Equals(volume.BoxMax)).ToArray();
-            if(matching.Length!=1)return false;var shape=matching[0];
-            if(volume.flags!=shape.Flags||volume.spawnCountMin!=shape.Minimum||volume.spawnCountMax!=shape.Maximum||
+            Shape shape=null;
+            foreach(var candidate in shapes)
+                if(candidate.Combat&&(origin+candidate.Start).Equals(volume.BoxMin)&&(origin+candidate.Start+candidate.Size).Equals(volume.BoxMax))
+                {if(shape!=null)return false;shape=candidate;}
+            if(shape==null)return false;
+            if(!RebirthPoiSleeperShapePolicy.FlagsMatch(volume.flags,shape.Flags)||volume.spawnCountMin!=shape.Minimum||volume.spawnCountMax!=shape.Maximum||
                 (id=World.FindSleeperVolume(volume.BoxMin,volume.BoxMax))<0||!ReferenceEquals(World.GetSleeperVolume(id),volume))return false;
             if(BindIdentity())descriptor=Descriptor(shape);
             return true;
@@ -251,9 +261,12 @@ internal sealed class RebirthPoiNativeManifest
         {
             descriptor=null;
             if(!BindIdentity()||volume==null||!ReferenceEquals(volume.prefabInstance,Prefab))return false;
-            var matching=shapes.Where(s=>s.Combat&&(origin+s.Start).Equals(volume.BoxMin)&&(origin+s.Start+s.Size).Equals(volume.BoxMax)&&
-                volume.flags==s.Flags&&volume.spawnCountMin==s.Minimum&&volume.spawnCountMax==s.Maximum).ToArray();
-            if(matching.Length!=1)return false;descriptor=Descriptor(matching[0]);return true;
+            Shape shape=null;
+            foreach(var candidate in shapes)
+                if(candidate.Combat&&(origin+candidate.Start).Equals(volume.BoxMin)&&(origin+candidate.Start+candidate.Size).Equals(volume.BoxMax)&&
+                    RebirthPoiSleeperShapePolicy.FlagsMatch(volume.flags,candidate.Flags)&&volume.spawnCountMin==candidate.Minimum&&volume.spawnCountMax==candidate.Maximum)
+                {if(shape!=null)return false;shape=candidate;}
+            if(shape==null)return false;descriptor=Descriptor(shape);return true;
         }
     }
 }

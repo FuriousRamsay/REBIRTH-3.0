@@ -15,6 +15,7 @@ internal static partial class RebirthProductiveEarnedPendingToolGestures
     }
     private static void PumpToolPublications()
     {
+        if(observations.Count==0)return;
         foreach(var scope in observations.Values.ToArray())
         {
             try

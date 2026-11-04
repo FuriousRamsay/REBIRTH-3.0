@@ -1,0 +1,23 @@
+{
+  "name": "Player Help sleeper controls — disposable host UI smoke (NOT RUN)",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires this feature installed and coordinated ownership of the disposable test game. Guard remains ON. This smoke checks the real ESC/button path and safe status/stop outside a Purge POI. It does not prove successful activation, remote authorization denial/revocation or force confirmation; follow the acceptance matrix in _Documentation/PlayerHelp/PLAYER_HELP_IMPLEMENTATION_20261102.md." },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "wait": 0.4 },
+    { "action": { "command": "click", "args": { "id": "btnRebirthPlayerHelp" } } },
+    { "wait": 0.5 },
+    { "expectWindowOpen": "rebirthPlayerHelp" },
+    { "screenshot": "player_help_sleepers_open" },
+    { "action": { "command": "click", "args": { "id": "helpStatus" } } },
+    { "wait": 0.5 },
+    { "screenshot": "player_help_sleepers_status" },
+    { "action": { "command": "click", "args": { "id": "helpStop" } } },
+    { "wait": 0.5 },
+    { "screenshot": "player_help_sleepers_stop" },
+    { "action": { "command": "click", "args": { "id": "helpClose" } } },
+    { "wait": 0.3 },
+    { "screenshot": "player_help_closed" },
+    { "expectNoErrors": true }
+  ]
+}

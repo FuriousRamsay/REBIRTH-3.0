@@ -1,0 +1,15 @@
+{
+  "name":"HUD buckle sparse repaint visual smoke",
+  "status":"AUTHORED_NOT_RUN",
+  "stopOnFailure":true,
+  "preconditions":"Lead-owned disposable save, guard ON, ordinary HUD visible, healthy player on verified clear flat ground with no nearby threat or obstacle. Use matched camera/settings for baseline/proposal; inspect all four gauge orientations and caps. No Energy-drop investigation, user-game control or gameplay tuning. Script success is not measured FPS/pixel-equivalence evidence; actual-source byte comparisons are separate.",
+  "steps":[
+    {"action":{"command":"surroundings","args":{}}},
+    {"screenshot":"hud_buckle_before_movement"},
+    {"move":{"forward":1,"seconds":2,"run":1}},
+    {"screenshot":"hud_buckle_during_recovery"},
+    {"wait":3},
+    {"screenshot":"hud_buckle_after_recovery"},
+    {"expectNoErrors":true}
+  ]
+}

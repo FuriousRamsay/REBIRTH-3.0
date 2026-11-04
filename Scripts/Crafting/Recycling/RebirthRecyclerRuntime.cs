@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,6 +19,7 @@ public static partial class RebirthRecyclerRuntime
     }
     private sealed class Processing {internal bool Active;internal int NativeOwnerFrame=-1;}
     private static readonly ConditionalWeakTable<TileEntityWorkstation,Processing> processing=new ConditionalWeakTable<TileEntityWorkstation,Processing>();
+    private static readonly MethodInfo syncUiFromTe=AccessTools.Method(typeof(XUiC_WorkstationWindowGroup),"syncUIfromTE");
     private static bool installed;
     public static void Install()
     {
@@ -406,7 +408,7 @@ public static partial class RebirthRecyclerRuntime
             {
                 if(station is RebirthCamperStationState mobile)
                 {if(RebirthCamperStationWindowSession.Admitted(window,mobile))RebirthCamperStationQueueProjection.Refresh(window,mobile);}
-                else AccessTools.Method(typeof(XUiC_WorkstationWindowGroup),"syncUIfromTE")?.Invoke(window,null);
+                else syncUiFromTe?.Invoke(window,null);
                 window.SetAllChildrenDirty();
             }
     }

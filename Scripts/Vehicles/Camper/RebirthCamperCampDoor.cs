@@ -40,9 +40,15 @@ internal static class RebirthCamperCampDoor
     }
     private static bool Current(EntityVehicle v) => ThreadManager.IsMainThread() && v?.vehicle != null && v.world != null
         && ReferenceEquals(GameManager.Instance?.World, v.world) && ReferenceEquals(v.world.GetEntity(v.entityId), v) && RebirthCamperRadial.IsCamper(v);
+    private sealed class ParsedDoor { internal string Text;internal Guid Identity;internal Frame Value; }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityVehicle,ParsedDoor> parsedDoors
+        =new System.Runtime.CompilerServices.ConditionalWeakTable<EntityVehicle,ParsedDoor>();
+    private static Frame CopyFrame(Frame f)=>new Frame {Identity=f.Identity,Mode=f.Mode,Epoch=f.Epoch,Revision=f.Revision,Open=f.Open};
     private static Frame Read(EntityVehicle v, Guid identity)
     {
         if (!v.vehicle.GetUpdatedItemValue().TryGetMetadata(Key, out string text)) return null;
+        var cached=parsedDoors.GetValue(v,_=>new ParsedDoor());
+        if(cached.Value!=null&&cached.Identity==identity&&string.Equals(cached.Text,text,StringComparison.Ordinal))return CopyFrame(cached.Value);
         var fields = text.Split('|');
         if (fields.Length != 6 || fields[0] != "1" || !Guid.TryParse(fields[1], out var id) || id != identity
             || !int.TryParse(fields[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int mode)
@@ -50,7 +56,8 @@ internal static class RebirthCamperCampDoor
             || !long.TryParse(fields[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out long epoch) || epoch < 0
             || !long.TryParse(fields[4], NumberStyles.Integer, CultureInfo.InvariantCulture, out long revision) || revision < 0
             || (fields[5] != "0" && fields[5] != "1")) return null;
-        return new Frame { Identity = id, Mode = (RebirthCamperEnergyMode)mode, Epoch = epoch, Revision = revision, Open = fields[5] == "1" };
+        var result=new Frame { Identity = id, Mode = (RebirthCamperEnergyMode)mode, Epoch = epoch, Revision = revision, Open = fields[5] == "1" };
+        cached.Text=text;cached.Identity=identity;cached.Value=CopyFrame(result);return result;
     }
     private static void Persist(EntityVehicle v, Frame f)
     {

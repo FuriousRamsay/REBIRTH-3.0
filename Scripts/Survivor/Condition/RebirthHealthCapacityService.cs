@@ -48,13 +48,18 @@ public static class RebirthHealthCapacityService
         float potential = GetPotential(record);
         if (potential <= 0f) return false;
 
-        // Native god mode is a full-restoration/debug state. Survivor condition capacity is
-        // intentionally preserved in the record so disabling god mode restores the real injury,
-        // but it must not continue to clamp the live Health stat while god mode is active.
+        // God mode clears the stored restriction as well as the live stat, so leaving
+        // god mode cannot reapply an injury that native god mode already removed.
         if (player.IsGodMode.Value)
         {
+            bool changed = record.Condition.HealthCapacity != potential ||
+                record.Condition.SevereDehydrationActiveSeconds != 0f ||
+                record.Condition.SevereMalnutritionActiveSeconds != 0f;
+            record.Condition.HealthCapacity = potential;
+            record.Condition.SevereDehydrationActiveSeconds = 0f;
+            record.Condition.SevereMalnutritionActiveSeconds = 0f;
             ApplyGodModeHealth(player.Stats);
-            return false;
+            return changed;
         }
 
         RebirthWorldConditionState condition = record.Condition;
@@ -138,8 +143,7 @@ public static class RebirthHealthCapacityService
             return;
 
         // Do not let persisted Survivor injury/deprivation capacity override native god mode.
-        // This is a live-stat override only; the stored condition remains untouched and returns
-        // when god mode is disabled.
+        // The authoritative condition tick also clears the stored restriction.
         if (player.IsGodMode.Value)
         {
             ApplyGodModeHealth(stats);

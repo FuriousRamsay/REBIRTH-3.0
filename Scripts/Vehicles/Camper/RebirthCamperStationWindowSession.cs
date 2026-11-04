@@ -194,15 +194,25 @@ public static class RebirthCamperStationWindowSession
     }
 
     private static bool IsCurrent(Session session)
-        => !session.Closing && session.Vehicle != null && session.Player != null
-            && session.Vehicle.world != null
-            && session.Vehicle.world.IsRemote()==session.Remote
-            && ReferenceEquals(session.Vehicle.world.GetEntity(session.Vehicle.entityId), session.Vehicle)
-            && (session.Remote || !RebirthCamperModuleRuntime.For(session.Vehicle).TransferPending
-                && ReferenceEquals(RebirthCamperModuleRuntime.For(session.Vehicle).Stations.Find(session.State.InstallationId)?.State, session.State))
-            && !session.Player.IsDead() && ReferenceEquals(session.Vehicle.world, session.Player.world)
+    {
+        if (session.Closing || session.Vehicle == null || session.Player == null
+            || session.Vehicle.world == null
+            || session.Vehicle.world.IsRemote() != session.Remote
+            || !ReferenceEquals(session.Vehicle.world.GetEntity(session.Vehicle.entityId), session.Vehicle))
+            return false;
+        if (!session.Remote)
+        {
+            // The visible station window checks this every frame. Resolve the same
+            // authoritative owner once for both transfer and installation checks.
+            var runtime = RebirthCamperModuleRuntime.For(session.Vehicle);
+            if (runtime.TransferPending
+                || !ReferenceEquals(runtime.Stations.Find(session.State.InstallationId)?.State, session.State))
+                return false;
+        }
+        return !session.Player.IsDead() && ReferenceEquals(session.Vehicle.world, session.Player.world)
             && UnityEngine.Vector3.SqrMagnitude(session.Vehicle.position - session.Player.position) <= 64f
             && session.Vehicle.AllowActivationCommand("service", session.Player) && session.Current();
+    }
 
     public static bool IsInUse(RebirthCamperStationState station)
     {

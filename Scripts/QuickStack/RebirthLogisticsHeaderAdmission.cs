@@ -17,6 +17,7 @@ internal static class RebirthLogisticsHeaderAdmission
     }
     private const int MaximumBytes=65536;
     private static World ownerWorld;private static Header pending;private static DateTime next;private static bool quarantined;
+    private static DateTime nextRecoveryScan;
     private static XElement CommandXml(RebirthLogisticsNativeBodyIntent.Command c)=>new XElement("command",new XAttribute("operation",c.Operation.ToString("N")),new XAttribute("world",c.World),new XAttribute("owner",c.Owner),new XAttribute("creation",c.Creation),new XAttribute("deaths",c.Deaths),new XAttribute("epoch",c.Epoch),new XAttribute("request",c.Request),new XAttribute("action",(byte)c.Action),new XElement("target",Convert.ToBase64String(Encoding.UTF8.GetBytes(c.Target))),new XElement("selection",Convert.ToBase64String(Encoding.UTF8.GetBytes(c.Selection))));
     private static bool Hex(string text,int length)=>text?.Length==length&&text.All(c=>c>='0'&&c<='9'||c>='a'&&c<='f');
     private static RebirthLogisticsNativeBodyIntent.Command ParseCommand(XElement root)
@@ -256,7 +257,7 @@ internal static class RebirthLogisticsHeaderAdmission
     {
         RebirthLogisticsHistoricalBeforeCapsule.ResetWorld(world);
         if(!ThreadManager.IsMainThread()||ReferenceEquals(ownerWorld,world))return;
-        ownerWorld=world;pending=null;quarantined=false;next=DateTime.MinValue;
+        ownerWorld=world;pending=null;quarantined=false;next=DateTime.MinValue;nextRecoveryScan=DateTime.MinValue;
         // Only volatile pointers are released; all original sidecars remain.
     }
     internal static bool HasPending=>pending!=null||quarantined;
@@ -265,7 +266,7 @@ internal static class RebirthLogisticsHeaderAdmission
     {
         try
         {
-            if(!ThreadManager.IsMainThread())return false;Tick(player);if(HasPending||player.IsDead()||player.Died!=command.Deaths)return false;
+            if(!ThreadManager.IsMainThread())return false;Tick(player,true);if(HasPending||player.IsDead()||player.Died!=command.Deaths)return false;
             var h=new Header{Command=command,Entity=player.entityId,Nonce=string.Empty};if(!OwnerCurrent(player,h)||!WriteOnce(OwnerPath(h),Marker(h,"intent")))return false;
             pending=h;ownerWorld=player.world;next=DateTime.MinValue;return true;
         }
@@ -297,19 +298,27 @@ internal static class RebirthLogisticsHeaderAdmission
         Directory.CreateDirectory(Path.GetDirectoryName(destination));Directory.Move(source,destination);RebirthLogisticsHistoricalBeforeCapsule.ForgetTransport(h.Command.Operation);
     }
     private static void Finish(Header h,int state,string proof)
-    {if(!WriteOnce(OwnerPath(h)+".done",DoneMarker(h,state,proof)))return;ArchiveOwner(h);if(ReferenceEquals(pending,h))pending=null;}
+    {if(!WriteOnce(OwnerPath(h)+".done",DoneMarker(h,state,proof)))return;ArchiveOwner(h);if(ReferenceEquals(pending,h)){pending=null;nextRecoveryScan=DateTime.MinValue;}}
     internal static bool CancelBeforeHold(EntityPlayerLocal player)
     {
         try{if(pending==null||!OwnerCurrent(player,pending)||HasMarker(pending,"holdAttempted"))return false;return WriteOnce(OwnerPath(pending)+".cancel",Marker(pending,"cancel"));}
         catch{quarantined=true;return true;}
     }
-    internal static void Tick(EntityPlayerLocal player)
+    internal static void Tick(EntityPlayerLocal player,bool forceRecoveryScan=false)
     {
         if(!ThreadManager.IsMainThread()||player?.world?.IsRemote()!=true)return;
         ResetWorld(player.world);
         try
         {
-            if(quarantined)return;if(pending==null&&!Load(player))return;var h=pending;if(h==null||!OwnerIdentity(player,h))return;
+            if(quarantined)return;
+            if(pending==null)
+            {
+                DateTime now=DateTime.UtcNow;
+                if(!forceRecoveryScan&&now<nextRecoveryScan)return;
+                nextRecoveryScan=now.AddSeconds(1);
+                if(!Load(player))return;
+            }
+            var h=pending;if(h==null||!OwnerIdentity(player,h))return;
             if(RebirthLogisticsOwnerReceipt.TryOperation(player.Buffs,out var existing,out _)&&existing==h.Command.Operation){RebirthLogisticsHistoricalBeforeCapsule.OwnerTick(player,h.Command,h.Nonce);return;} // Never re-Begin an already native-bound GUID, even if a local sidecar was lost.
             bool attempted=HasMarker(h,"holdAttempted"),cancel=HasMarker(h,"cancel");
             if(!attempted&&(!OwnerCurrent(player,h)||h.Entity!=player.entityId||player.Died!=h.Command.Deaths))

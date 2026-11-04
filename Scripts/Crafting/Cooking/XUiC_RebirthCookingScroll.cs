@@ -23,7 +23,7 @@ public sealed class XUiC_RebirthCookingScroll : XUiController
         columns=bag?13:queue?1:3;visibleRows=bag||queue?2:1;pitch=bag?96:queue?82:75;
         entries=queue?(XUiController[])grid.GetChildrenByType<XUiC_RecipeStack>():grid.GetChildrenByType<XUiC_ItemStack>();
         // Native queues execute from the last slot. Reverse presentation, never storage.
-        if(queue)entries=entries.Reverse().ToArray();
+        if(queue)entries=Enumerable.Reverse(entries).ToArray();
         dishNames=new XUiV_Label[entries.Length];
         for(int i=0;i<entries.Length;i++)
             if(entries[i] is XUiC_RecipeStack) dishNames[i]=entries[i].GetChildById("dishName")?.ViewComponent as XUiV_Label;
@@ -66,7 +66,8 @@ public sealed class XUiC_RebirthCookingScroll : XUiController
             if(entries[i] is XUiC_RecipeStack recipeSlot && dishNames[i] is XUiV_Label name)
             {
                 var recipe=recipeSlot.GetRecipe();
-                name.Text=recipe==null?"":Localization.Get(recipe.GetName());
+                string text=recipe==null?"":Localization.Get(recipe.GetName());
+                if(name.Text!=text)name.Text=text;
             }
         }
         foreach(var control in scrollControls)control.IsVisible=max>0;

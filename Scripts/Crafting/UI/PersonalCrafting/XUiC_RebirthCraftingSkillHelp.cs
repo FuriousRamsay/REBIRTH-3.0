@@ -11,9 +11,12 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
     private XUiC_RebirthCraftingRecipeDetails details;
     private Recipe recipe;
     private readonly RebirthCapabilityRequirementEvaluation[] targets = new RebirthCapabilityRequirementEvaluation[3];
+    private readonly XUiController[] targetControls = new XUiController[3];
+    private XUiController recipeRowControl, metControl;
     private RebirthCapabilityRequirementEvaluation active;
     private readonly List<Entry> entries = new List<Entry>();
     private const int RowCapacity=256;
+    private int renderedRowCount=RowCapacity;
     private int contentHeight=-1;
     private bool treatment, expanded;
     private float refreshAt, rowsAt;
@@ -39,6 +42,9 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
         base.Init();
         Cache(this);
         details = GetParentByType<XUiC_RebirthCraftingRecipeDetails>();
+        for (int i=0;i<targetControls.Length;i++) targetControls[i]=Find("skillHelpTarget"+i);
+        recipeRowControl=Find("skillHelpRecipeRow");
+        metControl=Find("skillHelpMet");
         for (int i=0;i<3;i++)
         {
             int row=i;
@@ -72,9 +78,9 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
         if(active!=null)base.Update(dt);
         else
         {
-            for(int i=0;i<3;i++)Find("skillHelpTarget"+i)?.Update(dt);
-            Find("skillHelpRecipeRow")?.Update(dt);
-            Find("skillHelpMet")?.Update(dt);
+            for(int i=0;i<targetControls.Length;i++)targetControls[i]?.Update(dt);
+            recipeRowControl?.Update(dt);
+            metControl?.Update(dt);
         }
         if(details==null || xui?.playerUI?.entityPlayer==null) return;
         if(recipe!=details.SelectedRecipe) {Hide();recipe=details.SelectedRecipe;refreshAt=0;}
@@ -209,16 +215,17 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
         var player=xui.playerUI.entityPlayer;
         if(!medical)
         {
+            var byOutput=new Dictionary<int,Entry>();
             foreach(var r in XUiM_Recipes.GetRecipes())
             {
                 if(r==null || RebirthServiceCraftSkillService.ClassifyRecipe(r)!=active.Id)continue;
                 var item=r.GetOutputItemClass();if(item==null)continue;
                 bool unlocked=XUiM_Recipes.GetRecipeIsUnlocked(xui,r);
-                var entry=entries.FirstOrDefault(e=>e.Recipe.itemValueType==r.itemValueType);
-                if(entry==null)
+                if(!byOutput.TryGetValue(r.itemValueType,out var entry))
                 {
                     entry=new Entry{Name=item.GetLocalizedItemName(),Icon=item.GetIconName(),Key=item.GetItemName(),Recipe=r,Priority=unlocked,Status=unlocked?"Unlocked":"Locked"};
                     entries.Add(entry);
+                    byOutput.Add(r.itemValueType,entry);
                 }
                 entry.Variants.Add(r);
                 if(unlocked && !entry.Priority){entry.Recipe=r;entry.Priority=true;entry.Status="Unlocked";}
@@ -295,7 +302,9 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
         if(boundsChanged){contentHeight=height;Find("skillHelpContent").ViewComponent.Size=new Vector2i(370,height);}
         float value;RebirthNativeScrollbarUtil.TryGetValue(scroll,out value);
         int first=Math.Max(0,(int)(value*Math.Max(0,height-448)/52)-1);
-        for(int i=0;i<RowCapacity;i++)
+        int shown=Math.Min(RowCapacity,rows.Count);
+        int limit=Math.Max(shown,renderedRowCount);
+        for(int i=0;i<limit;i++)
         {
             int n=i;Show("skillHelpRow"+i,n<rows.Count);
             if(n>=rows.Count)continue;
@@ -320,9 +329,10 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
                 Text("skillHelpGain"+i,treatment?e.TreatmentGain:RebirthCraftSkillPreview.GainText(e.Preview.Get(xui.playerUI.entityPlayer,e.Recipe,1,false)));
             }
         }
+        renderedRowCount=shown;
         if(boundsChanged)RebirthNativeScrollbarUtil.Refresh(scroll);
     }
-    private void Hide(){active=null;expanded=false;generation++;entries.Clear();Show("skillHelpMain",false);Show("skillHelpList",false);Show("skillHelpCraftSelected",false);Show("skillHelpTreatSelected",false);}
+    private void Hide(){active=null;expanded=false;renderedRowCount=RowCapacity;generation++;entries.Clear();Show("skillHelpMain",false);Show("skillHelpList",false);Show("skillHelpCraftSelected",false);Show("skillHelpTreatSelected",false);}
     private void Show(string id,bool value){var v=Find(id)?.ViewComponent;if(v!=null){if(v.IsVisible!=value)v.IsVisible=value;if(v.UiTransform!=null && v.UiTransform.gameObject.activeSelf!=value)v.UiTransform.gameObject.SetActive(value);}}
     private void Text(string id,string value){var v=Find(id)?.ViewComponent as XUiV_Label;if(v!=null && v.Text!=value)v.Text=value;}
     private void Icon(string id,string value){var v=Find(id)?.ViewComponent as XUiV_Sprite;if(v!=null && v.SpriteName!=value)v.SpriteName=value;}

@@ -1,0 +1,25 @@
+<configs>
+  <insertBefore xpath="/windows/window[@name='ingameMenu']/grid[@name='buttons']/*[@name='btnExit']">
+    <simplebutton name="btnRebirthPlayerHelp" caption_key="xuiRebirthPlayerHelpTitle" depth="3" width="496" height="46" font_size="24" upper_case="false" enabled_font_color="181,140,255,255" hovered_font_color="181,140,255,255" defaultcolor="12,12,16,255" bordercolor="83,77,94,255" hovercolor="104,94,63,255" />
+  </insertBefore>
+  <append xpath="/windows">
+    <window name="rebirthPlayerHelpWindow" controller="RebirthPlayerHelp, RebirthUtils" anchor="Center" pos="-480,330" width="960" height="660" cursor_area="true">
+      <sprite pos="0,0" width="960" height="660" sprite="menu_empty" type="sliced" fillcenter="true" color="18,18,24,252" depth="0" />
+      <sprite pos="0,0" width="960" height="660" sprite="menu_empty2px" type="sliced" fillcenter="false" color="95,73,115,255" depth="1" />
+      <label pos="28,-22" width="800" height="44" text_key="xuiRebirthPlayerHelpTitle" font_size="32" color="181,140,255,255" depth="3" />
+      <label pos="28,-78" width="900" height="34" text_key="xuiRebirthPlayerHelpSleepersTitle" font_size="24" color="235,235,240,255" depth="3" />
+      <label pos="28,-120" width="900" height="92" text_key="xuiRebirthPlayerHelpDescription" font_size="19" color="218,212,192,255" depth="3" />
+      <label name="helpAccess" pos="28,-222" width="900" height="50" text_key="xuiRebirthPlayerHelpPermissionsPending" font_size="18" color="181,140,255,255" depth="3" />
+      <rect name="sleeperActions" pos="28,-282" width="904" height="48" visible="false">
+        <simplebutton name="helpStatus" pos="0,0" width="210" height="44" caption_key="xuiRebirthPlayerHelpStatus" font_size="20" depth="4" />
+        <simplebutton name="helpStart" pos="228,0" width="210" height="44" caption_key="xuiRebirthPlayerHelpStart" font_size="20" depth="4" />
+        <simplebutton name="helpStop" pos="456,0" width="210" height="44" caption_key="xuiRebirthPlayerHelpStop" font_size="20" depth="4" />
+        <simplebutton name="helpForce" pos="684,0" width="210" height="44" caption_key="xuiRebirthPlayerHelpForce" font_size="20" depth="4" />
+      </rect>
+      <sprite pos="28,-350" width="904" height="2" sprite="menu_empty" color="83,77,94,255" depth="2" />
+      <label name="helpResult" pos="28,-370" width="904" height="194" text_key="xuiRebirthPlayerHelpChecking" font_size="18" color="235,235,240,255" depth="3" />
+      <simplebutton name="helpRefresh" pos="28,-592" width="240" height="42" caption_key="xuiRebirthPlayerHelpRefresh" font_size="20" depth="4" />
+      <simplebutton name="helpClose" pos="720,-592" width="210" height="42" caption_key="xuiRebirthPlayerHelpClose" font_size="20" depth="4" />
+    </window>
+  </append>
+</configs>

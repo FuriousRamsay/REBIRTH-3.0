@@ -99,11 +99,10 @@ public static class RebirthCookingItemStats
         if(key==RebirthLiquidContainerService.VolumeKey || key==RebirthLiquidContainerService.ProfileKey ||
             key==RebirthLiquidContainerService.VersionKey || key==RebirthLiquidContainerService.MurkyFullInitializationKey)return true;
         if(!key.StartsWith("rebirth.cooking.",StringComparison.Ordinal))return false;
-        string suffix=key.Substring("rebirth.cooking.".Length);
         // These fields are already compared through their typed/effective definitions above.
-        return suffix=="batch" || suffix=="nutrition" || suffix=="water" || suffix=="energy" ||
-            suffix=="comfort" || suffix=="quality" || suffix=="seasoning" || suffix=="tags" ||
-            suffix=="family" || suffix=="burnt" || suffix=="skill";
+        return key=="rebirth.cooking.batch" || key=="rebirth.cooking.nutrition" || key=="rebirth.cooking.water" || key=="rebirth.cooking.energy" ||
+            key=="rebirth.cooking.comfort" || key=="rebirth.cooking.quality" || key=="rebirth.cooking.seasoning" || key=="rebirth.cooking.tags" ||
+            key=="rebirth.cooking.family" || key=="rebirth.cooking.burnt" || key=="rebirth.cooking.skill";
     }
     private static bool SameOtherMetadata(ItemValue a,ItemValue b)
     { return MetadataSubset(a,b) && MetadataSubset(b,a); }

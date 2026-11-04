@@ -162,7 +162,14 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         // Deploying/Packing/unknown remain disabled and cannot dispatch.
     }
     internal void SelectSource(Guid id){selected=id;Paint();}
-    private RebirthCamperEnergySourceSnapshot Selected()=>snapshot?.Sources.FirstOrDefault(s=>s.Id==selected);
+    private RebirthCamperEnergySourceSnapshot SourceById(Guid id)
+    {
+        var sources=snapshot?.Sources;
+        if(sources==null)return null;
+        for(int i=0;i<sources.Count;i++)if(sources[i].Id==id)return sources[i];
+        return null;
+    }
+    private RebirthCamperEnergySourceSnapshot Selected()=>SourceById(selected);
     public override bool GetBindingValueInternal(ref string value,string name)
     {
         if(name=="energyfuelfraction"||name=="energyfuelvisible")
@@ -173,7 +180,13 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         }
         return base.GetBindingValueInternal(ref value,name);
     }
-    private RebirthCamperEnergySourceSnapshot SourceAt(int position)=>snapshot?.Sources.FirstOrDefault(s=>s.Position==position);
+    private RebirthCamperEnergySourceSnapshot SourceAt(int position)
+    {
+        var sources=snapshot?.Sources;
+        if(sources==null)return null;
+        for(int i=0;i<sources.Count;i++)if(sources[i].Position==position)return sources[i];
+        return null;
+    }
     private int FirstEmptySource(){for(int i=0;i<sourceCapacity;i++)if(SourceAt(i)==null)return i;return -1;}
     private void Send(RebirthCamperEnergyCommand action,bool on=false)
     {
@@ -197,7 +210,7 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
     private void ObservePowerRequest()
     {
         if(powerObservedSource==Guid.Empty)return;
-        var observed=snapshot?.Sources.FirstOrDefault(s=>s.Id==powerObservedSource);
+        var observed=SourceById(powerObservedSource);
         string value="source="+powerObservedSource+" revision="+Revision+" on="+(observed?.IsOn.ToString()??"missing")
             +" status="+observed?.Status+" busy="+busy+" admission="+status;
         if(value==powerObserved)return;powerObserved=value;PowerTrace("observed",value);

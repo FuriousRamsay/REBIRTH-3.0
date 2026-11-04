@@ -32,6 +32,7 @@ public static partial class RebirthCookingLegacyPull
     private sealed class Original
     {internal EntityPlayerLocal Player;internal World World;internal string Owner,Creation;internal int Deaths=-1;internal bool MetadataOnly;internal long Request;internal List<ItemStack> Needs;internal float Next;}
     private static readonly Dictionary<long,Original> waiting=new Dictionary<long,Original>();
+    private static readonly List<Original> waitingSnapshot=new List<Original>();
     private static bool installed;
     private static float bootstrapAt;private static World bootstrapWorld;private static string bootstrapDirectory;
     private static EntityPlayerLocal bootstrapPlayer;private static string bootstrapCreation;private static int bootstrapDeaths=-1;
@@ -102,12 +103,15 @@ public static partial class RebirthCookingLegacyPull
             catch{/* Unknown retained claim is not a new withdrawal or grid grant. */}
         }
         if(waiting.Count==0)return;
-        foreach(var original in waiting.Values.ToArray())
+        waitingSnapshot.Clear();
+        waitingSnapshot.AddRange(waiting.Values);
+        foreach(var original in waitingSnapshot)
         {
             if(!ReferenceEquals(GameManager.Instance?.World,original.World)||!ReferenceEquals(original.World.GetPrimaryPlayer(),original.Player))
             {waiting.Remove(original.Request);continue;}
             if(Time.realtimeSinceStartup>=original.Next)try{Send(original);}catch{/* Same durable original remains pending. */}
         }
+        waitingSnapshot.Clear();
     }
     private static RebirthRemoteResourceClientOriginalJournal Requests()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","CookingPullRequests"));
     private static RebirthRemoteResourceClientOriginalJournal Results()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","CookingPullResults"));

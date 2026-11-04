@@ -3,6 +3,7 @@
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/items.xml"/>
+  <include filename="_Wood/items.xml"/>
 	  <conditional>
     <if cond="character_progression('Rebirth')">
       <include filename="_Rebirth/items_starter.xml"/>
@@ -131,11 +132,13 @@
     <property name="Stacknumber" value="10" />
   </append></if></conditional>
   <!-- Readable study media use the native held book rather than resourcePaper's sack. -->
+  <conditional><if cond="character_progression('Rebirth')">
   <remove xpath="/items/item[property[@class='Action0']/property[@name='Class' and @value='ItemActionStudyLiteratureRebirth, RebirthUtils']]/property[@name='Meshfile' or @name='HoldType']" />
   <append xpath="/items/item[property[@class='Action0']/property[@name='Class' and @value='ItemActionStudyLiteratureRebirth, RebirthUtils']]">
     <property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
     <property name="HoldType" value="21" />
   </append>
+  </if></conditional>
   <include filename="_Workstations/items.xml"/>
 <include filename="_Survivor/literature_trade.xml"/>
   <!-- Preserve the native chicken item type when constructed through XML. -->
@@ -146,5 +149,6 @@
   <include filename="_Vehicles/camper_items.xml"/>
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
   <include filename="_Vehicles/standard_items.xml"/>
+  <include filename="_Seeker/items.xml"/>
 </configs>
 

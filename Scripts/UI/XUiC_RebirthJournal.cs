@@ -37,6 +37,8 @@ public static class RebirthJournalStore {
     }
     public static bool Save(string path,List<RebirthJournalEntry> entries,out string error) {
         error=string.Empty;
+        try { if(!string.Equals(Path.GetFullPath(path),Path.GetFullPath(ResolvePath()),StringComparison.Ordinal)) {error="Journal world changed; stale write refused.";return false;} }
+        catch(Exception ex) {error="Journal world unavailable: "+ex.Message;return false;}
         var personal=entries.Where(e=>e!=null&&!e.Authored).ToList();
         if(personal.Count>500){error="The journal exceeds the 500 personal entry limit.";return false;}
         var ids=new HashSet<string>(StringComparer.OrdinalIgnoreCase);

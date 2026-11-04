@@ -9,6 +9,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     {
         BindCancellationWorld();PumpRetiringCancellationHostCustodies();RebirthRemoteResourcePlacedStationPreparation.RetireDrainedNativeReads();if(!ProtocolActive)return;
         if(GameManager.Instance?.World?.IsRemote()==true){PumpCancellationClient();return;}
+        if(cancellationServers.Count==0)return;
         foreach(var original in cancellationServers.Values.ToArray())
         {try{PumpCancellationServer(original);}catch{/* Original/custody remains unknown. */}}
     }
@@ -69,9 +70,15 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     }
     internal static bool TryCancellationLockActor(TileEntityWorkstation station,int actorId,out bool allowed)
     {
-        allowed=false;var original=cancellationServers.Values.SingleOrDefault(value=>value.Accepted!=null&&ReferenceEquals(value.Station,station)&&value.Memory?.Current==true);
+        allowed=false;
+        // Native lock requests also arrive when no cancellation exists. Keep the
+        // exact active-claim scans, but avoid constructing their LINQ iterators
+        // on the ordinary empty path.
+        if(cancellationServers.Count==0&&restartCancellations.Count==0)return false;
+        CancellationServer original=cancellationServers.Count==0?null:cancellationServers.Values.SingleOrDefault(value=>value.Accepted!=null&&ReferenceEquals(value.Station,station)&&value.Memory?.Current==true);
         if(original==null)
         {
+            if(restartCancellations.Count==0)return false;
             var restarted=restartCancellations.Values.SingleOrDefault(value=>value.Memory?.Current==true&&ReferenceEquals(value.Load?.Loaded?.Tile,station)&&value.Load.Loaded.Installed());
             if(restarted==null)return false;
             var actor=GameManager.Instance?.World?.GetEntity(actorId) as EntityPlayer;

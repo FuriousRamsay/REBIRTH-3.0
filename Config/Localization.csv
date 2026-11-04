@@ -1176,7 +1176,7 @@ xuiRebirthMetabolismInfoStomachBody,Consumed Liquid and Solid enter the Stomach 
 xuiRebirthMetabolismInfoIntestineTitle,INTESTINE
 xuiRebirthMetabolismInfoIntestineBody,Liquid and Solid wait briefly in the Intestine before absorption. Liquid raises Hydration. Solid raises Nutrition. Absorbing shows the current reserve gain per real minute.
 xuiRebirthMetabolismInfoEnergyTitle,ENERGY AND STAMINA
-xuiRebirthMetabolismInfoEnergyBody,Nutrition supplies fuel for Energy recovery. Hydration affects recovery efficiency. Work spends Energy and your current Energy determines how quickly Stamina can recover.
+xuiRebirthMetabolismInfoEnergyBody,Nutrition fuels Energy recovery and sets its sustainable cap. Hydration improves recovery efficiency and that cap. Rest recovers Energy fastest when low and tapers near full; recovery still needs Nutrition. Work spends Energy. Current Energy controls Stamina recovery.
 xuiRebirthMetabolismInfoHealthTitle,DIGESTIVE HEALTH
 xuiRebirthMetabolismInfoHealthBody,Digestive Health affects digestion speed and gut resilience. Illness effects and supplements can modify these values.
 xuiRebirthMetabolismInfoExampleTitle,EXAMPLE: CANNED FOOD
@@ -4618,13 +4618,21 @@ rbStressDangerDescription,A nearby hostile is targeting you. Stress can rise and
 rbStressExploringDescription,You are away from a recognized camp or trader compound. Exploration alone does not increase stress. Darkness and unseen hostile activity can still affect the relevant traits.
 rbStressLocationGuidance,"Break contact with hostile targets to begin recovery. If darkness is the trigger, return to your camp or a trader compound; daylight removes the nighttime trigger. Deep darkness can maintain some anxiety even while sheltered."
 rbCookingDetailCooking,EXPECTED STATS PER SERVING
+rbCookingDetailDrinkCooking,EXPECTED DRINK STATS PER SERVING
 rbCookingDetailReady,READY - STATS PER SERVING
+rbCookingDetailDrinkReady,READY - DRINK STATS PER SERVING
 rbCookingDetailOvercooking,OVERCOOKING - STATS PER SERVING
+rbCookingDetailEvaporating,EVAPORATING - DRINK STATS PER SERVING
+rbCookingDetailEvaporated,EVAPORATED - DRINK STATS PER SERVING
 rbCookingDetailBurnt,BURNT - STATS PER SERVING
 rbCookingDetailCold,READY - STATS PER SERVING
 rbCookingConsequenceCooking,Cancel to get your ingredients back. Take the food when it is ready.
+rbCookingConsequenceDrinkCooking,Cancel to get your ingredients back. Take the drink when it is ready.
 rbCookingConsequenceReady,Take your food now. Turn off the heat if you need more time.
+rbCookingConsequenceDrinkReady,Take your drink now. Turn off the heat if you need more time.
 rbCookingConsequenceOvercooking,Take your food now or turn off the heat. It will burn when the timer ends.
+rbCookingConsequenceEvaporating,Take your drink now or turn off the heat. Only its volume falls as it evaporates.
+rbCookingConsequenceEvaporated,The drink has evaporated. Take the empty container.
 rbCookingConsequenceBurnt,This food is burnt. The values below are what you will receive.
 rbCookingConsequenceCold,This food is ready to take. It will not burn.
 rbCookingDeteriorationPaused,Heat off: timer paused.
@@ -8795,48 +8803,48 @@ rebirthTraderVoiceSection,Trader Dialogue
 rebirthTraderVoiceDescription,Changes this trader's dialogue personality while keeping their own voice. Saved separately for each player.
 rbJournal_StorageGear_title,Carry more with backpacks and toolbelts
 rbJournal_StorageGear_body,"Open Character. Under Survivor Gear, put a backpack in the Backpack slot or a toolbelt in the Belt slot. Shift-click the item in your inventory to equip it, or drag it into the matching slot. You can also select the item and choose Equip.\n\nA Daypack adds 13 backpack slots. Each better backpack adds another row of 13. Your 26 encumbrance slots stay the same. A Utility Toolbelt adds two toolbelt slots; better belts add more.\n\nMake room before removing storage gear. Items that no longer fit must be dropped: backpack overflow goes into a recovery backpack, while toolbelt overflow drops on the ground. Collect them before leaving."
-rebirthFieldNotesSpearsDesc,[B58CFF]Study to improve Spears Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesClubsDesc,[B58CFF]Study to improve Clubs Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesSwordsDesc,[B58CFF]Study to improve Swords Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesAxesDesc,[B58CFF]Study to improve Axes Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesBatonsDesc,[B58CFF]Study to improve Batons Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesHammersDesc,[B58CFF]Study to improve Hammers Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesKnivesDesc,[B58CFF]Study to improve Knives Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesScythesDesc,[B58CFF]Study to improve Scythes Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesKnucklesDesc,[B58CFF]Study to improve Knuckles Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesUnarmedDesc,[B58CFF]Study to improve Unarmed Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesArcheryDesc,[B58CFF]Study to improve Archery Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesPistolsDesc,[B58CFF]Study to improve Pistols Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesRevolversDesc,[B58CFF]Study to improve Revolvers Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesHeavyHandgunsDesc,[B58CFF]Study to improve Heavy Handguns Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesShotgunsDesc,[B58CFF]Study to improve Shotguns Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesAssaultRiflesDesc,[B58CFF]Study to improve Assault Rifles Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesTacticalRiflesDesc,[B58CFF]Study to improve Tactical Rifles Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesLongRangeRiflesDesc,[B58CFF]Study to improve Long-Range Rifles Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesExplosivesDesc,[B58CFF]Study to improve Explosives Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesDeployableTurretsDesc,[B58CFF]Study to improve Deployable Turrets Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesDroneOperationsDesc,[B58CFF]Study to improve Drone Operations Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesMiningDesc,[B58CFF]Study to improve Mining Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesLoggingDesc,[B58CFF]Study to improve Logging Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesSalvageDesc,[B58CFF]Study to improve Salvage Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesFarmingDesc,[B58CFF]Study to improve Farming Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesAnimalProcessingDesc,[B58CFF]Study to improve Animal Processing Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesTrackingDesc,[B58CFF]Study to improve Tracking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesMechanicsDesc,[B58CFF]Study to improve Mechanics Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesMedicineDesc,[B58CFF]Study to improve Medicine Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesCookingDesc,[B58CFF]Study to improve Cooking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
-rebirthFieldNotesMaintenanceDesc,[B58CFF]Study to improve Maintenance Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesConstructionDesc,[B58CFF]Study to improve Construction Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesElectricalDesc,[B58CFF]Study to improve Electrical Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesMetalworkingDesc,[B58CFF]Study to improve Metalworking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesGunsmithingDesc,[B58CFF]Study to improve Gunsmithing Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesChemistryDesc,[B58CFF]Study to improve Chemistry Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesLockpickingDesc,[B58CFF]Study to improve Lockpicking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesStealthDesc,[B58CFF]Study to improve Stealth Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesAthleticsDesc,[B58CFF]Study to improve Athletics Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesArmorProficiencyDesc,[B58CFF]Study to improve Armor Proficiency Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesBarteringDesc,[B58CFF]Study to improve Bartering Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-rebirthFieldNotesTailoringDesc,[B58CFF]Study to improve Tailoring Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesSpearsDesc,[B58CFF]Study to improve Spears Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesClubsDesc,[B58CFF]Study to improve Clubs Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesSwordsDesc,[B58CFF]Study to improve Swords Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesAxesDesc,[B58CFF]Study to improve Axes Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesBatonsDesc,[B58CFF]Study to improve Batons Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesHammersDesc,[B58CFF]Study to improve Hammers Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesKnivesDesc,[B58CFF]Study to improve Knives Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesScythesDesc,[B58CFF]Study to improve Scythes Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesKnucklesDesc,[B58CFF]Study to improve Knuckles Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesUnarmedDesc,[B58CFF]Study to improve Unarmed Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesArcheryDesc,[B58CFF]Study to improve Archery Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesPistolsDesc,[B58CFF]Study to improve Pistols Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesRevolversDesc,[B58CFF]Study to improve Revolvers Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesHeavyHandgunsDesc,[B58CFF]Study to improve Heavy Handguns Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesShotgunsDesc,[B58CFF]Study to improve Shotguns Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesAssaultRiflesDesc,[B58CFF]Study to improve Assault Rifles Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesTacticalRiflesDesc,[B58CFF]Study to improve Tactical Rifles Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesLongRangeRiflesDesc,[B58CFF]Study to improve Long-Range Rifles Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesExplosivesDesc,[B58CFF]Study to improve Explosives Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesDeployableTurretsDesc,[B58CFF]Study to improve Deployable Turrets Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesDroneOperationsDesc,[B58CFF]Study to improve Drone Operations Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesMiningDesc,[B58CFF]Study to improve Mining Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesLoggingDesc,[B58CFF]Study to improve Logging Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesSalvageDesc,[B58CFF]Study to improve Salvage Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesFarmingDesc,[B58CFF]Study to improve Farming Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesAnimalProcessingDesc,[B58CFF]Study to improve Animal Processing Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesTrackingDesc,[B58CFF]Study to improve Tracking Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesMechanicsDesc,[B58CFF]Study to improve Mechanics Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesMedicineDesc,[B58CFF]Study to improve Medicine Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesCookingDesc,[B58CFF]Study to improve Cooking Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
+rebirthFieldNotesMaintenanceDesc,[B58CFF]Study to improve Maintenance Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesConstructionDesc,[B58CFF]Study to improve Construction Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesElectricalDesc,[B58CFF]Study to improve Electrical Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesMetalworkingDesc,[B58CFF]Study to improve Metalworking Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesGunsmithingDesc,[B58CFF]Study to improve Gunsmithing Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesChemistryDesc,[B58CFF]Study to improve Chemistry Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesLockpickingDesc,[B58CFF]Study to improve Lockpicking Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesStealthDesc,[B58CFF]Study to improve Stealth Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesAthleticsDesc,[B58CFF]Study to improve Athletics Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesArmorProficiencyDesc,[B58CFF]Study to improve Armor Proficiency Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesBarteringDesc,[B58CFF]Study to improve Bartering Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
+rebirthFieldNotesTailoringDesc,[B58CFF]Study to improve Tailoring Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthManualConstructionFramingDesc,"[B58CFF]Study to learn: Framing & Structural Layout.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualConstructionMasonryDesc,"[B58CFF]Study to learn: Masonry & Concrete Work.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualConstructionReinforcementDesc,"[B58CFF]Study to learn: Structural Reinforcement.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
@@ -9269,6 +9277,9 @@ rebirthLessonStorageBeltDesc,"Open Crafting and search for Utility Toolbelt. Cra
 rebirthWaterEquipHeld,EQUIP HELD
 xuiRebirthMetabolismAutoSipOn,AUTO SIP: ON
 xuiRebirthMetabolismAutoSipOff,AUTO SIP: OFF
+xuiRebirthMetabolismSipNow,SIP NOW
+xuiRebirthMetabolismAutoSipDetail,Projected {0} | Auto sip below {1}
+xuiRebirthMetabolismAutoSipHelp,"Auto sip uses active real play time. It waits for projected Hydration below the shown threshold, stomach room, and a safe drink. Use Sip Now to drink manually."
 xuiRebirthMetabolismSlotEmpty,No water container equipped
 rebirthLessonAbsorbWaterDesc,Drink clean water. Open Character > Metabolism to see it pass through your stomach and intestine. Wait until your body absorbs some water. Drinking does not refill Hydration immediately; absorption completes this lesson.
 rebirthLessonDigestMealDesc,Eat a meal. Open Character > Metabolism and allow the food to digest. This completes when your body absorbs nutrition. You do not need to eat again while the first meal is still being processed.
@@ -9417,18 +9428,23 @@ rebirthLessonRewardLegacy,Covered by the introductory lesson
 rebirthLessonSkill_drone_operationsDesc,"Travel with your owned drone following within 30 metres. Cover 200 metres with at least 60 seconds of movement and finish at least 100 metres from your starting point. This trains Drone Operations without a module, at most once per five minutes. Eligible recovery, service and module combat offer additional practice; idle ownership does not. Open Character > Progression and select this skill to see its training activities and progress. Theory study is a separate lesson. Claim the matching Principles book as your reward. Finish studying it to gain Theory in this subject; collecting the book does not raise Skill or Theory."
 rebirthWaterSupplyTitle,CARRIED WATER
 
-xuiRebirthSupportSlotOccupied,Support slot is occupied. Unequip its current item first.
-rebirthLessonWaterSlotDesc,Open Character > Overview. Move a filled water jar from your backpack into the Support slot beneath the toolbelt. Open Metabolism and turn Auto Sip ON. This completes when that supply contains liquid and Auto Sip is on. An empty jar does not count. Use the Support slot removal button to return the container to your backpack.
-rebirthWaterSupplyHint,Equip water in Overview > Support.
+xuiRebirthSupportSlotOccupied,Drink slot is occupied. Return its current item to your backpack first.
+rebirthLessonWaterSlotDesc,Open Character > Overview. Drag a filled drink from your backpack into the bottom drink slot beside your character or shift-click it. Open Metabolism and turn Auto Sip ON. This completes when that supply contains liquid and Auto Sip is on. Shift-click or drag the drink out to return it to your backpack.
+rebirthWaterSupplyHint,Equip a drink in Character > Overview > bottom drink slot.
 
-xuiRebirthSupportDropHere,Place a water container or compatible Support gear here.
-xuiRebirthWaterSupportMoveHint,Shift-click or drag to return the water container to your backpack.
+xuiRebirthSupportDropHere,Place a drink here to sip from it.
+xuiRebirthDrinkSlotEmptyHint,Drink slot — Empty\nPlace a drink from your backpack here.
+xuiRebirthWaterSupportMoveHint,Shift-click or drag to return the drink to your backpack.
 
-xuiRebirthWaterSupportOccupied,Support already contains a water container.
-xuiRebirthWaterSupportEquipped,Water container equipped in Support.
-xuiRebirthWaterSupportEmpty,No water container is equipped in Support.
-xuiRebirthWaterSupportReturned,Water container returned to your backpack.
-xuiRebirthWaterSupportNoSpace,Make room in your backpack before removing the water container.
+xuiRebirthWaterSupportOccupied,The drink slot already contains a container.
+xuiRebirthWaterSupportEquipped,Drink equipped in the drink slot.
+xuiRebirthWaterSupportEmpty,The drink slot is empty.
+xuiRebirthWaterSupportReturned,Drink returned to your backpack.
+xuiRebirthWaterSupportNoSpace,Make room in your backpack before removing the drink.
+xuiRebirthHydrationTransferPending,Drink transfer is pending.
+xuiRebirthHydrationTransferUnavailable,Drink transfer could not be completed. See the game log for the specific reason.
+xuiRebirthDrinkSlotEmptyState,EMPTY
+xuiRebirthDrinkSlotOccupiedState,IN SLOT
 
 xuiRebirthStationExactMaterialsRequired,Use the exact recipe materials and quantities. Remove extra helpers.
 xuiRebirthLibraryTransferPending,A learning-material transfer is awaiting recovery. Try again after it finishes.
@@ -9937,7 +9953,7 @@ xuiRebirthPurgeDiscoveryHelpTitle,Purge: Location Discovery
 xuiRebirthPurgeDiscoveryHelpBody,"Your efforts have cleared more zombie-infested locations. This is an important milestone, and we've gathered more [bd9cd6]intelligence[-] to aid your mission.\n\nAs the shared effort advances, the map reveals locations of the earned difficulty tier. These are location markers, not a reveal of unexplored terrain. Each biome has its own discovery and clearing objective, and you may tackle the biomes in any order.\n\nThe default biome clearance target is 75%. You can change it in REBIRTH Game Options; the milestone numbers below reflect your current setting. POI count gives equal credit per location, while POI tier uses weighted points, including tiers 0 and 1.\n\nStay sharp and keep moving. You can read this intelligence again in the Journal."
 
 xuiRebirthPurgeIntroTitle,The Purge
-xuiRebirthPurgeIntroBody,"The helicopter blades whirred to a stop as you hit the ground, the wind whipping dust and debris around your feet. [91b9bd]The streets were eerily quiet[-]... long since cleared of the undead, but the shadows inside the buildings told a different story.\nYou'd heard the rumors: [c4bc93]the real danger lurked behind closed doors[-]... a deathtrap even for the most seasoned soldiers.\n\nArmed with basic supplies, your mission is to [8dad87]clear the remaining zombies[-] from occupied locations across the [94b092]Pine Forest[-], [bdbf9f]Desert[-], [a3a3a3]Snow[-], [999577]Wasteland[-], and [887a99]Burnt Forest[-]. Each biome has its own clearing objective, and your progress is shared.\n\nDiscovery milestones reveal more locations on your map. Credited kills from cleared locations earn supply drops. Watch the Purge display as you push deeper into the world. [ababab]The real fight is just beginning[-]."
+xuiRebirthPurgeIntroBody,"You’ve been [91b9bd]sent into the region[-] to do the work others left unfinished: [8dad87]clear the infected[-] from the places they still hold.\n\nYou arrive with [c4bc93]limited supplies and your own truck[-]. Enough to get started—but keeping yourself fed, equipped, and moving will take resourcefulness. Establish a foothold, gather what you need, and prepare before taking on your next target.\n\nBehind every closed door is an unknown. Some locations will demand better equipment, more experience, or help from other survivors. Choose your fights carefully.\n\nThe assignment is clear. How you carry it out—and how long you survive—is up to you."
 xuiRebirthPurgeScannerTitle,Threat Scanner
 xuiRebirthPurgeScannerBody,"A [bd9cd6]Threat Scanner Module[-] has been integrated into your communication system, giving you the ability to [e8d0a5]estimate the number of hostiles[-] in an occupied location. It needs no equipped tool.\n\nBut the module isn't without its flaws... it may [c97777]miss threats[-] in rooms that have not awakened. A quiet room or an absent marker does not prove the building is clear.\n\nWhen a location is nearly cleared, the scanner activates eligible remaining sleepers and shows markers within 50 metres. Tiers 0 to 3 require more than two rooms and allow one uncleared room; tier 4 allows two uncleared rooms; tier 5 allows three; tiers 6 and above allow four.\n\nStay focused, keep progressing, and use the room and enemy display together with the shared map markers to finish the job."
 xuiRebirthPurgeSupplyUpdateTitle,Supply Drop Update
@@ -11702,40 +11718,18 @@ modVehicleWrapStagofthePines,Stag of the Pines Vehicle Wrap
 modVehicleWrapStagofthePinesDesc,"Stag of the Pines: Antlered stag portrait on the hood; woodland deer silhouettes along the truck; antler and pinecone bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapButterflyMigration,Butterfly Migration Vehicle Wrap
 modVehicleWrapButterflyMigrationDesc,"Butterfly Migration: Monarch butterfly on the hood; swarm across flowering landscape along the truck; wing-pattern mosaics on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapDragonsHoard,Dragon's Hoard Vehicle Wrap
-modVehicleWrapDragonsHoardDesc,"Dragon's Hoard: Coiled dragon crest on the hood; dragon guarding scattered treasure along the truck; gold-scale and jewel bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapMoonlitWitch,Moonlit Witch Vehicle Wrap
-modVehicleWrapMoonlitWitchDesc,"Moonlit Witch: Witch hat and crescent on the hood; enchanted cottage and flying broom along the truck; herb and constellation ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapPaladinsOath,Paladin's Oath Vehicle Wrap
 modVehicleWrapPaladinsOathDesc,"Paladin's Oath: Sun shield and sword on the hood; stained-glass knight scene along the truck; gold illuminated manuscript borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapGoblinMarket,Goblin Market Vehicle Wrap
-modVehicleWrapGoblinMarketDesc,"Goblin Market: Mischievous goblin face on the hood; chaotic fantasy market stalls along the truck; coin and trinket strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapForestDryad,Forest Dryad Vehicle Wrap
-modVehicleWrapForestDryadDesc,"Forest Dryad: Leaf-crowned face on the hood; living trees and winding roots along the truck; interlaced vine ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapNecromancersGrimoire,Necromancer's Grimoire Vehicle Wrap
-modVehicleWrapNecromancersGrimoireDesc,"Necromancer's Grimoire: Arcane skeletal book on the hood; violet spirits rising from runes along the truck; bone and spell-circle strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapMermaidsWake,Mermaid's Wake Vehicle Wrap
-modVehicleWrapMermaidsWakeDesc,"Mermaid's Wake: Mermaid shell medallion on the hood; underwater city and flowing tail along the truck; pearl and seaweed borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapPhoenixReborn,Phoenix Reborn Vehicle Wrap
-modVehicleWrapPhoenixRebornDesc,"Phoenix Reborn: Fiery phoenix on the hood; rising flame-feather panorama along the truck; embers and gold feather bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapFrostboundRune,Frostbound Rune Vehicle Wrap
 modVehicleWrapFrostboundRuneDesc,"Frostbound Rune: Icy runestone crest on the hood; frozen giant fortress along the truck; carved ice-rune strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapDeepSpaceCourier,Deep Space Courier Vehicle Wrap
-modVehicleWrapDeepSpaceCourierDesc,"Deep Space Courier: Orbital delivery badge on the hood; freighter among stars along the truck; orbital route bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapCyberRonin,Cyber Ronin Vehicle Wrap
 modVehicleWrapCyberRoninDesc,"Cyber Ronin: Neon samurai mask on the hood; rain-soaked neon city along the truck; angular magenta circuit strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapLunarSurveyor,Lunar Surveyor Vehicle Wrap
-modVehicleWrapLunarSurveyorDesc,"Lunar Surveyor: Moon mission patch on the hood; lunar rover and crater panorama along the truck; technical moon-phase borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapAlienBotanist,Alien Botanist Vehicle Wrap
-modVehicleWrapAlienBotanistDesc,"Alien Botanist: Alien flower specimen on the hood; bioluminescent extraterrestrial garden along the truck; strange leaf-cell bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapRetroRocketClub,Retro Rocket Club Vehicle Wrap
 modVehicleWrapRetroRocketClubDesc,"Retro Rocket Club: 1950s rocket badge on the hood; pulp space adventure along the truck; atom and starburst ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapMechBaySeven,Mech Bay Seven Vehicle Wrap
 modVehicleWrapMechBaySevenDesc,"Mech Bay Seven: Robotic visor emblem on the hood; giant robot assembly schematic along the truck; warning-panel and piston strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapQuantumArcade,Quantum Arcade Vehicle Wrap
 modVehicleWrapQuantumArcadeDesc,"Quantum Arcade: Pixel portal on the hood; glitch city and neon grids along the truck; broken-code mosaic strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapMarsRustRunner,Mars Rust Runner Vehicle Wrap
-modVehicleWrapMarsRustRunnerDesc,"Mars Rust Runner: Red planet expedition seal on the hood; Martian mesas and habitats along the truck; terrain-grid border ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapBlackHoleClub,Black Hole Club Vehicle Wrap
 modVehicleWrapBlackHoleClubDesc,"Black Hole Club: Gravitational lens emblem on the hood; stars spiraling into singularity along the truck; warped spacetime bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapSunsetStripSeventy,Sunset Strip Seventy Vehicle Wrap
@@ -11860,8 +11854,6 @@ modVehicleWrapTabletopQuest,Tabletop Quest Vehicle Wrap
 modVehicleWrapTabletopQuestDesc,"Tabletop Quest: Twenty-sided die on the hood; fantasy gaming table illustration along the truck; dice and dungeon-grid strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapHauntedHarvest,Haunted Harvest Vehicle Wrap
 modVehicleWrapHauntedHarvestDesc,"Haunted Harvest: Jack-o-lantern moon on the hood; crooked farm and pumpkin field along the truck; vines and lantern strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapVampiresVelvet,Vampire's Velvet Vehicle Wrap
-modVehicleWrapVampiresVelvetDesc,"Vampire's Velvet: Bat-wing goblet on the hood; gothic castle and crimson roses along the truck; velvet damask borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapLovecraftianTide,Lovecraftian Tide Vehicle Wrap
 modVehicleWrapLovecraftianTideDesc,"Lovecraftian Tide: Eldritch eye medallion on the hood; impossible sea city and tentacles along the truck; ancient tidal glyph bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapAbandonedCarnival,Abandoned Carnival Vehicle Wrap
@@ -11900,14 +11892,6 @@ modVehicleWrapPirateRadioRover,Pirate Radio Rover Vehicle Wrap
 modVehicleWrapPirateRadioRoverDesc,"Pirate Radio Rover: Pirate broadcast skull on the hood; treasure island radio station along the truck; nautical flags and signal bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapWildWestShowdown,Wild West Showdown Vehicle Wrap
 modVehicleWrapWildWestShowdownDesc,"Wild West Showdown: Sheriff star on the hood; western town and desert rider along the truck; tooled leather and rope strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapSteampunkDispatch,Steampunk Dispatch Vehicle Wrap
-modVehicleWrapSteampunkDispatchDesc,"Steampunk Dispatch: Brass pressure gauge on the hood; airship and mechanical city along the truck; riveted gearwork ribbons on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapSuperheroDelivery,Superhero Delivery Vehicle Wrap
-modVehicleWrapSuperheroDeliveryDesc,"Superhero Delivery: Bold comic starburst on the hood; original comic action panels along the truck; halftone speed-line bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapDinosaurSafari,Dinosaur Safari Vehicle Wrap
-modVehicleWrapDinosaurSafariDesc,"Dinosaur Safari: Tyrannosaur crest on the hood; prehistoric jungle panorama along the truck; fossil and fern borders on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
-modVehicleWrapUnderseaLaboratory,Undersea Laboratory Vehicle Wrap
-modVehicleWrapUnderseaLaboratoryDesc,"Undersea Laboratory: Bathysphere badge on the hood; deep-sea research station along the truck; pressure-gauge and bubble strips on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapMountainRescueOne,Mountain Rescue One Vehicle Wrap
 modVehicleWrapMountainRescueOneDesc,"Mountain Rescue One: Rescue rope shield on the hood; helicopter and mountain rescue illustration along the truck; orange technical rescue bands on the camper. Install in the camper's cosmetic slot, replacing dye. Remove to restore the original finish."
 modVehicleWrapTreelineFirewatch,Treeline Firewatch Vehicle Wrap
@@ -11970,17 +11954,136 @@ rbPoiSleepersMode,"requires active Purge mode."
 rbPoiSleepersPlayer,"requires a living, spawned player on foot, not flying or spectating."
 rbPoiSleepersAlready,"already running; stop your request before restarting."
 rbPoiSleepersLimit,"request limit reached; retry after another request finishes."
-rbPoiSleepersNotReady,"current POI is not fully registered and published; enter normally and retry when ready."
+rbPoiSleepersNotReady,"no eligible authored sleeper POI is available at your current position."
 rbPoiSleepersUnavailable,"current POI is cleared, resetting, withheld or otherwise unavailable."
 rbPoiSleepersNoRequest,"no active request for you."
 rbPoiSleepersStopped,"stopped your request; already requested native spawning is not undone."
 rbPoiSleepersChanged,"cancelled: player, POI, room registration or evidence ownership changed"
 rbPoiSleepersBudget,"stopped at the 120-second request budget"
 rbPoiSleepersBatchChanged,"cancelled: native ownership changed during the batch"
-rbPoiSleepersComplete,"request queue complete; ordinary native spawning may still be pending"
+rbPoiSleepersComplete,"sleeper activation finished; command stopped. Activated enemies still need to be killed"
+rbPoiSleepersPurged,POI purged; command stopped
 rbPoiSleepersProgress,"requires 85% of rooms cleared or populated ({0}/{1}); force uses the same console permission."
 rbPoiSleepersStarted,"started for {0}; {1}/{2} rooms progressed."
 rbPoiSleepersStartedForce,"started for {0}; {1}/{2} rooms progressed (force bypassed only the progress gate)."
 rbPoiSleepersRunning,"{0}: running; examined {1}/{2}, native activation requests {3}."
 rbPoiSleepersFinished,"{0}; native activation requests {1}. No clearance granted."
 rbPoiSleepersCancelled,"cancelled: {0}"
+xuiRebirthPurgeSupplyCycle,Next supply drop
+xuiRebirthPurgeSupplyCycleTooltip,"Click to center the map on the next drop.\nCycles through your available supply drops."
+xuiRebirthSeekerMode,Seekers
+xuiRebirthSeekerModeDesc,Controls Mutant Seeker spawning. Not While Questing suppresses targeted encounters during active quests; Not on Horde Night also excludes blood-moon selection. Normal Boss Events use their own settings.
+xuiRebirthSeekerRewards,Seeker Loot
+xuiRebirthSeekerRewardsDesc,Allow defeated Seekers to drop their tiered loot bags. Does not change normal Boss Event rewards or minion loot.
+xuiRebirthSeekerNotifications,Seeker Warnings
+xuiRebirthSeekerNotificationsDesc,Notify the hunted player when a Seeker encounter actually spawns. Native Seeker map and compass markers remain available.
+xuiSeekerNever,Never
+xuiSeekerNotQuesting,Not While Questing
+xuiSeekerNotHordeNight,Not on Horde Night
+xuiSeekerAlways,Always
+ttSeeker,A [db8a8a]Seeker[-] has pinpointed your location.
+Seeker001,Mutant Seeker
+FuriousRamsaySeeker000,Mutant Seeker
+SeekerBossEntityLootContainer,Seeker Spoils
+rebirthSeekerRoarSource,Seeker Roar
+FuriousRamsaySeeker001,Mutant Seeker
+Seeker001EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker002,Mutant Seeker
+Seeker002EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker003,Mutant Seeker
+Seeker003EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker004,Mutant Seeker
+Seeker004EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker005,Mutant Seeker
+Seeker005EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker006,Mutant Seeker
+Seeker006EntityLootContainer,Seeker Spoils
+FuriousRamsaySeeker007,Mutant Seeker
+Seeker007EntityLootContainer,Seeker Spoils
+rebirthSeekerCop,Seeker Brood
+rebirthSeekerCopFeral,Seeker Brood (Feral)
+rebirthSeekerCopRadiated,Seeker Brood (Radiated)
+rebirthSeekerCopTainted,Seeker Brood (Tainted)
+rebirthSeekerKamikaze,Seeker Kamikaze
+rebirthSeekerKamikazeFeral,Seeker Kamikaze (Feral)
+rebirthSeekerKamikazeRadiated,Seeker Kamikaze (Radiated)
+rebirthSeekerKamikazeTainted,Seeker Kamikaze (Tainted)
+FuriousRamsayMeleeHandSeeker001,Seeker Claws
+FuriousRamsayMeleeHandSeeker002,Seeker Claws
+FuriousRamsayMeleeHandSeeker003,Seeker Claws
+FuriousRamsayMeleeHandSeeker004,Seeker Claws
+FuriousRamsayMeleeHandSeeker005,Seeker Claws
+FuriousRamsayMeleeHandSeeker006,Seeker Claws
+FuriousRamsayMeleeHandSeeker007,Seeker Claws
+xuiRebirthSeekerFrequency,Seeker Encounter Frequency
+xuiRebirthSeekerFrequencyDesc,"Frequency of normal Seeker encounters, from 0% to 200%. The separate legacy horde-night encounter channel still checks every 30 seconds; choose Never or Not on Horde Night to disable that channel."
+xuiRebirthSeekerRestriction,Seeker Encounter Restrictions
+xuiRebirthSeekerRestrictionDesc,Restrictions for normal Seeker encounters. The legacy horde-night channel uses the main Seekers setting. Cave and mounted-player protection always applies.
+xuiRebirthSeekerHordeDay,Seeker Encounters on Horde Day
+xuiRebirthSeekerHordeDayDesc,Allow normal Seeker encounters during the day of a blood moon. Actual horde-night encounters are controlled by the main Seekers setting.
+xuiSeekerRestrictionAnywhere,Anywhere
+xuiSeekerRestrictionQuesting,Only While Questing
+xuiSeekerRestrictionNotQuesting,Not While Questing
+xuiSeekerRestrictionOutdoors,Outdoors Only
+xuiSeekerRestrictionOutdoorsNotQuesting,Outdoors and Not Questing
+xuiSeekerRestrictionOff,Off
+rbSeekerCommandDescription,Spawns a Seeker encounter for the authenticated requesting player (administrator only).
+rbSeekerCommandHelp,"rbseeker [player-level 30-1000] [repeats 1-4], or rbentityevent seeker [level] [repeats]. Explicit administrative spawning bypasses encounter scheduling and mode restrictions."
+rbSeekerCommandAuth,This command requires an authenticated in-world server player.
+rbSeekerCommandResult,Seeker event: {0} native entities spawned.
+FuriousRamsayTreeSap,Tree Sap
+FuriousRamsayWoodLog,Wood Log
+FuriousRamsayTreeBranch,Tree Branch
+FuriousRamsayWoodStick,Wood Stick
+
+xuiRebirthMetabolismIntakeRemainingMl,{0} mL remaining in stomach + intestine
+xuiRebirthMetabolismIntakeVolumesMl,All intake: liquid {0} mL • solid {1} mL
+xuiRebirthPlayerHelpChecking,Checking available assistance...
+xuiRebirthPlayerHelpForceConfirmation,"Force skips the 85% room-progress requirement. It still uses normal sleeper activation and grants no kills or clearance. Click Force again to confirm, or choose another action."
+xuiRebirthPlayerHelpTimeout,No response from the server. Refresh assistance to try again.
+xuiRebirthPlayerHelpCommandPending,Waiting for the sleeper command...
+xuiRebirthPlayerHelpServerPending,Waiting for the server...
+xuiRebirthPlayerHelpAvailable,Sleeper assistance available
+xuiRebirthPlayerHelpPermissionsPending,Checking server permissions...
+xuiRebirthPlayerHelpPermissionRequired,Sleeper assistance requires permission from this server's administrator.
+xuiRebirthPlayerHelpSessionUnavailable,The game session is unavailable.
+xuiRebirthPlayerHelpDenied,Sleeper assistance is unavailable with your current server permissions.
+xuiRebirthPlayerHelpChooseAction,Choose an action for your current Purge POI.
+xuiRebirthPlayerHelpNoMessage,The sleeper command returned no message.
+xuiRebirthPlayerHelpFailed,Sleeper assistance could not complete: 
+xuiRebirthPlayerHelpTitle,Player Help
+xuiRebirthQuestChoicesAtTurnIn,Reward choices are shown when you turn in this quest.
+cntForgeWorkstationBroken,Forge
+cntCollapsedWorkbench,Workbench
+cntCollapsedWorkbenchEmpty,Workbench
+cntCollapsedCementMixer,Cement Mixer
+cntCollapsedChemistryStation,Chemistry Station
+FuriousRamsayCollapsedGeneratorBank,Repairable Generator
+FuriousRamsayCollapsedGeneratorBankDesc,Salvaged POI generator. Rebuild it at a Toolbox with a Hammer and Pliers and the listed repair materials.
+xuiRebirthPlayerHelpSleepersTitle,REMAINING PURGE SLEEPERS
+xuiRebirthPlayerHelpDescription,Use this when sleepers remain in your current unfinished Purge POI. Start gradually activates native sleeper rooms and grants no kills or clearance. Normal start requires 85% of rooms cleared or populated. Close this window to resume play.
+xuiRebirthPlayerHelpStatus,CHECK STATUS
+xuiRebirthPlayerHelpStart,START
+xuiRebirthPlayerHelpStop,STOP
+xuiRebirthPlayerHelpForce,FORCE
+xuiRebirthPlayerHelpRefresh,REFRESH ACCESS
+xuiRebirthPlayerHelpClose,CLOSE
+modVehicleWrapViper,Viper Vehicle Wrap
+modVehicleWrapViperDesc,"Viper: combat architect and veteran firefighter. Muted navy, olive and gunmetal fortress-building scenes, military hardware and dark humour. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish."
+cntCementMixerBustedRandomLootHelper,= damaged Cement Mixer = Random Helper
+cntCementMixerBustedRandomLootHelperDesc,Can spawn a Cement Mixer or a damaged one based on Sandbox Options.
+cntChemistryStationBustedRandomLootHelperDesc,Can spawn a Chemistry Station or a damaged one based on Sandbox Options.
+cntWorkbenchBustedRandomLootHelper,= damaged Workbench = Random Helper
+cntWorkbenchBustedRandomLootHelperDesc,Can spawn a Workbench or a damaged one based on Sandbox Options.
+
+xuiRebirthBankComponentsHelp,Turn off the bank before changing its components.
+modVehicleWrapStallionsDen,Stallion's Den Vehicle Wrap
+modVehicleWrapStallionsDenDesc,"Stallion’s Den: hospitality for him, absolute misery for visiting survivors. Black and crimson nightclub luxury, cruel POI design and dark humour. Install in the 80s Camper Truck cosmetic slot, replacing dye. Remove to restore the original finish."
+modVehicleWrapNavezganeExplorerCompare100,Wrap Test A - Explorer 100%
+modVehicleWrapNavezganeExplorerCompare100Desc,Navezgane Explorer comparison A. 23.09 MB; 0% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.
+modVehicleWrapNavezganeExplorerCompare75,Wrap Test B - Explorer 75%
+modVehicleWrapNavezganeExplorerCompare75Desc,Navezgane Explorer comparison B. 13.65 MB; 41% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.
+modVehicleWrapNavezganeExplorerCompare50,Wrap Test C - Explorer 50%
+modVehicleWrapNavezganeExplorerCompare50Desc,Navezgane Explorer comparison C. 6.71 MB; 71% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.
+modVehicleWrapNavezganeExplorerCompare35,Wrap Test D - Explorer 35%
+modVehicleWrapNavezganeExplorerCompare35Desc,Navezgane Explorer comparison D. 3.83 MB; 83% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.

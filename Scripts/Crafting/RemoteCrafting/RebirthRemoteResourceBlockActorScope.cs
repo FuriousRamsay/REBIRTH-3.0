@@ -69,8 +69,10 @@ internal static class RebirthRemoteResourceBlockActorCallsite
 {
     private sealed class CallFrame{internal RebirthRemoteResourceBlockActorScope.Scope Server;internal RebirthRemoteResourceBlockProjection.Scope Projection;}
     private static bool Prefix(PlatformUserIdentifierAbs persistentPlayerId,List<BlockChangeInfo> _blocksToChange,out CallFrame __state)
-    {__state=new CallFrame{Server=RebirthRemoteResourceBlockActorScope.Enter(persistentPlayerId,_blocksToChange),Projection=RebirthRemoteResourceBlockProjection.Enter(persistentPlayerId,_blocksToChange)};
-        return RebirthRemoteResourceBlockActorScope.MayRun(__state.Server)&&RebirthRemoteResourceBlockProjection.MayRun(__state.Projection);}
+    {var server=RebirthRemoteResourceBlockActorScope.Enter(persistentPlayerId,_blocksToChange);
+        var projection=RebirthRemoteResourceBlockProjection.Enter(persistentPlayerId,_blocksToChange);
+        __state=server==null&&projection==null?null:new CallFrame{Server=server,Projection=projection};
+        return RebirthRemoteResourceBlockActorScope.MayRun(server)&&RebirthRemoteResourceBlockProjection.MayRun(projection);}
     private static void Postfix(bool __runOriginal,CallFrame __state)
     {RebirthRemoteResourceBlockActorScope.Completed(__state?.Server,__runOriginal);RebirthRemoteResourceBlockProjection.Completed(__state?.Projection,__runOriginal);}
     private static Exception Finalizer(Exception __exception,CallFrame __state)

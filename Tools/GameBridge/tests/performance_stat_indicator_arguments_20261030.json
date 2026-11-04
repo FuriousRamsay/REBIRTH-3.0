@@ -1,0 +1,12 @@
+{
+  "name": "Selected item stat-marker passive smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable game only, guard ON and safe player. Use an already prepared item-inspection UI fixture; repeat for melee/tool and ranged items with boosted and unboosted stats and comparison cards. Inspect the marker, values and row order against the matching baseline. This passive capture does not change items, fight, qualify native effect math or measure FPS. Never run in the user's game or capture NPC profiling.",
+  "steps": [
+    {"screenshot":"stat_indicator_before_dwell"},
+    {"wait":2},
+    {"screenshot":"stat_indicator_after_dwell"},
+    {"expectNoErrors":true}
+  ]
+}

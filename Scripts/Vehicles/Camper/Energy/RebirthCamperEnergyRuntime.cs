@@ -445,8 +445,9 @@ public sealed class RebirthCamperEnergyRuntime
     {
         long remaining=requested;
         foreach(var kind in RebirthCamperEnergyConfiguration.Current.Priority)
-        foreach(var source in state.Sources.Where(entry=>RebirthCamperEnergyState.Kind(entry.Bank)==kind))
+        foreach(var source in state.Sources)
         {
+            if(RebirthCamperEnergyState.Kind(source.Bank)!=kind)continue;
             var bank=source.Bank;if(!bank.isOn||!bank.Stacks.Any(item=>!item.IsEmpty()))continue;
             if(bank is PowerSolarPanel)continue;
             while(remaining>0)

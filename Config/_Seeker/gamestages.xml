@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/gamestages">
+    <group name="HiveBossSeeker" spawner="HiveBossSeeker" />
+    <spawner name="HiveBossSeeker">
+      <gamestage stage="1">
+        <spawn group="HiveBossSeeker" num="1" maxAlive="1" duration="10" />
+      </gamestage>
+    </spawner>
+  </append>
+</configs>

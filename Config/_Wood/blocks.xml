@@ -1,0 +1,358 @@
+<configs>
+  <setattribute xpath="/blocks/block[@name='plantHedge']/drop[@name='resourceWood']" name="count">6</setattribute>
+  <setattribute xpath="/blocks/block[@name='plantHedge']/drop[@name='resourceWood']" name="name">FuriousRamsayWoodStick</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeAzalea']/drop[@event='Harvest']" name="count">1,3</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeAzalea']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeSnowyDeadBush']/drop[@event='Harvest']" name="count">1,3</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeSnowyDeadBush']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeDeadPineLeaf']/drop[@event='Harvest']" name="count">1,3</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeDeadPineLeaf']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlainsTree']/drop[@event='Harvest']" name="count">1,3</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlainsTree']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeDeadPineLeaf']">
+    <property name="IndexName" value="FuriousRamsayQuest_Stick" />
+  </append>
+  <remove xpath="/blocks/block[@name='treeStump']/drop[@event='Harvest']" />
+  <setattribute xpath="/blocks/block[@name='treeStump']/drop[@event='Destroy']" name="count">0</setattribute>
+  <append xpath="/blocks/block[@name='treeStump']">
+    <drop event="Harvest" name="resourceWood" count="20,30" tag="oreWoodHarvest" />
+    <!--<drop event="Destroy" name="foodHoney" count="1" prob=".4"/>-->
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlainsTree2']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlainsTree2']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlainsTree2']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeDeadTree01']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeDeadTree01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeDeadTree01']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeDeadTree02']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeDeadTree02']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeDeadTree02']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple01']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeBurntMaple01']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine6m']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine6m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedWinterPine6m']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeWinterEverGreen']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeWinterEverGreen']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeWinterEverGreen']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine12m']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine12m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedMountainPine12m']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeJuniper4m']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeJuniper4m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeJuniper4m']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeOakSml01']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeOakSml01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeOakSml01']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak08m']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak08m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedOak08m']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine12m']/drop[@event='Harvest']" name="count">4,6</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine12m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine12m']">
+    <drop event="Harvest" name="resourceWood" count="4,8" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="2,4" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="2" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine13m']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine13m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedWinterPine13m']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine13m']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine13m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeWinterPine13m']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine19m']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine19m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine19m']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak16m']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak16m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedOak16m']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeOakMed01']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeOakMed01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeOakMed01']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine19m']/drop[@event='Harvest']" name="count">8,12</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine19m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedMountainPine19m']">
+    <drop event="Harvest" name="resourceWood" count="8,16" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="4,6" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="4" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine19m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine19m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedWinterPine19m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine19m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine19m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeWinterPine19m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine31m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine31m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine31m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1,2" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine27m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine27m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine27m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1,2" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak27m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak27m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedOak27m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeOakMed02']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeOakMed02']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeOakMed02']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPineDry21m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPineDry21m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPineDry21m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePineBurntMed']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePineBurntMed']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePineBurntMed']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePineBurntFullMed']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePineBurntFullMed']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePineBurntFullMed']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine27m']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine27m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedMountainPine27m']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1,2" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple02']/drop[@event='Harvest']" name="count">12,18</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple02']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeBurntMaple02']">
+    <drop event="Harvest" name="resourceWood" count="12,20" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="6,9" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="6" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine41m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine41m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine41m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="2,3" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak41m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedOak41m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedOak41m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeOakLrg01']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeOakLrg01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeOakLrg01']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedOak1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine48m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeMountainPine48m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeMountainPine48m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="2,3" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePineBurntLrg']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePineBurntLrg']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePineBurntLrg']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeFirLrg01']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeFirLrg01']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeFirLrg01']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine41m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedMountainPine41m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedMountainPine41m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="2,3" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedMountainPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine28m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeWinterPine28m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeWinterPine28m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1,2" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+    <property name="FallOver" value="false" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine28m']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treePlantedWinterPine28m']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treePlantedWinterPine28m']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeSap" count="1,2" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+    <property name="DowngradeBlock" value="treePlantedWinterPine1m" />
+  </append>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple03']/drop[@event='Harvest']" name="count">18,24</setattribute>
+  <setattribute xpath="/blocks/block[@name='treeBurntMaple03']/drop[@event='Harvest']" name="name">FuriousRamsayWoodStick</setattribute>
+  <append xpath="/blocks/block[@name='treeBurntMaple03']">
+    <drop event="Harvest" name="resourceWood" count="16,24" tag="oreWoodHarvest" />
+    <drop event="Harvest" name="FuriousRamsayTreeBranch" count="9,12" tag="oreWoodHarvest" />
+    <drop event="Destroy" name="FuriousRamsayWoodLog" count="8" />
+  </append>
+</configs>

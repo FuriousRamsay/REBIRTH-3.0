@@ -5,6 +5,8 @@ using UnityEngine;
 
 public sealed partial class XUiC_RebirthCamperTurrets
 {
+    private static readonly int[] CameraZoomLevels={1,2,4,8};
+    private static readonly string[] CameraCornerNames={"xuiCamperTurretFrontLeft","xuiCamperTurretFrontRight","xuiCamperTurretRearLeft","xuiCamperTurretRearRight"};
     internal Newtonsoft.Json.Linq.JObject ObservePresentation()=>new Newtonsoft.Json.Linq.JObject
     {
         ["open"]=opened,["waiting"]=waiting,["selectedCorner"]=selectedCorner,["backpackFilter"]=Backpack?.Filter??0,
@@ -150,7 +152,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
         }
         float magnification=automaticZoom?RebirthCamperTurretOptics.Clamp(slot,autoZoom):selectedZoom;
         var available=RebirthCamperTurretOptics.Available(slot);
-        foreach(int level in new[]{1,2,4,8})Visible("turretZoom"+level,false);
+        foreach(int level in CameraZoomLevels)Visible("turretZoom"+level,false);
         Visible("turretZoomAuto",false);
         bool zoom=!pointer&&input.GUIActions.RightClick.IsPressed;
         // Magnification scales the projection, rather than dividing the angle itself.
@@ -163,8 +165,9 @@ public sealed partial class XUiC_RebirthCamperTurrets
         Text("cctvInfoBodyZoom",(automaticZoom?Localization.Get("xuiCamperCctvAutomatic"):Localization.Get("xuiCamperCctvSelected"))+" "+magnification+"×\n"+Localization.Get("xuiCamperCctvZoomHelp"));
         Text("cctvSelectedZoom",magnification+"×");
         Text("cctvInfoBodyFire",Localization.Get(RebirthCamperRelayWiring.TurretPowered(cameraVehicle,cameraCorner)?"xuiCamperCctvFireHelp":"xuiCamperWireNoPower"));
-        Text("turretCameraStatus",Localization.Get(new[]{"xuiCamperTurretFrontLeft","xuiCamperTurretFrontRight","xuiCamperTurretRearLeft","xuiCamperTurretRearRight"}[cameraCorner])+"  |  "+(ammo<0?Localization.Get("xuiCamperTurretNoAmmoLoaded"):slot.Ammo[ammo].itemValue.ItemClass.GetLocalizedItemName()+" x"+slot.Ammo[ammo].count));
-        Text("turretCameraStatus",((XUiV_Label)GetChildById("turretCameraStatus").ViewComponent).Text+"  |  "+RangeText(slot));
+        Text("turretCameraStatus",Localization.Get(CameraCornerNames[cameraCorner])+"  |  "+
+            (ammo<0?Localization.Get("xuiCamperTurretNoAmmoLoaded"):slot.Ammo[ammo].itemValue.ItemClass.GetLocalizedItemName()+" x"+slot.Ammo[ammo].count)+
+            "  |  "+RangeText(slot));
         if(!RebirthCamperRelayWiring.TurretPowered(cameraVehicle,cameraCorner))
             Text("turretCameraWarning",Localization.Get("xuiCamperWireNoPower"));
     }

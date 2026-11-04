@@ -186,7 +186,7 @@ internal static class RebirthVehicleTuningUi
 [Preserve]
 public sealed class ConsoleCmdRebirthVehicleTuning:ConsoleCmdAbstract
 {
-    public override string[] getCommands()=>new[]{"rbvehicletune"};
+    public override string[] getCommands()=>new[]{"rbvehicletune","rebirthvehicletune"};
     public override string getDescription()=>Localization.Get("xuiRbVehicleTune18");
     public override string getHelp()=>Localization.Get("xuiRbTuneCommandHelp");
     public override void Execute(List<string> args,CommandSenderInfo sender)

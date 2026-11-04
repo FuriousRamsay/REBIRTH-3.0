@@ -48,6 +48,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
     private Vector2i lastSize;
     private int lastEventScrollFrame = -1;
     private float nextTrace;
+    private readonly List<Collider> hitTestColliders = new List<Collider>();
     private int lastHoverTraceSlot = -2;
     private int geometryCommits;
 
@@ -603,26 +604,32 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         return false;
     }
 
-    private static bool IsMouseInsideCollider(Transform transform)
+    private bool IsMouseInsideCollider(Transform transform)
     {
         if (transform == null || UICamera.currentCamera == null)
             return false;
-        Collider[] colliders = transform.GetComponentsInChildren<Collider>(false);
-        Vector2 mouse = Input.mousePosition;
-        Camera camera = UICamera.currentCamera;
-        for (int i = 0; i < colliders.Length; i++)
+        var colliders = hitTestColliders;
+        colliders.Clear();
+        try
         {
-            Collider collider = colliders[i];
-            if (collider == null || !collider.enabled)
-                continue;
-            Bounds b = collider.bounds;
-            Vector3 a = camera.WorldToScreenPoint(b.min);
-            Vector3 c = camera.WorldToScreenPoint(b.max);
-            if (mouse.x >= Mathf.Min(a.x, c.x) && mouse.x <= Mathf.Max(a.x, c.x) &&
-                mouse.y >= Mathf.Min(a.y, c.y) && mouse.y <= Mathf.Max(a.y, c.y))
-                return true;
+            transform.GetComponentsInChildren(false, colliders);
+            Vector2 mouse = Input.mousePosition;
+            Camera camera = UICamera.currentCamera;
+            for (int i = 0; i < colliders.Count; i++)
+            {
+                Collider collider = colliders[i];
+                if (collider == null || !collider.enabled)
+                    continue;
+                Bounds b = collider.bounds;
+                Vector3 a = camera.WorldToScreenPoint(b.min);
+                Vector3 c = camera.WorldToScreenPoint(b.max);
+                if (mouse.x >= Mathf.Min(a.x, c.x) && mouse.x <= Mathf.Max(a.x, c.x) &&
+                    mouse.y >= Mathf.Min(a.y, c.y) && mouse.y <= Mathf.Max(a.y, c.y))
+                    return true;
+            }
+            return false;
         }
-        return false;
+        finally { colliders.Clear(); }
     }
 
 

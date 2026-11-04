@@ -1,4 +1,12 @@
 <configs>
+  <!-- World POI generator salvage: native damage/destruction awards one repairable shell.
+       Ordinary placed power banks retain their existing component/ownership lifecycle. -->
+  <set xpath="/blocks/block[@name='questGeneratorSmall']/property[@name='MaxDamage']/@value">500</set>
+  <remove xpath="/blocks/block[@name='questGeneratorSmall']/drop" />
+  <append xpath="/blocks/block[@name='questGeneratorSmall']">
+    <drop event="Destroy" name="FuriousRamsayCollapsedGeneratorBank" count="1" prob="1" />
+    <drop event="Fall" name="FuriousRamsayCollapsedGeneratorBank" count="1" prob="1" stick_chance="1" />
+  </append>
   <append xpath="/blocks">
     <block name="FuriousRamsayGeneratorBank">
       <property name="Extends" value="generatorbank"/>

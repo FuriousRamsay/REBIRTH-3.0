@@ -1,0 +1,11 @@
+{
+  "name": "GameSense typed-prefix passive smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable game only, guard ON, safe stationary player. Native GameSense acceptance requires SteelSeries Engine already installed/running/configured by the owner; do not install/start the service, change peripherals, or enable device networking for this test. Record existing dedupe sent/skipped counters and confirm normal health/ammo/durability lighting plus periodic refresh separately. This passive dwell checks only game errors; it does not certify SDK traffic, peripheral colors, allocations or FPS. Actual installed-Harmony wrapper decisions are covered by the separate managed fixture. Never run against the user's game or capture NPC profiling.",
+  "steps": [
+    {"action":{"command":"surroundings","args":{}}},
+    {"wait":6},
+    {"expectNoErrors":true}
+  ]
+}

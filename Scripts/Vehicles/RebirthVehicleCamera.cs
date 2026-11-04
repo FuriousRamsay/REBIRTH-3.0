@@ -131,7 +131,8 @@ public static class RebirthVehicleCamera
     {
         var player = camera.FPController?.localPlayer;
         if (!Active(player, out var view)) return default;
-        if (Head(player) == null || !Bind(player, view.Vehicle, view))
+        var head = Head(player);
+        if (head == null || !Bind(player, view.Vehicle, view))
         {
             view.FirstPerson = false;
             SetNativeView(player, false);
@@ -139,7 +140,7 @@ public static class RebirthVehicleCamera
         }
         float yaw = SeatYaw(view);
         camera.Yaw += Mathf.DeltaAngle(view.AnchorYaw, yaw); view.AnchorYaw = yaw;
-        camera.DrivingPosition = Head(player).position;
+        camera.DrivingPosition = head.position;
         // The native first-person collision probe starts at the standing capsule
         // and can pull a seated camera out of the cab. Scope it to this one view
         // update; native player/vehicle collision and third-person probes remain.

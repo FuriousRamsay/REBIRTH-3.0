@@ -45,7 +45,11 @@ internal static class RebirthTheorySoloCombatService
  internal static KillCommit BeforeKill(EntityAlive target,DamageResponse response)
  {
   if(target==null||target.bDead||target.Health>0||response.Source==null)return null;
-  var w=CapturedEpochs.Keys.Where(x=>!x.Consumed&&ReferenceEquals(x.Target,target)&&ReferenceEquals(x.Source,response.Source)&&ReferenceEquals(x.Item,response.Source.AttackingItem)).OrderByDescending(x=>x.CaptureSequence).FirstOrDefault();
+  Witness w=null;
+  foreach(var candidate in CapturedEpochs.Keys)
+   if(!candidate.Consumed&&ReferenceEquals(candidate.Target,target)&&ReferenceEquals(candidate.Source,response.Source)&&
+      ReferenceEquals(candidate.Item,response.Source.AttackingItem)&&
+      (w==null||candidate.CaptureSequence>w.CaptureSequence))w=candidate;
   if(w==null||!Current(w,false)||response.Source.getEntityId()!=w.Player.entityId)return null;
   return new KillCommit{Witness=w,Source=response.Source,Item=response.Source.AttackingItem};
  }
@@ -115,6 +119,6 @@ internal static class RebirthTheorySoloCombatService
   return w.Retiring?w.Solo.CombatOriginal.Issued>=w.Original.Ordinal&&!w.Solo.CombatOriginal.TryGet(w.Original.Ordinal,w.Id,out _):w.Solo.CombatOriginal.TryGet(w.Original.Ordinal,w.Id,out var a)&&ReferenceEquals(a,w.Original);
  }
  private static void Context(World current){if(!ReferenceEquals(world,current)||!ReferenceEquals(state,current.worldState)){Pending.Clear();CapturedEpochs.Clear();world=current;state=current.worldState;generation=Guid.NewGuid().ToString("N");}if(!installed){ModEvents.GameUpdate.RegisterHandler(OnUpdate);installed=true;}}
- private static void OnUpdate(ref ModEvents.SGameUpdateData data){var current=GameManager.Instance?.World;if(current==null||current.IsRemote()||!ReferenceEquals(world,current)||!ReferenceEquals(state,current.worldState)){Pending.Clear();CapturedEpochs.Clear();return;}float now=Time.realtimeSinceStartup;if(!Finite(now)||now<nextRetry)return;nextRetry=now+1;foreach(var w in Pending.ToArray()){if(!Current(w,true)){Pending.Remove(w);continue;}TrySave(w);}}
+ private static void OnUpdate(ref ModEvents.SGameUpdateData data){var current=GameManager.Instance?.World;if(current==null||current.IsRemote()||!ReferenceEquals(world,current)||!ReferenceEquals(state,current.worldState)){Pending.Clear();CapturedEpochs.Clear();return;}float now=Time.realtimeSinceStartup;if(!Finite(now)||now<nextRetry)return;nextRetry=now+1;if(Pending.Count==0)return;foreach(var w in Pending.ToArray()){if(!Current(w,true)){Pending.Remove(w);continue;}TrySave(w);}}
  private static bool Finite(float f)=>!float.IsNaN(f)&&!float.IsInfinity(f);
 }

@@ -1330,7 +1330,7 @@
             <label name="rebirthTrackedProgressionValue0" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta0" visible="false" />
             <rect name="rebirthTrackedProgressionProgress0" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill0" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1345,7 +1345,7 @@
             <label name="rebirthTrackedProgressionValue1" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta1" visible="false" />
             <rect name="rebirthTrackedProgressionProgress1" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill1" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1360,7 +1360,7 @@
             <label name="rebirthTrackedProgressionValue2" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta2" visible="false" />
             <rect name="rebirthTrackedProgressionProgress2" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill2" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1375,7 +1375,7 @@
             <label name="rebirthTrackedProgressionValue3" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta3" visible="false" />
             <rect name="rebirthTrackedProgressionProgress3" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill3" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1390,7 +1390,7 @@
             <label name="rebirthTrackedProgressionValue4" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta4" visible="false" />
             <rect name="rebirthTrackedProgressionProgress4" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill4" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1405,7 +1405,7 @@
             <label name="rebirthTrackedProgressionValue5" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta5" visible="false" />
             <rect name="rebirthTrackedProgressionProgress5" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill5" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1420,7 +1420,7 @@
             <label name="rebirthTrackedProgressionValue6" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta6" visible="false" />
             <rect name="rebirthTrackedProgressionProgress6" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill6" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1435,7 +1435,7 @@
             <label name="rebirthTrackedProgressionValue7" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta7" visible="false" />
             <rect name="rebirthTrackedProgressionProgress7" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill7" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1450,7 +1450,7 @@
             <label name="rebirthTrackedProgressionValue8" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta8" visible="false" />
             <rect name="rebirthTrackedProgressionProgress8" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill8" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1465,7 +1465,7 @@
             <label name="rebirthTrackedProgressionValue9" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta9" visible="false" />
             <rect name="rebirthTrackedProgressionProgress9" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill9" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1480,7 +1480,7 @@
             <label name="rebirthTrackedProgressionValue10" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta10" visible="false" />
             <rect name="rebirthTrackedProgressionProgress10" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill10" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1495,7 +1495,7 @@
             <label name="rebirthTrackedProgressionValue11" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta11" visible="false" />
             <rect name="rebirthTrackedProgressionProgress11" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill11" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1510,7 +1510,7 @@
             <label name="rebirthTrackedProgressionValue12" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta12" visible="false" />
             <rect name="rebirthTrackedProgressionProgress12" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill12" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1525,7 +1525,7 @@
             <label name="rebirthTrackedProgressionValue13" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta13" visible="false" />
             <rect name="rebirthTrackedProgressionProgress13" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill13" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1540,7 +1540,7 @@
             <label name="rebirthTrackedProgressionValue14" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta14" visible="false" />
             <rect name="rebirthTrackedProgressionProgress14" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill14" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1555,7 +1555,7 @@
             <label name="rebirthTrackedProgressionValue15" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta15" visible="false" />
             <rect name="rebirthTrackedProgressionProgress15" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill15" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1570,7 +1570,7 @@
             <label name="rebirthTrackedProgressionValue16" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta16" visible="false" />
             <rect name="rebirthTrackedProgressionProgress16" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill16" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1585,7 +1585,7 @@
             <label name="rebirthTrackedProgressionValue17" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta17" visible="false" />
             <rect name="rebirthTrackedProgressionProgress17" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill17" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1600,7 +1600,7 @@
             <label name="rebirthTrackedProgressionValue18" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta18" visible="false" />
             <rect name="rebirthTrackedProgressionProgress18" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill18" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1615,7 +1615,7 @@
             <label name="rebirthTrackedProgressionValue19" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta19" visible="false" />
             <rect name="rebirthTrackedProgressionProgress19" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill19" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1630,7 +1630,7 @@
             <label name="rebirthTrackedProgressionValue20" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta20" visible="false" />
             <rect name="rebirthTrackedProgressionProgress20" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill20" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1645,7 +1645,7 @@
             <label name="rebirthTrackedProgressionValue21" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta21" visible="false" />
             <rect name="rebirthTrackedProgressionProgress21" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill21" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1660,7 +1660,7 @@
             <label name="rebirthTrackedProgressionValue22" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta22" visible="false" />
             <rect name="rebirthTrackedProgressionProgress22" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill22" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1675,7 +1675,7 @@
             <label name="rebirthTrackedProgressionValue23" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta23" visible="false" />
             <rect name="rebirthTrackedProgressionProgress23" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill23" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1690,7 +1690,7 @@
             <label name="rebirthTrackedProgressionValue24" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta24" visible="false" />
             <rect name="rebirthTrackedProgressionProgress24" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill24" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1705,7 +1705,7 @@
             <label name="rebirthTrackedProgressionValue25" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta25" visible="false" />
             <rect name="rebirthTrackedProgressionProgress25" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill25" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1720,7 +1720,7 @@
             <label name="rebirthTrackedProgressionValue26" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta26" visible="false" />
             <rect name="rebirthTrackedProgressionProgress26" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill26" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1735,7 +1735,7 @@
             <label name="rebirthTrackedProgressionValue27" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta27" visible="false" />
             <rect name="rebirthTrackedProgressionProgress27" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill27" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1750,7 +1750,7 @@
             <label name="rebirthTrackedProgressionValue28" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta28" visible="false" />
             <rect name="rebirthTrackedProgressionProgress28" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill28" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1765,7 +1765,7 @@
             <label name="rebirthTrackedProgressionValue29" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta29" visible="false" />
             <rect name="rebirthTrackedProgressionProgress29" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill29" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1780,7 +1780,7 @@
             <label name="rebirthTrackedProgressionValue30" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta30" visible="false" />
             <rect name="rebirthTrackedProgressionProgress30" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill30" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1795,7 +1795,7 @@
             <label name="rebirthTrackedProgressionValue31" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta31" visible="false" />
             <rect name="rebirthTrackedProgressionProgress31" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill31" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1810,7 +1810,7 @@
             <label name="rebirthTrackedProgressionValue32" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta32" visible="false" />
             <rect name="rebirthTrackedProgressionProgress32" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill32" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1825,7 +1825,7 @@
             <label name="rebirthTrackedProgressionValue33" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta33" visible="false" />
             <rect name="rebirthTrackedProgressionProgress33" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill33" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1840,7 +1840,7 @@
             <label name="rebirthTrackedProgressionValue34" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta34" visible="false" />
             <rect name="rebirthTrackedProgressionProgress34" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill34" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1855,7 +1855,7 @@
             <label name="rebirthTrackedProgressionValue35" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta35" visible="false" />
             <rect name="rebirthTrackedProgressionProgress35" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill35" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1870,7 +1870,7 @@
             <label name="rebirthTrackedProgressionValue36" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta36" visible="false" />
             <rect name="rebirthTrackedProgressionProgress36" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill36" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1885,7 +1885,7 @@
             <label name="rebirthTrackedProgressionValue37" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta37" visible="false" />
             <rect name="rebirthTrackedProgressionProgress37" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill37" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1900,7 +1900,7 @@
             <label name="rebirthTrackedProgressionValue38" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta38" visible="false" />
             <rect name="rebirthTrackedProgressionProgress38" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill38" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1915,7 +1915,7 @@
             <label name="rebirthTrackedProgressionValue39" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta39" visible="false" />
             <rect name="rebirthTrackedProgressionProgress39" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill39" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1930,7 +1930,7 @@
             <label name="rebirthTrackedProgressionValue40" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta40" visible="false" />
             <rect name="rebirthTrackedProgressionProgress40" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill40" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1945,7 +1945,7 @@
             <label name="rebirthTrackedProgressionValue41" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta41" visible="false" />
             <rect name="rebirthTrackedProgressionProgress41" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill41" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1960,7 +1960,7 @@
             <label name="rebirthTrackedProgressionValue42" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta42" visible="false" />
             <rect name="rebirthTrackedProgressionProgress42" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill42" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1975,7 +1975,7 @@
             <label name="rebirthTrackedProgressionValue43" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta43" visible="false" />
             <rect name="rebirthTrackedProgressionProgress43" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill43" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -1990,7 +1990,7 @@
             <label name="rebirthTrackedProgressionValue44" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta44" visible="false" />
             <rect name="rebirthTrackedProgressionProgress44" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill44" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2005,7 +2005,7 @@
             <label name="rebirthTrackedProgressionValue45" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta45" visible="false" />
             <rect name="rebirthTrackedProgressionProgress45" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill45" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2020,7 +2020,7 @@
             <label name="rebirthTrackedProgressionValue46" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta46" visible="false" />
             <rect name="rebirthTrackedProgressionProgress46" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill46" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2035,7 +2035,7 @@
             <label name="rebirthTrackedProgressionValue47" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta47" visible="false" />
             <rect name="rebirthTrackedProgressionProgress47" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill47" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2050,7 +2050,7 @@
             <label name="rebirthTrackedProgressionValue48" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta48" visible="false" />
             <rect name="rebirthTrackedProgressionProgress48" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill48" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2065,7 +2065,7 @@
             <label name="rebirthTrackedProgressionValue49" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta49" visible="false" />
             <rect name="rebirthTrackedProgressionProgress49" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill49" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2080,7 +2080,7 @@
             <label name="rebirthTrackedProgressionValue50" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta50" visible="false" />
             <rect name="rebirthTrackedProgressionProgress50" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill50" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2095,7 +2095,7 @@
             <label name="rebirthTrackedProgressionValue51" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta51" visible="false" />
             <rect name="rebirthTrackedProgressionProgress51" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill51" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2110,7 +2110,7 @@
             <label name="rebirthTrackedProgressionValue52" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta52" visible="false" />
             <rect name="rebirthTrackedProgressionProgress52" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill52" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2125,7 +2125,7 @@
             <label name="rebirthTrackedProgressionValue53" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta53" visible="false" />
             <rect name="rebirthTrackedProgressionProgress53" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill53" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2140,7 +2140,7 @@
             <label name="rebirthTrackedProgressionValue54" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta54" visible="false" />
             <rect name="rebirthTrackedProgressionProgress54" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill54" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2155,7 +2155,7 @@
             <label name="rebirthTrackedProgressionValue55" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta55" visible="false" />
             <rect name="rebirthTrackedProgressionProgress55" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill55" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2170,7 +2170,7 @@
             <label name="rebirthTrackedProgressionValue56" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta56" visible="false" />
             <rect name="rebirthTrackedProgressionProgress56" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill56" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2185,7 +2185,7 @@
             <label name="rebirthTrackedProgressionValue57" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta57" visible="false" />
             <rect name="rebirthTrackedProgressionProgress57" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill57" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2200,7 +2200,7 @@
             <label name="rebirthTrackedProgressionValue58" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta58" visible="false" />
             <rect name="rebirthTrackedProgressionProgress58" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill58" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2215,7 +2215,7 @@
             <label name="rebirthTrackedProgressionValue59" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta59" visible="false" />
             <rect name="rebirthTrackedProgressionProgress59" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill59" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2230,7 +2230,7 @@
             <label name="rebirthTrackedProgressionValue60" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta60" visible="false" />
             <rect name="rebirthTrackedProgressionProgress60" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill60" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2245,7 +2245,7 @@
             <label name="rebirthTrackedProgressionValue61" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta61" visible="false" />
             <rect name="rebirthTrackedProgressionProgress61" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill61" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2260,7 +2260,7 @@
             <label name="rebirthTrackedProgressionValue62" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta62" visible="false" />
             <rect name="rebirthTrackedProgressionProgress62" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill62" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -2275,7 +2275,7 @@
             <label name="rebirthTrackedProgressionValue63" depth="4" pos="88,21" pivot="right" width="58" height="22" font_size="15" justify="right" color="235,235,240,255" overflow="shrinkcontent" />
             <label name="rebirthTrackedProgressionDelta63" visible="false" />
             <rect name="rebirthTrackedProgressionProgress63" pos="4,3" pivot="BottomLeft" width="84" height="5" visible="false">
-              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="58,58,65,245" />
+              <sprite depth="2" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="sliced" color="96,96,108,255" />
               <sprite name="rebirthTrackedProgressionProgressFill63" depth="3" pos="0,0" pivot="BottomLeft" width="84" height="5" sprite="menu_empty" type="filled" fill="0" color="90,180,186,255" />
               <sprite depth="4" pos="0,4" pivot="BottomLeft" width="84" height="1" sprite="menu_empty" color="220,220,235,50" />
             </rect>
@@ -4581,8 +4581,9 @@
             </rect>
             <rect name="survivorOverviewGearSupportCard" pos="465,-702" width="83" height="83">
               <sprite name="survivorOverviewGearSupportBg" pos="0,0" width="83" height="83" sprite="menu_empty" color="90,90,90,255" depth="1" type="sliced" globalopacitymod="0" />
-              <sprite name="survivorOverviewGearSupportIcon" pos="5,-5" width="73" height="73" sprite="rb_slot_support" color="200,200,200,180" depth="3" atlas="RebirthUiIcons" globalopacitymod="0" keepsourceaspectratio="true" />
-              <button name="btnPc134UnequipSupport" pos="62,-2" width="19" height="19" sprite="ui_game_symbol_x" hoversprite="ui_game_symbol_x" defaultcolor="225,225,225,255" hovercolor="255,180,100,255" depth="12" visible="false" tooltip="Unequip to Inventory" hoverscale="1.0" />
+              <sprite name="survivorOverviewGearSupportIcon" pos="5,-5" width="73" height="73" sprite="drinkJarGrey" color="110,110,110,175" depth="3" atlas="ItemIconAtlas" globalopacitymod="0" keepsourceaspectratio="true" />
+              <sprite name="survivorOverviewDrinkStateBg" pos="2,-61" width="79" height="19" sprite="menu_empty" color="16,16,20,210" depth="6" globalopacitymod="0" />
+              <label name="survivorOverviewDrinkSlotState" pos="3,-61" width="77" height="18" font_size="12" justify="center" color="215,215,220,255" depth="7" />
               <sprite name="pc135SupportFrame" pos="0,0" width="83" height="83" sprite="menu_empty2px" type="sliced" fillcenter="false" color="0,0,0,255" depth="5" globalopacitymod="0" />
               <button name="survivorGearInputSupport" controller="RebirthSurvivorGearSlot, RebirthUtils" gear_slot="support" width="83" height="83" depth="15" sprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="255,255,255,15" on_drag="true" hoverscale="1" />
             </rect>
@@ -6289,7 +6290,7 @@
           </panel>
           <rect name="survivorHudTrackingHost" pos="0,0" width="1744" height="851" depth="18" controller="RebirthHudTrackingManager, RebirthUtils" pivot="topleft">
             <labeledbutton name="btnSurvivorProgressionHudTracking" pos="900,-8" width="248" height="34" font_size="18" caption_key="xuiRebirthHudTrackingOpen" upper_case="true" />
-            <panel name="survivorHudTrackingOverlay" pos="0,0" width="1744" height="851" depth="100" visible="false" on_press="true" pivot="topleft">
+            <panel name="survivorHudTrackingOverlay" pos="0,0" width="1744" height="851" depth="100" visible="false" on_press="true" pivot="topleft" controller="RebirthHudTrackingOverlay, RebirthUtils">
               <button name="pc136TrackingInputShield" pos="-5000,5000" width="12000" height="12000" depth="0" sprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1" on_press="true" gamepad_selectable="false" on_scroll="true" />
               <sprite depth="1" sprite="menu_empty" type="sliced" color="24,24,29,250" width="1744" height="851" pivot="topleft" pos="0,0" globalopacitymod="0" />
               <sprite depth="2" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" width="1744" height="851" pivot="topleft" pos="0,0" globalopacitymod="0" />
@@ -11629,6 +11630,8 @@
               <sprite name="survivorConditionSelectedIcon" depth="8" pos="18,-18" width="64" height="64" atlas="RebirthSurvivorIcons" sprite="rb_condition_mood_good" pivot="topleft" globalopacitymod="0" />
               <label name="survivorConditionSelectedName" pos="98,-16" width="410" height="34" font_size="25" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
               <label name="survivorConditionSelectedCategory" pos="98,-52" width="410" height="24" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
+              <sprite name="survivorConditionSelectedDietIcon" pos="98,-52" width="22" height="22" atlas="RebirthSurvivorIcons" sprite="rb_diet_unrestricted" pivot="topleft" depth="12" visible="false" />
+              <label name="survivorConditionSelectedDietName" pos="126,-52" width="382" height="24" font_size="18" color="181,140,255,255" overflow="shrinkcontent" pivot="topleft" depth="12" visible="false" />
               <label name="survivorConditionSelectedDuration" pos="520,-24" width="146" height="50" font_size="18" justify="right" color="225,225,232,255" overflow="clampcontent" pivot="topleft" depth="12" />
             </rect>
             <rect pos="14,-132" width="686" height="120" pivot="topleft">
@@ -18662,11 +18665,11 @@
               <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="467,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
               <sprite name="modifyFrameeditorBackpack" width="841" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4" />
             </rect>
-            <rect pos="17,-54" width="120" height="120">
-              <item_stack name="editorEquipmentPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="120" repeat_i="0" allow_dropping="false" />
+            <rect pos="31,-68" width="92" height="92">
+              <item_stack name="editorEquipmentPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="92" repeat_i="0" allow_dropping="false" />
             </rect>
-            <rect pos="1000,-54" width="120" height="120">
-              <item_stack name="editorSelectionPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="120" repeat_i="0" allow_dropping="false" />
+            <rect pos="1014,-68" width="92" height="92">
+              <item_stack name="editorSelectionPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="92" repeat_i="0" allow_dropping="false" />
             </rect>
           </rect>
           <sprite name="modifyFramerebirthModifyEditor" width="1840" height="900" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4" />
@@ -19209,7 +19212,7 @@
               </rect>
               <rect pos="16,-160" width="500" height="140">
                 <label pos="0,0" width="500" height="24" text="REWARD CHOICES" font_size="18" color="181,140,255,255" />
-                <label pos="0,-28" width="500" height="108" text="{chosenrewards}" font_size="18" support_bb_code="true" />
+                <label pos="0,-28" width="500" height="108" text_key="xuiRebirthQuestChoicesAtTurnIn" font_size="18" support_bb_code="true" />
               </rect>
               <rect pos="16,-310" width="500" height="140">
                 <label pos="0,0" width="500" height="24" text="QUEST CHAIN" font_size="18" color="181,140,255,255" />
@@ -26449,7 +26452,9 @@
       <label pos="0,-30" width="310" height="26" text_key="rebirthWaterSupplyHint" font_size="16" overflow="shrinkcontent" depth="12" />
       <label pos="0,-58" width="310" height="28" text="{rbmet_slot_name}" font_size="18" overflow="shrinkcontent" depth="12" />
       <label pos="0,-84" width="310" height="26" text="{rbmet_slot_volume}" font_size="18" depth="12" />
-      <labeledbutton name="btnRebirthMetabolismAutoSip" pos="0,-152" width="310" height="32" caption="{rbmet_autosip}" font_size="18" />
+      <label pos="0,-111" width="310" height="27" text="{rbmet_autosip_detail}" font_size="15" overflow="shrinkcontent" depth="12" tooltip_key="xuiRebirthMetabolismAutoSipHelp" />
+      <labeledbutton name="btnRebirthMetabolismSip" pos="0,-152" width="150" height="32" caption_key="xuiRebirthMetabolismSipNow" font_size="18" />
+      <labeledbutton name="btnRebirthMetabolismAutoSip" pos="158,-152" width="152" height="32" caption="{rbmet_autosip}" font_size="17" />
       <rect name="rebirthWaterFeedbackReader" controller="RebirthReadableText, RebirthUtils" pos="0,-190" width="310" height="62" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
         <defaultscrollbar />
         <scrollview name="readableTextViewport" depth="10" width="288" height="62" clippingsoftness="0,4">
@@ -28170,7 +28175,6 @@
     <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="380,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
     <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="420,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
   </append>
-  <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">-60,-22</setattribute>
   <append xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']">
     <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="-20,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
     <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="20,-22" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
@@ -29298,6 +29302,7 @@
   </conditional>
 
   <!-- Inventory header standard: Sort, Lock, transfer controls. -->
+  <conditional><if cond="character_progression('Rebirth')">
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="pos">536,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="nav_right">contextCategory</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="pos">576,-9</setattribute>
@@ -29343,7 +29348,6 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="nav_left">contextBackpackStack</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//label[@name='contextContainerName']" name="width">470</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">60,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">100,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">140,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">180,-22</setattribute>
   <setattribute xpath="/windows//button[@name='btnToggleLockMode']" name="atlas">RebirthUiIcons</setattribute>
@@ -29351,7 +29355,7 @@
 
   <!-- Header actions align with the final physical column; no decorative padding slots. -->
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="pos">700,-9</setattribute>
-  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="pos">542,-9</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="pos">660,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerTheorySection']" name="pos">598,-25</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerSellSection']" name="pos">638,-25</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerSort']" name="pos">740,-9</setattribute>
@@ -29365,12 +29369,13 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStack']" name="pos">811,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="pos">851,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//label[@name='contextCurrency']" name="pos">380,-10</setattribute>
-  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="nav_right">rbContainerTheorySection</setattribute>
-  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerTheorySection']" name="nav_left">contextCategory</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="nav_left">rbContainerSellSection</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="nav_right">contextWifi</setattribute>
+  <removeattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerTheorySection']/@nav_left" />
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerTheorySection']" name="nav_right">rbContainerSellSection</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerSellSection']" name="nav_left">rbContainerTheorySection</setattribute>
-  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerSellSection']" name="nav_right">contextWifi</setattribute>
-  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="nav_left">rbContainerSellSection</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContainerSellSection']" name="nav_right">contextCategory</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="nav_left">contextCategory</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="nav_right">contextContainerSort</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerSort']" name="nav_left">contextWifi</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerSort']" name="nav_right">contextContainerLock</setattribute>
@@ -29379,6 +29384,7 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerStack']" name="nav_left">contextContainerLock</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerStack']" name="nav_right">contextContainerTake</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerTake']" name="nav_left">contextContainerStack</setattribute>
+  </if></conditional>
   <!-- Observe the native camper transition without opening a cursor/modal window.
        The existing toolbelt group instantiates this always-updating controller. -->
   <append xpath="/windows/window[@name='windowToolbelt']">
@@ -29396,8 +29402,8 @@
   <include filename="../_Statistics/horde_windows.xml" />
   <include filename="../_Statistics/purge_windows.xml" />
   <include filename="../_Purge/map_filters.xml" />
-<include filename="../_Purge/map_popup.xml" />
-  <include filename="../_Map/zoom_slider.xml" />
+  <conditional><if cond="character_progression('Rebirth')"><include filename="../_Purge/map_popup.xml" /></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="../_Map/zoom_slider.xml" /></if></conditional>
   <!-- U6/S03: Character backpack header row on a uniform 40-unit pitch ending at Sort (x=346) and Lock (x=386):
        Library(240c) Sell(280c) Filter(306) Sort(346) Lock(386). Overrides backpack_toolbar_layout.xml, which
        left Filter (294) overlapping Sell (302c) and the Sell icon 44 units left of Sort. Y is owned at runtime by
@@ -29414,9 +29420,9 @@
   <!-- Capacity label shares the icon row: keep it left of the Library icon (x 226): 14 + 206 = 220. -->
   <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/label[@name='characterBagCapacity']" name="width">206</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/label[@name='characterBagCapacity']" name="overflow">shrinkcontent</setattribute>
-  <include filename="../_Vehicles/camper_station_switch_windows.xml" />
+  <conditional><if cond="character_progression('Rebirth')"><include filename="../_Vehicles/camper_station_switch_windows.xml" /></if></conditional>
 <include filename="../_Vehicles/vehicle_editor_windows.xml" />
-  <include filename="../_Vehicles/camper_cargo_filter_windows.xml" />
+  <conditional><if cond="character_progression('Rebirth')"><include filename="../_Vehicles/camper_cargo_filter_windows.xml" /></if></conditional>
   <include filename="../_Vehicles/camper_sink_windows.xml" />
   <include filename="../_NPC/equipment_windows.xml" />
   <include filename="companion_desk_windows.xml" />
@@ -29425,5 +29431,8 @@
   <setattribute xpath="/windows/window[@name='windowBackpack']/rect[@name='header']/button[@name='btnClearInventory']" name="pos">460,-22</setattribute>
   <!-- 3.4: preserve the native filter/action row; REBIRTH extras occupy header slots. -->
   <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='header']/label[@name='lootName']" name="anchor_right">scrollbarborder,1,-190</setattribute>
+  <include filename="../PlayerHelp/windows.xml" />
+  <include filename="standalone_bank_windows.xml" />
+  <include filename="modify_corrections.xml" />
 </configs>
 

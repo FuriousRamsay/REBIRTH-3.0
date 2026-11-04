@@ -59,6 +59,7 @@ internal static partial class RebirthVehicleTransferCoordinator
         if(!ThreadManager.IsMainThread())return;
         double now=System.Diagnostics.Stopwatch.GetTimestamp()/(double)System.Diagnostics.Stopwatch.Frequency;
         if(now<lastTick)nextTick=now;if(now<nextTick)return;lastTick=now;nextTick=now+0.75d;
+        if(active.Count==0)return;
         foreach(var transfer in active.Values.ToArray())if(transfer.Current()&&!transfer.Finished)transfer.Advance();
     }
     private static double nextTick,lastTick;

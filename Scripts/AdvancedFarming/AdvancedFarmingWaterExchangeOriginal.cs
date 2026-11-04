@@ -437,9 +437,9 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
         if(world==null||!ThreadManager.IsMainThread()||!ReferenceEquals(world,GameManager.Instance?.World))return;Scope(world);var player=world.GetPrimaryPlayer();
         if(UnityEngine.Time.realtimeSinceStartup>=nextRead)Reconcile(world);
         if(quarantine)return;
-        if(!world.IsRemote())foreach(var r in Servers.Values.ToArray())try{TryCloseEndedNoEffect(world,r);}catch(Exception error){Log.Warning("[REBIRTH Farming] ended water original retained: "+error.GetType().Name);}
+        if(!world.IsRemote()&&Servers.Count>0)foreach(var r in Servers.Values.ToArray())try{TryCloseEndedNoEffect(world,r);}catch(Exception error){Log.Warning("[REBIRTH Farming] ended water original retained: "+error.GetType().Name);}
         PromoteOwner();
-        foreach(var a in Owners.Values.ToArray())
+        if(Owners.Count>0)foreach(var a in Owners.Values.ToArray())
         {
             if(a.PendingSlot!=null&&a.PendingSlot.Deaths!=a.Player.Died){a.PendingSlot.Dispose();a.PendingSlot=null;}
             if(!Current(a)||UnityEngine.Time.realtimeSinceStartup<a.Next)continue;a.Next=UnityEngine.Time.realtimeSinceStartup+1f;var r=a.Record;

@@ -12,7 +12,7 @@ internal static class RebirthPurgeStartFootprint
     internal static bool IntersectsVoxel(double minimumX,double minimumZ,double angle)
     {
         double x=minimumX+.5,z=minimumZ+.5,c=Math.Cos(angle),s=Math.Sin(angle);
-        if(Math.Abs(x)>WorldExtentX(angle)+.5||Math.Abs(z)>WorldExtentZ(angle)+.5)return false;
+        if(Math.Abs(x)>Math.Abs(c)*HalfWidth+Math.Abs(s)*HalfLength+.5||Math.Abs(z)>Math.Abs(s)*HalfWidth+Math.Abs(c)*HalfLength+.5)return false;
         double voxelRadius=.5*(Math.Abs(c)+Math.Abs(s));
         return Math.Abs(c*x-s*z)<=HalfWidth+voxelRadius&&Math.Abs(s*x+c*z)<=HalfLength+voxelRadius;
     }

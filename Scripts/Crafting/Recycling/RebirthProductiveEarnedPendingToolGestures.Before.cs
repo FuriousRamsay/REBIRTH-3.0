@@ -40,7 +40,7 @@ internal static partial class RebirthProductiveEarnedPendingToolGestures
     }
     private static void PumpOwnerBefore()
     {
-        if(!RebirthProductiveEarnedCoordinator.Enabled||executing!=null)return;
+        if(!RebirthProductiveEarnedCoordinator.Enabled||executing!=null||observations.Count==0)return;
         foreach(var scope in System.Linq.Enumerable.ToArray(observations.Values))
         {
             if(scope.BeforeSaveRequested||scope.Steps!=0||scope.Unknown)continue;

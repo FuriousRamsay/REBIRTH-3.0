@@ -40,13 +40,13 @@ internal static class RebirthHydrationLocalTransfer
         bool entered=false;
         try
         {
-            if(player==null||!ThreadManager.IsMainThread())return Result.Refused;
+            if(player==null||!ThreadManager.IsMainThread())return Refuse(player,returning,sourceIsBag,sourceIndex,"invalid-owner-or-thread");
             // Any request on this exact actor resumes its retained original;
             // changed selection/action never replaces an entered operation.
             if(pending.TryGetValue(player,out var retained))return Resume(retained);
             if(RebirthHydrationColdRecoveryLease.TryGetRetained(player,out var recovery))
                 return recovery.TryComplete()?Result.Applied:Result.Pending;
-            if(admitting)return Result.Refused;
+            if(admitting)return Refuse(player,returning,sourceIsBag,sourceIndex,"admission-busy");
             var recovered=TryRecoverOriginal(player);
             if(recovered!=Result.Refused)return recovered;
             admitting=true;entered=true;
@@ -58,41 +58,56 @@ internal static class RebirthHydrationLocalTransfer
                 !RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)||
                 !Guid.TryParse(player.world.Guid,out var world)||world==Guid.Empty||
                 !RebirthMetabolismStateRepository.TryGet(player,out var state)||
-                !RebirthHydrationTransferScope.MatchesState(creation,state))return Result.Refused;
+                !RebirthHydrationTransferScope.MatchesState(creation,state))return Refuse(player,returning,sourceIsBag,sourceIndex,"owner-or-state-scope");
             if(!TryClearCommittedCold(player))
-                return RebirthHydrationColdRecoveryLease.TryGetRetained(player,out _)?Result.Pending:Result.Refused;
+                return RebirthHydrationColdRecoveryLease.TryGetRetained(player,out _)?Result.Pending:Refuse(player,returning,sourceIsBag,sourceIndex,"cold-recovery");
             // Recovery may publish the source result. A replacement repository
             // row cannot inherit the new action's pre-recovery state witness.
             if(!RebirthMetabolismStateRepository.TryGet(player,out var latest)||!ReferenceEquals(latest,state)||
-                !RebirthHydrationTransferScope.MatchesState(creation,state))return Result.Refused;
+                !RebirthHydrationTransferScope.MatchesState(creation,state))return Refuse(player,returning,sourceIsBag,sourceIndex,"state-changed-after-recovery");
             var bag=player.bag?.ItemGrid?.items;var belt=player.inventory?.ItemGrid?.items;
-            if(bag==null||belt==null)return Result.Refused;
+            if(bag==null||belt==null)return Refuse(player,returning,sourceIsBag,sourceIndex,"native-grid-unavailable");
             int owned=RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length);
-            if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var snapshot))return Result.Refused;
+            if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var snapshot))return Refuse(player,returning,sourceIsBag,sourceIndex,"native-snapshot-failed");
             var hydration=state.HydrationSlotItem;
+            Trace(player,returning,sourceIsBag,sourceIndex,"admission",$"slot={SafeName(hydration)} count={(hydration==null||hydration.IsEmpty()?0:hydration.count)} bag={bag.Length} freeUnlocked={FreeUnlocked(player,bag)} stateRevision={state.Revision}");
             var cell=new RebirthGearInventoryPlan.Stack{Count=hydration==null||hydration.IsEmpty()?0:hydration.count};
             cell.ItemData=cell.Count==0?string.Empty:RebirthNativeItemCodec.Encode(hydration.itemValue);
             var nativeLocks=player.bag.LockedSlots;
-            if(nativeLocks!=null&&nativeLocks.Length!=bag.Length)return Result.Refused;
+            if(nativeLocks!=null&&nativeLocks.Length!=bag.Length)return Refuse(player,returning,sourceIsBag,sourceIndex,"lock-grid-length-mismatch");
             var lockedBag=nativeLocks==null?null:Enumerable.Range(0,nativeLocks.Length).Select(index=>nativeLocks[index]).ToArray();
             if(!RebirthHydrationTransferPlan.TryCreate(snapshot.Bag,snapshot.Belt,lockedBag,owned,cell,
-                sourceIsBag,returning?-1:sourceIndex,out var plan))return Result.Refused;
+                sourceIsBag,returning?-1:sourceIndex,out var plan))return Refuse(player,returning,sourceIsBag,sourceIndex,"plan-refused");
             var container=returning?plan.GearBefore:plan.GearAfter;
-            if(!RebirthNativeItemCodec.TryDecode(container.ItemData,out var value)||
-                !RebirthConsumableResolver.TryResolve(value,out var definition)||definition==null||!definition.IsDrink||!definition.HydrationEquippable)return Result.Refused;
+            if(!RebirthNativeItemCodec.TryDecode(container.ItemData,out var value)||value==null||value.ItemClass==null)
+                return Refuse(player,returning,sourceIsBag,sourceIndex,"item-decode-failed");
+            // A consumed drink can leave its empty jar in this exact custody cell.
+            // Returning any valid occupied cell is safe: the conserved plan moves
+            // that same item to an unlocked native backpack slot without cloning it.
+            if(!returning&&(!RebirthConsumableResolver.TryResolve(value,out var definition)||definition==null||!definition.IsDrink||!definition.HydrationEquippable))
+                return Refuse(player,returning,sourceIsBag,sourceIndex,"source-is-not-equippable-drink");
             if(!returning&&RebirthSurvivorMode.IsEnabledForCurrentWorld())
             {
-                if(!RebirthWorldCharacterService.TryGet(player,out var character)||character?.Support==null)return Result.Refused;
-                if(character.Support.EquippedGearBySlot.TryGetValue(RebirthSurvivorGearService.SupportSlotId,out var gear)&&!string.IsNullOrEmpty(gear))return Result.Refused;
+                if(!RebirthWorldCharacterService.TryGet(player,out var character)||character?.Support==null)return Refuse(player,returning,sourceIsBag,sourceIndex,"survivor-support-unavailable");
+                if(character.Support.EquippedGearBySlot.TryGetValue(RebirthSurvivorGearService.SupportSlotId,out var gear)&&!string.IsNullOrEmpty(gear))return Refuse(player,returning,sourceIsBag,sourceIndex,"support-slot-occupied");
             }
             if(!RebirthHydrationTransferOriginal.TryCreate(Guid.NewGuid(),world,owner.StorageKey,creation,player.Died,state.Revision,
-                owned,lockedBag,plan,out var original)||!RebirthHydrationOwnerHold.TryAcquire(player,original))return Result.Refused;
+                owned,lockedBag,plan,out var original)||!RebirthHydrationOwnerHold.TryAcquire(player,original))return Refuse(player,returning,sourceIsBag,sourceIndex,"original-or-owner-hold-failed");
             var next=new Pending{Player=player,Original=original};pending.Add(player,next);
-            return Resume(next);
+            var result=Resume(next);
+            Trace(player,returning,sourceIsBag,sourceIndex,"result",result.ToString());
+            return result;
         }
-        catch{return player!=null&&pending.ContainsKey(player)?Result.Pending:Result.Refused;}
+        catch(Exception ex){Trace(player,returning,sourceIsBag,sourceIndex,"exception",ex.GetType().Name);return player!=null&&pending.ContainsKey(player)?Result.Pending:Result.Refused;}
         finally{if(entered)admitting=false;}
     }
+    private static Result Refuse(EntityPlayerLocal player,bool returning,bool sourceIsBag,int sourceIndex,string reason)
+    {Trace(player,returning,sourceIsBag,sourceIndex,"refused",reason);return Result.Refused;}
+    private static void Trace(EntityPlayerLocal player,bool returning,bool sourceIsBag,int sourceIndex,string phase,string detail)
+    {Log.Out($"[REBIRTH HydrationTransfer] {phase} action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(sourceIsBag?"bag":"belt")} index={sourceIndex} {detail}");}
+    private static string SafeName(ItemStack stack)=>stack==null||stack.IsEmpty()?"empty":stack.itemValue?.ItemClass?.GetItemName()??"unknown";
+    private static int FreeUnlocked(EntityPlayerLocal player,ItemStack[] bag)
+    {if(bag==null)return -1;var locks=player?.bag?.LockedSlots;int free=0;for(int i=0;i<bag.Length;i++)if((bag[i]==null||bag[i].IsEmpty())&&(locks==null||i>=locks.Length||!locks[i]))free++;return free;}
     internal static Result TryResume(EntityPlayerLocal player)
     {
         if(player==null||!ThreadManager.IsMainThread())return Result.Refused;

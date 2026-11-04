@@ -464,7 +464,10 @@ public static class RebirthMetabolismItemInfoPatch
         bool weaponValue=bindingName.StartsWith("itemstat",StringComparison.Ordinal)&&!weaponTitle;
         if((weaponTitle||weaponValue)&&int.TryParse(bindingName.Substring(weaponTitle?13:8),out var weaponIndex)&&
             RebirthWeaponDetailRows.TryGet(__instance.xui,__instance.itemStack,null,weaponIndex-1,out var weaponLabel,out var weaponText))
-        {value=weaponTitle?weaponLabel:weaponText;__result=true;return;}        RebirthConsumableDefinition d;
+        {value=weaponTitle?weaponLabel:weaponText;__result=true;return;}
+        if(!weaponTitle&&!weaponValue&&bindingName!="hasdurability"&&bindingName!="durabilityfill"&&
+            bindingName!="durabilitycolor"&&bindingName!="durabilityjustify"&&bindingName!="durabilitytext")return;
+        RebirthConsumableDefinition d;
         if (!RebirthConsumableResolver.TryResolve(__instance.itemStack.itemValue, out d) || d == null)
             return;
 

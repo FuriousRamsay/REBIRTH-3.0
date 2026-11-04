@@ -389,6 +389,11 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
         // explicit authority contract; no distance-only mutation fallback.
     }
 
+    internal static void ResetRateBudget()
+    {
+        lock(RateSync)RecentRequests.Clear();
+    }
+
     private static bool ConsumeRateBudget(int entityId)
     {
         float now = Time.realtimeSinceStartup;

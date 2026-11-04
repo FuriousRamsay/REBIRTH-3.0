@@ -17,6 +17,14 @@ public sealed class XUiC_RebirthPlayerProfileEntry : XUiC_ProfilesList.EntryCont
 {
     private const string LogPrefix = "[REBIRTH Survivor][PlayerProfilePortrait]";
     private static float nextGlobalBuildAt;
+    private sealed class ReflectionMembers
+    {
+        internal FieldInfo[] Fields;
+        internal PropertyInfo[] Properties;
+    }
+    // Portrait resolution runs on the UI thread; type members are immutable while
+    // the live profile objects and their values are rechecked on every probe.
+    private static readonly Dictionary<Type, ReflectionMembers> reflectionMembers = new Dictionary<Type, ReflectionMembers>();
 
     private XUiV_Texture faceTexture;
     private Texture2D faceSnapshot;
@@ -222,9 +230,8 @@ public sealed class XUiC_RebirthPlayerProfileEntry : XUiC_ProfilesList.EntryCont
 
         for (Type scan = type; scan != null; scan = scan.BaseType)
         {
-            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
-            FieldInfo[] fields;
-            try { fields = scan.GetFields(flags); } catch { fields = new FieldInfo[0]; }
+            ReflectionMembers members = GetReflectionMembers(scan);
+            FieldInfo[] fields = members.Fields;
             for (int i = 0; i < fields.Length; i++)
             {
                 FieldInfo field = fields[i];
@@ -236,8 +243,7 @@ public sealed class XUiC_RebirthPlayerProfileEntry : XUiC_ProfilesList.EntryCont
                     return true;
             }
 
-            PropertyInfo[] properties;
-            try { properties = scan.GetProperties(flags); } catch { properties = new PropertyInfo[0]; }
+            PropertyInfo[] properties = members.Properties;
             for (int i = 0; i < properties.Length; i++)
             {
                 PropertyInfo property = properties[i];
@@ -252,6 +258,18 @@ public sealed class XUiC_RebirthPlayerProfileEntry : XUiC_ProfilesList.EntryCont
             }
         }
         return false;
+    }
+
+    private static ReflectionMembers GetReflectionMembers(Type type)
+    {
+        ReflectionMembers members;
+        if (reflectionMembers.TryGetValue(type, out members)) return members;
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+        members = new ReflectionMembers();
+        try { members.Fields = type.GetFields(flags); } catch { members.Fields = new FieldInfo[0]; }
+        try { members.Properties = type.GetProperties(flags); } catch { members.Properties = new PropertyInfo[0]; }
+        reflectionMembers[type] = members;
+        return members;
     }
 
     private static bool LooksAppearanceRelated(string name)

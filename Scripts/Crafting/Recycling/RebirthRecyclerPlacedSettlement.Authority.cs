@@ -28,6 +28,7 @@ internal static partial class RebirthRecyclerPlacedSettlement
     }
     private static readonly List<AuthorityOriginal> authorityOriginals=new List<AuthorityOriginal>();
     private static readonly Dictionary<Guid,AuthorityReceipt> authorityReceipts=new Dictionary<Guid,AuthorityReceipt>();
+    private static WeakReference<World> authorityReceiptWorld;
     [ThreadStatic]private static AuthorityOriginal startingAuthorityOwner;
     private static bool authorityInstalled;
     internal sealed class AccessHold
@@ -184,6 +185,14 @@ internal static partial class RebirthRecyclerPlacedSettlement
     private static void PumpAuthority(ref ModEvents.SGameUpdateData data)
     {
         var world=GameManager.Instance?.World;
+        // Receipts are created only by FinishAuthorityTerminal for this pump's
+        // world. A retained receipt can never authorize a different world, so
+        // retire the whole prior set once at the transition instead of scanning
+        // every completed operation on every game frame.
+        bool sameReceiptWorld=authorityReceiptWorld==null?world==null:
+            authorityReceiptWorld.TryGetTarget(out var receiptWorld)&&ReferenceEquals(receiptWorld,world);
+        if(!sameReceiptWorld)
+        {authorityReceipts.Clear();authorityReceiptWorld=world==null?null:new WeakReference<World>(world);}
         PumpRemoteRecyclerOwner(world);
         PumpClosedAuthorityCompletions(world);
         PumpPlacedProtocol(world);
@@ -199,7 +208,7 @@ internal static partial class RebirthRecyclerPlacedSettlement
         RecoverRemoteRecyclerReconnect(world);
         RecoverAuthorityCold(world);
         RecoverRemoteRecyclerCold(world);
-        foreach(var item in authorityOriginals.ToArray())
+        foreach(var item in authorityOriginals.Count>0?authorityOriginals.ToArray():Array.Empty<AuthorityOriginal>())
         {
             try
             {
@@ -236,7 +245,6 @@ internal static partial class RebirthRecyclerPlacedSettlement
             }
             catch{/* Retain the same actual source. Never repeat a slot/native setter after an unknown attempt. */}
         }
-        foreach(var old in authorityReceipts.Where(pair=>!pair.Value.World.TryGetTarget(out var saved)||!ReferenceEquals(saved,world)).Select(pair=>pair.Key).ToArray())authorityReceipts.Remove(old);
         RebirthProductiveEarnedUiDeferredTransport.PumpSelectedNativeAccessRequests(world);
     }
     private static void FinishAuthorityTerminal(AuthorityOriginal item,World world)

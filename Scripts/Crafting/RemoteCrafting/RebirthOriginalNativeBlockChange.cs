@@ -18,7 +18,7 @@ internal static class RebirthOriginalNativeBlockChange
             {
                 writer.SetBaseStream(stream);writer.Write((byte)1);writer.Write((byte)changes.Count);
                 foreach(var change in changes)change.Write(writer);writer.Flush();
-                if(stream.Length>MaximumBytes)return false;image=Convert.ToBase64String(stream.ToArray());return true;
+                if(stream.Length>MaximumBytes)return false;image=Convert.ToBase64String(stream.GetBuffer(),0,checked((int)stream.Length));return true;
             }
         }
         catch{image=null;return false;}

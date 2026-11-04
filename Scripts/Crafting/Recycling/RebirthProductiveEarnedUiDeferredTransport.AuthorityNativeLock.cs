@@ -77,6 +77,7 @@ internal static partial class RebirthProductiveEarnedUiDeferredTransport
     }
     private static void PumpAuthorityNativeRequests(World world)
     {
+        if(authorityLockRequests.Count==0)return;
         foreach(var request in authorityLockRequests.ToArray())
         {
             if(!ReferenceEquals(request.World,world)){authorityLockRequests.Remove(request);request.Dispose();continue;}

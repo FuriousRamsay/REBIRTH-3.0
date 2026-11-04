@@ -93,13 +93,13 @@ internal static class AdvancedFarmingHarvestEvents
     {
         try{var r=Record(s);string path=PathFor(r.Operation,server),done=path+".done";if(File.Exists(done))return File.ReadAllText(done,new UTF8Encoding(false,true))==Encode(s);if(!File.Exists(path)||File.ReadAllText(path,new UTF8Encoding(false,true))!=Encode(s))return false;File.Move(path,done);return true;}catch{return false;}
     }
-    private static void Reply(World world,EntityPlayer owner,State s)
+    private static void Reply(World world,EntityPlayer owner,State s,AdvancedFarmingHarvestReceipt.Record r)
     {
-        var r=Record(s);if(!Current(world,owner,r)||!AdvancedFarmingHarvestReceipt.TryRead(r.World,r.Operation,out var main)||main.State!=AdvancedFarmingHarvestReceipt.Phase.Retired||Signature(main)!=s.Signature)return;
+        if(!Current(world,owner,r)||!AdvancedFarmingHarvestReceipt.TryRead(r.World,r.Operation,out var main)||main.State!=AdvancedFarmingHarvestReceipt.Phase.Retired||Signature(main)!=s.Signature)return;
         AdvancedFarmingHarvestProtocol.ReplyEvents(owner,main,s.Index,s.OwnerDone);
     }
     internal static void Request(World world,EntityPlayer player,Guid operation)
-    {if(world?.IsRemote()!=false||!Read(operation,true,out var s)||!Current(world,player,Record(s)))return;Reply(world,player,s);}
+    {if(world?.IsRemote()!=false||!Read(operation,true,out var s))return;var r=Record(s);if(!Current(world,player,r))return;Reply(world,player,s,r);}
     internal static void Receive(World world,AdvancedFarmingHarvestReceipt.Record r,int index,bool done)
     {
         try
@@ -178,7 +178,7 @@ internal static class AdvancedFarmingHarvestEvents
                     var output=StatisticsOutput(r);if(output==null||!RebirthStatisticsService.RecordResourcesGatheredOriginal(owner,output.itemValue.ItemClass.GetItemName(),output.count,r.Operation.ToString("N")))continue;
                     string prior=Encode(s);s.StatisticsPending=false;if(!Save(s,true,prior)){Servers[pair.Key]=Decode(prior);continue;}
                 }
-                Reply(world,owner,s);if(s.OwnerDone&&Archive(s,true)){RebirthStatisticsService.RetireResourcesGatheredOriginal(owner,r.Operation.ToString("N"));Servers.Remove(pair.Key);}
+                Reply(world,owner,s,r);if(s.OwnerDone&&Archive(s,true)){RebirthStatisticsService.RetireResourcesGatheredOriginal(owner,r.Operation.ToString("N"));Servers.Remove(pair.Key);}
             }
             catch(Exception failure){Log.Warning("[REBIRTH Farming] native event obligation retained: "+failure.GetType().Name);}
         }

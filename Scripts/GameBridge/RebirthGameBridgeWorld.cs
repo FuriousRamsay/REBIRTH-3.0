@@ -157,9 +157,12 @@ public static class RebirthGameBridgeWorld
     public static IEnumerator GoToPoiRoutine(BridgeRequest req, EntityPlayerLocal p, PrefabInstance pi, bool run, Action<string> log)
     {
         float start = Time.realtimeSinceStartup;
+        float requested=req.QueryFloat("maxSeconds",60f);
+        if(float.IsNaN(requested)||float.IsInfinity(requested))requested=60f;
+        float deadline=start+Mathf.Clamp(requested,1f,60f);
         string result = null;
         int interruptions = 0;
-        for (int leg = 0; leg < 8 && result == null; leg++)
+        for (int leg = 0; leg < 8 && result == null && !req.IsAbandoned && !p.IsDead() && Time.realtimeSinceStartup < deadline; leg++)
         {
             if (DistanceTo(pi, p.position) <= 3f) { result = "arrived"; break; }
             Vector3 edge = EdgePoint(pi, p.position);
@@ -167,13 +170,13 @@ public static class RebirthGameBridgeWorld
             Vector3 to = edge - p.position; to.y = 0f;
             Vector3 waypoint = to.magnitude > 60f ? p.position + to.normalized * 60f : edge;
             string legResult = null;
-            yield return RebirthGameBridgePlayer.WalkTo(p, waypoint, 2.5f, run, 45f, r => legResult = r);
+            yield return RebirthGameBridgePlayer.WalkTo(p, waypoint, 2.5f, run, Mathf.Min(45f,Mathf.Max(.05f,deadline-Time.realtimeSinceStartup)), r => legResult = r);
             if (legResult == "cancelled" && interruptions < 10 && !p.IsDead())
             {
                 // An instinct took over (a zombie, food about to burn): let it finish, then carry on.
                 interruptions++;
                 log("trip interrupted - dealing with it, then carrying on");
-                yield return WaitForInstincts(p, 180f);
+                yield return WaitForInstincts(p, Mathf.Max(0f,deadline-Time.realtimeSinceStartup));
                 leg--;
                 continue;
             }
@@ -184,10 +187,11 @@ public static class RebirthGameBridgeWorld
                 // Detour: try a sideways waypoint, like a player going around an obstacle.
                 Vector3 side = Quaternion.Euler(0f, leg % 2 == 0 ? 60f : -60f, 0f) * (to.sqrMagnitude > 0.01f ? to.normalized : Vector3.forward);
                 string detour = null;
-                yield return RebirthGameBridgePlayer.WalkTo(p, p.position + side * 15f, 2.5f, run, 20f, r => detour = r);
+                yield return RebirthGameBridgePlayer.WalkTo(p, p.position + side * 15f, 2.5f, run, Mathf.Min(20f,Mathf.Max(.05f,deadline-Time.realtimeSinceStartup)), r => detour = r);
             }
         }
-        if (result == null) result = DistanceTo(pi, p.position) <= 3f ? "arrived" : "could not reach it";
+        if(req.IsAbandoned)yield break;
+        if (result == null) result = DistanceTo(pi, p.position) <= 3f ? "arrived" : Time.realtimeSinceStartup>=deadline?"timeout":"could not reach it";
         if (result == "arrived") { visited.Add(pi.id); lastInside = pi; }
         log((result == "arrived" ? "arrived at " : "couldn't reach ") + (pi.prefab.LocalizedName ?? pi.prefab.PrefabName) + " (tier " + pi.prefab.DifficultyTier + ")");
         req.Complete(new JObject

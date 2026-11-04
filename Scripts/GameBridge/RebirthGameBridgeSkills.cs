@@ -10,6 +10,37 @@ using UnityEngine;
 /// </summary>
 public static class RebirthGameBridgeSkills
 {
+    // One explicit read-only observation of an actual inventory instance. Unlike
+    // /loadout this never replaces the gun, seed, ammo choice or modifications.
+    public static void ObserveWeapon(BridgeRequest req)
+    {
+        if (req.Method != "GET") { req.Fail("weaponprofile is read-only", 405); return; }
+        var player = RebirthGameBridgeCombat.PlayerFor(req);
+        if (player == null) return;
+        int slot = req.QueryInt("slot", -1);
+        if (slot < -1 || slot >= RebirthGameBridgeNeeds.ToolbeltSize(player))
+        { req.Fail("invalid toolbelt slot", 400); return; }
+        var item = slot < 0 ? player.inventory.holdingItemItemValue : player.inventory.GetItem(slot)?.itemValue;
+        if (item == null || item.IsEmpty()) { req.Fail("empty weapon slot", 409); return; }
+        RebirthWeaponSustainedDpsService.Profile p;
+        bool known = slot < 0
+            ? RebirthWeaponSustainedDpsService.TryGetCombatProfile(player, item, out p)
+            : RebirthWeaponSustainedDpsService.TryGetDisplayProfile(player, item, out p);
+        var mods = new JArray();
+        if (item.modifications != null) foreach (var mod in item.modifications)
+            if (mod != null && !mod.IsEmpty()) mods.Add(mod.ItemClass.GetItemName());
+        req.Complete(new JObject {
+            ["observationOnly"] = true, ["slot"] = slot, ["item"] = item.ItemClass.GetItemName(),
+            ["quality"] = item.Quality, ["seed"] = item.Seed, ["ammoIndex"] = item.SelectedAmmoTypeIndex,
+            ["modifications"] = mods, ["known"] = known,
+            ["reloadTiming"] = RebirthWeaponSustainedDpsService.CaptureReloadTiming(player),
+            ["profile"] = !known || p == null ? null : new JObject {
+                ["damagePerAttack"] = p.DamagePerAttack, ["projectiles"] = p.ProjectilesPerAttack,
+                ["rpm"] = p.RoundsPerMinute, ["magazine"] = p.MagazineSize,
+                ["reloadSeconds"] = p.ReloadSeconds, ["reloadSource"] = p.ReloadSource,
+                ["burstDps"] = p.BurstDps, ["sustainedDps"] = p.SustainedDps, ["detail"] = p.Detail }
+        });
+    }
     // Fixture preparation only, never qualification evidence. Deliberately refuses every
     // save except the disposable CodexTest save and requires an explicit confirmation.
     public static void SetupSkill(BridgeRequest req)
@@ -82,7 +113,7 @@ public static class RebirthGameBridgeSkills
         {
             RebirthWeaponSustainedDpsService.Profile pr;
             if (RebirthWeaponSustainedDpsService.TryGetCombatProfile(p, p.inventory.holdingItemItemValue, out pr) && pr != null)
-                res["profile"] = new JObject { ["valid"] = pr.Valid, ["skill"] = pr.SkillId, ["damagePerAttack"] = pr.DamagePerAttack, ["projectiles"] = pr.ProjectilesPerAttack, ["rpm"] = pr.RoundsPerMinute, ["magazine"] = pr.MagazineSize, ["ammoPerAttack"] = pr.AmmoPerAttack, ["reloadSeconds"] = pr.ReloadSeconds, ["burstDps"] = pr.BurstDps, ["sustainedDps"] = pr.SustainedDps, ["detail"] = pr.Detail };
+                res["profile"] = new JObject { ["valid"] = pr.Valid, ["skill"] = pr.SkillId, ["damagePerAttack"] = pr.DamagePerAttack, ["projectiles"] = pr.ProjectilesPerAttack, ["rpm"] = pr.RoundsPerMinute, ["magazine"] = pr.MagazineSize, ["ammoPerAttack"] = pr.AmmoPerAttack, ["reloadSeconds"] = pr.ReloadSeconds, ["reloadSource"] = pr.ReloadSource, ["burstDps"] = pr.BurstDps, ["sustainedDps"] = pr.SustainedDps, ["detail"] = pr.Detail };
         }
         catch (Exception ex) { res["profileError"] = ex.Message; }
         req.Complete(res);
@@ -196,3 +227,4 @@ public static class RebirthGameBridgeCraft
         req.Complete(new JObject { ["recipe"] = name, ["count"] = count, ["queued"] = ok, ["window"] = group.GetType().Name }, ok ? 200 : 409);
     }
 }
+

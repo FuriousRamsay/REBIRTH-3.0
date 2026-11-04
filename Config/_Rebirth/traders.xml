@@ -1,4 +1,5 @@
 <configs>
   <include filename="../_Survivor/traders.xml"/>
   <include filename="progression_traders.xml"/>
+  <remove xpath="/traders//item[@name='modArmorPerception' or @name='modArmorStrength' or @name='modArmorFortitude' or @name='modArmorAgility' or @name='modArmorIntellect']"/>
 </configs>

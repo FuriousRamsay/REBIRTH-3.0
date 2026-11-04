@@ -232,7 +232,12 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     }
     private static void PumpRetiringCancellationHostCustodies()
     {
-        CancellationHostCustody[] items;lock(cancellationHostCustodyGate)items=cancellationRetiringCustodies.ToArray();
+        CancellationHostCustody[] items;
+        lock(cancellationHostCustodyGate)
+        {
+            if(cancellationRetiringCustodies.Count==0)return;
+            items=cancellationRetiringCustodies.ToArray();
+        }
         foreach(var custody in items)lock(custody.Gate)if(TryRetireCancellationHostCustody(custody))lock(cancellationHostCustodyGate)cancellationRetiringCustodies.Remove(custody);
     }
     internal static bool EnterCancellationBlockEscape(string command,WorldBase world,Vector3i position,MethodBase method,bool runOriginal,out object state)

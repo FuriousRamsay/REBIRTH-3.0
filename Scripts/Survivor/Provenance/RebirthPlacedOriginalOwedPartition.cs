@@ -16,7 +16,7 @@ internal static partial class RebirthPlacedOriginalDeathPartition
         internal Guid Operation;internal string World,Owner,Creation,Trace,Body,Native,Owed,Image;internal int Deaths;
     }
     private static string OwedPath(Guid operation)=>Path.Combine(GameIO.GetSaveGameDir(),"rebirth","placed-original","owed-partitions",operation.ToString("N")+".xml");
-    private static string OwedBody(OwedPartition value){var xml=XElement.Parse(BareOwedBody(value));xml.SetAttributeValue("checksum",Hash(BareOwedBody(value)));return xml.ToString(SaveOptions.DisableFormatting);}
+    private static string OwedBody(OwedPartition value){var bare=BareOwedBody(value);var xml=XElement.Parse(bare);xml.SetAttributeValue("checksum",Hash(bare));return xml.ToString(SaveOptions.DisableFormatting);}
     private static string BareOwedBody(OwedPartition p)=>new XElement("placedOwedPartition",new XAttribute("version",1),new XAttribute("operation",p.Operation.ToString("N")),new XAttribute("world",p.World),new XAttribute("owner",p.Owner),new XAttribute("creation",p.Creation),new XAttribute("deaths",p.Deaths),new XAttribute("trace",p.Trace),new XAttribute("body",p.Body),new XAttribute("native",p.Native),new XElement("owed",p.Owed)).ToString(SaveOptions.DisableFormatting);
     private static bool FullHash(string value)=>value!=null&&value.Length==64&&value.All(c=>c>='0'&&c<='9'||c>='a'&&c<='f');
     private static OwedPartition DecodeOwed(string image)

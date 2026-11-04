@@ -80,7 +80,7 @@ internal static partial class RebirthPlacedOriginalDeathPartition
     {
         try
         {
-            DeferredScope(world);deferredWire.Pump(4);terminalTraceWire.Pump(4);UpdateTerminalNativeBodies(world);if(world?.GetPrimaryPlayer() is not EntityPlayerLocal player)return;
+            DeferredScope(world);deferredWire.Pump(4);terminalTraceWire.Pump(4);UpdateTerminalNativeBodies(world);if(world?.GetPrimaryPlayer() is not EntityPlayerLocal player||deferredBodies.Count==0)return;
             foreach(var d in deferredBodies.Values.ToArray())
             {
                 if(!ReferenceEquals(d.WorldReference,world)||d.Directory!=GameIO.GetSaveGameDir()||!DeferredOwner(player,d)||UnityEngine.Time.realtimeSinceStartup<d.Next)continue;d.Next=UnityEngine.Time.realtimeSinceStartup+1f;if(d.Terminal?TerminalOwnerDone(DecodeTerminalBody(d.Trace)):DeferredOriginalRetired(player,d)){deferredBodies.Remove(d.Operation);continue;}

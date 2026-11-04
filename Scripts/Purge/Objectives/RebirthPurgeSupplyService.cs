@@ -18,6 +18,8 @@ internal static class RebirthPurgeSupplyService
     private static Dictionary<string,long> accumulatingLifetime;
     internal static IReadOnlyDictionary<string,long> LifetimeKills {get;private set;}
     private static Dictionary<string,long> accumulating;
+    private static Dictionary<string,List<RebirthPurgeSupplyOriginSource>> accumulatingOrigins,originSources;
+    private static RebirthPoiClearanceRecord reading;
     private static IReadOnlyDictionary<string,long> credits;
     private static bool opened;
     private static double next,reopen;
@@ -55,6 +57,12 @@ internal static class RebirthPurgeSupplyService
         if(original.InFlight!=launch.Sequence||!original.TryLaunched(launch.World,launch.Token,out successor))return false;
         return TryDeliveryCommit(expected,successor,out published);
     }
+    internal static bool TryInvoking(RebirthPurgeSupplyAccount original,Guid world,out RebirthPurgeSupplyAccount published)
+    {
+        published=null;IReadOnlyDictionary<string,RebirthPurgeSupplyAccount> expected;RebirthPurgeSupplyAccount successor;
+        if(!TryDeliveryPublication(original,out expected)||!original.TryStart(world,original.Token(world),out successor))return false;
+        return TryDeliveryCommit(expected,successor,out published);
+    }
     internal static void ReconcileLoadedCrate(EntitySupplyCrate crate)
     {
         if(binding==null)return;
@@ -71,9 +79,10 @@ internal static class RebirthPurgeSupplyService
     }
     internal static void Reset()
     {
+        RebirthPurgeSupplyEquipment.Reset();
         records?.Dispose();contributors?.Dispose();earning?.Dispose();lifetimeContributors?.Dispose();
         lifetimeContributors=null;accumulatingLifetime=null;LifetimeKills=null;
-        records=null;contributors=null;earning=null;binding=null;indexed=null;scanning=null;accounts=null;accumulating=null;credits=null;opened=false;next=0;reopen=0;
+        records=null;contributors=null;earning=null;binding=null;indexed=null;scanning=null;accounts=null;accumulating=null;credits=null;accumulatingOrigins=originSources=null;reading=null;opened=false;next=0;reopen=0;
     }
     internal static void Pulse()
     {
@@ -92,6 +101,7 @@ internal static class RebirthPurgeSupplyService
         if(scanning==null&&!ReferenceEquals(indexed,snapshot))
         {
             scanning=snapshot;accumulating=new Dictionary<string,long>(StringComparer.Ordinal);
+            accumulatingOrigins=new Dictionary<string,List<RebirthPurgeSupplyOriginSource>>(StringComparer.Ordinal);
             accumulatingLifetime=new Dictionary<string,long>(StringComparer.Ordinal);
             records=snapshot.Shards.Values.SelectMany(s=>s.Records.Values).GetEnumerator();
         }
@@ -106,7 +116,11 @@ internal static class RebirthPurgeSupplyService
                     {
                         var pair=contributors.Current;long old;accumulating.TryGetValue(pair.Key,out old);
                         if(old>long.MaxValue-pair.Value||!accumulating.ContainsKey(pair.Key)&&accumulating.Count>=16384){Reset();return;}
-                        accumulating[pair.Key]=old+pair.Value;players++;continue;
+                        accumulating[pair.Key]=old+pair.Value;
+                        RebirthPurgeOfflineCredit offline;
+                        if(reading.SupplyCredits.Offline.TryGetValue(pair.Key,out offline))
+                        {List<RebirthPurgeSupplyOriginSource> sources;if(!accumulatingOrigins.TryGetValue(pair.Key,out sources))accumulatingOrigins.Add(pair.Key,sources=new List<RebirthPurgeSupplyOriginSource>());sources.Add(new RebirthPurgeSupplyOriginSource(reading.Identity.Key,offline));}
+                        players++;continue;
                     }
                     contributors.Dispose();contributors=null;
                 }
@@ -123,11 +137,11 @@ internal static class RebirthPurgeSupplyService
                 if(!records.MoveNext())
                 {
                     records.Dispose();records=null;indexed=scanning;scanning=null;
-                    credits=new ReadOnlyDictionary<string,long>(accumulating);accumulating=null;
+                    credits=new ReadOnlyDictionary<string,long>(accumulating);accumulating=null;originSources=accumulatingOrigins;accumulatingOrigins=null;
                     LifetimeKills=new ReadOnlyDictionary<string,long>(accumulatingLifetime);accumulatingLifetime=null;
                     earning?.Dispose();earning=credits.GetEnumerator();break;
                 }
-                examined++;if(records.Current.SupplyCredits!=null)contributors=records.Current.SupplyCredits.Totals.GetEnumerator();
+                examined++;reading=records.Current;if(records.Current.SupplyCredits!=null)contributors=records.Current.SupplyCredits.Totals.GetEnumerator();
                 if(records.Current.LifetimeKills!=null)lifetimeContributors=records.Current.LifetimeKills.Totals.GetEnumerator();
             }
         }
@@ -140,11 +154,19 @@ internal static class RebirthPurgeSupplyService
             var source=earning.Current;var expected=accounts.Published;if(expected==null){opened=false;return;}
             RebirthPurgeSupplyAccount old;if(!expected.TryGetValue(source.Key,out old))old=new RebirthPurgeSupplyAccount(source.Key);
             RebirthPurgeSupplyAccount successor;
-            // Keep offline credits in the ledger until native equipment is available.
-            // Never redeem at an assumed full price while the owner is disconnected.
-            int modifierTier;
-            if(!RebirthPurgeSupplyEquipment.TryTier(source.Key,out modifierTier))continue;
-            if(!old.TryEarn(source.Value,RebirthPurgeSupplyPolicy.Current,out successor,modifierTier))continue;
+            // Owner-authorized offline pricing: real equipped tier when available,
+            // otherwise conservative no-glove price. Clear-time origin stays durable.
+            int modifierTier;if(!RebirthPurgeSupplyEquipment.TryTier(source.Key,out modifierTier))modifierTier=0;
+            var rules=RebirthPurgeSupplyPolicy.Current;
+            // With no new credits and too little balance for the next entitlement,
+            // TryEarn cannot change the published account. A better equipment tier
+            // still reaches TryEarn as soon as its lower target is affordable.
+            if(source.Value==old.ObservedCredits&&modifierTier>=0&&modifierTier<=5&&
+                source.Value-old.SpentCredits<rules.Target(old.EarnedDrops,modifierTier))continue;
+            List<RebirthPurgeSupplyOriginSource> origins;
+            IEnumerable<RebirthPurgeSupplyOriginSource> sources=originSources.TryGetValue(source.Key,out origins)
+                ?origins:Array.Empty<RebirthPurgeSupplyOriginSource>();
+            if(!RebirthPurgeSupplyOrigins.TryEarn(old,source.Value,sources,rules,modifierTier,out successor))continue;
             if(successor.ObservedCredits==old.ObservedCredits&&successor.EarnedDrops==old.EarnedDrops)continue;
             if(!accounts.TryCommit(expected,successor)){opened=false;reopen=Time.realtimeSinceStartup+1;}
             return;

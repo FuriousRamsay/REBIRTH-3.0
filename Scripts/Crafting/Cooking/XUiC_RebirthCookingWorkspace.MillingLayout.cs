@@ -26,15 +26,22 @@ public sealed partial class XUiC_RebirthCookingWorkspace
         MillingRect("resultDescription",0,0,312,110);
         var reader = Find("resultDescriptionReader");
         var viewport = reader?.GetChildById("readableTextViewport")?.ViewComponent;
-        if (viewport != null) viewport.Size = new Vector2i(318,110);
+        if (viewport != null && viewport.Size != new Vector2i(318,110)) viewport.Size = new Vector2i(318,110);
         MillingRect("nonFoodStats",590,-54,350,168);
         MillingRect("cook",16,-248,440,36);
         var action = Find("cook");
+        var actionFill=action.GetChildById("actionFill");
+        var actionFrame=action.GetChildById("actionFrame");
+        var actionLabel=action.GetChildById("label");
         foreach (var child in action.Children)
         {
             if (child.ViewComponent == null) continue;
-            if (child == action.GetChildById("actionFill") || child == action.GetChildById("actionFrame")) child.ViewComponent.Size = new Vector2i(440,36);
-            if (child == action.GetChildById("label")) { child.ViewComponent.Position = new Vector2i(220,-18); child.ViewComponent.Size = new Vector2i(370,24); }
+            if ((child == actionFill || child == actionFrame) && child.ViewComponent.Size != new Vector2i(440,36)) child.ViewComponent.Size = new Vector2i(440,36);
+            if (child == actionLabel)
+            {
+                if (child.ViewComponent.Position != new Vector2i(220,-18)) child.ViewComponent.Position = new Vector2i(220,-18);
+                if (child.ViewComponent.Size != new Vector2i(370,24)) child.ViewComponent.Size = new Vector2i(370,24);
+            }
         }
         MillingRect("cookShortcut",408,-18,24,24);
         MillingRect("cookStatus",16,-286,924,24);
@@ -46,7 +53,11 @@ public sealed partial class XUiC_RebirthCookingWorkspace
         {
             MillingRect("ingredient"+i,14+(i%2)*464,-48-(i/2)*44,450,42);
             var slot=slots[i]?.ViewComponent;
-            if(slot?.UiTransform!=null)slot.UiTransform.localScale=new Vector3(42f/86f,42f/86f,1);
+            if(slot?.UiTransform!=null)
+            {
+                var scale=new Vector3(42f/86f,42f/86f,1);
+                if(slot.UiTransform.localScale!=scale)slot.UiTransform.localScale=scale;
+            }
             MillingRect("ghost"+i,21,-21,36,36);
             MillingRect("need"+i,384,-8,62,26);
             MillingRect("millingIngredientName"+i,48,-4,330,32);
@@ -77,9 +88,12 @@ public sealed partial class XUiC_RebirthCookingWorkspace
         MillingRect("prepare",980,-185,472,34);
         var preparation = Find("prepare");
         foreach (var id in new[] { "actionFill", "actionFrame" })
-            if (preparation?.GetChildById(id)?.ViewComponent is XUiView fill) fill.Size = new Vector2i(472,34);
+            if (preparation?.GetChildById(id)?.ViewComponent is XUiView fill && fill.Size != new Vector2i(472,34)) fill.Size = new Vector2i(472,34);
         if (preparation?.GetChildById("label")?.ViewComponent is XUiView caption)
-        { caption.Position = new Vector2i(236,-17); caption.Size = new Vector2i(410,24); }
+        {
+            if(caption.Position != new Vector2i(236,-17))caption.Position = new Vector2i(236,-17);
+            if(caption.Size != new Vector2i(410,24))caption.Size = new Vector2i(410,24);
+        }
         MillingRect("prepTrack",980,-221,472,6);
         MillingRect("prepProgress",980,-221,472,6);
         MillingRect("referenceBenefits",980,-144,472,18);

@@ -19,8 +19,8 @@ try {
     throw 'Production DLL differs from the diagnostic build receipt; rebuild the helper against the current DLL.'
   }
   if((Get-FileHash -LiteralPath $build.dll).Hash.ToLowerInvariant() -cne $build.sha256){throw 'Built DLL differs from receipt.'}
-  $mod=Join-Path $env:APPDATA '7DaysToDie\Mods\REBIRTH_VehicleInspector_Dev'
-  if(-not(Test-Path -LiteralPath (Join-Path $mod 'ModInfo.xml'))){throw 'Existing developer inspector installation missing.'}
+  $mod=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+  if(-not(Test-Path -LiteralPath (Join-Path $mod 'ModInfo.xml'))){throw 'REBIRTH mod installation missing.'}
   $dest=Join-Path $mod 'RebirthCamperDiagnostics.dll'
   if(Test-Path -LiteralPath $dest){
     if(-not $PreviousInstallResult){throw 'Developer diagnostic already exists; require its prior ownership receipt.'}
@@ -32,7 +32,7 @@ try {
     $result.previousDiagnosticBackup=$backup
     $result.previousDiagnosticSha256=$previous.sha256
   }
-  Write-Host '[2 INSTALL] Adding owned diagnostic/calibration helper to the existing developer inspector'
+  Write-Host '[2 INSTALL] Adding owned diagnostic/calibration helper inside REBIRTH'
   $original=Join-Path $mod 'RebirthVehicleInspector.dll'
   $originalHash=(Get-FileHash -LiteralPath $original).Hash
   if((Get-FileHash -LiteralPath $production).Hash.ToLowerInvariant() -cne $build.productionSha256){throw 'Production DLL changed before diagnostic installation.'}

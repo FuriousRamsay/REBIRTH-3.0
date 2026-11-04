@@ -15,13 +15,17 @@ public static class RebirthCookingIngredientPlan
         if(roles==null||roles.Length==0)return 0;
         if(roles.Length>MaxRoles)return 0;
         var ordered=new Choice[roles.Length][];
+        int high=9999;
         for(int r=0;r<roles.Length;r++)
         {
             if(roles[r]==null||roles[r].Count==0||roles[r].Count>MaxChoicesPerRole)return 0;
             ordered[r]=roles[r].Where(Valid).OrderByDescending(Score).ThenBy(c=>c.Type).ToArray();
             if(ordered[r].Length==0)return 0;
+            int capacity=0;
+            foreach(var choice in ordered[r])capacity=Math.Max(capacity,choice.Available/choice.Required);
+            high=Math.Min(high,capacity);
         }
-        int low=0,high=9999;
+        int low=0;
         while(low<high)
         {
             int mid=(low+high+1)/2;

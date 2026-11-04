@@ -152,6 +152,18 @@ public static class RebirthHudTrackingPreferenceService
             if(RebirthHudTrackingPreferenceStore.TrySave(pending.Context,pending.Preferences,out error))pendingPreviousWrites.RemoveAt(i);
         }
     }
+    internal static void RetireDeletedWorld(string worldKey)
+    {
+        lock (Sync)
+        {
+            for (int i = pendingPreviousWrites.Count - 1; i >= 0; i--)
+                if (pendingPreviousWrites[i].Context?.WorldKey == worldKey)
+                { pendingPreviousWrites[i].Context.Retired = true; pendingPreviousWrites.RemoveAt(i); }
+            if (context?.WorldKey != worldKey) return;
+            context.Retired = true;
+            ResetRuntime(false); // The deleted world's dirty snapshot must never be flushed.
+        }
+    }
     public static void ResetRuntime(bool flush)
     {
         lock (Sync)

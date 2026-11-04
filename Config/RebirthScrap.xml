@@ -1395,6 +1395,19 @@
 		<ingredient name="resourceScrapPolymers" count="5" time="8"/>
 		<ingredient name="resourceMechanicalParts" count="2" time="3"/>
 	</scrap>
+	<scrap item="modArmorInsulatedLinerT1" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="resourceCloth" count="50" time="6"/>
+		<ingredient name="resourceScrapPolymers" count="1" time="8"/>
+	</scrap>
+	<scrap item="modArmorInsulatedLinerT2" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="resourceCloth" count="100" time="6"/>
+		<ingredient name="resourceScrapPolymers" count="5" time="8"/>
+	</scrap>
+	<scrap item="modArmorInsulatedLinerT3" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="resourceCloth" count="150" time="6"/>
+		<ingredient name="resourceScrapPolymers" count="10" time="8"/>
+		<ingredient name="resourceLegendaryParts" count="1" time="3"/>
+	</scrap>
 	<scrap item="modArmorStealthBoots" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="resourceForgedSteel" count="3" time="15"/>
 		<ingredient name="resourceScrapPolymers" count="30" time="8"/>

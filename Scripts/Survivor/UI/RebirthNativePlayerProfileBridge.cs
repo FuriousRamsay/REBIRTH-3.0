@@ -74,6 +74,26 @@ public static class RebirthNativePlayerProfileBridge
         }
     }
 
+    private sealed class EmbeddedMembers
+    {
+        internal FieldInfo[] Fields;
+        internal PropertyInfo[] Properties;
+    }
+    private static readonly Dictionary<Type, EmbeddedMembers> EmbeddedMembersByType = new Dictionary<Type, EmbeddedMembers>();
+    private static EmbeddedMembers GetEmbeddedMembers(Type type, BindingFlags flags)
+    {
+        EmbeddedMembers members;
+        if (EmbeddedMembersByType.TryGetValue(type, out members)) return members;
+        bool fieldsRead = true, propertiesRead = true;
+        FieldInfo[] fields;
+        PropertyInfo[] properties;
+        try { fields = type.GetFields(flags); } catch { fields = new FieldInfo[0]; fieldsRead = false; }
+        try { properties = type.GetProperties(flags); } catch { properties = new PropertyInfo[0]; propertiesRead = false; }
+        members = new EmbeddedMembers { Fields = fields, Properties = properties };
+        if (fieldsRead && propertiesRead) EmbeddedMembersByType[type] = members;
+        return members;
+    }
+
     /// <summary>
     /// Returns the actual native Player Profile data collection rather than the visual
     /// grid-entry pool. ProfilesList preallocates rows and pages them, so counting XUi
@@ -97,8 +117,8 @@ public static class RebirthNativePlayerProfileBridge
         for (Type scan = type; scan != null; scan = scan.BaseType)
         {
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
-            FieldInfo[] fields;
-            try { fields = scan.GetFields(flags); } catch { fields = new FieldInfo[0]; }
+            EmbeddedMembers members = GetEmbeddedMembers(scan, flags);
+            FieldInfo[] fields = members.Fields;
             for (int i = 0; i < fields.Length; i++)
             {
                 object value;
@@ -117,8 +137,7 @@ public static class RebirthNativePlayerProfileBridge
                 }
             }
 
-            PropertyInfo[] properties;
-            try { properties = scan.GetProperties(flags); } catch { properties = new PropertyInfo[0]; }
+            PropertyInfo[] properties = members.Properties;
             for (int i = 0; i < properties.Length; i++)
             {
                 PropertyInfo property = properties[i];

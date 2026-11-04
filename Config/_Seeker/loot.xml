@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/lootcontainers">
+    <lootgroup name="FuriousRamsaySeeker001LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.05" />
+      <item name="resourceGoldNugget" count="1" prob="0.20" />
+      <item name="resourceSilverNugget" count="1" prob="0.35" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker001LootGroup" count="all">
+      <item name="casinoCoin" count="1000,1200" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker001LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker002LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.075" />
+      <item name="resourceGoldNugget" count="1" prob="0.18" />
+      <item name="resourceSilverNugget" count="1" prob="0.3" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker002LootGroup" count="all">
+      <item name="casinoCoin" count="1100,1300" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker002LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker003LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.1" />
+      <item name="resourceGoldNugget" count="1" prob="0.16" />
+      <item name="resourceSilverNugget" count="1" prob="0.25" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker003LootGroup" count="all">
+      <item name="casinoCoin" count="1200,1400" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker003LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker004LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.125" />
+      <item name="resourceGoldNugget" count="1" prob="0.14" />
+      <item name="resourceSilverNugget" count="1" prob="0.2" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker004LootGroup" count="all">
+      <item name="casinoCoin" count="1300,1500" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker004LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker005LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.15" />
+      <item name="resourceGoldNugget" count="1" prob="0.12" />
+      <item name="resourceSilverNugget" count="1" prob="0.15" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker005LootGroup" count="all">
+      <item name="casinoCoin" count="1400,1600" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker005LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker006LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.175" />
+      <item name="resourceGoldNugget" count="1" prob="0.1" />
+      <item name="resourceSilverNugget" count="1" prob="0.1" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker006LootGroup" count="all">
+      <item name="casinoCoin" count="1500,1700" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker006LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker007LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.4" />
+      <item name="resourceGoldNugget" count="1" prob="0.08" />
+      <item name="resourceSilverNugget" count="1" prob="0.05" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsaySeeker007LootGroup" count="all">
+      <item name="casinoCoin" count="1600,1800" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker007LootGroupSpecial" />
+      <item group="groupArmorModsScaled" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="SeekerBossLootGroup" count="all">
+      <item name="casinoCoin" count="600,700" />
+      <item group="groupZpackStrong" />
+      <item group="FuriousRamsaySeeker002LootGroupSpecial" />
+      <item group="groupWeaponModsT2" />
+    </lootgroup>
+    <lootcontainer name="SeekerBossEntityLootContainer" size="4,4" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="SeekerBossLootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker001LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker001LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker002LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker002LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker003LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker003LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker004LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker004LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker005LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker005LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker006LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker006LootGroup" />
+    </lootcontainer>
+    <lootcontainer name="FuriousRamsaySeeker007LootContainer" size="4,2" sound_open="UseActions/open_corpse" sound_close="UseActions/close_corpse" open_time="1.5" destroy_on_close="false">
+      <item group="FuriousRamsaySeeker007LootGroup" />
+    </lootcontainer>
+  </append>
+</configs>

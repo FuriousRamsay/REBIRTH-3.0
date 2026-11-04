@@ -3,12 +3,13 @@
     <window name="rebirthPurgeInformationWindow" anchor="Center" depth="40" pos="-500,381" width="1003" height="763" controller="RebirthPurgeInformation, RebirthUtils" cursor_area="true">
       <fullscreencollider_new color="0,0,0,185" />
       <sprite width="1003" height="763" sprite="menu_empty2px" type="sliced" color="17,17,21,250" depth="0" />
-      <panel name="header" height="43" depth="1" backgroundspritename="ui_game_panel_header">
-        <label name="purgeInformationTitle" style="header.name" width="1003" />
-      </panel>
-      <panel name="content" pos="0,-46" height="699" depth="1" backgroundcolor="0,0,0,0" bordercolor="[black]" borderthickness="3" pivot="center">
+      <rect name="header" height="43" depth="1">
+        <sprite name="purgeInformationHeaderBg" width="1003" height="43" depth="1" sprite="ui_game_panel_header" color="255,255,255,255" />
+        <label name="purgeInformationTitle" style="header.name" width="1003" depth="2" />
+      </rect>
+      <rect name="content" pos="0,-46" width="1003" height="699" depth="1" pivot="center">
         <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="1003" height="699" color="[black]" type="sliced" fillcenter="false" />
-        <sprite name="purgeInformationArt" pos="3,-2" width="996" height="248" atlas="UIAtlas" sprite="AutoDiscovery" depth="9"/>
+        <sprite name="purgeInformationArt" pos="3,-2" width="996" height="248" atlas="UIAtlas" sprite="AutoDiscovery" color="255,255,255,255" depth="9"/>
         <rect name="purgeInformationReader" controller="RebirthReadableText, RebirthUtils" reset_on_text_change="false" pos="10,-260" width="983" height="360" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
           <defaultscrollbar/>
           <scrollview name="readableTextViewport" depth="10" width="960" height="360" clippingsoftness="0,4">
@@ -16,7 +17,7 @@
           </scrollview>
         </rect>
         <simplebutton name="purgeInformationClose" depth="12" pos="0,-663" width="1001" height="32" font_size="24" caption_key="xuiClose" />
-      </panel>
+      </rect>
     </window>
   </append>
 </configs>

@@ -1,0 +1,21 @@
+{
+  "name": "Purge sleeper diagnostic snapshot (prepared, not run)",
+  "stopOnFailure": true,
+  "preconditions": [
+    "Run only in the authorized profiler-launched disposable Purge save, while inside a registered POI.",
+    "This is diagnostic smoke only; verify gameplay cases in ANIMAL_SLEEPER_REGRESSION_20261103.md."
+  ],
+  "steps": [
+    {
+      "console": "poisleepers audit"
+    },
+    {
+      "expectLog": {
+        "contains": "[PurgeAudit] reason="
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

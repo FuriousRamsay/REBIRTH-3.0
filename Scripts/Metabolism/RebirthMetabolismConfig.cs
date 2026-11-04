@@ -25,13 +25,13 @@ public static class RebirthMetabolismConfig
     // Survival demand uses active real play time. World day length never changes these rates.
     public static float BaseFluidNeedMlPerReal60Minutes = 900f;
 
-    public static float ClearLiquidHoldRealSeconds = 20f;
-    public static float ClearLiquidGastricHalfTimeRealSeconds = 120f;
+    public static float ClearLiquidHoldRealSeconds = 10f;
+    public static float ClearLiquidGastricHalfTimeRealSeconds = 60f;
     public static float ClearLiquidWithFoodHalfTimeMultiplier = 1.60f;
-    public static float MealFluidHoldRealSeconds = 45f;
-    public static float MealFluidGastricHalfTimeRealSeconds = 300f;
-    public static float IntestinalFluidResidenceRealSeconds = 30f;
-    public static float BaseIntestinalFluidAbsorptionMlPerRealMinute = 112.5f;
+    public static float MealFluidHoldRealSeconds = 22.5f;
+    public static float MealFluidGastricHalfTimeRealSeconds = 150f;
+    public static float IntestinalFluidResidenceRealSeconds = 15f;
+    public static float BaseIntestinalFluidAbsorptionMlPerRealMinute = 225f;
     public static float AutoSipStartProjectedPercent = 0.72f;
     public static float AutoSipStopProjectedPercent = 0.85f;
     public static float AutoSipDefaultMl = 50f;
@@ -81,13 +81,13 @@ public static class RebirthMetabolismConfig
     public static float FoodRequirementMaxMultiplier = 1.40f;
 
     public static float BaseDigestiveHealth = 100f;
-    public static float BaseSolidGastricEmptyingMlPerRealMinute = 45f;
-    public static float BaseIntestinalNutrientAbsorptionUnitsPerRealMinute = 2.25f;
-    public static float IntestinalNutritionResidenceRealSeconds = 60f;
-    public static float LightFoodGastricLagRealSeconds = 60f;
-    public static float NormalFoodGastricLagRealSeconds = 90f;
-    public static float DenseFoodGastricLagRealSeconds = 120f;
-    public static float HeavyFoodGastricLagRealSeconds = 180f;
+    public static float BaseSolidGastricEmptyingMlPerRealMinute = 90f;
+    public static float BaseIntestinalNutrientAbsorptionUnitsPerRealMinute = 4.5f;
+    public static float IntestinalNutritionResidenceRealSeconds = 30f;
+    public static float LightFoodGastricLagRealSeconds = 30f;
+    public static float NormalFoodGastricLagRealSeconds = 45f;
+    public static float DenseFoodGastricLagRealSeconds = 60f;
+    public static float HeavyFoodGastricLagRealSeconds = 90f;
     public static float DigestionSpeedMinMultiplier = 0.50f;
     public static float DigestionSpeedMaxMultiplier = 1.75f;
     public static float GutResilienceMinMultiplier = 0.50f;

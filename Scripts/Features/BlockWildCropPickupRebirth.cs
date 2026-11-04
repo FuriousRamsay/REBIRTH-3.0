@@ -111,7 +111,7 @@ public class BlockWildCropPickupRebirth : BlockPlantGrowing
                 ? blockValue.ToItemValue()
                 : ItemClass.GetItem(drop.name);
 
-            if (itemValue.IsEmpty())
+            if (itemValue == null || itemValue.IsEmpty())
                 continue;
 
             int baseCount = rollRandom

@@ -241,11 +241,16 @@ public static partial class RebirthInfrastructureWorkService
         if(world==null)return;
         RebirthElectricalSourceIdentity.PromoteLoaded(world);
         float decayPerSecond=Math.Max(0f,RebirthProgressionRuntimeConfig.ElectricalConditionDecayPerPoweredMinute)/60f;
-        var removed=new List<Vector3i>();
+        List<Vector3i> removed=null;
         foreach(RebirthElectricalServiceRecord r in records.Values)
         {
             if(RemoteResourceTransactions.ActionElectricalHeld(world,r.Position))continue;
-            if(RebirthElectricalSourceIdentity.ProvenReplaced(world,r)){removed.Add(r.Position);continue;}
+            if(RebirthElectricalSourceIdentity.ProvenReplaced(world,r))
+            {
+                if(removed==null)removed=new List<Vector3i>();
+                removed.Add(r.Position);
+                continue;
+            }
             if(decayPerSecond<=0f)continue;
             TileEntityPowered te=world.GetTileEntity(r.Position) as TileEntityPowered;
             if(te==null||!RebirthElectricalSourceIdentity.Matches(world,r))continue; // unloaded or unproven legacy sources never inherit effects
@@ -257,7 +262,7 @@ public static partial class RebirthInfrastructureWorkService
             r.Condition=Mathf.Clamp(r.Condition-decayPerSecond*dt,0f,100f);
             if(Math.Abs(r.Condition-before)>=0.0001f)dirty=true;
         }
-        foreach(var position in removed)RemoveRecord(position);
+        if(removed!=null)foreach(var position in removed)RemoveRecord(position);
     }
 
     [ThreadStatic] private static TileEntityPowered nativeDemandCapture;

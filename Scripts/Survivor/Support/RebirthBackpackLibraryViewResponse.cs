@@ -12,7 +12,7 @@ public sealed class RebirthBackpackLibraryViewResponse
     private readonly byte[] data;
     public int BodyLength=>(Guid.TryParse(CreationId,out _)?46:102)+data.Length;
     private RebirthBackpackLibraryViewResponse(string creation,Guid request,long revision,RebirthBackpackLibraryViewStatus status,RebirthBackpackLibraryView value,byte[] bytes)
-    {CreationId=creation;RequestId=request;Revision=revision;Status=status;view=value;data=(byte[])bytes.Clone();}
+    {CreationId=creation;RequestId=request;Revision=revision;Status=status;view=value;data=bytes;}
     public static bool TryCreate(Guid creation,Guid request,long revision,RebirthBackpackLibraryViewStatus status,RebirthBackpackLibraryView view,out RebirthBackpackLibraryViewResponse response)
         =>TryCreate(creation.ToString("N"),request,revision,status,view,out response);
     public static bool TryCreate(string creation,Guid request,long revision,RebirthBackpackLibraryViewStatus status,RebirthBackpackLibraryView view,out RebirthBackpackLibraryViewResponse response)

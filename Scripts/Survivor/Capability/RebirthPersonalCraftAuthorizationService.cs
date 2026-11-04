@@ -843,16 +843,21 @@ public static class RebirthPersonalCraftCompletionService
         }
         if (!world.IsRemote())
         {
-            var gone = new List<int>();
+            List<int> gone = null;
             foreach (var pair in Peers)
             {
-                if (!ReferenceEquals(world.GetEntity(pair.Key), pair.Value.Player)) { gone.Add(pair.Key); continue; }
+                if (!ReferenceEquals(world.GetEntity(pair.Key), pair.Value.Player))
+                {
+                    (gone ??= new List<int>()).Add(pair.Key);
+                    continue;
+                }
                 Drain(pair.Value);
-                var stale = new List<int>();
-                foreach (var add in pair.Value.Additions) if (add.Value.Expires < now) stale.Add(add.Key);
-                foreach (int type in stale) pair.Value.Additions.Remove(type);
+                List<int> stale = null;
+                foreach (var add in pair.Value.Additions)
+                    if (add.Value.Expires < now) (stale ??= new List<int>()).Add(add.Key);
+                if (stale != null) foreach (int type in stale) pair.Value.Additions.Remove(type);
             }
-            foreach (int id in gone) Peers.Remove(id);
+            if (gone != null) foreach (int id in gone) Peers.Remove(id);
         }
     }
 }

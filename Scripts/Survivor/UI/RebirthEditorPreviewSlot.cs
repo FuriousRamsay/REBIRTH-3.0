@@ -13,7 +13,9 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
         var root=GetParentByType<XUiC_RebirthItemEditorHeader>();
         var restoration=GetParentByType<XUiC_RebirthVehicleRestoration>();
         equipment=root?.GetChildByType<XUiC_RebirthAssembleItem>();
-        backpack=root?.GetChildByType<XUiC_RebirthEditorBackpack>()??restoration?.GetChildByType<XUiC_RebirthEditorBackpack>();
+        backpack=root?.GetChildByType<XUiC_RebirthEditorBackpack>()
+            ??restoration?.GetChildByType<XUiC_RebirthEditorBackpack>()
+            ??GetParentByType<XUiC_RebirthEditorBackpack>();
         equipmentPreview=ReferenceEquals(root?.GetChildById("editorEquipmentPreview"),this);
         backgrounds[0]=GetChildById("backgroundMain")?.ViewComponent as XUiV_Sprite;
         backgrounds[1]=GetChildById("background")?.ViewComponent as XUiV_Sprite;

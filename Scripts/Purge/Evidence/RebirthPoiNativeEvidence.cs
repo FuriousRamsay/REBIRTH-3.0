@@ -235,7 +235,7 @@ internal sealed class RebirthPoiNativeEvidence
             actors.Add(entity.entityId,new Actor { Entity=entity,
                 Observation=new RebirthPoiActorObservation(token,entity.entityId,membership.className,membership.spawnPointIndex) });
                         var store=resolveStore();RebirthPoiClearanceRecord current;
-            if(store?.Published!=null && store.Published.TryGet(candidate.Identity,out current) &&
+            if(RebirthPoiCombatantPolicy.IsRequired(membership.className)&&store?.Published!=null && store.Published.TryGet(candidate.Identity,out current) &&
                 current.State==RebirthPoiClearanceState.Cleared && candidate.PendingRepopulation==null)
                 candidate.PendingRepopulation=new RebirthPoiRepopulationEvidence(candidate.Repopulation,1,world.worldTime);
             candidate.JournalDirty=true; Dirty(candidate);
@@ -458,7 +458,14 @@ internal sealed class RebirthPoiNativeEvidence
         catch(ArgumentException){return null;}catch(OverflowException){return null;}
     }
     public bool IsWithheld(RebirthPoiIdentity identity)
-    { return identity!=null && (candidates.Values.Any(c=>identity.Equals(c.Identity) && (c.Fault || c.ResetObserved))||quarantined.Values.Any(c=>identity.Equals(c.Identity))); }
+    {
+        if(identity==null)return false;
+        foreach(var candidate in candidates.Values)
+            if(identity.Equals(candidate.Identity)&&(candidate.Fault||candidate.ResetObserved))return true;
+        foreach(var candidate in quarantined.Values)
+            if(identity.Equals(candidate.Identity))return true;
+        return false;
+    }
     internal string ClearObserverName(RebirthPoiIdentity identity)
     {
         if(identity==null)return string.Empty;
@@ -487,7 +494,7 @@ internal sealed class RebirthPoiNativeEvidence
             record.State!=RebirthPoiClearanceState.Discovered)return false;
         manifest=candidate.Manifest;
         actors=candidate.Actors.Values.SelectMany(room=>room.Values)
-            .Where(actor=>!actor.Dead&&actor.Entity!=null&&actor.Entity.IsAlive()&&
+            .Where(actor=>RebirthPoiCombatantPolicy.IsRequired(actor.Observation.ClassName)&&!actor.Dead&&actor.Entity!=null&&actor.Entity.IsAlive()&&
                 ReferenceEquals(world.GetEntity(actor.Entity.entityId),actor.Entity))
             .Select(actor=>actor.Entity).Distinct().ToArray();
         return true;
@@ -505,10 +512,54 @@ internal sealed class RebirthPoiNativeEvidence
             ?record.State+", resetOnly="+record.ResetOnly:"no clearance record";
         return "Scanner: "+(candidate.Identity?.Prefab??candidate.Prefab.prefab.PrefabName)+", "+state+
             ", fault="+candidate.Fault+", resetObserved="+candidate.ResetObserved+
+            ", journalRestored="+candidate.Restored+", journalDirty="+candidate.JournalDirty+", boundEpoch="+candidate.Epoch+
             ", manifestCurrent="+(candidate.Manifest!=null&&candidate.Manifest.StillMatches())+
             ", spawned="+player.IsSpawned()+", alive="+player.IsAlive()+
             ", spectator="+player.IsSpectator+", attached="+(player.AttachedToEntity!=null)+
             ", fly="+player.IsFlyMode.Value;
+    }
+    // On-demand diagnostics only. Do not discover, enroll, repair, pulse or write
+    // while explaining why the ordinary completion path has not published.
+    internal string CompletionStatus(World world,EntityPlayer player)
+    {
+        if(!CurrentWorld(world)||player==null)return "no-current-player";
+        var prefab=RebirthPurgeScannerPoi.Resolve(world,player.position);
+        if(prefab==null)return "outside-poi";
+        if(!candidates.TryGetValue(prefab,out var c))return "no-native-candidate";
+        if(c.Fault)return "candidate-fault";
+        if(c.ResetObserved)return "reset-observed";
+        if(!c.Root.AuthoredCurrent())return "authoring-changed";
+        if(c.Identity==null)return "identity-unbound";
+        if(!c.Restored)return "journal-not-restored";
+        var store=resolveStore();var snapshot=store?.Published;
+        if(snapshot==null)return "store-unavailable";
+        if(store.HasPending)return "store-write-pending";
+        if(!snapshot.TryGet(c.Identity,out var record))return "record-not-published";
+        if(record.State!=RebirthPoiClearanceState.Discovered)return "record-state="+record.State;
+        if(c.Epoch!=record.Epoch)return "epoch-mismatch";
+        if(c.JournalDirty)return "journal-dirty";
+        if(quarantined.ContainsKey(prefab))return "quarantined";
+        if(c.Manifest==null)return "full-room-manifest-unavailable";
+        if(!c.Manifest.StillMatches())return "full-room-manifest-changed";
+        if(c.Unbound.Count!=0)return "unbound-saved-rooms="+c.Unbound.Count;
+        if(RebirthPoiNativeRestorationConnection.HasPending(c.Identity))return "native-restoration-pending";
+        int spawned=0;
+        foreach(var room in c.Manifest.Volumes)
+        {
+            int id=world.FindSleeperVolume(room.BoxMin,room.BoxMax);
+            string prefix="room="+id+" ";
+            if(!c.Actors.TryGetValue(room,out var actors))return prefix+"not-enrolled";
+            if(room.isSpawning)return prefix+"spawning";
+            if(!RebirthPurgeSleeperPolicy.CombatSettled(room))return prefix+"not-combat-settled";
+            if(room.respawnMap.Values.Any(a=>RebirthPoiCombatantPolicy.IsRequired(a.className)))return prefix+"combat-respawn-members";
+            if(room.minScript!=null&&room.minScript.IsRunning())return prefix+"script-running";
+            if(room.pendingSpawnOps.Any(h=>h==null||!h.IsCompleted||h.onComplete!=null))return prefix+"unfinished-native-operations";
+            if(room.numSpawned!=actors.Count)return prefix+"native-spawned="+room.numSpawned+" enrolled="+actors.Count;
+            if(actors.Values.Any(a=>!a.Dead&&RebirthPoiCombatantPolicy.IsRequired(a.Observation.ClassName)))return prefix+"unproven-combat-deaths="+actors.Values.Count(a=>!a.Dead&&RebirthPoiCombatantPolicy.IsRequired(a.Observation.ClassName));
+            if(room.pendingSpawnMap.Any(id2=>!actors.ContainsKey(id2)||!actors[id2].Dead&&RebirthPoiCombatantPolicy.IsRequired(actors[id2].Observation.ClassName)))return prefix+"unproven-pending-ids";
+            spawned+=actors.Values.Count(a=>RebirthPoiCombatantPolicy.IsRequired(a.Observation.ClassName));
+        }
+        return spawned==0?"no-combat-participants":"ready-for-publication";
     }
     private static bool AcknowledgedLatest(Candidate c,RebirthPoiPartialObservation published)
     {
@@ -618,6 +669,7 @@ internal sealed class RebirthPoiNativeEvidence
     }
     private void ReleaseQuarantine()
     {
+        if(quarantined.Count==0)return;
         var snapshot=resolveStore()?.Published;
         if(snapshot==null||!snapshot.Binding.IsCurrent)return;
         foreach(var pair in quarantined.Take(4).ToArray())
@@ -639,6 +691,51 @@ internal sealed class RebirthPoiNativeEvidence
             candidates[pair.Key]=q;quarantined.Remove(pair.Key);q.JournalDirty=true;Dirty(q);
         }
     }
+    // Native room registration alone is not a player discovery. An idle, untouched
+    // skeleton has no actor custody to publish. Never apply this to an existing
+    // record or to incomplete, reset, spawn, death or restoration work.
+    private bool CanOmitUntouchedCandidate(Candidate c,RebirthPoiWorldStore store,RebirthPoiWorldSnapshot snapshot)
+    {
+        if(!RebirthSandboxOptionManager.Current.IsPurge||c==null||store==null||snapshot==null||
+            !ReferenceEquals(store,resolveStore())||!ReferenceEquals(store.Published,snapshot)||store.HasPending||
+            !snapshot.Binding.IsCurrent||!ReferenceEquals(snapshot.Binding.Scope,c.World)||!ReferenceEquals(c.Store,store)||
+            c.Identity==null||snapshot.TryGet(c.Identity,out _)||!c.Restored||c.Epoch!=0||c.BoundReset!=Guid.Empty||
+            c.Touched!=null||c.Fault||c.ResetObserved||c.Quarantine!=Guid.Empty||quarantined.ContainsKey(c.Prefab)||
+            c.PendingClear!=null||c.PendingRepopulation!=null||c.Unbound.Count!=0||
+            HasPendingDeaths(c.Identity)||RebirthPoiNativeRestorationConnection.HasUnresolved(c.Identity)||
+            !c.Root.AuthoredCurrent()||c.Manifest==null||!c.Manifest.StillMatches()||
+            c.Bindings.Count!=c.Manifest.Volumes.Length||c.Actors.Count!=c.Bindings.Count)return false;
+        foreach(var room in c.Manifest.Volumes)
+        {
+            if(!c.Bindings.ContainsKey(room)||!c.Actors.TryGetValue(room,out var actors)||actors.Count!=0||
+                room.wasCleared||room.isSpawning||room.numSpawned!=0||room.respawnMap.Count!=0||room.pendingSpawnMap.Count!=0||
+                room.pendingSpawnOps.Any(h=>h==null||!h.IsCompleted||h.onComplete!=null)||
+                room.minScript!=null&&room.minScript.IsRunning())return false;
+        }
+        return true;
+    }
+#if PURGE_QUALIFICATION
+    // Bounded, explicit observation only. Does not create candidates, pulse the
+    // store, bind journals or acknowledge custody.
+    internal object ObserveDiscoveryAdmission()
+    {
+        var store=resolveStore();var snapshot=store?.Published;
+        var rows=new List<object>();
+        // Previously published records can fill the first64 slots on cold load.
+        // Prioritize absent records so the bounded observer can actually witness
+        // new idle neighbors; retain the truncation flag and never hide the cap.
+        var selected=candidates.Values.OrderBy(c=>c.Identity!=null&&snapshot!=null&&snapshot.TryGet(c.Identity,out _)?1:0).Take(64);
+        foreach(var c in selected)
+        {
+            bool recorded=c.Identity!=null&&snapshot!=null&&snapshot.TryGet(c.Identity,out _);
+            rows.Add(new { key=c.Identity?.Key,prefab=c.Identity?.Prefab,recorded,
+                untouched=c.Touched==null,restored=c.Restored,epoch=c.Epoch,
+                actors=c.Actors.Values.Sum(m=>m.Count),unboundRooms=c.Unbound.Count,
+                canOmit=CanOmitUntouchedCandidate(c,store,snapshot) });
+        }
+        return new { observationOnly=true,total=candidates.Count,truncated=candidates.Count>64,rows };
+    }
+#endif
     internal enum ShutdownDrainResult { Complete, Incomplete, IoPending, StaleScope }
     private bool shutdownPrepared;
     internal ShutdownDrainResult LastShutdownResult {get;private set;}
@@ -670,6 +767,9 @@ internal sealed class RebirthPoiNativeEvidence
                 ProcessCandidate(c,true);RebirthPoiNativeRestorationConnection.Pulse(true);
                 if(candidates.TryGetValue(c.Prefab,out var current))c=current;
                 if(store.HasPending)return ShutdownFailed(ShutdownDrainResult.IoPending);
+                // No journal obligation exists here; do not invent a discovered
+                // record just to satisfy the published-journal acknowledgment.
+                if(CanOmitUntouchedCandidate(c,store,store.Published)){complete=true;break;}
                 if(!c.Fault&&!c.ResetObserved&&c.Restored&&!c.JournalDirty&&c.Identity!=null&&
                     !quarantined.ContainsKey(c.Prefab)&&!RebirthPoiNativeRestorationConnection.HasUnresolved(c.Identity)&&
                     store.Published.TryGet(c.Identity,out var record)&&record.Epoch==c.Epoch&&AcknowledgedLatest(c,record.Observations))
@@ -719,6 +819,7 @@ internal sealed class RebirthPoiNativeEvidence
         RebirthPoiClearanceRecord record;
         if(!snapshot.TryGet(c.Identity,out record))
         {
+            if(CanOmitUntouchedCandidate(c,store,snapshot))return;
             var discovery=store.TryDiscover(snapshot,c.Identity);
             if(discovery!=RebirthPoiStoreResult.Published && discovery!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}
             snapshot=store.Published;if(snapshot==null || !snapshot.TryGet(c.Identity,out record)){Dirty(c);return;}
@@ -742,7 +843,7 @@ internal sealed class RebirthPoiNativeEvidence
         if(record.State==RebirthPoiClearanceState.Discovered && c.Touched!=null && RebirthPurgeKillContributor.Identify(c.Touched,c.World)!=null
             && c.Touched.IsSpawned()&&!c.Touched.IsDead()&&!c.Touched.IsSpectator
             && c.Touched.AttachedToEntity==null&&!c.Touched.IsFlyMode.Value)
-            RebirthPurgePoiHistory.Discover(c.Identity,RebirthPurgeDiscoveryNotification.DisplayName(c.Touched));
+            RebirthPurgeFirstVisitFeedback.Observe(record,c.Touched);
         if(c.PendingRepopulation!=null && c.Epoch!=null && record.Epoch==c.Epoch.Value+1 && record.LastRepopulation!=null &&
             record.LastRepopulation.GenerationId==c.PendingRepopulation.GenerationId &&
             record.LastRepopulation.LiveNativeParticipants==c.PendingRepopulation.LiveNativeParticipants &&
@@ -750,10 +851,22 @@ internal sealed class RebirthPoiNativeEvidence
         { c.Epoch=record.Epoch;c.PendingRepopulation=null;c.PendingClear=null;c.Proof=Guid.NewGuid(); c.JournalDirty=true; }
         if(c.Epoch==null)c.Epoch=record.Epoch;
         if(c.Epoch!=record.Epoch || c.Fault)return;
-        int live=c.Actors.Values.Sum(a=>a.Values.Count(actor=>!actor.Dead && actor.Entity!=null && !actor.Entity.IsDead()));
+        int live=c.Actors.Values.Sum(a=>a.Values.Count(actor=>RebirthPoiCombatantPolicy.IsRequired(actor.Observation.ClassName)&&!actor.Dead && actor.Entity!=null && !actor.Entity.IsDead()));
         if(record.State==RebirthPoiClearanceState.Cleared)
         {
-            if(live==0 && c.PendingRepopulation==null)return;
+            if(live==0 && c.PendingRepopulation==null)
+            {
+                // Attaching reloaded native rooms marks their journal dirty even
+                // when RestoreJournal recovered the exact published death proofs.
+                // A cleared record cannot accept another partial publication.
+                // Acknowledge only that already-published journal; otherwise keep
+                // custody dirty so reset/shutdown admission still refuses it.
+                if(c.JournalDirty && !store.HasPending && !HasPendingDeaths(c.Identity) &&
+                    !RebirthPoiNativeRestorationConnection.HasPending(c.Identity) &&
+                    record.Observations!=null && record.Observations.Epoch==record.Epoch &&
+                    AcknowledgedLatest(c,record.Observations))c.JournalDirty=false;
+                return;
+            }
             var evidence=c.PendingRepopulation??(c.PendingRepopulation=new RebirthPoiRepopulationEvidence(c.Repopulation,live,c.World.worldTime));
             var result=store.TryObserveRepopulation(snapshot,c.Identity,record.Epoch,evidence);
             if(result!=RebirthPoiStoreResult.Published && result!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}
@@ -784,16 +897,16 @@ internal sealed class RebirthPoiNativeEvidence
             var actors=c.Actors[volume];
             // Native async queues retain completed handles; count actual unfinished/callback
             // failures, not pendingSpawnMap.Count or queue length as active work.
-            if(volume.isSpawning || !volume.wasCleared || volume.respawnMap.Count!=0 ||
+            if(volume.isSpawning || !RebirthPurgeSleeperPolicy.CombatSettled(volume) || volume.respawnMap.Values.Any(a=>RebirthPoiCombatantPolicy.IsRequired(a.className)) ||
                 volume.minScript!=null && volume.minScript.IsRunning() ||
                 volume.pendingSpawnOps.Any(h=>h==null || !h.IsCompleted || h.onComplete!=null) ||
-                volume.numSpawned!=actors.Count || actors.Values.Any(a=>!a.Dead)) return;
+                volume.numSpawned!=actors.Count || actors.Values.Any(a=>!a.Dead&&RebirthPoiCombatantPolicy.IsRequired(a.Observation.ClassName))) return;
             // Stale pending IDs are allowed only when this exact enrolled actor was proven dead.
-            if(volume.pendingSpawnMap.Any(id=>!actors.ContainsKey(id) || !actors[id].Dead))return;
-            spawned+=actors.Count;
+            if(volume.pendingSpawnMap.Any(id=>!actors.ContainsKey(id) || !actors[id].Dead&&RebirthPoiCombatantPolicy.IsRequired(actors[id].Observation.ClassName)))return;
+            spawned+=actors.Values.Count(a=>RebirthPoiCombatantPolicy.IsRequired(a.Observation.ClassName));
         }
         if(spawned==0)return; // An entirely empty POI is not a combat clear.
-        var proof=c.PendingClear??(c.PendingClear=new RebirthPoiClearEvidence(c.Proof,c.Manifest.Volumes.Length,c.Manifest.Volumes.Length,spawned,0,0,false,c.World.worldTime));
+        var proof=c.PendingClear??(c.PendingClear=new RebirthPoiClearEvidence(c.Proof,c.Manifest.Volumes.Length,c.Manifest.Volumes.Length,spawned,0,0,false,c.World.worldTime,RebirthPurgeOfflineSupply.Capture(c.World,record.Observations)));
         var clear=store.TryClear(snapshot,c.Identity,record.Epoch,proof);
         if(clear!=RebirthPoiStoreResult.Published && clear!=RebirthPoiStoreResult.Duplicate)Dirty(c);
     }

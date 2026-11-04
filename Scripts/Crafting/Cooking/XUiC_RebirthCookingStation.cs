@@ -90,7 +90,9 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
         var entries=cookingEntries;
         if(entries!=null&&entries.Length>0)
         {
-            var current=System.Array.FindLast(entries,e=>e?.recipe!=null);
+            XUiC_RecipeStack current=null;
+            for(int i=entries.Length-1;i>=0;i--)
+                if(entries[i]?.recipe!=null){current=entries[i];break;}
             var recipe=current?.recipe;
             if(windowGroup.isShowing&&RebirthCookingHeat.Ready(recipe)&&UIInput.selection==null&&!RebirthConsoleInputGuardRuntime.BlocksGameplayInput()&&xui.playerUI.playerInput.PermanentActions.Reload.WasPressed)
                 RebirthCookingHeat.Take(current);

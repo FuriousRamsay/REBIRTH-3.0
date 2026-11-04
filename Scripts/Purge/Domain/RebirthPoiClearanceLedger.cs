@@ -13,15 +13,16 @@ internal sealed class RebirthPoiClearEvidence
     public readonly Guid ProofId;
     public readonly int RequiredVolumes, VerifiedVolumes, SpawnedParticipants;
     public readonly ulong WorldTime;
+    internal readonly HashSet<string> OfflineContributors;
     public RebirthPoiClearEvidence(Guid proofId, int requiredVolumes, int verifiedVolumes,
-        int spawnedParticipants, int pendingSpawns, int liveParticipants, bool isSpawning, ulong worldTime)
+        int spawnedParticipants, int pendingSpawns, int liveParticipants, bool isSpawning, ulong worldTime,HashSet<string> offlineContributors=null)
     {
         if (proofId == Guid.Empty || requiredVolumes < 1 || requiredVolumes > 4096 ||
             requiredVolumes != verifiedVolumes || spawnedParticipants < 1 || spawnedParticipants > 1000000 ||
             pendingSpawns != 0 || liveParticipants != 0 || isSpawning)
             throw new ArgumentException("Incomplete POI clear evidence.");
         ProofId=proofId; RequiredVolumes=requiredVolumes; VerifiedVolumes=verifiedVolumes;
-        SpawnedParticipants=spawnedParticipants; WorldTime=worldTime;
+        SpawnedParticipants=spawnedParticipants; WorldTime=worldTime;OfflineContributors=offlineContributors==null?null:new HashSet<string>(offlineContributors,StringComparer.Ordinal);
     }
 }
 
@@ -72,7 +73,7 @@ internal sealed class RebirthPoiClearanceRecord
         else if (resetId != Guid.Empty || beforeResetClear != null || beforeReset != RebirthPoiClearanceState.Discovered ||
             (state == RebirthPoiClearanceState.Cleared) != (clear != null)) throw new ArgumentException("Invalid clearance state.");
         if(observations!=null&&observations.Epoch!=epoch)throw new ArgumentException("Observation epoch differs.");
-        if((state==RebirthPoiClearanceState.Cleared||state==RebirthPoiClearanceState.ResetPending&&beforeReset==RebirthPoiClearanceState.Cleared)&&observations!=null&&observations.Volumes.Values.Any(v=>v.Actors.Values.Any(a=>!a.Dead)))throw new ArgumentException("Cleared record contains living original participants.");
+        if((state==RebirthPoiClearanceState.Cleared||state==RebirthPoiClearanceState.ResetPending&&beforeReset==RebirthPoiClearanceState.Cleared)&&observations!=null&&observations.Volumes.Values.Any(v=>v.Actors.Values.Any(a=>!a.Dead&&RebirthPoiCombatantPolicy.IsRequired(a.ClassName))))throw new ArgumentException("Cleared record contains living original combat participants.");
         if(resetPlan!=null&&(state!=RebirthPoiClearanceState.ResetPending||resetPlan.Transaction!=resetId))throw new ArgumentException("Reset plan does not bind original intent.");
         if(lastAuthoredReset!=null&&lastAuthoredReset.OriginalEpoch+1!=epoch)throw new ArgumentException("Authored runtime receipt differs from native generation epoch.");
         if(resetOnly&&(clear!=null||beforeResetClear!=null||observations!=null||lastRepopulation!=null||supplyCredits!=null))throw new ArgumentException("Reset-only custody cannot contain combat evidence.");
@@ -155,13 +156,13 @@ internal sealed class RebirthPoiClearanceLedger
     {
         next=null; RebirthPoiClearanceRecord old;
         if(!Scope(scope,worldId) || evidence==null || !Find(identity,out old) || old.Epoch!=epoch || old.State==RebirthPoiClearanceState.ResetPending||old.ResetOnly) return false;
-        if(old.Observations!=null&&old.Observations.Volumes.Values.Any(v=>v.Actors.Values.Any(a=>!a.Dead)))return false;
+        if(old.Observations!=null&&old.Observations.Volumes.Values.Any(v=>v.Actors.Values.Any(a=>!a.Dead&&RebirthPoiCombatantPolicy.IsRequired(a.ClassName))))return false;
         if(old.State==RebirthPoiClearanceState.Cleared)
         {
             if(!SameEvidence(old.Clear,evidence)) return false; next=this; return true;
         }
         if(expectedRevision!=Revision || Revision==long.MaxValue) return false;
-        RebirthPoiSupplyCredits earned;if(!RebirthPoiSupplyCredits.TryCredit(old.SupplyCredits,old.Observations,out earned))return false;
+        RebirthPoiSupplyCredits earned;if(!RebirthPoiSupplyCredits.TryCredit(old.SupplyCredits,old.Observations,out earned,evidence.OfflineContributors,identity,evidence.WorldTime))return false;
         return Next(new RebirthPoiClearanceRecord(identity,epoch,Revision+1,RebirthPoiClearanceState.Cleared,evidence,Guid.Empty,
             RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,old.Observations,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:earned,lifetimeKills:old.LifetimeKills),out next);
     }

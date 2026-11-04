@@ -11,7 +11,8 @@ class Program
   var crate=new EntitySupplyCrate{world=world,entityId=10,WorldTimeBorn=42};
   using(var stream=new MemoryStream(bytes))using(var reader=new PooledBinaryReader(stream)){reader.ReadInt32();RebirthPurgeSupplyCrateSerialization.AfterRead(crate,reader,mode,ran);}world.Entities.dict[crate.entityId]=crate;return crate;
  }
- static void Main()
+ static int Main(){try{Run();return 0;}catch(Exception error){Console.Error.WriteLine(error.Message);return 1;}}
+ static void Run()
  {
   var guid=Guid.NewGuid();var world=new World{worldState=new WorldState{Guid=guid.ToString("N").ToUpperInvariant()}};GameManager.Instance=new GameManager{World=world};SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager{IsServer=true};
   var player=new string('a',64);var account=new RebirthPurgeSupplyAccount(player,75,75,1,0,1);RebirthPurgeSupplyService.Published=new Dictionary<string,RebirthPurgeSupplyAccount>{{player,account}};
@@ -51,6 +52,19 @@ class Program
   Check(!RebirthPurgeSupplyCrateSerialization.TryAttach(qualified,stamp,new object(),()=>false),"inactive native reservation cannot bind an owned crate");
   current.TryLaunched(guid,current.Token(guid),out current);RebirthPurgeSupplyService.Published=new Dictionary<string,RebirthPurgeSupplyAccount>{{player,current}};
   Check(RebirthPurgeSupplyCrateSerialization.TryAttach(qualified,stamp,new object(),()=>true),"accepted native launch binds its crate after account consumption");
+  // Unity destroys the native component on unload, but cached Chunk still uses
+  // that managed reference to construct its EntityCreationData later.
+  crate.Destroyed=true;Check(crate==null&&!ReferenceEquals(crate,null),"Unity destroyed-object null differs from CLR reference null");
+  var cachedBytes=Save(crate,StreamModeWrite.ToClient);
+  Check(cachedBytes.Length==4+77,"cached destroyed component retains original ownership trailer");
+  var cachedReload=Load(world,cachedBytes);
+  Check(RebirthPurgeSupplyCrateSerialization.TryReadAuthoritative(cachedReload,guid,out var cacheStamp)&&cacheStamp.Token==stamp.Token,"cached native copy restores same original owner and token");
+  crate.WorldTimeBorn=999;Check(Save(crate).Length==4,"destroyed component still refuses changed birth");crate.WorldTimeBorn=42;
+  crate.entityId=999;Check(Save(crate).Length==4,"destroyed component still refuses reused identity");crate.entityId=10;
+  world.worldState.Guid=Guid.NewGuid().ToString("N");Check(Save(crate).Length==4,"destroyed component still refuses changed world");world.worldState.Guid=guid.ToString("N");
+  projection.Destroyed=true;Check(Save(projection).Length==4,"destroyed network projection cannot mint authority");
+  other.Destroyed=true;Check(Save(other).Length==4,"destroyed unowned crate stays unowned");
+  Check(Save(null).Length==4,"actual CLR null stays refused");crate.Destroyed=false;
   RebirthSandboxOptionManager.Current.IsPurge=false;Check(!RebirthPurgeSupplyCrateSerialization.TryReadSaved(cold,guid,out _),"None QoL cannot use saved Purge crate as authoritative delivery evidence");Check(Save(crate).Length==4,"None QoL does not append Purge crate metadata");
   Console.WriteLine("RESULT "+checks+" PASS; production stamp and serialization helpers; binary roundtrip real; native caller/Harmony/engine doubles; no native save commit or flight proof.");
  }
@@ -58,7 +72,12 @@ class Program
 enum StreamModeRead {Persistency,FromServer,FromClient} enum StreamModeWrite {Persistency,ToServer,ToClient}
 class PooledBinaryWriter:BinaryWriter {public PooledBinaryWriter(Stream stream):base(stream,Encoding.UTF8,true){}}
 class PooledBinaryReader:BinaryReader {public PooledBinaryReader(Stream stream):base(stream,Encoding.UTF8,true){}}
-class Entity {public World world;public int entityId;public ulong WorldTimeBorn;}
+class Entity {
+ public World world;public int entityId;public ulong WorldTimeBorn;public bool Destroyed;
+ public static bool operator ==(Entity a,Entity b){if(ReferenceEquals(a,b))return true;if(ReferenceEquals(a,null))return b.Destroyed;if(ReferenceEquals(b,null))return a.Destroyed;return false;}
+ public static bool operator !=(Entity a,Entity b)=>!(a==b);
+ public override bool Equals(object o)=>ReferenceEquals(this,o);public override int GetHashCode()=>System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this);
+}
 class EntitySupplyCrate:Entity {public void Write(PooledBinaryWriter writer,StreamModeWrite mode){}public void Read(byte version,PooledBinaryReader reader,StreamModeRead mode){}}
 class WorldState {public string Guid;} class EntityList {public Dictionary<int,Entity> dict=new Dictionary<int,Entity>();}
 class World {public WorldState worldState;public EntityList Entities=new EntityList();public bool IsRemote()=>false;}
@@ -66,6 +85,7 @@ class GameManager {public static GameManager Instance;public World World;} class
 class SingletonMonoBehaviour<T> {public static T Instance;} class ThreadManager {public static bool Main=true;public static bool IsMainThread()=>Main;}
 class Log {public static void Warning(string value){}}
 internal static class RebirthPurgeReleasePolicy {internal static bool Enabled=true;}
+internal static class RebirthPurgeFeedbackTrace {internal static bool Allowed=false;}
 internal sealed class RebirthSandboxOptionManager {internal static readonly RebirthSandboxOptionManager Current=new RebirthSandboxOptionManager();internal bool IsPurge=true;}
 internal static class RebirthPurgeSupplyService {internal static IReadOnlyDictionary<string,RebirthPurgeSupplyAccount> Published;}
 public interface IModApi {void InitMod(Mod mod);} public class Mod {}

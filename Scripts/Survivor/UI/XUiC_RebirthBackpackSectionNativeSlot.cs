@@ -8,6 +8,7 @@ public sealed class XUiC_RebirthBackpackSectionNativeSlot : XUiC_ItemStack
     private RebirthSlotPalette palette;
     private XUiC_RebirthCharacterOverviewList scroll;
     private RebirthSlotPresentationGate presentation;
+    private XUiV_Sprite camperBorder;
     private bool pointerOver;
     private bool storage; private XUiC_RebirthBackpackSectionBackpack backpack;
     public bool IsStorage => storage;
@@ -70,8 +71,17 @@ public sealed class XUiC_RebirthBackpackSectionNativeSlot : XUiC_ItemStack
             &&xui.playerUI.CursorController.GetMouseButton(UICamera.MouseButton.LeftButton))lastClicked=true;
         base.Update(dt);if(waking)RebirthSlotPresentationGate.FlushViews(this);palette?.Apply(AttributeLock);
         if(waking)presentation.Show();
-        if(Camper!=null && GetChildById("background")?.ViewComponent is XUiV_Sprite border)
-            border.SetColorImmediately(pointerOver||IsSelected?SelectionBorderColor:new UnityEngine.Color32(96,96,96,255));
+        if(Camper!=null)
+        {
+            if(camperBorder?.UiTransform==null)camperBorder=GetChildById("background")?.ViewComponent as XUiV_Sprite;
+            if(camperBorder!=null)
+            {
+                UnityEngine.Color color=pointerOver||IsSelected?SelectionBorderColor:new UnityEngine.Color32(96,96,96,255);
+                // Native slot bindings can change the live sprite after our last update.
+                if(camperBorder.Color!=color||camperBorder.Sprite==null||camperBorder.Sprite.color!=color)
+                    camperBorder.SetColorImmediately(color);
+            }
+        }
     }
 }
 [Preserve]

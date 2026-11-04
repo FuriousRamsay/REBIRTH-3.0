@@ -87,8 +87,8 @@ internal static class RebirthPlacedOriginal
     private static bool Current(EntityPlayer actor,Record r)=>ThreadManager.IsMainThread()&&actor!=null&&!actor.IsDead()&&actor.Died==r.Deaths&&actor.world?.worldState?.Guid==r.World&&ReferenceEquals(GameManager.Instance?.World,actor.world)&&ReferenceEquals(actor.world.GetEntity(actor.entityId),actor)&&RebirthCamperCharacterAccess.CurrentCreation(actor)==r.Creation&&RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var id)&&id.StorageKey==r.Owner;
     private static bool CanRelay(Attempt a)=>SameNativeOwner(a.Player,a.Record)&&ReferenceEquals(a.World,GameManager.Instance?.World)&&a.Directory==GameIO.GetSaveGameDir()&&a.Player.IsSpawned()&&a.Player.Died>a.Record.Deaths&&a.Record.Phase<5;
     private static bool Current(Attempt a)=>Current(a.Player,a.Record)&&ReferenceEquals(a.World,GameManager.Instance?.World)&&a.Directory==GameIO.GetSaveGameDir()&&a.Player.IsSpawned();
-    internal static bool IsHeld(EntityPlayerLocal player)=>RebirthPlacedOriginalDeathPartition.IsOwedHeld(player)||owners.Values.Any(a=>ReferenceEquals(a.Player,player)&&a.Record.Phase<5&&Current(a));
-    internal static bool Blocks(ItemStackGrid grid)=>RebirthPlacedOriginalDeathPartition.BlocksOwed(grid)||owners.Values.Any(a=>a.Record.Phase<5&&Current(a)&&(ReferenceEquals(grid,a.Player.bag?.ItemGrid)||ReferenceEquals(grid,a.Player.inventory?.ItemGrid)));
+    internal static bool IsHeld(EntityPlayerLocal player)=>RebirthPlacedOriginalDeathPartition.IsOwedHeld(player)||owners.Count!=0&&owners.Values.Any(a=>ReferenceEquals(a.Player,player)&&a.Record.Phase<5&&Current(a));
+    internal static bool Blocks(ItemStackGrid grid)=>RebirthPlacedOriginalDeathPartition.BlocksOwed(grid)||owners.Count!=0&&owners.Values.Any(a=>a.Record.Phase<5&&Current(a)&&(ReferenceEquals(grid,a.Player.bag?.ItemGrid)||ReferenceEquals(grid,a.Player.inventory?.ItemGrid)));
     internal static bool Consume(ItemStackGrid grid,int index,ItemStack value)
     {
         if(RebirthPlacedOriginalDeathPartition.ConsumeOwed(grid,index,value))return true;var a=coroutine??returning??native;if(a==null||!Current(a)||a.Debit||!ReferenceEquals(grid,a.Player.inventory.ItemGrid)||index!=a.Record.Slot||!RebirthCamperEnergyActorImage.Capture(a.Player).Matches(ActorImage(returning==a?a.Record.After:a.Record.Before))||!RebirthCamperEnergyItems.Same(value,ActorImage(returning==a?a.Record.Before:a.Record.After).Belt[index]))return false;a.Debit=true;return true;
@@ -549,6 +549,7 @@ internal static class RebirthPlacedOriginal
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
         var world=GameManager.Instance?.World;if(world==null||!ThreadManager.IsMainThread())return;Scope(world);if(!world.IsRemote()&&world.GetPrimaryPlayer() is EntityPlayerLocal local&&UnityEngine.Time.realtimeSinceStartup>=nextOwnerScan)ReconcileLocalOwner(world,local);RebirthPlacedOriginalFootprintPublication.Update(world);RebirthPlacedOriginalDeathPartition.RetryBodyPublication(world);RebirthPlacedOriginalDeathPartition.UpdateOwed(world);if(UnityEngine.Time.realtimeSinceStartup>=nextScan)Reconcile(world);if(blocked)return;
+        if(owners.Count==0)return;
         foreach(var a in owners.Values.ToArray())
         {
             if((!Current(a)&&!CanRelay(a))||UnityEngine.Time.realtimeSinceStartup<a.Next)continue;a.Next=UnityEngine.Time.realtimeSinceStartup+1f;

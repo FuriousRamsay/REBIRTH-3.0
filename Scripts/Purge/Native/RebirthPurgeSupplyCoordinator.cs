@@ -15,22 +15,30 @@ internal static class RebirthPurgeSupplyCoordinator
         internal Vector3 PlayerPosition,Drop;
         internal float Radius;
         internal bool Spawned;
+        internal bool OriginAnchored;
         internal bool Current()=>NativePurge(Controller)&&ReferenceEquals(Controller.activeAirDrop,Flight)&&Flight!=null;
         internal void ProjectOwner(EntitySupplyCrate crate)
         {
-            crate.spawnById=Player.entityId;crate.spawnByName=Player.EntityName??string.Empty;crate.spawnByAllowShare=false;
+            crate.spawnById=Player?.entityId??-1;crate.spawnByName=Player?.EntityName??Localization.Get("xuiRebirthPurgeSupplyOwner");crate.spawnByAllowShare=false;
         }
     }
     private static World world;
     private static Reservation queued,active;
     private static RebirthPurgeSupplyCrateStamp awaitingAccount;
     private static float next;
-    private static int playerCursor,entityCursor;
+    private static int entityCursor;
+    private static readonly List<string> accountKeys=new List<string>();
+    private static string lastAccount;
+    private static IReadOnlyDictionary<string,RebirthPurgeSupplyAccount> pendingSnapshot;
+    internal static string Diagnostic()=>"worldCurrent="+ReferenceEquals(world,GameManager.Instance?.World)+
+        ", queued="+(queued!=null)+", active="+(active!=null)+", flightCurrent="+(active?.Current()??false)+
+        ", crateSpawned="+(active?.Spawned??false)+", awaitingAccount="+(awaitingAccount!=null)+
+        ", accountScan="+entityCursor+"/"+accountKeys.Count;
     internal static void Reset(bool preserveMarkerLabelsForFinalWrite=false)
     {
         if(preserveMarkerLabelsForFinalWrite)RebirthPurgeSupplyMarkerLabels.PreserveUntilFinalWrite();
         else RebirthPurgeSupplyMarkerLabels.Reset();
-        world=null;queued=active=null;awaitingAccount=null;next=0;playerCursor=entityCursor=0;
+        world=null;queued=active=null;awaitingAccount=null;next=0;entityCursor=0;accountKeys.Clear();lastAccount=null;pendingSnapshot=null;
     }
     private static bool NativePurge(AIDirectorAirDropComponent owner)
     {
@@ -68,6 +76,8 @@ internal static class RebirthPurgeSupplyCoordinator
             End=new Vector3(end.x,request.PlayerPosition.y+180f,end.y),
             Delay=random.RandomRange(0f,15f)
         };
+        if(request.OriginAnchored)
+        {path.Start=request.Controller.Director.World.ClampToValidWorldPos(path.Start);path.End=request.Controller.Director.World.ClampToValidWorldPos(path.End);}
         var crate=new AIAirDrop.SupplyCrateSpawn {
             SpawnPos=request.Drop,Delay=(start-drop).magnitude/AIAirDrop.cPlaneMetersPerSecond
         };
@@ -113,39 +123,69 @@ internal static class RebirthPurgeSupplyCoordinator
             var crate=entities[entityCursor++] as EntitySupplyCrate;
             if(crate!=null)RebirthPurgeSupplyService.ReconcileLoadedCrate(crate);
         }
-        if(director.activeAirDrop!=null||LootContainer.NoLoot)return;
+        if(director.activeAirDrop!=null||LootContainer.NoLoot||AIDirectorAirDropComponent.MaxDayCount==0)return;
         var players=world.aiDirector.GetComponent<AIDirectorPlayerManagementComponent>()?.trackedPlayers.list;
         var accounts=RebirthPurgeSupplyService.Published;
         var rules=RebirthPurgeSupplyPolicy.Current;
-        if(players==null||players.Count==0||accounts==null||rules==null)return;
-        for(int n=0,limit=Math.Min(16,players.Count);n<limit;n++)
+        if(players==null||accounts==null||rules==null)return;
+        if(!ReferenceEquals(pendingSnapshot,accounts))
+        {accountKeys.Clear();foreach(var pair in accounts)if(pair.Value.DeliveredDrops<pair.Value.EarnedDrops&&(pair.Value.InFlight==0||pair.Value.Delivery!=null&&(pair.Value.Delivery.Phase==RebirthPurgeSupplyDeliveryPhase.Prepared||pair.Value.Delivery.CanResumeFlight)))accountKeys.Add(pair.Key);accountKeys.Sort(StringComparer.Ordinal);pendingSnapshot=accounts;}
+        if(accountKeys.Count==0)return;
+        var online=new Dictionary<string,EntityPlayer>(StringComparer.Ordinal);bool nativeHasLivingPlayer=false;
+        foreach(var tracked in players)
         {
-            if(playerCursor>=players.Count)playerCursor=0;
-            var player=players[playerCursor++].Player;
-            if(player==null||!player.IsSpawned()||!player.IsAlive()||player.IsSpectator||
-                player.AttachedToEntity!=null||player.IsFlyMode.Value)continue;
-            var key=RebirthPurgeKillContributor.Identify(player,world);RebirthPurgeSupplyAccount account;
-            if(key==null||!accounts.TryGetValue(key,out account)||account.DeliveredDrops>=account.EarnedDrops)continue;
+            var player=tracked.Player;if(player==null)continue;
+            if(!player.IsDead())nativeHasLivingPlayer=true;
+            string key=RebirthPurgeKillContributor.Identify(player,world);if(key!=null)online[key]=player;
+        }
+        // Native SpawnAirDrop refuses an empty living-player list. Keep receipts
+        // pending; never fabricate a player/entity or bypass native construction.
+        if(!nativeHasLivingPlayer)return;
+        for(int n=0;n<16;n++)
+        {
+            if(accountKeys.Count==0)return;
+            int index=lastAccount==null?-1:accountKeys.BinarySearch(lastAccount,StringComparer.Ordinal);
+            index=index<0?(lastAccount==null?0:~index):index+1;if(index>=accountKeys.Count)index=0;
+            string key=accountKeys[index];lastAccount=key;var account=accounts[key];
+            if(account.DeliveredDrops>=account.EarnedDrops)continue;
             if(account.InFlight!=0&&(account.Delivery==null||account.Delivery.Phase!=RebirthPurgeSupplyDeliveryPhase.Prepared&&!account.Delivery.CanResumeFlight))continue;
+            EntityPlayer player;online.TryGetValue(key,out player);
+            var origin=account.Origins?.Destination(account.InFlight==0?account.DeliveredDrops+1:account.InFlight);
+            if(origin==null&&(player==null||!player.IsSpawned()||!player.IsAlive()||player.IsSpectator||player.AttachedToEntity!=null||player.IsFlyMode.Value))continue;
             Guid id;if(!Guid.TryParseExact(world.worldState?.Guid,"N",out id))return;
             float radius=rules.FlightRadius;
-            var playerPosition=player.position;
-            var offset=director.Random.RandomOnUnitCircle*director.Random.RandomRange(0f,radius);
-            var drop=world.ClampToValidWorldPos(new Vector3(playerPosition.x+offset.x,playerPosition.y+170f,playerPosition.z+offset.y));
-            if(new Vector2(drop.x-playerPosition.x,drop.z-playerPosition.z).sqrMagnitude>radius*radius)continue;
-            if(account.InFlight==0)
+            var playerPosition=origin==null?player.position:world.ClampToValidWorldPos(new Vector3(origin.X,origin.Y,origin.Z));
+            Vector3 drop;
+            if(account.InFlight!=0)
             {
+                drop=new Vector3(account.Delivery.X,account.Delivery.Y,account.Delivery.Z);
+                // Prepared retries retain their original saved destination.
+                playerPosition=new Vector3(drop.x,drop.y-170f,drop.z);
+            }
+            else
+            {
+                var offset=origin==null?director.Random.RandomOnUnitCircle*director.Random.RandomRange(0f,radius):Vector2.zero;
+                drop=world.ClampToValidWorldPos(new Vector3(playerPosition.x+offset.x,playerPosition.y+170f,playerPosition.z+offset.y));
+                if(new Vector2(drop.x-playerPosition.x,drop.z-playerPosition.z).sqrMagnitude>radius*radius)continue;
+                if(Math.Abs(drop.x)>1000000f||Math.Abs(drop.z)>1000000f||drop.y< -4096f||drop.y>4096f)continue;
                 RebirthPurgeSupplyAccount prepared;
-                if(!RebirthPurgeSupplyService.TryPrepare(account,new RebirthPurgeSupplyDeliveryPlan((int)drop.x,(int)drop.y,(int)drop.z),out prepared))return;
+                if(!RebirthPurgeSupplyService.TryPrepare(account,new RebirthPurgeSupplyDeliveryPlan((int)drop.x,(int)drop.y,(int)drop.z,version:origin==null?2:3),out prepared))return;
                 account=prepared;
             }
-            var request=new Reservation {Controller=director,Player=player,PlayerPosition=playerPosition,Drop=drop,Radius=radius,
+            if(account.Delivery.Version==3)
+            {
+                RebirthPurgeSupplyAccount invoking;
+                // Persist exact owner/token/POI destination BEFORE native effect.
+                // A restarted uncertain v3 invocation is retained, never replayed.
+                if(!RebirthPurgeSupplyService.TryInvoking(account,id,out invoking))return;
+                account=invoking;
+            }
+            var request=new Reservation {Controller=director,Player=player,PlayerPosition=playerPosition,Drop=drop,Radius=radius,OriginAnchored=origin!=null,
                 Stamp=new RebirthPurgeSupplyCrateStamp(id,key,account.InFlight,account.Token(id))};
             queued=request;
             try
             {
                 bool accepted=director.SpawnAirDrop();
-                // Native returns true with no flight when airdrops/loot are disabled.
                 if(accepted&&director.activeAirDrop!=null&&
                     (request.Flight==null||ReferenceEquals(director.activeAirDrop,request.Flight)))
                 {

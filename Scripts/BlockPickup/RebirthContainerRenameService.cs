@@ -208,9 +208,11 @@ public static class RebirthContainerRenameService
             activationText = displayName;
         }
 
+        if (composite.Owner == null)
+            return;
+
         string ownerLabel = Localization.Get("xuiRebirthOwnedBy") + ":";
-        if (composite.Owner == null ||
-            activationText.IndexOf("\n" + ownerLabel, StringComparison.Ordinal) >= 0)
+        if (activationText.IndexOf("\n" + ownerLabel, StringComparison.Ordinal) >= 0)
             return;
 
         string ownerName = RebirthBlockPickupAccessService.GetOwnerDisplayName(composite.Owner);

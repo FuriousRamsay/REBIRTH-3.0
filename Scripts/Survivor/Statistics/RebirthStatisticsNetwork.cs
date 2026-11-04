@@ -9,7 +9,7 @@ public static class RebirthStatisticsClientState
     private static readonly object Sync = new object();
     private static RebirthStatisticsSnapshot snapshot;
     private static long generation;
-    private static bool pending;
+    private static volatile bool pending;
     public static event Action<RebirthStatisticsSnapshot> Changed;
     public static event Action ProjectionChanged;
     public static long Generation { get { lock (Sync) return generation; } }
@@ -31,6 +31,7 @@ public static class RebirthStatisticsClientState
     // The Statistics GameUpdate hook calls this on clients as well as the authority.
     public static void PumpNotifications()
     {
+        if (!pending) return;
         RebirthStatisticsSnapshot accepted = null;
         Action<RebirthStatisticsSnapshot> legacy = Changed;
         lock (Sync)

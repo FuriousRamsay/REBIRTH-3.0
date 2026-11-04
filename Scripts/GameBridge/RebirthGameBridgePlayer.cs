@@ -208,7 +208,11 @@ public static class RebirthGameBridgePlayer
             if (e == null) return "entity " + entity + " not found";
             var alive = e as EntityAlive;
             float along = req.QueryString("part", "body") == "head" ? 0f : 0.45f;
-            point = () => e == null ? (Vector3?)null : alive != null ? EntityAimPoint(alive, along) : e.position + Vector3.up * 0.8f;
+            // Low supply crates can be missed above their collider. Explicit base aim
+            // changes only the look point, including for EntityAlive-derived crates;
+            // activation still verifies the exact entity.
+            bool baseAim = req.QueryString("part", "body") == "base";
+            point = () => e == null ? (Vector3?)null : baseAim ? e.position + Vector3.up * 0.2f : alive != null ? EntityAimPoint(alive, along) : e.position + Vector3.up * 0.8f;
             return null;
         }
         if (req.QueryString("x") == null) return null;

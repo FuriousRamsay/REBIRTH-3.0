@@ -295,7 +295,7 @@ internal sealed class RebirthLogisticsBackpackPublication:IDisposable
         try{RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(Write));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(MarkerWrite));ModEvents.GameUpdate.RegisterHandler(Update);installed=true;}catch{harmony.UnpatchSelf();throw;}
     }
     private static void Update(ref ModEvents.SGameUpdateData data)
-    {foreach(var item in pending.ToArray())try{if(!item.Current())item.Dispose();}catch{item.Dispose();}}
+    {if(pending.Count==0)return;foreach(var item in pending.ToArray())try{if(!item.Current())item.Dispose();}catch{item.Dispose();}}
     // Actual published canonical ECD only; detached capture is not proof.
     // Caller owns the copied frame allocation until its notice is released.
     internal bool TryCopyPublishedFrame(out byte[] frame,out IDisposable frameAllocation)

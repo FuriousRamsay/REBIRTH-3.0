@@ -121,9 +121,12 @@ public static class RebirthCamperEnergyBoundsDisplay
     {
         var display=shown;if(display==null||!ReferenceEquals(display.Vehicle,vehicle))return;
         if(!ReferenceEquals(display.World,vehicle.world)||!Current(vehicle,display.Player)){Hide();return;}
-        display.Root.transform.position=RebirthCamperEnergyBounds.CurrentCenter(vehicle)-Origin.position;
+        var transform=display.Root.transform;
+        var center=RebirthCamperEnergyBounds.CurrentCenter(vehicle)-Origin.position;
+        if(!transform.position.Equals(center))transform.position=center;
         if(!TryRadius(vehicle,out float radius)){Hide();return;}
-        float span=radius*2f;display.Root.transform.localScale=new Vector3(span,span,span);
+        float span=radius*2f;var scale=new Vector3(span,span,span);
+        if(!transform.localScale.Equals(scale))transform.localScale=scale;
     }
     internal static void OnUnload(EntityVehicle vehicle)
     {if(shown!=null&&ReferenceEquals(shown.Vehicle,vehicle))Hide();}

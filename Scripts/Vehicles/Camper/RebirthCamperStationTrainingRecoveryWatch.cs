@@ -94,6 +94,7 @@ internal static class RebirthCamperStationTrainingRecoveryWatch
             if(lease==null||!RebirthWorldCharacterService.TryGet(player,out var owner)||owner?.Progression==null)return;
             if(!RebirthCamperStationWindowSession.TryGetCurrent(player,out var station,out var address)||
                 RebirthCamperStationSaveEvidence.IsPending(station))return;
+            if(owner.Progression.CamperStationTrainingPlans.Count==0&&owner.Progression.StationRefundArchives.Count==0)return;
             var jobs=new HashSet<string>(owner.Progression.CamperStationTrainingPlans.Keys,StringComparer.Ordinal);
             foreach(var history in owner.Progression.StationRefundArchives.Values)
                 if(history!=null&&history.IsCompletion)jobs.Add(history.JobId);
@@ -118,6 +119,7 @@ internal static class RebirthCamperStationTrainingRecoveryWatch
     }
     private static void TickRemote(float now)
     {
+        if(remote.Count==0)return;
         foreach(var job in new List<string>(remote.Keys))
         {
             var entry=remote[job];

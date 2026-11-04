@@ -71,128 +71,13 @@ public sealed class RebirthPurgeThemeModApi : IModApi
             harmony.CreateClassProcessor(typeof(RebirthPurgeBiomeBuffAddHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeBiomeBuffTickHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeTraderGenerationHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeTraderListingHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeCachedTraderListingHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeNewTraderQuestHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeSharedAcceptanceHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeShareEntryHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeServerShareHook)).Patch();
-            harmony.CreateClassProcessor(typeof(RebirthPurgeDialogOfferHook)).Patch();
+            harmony.CreateClassProcessor(typeof(RebirthPurgeQuestCandidateHook)).Patch();
+            harmony.CreateClassProcessor(typeof(RebirthPurgeQuestRemovalScopeHook)).Patch();
             ModEvents.GameStarting.RegisterHandler(Starting);
             installed = true;
         }
         catch { harmony.UnpatchSelf(); throw; }
     }
     private static void Starting(ref ModEvents.SGameStartingData data) { RebirthPurgeBiomeHazardPolicy.Reset(); }
-}
-[HarmonyPatch(typeof(EntityTrader), nameof(EntityTrader.PopulateActiveQuests))]
-internal static class RebirthPurgeTraderGenerationHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(ref List<Quest> __result)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge) return true;
-        __result = new List<Quest>(); return false;
-    }
-    [HarmonyPriority(Priority.Last)]
-    private static void Postfix(ref List<Quest> __result)
-    {
-        if (RebirthSandboxOptionManager.Current.IsPurge) __result = new List<Quest>();
-    }
-}
-[HarmonyPatch(typeof(EntityTrader), nameof(EntityTrader.SetActiveQuests))]
-internal static class RebirthPurgeTraderListingHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(EntityTrader __instance)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge) return true;
-        __instance.activeQuests = new List<Quest>(); return false;
-    }
-}
-[HarmonyPatch(typeof(QuestJournal), nameof(QuestJournal.AddQuest))]
-internal static class RebirthPurgeNewTraderQuestHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(Quest q, Quest.QuestSource questSource)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge) return true;
-        // Loading existing owned quests is preserved. No inventory/custody is deleted.
-        return questSource != Quest.QuestSource.Trader &&
-            !(questSource == Quest.QuestSource.PartyShare && RebirthPurgeTraderJobPolicy.IsTraderJob(q));
-    }
-}
-internal static class RebirthPurgeTraderJobPolicy
-{
-    internal static bool IsTraderJob(Quest quest) => quest != null &&
-        (quest.PositionData.ContainsKey(Quest.PositionDataTypes.TraderPosition)
-        || RebirthTraderJobCompletionStats.IsRecognizedNormalTraderJob(quest));
-}
-[HarmonyPatch(typeof(PartyQuests), nameof(PartyQuests.AcceptSharedQuest))]
-internal static class RebirthPurgeSharedAcceptanceHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(SharedQuestEntry _sharedQuest)
-    {
-        return !RebirthSandboxOptionManager.Current.IsPurge || !RebirthPurgeTraderJobPolicy.IsTraderJob(_sharedQuest?.Quest);
-    }
-}
-[HarmonyPatch(typeof(QuestJournal), nameof(QuestJournal.AddSharedQuestEntry))]
-internal static class RebirthPurgeShareEntryHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(NetPackageSharedQuest.SharedQuestData sqd, ref bool __result)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge || sqd == null) return true;
-        var quest = string.IsNullOrEmpty(sqd.questID) ? null : QuestClass.CreateQuest(sqd.questID);
-        if (!RebirthPurgeTraderJobPolicy.IsTraderJob(quest) && !RebirthUtilities.IsVanillaTrader(sqd.questGiverID)) return true;
-        // No new trader/job sharing in Purge. Existing shared custody remains owned.
-        __result = false; return false;
-    }
-}
-
-
-[HarmonyPatch(typeof(QuestEventManager), nameof(QuestEventManager.GetQuestList),
-    new Type[] { typeof(World), typeof(int), typeof(int) })]
-internal static class RebirthPurgeCachedTraderListingHook
-{
-    // This is the offer cache, not the player's owned quest journal.
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(ref List<Quest> __result)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge) return true;
-        __result = new List<Quest>(); return false;
-    }
-    [HarmonyPriority(Priority.Last)]
-    private static void Postfix(ref List<Quest> __result)
-    {
-        if (RebirthSandboxOptionManager.Current.IsPurge) __result = new List<Quest>();
-    }
-}
-[HarmonyPatch(typeof(GameManager), nameof(GameManager.QuestShareServer),
-    new Type[] { typeof(NetPackageSharedQuest.SharedQuestData) })]
-internal static class RebirthPurgeServerShareHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(NetPackageSharedQuest.SharedQuestData sqd)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge || sqd == null
-            || sqd.questEvent != NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.ShareQuest) return true;
-        // Removing members/owned shares must remain functional in existing saves.
-        if (RebirthUtilities.IsVanillaTrader(sqd.questGiverID)) return false;
-        var quest = string.IsNullOrEmpty(sqd.questID) ? null : QuestClass.CreateQuest(sqd.questID);
-        return !RebirthPurgeTraderJobPolicy.IsTraderJob(quest);
-    }
-}
-[HarmonyPatch(typeof(DialogActionAddQuest), nameof(DialogActionAddQuest.PerformAction),
-    new Type[] { typeof(EntityPlayer) })]
-internal static class RebirthPurgeDialogOfferHook
-{
-    [HarmonyPriority(Priority.First)]
-    private static bool Prefix(DialogActionAddQuest __instance, EntityPlayer player)
-    {
-        if (!RebirthSandboxOptionManager.Current.IsPurge) return true;
-        if (RebirthPurgeTraderJobPolicy.IsTraderJob(__instance?.Quest)) return false;
-        return !(player is EntityPlayerLocal local && local.PlayerUI?.xui?.Dialog?.Respondent is EntityTrader);
-    }
 }

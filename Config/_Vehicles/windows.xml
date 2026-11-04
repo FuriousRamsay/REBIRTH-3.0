@@ -309,8 +309,8 @@
           </rect>
         </rect>
         <rect name="editorBackpack" pos="1214,0" width="610" height="813" controller="RebirthEditorBackpack, RebirthUtils">
-          <sprite depth="0" pos="0,-400" width="610" height="413" sprite="menu_empty2px" color="24,24,29,235" globalopacitymod="0" type="sliced" />
-          <sprite name="vehicleSelectedFallbackBg" depth="0" width="610" height="400" sprite="menu_empty2px" color="24,24,29,235" globalopacitymod="0" type="sliced" />
+          <sprite depth="0" pos="0,-395" width="610" height="418" sprite="menu_empty" color="24,24,29,235" globalopacitymod="0" />
+          <sprite name="vehicleSelectedFallbackBg" depth="0" width="610" height="431" sprite="menu_empty" color="24,24,29,235" globalopacitymod="0" />
           <label name="editorSelectedHeading" depth="5" pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text_key="xuiRebirthVehicleSelectedHeading" upper_case="true" />
           <sprite name="editorSelectedRule" depth="3" pos="0,-38" width="610" height="2" sprite="menu_empty" color="181,140,255,255" />
           <rect pos="17,-54" width="80" height="80"><item_stack name="editorSelectionPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="80" repeat_i="0" allow_dropping="false" /></rect>
@@ -341,17 +341,84 @@
             <label name="vehicleSelStatName4" depth="5" pos="17,-302" width="330" height="22" font_size="18" color="220,220,227,255" overflow="shrinkcontent" />
             <label name="vehicleSelStatValue4" depth="5" pos="350,-302" width="240" height="22" font_size="18" justify="right" color="220,214,165,255" overflow="shrinkcontent" />
           </rect>
-          <label pos="17,-404" width="145" height="28" font_size="28" color="188,132,231,255" text_key="xuiBackpack" depth="5" pivot="left" upper_case="true" />
-          <label name="editorBagCapacity" pos="155,-404" width="292" height="26" font_size="19" color="220,214,165,255" depth="5" pivot="left" />
-          <button name="editorBagFilter" pos="471,-404" width="28" height="28" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_assemble" style="press, hover" tooltip_key="xuiRebirthVehicleBagFilter" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_right="editorBagSort" pivot="center" />
-          <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="509,-404" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="editorBagFilter" nav_right="rbBackpackSellSection" visible="false" />
-          <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="547,-404" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="editorBagSort" visible="false" />
-          <button name="editorBagSort" pos="509,-404" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_sort" style="press, hover" tooltip_key="xuiRebirthCraftingInventorySortTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagFilter" nav_right="editorBagLock" pivot="center" />
-          <button name="editorBagLock" pos="547,-404" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_lock" style="press, hover" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagSort" pivot="center" />
-          <rect name="editorBagScroll" pos="17,-433" width="540" height="372" controller="RebirthCharacterOverviewList, RebirthUtils">
-            <panel name="listViewport" width="512" height="372" clipping="SoftClip" depth="10" clippingsize="512,372" clippingcenter="256,-186">
-              <rect name="listContent" width="512" height="1775">
-                <rect name="editorRow0" pos="0,0" width="512" height="69">
+          <rect name="editorBagActions" pos="8,-327" width="594" height="70" controller="RebirthItemActionList, RebirthUtils">
+            <rect name="editorBagAction0" pos="0,0" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction1" pos="149,0" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction2" pos="298,0" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction3" pos="447,0" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction4" pos="0,-36" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction5" pos="149,-36" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction6" pos="298,-36" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+            <rect name="editorBagAction7" pos="447,-36" width="145" height="32" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="145" height="32" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite name="background" depth="3" width="145" height="32" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite name="icon" depth="4" sprite="{actionicon}" width="18" height="18" color="{statuscolor}" pos="6,-7" foregroundlayer="true" />
+              <label name="name" depth="4" pos="25,-8" width="84" height="23" text="{actionname}" font_size="16" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon name="gamepadIcon" depth="4" width="18" height="18" pos="137,-6" pivot="Right" visible="{inspectheld}" />
+              <label name="keyboardButton" depth="4" pos="111,-8" width="28" height="23" font_size="15" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+          </rect>
+          <label pos="17,-410" width="145" height="28" font_size="28" color="188,132,231,255" text_key="xuiBackpack" depth="5" pivot="left" upper_case="true" />
+          <label name="editorBagCapacity" pos="155,-410" width="245" height="26" font_size="19" color="220,214,165,255" depth="5" pivot="left" overflow="shrinkcontent" />
+          <button name="editorBagFilter" pos="471,-410" width="28" height="28" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_assemble" style="press, hover" tooltip_key="xuiRebirthVehicleBagFilter" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_right="editorBagSort" pivot="center" />
+          <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="509,-410" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="editorBagFilter" nav_right="rbBackpackSellSection" visible="false" />
+          <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="547,-410" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="editorBagSort" visible="false" />
+          <button name="editorBagSort" pos="509,-410" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_sort" style="press, hover" tooltip_key="xuiRebirthCraftingInventorySortTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagFilter" nav_right="editorBagLock" pivot="center" />
+          <button name="editorBagLock" pos="547,-410" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_lock" style="press, hover" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagSort" pivot="center" />
+          <sprite name="editorBagRule" depth="12" pos="0,-413" width="610" height="2" sprite="menu_empty" color="181,140,255,255" />
+          <rect name="editorBagScroll" pos="17,-433" width="590" height="372" controller="RebirthCharacterOverviewList, RebirthUtils">
+            <panel name="listViewport" width="568" height="372" clipping="SoftClip" depth="10" clippingsize="568,372" clippingcenter="284,-186">
+              <rect name="listContent" width="568" height="1775">
+                <rect name="editorRow0" pos="0,0" width="568" height="69">
                   <rect name="editorCell0" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot0" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="0" cell_size="69" />
                   </rect>
@@ -386,7 +453,7 @@
                     <item_stack name="editorSlot10" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="10" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow1" pos="0,-71" width="512" height="69">
+                <rect name="editorRow1" pos="0,-71" width="568" height="69">
                   <rect name="editorCell11" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot11" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="11" cell_size="69" />
                   </rect>
@@ -421,7 +488,7 @@
                     <item_stack name="editorSlot21" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="21" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow2" pos="0,-142" width="512" height="69">
+                <rect name="editorRow2" pos="0,-142" width="568" height="69">
                   <rect name="editorCell22" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot22" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="22" cell_size="69" />
                   </rect>
@@ -456,7 +523,7 @@
                     <item_stack name="editorSlot32" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="32" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow3" pos="0,-213" width="512" height="69">
+                <rect name="editorRow3" pos="0,-213" width="568" height="69">
                   <rect name="editorCell33" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot33" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="33" cell_size="69" />
                   </rect>
@@ -491,7 +558,7 @@
                     <item_stack name="editorSlot43" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="43" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow4" pos="0,-284" width="512" height="69">
+                <rect name="editorRow4" pos="0,-284" width="568" height="69">
                   <rect name="editorCell44" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot44" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="44" cell_size="69" />
                   </rect>
@@ -526,7 +593,7 @@
                     <item_stack name="editorSlot54" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="54" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow5" pos="0,-355" width="512" height="69">
+                <rect name="editorRow5" pos="0,-355" width="568" height="69">
                   <rect name="editorCell55" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot55" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="55" cell_size="69" />
                   </rect>
@@ -561,7 +628,7 @@
                     <item_stack name="editorSlot65" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="65" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow6" pos="0,-426" width="512" height="69">
+                <rect name="editorRow6" pos="0,-426" width="568" height="69">
                   <rect name="editorCell66" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot66" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="66" cell_size="69" />
                   </rect>
@@ -596,7 +663,7 @@
                     <item_stack name="editorSlot76" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="76" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow7" pos="0,-497" width="512" height="69">
+                <rect name="editorRow7" pos="0,-497" width="568" height="69">
                   <rect name="editorCell77" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot77" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="77" cell_size="69" />
                   </rect>
@@ -631,7 +698,7 @@
                     <item_stack name="editorSlot87" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="87" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow8" pos="0,-568" width="512" height="69">
+                <rect name="editorRow8" pos="0,-568" width="568" height="69">
                   <rect name="editorCell88" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot88" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="88" cell_size="69" />
                   </rect>
@@ -666,7 +733,7 @@
                     <item_stack name="editorSlot98" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="98" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow9" pos="0,-639" width="512" height="69">
+                <rect name="editorRow9" pos="0,-639" width="568" height="69">
                   <rect name="editorCell99" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot99" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="99" cell_size="69" />
                   </rect>
@@ -701,7 +768,7 @@
                     <item_stack name="editorSlot109" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="109" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow10" pos="0,-710" width="512" height="69">
+                <rect name="editorRow10" pos="0,-710" width="568" height="69">
                   <rect name="editorCell110" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot110" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="110" cell_size="69" />
                   </rect>
@@ -736,7 +803,7 @@
                     <item_stack name="editorSlot120" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="120" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow11" pos="0,-781" width="512" height="69">
+                <rect name="editorRow11" pos="0,-781" width="568" height="69">
                   <rect name="editorCell121" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot121" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="121" cell_size="69" />
                   </rect>
@@ -771,7 +838,7 @@
                     <item_stack name="editorSlot131" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="131" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow12" pos="0,-852" width="512" height="69">
+                <rect name="editorRow12" pos="0,-852" width="568" height="69">
                   <rect name="editorCell132" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot132" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="132" cell_size="69" />
                   </rect>
@@ -806,7 +873,7 @@
                     <item_stack name="editorSlot142" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="142" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow13" pos="0,-923" width="512" height="69">
+                <rect name="editorRow13" pos="0,-923" width="568" height="69">
                   <rect name="editorCell143" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot143" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="143" cell_size="69" />
                   </rect>
@@ -841,7 +908,7 @@
                     <item_stack name="editorSlot153" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="153" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow14" pos="0,-994" width="512" height="69">
+                <rect name="editorRow14" pos="0,-994" width="568" height="69">
                   <rect name="editorCell154" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot154" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="154" cell_size="69" />
                   </rect>
@@ -876,7 +943,7 @@
                     <item_stack name="editorSlot164" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="164" cell_size="69" />
                   </rect>
                 </rect>
-                <rect name="editorRow15" pos="0,-1065" width="512" height="69">
+                <rect name="editorRow15" pos="0,-1065" width="568" height="69">
                   <rect name="editorCell165" pos="0,0" width="69" height="69">
                     <item_stack name="editorSlot165" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="165" cell_size="69" />
                   </rect>
@@ -892,8 +959,8 @@
                 </rect>
               </rect>
             </panel>
-            <button name="listTrack" pos="520,0" width="16" height="372" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" depth="20" on_press="true" on_hover="true" />
-            <button name="listThumb" pos="522,0" width="12" height="150" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" depth="50" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+            <button name="listTrack" pos="570,0" width="16" height="372" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" depth="20" on_press="true" on_hover="true" />
+            <button name="listThumb" pos="572,0" width="12" height="150" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" depth="50" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
           </rect>
           <simplebutton name="editorBagModify" pos="17,-272" width="228" height="32" caption_key="xuiRebirthVehicleItemModify" upper_case="true" font_size="22" defaultcolor="25,25,31,255" depth="10" bordercolor="240,240,244,255" visible="false" />
           <sprite name="editorModifyIcon" pos="31,-277" width="24" height="20" sprite="ui_game_symbol_assemble" depth="14" color="255,255,255,255" foregroundlayer="true" />

@@ -8,6 +8,10 @@ internal static class RebirthPurgeSupplyEquipment
     private static World owner;
     private static double next;
     private static readonly Dictionary<string, EntityPlayer> players = new Dictionary<string, EntityPlayer>(StringComparer.Ordinal);
+    internal static void Reset() { players.Clear(); owner = null; next = 0; }
+    internal static bool HasCachedWorld => owner != null;
+    internal static int CachedPlayerCount => players.Count;
+    internal static bool CacheMatchesCurrentWorld => owner != null && ReferenceEquals(owner, GameManager.Instance?.World);
 
     internal static int Tier(EntityPlayer player)
     {
@@ -32,7 +36,7 @@ internal static class RebirthPurgeSupplyEquipment
     {
         tier = 0;
         var world = GameManager.Instance?.World;
-        if (world == null || world.IsRemote()) return false;
+        if (world == null || world.IsRemote()) { Reset(); return false; }
         if (!ReferenceEquals(owner, world)) { owner = world; next = 0; players.Clear(); }
         if (Time.realtimeSinceStartup >= next)
         {

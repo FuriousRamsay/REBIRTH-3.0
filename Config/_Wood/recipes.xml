@@ -1,0 +1,6 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="FuriousRamsayWoodStick" count="30" craft_time="10" craft_area="WorkbenchCircularMachine001_FR" always_unlocked="true"><ingredient name="FuriousRamsayWoodLog" count="1" /></recipe>
+    <recipe name="FuriousRamsayWoodPlank" count="6" craft_time="10" craft_area="WorkbenchCircularMachine001_FR" always_unlocked="true"><ingredient name="FuriousRamsayWoodLog" count="1" /></recipe>
+  </append>
+</configs>

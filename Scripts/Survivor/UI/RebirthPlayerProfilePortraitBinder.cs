@@ -62,14 +62,17 @@ public sealed class RebirthPlayerProfilePortraitBinder
         if (!TryGetEntry(profileName, out entry))
         {
             if (!string.Equals(boundProfileName, profileName ?? string.Empty, StringComparison.OrdinalIgnoreCase) || view.Texture == null)
-            { view.Texture = null; view.IsVisible = false; }
-            else view.IsVisible = true;
+            {
+                if (!ReferenceEquals(view.Texture, null)) view.Texture = null;
+                if (view.IsVisible) view.IsVisible = false;
+            }
+            else if (!view.IsVisible) view.IsVisible = true;
             boundProfileName = profileName ?? string.Empty;
             return false;
         }
 
-        view.Texture = entry.Texture;
-        view.IsVisible = true;
+        if (!ReferenceEquals(view.Texture, entry.Texture)) view.Texture = entry.Texture;
+        if (!view.IsVisible) view.IsVisible = true;
         boundProfileName = profileName;
         return true;
     }
@@ -353,8 +356,8 @@ public sealed class RebirthPlayerProfilePortraitBinder
         XUiV_Texture view = GetView();
         if (view != null)
         {
-            view.Texture = null;
-            view.IsVisible = false;
+            if (!ReferenceEquals(view.Texture, null)) view.Texture = null;
+            if (view.IsVisible) view.IsVisible = false;
         }
         boundProfileName = string.Empty;
     }
@@ -515,7 +518,7 @@ public sealed class RebirthPlayerProfilePortraitBinder
     private void SetVisible(bool visible)
     {
         XUiV_Texture view = GetView();
-        if (view != null) view.IsVisible = visible;
+        if (view != null && view.IsVisible != visible) view.IsVisible = visible;
     }
 
     private static string GetCacheDirectory()

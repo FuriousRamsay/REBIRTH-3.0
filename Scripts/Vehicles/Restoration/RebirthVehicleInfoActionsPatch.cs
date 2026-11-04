@@ -2,12 +2,10 @@ using System;
 using System.Reflection;
 using HarmonyLib;
 
-// The shared ItemInfoWindow (itemInfoPanel) builds Drop/Scrap/Take/Wear/Modify entries from the selected stack
-// controller. In the vehicle restoration window the selected stack is either an editor-backpack cell or the hidden
-// read-only proxy that stands in for an installed part, and every vehicle transfer goes through the server-
-// authoritative custody protocol. The pane is therefore informational there: the action list is cleared right
-// after the native build (also on each dirty rebuild, because ItemInfoWindow.Update re-calls SetItemStack).
-// Same technique as RebirthHumanEquipmentInfoActionsPatch; it only fires for controllers under the vehicle window.
+// The floating native item-info pane remains informational in vehicle restoration.
+// Its action entries cannot operate on an installed-part proxy. The embedded
+// backpack action list may operate only on a physical player-backpack slot;
+// vehicle-part installation/removal still uses the authoritative transfer path.
 [HarmonyPatch]
 internal static class RebirthVehicleInfoActionsPatch
 {
@@ -32,6 +30,10 @@ internal static class RebirthVehicleInfoActionsPatch
         if(_actionListType!=XUiC_ItemActionList.ItemActionListTypes.Item)return;
         if(!(itemController is XUiC_RebirthEditorBackpackSlot)&&!(itemController is XUiC_RebirthReadonlyItemSlot))return;
         if(itemController.GetParentByType<XUiC_RebirthVehicleRestoration>()==null)return;
+        // The embedded backpack list acts on the player's real bag slot. Only a floating
+        // item-info pane or read-only vehicle-part proxy must lose native item actions.
+        if(itemController is XUiC_RebirthEditorBackpackSlot&&
+            __instance.GetParentByType<XUiC_RebirthEditorBackpack>()!=null)return;
         __instance.SetCraftingActionList(XUiC_ItemActionList.ItemActionListTypes.None,null);
     }
 }

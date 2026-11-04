@@ -21,12 +21,12 @@ class GameManager {public static GameManager Instance;public World World;public 
 class ConnectionManager {public bool IsServer=true;}
 class SingletonMonoBehaviour<T> {public static T Instance;}
 class ThreadManager {public static bool IsMainThread()=>true;}
-class GameIO {public static string GetSaveGameDir()=>"unused";}
+class GameIO {public static string GetSaveGameDir()=>"unused";public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>System.IO.Path.GetTempPath();}
 class Log {public static void Warning(string s){} }
 
 internal class RebirthPurgeObjectiveFrame {internal const int MaximumEligible=200000;}
 // Default option input double; native options/UI are not exercised.
-class RebirthSandboxOptionManager {internal static readonly Options Current=new Options();internal sealed class Options {internal int PurgeCompletionPercentage=0;}}
+class RebirthSandboxOptionManager {internal static readonly Options Current=new Options();internal sealed class Options {internal int PurgeCompletionPercentage=0;internal int PurgeProgression=0;}}
 static class Program
 {
     static int checks;static void Check(bool ok,string label){if(!ok)throw new Exception("FAIL "+label);checks++;Console.WriteLine("PASS "+label);}
@@ -50,3 +50,7 @@ static class Program
         Console.WriteLine("RESULT "+checks+" PASS; production tuning/quota arithmetic; no kill attribution or aircraft delivery claim.");
     }
 }
+
+namespace Platform { public enum UserDataStorageType { Local } }
+public enum EnumGamePrefs { GameSaveStorageType,GameWorld,GameName }
+public static class GamePrefs { public static int GetInt(EnumGamePrefs pref)=>0;public static string GetString(EnumGamePrefs pref)=>"unused"; }

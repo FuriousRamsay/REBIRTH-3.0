@@ -142,7 +142,7 @@ internal static partial class RebirthProductiveEarnedPendingToolGestures
     }
     private static void PumpJournalOwnerAfter()
     {
-        if(!RebirthProductiveEarnedCoordinator.Enabled||executing!=null)return;
+        if(!RebirthProductiveEarnedCoordinator.Enabled||executing!=null||observations.Count==0)return;
         foreach(var scope in observations.Values.ToArray())
         {
             if(scope.Journal==null||scope.OwnerAfter==null||scope.Unknown||!scope.Journal.NeedsOwnerAfter(scope.Steps)||

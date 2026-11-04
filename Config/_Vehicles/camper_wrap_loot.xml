@@ -1,0 +1,46 @@
+<configs>
+  <insertBefore xpath="/lootcontainers/lootgroup[@name='groupRollingToolbox02']">
+    <lootgroup name="RebirthWraps" count="1">
+      <item name="modVehicleWrapBobsSalvageRoute" count="1"/>
+      <item name="modVehicleWrapBobsTowService" count="1"/>
+      <item name="modVehicleWrapCrackABookBookmobile" count="1"/>
+      <item name="modVehicleWrapDeadZoneRunner" count="1"/>
+      <item name="modVehicleWrapHughsHeavySupply" count="1"/>
+      <item name="modVehicleWrapHughsWinterOutpost" count="1"/>
+      <item name="modVehicleWrapJensClinic" count="1"/>
+      <item name="modVehicleWrapJoelsFrontierFaith" count="1"/>
+      <item name="modVehicleWrapMidnightCartographer" count="1"/>
+      <item name="modVehicleWrapMoPowerServiceVan" count="1"/>
+      <item name="modVehicleWrapPassNGasRoadCrew" count="1"/>
+      <item name="modVehicleWrapPopNPillsHouseCall" count="1"/>
+      <item name="modVehicleWrapPoppysOddities" count="1"/>
+      <item name="modVehicleWrapRektsHarvestHauler" count="1"/>
+      <item name="modVehicleWrapRektsLastNerve" count="1"/>
+      <item name="modVehicleWrapSavageCountryOutfitter" count="1"/>
+      <item name="modVehicleWrapShamwaySupperRun" count="1"/>
+      <item name="modVehicleWrapShotgunMessiah" count="1"/>
+      <item name="modVehicleWrapTheHungryRoad" count="1"/>
+      <item name="modVehicleWrapWorkingStiffsToolRun" count="1"/>
+    <item name="modVehicleWrapBobsCopperheadGarage" count="1"/><item name="modVehicleWrapHughsBrassStandard" count="1"/><item name="modVehicleWrapJensNightShift" count="1"/><item name="modVehicleWrapJoelsDesertMission" count="1"/><item name="modVehicleWrapJoelsTradingCaravan" count="1"/><item name="modVehicleWrapRektsNoRefunds" count="1"/><item name="modVehicleWrapBoarandCorn" count="1"/><item name="modVehicleWrapBuzzsBarFly" count="1"/><item name="modVehicleWrapDishongExecutiveFleet" count="1"/><item name="modVehicleWrapFatHawaiianFeast" count="1"/><item name="modVehicleWrapHigashiResearchDivision" count="1"/><item name="modVehicleWrapNavezganeGeneralHospital" count="1"/><item name="modVehicleWrapBearDenLodge" count="1"/><item name="modVehicleWrapJoesUSAHauler" count="1"/><item name="modVehicleWrapNavezganeCorrections" count="1"/><item name="modVehicleWrapPetesPawnPatrol" count="1"/><item name="modVehicleWrapRedMesaDispatch" count="1"/><item name="modVehicleWrapZoesSalonCruiser" count="1"/><item name="modVehicleWrapNavezganeBankReserve" count="1"/><item name="modVehicleWrapOstrichHotelWanderer" count="1"/><item name="modVehicleWrapPoopyPantsPlayhouse" count="1"/><item name="modVehicleWrapProwlinPetesRescue" count="1"/><item name="modVehicleWrapTheLastSunsetMotel" count="1"/><item name="modVehicleWrapWashandGo" count="1"/>      <item name="modVehicleWrapNavezganeFireRescue" count="1"/>
+      <item name="modVehicleWrapNavezganePostalRoute" count="1"/>
+      <item name="modVehicleWrapNavezganeTransitHeritage" count="1"/>
+      <item name="modVehicleWrapShamwayMidnightSnack" count="1"/>
+      <item name="modVehicleWrapPassNGasHighOctane" count="1"/>
+      <item name="modVehicleWrapBloodMoonExpress" count="1"/>
+      <item name="modVehicleWrapViper" count="1"/>
+      <item name="modVehicleWrapNavezganeExplorer" count="1"/>
+      <item name="modVehicleWrapPineForestRefuge" count="1"/>
+      <item name="modVehicleWrapDesertScavenger" count="1"/>
+      <item name="modVehicleWrapSnowboundSurvivor" count="1"/>
+      <item name="modVehicleWrapBurntForestEmbers" count="1"/>
+      <item name="modVehicleWrapWastelandWanderer" count="1"/>
+</lootgroup>
+  </insertBefore>
+  <conditional>
+    <if cond="isoption('IsPurge', 'bool', 'true')">
+      <append xpath="/lootcontainers/lootgroup[@name='groupRollingToolbox02']">
+        <item group="RebirthWraps" count="1" loot_prob_template="low"/>
+      </append>
+    </if>
+  </conditional>
+</configs>

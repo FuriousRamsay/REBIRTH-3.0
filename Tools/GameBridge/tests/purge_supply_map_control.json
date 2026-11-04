@@ -1,0 +1,84 @@
+{
+  "name": "Approved supply-drop map control (prepared, NOT RUN)",
+  "stopOnFailure": true,
+  "preconditions": [
+    "Authorized profiler-launched disposable Purge save; map open and exactly three real owned active drop targets in distinct locations.",
+    "Inspect default/hover bounds, white icons and purple selection ring; four clicks must center1/2/3/1 with matching counter. Screenshots require visual review; their existence is not a visual pass.",
+    "Also check zero drops hides button, one drop1/1, removal refresh, map zoom/drag input under control and compact/wide resolutions."
+  ],
+  "steps": [
+    {
+      "screenshot": "supply-control-default"
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "id": "supplyCycleButton"
+        }
+      }
+    },
+    {
+      "screenshot": "supply-control-hover"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "supplyCycleButton"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "supply-cycle-1"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "supplyCycleButton"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "supply-cycle-2"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "supplyCycleButton"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "supply-cycle-3"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "supplyCycleButton"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "supply-cycle-4"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

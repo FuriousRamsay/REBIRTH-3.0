@@ -287,9 +287,19 @@ public static class RebirthDietFoodCatalogue
     {
         string raw = RebirthConsumableResolver.Get(item, "Tags", string.Empty);
         if (raw.Length == 0) return false;
-        string[] parts = raw.Split(',');
-        for (int i = 0; i < parts.Length; i++)
-            if (string.Equals((parts[i] ?? string.Empty).Trim(), wanted, StringComparison.OrdinalIgnoreCase)) return true;
+        int start = 0;
+        while (true)
+        {
+            int comma = raw.IndexOf(',', start);
+            int end = comma < 0 ? raw.Length : comma;
+            int tokenStart = start;
+            while (tokenStart < end && char.IsWhiteSpace(raw[tokenStart])) tokenStart++;
+            while (end > tokenStart && char.IsWhiteSpace(raw[end - 1])) end--;
+            if (wanted != null && end - tokenStart == wanted.Length &&
+                string.Compare(raw, tokenStart, wanted, 0, wanted.Length, StringComparison.OrdinalIgnoreCase) == 0) return true;
+            if (comma < 0) break;
+            start = comma + 1;
+        }
         return false;
     }
 }

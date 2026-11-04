@@ -88,13 +88,13 @@ internal sealed class RebirthCamperEnergyState
                 throw new InvalidDataException("Energy identity/mode invalid.");
             if(!Fraction(state.ConsumptionRemainder))throw new InvalidDataException("Native demand carry invalid.");
             int count=reader.ReadByte();if(count>12)throw new InvalidDataException("Too many installed sources.");
-            var ids=new HashSet<Guid>();var positions=new HashSet<int>();
+            var ids=new HashSet<Guid>();var positions=new HashSet<int>();string emptyFrame=null;
             for(int i=0;i<count;i++)
             {
                 Guid id=new Guid(reader.ReadBytes(16));int position=version>=2?reader.ReadByte():i;
                 if(position<0||position>=12||!positions.Add(position))throw new InvalidDataException("Energy source position invalid.");
-                var installed=ReadStacks(reader,1);
-                var components=ReadStacks(reader,6);
+                var installed=ReadStacks(reader,1,ref emptyFrame);
+                var components=ReadStacks(reader,6,ref emptyFrame);
                 if(id==Guid.Empty||!ids.Add(id)||installed.Length!=1||components.Length!=6||!TryCreateBank(installed[0],out var bank)
                     ||!ValidComponents(bank,components))throw new InvalidDataException("Native energy source invalid.");
                 bank.SetSlots(components);bank.CurrentPower=reader.ReadUInt16();bank.isOn=reader.ReadBoolean();ushort fuel=reader.ReadUInt16();
@@ -138,15 +138,16 @@ internal sealed class RebirthCamperEnergyState
             writer.Write(item.IsEmpty()?(emptyFrame??(emptyFrame=RebirthNativeItemCodec.Encode(ItemStack.Empty.itemValue))):RebirthNativeItemCodec.Encode(item.itemValue));
         }
     }
-    private static ItemStack[] ReadStacks(PooledBinaryReader reader,int expected)
+    private static ItemStack[] ReadStacks(PooledBinaryReader reader,int expected,ref string emptyFrame)
     {
         if(reader.ReadByte()!=expected)throw new InvalidDataException("Energy slot count invalid.");
-        var items=new ItemStack[expected];string empty=RebirthNativeItemCodec.Encode(ItemStack.Empty.itemValue);
+        var items=new ItemStack[expected];
+        if(emptyFrame==null)emptyFrame=RebirthNativeItemCodec.Encode(ItemStack.Empty.itemValue);
         for(int index=0;index<expected;index++)
         {
             int count=reader.ReadInt32();string frame=reader.ReadString();
             if(frame.Length>262144||count<0||count>1)throw new InvalidDataException("Bounded native item image required.");
-            if(count==0){if(frame!=empty)throw new InvalidDataException("Canonical empty required.");items[index]=ItemStack.Empty.Clone();}
+            if(count==0){if(frame!=emptyFrame)throw new InvalidDataException("Canonical empty required.");items[index]=ItemStack.Empty.Clone();}
             else {if(!RebirthNativeItemCodec.TryDecode(frame,out var value))throw new InvalidDataException("Full native image invalid.");items[index]=new ItemStack(value,count);}
         }
         return items;

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/items">
+    <item name="FuriousRamsayMeleeHandSeeker001">
+      <property name="Extends" value="meleeHandZombiePartyGirl" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="Class" value="Melee" />
+        <property name="DamageEntity" value="50" />
+        <property name="DamageBlock" value="100" />
+        <property name="Range" value="3.0" />
+        <property name="Block_range" value="3" />
+      </property>
+      <effect_group name="FuriousRamsayMeleeHandSeeker" tiered="false">
+        <passive_effect name="DamageModifier" operation="perc_add" value="100" tags="earth" />
+        <passive_effect name="ModSlots" operation="base_set" value="0" />
+        <passive_effect name="BuffProcChance" operation="base_set" value=".50" tags="buffInjuryBleedingTwo" />
+        <passive_effect name="BuffProcChance" operation="base_set" value=".40" tags="buffInfectionCatch" />
+        <passive_effect name="BuffProcChance" operation="base_set" value=".50" tags="buffInjuryStunned01" />
+      </effect_group>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker002">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="125" />
+      </property>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker003">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="150" />
+      </property>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker004">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="175" />
+      </property>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker005">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="200" />
+      </property>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker006">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="250" />
+      </property>
+    </item>
+    <item name="FuriousRamsayMeleeHandSeeker007">
+      <property name="Extends" value="FuriousRamsayMeleeHandSeeker001" />
+      <property name="CreativeMode" value="None" />
+      <property class="Action0">
+        <property name="DamageBlock" value="300" />
+      </property>
+    </item>
+    <item name="rebirthSeekerRoarSource">
+      <property name="Extends" value="thrownGrenadeContact" />
+      <property name="CreativeMode" value="None" />
+    </item>
+  </append>
+</configs>

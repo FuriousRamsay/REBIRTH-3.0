@@ -1,5 +1,6 @@
 <configs>
   <include filename="../_Turret/turret_xui.xml" />
+  <include filename="standalone_bank_xui.xml" />
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/xui/window_group[@name='trader']" name="controller">RebirthTraderWorkspace, RebirthUtils</setattribute>
@@ -321,6 +322,7 @@
       </append>
     </if>
   </conditional>
+  <conditional><if cond="character_progression('Rebirth')">
   <append xpath="/xui">
     <window_group name="workstation_WorkbenchToolbox001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
       <window name="rebirthBackpackSectionNavigationChrome" />
@@ -355,13 +357,15 @@
       <window name="rebirthStationRootBasic" />
     </window_group>
   </append>
+  </if></conditional>
   <append xpath="/xui">
     <window_group name="rebirthPurgeInformation" close_compass_on_open="true">
       <window name="rebirthPurgeInformationWindow" />
     </window_group>
   </append>
 <include filename="../_Vehicles/vehicle_editor_xui.xml" />
-<include filename="../_Recycling/xui.xml" />
+  <conditional><if cond="character_progression('Rebirth')"><include filename="../_Recycling/xui.xml" /></if></conditional>
   <include filename="companion_desk_xui.xml" />
   <include filename="../_Vehicles/vehicle_tuning_xui.xml" />
+  <include filename="../PlayerHelp/xui.xml" />
 </configs>

@@ -7,6 +7,8 @@ internal static class RebirthCamperWrapCatalog
     internal const string ItemPrefix = "modVehicleWrap";
     private static readonly HashSet<string> Ids = new HashSet<string>(StringComparer.Ordinal)
     {
+        "StallionsDen",
+        "Viper",
         "MissBanjo",
         "FuriousRamsay",
         "HeyWeps",
@@ -99,23 +101,12 @@ internal static class RebirthCamperWrapCatalog
         "DragonflyDrift",
         "StagofthePines",
         "ButterflyMigration",
-        "DragonsHoard",
-        "MoonlitWitch",
         "PaladinsOath",
-        "GoblinMarket",
-        "ForestDryad",
-        "NecromancersGrimoire",
-        "MermaidsWake",
-        "PhoenixReborn",
         "FrostboundRune",
-        "DeepSpaceCourier",
         "CyberRonin",
-        "LunarSurveyor",
-        "AlienBotanist",
         "RetroRocketClub",
         "MechBaySeven",
         "QuantumArcade",
-        "MarsRustRunner",
         "BlackHoleClub",
         "SunsetStripSeventy",
         "NeonEightyEight",
@@ -178,7 +169,6 @@ internal static class RebirthCamperWrapCatalog
         "PhotographyFieldTrip",
         "TabletopQuest",
         "HauntedHarvest",
-        "VampiresVelvet",
         "LovecraftianTide",
         "AbandonedCarnival",
         "GhostShipPassage",
@@ -198,10 +188,6 @@ internal static class RebirthCamperWrapCatalog
         "CobaltPorcelain",
         "PirateRadioRover",
         "WildWestShowdown",
-        "SteampunkDispatch",
-        "SuperheroDelivery",
-        "DinosaurSafari",
-        "UnderseaLaboratory",
         "MountainRescueOne",
         "TreelineFirewatch",
         "SolarpunkHomestead",
@@ -223,10 +209,10 @@ internal static class RebirthCamperWrapCatalog
         foreach (string id in Ids) values.Add(ItemPrefix + id, id);
         return values;
     }
-    internal static bool Contains(string id) => id != null && Ids.Contains(id);
+    internal static bool Contains(string id) => id != null && (Ids.Contains(id) || RebirthCamperWrapComparison.Contains(id));
     internal static string FromItem(string name)
     {
         string id;
-        return name != null && Items.TryGetValue(name, out id) ? id : null;
+        return name != null && Items.TryGetValue(name, out id) ? id : RebirthCamperWrapComparison.FromItem(name);
     }
 }

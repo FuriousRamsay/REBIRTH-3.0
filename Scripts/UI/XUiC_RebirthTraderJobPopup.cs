@@ -195,11 +195,15 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (width < 240 || height < 260) { Hide(); return; }
         Resize(ViewComponent,width,height); Resize(background,width,height); Resize(frame,width,height);
         if (cardView?.UiTransform != null)
-            cardView.UiTransform.localScale = Vector3.one * (width / 294f);
+        {
+            var scale = Vector3.one * (width / 294f);
+            if (cardView.UiTransform.localScale != scale) cardView.UiTransform.localScale = scale;
+        }
         Place(accept.ViewComponent,8,-height+44,width-16,36);
         if (acceptLabel != null) Place(acceptLabel,(width-16)/2,-18,width-24,30);
         RefreshBindings();
-        if (sourceArrow != null && previewArrow != null) previewArrow.Rotation = sourceArrow.Rotation;
+        if (sourceArrow != null && previewArrow != null && previewArrow.Rotation != sourceArrow.Rotation)
+            previewArrow.Rotation = sourceArrow.Rotation;
         var point = parent.UiTransform.InverseTransformPoint(source.ViewComponent.UiTransform.position);
         var position = new Vector2i((int)Mathf.Clamp(point.x-(width-source.ViewComponent.Size.x)/2f,minX,maxX-width),
             (int)Mathf.Clamp(point.y+16,minY+height,maxY));

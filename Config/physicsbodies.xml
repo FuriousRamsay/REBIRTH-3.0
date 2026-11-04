@@ -137,4 +137,5 @@
 		</append>
   <!-- Unfinished Entity Studio diagnostic compound shapes. -->
   <include filename="_EntityStudio/farmer_diagnostic_physicsbodies.xml"/>
+  <include filename="_Seeker/physicsbodies.xml"/>
 </configs>

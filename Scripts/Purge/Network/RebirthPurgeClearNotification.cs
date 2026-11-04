@@ -75,16 +75,30 @@ internal static class RebirthPurgeClearNotification
         string message=string.IsNullOrEmpty(contributor)
             ? string.Format(Localization.Get("xuiRebirthPurgePoiCleared"),Localization.Get(prefab),count,Localization.Get("biome_"+biome))
             : string.Format(Localization.Get("xuiRebirthPurgePoiClearedBy"),contributor,Localization.Get(prefab),count,Localization.Get("biome_"+biome));
-        if(string.IsNullOrEmpty(contributor))GameManager.ShowTooltip(player,message);
+        if(string.IsNullOrEmpty(contributor))
+        {
+            GameManager.ShowTooltip(player,message);
+#if PURGE_QUALIFICATION
+            RebirthPurgeFeedbackTrace.Record("clear-tooltip",prefab,biome,message);
+#endif
+        }
         else
         {
             // Every page repeats the POI/context and complete color tags, so
             // pagination cannot leave a player's name clipped or miscolored.
             foreach(string page in XUiC_RebirthMessagePopup.ClearNoticePages(contributor,names=>
                 string.Format(Localization.Get("xuiRebirthPurgePoiClearedBy"),names,Localization.Get(prefab),count,Localization.Get("biome_"+biome))))
+            {
                 GameManager.ShowTooltip(player,page);
+#if PURGE_QUALIFICATION
+                RebirthPurgeFeedbackTrace.Record("clear-tooltip",prefab,biome,page);
+#endif
+            }
         }
         Audio.Manager.PlayInsidePlayerHead("purge_discovered");
+#if PURGE_QUALIFICATION
+        RebirthPurgeFeedbackTrace.Record("clear-audio",prefab,biome,"purge_discovered");
+#endif
     }
 }
 [Preserve]

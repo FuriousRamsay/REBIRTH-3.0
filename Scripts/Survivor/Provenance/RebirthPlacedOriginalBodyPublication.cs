@@ -19,7 +19,7 @@ internal static class RebirthPlacedOriginalBodyPublication
     }
     private static readonly Dictionary<Guid,Entry> active=new Dictionary<Guid,Entry>();private static World scope;private static string directory;private static bool installed;
     private static string Hash(byte[] bytes){using(var hash=SHA256.Create())return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();}
-    private static string Image(Entry e){var xml=XElement.Parse(BareImage(e));xml.SetAttributeValue("checksum",Hash(Encoding.UTF8.GetBytes(BareImage(e))));return xml.ToString(SaveOptions.DisableFormatting);}
+    private static string Image(Entry e){var bare=BareImage(e);var xml=XElement.Parse(bare);xml.SetAttributeValue("checksum",Hash(Encoding.UTF8.GetBytes(bare)));return xml.ToString(SaveOptions.DisableFormatting);}
     private static string BareImage(Entry e)=>new XElement("placedBodyPublication",new XAttribute("version",1),new XAttribute("operation",e.Operation.ToString("N")),new XAttribute("world",e.World),new XAttribute("owner",e.Owner),new XAttribute("creation",e.Creation),new XAttribute("binding",e.Binding),new XAttribute("deaths",e.Deaths),new XAttribute("nativeOwner",e.NativeOwner),new XAttribute("entity",e.Entity),new XAttribute("class",e.Class),new XAttribute("ambiguous",e.Ambiguous),new XAttribute("proof",e.Proof),new XElement("request",e.Request),new XElement("initial",e.Initial)).ToString(SaveOptions.DisableFormatting);
     private static string PathFor(Guid op)=>Path.Combine(GameIO.GetSaveGameDir(),"rebirth","placed-original","native-bodies",op.ToString("N")+".xml");
     private static EntityCreationData Ecd(string image)
@@ -152,7 +152,7 @@ internal static class RebirthPlacedOriginalBodyPublication
     }
     internal static void Tick(World world)
     {
-        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false)return;Scope(world);foreach(var old in active.Values.Where(value=>value.Proof.Length!=0&&RebirthPlacedOriginalDeathPartition.HasSavedBodySource(world,value.Operation,value.Request)||value.Ambiguous||value.Body==null||!ReferenceEquals(world.GetEntity(value.Entity),value.Body)).ToArray()){if(old.Proof.Length!=0)RetireMarker(old);old.Watch?.Dispose();active.Remove(old.Operation);}foreach(var e in active.Values.Take(128).ToArray())
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false)return;Scope(world);if(active.Count==0)return;foreach(var old in active.Values.Where(value=>value.Proof.Length!=0&&RebirthPlacedOriginalDeathPartition.HasSavedBodySource(world,value.Operation,value.Request)||value.Ambiguous||value.Body==null||!ReferenceEquals(world.GetEntity(value.Entity),value.Body)).ToArray()){if(old.Proof.Length!=0)RetireMarker(old);old.Watch?.Dispose();active.Remove(old.Operation);}foreach(var e in active.Values.Take(128).ToArray())
         {
             try
             {

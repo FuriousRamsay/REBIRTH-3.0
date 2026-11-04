@@ -65,8 +65,12 @@ internal static class RebirthCamperRearLights
                 :RebirthCamperLampIntensity.PickupRed(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn);
             if(!lamp.Lens.gameObject.activeInHierarchy)value=0;
             lamp.Lens.GetPropertyBlock(lamp.Block);
-            lamp.Block.SetColor(Emission,(lamp.Reverse?Color.white:Color.red)*value);
-            lamp.Lens.SetPropertyBlock(lamp.Block);
+            Color emission=(lamp.Reverse?Color.white:Color.red)*value;
+            if(!lamp.Block.HasColor(Emission)||!lamp.Block.GetColor(Emission).Equals(emission))
+            {
+                lamp.Block.SetColor(Emission,emission);
+                lamp.Lens.SetPropertyBlock(lamp.Block);
+            }
             if(lamp.Light!=null)
             {
                 lamp.Light.range=lamp.Reverse?RebirthCamperLampIntensity.ReverseBeamRange:4f;

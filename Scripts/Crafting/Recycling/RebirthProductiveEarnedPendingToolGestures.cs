@@ -88,7 +88,7 @@ internal static partial class RebirthProductiveEarnedPendingToolGestures
     internal static void Pump()
     {
         if(!ThreadManager.IsMainThread()||executing!=null)return;
-        foreach(var value in observations.Values.ToArray())
+        if(observations.Count>0)foreach(var value in observations.Values.ToArray())
             if(!RebirthProductiveEarnedCoordinator.Enabled||!value.WindowCurrent()||value.Source?.RetainedContext()!=true)value.Dispose();
         PumpOwnerBefore();
         PumpJournalOwnerAfter();

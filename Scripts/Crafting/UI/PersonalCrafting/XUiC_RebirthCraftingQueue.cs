@@ -404,7 +404,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
             SetVisible(entry, intersectsViewport);
         }
 
-        for (int i = 0; i < entries.Length; i++)
+        for (int i = capacity; i < entries.Length; i++)
         {
             XUiC_RebirthCraftingQueueEntry entry = entries[i];
             if (entry == null || entry.ViewComponent == null || entry.HasRecipeForPresentation)

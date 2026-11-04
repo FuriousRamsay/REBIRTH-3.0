@@ -113,12 +113,14 @@ public sealed class XUiC_RebirthCookingFuelSlot : XUiC_ItemStack
             bool empty=ItemStack==null||ItemStack.IsEmpty();
             // The sibling SlotPreview renders below the native cell fill.
             // Put the placeholder in the cell's own icon layer instead.
-            itemIconSprite.UIAtlas=empty?"ItemIconAtlasGreyscale":"ItemIconAtlas";
+            string atlas=empty?"ItemIconAtlasGreyscale":"ItemIconAtlas";
+            if(itemIconSprite.UIAtlas!=atlas)itemIconSprite.UIAtlas=atlas;
             if(empty)
             {
-                itemIconSprite.SpriteName="resourceWood";
-                itemIconSprite.Color=new Color32(155,155,164,150);
-                itemIconSprite.IsVisible=true;
+                if(itemIconSprite.SpriteName!="resourceWood")itemIconSprite.SpriteName="resourceWood";
+                Color placeholder=new Color32(155,155,164,150);
+                if(itemIconSprite.Color!=placeholder)itemIconSprite.Color=placeholder;
+                if(!itemIconSprite.IsVisible)itemIconSprite.IsVisible=true;
             }
         }
         RebirthCookingDiagnostics.Section("fuel slots",profile);

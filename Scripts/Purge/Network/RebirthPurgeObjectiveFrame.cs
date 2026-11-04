@@ -79,7 +79,8 @@ internal sealed class RebirthPurgeObjectiveFrame
         frame=null;if(bytes==null || bytes.Length<79 || bytes.Length>MaximumBytes)return false;
         try
         {
-            using(var stream=new MemoryStream((byte[])bytes.Clone(),false))using(var reader=new BinaryReader(stream,new UTF8Encoding(false,true),true))
+            var utf8=new UTF8Encoding(false,true);
+            using(var stream=new MemoryStream((byte[])bytes.Clone(),false))using(var reader=new BinaryReader(stream,utf8,true))
             {
                 int version=reader.ReadInt32();if(version!=0x504f4232&&version!=0x504f4233&&version!=0x504f4234&&version!=0x504f4235)return false;
                 var request=new Guid(reader.ReadBytes(16));var world=new Guid(reader.ReadBytes(16));var session=new Guid(reader.ReadBytes(16));
@@ -88,7 +89,7 @@ internal sealed class RebirthPurgeObjectiveFrame
                 for(int n=0;n<count;n++)
                 {
                     int length=reader.ReadUInt16();if(length<1 || length>512 || length>stream.Length-stream.Position)return false;
-                    string name=new UTF8Encoding(false,true).GetString(reader.ReadBytes(length));int eligible=reader.ReadInt32(),discovered=reader.ReadInt32(),cleared=reader.ReadInt32();
+                    string name=utf8.GetString(reader.ReadBytes(length));int eligible=reader.ReadInt32(),discovered=reader.ReadInt32(),cleared=reader.ReadInt32();
                     int tiers=reader.ReadUInt16();if(tiers>256)return false;var totals=new Dictionary<int,int>();var completed=new Dictionary<int,int>();
                     for(int t=0;t<tiers;t++) { int tier=reader.ReadByte(),total=reader.ReadInt32(),done=reader.ReadInt32();totals.Add(tier,total);if(done<0)return false;if(done>0)completed.Add(tier,done); }
                     biomes.Add(new Biome(name,eligible,discovered,cleared,totals,completed));

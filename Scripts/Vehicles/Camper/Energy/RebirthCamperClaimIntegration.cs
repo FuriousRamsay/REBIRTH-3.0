@@ -38,7 +38,7 @@ public static class RebirthCamperClaimIntegration
     }
     public static bool Contains(EntityVehicle vehicle,Vector3i position)
     {
-        if(!ThreadManager.IsMainThread()||vehicle?.world==null||
+        if(!ThreadManager.IsMainThread()||!RebirthCamperRadial.IsCamper(vehicle)||vehicle.world==null||
             !RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out float range)||mode!=RebirthCamperEnergyMode.Camp)return false;
         if(vehicle.world.IsRemote()&&!RebirthCamperClaimProjection.TryRange(vehicle,out range))return false;
         // Most POI lamps are outside the mobile claim. Reject those before
@@ -71,7 +71,12 @@ public static class RebirthCamperClaimIntegration
     }
     internal static PersistentPlayerData OwnerAt(World world,Vector3i position)
     {
-        if(Resolve(world,position,null)==EnumLandClaimOwner.None)return null;
+        // Resolve would traverse every loaded entity and this method would
+        // immediately traverse them again to recover the owner. Apply the same
+        // claim admission guards here and keep the single ambiguity-aware pass.
+        if(nativeOnly!=0||Scope==RebirthCamperClaimScope.Unconfigured||!ThreadManager.IsMainThread()||
+            !ReferenceEquals(GameManager.Instance?.World,world)||world.IsWithinTraderArea(position)||GameStats.GetInt(EnumGameStats.GameModeId)!=1)
+            return null;
         PersistentPlayerData chosen=null;
         foreach(var entity in world.Entities.list)
         {

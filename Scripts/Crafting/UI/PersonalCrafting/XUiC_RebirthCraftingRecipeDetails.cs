@@ -28,6 +28,10 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private XUiV_Label timeTitleLabel;
     private XUiV_Label timeValueLabel;
     private XUiV_Label emptyLabel;
+    private XUiV_Sprite requiredToolIcon;
+    private XUiV_Label requiredToolLabel;
+    private XUiV_Sprite requiredFuelIcon;
+    private XUiV_Label requiredFuelLabel;
 
     private Recipe selectedRecipe;
     private int selectedCraftingTier = 1;
@@ -64,6 +68,10 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         timeTitleLabel = GetView<XUiV_Label>("rebirthCraftingSelectedRecipeTimeTitle");
         timeValueLabel = GetView<XUiV_Label>("rebirthCraftingSelectedRecipeTimeValue");
         emptyLabel = GetView<XUiV_Label>("rebirthCraftingSelectedRecipeEmpty");
+        requiredToolIcon = GetView<XUiV_Sprite>("recipeRequiredToolIcon");
+        requiredToolLabel = GetView<XUiV_Label>("recipeRequiredToolText");
+        requiredFuelIcon = GetView<XUiV_Sprite>("recipeRequiredFuelIcon");
+        requiredFuelLabel = GetView<XUiV_Label>("recipeRequiredFuelText");
 
         if (catalogue != null) catalogue.RebirthSelectionChanged += Catalogue_SelectionChanged;
         if (craftCount != null) craftCount.OnCountChanged += CraftCount_OnCountChanged;
@@ -280,8 +288,8 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         var fuel=requirementFuel;
         bool missingTool=tool!=null&&!(grid?.HasRequirement(selectedRecipe)??false);
         bool missingFuel=selectedRecipe!=null&&fuel?.WorkstationData!=null&&!fuel.HasRequirement(selectedRecipe);
-        var icon=GetChildById("recipeRequiredToolIcon")?.ViewComponent as XUiV_Sprite;
-        var label=GetChildById("recipeRequiredToolText")?.ViewComponent as XUiV_Label;
+        var icon=requiredToolIcon;
+        var label=requiredToolLabel;
         if(icon!=null)
         {
             icon.IsVisible=missingTool;
@@ -293,8 +301,8 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
             if(missingTool)label.Text=Localization.Get("xuiTools")+": "+tool.GetLocalizedItemName();
             label.Color=new Color32(255,120,120,255);
         }
-        var fuelIcon=GetChildById("recipeRequiredFuelIcon")?.ViewComponent as XUiV_Sprite;
-        var fuelLabel=GetChildById("recipeRequiredFuelText")?.ViewComponent as XUiV_Label;
+        var fuelIcon=requiredFuelIcon;
+        var fuelLabel=requiredFuelLabel;
         int fuelY=-244;
         // Reserve the warning rows below the scrollable unlock list, including when
         // tools and fuel are both missing. Neither warning may cover an unlock entry.
@@ -378,10 +386,10 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private void ClearVisuals()
     {
         GetChildById("rebirthRecipeQuality").ViewComponent.IsVisible = false;
-        if(GetChildById("recipeRequiredFuelIcon")?.ViewComponent is XUiView fi)fi.IsVisible=false;
-        if(GetChildById("recipeRequiredFuelText")?.ViewComponent is XUiView ft)ft.IsVisible=false;
-        if(GetChildById("recipeRequiredToolIcon")?.ViewComponent is XUiView ti)ti.IsVisible=false;
-        if(GetChildById("recipeRequiredToolText")?.ViewComponent is XUiView tt)tt.IsVisible=false;
+        if(requiredFuelIcon!=null)requiredFuelIcon.IsVisible=false;
+        if(requiredFuelLabel!=null)requiredFuelLabel.IsVisible=false;
+        if(requiredToolIcon!=null)requiredToolIcon.IsVisible=false;
+        if(requiredToolLabel!=null)requiredToolLabel.IsVisible=false;
         if (outputIcon != null) outputIcon.IsVisible = false;
         if (nameLabel != null) nameLabel.Text = string.Empty;
         if (typeLabel != null) typeLabel.Text = string.Empty;

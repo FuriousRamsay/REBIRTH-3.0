@@ -34,7 +34,8 @@ internal sealed class RebirthCamperTurretLaser
     {
         if(!root)return;
         Restore();
-        root.SetActive(visible);if(!visible)return;
+        if(root.activeSelf!=visible)root.SetActive(visible);
+        if(!visible)return;
         var origin=muzzle.position-muzzle.up*.025f;
         bool hit=Voxel.Raycast(world,new Ray(origin+Origin.position,muzzle.forward),range,-538750989,8,0);
         float distance=hit?Mathf.Clamp(Mathf.Sqrt(Voxel.voxelRayHitInfo.hit.distanceSq),0,range):range;

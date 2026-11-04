@@ -54,6 +54,8 @@ public static class RebirthCraftingRequirementProjectionService
         EntityPlayerLocal localPlayer = xui.playerUI.entityPlayer;
         int batches = Math.Max(1, craftCount);
         List<ItemStack> allStacks = xui.PlayerInventory.GetAllItemStacks();
+        IList<RemoteResourceSourceContribution> sources = null;
+        bool sourcesResolved = false;
 
         for (int i = 0; i < recipe.ingredients.Count; i++)
         {
@@ -86,7 +88,8 @@ public static class RebirthCraftingRequirementProjectionService
                 projection.Need = combined > int.MaxValue ? int.MaxValue : (int)combined;
                 projection.Have = have;
                 projection.HasEnough = projection.Have >= projection.Need;
-                projection.SourceBreakdown = BuildSourceBreakdown(xui, localPlayer, projection);
+                if (!sourcesResolved) { sources = GetRemoteSources(localPlayer); sourcesResolved = true; }
+                projection.SourceBreakdown = BuildSourceBreakdown(xui, localPlayer, projection, sources);
                 continue;
             }
 
@@ -102,7 +105,8 @@ public static class RebirthCraftingRequirementProjectionService
                 HasEnough = have >= need,
                 QualityIngredient = qualityIngredient
             };
-            projection.SourceBreakdown = BuildSourceBreakdown(xui, localPlayer, projection);
+            if (!sourcesResolved) { sources = GetRemoteSources(localPlayer); sourcesResolved = true; }
+            projection.SourceBreakdown = BuildSourceBreakdown(xui, localPlayer, projection, sources);
             result.Add(projection);
         }
 
@@ -131,7 +135,8 @@ public static class RebirthCraftingRequirementProjectionService
         return (int)count;
     }
 
-    private static string BuildSourceBreakdown(XUi xui, EntityPlayerLocal player, Requirement requirement)
+    private static string BuildSourceBreakdown(XUi xui, EntityPlayerLocal player, Requirement requirement,
+        IList<RemoteResourceSourceContribution> sources)
     {
         if (xui == null || xui.PlayerInventory == null || player == null ||
             requirement == null || requirement.ItemValue == null)
@@ -141,8 +146,6 @@ public static class RebirthCraftingRequirementProjectionService
         string itemName = string.IsNullOrWhiteSpace(requirement.Name) ? Localize("xuiRebirthRequiredMaterial", "Required material") : requirement.Name;
         int backpack = xui.PlayerInventory.Backpack.GetItemCount(itemValue);
         int toolbelt = xui.PlayerInventory.Toolbelt.GetItemCount(itemValue);
-        IList<RemoteResourceSourceContribution> sources = GetRemoteSources(player);
-
         StringBuilder builder = new StringBuilder(256);
         builder.Append("[u]").Append(itemName).Append(" ")
             .Append(Localize("xuiRebirthSourceStockTotals", "Total source stock")).Append(":[/u]");

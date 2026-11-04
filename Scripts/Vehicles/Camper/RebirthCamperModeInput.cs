@@ -40,9 +40,9 @@ internal static class RebirthCamperModeInput
         if (!ThreadManager.IsMainThread() || !RebirthCamperEnergyAccess.Registered || vehicle?.world == null
             || player == null || player.IsDead() || player.AttachedToEntity != null || vehicle.IsDead()
             || !ReferenceEquals(GameManager.Instance?.World, vehicle.world) || !ReferenceEquals(player.world, vehicle.world)
+            || !RebirthCamperRadial.IsCamper(vehicle) || (player.position - vehicle.position).sqrMagnitude > 64f
             || !ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId), vehicle)
-            || !ReferenceEquals(vehicle.world.GetEntity(player.entityId), player) || !RebirthCamperRadial.IsCamper(vehicle)
-            || (player.position - vehicle.position).sqrMagnitude > 64f
+            || !ReferenceEquals(vehicle.world.GetEntity(player.entityId), player)
             || RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle) >= 0
             || !RebirthCamperEnergyRuntime.TryObservePresentation(vehicle, out _, out _, out _, out _)) return false;
         var owner = vehicle.GetOwner();

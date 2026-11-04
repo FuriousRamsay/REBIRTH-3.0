@@ -1,0 +1,56 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="modVehicleWrapNavezganeExplorerCompare100" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
+      <property name="DescriptionKey" value="modVehicleWrapNavezganeExplorerCompare100Desc" />
+      <property name="CustomIcon" value="modVehicleWrapNavezganeExplorer" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="0" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="NavezganeExplorerCompare100" />
+      <property name="SellableToTrader" value="false" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapNavezganeExplorerCompare75" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
+      <property name="DescriptionKey" value="modVehicleWrapNavezganeExplorerCompare75Desc" />
+      <property name="CustomIcon" value="modVehicleWrapNavezganeExplorer" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="0" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="NavezganeExplorerCompare75" />
+      <property name="SellableToTrader" value="false" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapNavezganeExplorerCompare50" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
+      <property name="DescriptionKey" value="modVehicleWrapNavezganeExplorerCompare50Desc" />
+      <property name="CustomIcon" value="modVehicleWrapNavezganeExplorer" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="0" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="NavezganeExplorerCompare50" />
+      <property name="SellableToTrader" value="false" />
+    </item_modifier>
+    <item_modifier name="modVehicleWrapNavezganeExplorerCompare35" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CreativeMode" value="Player" />
+      <property name="DescriptionKey" value="modVehicleWrapNavezganeExplorerCompare35Desc" />
+      <property name="CustomIcon" value="modVehicleWrapNavezganeExplorer" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <property name="EconomicValue" value="0" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+      <property name="RebirthCamperWrapId" value="NavezganeExplorerCompare35" />
+      <property name="SellableToTrader" value="false" />
+    </item_modifier>
+  </append>
+</configs>

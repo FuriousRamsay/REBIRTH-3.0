@@ -1,4 +1,4 @@
-param([ValidateSet('blocks','recipes','items','item_modifiers','loot','traders')][string]$Kind='recipes',[bool]$Rebirth=$true,[bool]$RequireTimedReading=$true)
+param([ValidateSet('blocks','recipes','items','item_modifiers','loot','traders')][string]$Kind='recipes',[bool]$Rebirth=$true,[bool]$RequireTimedReading=$true,[string]$OutputDirectory='')
 $ErrorActionPreference='Stop'
 $root=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $config=Join-Path $root 'Config'
@@ -38,7 +38,8 @@ function ApplyChildren($parent,$file){
  }
 }
 $patch=[xml](Get-Content "$config/$Kind.xml" -Raw);ApplyChildren $patch.DocumentElement "$config/$Kind.xml"
-$out=Join-Path $root '_Documentation/CraftingAudit_20261010'
+$out=if([string]::IsNullOrWhiteSpace($OutputDirectory)){Join-Path $root '_Documentation/CraftingAudit_20261010'}else{$OutputDirectory}
+if(!(Test-Path -LiteralPath $out)){New-Item -ItemType Directory -Path $out -Force|Out-Null}
 $mode=if($Rebirth){'rebirth'}else{'base'}
 $doc.Save("$out/EFFECTIVE_$($Kind)_$mode.xml")
 $events|Export-Csv "$out/PATCH_TRACE_$($Kind)_$mode.csv" -NoTypeInformation

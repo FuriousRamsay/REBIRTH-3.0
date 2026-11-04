@@ -30,7 +30,6 @@ public static class AdvancedFarmingTemperatureService
     // invalidation path was missed. Thermal searches are cheap in the profiler now, so prefer
     // coherence over the previous 120+60s cache lifetime.
     private const int ThermalExposureCacheSeconds = 15;
-    private const int ThermalExposureCacheJitterSeconds = 0;
     private const int MaxThermalExposureCacheEntries = 4096;
     private const int ThermalSearchMemoCells = (ThermalSearchHorizontalRadius * 2 + 1) * (ThermalSearchUp + ThermalSearchDown + 1) * (ThermalSearchHorizontalRadius * 2 + 1);
 
@@ -283,22 +282,22 @@ public static class AdvancedFarmingTemperatureService
 
     private static CachedThermalExposure EvaluateThermalExposure(WorldBase world, Vector3i plantPos)
     {
-        CachedThermalExposure fallback = new CachedThermalExposure
-        {
-            Pos = plantPos,
-            WorldSeconds = RebirthUtilities.TotalGameSecondsPassed(),
-            PolicyVersion = AdvancedFarmingRuntimePolicy.PolicyVersion,
-            Complete = false,
-            OpenToExterior = true,
-            Mode = "bypass",
-            ExitPos = plantPos,
-            BlockingPos = Vector3i.zero,
-            BlockingBlock = string.Empty,
-            NodesVisited = 0
-        };
-
         if (world == null)
-            return fallback;
+        {
+            return new CachedThermalExposure
+            {
+                Pos = plantPos,
+                WorldSeconds = RebirthUtilities.TotalGameSecondsPassed(),
+                PolicyVersion = AdvancedFarmingRuntimePolicy.PolicyVersion,
+                Complete = false,
+                OpenToExterior = true,
+                Mode = "bypass",
+                ExitPos = plantPos,
+                BlockingPos = Vector3i.zero,
+                BlockingBlock = string.Empty,
+                NodesVisited = 0
+            };
+        }
 
         int now = RebirthUtilities.TotalGameSecondsPassed();
         int policyVersion = AdvancedFarmingRuntimePolicy.PolicyVersion;
@@ -306,7 +305,7 @@ public static class AdvancedFarmingTemperatureService
         int cachedAge = 0;
         if (s_thermalExposureCache.TryGetValue(key, out CachedThermalExposure cached)
             && (cachedAge = now - cached.WorldSeconds) >= 0
-            && cachedAge <= GetThermalExposureCacheLifetimeSeconds(cached.Pos)
+            && cachedAge <= ThermalExposureCacheSeconds
             && cached.PolicyVersion == policyVersion)
         {
             AdvancedFarmingPerfSnapshotService.RecordThermalExposureCacheQuery(true);
@@ -340,7 +339,7 @@ public static class AdvancedFarmingTemperatureService
         s_thermalCacheRemovalScratch.Clear();
         foreach (KeyValuePair<long, CachedThermalExposure> pair in s_thermalExposureCache)
         {
-            if (now - pair.Value.WorldSeconds > GetThermalExposureCacheLifetimeSeconds(pair.Value.Pos))
+            if (now - pair.Value.WorldSeconds > ThermalExposureCacheSeconds)
                 s_thermalCacheRemovalScratch.Add(pair.Key);
         }
 
@@ -352,32 +351,6 @@ public static class AdvancedFarmingTemperatureService
             s_thermalExposureCache.Clear();
     }
 
-
-    private static int GetThermalExposureCacheLifetimeSeconds(Vector3i pos)
-    {
-        return ThermalExposureCacheSeconds + PositiveModulo(HashPosition(pos) ^ 0x2f17c3, ThermalExposureCacheJitterSeconds);
-    }
-
-    private static int PositiveModulo(int value, int divisor)
-    {
-        if (divisor <= 0)
-            return 0;
-
-        int result = value % divisor;
-        return result < 0 ? result + divisor : result;
-    }
-
-    private static int HashPosition(Vector3i pos)
-    {
-        unchecked
-        {
-            int hash = 216613626;
-            hash = (hash ^ pos.x) * 16777619;
-            hash = (hash ^ pos.y) * 16777619;
-            hash = (hash ^ pos.z) * 16777619;
-            return hash;
-        }
-    }
 
     private static CachedThermalExposure SearchThermalOpeningToExterior(WorldBase world, Vector3i plantPos)
     {

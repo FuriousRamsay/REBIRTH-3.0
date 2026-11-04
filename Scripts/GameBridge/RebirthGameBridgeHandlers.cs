@@ -17,6 +17,7 @@ public static partial class RebirthGameBridgeHandlers
         "GET  /state?sections=player,stats,buffs,cvars,inventory,equipment,skills,world,ui,consumption",
         "POST /frames?action=start|stop  GET /frames   bounded game-frame timing for profiler sessions",
         "GET  /gearobserve                            read-only exact owner custody, cursor, locks, offer and terminal",
+        "GET  /purgelifecycle                         read-only cache/world lifecycle, including at the main menu",
         "GET  /camperturrets?entity=ID[&seconds=0..10]  read-only turret state/poses/consumption and LOD inventory; bounded10Hz capture",
         "GET  /energy?entity=ID[&limit=256]             read-only existing Energy sources, native devices/wiring/baselines; no state creation",
         "POST /console?cmd=...  (or body: one command per line)   run console commands; returns output + log lines they produced",
@@ -73,6 +74,7 @@ public static partial class RebirthGameBridgeHandlers
             case "/help": req.Complete(new JObject { ["endpoints"] = new JArray(HelpLines) }); return;
             case "/gearfixture": RebirthGameBridgeGearFixture.Setup(req); return;
             case "/gearobserve": RebirthGameBridgeGearObservation.Handle(req); return;
+            case "/purgelifecycle": ConsoleCmdRebirthPurgeObservation.HandleLifecycle(req); return;
             case "/camperturrets": RebirthGameBridgeCamperTurretObservation.Handle(req); return;
             case "/energy": RebirthGameBridgeEnergyObservation.Handle(req); return;
             case "/radial": RebirthGameBridgeRadialObservation.Handle(req); return;

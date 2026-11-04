@@ -16,6 +16,7 @@ public static class RebirthCamperStationPublicationWatch
         internal bool Releasing,ReleaseWarning;
     }
     private static readonly Dictionary<string,Entry> entries=new Dictionary<string,Entry>(StringComparer.Ordinal);
+    private static readonly List<string> jobKeys=new List<string>();
     private static bool installed;
     private static float next;
     public static void Install()
@@ -91,8 +92,8 @@ public static class RebirthCamperStationPublicationWatch
         if(!ThreadManager.IsMainThread()||entries.Count==0)return;
         float now=UnityEngine.Time.realtimeSinceStartup;
         if(now<next)return;next=now+.25f;
-        var jobs=new List<string>(entries.Keys);
-        foreach(var job in jobs)
+        jobKeys.Clear();jobKeys.AddRange(entries.Keys);
+        foreach(var job in jobKeys)
         {
             if(!entries.TryGetValue(job,out var entry))continue;
             if(entry.Releasing){Release(job,entry);continue;}
@@ -126,6 +127,7 @@ public static class RebirthCamperStationPublicationWatch
             }
             if(completed)Release(job,entry);
         }
+        jobKeys.Clear();
     }
     private static void Release(string job,Entry entry)
     {

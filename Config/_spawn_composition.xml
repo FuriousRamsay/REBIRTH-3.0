@@ -25,7 +25,7 @@
   </categories>
 
   <entities>
-    <!-- Complete base 3.0 b259 managed humanoid zombie roster. No custom REBIRTH entities. -->
+    <!-- Base managed humanoid roster plus the independently configured Seeker family. -->
     <entity name="zombieArlene" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon,EventSpawn" biomes="forest,desert"/>
     <entity name="zombieArleneFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon,EventSpawn" biomes="desert,snow"/>
     <entity name="zombieArleneRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon,EventSpawn" biomes="wasteland"/>
@@ -181,6 +181,13 @@
     <entity name="zombieDemolition" category="Special" min_gs="220" weight="1" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="military,demolition"/>
     <entity name="zombieSteveCrawler" category="Special" min_gs="0" weight="4" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
     <entity name="zombieSteveCrawlerFeral" category="Special" min_gs="0" weight="4" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="FuriousRamsaySeeker001" category="Special" min_gs="40" max_gs="60" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker002" category="Special" min_gs="50" max_gs="70" weight="15" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker003" category="Special" min_gs="60" max_gs="80" weight="20" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker004" category="Special" min_gs="70" max_gs="90" weight="30" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker005" category="Special" min_gs="80" max_gs="100" weight="35" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker006" category="Special" min_gs="90" max_gs="110" weight="40" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
+    <entity name="FuriousRamsaySeeker007" category="Special" min_gs="100" max_gs="2147483647" weight="45" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="seeker"/>
   </entities>
 
   <vanilla_preserved_entities>

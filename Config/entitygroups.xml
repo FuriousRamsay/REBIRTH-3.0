@@ -1,3 +1,4 @@
 <configs>
   <include filename="_NPC/entitygroups.xml" />
+  <include filename="_Seeker/entitygroups.xml"/>
 </configs>

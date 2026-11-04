@@ -628,9 +628,15 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
             isDaytime = GameManager.Instance.World.IsDaytime();
 
         if (sunView != null)
-            sunView.IsVisible = isDaytime;
+        {
+            if (sunView.IsVisible != isDaytime)
+                sunView.IsVisible = isDaytime;
+        }
         if (moonView != null)
-            moonView.IsVisible = !isDaytime;
+        {
+            if (moonView.IsVisible == isDaytime)
+                moonView.IsVisible = !isDaytime;
+        }
     }
 
     private static bool IsDayVisible(EntityPlayerLocal player)
@@ -858,23 +864,30 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
 
         fill = Mathf.Clamp01(fill);
 
-        view.Type = UIBasicSprite.Type.Filled;
-        view.FillDirection = radial
+        UIBasicSprite.FillDirection direction = radial
             ? UIBasicSprite.FillDirection.Radial360
             : UIBasicSprite.FillDirection.Horizontal;
-        view.FillInvert = false;
-        view.Fill = fill;
+        if (view.Type != UIBasicSprite.Type.Filled)
+            view.Type = UIBasicSprite.Type.Filled;
+        if (view.FillDirection != direction)
+            view.FillDirection = direction;
+        if (view.FillInvert)
+            view.FillInvert = false;
+        if (view.Fill != fill)
+            view.Fill = fill;
 
         UISprite sprite = view.Sprite;
         if ((UnityEngine.Object)sprite == (UnityEngine.Object)null)
             return;
 
-        sprite.type = UIBasicSprite.Type.Filled;
-        sprite.fillDirection = radial
-            ? UIBasicSprite.FillDirection.Radial360
-            : UIBasicSprite.FillDirection.Horizontal;
-        sprite.invert = false;
-        sprite.fillAmount = fill;
+        if (sprite.type != UIBasicSprite.Type.Filled)
+            sprite.type = UIBasicSprite.Type.Filled;
+        if (sprite.fillDirection != direction)
+            sprite.fillDirection = direction;
+        if (sprite.invert)
+            sprite.invert = false;
+        if (sprite.fillAmount != fill)
+            sprite.fillAmount = fill;
     }
 
     public override void OnClose()

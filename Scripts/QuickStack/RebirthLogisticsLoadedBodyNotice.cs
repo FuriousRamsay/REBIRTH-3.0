@@ -258,7 +258,7 @@ internal static class RebirthLogisticsLoadedBodyNotice
             }
             catch{coldOriginals?.Dispose();coldOriginals=null;} // Unknown IO never becomes readiness.
         }
-        foreach(var pair in server.ToArray())
+        if(server.Count>0)foreach(var pair in server.ToArray())
         {
             var n=pair.Value;
             try
@@ -269,7 +269,7 @@ internal static class RebirthLogisticsLoadedBodyNotice
             }
             catch{/* Same immutable metadata notice retained; no body replay. */}
         }
-        foreach(var pair in client.ToArray())try
+        if(client.Count>0)foreach(var pair in client.ToArray())try
         {
             var n=pair.Value;if(n.Expires<=DateTime.UtcNow||!ClientConnectionCurrent(n)){n.Dispose();client.Remove(pair.Key);continue;}
             if(n.NextApply>DateTime.UtcNow)continue;n.NextApply=DateTime.UtcNow.AddMilliseconds(250);

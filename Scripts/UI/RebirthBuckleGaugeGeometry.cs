@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -13,13 +14,13 @@ internal static class RebirthBuckleGaugeGeometry
     {
         internal float Position;
         internal byte Alpha;
-        internal bool Draw;
+        internal int X, Y;
     }
     private static readonly Geometry[] geometry = Build();
 
     private static Geometry[] Build()
     {
-        Geometry[] result = new Geometry[Width * Height];
+        var result = new List<Geometry>(Width * Height / 3);
         for (int y = 0; y < Height; y++) for (int x = 0; x < Width; x++)
         {
             float u = x + 0.5f, v = y + 0.5f;
@@ -30,9 +31,9 @@ internal static class RebirthBuckleGaugeGeometry
             float within = segment - Mathf.Floor(segment);
             if (radius < 0.74f || radius > 1f || within <= 0.055f || within >= 0.945f) continue;
             float edge = Mathf.Min((radius - 0.74f) * 92, (1 - radius) * 92);
-            result[y * Width + x] = new Geometry { Position = t, Alpha = (byte)(255 * Mathf.Clamp01(edge)), Draw = true };
+            result.Add(new Geometry { Position = t, Alpha = (byte)(255 * Mathf.Clamp01(edge)), X = x, Y = y });
         }
-        return result;
+        return result.ToArray();
     }
 
     internal static void Render(Color32[] pixels, float current, float maximum, Color32 color, bool right, bool bottom)
@@ -40,18 +41,15 @@ internal static class RebirthBuckleGaugeGeometry
         if (pixels == null || pixels.Length != Width * Height) throw new ArgumentException("Gauge buffer dimensions must be 128 x 96.", "pixels");
         maximum = Mathf.Clamp01(maximum);
         current = Mathf.Clamp(current, 0, maximum);
-        for (int y = 0; y < Height; y++) for (int x = 0; x < Width; x++)
+        Array.Clear(pixels, 0, pixels.Length);
+        for (int i = 0; i < geometry.Length; i++)
         {
-            Geometry sample = geometry[y * Width + x];
-            Color32 value = new Color32(0, 0, 0, 0);
-            if (sample.Draw)
-            {
-                value = sample.Position >= maximum ? new Color32(0, 0, 0, 255) :
-                    sample.Position >= current ? new Color32(106, 108, 112, 255) : color;
-                value.a = sample.Alpha;
-            }
-            int targetX = right ? Width - 1 - x : x;
-            int targetY = bottom ? Height - 1 - y : y;
+            Geometry sample = geometry[i];
+            Color32 value = sample.Position >= maximum ? new Color32(0, 0, 0, 255) :
+                sample.Position >= current ? new Color32(106, 108, 112, 255) : color;
+            value.a = sample.Alpha;
+            int targetX = right ? Width - 1 - sample.X : sample.X;
+            int targetY = bottom ? Height - 1 - sample.Y : sample.Y;
             pixels[targetY * Width + targetX] = value;
         }
     }

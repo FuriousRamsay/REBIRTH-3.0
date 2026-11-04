@@ -50,29 +50,35 @@ internal static class RebirthCamperPoiLightInteraction
     {
         if(commands==null||!Managed(world,position,value,actor,out var vehicle))return;
         // Remove the switch action; preserve native pickup eligibility and command order.
-        var filtered=new List<BlockActivationCommand>(commands.Length);
-        foreach(var command in commands)if(command.text!="light")filtered.Add(command);
-        // Native SetCommonData executes a single entry immediately. Keep the
-        // native pickup/cancel hold menu when ON, so short E can be special
-        // without consuming the only pickup entry before the radial opens.
-        int enabled=0;bool take=false,cancel=false;
-        foreach(var command in filtered)
+        int kept=0,enabled=0;bool take=false,cancel=false;
+        foreach(var command in commands)
         {
+            if(command.text=="light")continue;
+            kept++;
             if(command.enabled){enabled++;take=command.text=="take";}
             if(command.text=="cancel")cancel=true;
         }
+        // Native SetCommonData executes a single entry immediately. Keep the
+        // native pickup/cancel hold menu when ON, so short E can be special
+        // without consuming the only pickup entry before the radial opens.
         if(enabled==1&&take&&Active(vehicle))
         {
+            var filtered=new BlockActivationCommand[kept+(cancel?0:1)];
+            int index=0;
+            foreach(var command in commands)if(command.text!="light")filtered[index++]=command;
             if(cancel)
             {
-                for(int i=0;i<filtered.Count;i++)if(filtered[i].text=="cancel")
+                for(int i=0;i<kept;i++)if(filtered[i].text=="cancel")
                 {var command=filtered[i];command.enabled=true;filtered[i]=command;break;}
             }
-            else filtered.Add(new BlockActivationCommand("cancel","x",true));
-            commands=filtered.ToArray();return;
+            else filtered[kept]=new BlockActivationCommand("cancel","x",true);
+            commands=filtered;return;
         }
-        if(filtered.Count!=commands.Length||commands.Length!=0&&Array.Exists(commands,c=>c.text=="light"))
-            commands=filtered.ToArray();
+        if(kept==commands.Length)return;
+        var withoutLight=new BlockActivationCommand[kept];
+        int output=0;
+        foreach(var command in commands)if(command.text!="light")withoutLight[output++]=command;
+        commands=withoutLight;
     }
     internal static void Prompt(WorldBase world,BlockValue value,Vector3i position,EntityAlive actor,ref string text)
     {

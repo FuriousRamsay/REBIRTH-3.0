@@ -52,7 +52,7 @@ internal sealed class RebirthPoiNativeAuthoredManifest
                 string descriptor=Hash(identity.Key+"|"+Point(min)+"|"+Point(max)+"|"+flags.ToString(f)+"|"+minimum.ToString(f)+"|"+maximum.ToString(f)+"|"+script.Length.ToString(f)+":"+script);
                 shape.Append(":shape:").Append(descriptor);if(!used)continue;
                 if(!descriptors.Add("1:"+descriptor))return false;int id=world.FindSleeperVolume(min,max);var native=id<0?null:world.GetSleeperVolume(id);
-                Func<SleeperVolume,bool> matches=v=>v!=null&&ReferenceEquals(v.prefabInstance,prefab)&&v.BoxMin.Equals(min)&&v.BoxMax.Equals(max)&&v.flags==flags&&v.spawnCountMin==minimum&&v.spawnCountMax==maximum&&v.groupId==group&&v.groupName==GameStageGroup.CleanName(name);
+                Func<SleeperVolume,bool> matches=v=>v!=null&&ReferenceEquals(v.prefabInstance,prefab)&&v.BoxMin.Equals(min)&&v.BoxMax.Equals(max)&&RebirthPoiSleeperShapePolicy.FlagsMatch(v.flags,flags)&&v.spawnCountMin==minimum&&v.spawnCountMax==maximum&&v.groupId==group&&v.groupName==GameStageGroup.CleanName(name);
                 if(id>=0&&!matches(native))return false;
                 var expected=new RebirthPoiAuthoredResetExpectation(RebirthPoiAuthoredResetKind.Sleeper,index,descriptor,id<0?(int?)null:id,maximum!=0||!string.IsNullOrWhiteSpace(script));
                 slots.Add(new Slot(expected,native,()=>{int actual=world.FindSleeperVolume(min,max);var value=actual<0?null:world.GetSleeperVolume(actual);return matches(value)?Tuple.Create(actual,(object)value):null;},sleepers,d,min,max));shape.Append(':').Append(descriptor).Append(':').Append(id.ToString(f));

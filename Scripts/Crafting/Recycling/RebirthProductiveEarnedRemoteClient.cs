@@ -140,7 +140,7 @@ internal static partial class RebirthProductiveEarnedRemoteClient
     internal static void Update()
     {
         if(!RebirthProductiveEarnedCoordinator.Enabled)return;ObserveWorld();RecoverCurrentOwner();PumpViewerToolRequests();
-        foreach(var request in descriptions.Values.ToArray())
+        if(descriptions.Count>0)foreach(var request in descriptions.Values.ToArray())
         {
             try
             {
@@ -187,7 +187,7 @@ internal static partial class RebirthProductiveEarnedRemoteClient
         double now=DateTime.UtcNow.Ticks/(double)TimeSpan.TicksPerSecond;
         PumpNativeClosures(now);
         PumpViewerToolsClosures(now);
-        foreach(var original in originals.Values.ToArray())
+        if(originals.Count>0)foreach(var original in originals.Values.ToArray())
         {
             try
             {

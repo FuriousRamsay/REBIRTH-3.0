@@ -34,9 +34,16 @@ internal static partial class RebirthWorkstationCompletionOutbox
     {return world?.IsRemote()==true?GamePrefs.GetString(EnumGamePrefs.GameGuidClient):world?.Guid;}
     internal static string Root(string role)
     {
+        string root=ScopePath(role);
+        RebirthWorkstationCompletionPublication.RequireSafeDirectory(root);return root;
+    }
+    // Path derivation does not admit a read or write. Recovery can use it to
+    // recognize an already checked empty scope without repeating filesystem IO.
+    internal static string ScopePath(string role)
+    {
         string save=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(save))throw new InvalidDataException("Actual completion save scope required");
         string root=System.IO.Path.Combine(System.IO.Path.GetFullPath(save),"RebirthData","Survivor","WorkstationCompletions",role);
-        RebirthWorkstationCompletionPublication.RequireSafeDirectory(root);return root;
+        return root;
     }
     private static string Key(string root,string operation)=>root+"|"+operation;
     internal static State Retain(RebirthWorkstationCompletionOriginal original,string role,World nativeWorld=null,TileEntityWorkstation station=null,string acceptedStationBirth=null)
@@ -120,17 +127,21 @@ internal static partial class RebirthWorkstationCompletionOutbox
     }
     internal static State[] Pending(string role)
     {
-        string root=Root(role),folder=System.IO.Path.Combine(root,"pending");
-        RebirthWorkstationCompletionPublication.RequireSafeDirectory(folder);
-        if(Directory.Exists(folder))
+        var world=GameManager.Instance?.World;
+        string root=ScopePath(role),folder=System.IO.Path.Combine(root,"pending"),identity=root+"|"+CurrentGuid(world);
+        if(RebirthWorkstationCompletionEmptyRecovery.ShouldScan(world,identity,folder))
         {
-            int count=0;foreach(string path in Directory.EnumerateFiles(folder,"*.xml"))
+            RebirthWorkstationCompletionPublication.RequireSafeDirectory(root);
+            RebirthWorkstationCompletionPublication.RequireSafeDirectory(folder);
+            int count=0;
+            if(Directory.Exists(folder))foreach(string path in Directory.EnumerateFiles(folder,"*.xml"))
             {
                 if(++count>4096)throw new InvalidDataException("Pending original completion bound");
                 string operation=System.IO.Path.GetFileNameWithoutExtension(path),key=Key(root,operation);
                 if(!active.ContainsKey(key))
                 {try{active.Add(key,Read(path,root,role));blocked.Remove(path);}catch(Exception exception){blocked[path]=exception.GetType().Name;}}
             }
+            if(count==0)RebirthWorkstationCompletionEmptyRecovery.ObservedEmpty(world,identity,folder);
         }
         // A failed write after setting terminal/ACK is still pending. Only an
         // actual archive path retires retry custody, never an in-memory flag.

@@ -68,6 +68,7 @@ public static class RebirthSurvivorFirstEntryUiService
     /// </summary>
     public static bool ShouldShowSpawnProfileSelector()
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return false;
         if (RebirthSurvivorMode.ConfiguredMode != RebirthPlayerProgressionMode.Rebirth) return false;
         // First-entry Survivor selection is a dedicated full-screen step before native spawn.
         // Once a profile is staged, return to the stock spawnselection window.
@@ -95,6 +96,7 @@ public static class RebirthSurvivorFirstEntryUiService
     /// </summary>
     public static void RegisterNativeSpawnSelectionHost(XUi xui)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         GUIWindowManager manager = xui != null && xui.playerUI != null ? xui.playerUI.windowManager : null;
         if (manager != null)
         {
@@ -145,6 +147,7 @@ public static class RebirthSurvivorFirstEntryUiService
     /// </summary>
     public static bool ShouldShowEmbeddedPreSpawnChooser()
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return false;
         if (RebirthSurvivorMode.ConfiguredMode != RebirthPlayerProgressionMode.Rebirth || stagedSelectionReady)
             return false;
 
@@ -307,15 +310,16 @@ public static class RebirthSurvivorFirstEntryUiService
         // its new gameplay UI; otherwise GetUIForPlayer may bind a stale/destroyed UI and Awake
         // cascades into duplicate ScreenEffects / PlayerMoveController null references.
         RestoreInitialSpawnPreference();
-        bool? existingSurvivor = CurrentSaveHasSurvivorCharacter();
-        if(!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth
+        bool editMode = RebirthCharacterCreationHoldService.IsEditModeActive();
+        bool? existingSurvivor = editMode ? null : CurrentSaveHasSurvivorCharacter();
+        if(!editMode&&!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth
             && existingSurvivor == false)
         {
             initialSkipSpawnPreference=GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton);
             GamePrefs.Set(EnumGamePrefs.SkipSpawnButton,false);
             Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-gate enabled skipSpawnWas="+initialSkipSpawnPreference.Value);
         }
-        else if(!GameManager.IsDedicatedServer)
+        else if(!editMode&&!GameManager.IsDedicatedServer)
         {
             // Earlier builds persisted false while forcing the first-entry gate, even
             // for an established character. Restore the native auto-spawn preference
@@ -360,6 +364,7 @@ public static class RebirthSurvivorFirstEntryUiService
     {
         if (!data.IsLocalPlayer) return;
         RestoreInitialSpawnPreference();
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-selection consumed staged="+stagedSelectionReady);
 
         EntityPlayerLocal player = GetLocalPlayer();
@@ -399,6 +404,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void OnOwnerStateChanged(RebirthSurvivorOwnerStateSnapshot snapshot)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         if (snapshot == null) return;
 
         // PC127: OwnerStateChanged also carries ordinary condition snapshots every few seconds.
@@ -574,6 +580,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         TickCore("ModEvents.GameUpdate");
     }
 
@@ -679,6 +686,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     public static void NotifyNativePlayerSpawned(ClientInfo clientInfo, RespawnType reason, Vector3i pos, int entityId)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         if (RebirthSurvivorMode.ConfiguredMode != RebirthPlayerProgressionMode.Rebirth)
             return;
 
@@ -1202,6 +1210,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void LockLocalPlayer()
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         EntityPlayerLocal player = GetLocalPlayer();
         if (player == null) return;
         player.ClearMovementInputs();

@@ -68,8 +68,12 @@ public static class RebirthScrollbarPresentation
         var collider = view.UiTransform.GetComponent<BoxCollider>();
         if(collider != null)
         {
-            collider.center = new Vector3(view.Size.x*.5f,-view.Size.y*.5f,collider.center.z);
-            collider.size = new Vector3(view.Size.x,view.Size.y,collider.size.z);
+            var currentCenter = collider.center;
+            var center = new Vector3(view.Size.x*.5f,-view.Size.y*.5f,currentCenter.z);
+            if (!currentCenter.Equals(center)) collider.center = center;
+            var currentSize = collider.size;
+            var size = new Vector3(view.Size.x,view.Size.y,currentSize.z);
+            if (!currentSize.Equals(size)) collider.size = size;
         }
     }
 }

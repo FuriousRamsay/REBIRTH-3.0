@@ -403,7 +403,7 @@ internal static class RebirthNativeItemConformanceReader
                     if (stream.Length > maximumBytes) return false;
                 }
                 writer.Flush();
-                string text = Convert.ToBase64String(stream.ToArray());
+                string text = Convert.ToBase64String(stream.GetBuffer(), 0, checked((int)stream.Length));
                 if (text.Length > maximumText || text.Length > MaximumEncodedCharacters) return false;
                 encoded = text; return true;
             }
@@ -473,7 +473,7 @@ internal static class RebirthNativeItemConformanceReader
                     writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(stream);
                     writer.Write((short)count);foreach(var data in decoded)data.Write(writer);writer.Flush();
                     if(stream.Length!=bytes.Length)return false;
-                    var image=stream.ToArray();for(int i=0;i<bytes.Length;i++)if(bytes[i]!=image[i])return false;
+                    var image=stream.GetBuffer();for(int i=0;i<bytes.Length;i++)if(bytes[i]!=image[i])return false;
                 }
                 finally{writer.Encoding=previous;}
             }
@@ -558,7 +558,7 @@ internal static class RebirthNativeItemConformanceReader
                     writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(stream);
                     writer.Write((byte)count);foreach(var row in decoded)row.Write(writer);writer.Flush();
                     if(stream.Length!=bytes.Length)return false;
-                    var image=stream.ToArray();for(int i=0;i<bytes.Length;i++)if(bytes[i]!=image[i])return false;
+                    var image=stream.GetBuffer();for(int i=0;i<bytes.Length;i++)if(bytes[i]!=image[i])return false;
                 }
                 finally{writer.Encoding=previous;}
             }

@@ -18,7 +18,7 @@
       <ingredient name="resourceMechanicalParts" count="15"/>
       <ingredient name="resourceElectricParts" count="25"/>
       <ingredient name="resourceScrapPolymers" count="20"/>
-      <ingredient name="motionsensor" count="1"/>
+      <ingredient name="motionsensor" count="3"/>
     </recipe>
   </append>
 	<append xpath="/recipes">

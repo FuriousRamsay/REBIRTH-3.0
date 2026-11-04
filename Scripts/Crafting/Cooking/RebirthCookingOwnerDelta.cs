@@ -22,7 +22,7 @@ internal static partial class RebirthCookingOwnerDelta
     private sealed class Permit{internal ItemStackGrid Grid;internal int Slot;internal ItemStack Value;internal bool Used;internal Func<bool> Current;}
     private static Permit permit;
     private static readonly Dictionary<Guid,Attempt> Attempts=new Dictionary<Guid,Attempt>();
-    internal static bool HasOwnHold(EntityPlayerLocal player)=>player!=null&&player.IsSpawned()&&!player.IsDead()&&Attempts.Values.Any(attempt=>ReferenceEquals(attempt.Player,player)&&ReferenceEquals(attempt.World,player.world)&&attempt.Deaths==player.Died);
+    internal static bool HasOwnHold(EntityPlayerLocal player)=>player!=null&&player.IsSpawned()&&!player.IsDead()&&Attempts.Count!=0&&Attempts.Values.Any(attempt=>ReferenceEquals(attempt.Player,player)&&ReferenceEquals(attempt.World,player.world)&&attempt.Deaths==player.Died);
     internal static bool IsHeld(EntityPlayerLocal player)=>HasOwnHold(player)||RebirthCookingGridCustody.IsHeld(player);
     internal static bool Consume(ItemStackGrid grid,int slot,ItemStack value)
     {var current=permit;if(current==null)return RebirthCookingGridCustody.Consume(grid,slot,value);if(current.Used||!ReferenceEquals(current.Grid,grid)||current.Slot!=slot||!ReferenceEquals(current.Value,value)||!current.Current())return false;current.Used=true;return true;}

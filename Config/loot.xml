@@ -1,4 +1,6 @@
 <configs>
+  <include filename="_Vehicles/camper_wrap_loot.xml"/>
+  <include filename="_Wood/loot.xml"/>
   <include filename="_Purge/loot.xml"/>
   <include filename="_Purge/supply_modifiers_loot.xml"/>
 
@@ -120,7 +122,6 @@
   </conditional>
 <include filename="_Survivor/container_junk_balance.xml"/>
 <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
-<conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/loot_food_exclusions.xml"/></if></conditional>
   <include filename="_Workstations/birdnest_loot.xml"/>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_loot.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_loot.xml"/></if></conditional>
@@ -129,6 +130,7 @@
   <setattribute xpath="/lootcontainers//item[@name='drinkJarRiverWater']" name="random_durability">false</setattribute>
 
   <!-- Functional REBIRTH armor mods use the existing native armor-mod loot pools. -->
+  <conditional><if cond="character_progression('Rebirth')">
   <append xpath="/lootcontainers/lootgroup[@name='modArmorT1']">
     <item name="ModLootTimeDecreaseTier1" loot_prob_template="low"/>
     <item name="modArmorDegradationTier1" loot_prob_template="low"/>
@@ -175,5 +177,11 @@
     <item name="ModCharismaCharismaticNature" loot_prob_template="veryLow"/>
     <item name="ModCharismaDaringAdventurer" loot_prob_template="veryLow"/>
   </append>
+  </if></conditional>
   <include filename="_Survivor/loot_sizes_26.xml"/>
+  <include filename="_Seeker/loot.xml"/>
+  <!-- Apply food exclusions last so later bird-nest and seeker loot cannot re-add them. -->
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/loot_food_exclusions.xml"/></if></conditional>
+  <!-- Final REBIRTH-only cleanup of vanilla skill/progression loot tags. -->
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/loot_skill_tag_cleanup.xml"/></if></conditional>
 </configs>

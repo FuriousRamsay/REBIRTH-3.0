@@ -181,8 +181,9 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         scroll?.SetItemCount((visible + BagColumns - 1) / BagColumns, filtered ? "No wearable items" : "");
         if (capacityLabel != null)
         {
-            string text = RebirthCraftingInventoryBridge.GetUsedSlotCount(xui) + "/" + physical
-                + " • " + RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui) + " ENCUMBERED";
+            int used = RebirthCraftingInventoryBridge.GetUsedSlotCount(xui);
+            string text = used + "/" + physical
+                + " • " + RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui, used) + " ENCUMBERED";
             if (capacityLabel.Text != text) capacityLabel.Text = text;
         }
         RefreshSelection();
@@ -548,8 +549,9 @@ public sealed class XUiC_RebirthCharacterBackpackSlot : XUiC_ItemStack
         return !RebirthCreativeViewportMath.Intersects(top, ViewComponent.Size.y, viewport.Size.y);
     }
     private bool PinnedForNativeAction => IsSelected || IsHolding || IsLocked || IsDragAndDrop || presentationHovered ||
-        Time.realtimeSinceStartup < presentationWakeUntil || creativeOwner?.BackpackView?.SelectedItem == this ||
-        creativeOwner?.PresentationInteractionBusy == true;
+        // A global press/held cursor needs visible drop targets, not off-screen visuals.
+        // Native inventory roots stay active; only this cell's own live action pins it.
+        Time.realtimeSinceStartup < presentationWakeUntil || creativeOwner?.BackpackView?.SelectedItem == this;
 
     // Keep the native slot ROOT active: native empty-slot discovery and transaction sources
     // can consult activeInHierarchy. Only its visual descendants and root hit colliders sleep.

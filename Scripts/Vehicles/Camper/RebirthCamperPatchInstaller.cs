@@ -51,6 +51,11 @@ namespace Rebirth.Vehicles.Camper
                     RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperStationOpenSoundPosition));
                     installed = 7;
                 }
+                if (installed < 8)
+                {
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperCoastBraking));
+                    installed = 8;
+                }
             }
         }
     }

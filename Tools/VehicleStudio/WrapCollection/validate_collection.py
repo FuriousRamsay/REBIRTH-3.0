@@ -1,5 +1,6 @@
 """Conformance inventory. Never turns missing art into a passing 200-wrap claim."""
 import argparse
+from collections import Counter
 import csv
 import hashlib
 import json
@@ -23,9 +24,9 @@ def validate():
     by_name={m.attrib['name']:m for m in mods}
     with (ROOT/'Config/Localization.csv').open(encoding='utf-8-sig',newline='') as f:
         all_loc=list(csv.reader(f))
-    keys=[r[0] for r in all_loc[1:] if r]
+    keys=Counter(r[0] for r in all_loc[1:] if r)
     for row in rows:
-        assert keys.count(row['item'])==1 and keys.count(row['item']+'Desc')==1,row['id']
+        assert keys[row['item']]==1 and keys[row['item']+'Desc']==1,row['id']
         assert by_name[row['item']].attrib['installable_tags']=='rebirthCamperWrapCollection'
         props={p.attrib['name']:p.attrib['value'] for p in by_name[row['item']].findall('property')}
         assert props['CustomIcon']==row['item'] and props['RebirthCamperWrapId']==row['id']

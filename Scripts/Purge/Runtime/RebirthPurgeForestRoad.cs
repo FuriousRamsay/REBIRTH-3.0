@@ -1,12 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 // Reads native authored biome/surface/height providers before destination chunks
 // exist. No terrain painting or settlement relocation is performed.
 internal static class RebirthPurgeForestRoad
 {
+    private static World rejectedWorld;
+    private static readonly List<Vector2> rejectedSites = new List<Vector2>();
+    internal static void Reset()
+    {rejectedWorld=null;rejectedSites.Clear();cachedWorld=null;found=false;cached=SpawnPosition.Undef;roads=null;exclusions.Clear();}
+    internal static void RejectSite(World world, Vector3 position)
+    {
+        if (!ReferenceEquals(rejectedWorld, world)) { rejectedWorld = world; rejectedSites.Clear(); }
+        rejectedSites.Add(new Vector2(position.x, position.z));
+        if (ReferenceEquals(cachedWorld, world)) cachedWorld = null;
+    }
+    private static bool Rejected(Vector2 point)
+    {
+        foreach (var site in rejectedSites)
+            if (!RebirthPurgeStartPlacementPolicy.FarEnough(point.x - site.x, point.y - site.y)) return true;
+        return false;
+    }
     private static World cachedWorld;private static SpawnPosition cached;private static bool found;
     private static WorldGridCompressedData<byte> roads;
     private static readonly List<Rect> exclusions=new List<Rect>();
@@ -18,6 +33,7 @@ internal static class RebirthPurgeForestRoad
     {
         position=SpawnPosition.Undef;
         if(ReferenceEquals(cachedWorld,world)){position=cached;return found;}
+        if (!ReferenceEquals(rejectedWorld, world)) { rejectedWorld=world;rejectedSites.Clear(); }
         cachedWorld=world;found=false;cached=SpawnPosition.Undef;
         var provider=world?.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
         var biomes=provider?.GetBiomeProvider() as WorldBiomeProviderFromImage;
@@ -38,9 +54,9 @@ internal static class RebirthPurgeForestRoad
         {
             int x=random.Next(-half+margin,half-margin),z=random.Next(-half+margin,half-margin);
             if((attempt&255)==0&&timer.ElapsedMilliseconds>3000)break;
-            if(!Forest(biomes,x,z))continue;forest++;
+            if(Rejected(new Vector2(x,z))||!Forest(biomes,x,z))continue;forest++;
             if(!Road(biomes,x,z))continue;road++;
-            if(buildings.Any(b=>b.Contains(new Vector2(x,z)))){settlement++;continue;}
+            if(InsideExclusion(buildings,new Vector2(x,z))){settlement++;continue;}
             for(int angle=0;angle<8;angle++)
             {
                 float radians=angle*Mathf.PI/8;var forward=new Vector2(Mathf.Sin(radians),Mathf.Cos(radians));var side=new Vector2(forward.y,-forward.x);
@@ -48,7 +64,7 @@ internal static class RebirthPurgeForestRoad
                 float left=Width(biomes,new Vector2(x,z),-side),right=Width(biomes,new Vector2(x,z),side);
                 if(left+right<3||left+right>20){width++;continue;}
                 var centre=new Vector2(x,z)+side*(right-left)*.5f;
-                if(buildings.Any(b=>b.Contains(centre)))continue;
+                if(InsideExclusion(buildings,centre)||Rejected(centre))continue;
                 bool clear=true;float low=float.MaxValue,high=float.MinValue;
                 for(int along=-6;along<=6;along+=3)for(int across=-2;across<=2;across+=2)
                 {
@@ -63,9 +79,9 @@ internal static class RebirthPurgeForestRoad
                 if(!clear)continue;
                 float y=terrain.GetTerrainHeightAt(Mathf.RoundToInt(centre.x),Mathf.RoundToInt(centre.y));
                 var candidate=new SpawnPosition(new Vector3(centre.x,y+.5f,centre.y),angle*22.5f);
-                if(!PlayerAnchor(world,candidate,out _))continue;
+                if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
                 cached=candidate;found=true;position=cached;
-                Log.Out("[PurgeTruckStart] step=road.search.selected position="+cached.position+" heading="+cached.heading+" elapsedMs="+timer.ElapsedMilliseconds+" attempts="+(attempt+1));return true;
+                Log.Out("[PurgeTruckStart] step=road.search.qualified-candidate position="+cached.position+" heading="+cached.heading+" elapsedMs="+timer.ElapsedMilliseconds+" attempts="+(attempt+1));return true;
             }
         }
         Log.Error("[PurgeTruckStart] step=road.search.failed elapsedMs="+timer.ElapsedMilliseconds+" forest="+forest+" road="+road+" settlementRejected="+settlement+" straightRuns="+run+" widthRejected="+width+" footprintRejected="+slope);return false;
@@ -77,12 +93,50 @@ internal static class RebirthPurgeForestRoad
         var provider=world.ChunkCache.ChunkProvider as ChunkProviderGenerateWorld;
         var map=provider?.GetBiomeProvider() as WorldBiomeProviderFromImage;
         var forward=Quaternion.Euler(0,heading,0)*Vector3.forward;var point=origin+forward*offset;
-        if(map==null||exclusions.Any(b=>b.Contains(new Vector2(point.x,point.z))))return false;
+        if(map==null||InsideExclusion(exclusions,new Vector2(point.x,point.z))||Rejected(new Vector2(point.x,point.z)))return false;
         for(int along=-6;along<=6;along+=2)for(int across=-1;across<=1;across++)
         {var at=point+forward*along+Quaternion.Euler(0,heading,0)*Vector3.right*across*1.4f;
             if(!Forest(map,Mathf.RoundToInt(at.x),Mathf.RoundToInt(at.z))||!Road(map,Mathf.RoundToInt(at.x),Mathf.RoundToInt(at.z)))return false;}
         point.y=provider.m_TerrainGenerator.GetTerrainHeightAt(Mathf.RoundToInt(point.x),Mathf.RoundToInt(point.z))+.5f;
-        candidate=new SpawnPosition(point,heading);return true;
+        candidate=new SpawnPosition(point,heading);return FootprintAvailable(world,provider,candidate);
+    }
+    // Initial selection uses the same complete rotated footprint and terrain tolerance
+    // as final clearance. Unloaded decoration cannot be known from the road map;
+    // loaded hard obstructions are rejected here, and final clearance rechecks all chunks.
+    private static bool FootprintAvailable(World world,ChunkProviderGenerateWorld provider,SpawnPosition candidate)
+    {
+        double radians=candidate.heading*Math.PI/180;
+        double ex=RebirthPurgeStartFootprint.WorldExtentX(radians),ez=RebirthPurgeStartFootprint.WorldExtentZ(radians);
+        for(int x=Mathf.FloorToInt(candidate.position.x-(float)ex)-1;x<=Mathf.CeilToInt(candidate.position.x+(float)ex);x++)
+        for(int z=Mathf.FloorToInt(candidate.position.z-(float)ez)-1;z<=Mathf.CeilToInt(candidate.position.z+(float)ez);z++)
+        {
+            if(!RebirthPurgeStartFootprint.IntersectsVoxel(x-candidate.position.x,z-candidate.position.z,radians))continue;
+            float terrain=provider.m_TerrainGenerator.GetTerrainHeightAt(x,z);
+            if(float.IsNaN(terrain)||float.IsInfinity(terrain)||Mathf.Abs(terrain-(candidate.position.y-.5f))>.8f)return false;
+            if(world.GetChunkFromWorldPos(new Vector3i(x,Mathf.FloorToInt(terrain),z))==null)continue;
+            for(int y=Mathf.FloorToInt(terrain);y<=Mathf.CeilToInt(candidate.position.y+4);y++)
+            {
+                var at=new Vector3i(x,y,z);var block=world.GetBlock(at);
+                if(block.ischild)
+                {
+                    if(block.Block?.multiBlockPos==null)return false;
+                    at=block.Block.multiBlockPos.GetParentPos(at,block);block=world.GetBlock(at);
+                    if(block.isair||block.ischild)return false;
+                    if(!RebirthPurgeStartPlacementPolicy.Removable(block.Block.GetBlockName(),block.Block.IsTerrainDecoration,block.Block.Properties.GetString("Shape")))return false;
+                }
+                if(block.isair)continue;
+                if(y<=Mathf.CeilToInt(terrain)&&block.Block.shape.IsTerrain())continue;
+                if(!RebirthPurgeStartPlacementPolicy.Removable(block.Block.GetBlockName(),block.Block.IsTerrainDecoration,block.Block.Properties.GetString("Shape")))return false;
+            }
+        }
+        var inverse=Quaternion.Inverse(Quaternion.Euler(0,candidate.heading,0));
+        foreach(var entity in world.Entities.list)
+        {
+            if(entity==null)continue;
+            var bounds=entity.boundingBox;var local=inverse*(bounds.center-candidate.position);float radius=bounds.extents.magnitude;
+            if(Mathf.Abs(local.x)<=2.2f+radius&&Mathf.Abs(local.z)<=7+radius&&bounds.max.y>=candidate.position.y-.5f&&bounds.min.y<=candidate.position.y+4)return false;
+        }
+        return true;
     }
     internal static bool PlayerAnchor(World world,SpawnPosition truck,out SpawnPosition player)
     {
@@ -104,6 +158,11 @@ internal static class RebirthPurgeForestRoad
         if(high-low>.45f)return false;
         point.y=provider.m_TerrainGenerator.GetTerrainHeightAt(Mathf.RoundToInt(point.x),Mathf.RoundToInt(point.z))+.5f;
         player=new SpawnPosition(point,truck.heading);return true;
+    }
+    private static bool InsideExclusion(List<Rect> buildings,Vector2 point)
+    {
+        for(int i=0;i<buildings.Count;i++)if(buildings[i].Contains(point))return true;
+        return false;
     }
     private static bool Forest(WorldBiomeProviderFromImage map,int x,int z)=>map.GetBiomeAt(x,z)?.m_sBiomeName=="pine_forest"&&map.GetRadiationAt(x,z)<=0;
     private static bool Road(WorldBiomeProviderFromImage map,int x,int z)

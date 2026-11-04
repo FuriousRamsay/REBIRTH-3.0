@@ -19,7 +19,7 @@ public sealed class NetPackageRebirthPurgeScanner : NetPackage
         value.Prefab=RebirthSurvivorNetworkCodec.ReadBoundedString(reader,256);
         value.X=reader.ReadInt32();value.Y=reader.ReadInt32();value.Z=reader.ReadInt32();
         value.Tier=reader.ReadInt32();value.Rooms=reader.ReadInt32();value.Cleared=reader.ReadInt32();
-        value.Enemies=reader.ReadInt32();value.Approximate=reader.ReadBoolean();
+        value.Enemies=reader.ReadInt32();value.Approximate=reader.ReadBoolean();value.Assisted=reader.ReadBoolean();
         int count=reader.ReadUInt16();
         if(value.LifetimeKills< -1||value.Sequence<1||value.Epoch<0||count>8192||value.Rooms<0||value.Rooms>4096||value.Cleared<0||value.Cleared>value.Rooms||
             value.Enemies<0||value.Enemies>1000000||value.Tier<0||value.Tier>255)
@@ -33,11 +33,11 @@ public sealed class NetPackageRebirthPurgeScanner : NetPackage
         writer.Write(view.Sequence);writer.Write(view.Epoch);writer.Write(view.LifetimeKills);RebirthSurvivorNetworkCodec.WriteString(writer,view.PoiKey,2048);
         RebirthSurvivorNetworkCodec.WriteString(writer,view.Prefab,256);
         writer.Write(view.X);writer.Write(view.Y);writer.Write(view.Z);writer.Write(view.Tier);
-        writer.Write(view.Rooms);writer.Write(view.Cleared);writer.Write(view.Enemies);writer.Write(view.Approximate);
+        writer.Write(view.Rooms);writer.Write(view.Cleared);writer.Write(view.Enemies);writer.Write(view.Approximate);writer.Write(view.Assisted);
         if(view.Targets.Length>8192)throw new InvalidDataException("Purge scanner actor bound exceeded.");
         writer.Write((ushort)view.Targets.Length);foreach(int id in view.Targets)writer.Write(id);
     }
-    public int GetLength()=>108+((view?.Prefab?.Length??0)+(view?.PoiKey?.Length??0))*3+(view?.Targets?.Length??0)*4;
+    public int GetLength()=>109+((view?.Prefab?.Length??0)+(view?.PoiKey?.Length??0))*3+(view?.Targets?.Length??0)*4;
     public override void ProcessPackage(World world,GameManager callbacks)
     {
         if(world==null||!world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||

@@ -68,6 +68,7 @@ internal static class RebirthTheorySoloService
     }
     private static void OnUpdate(ref ModEvents.SGameUpdateData data)
     {
+        if(Active.Count==0)return;
         var world=GameManager.Instance?.World;float now=Time.realtimeSinceStartup;
         foreach(var pair in Active.ToArray())
         {

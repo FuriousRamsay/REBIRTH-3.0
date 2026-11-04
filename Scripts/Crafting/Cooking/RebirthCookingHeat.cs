@@ -13,7 +13,21 @@ public static class RebirthCookingHeat
     {var retry=outputRetries.GetValue(recipe,_=>new OutputRetry());if(Time.unscaledTime<retry.Next)return false;retry.Next=Time.unscaledTime+.25f;return true;}
     private const string Prefix="rebirth.cooking.queue.";
     public static bool Managed(Recipe r)=>RebirthCookingBatch.IsBatch(r)&&r.ingredients[0].itemValue.HasMetadata(Prefix+"held");
-    public static float Number(Recipe r,string key){if(Managed(r)&&r.ingredients[0].itemValue.TryGetMetadata(Prefix+key,out float n))return n;return 0;}
+    public static float Number(Recipe r,string key)
+    {
+        if(!Managed(r))return 0;
+        string metadataKey;
+        switch(key)
+        {
+            case "elapsed":metadataKey=Prefix+"elapsed";break;
+            case "duration":metadataKey=Prefix+"duration";break;
+            case "overdue":metadataKey=Prefix+"overdue";break;
+            case "hidden":metadataKey=Prefix+"hidden";break;
+            case "reported":metadataKey=Prefix+"reported";break;
+            default:metadataKey=Prefix+key;break;
+        }
+        return r.ingredients[0].itemValue.TryGetMetadata(metadataKey,out float n)?n:0;
+    }
     // Native queue Multiplier/recipeCount reaches zero when a job finishes.
     // Stamp already preserves the original batch size on the serialized recipe.
     public static int Portions(Recipe r,int activeCount)
@@ -37,7 +51,9 @@ public static class RebirthCookingHeat
         v.SetMetadata(Prefix+"preview",previewIcon);
     }
     public static bool Ready(Recipe r)=>Managed(r)&&Number(r,"elapsed")>=Number(r,"duration");
-    public static bool Burnt(Recipe r)=>Managed(r)&&Number(r,"overdue")>=RebirthCookingHeatRules.BurnAfter(Text(r,"method"));
+    public static bool IsDrink(Recipe r)=>r!=null&&RebirthConsumableResolver.TryResolve(ItemClass.GetForId(r.itemValueType),out var definition)&&definition.IsDrink;
+    public static bool Burnt(Recipe r)=>Managed(r)&&!IsDrink(r)&&Number(r,"overdue")>=RebirthCookingHeatRules.BurnAfter(Text(r,"method"));
+    public static bool Evaporated(Recipe r)=>Managed(r)&&IsDrink(r)&&Number(r,"overdue")>=RebirthCookingHeatRules.BurnAfter(Text(r,"method"));
     public static float Remaining(Recipe r)=>Math.Max(0,Number(r,"duration")-Number(r,"elapsed"));
     public static string Name(Recipe r)=>Number(r,"hidden")>0&&!Ready(r)?r.craftingArea=="WorkbenchMortarPestle001_FR"?Localization.Get("xuiRebirthStationUnfamiliarRecipe"):"Unfamiliar dish":Localization.Get(r.GetName());
     public static string Icon(Recipe r)
@@ -45,13 +61,16 @@ public static class RebirthCookingHeat
         if(Number(r,"hidden")>0&&!Ready(r))return string.IsNullOrEmpty(Text(r,"preview"))?"rebirthImprovised"+Text(r,"method")+"01":Text(r,"preview");
         return Burnt(r)?RebirthCookingBurntIcons.Icon(r.GetName()):r.GetIcon();
     }
-    public static string Status(Recipe r,bool heated)=>Burnt(r)?"BURNT":!Ready(r)?heated||!RebirthCookingBatch.NeedsHeat(r)?r.craftingArea=="WorkbenchMortarPestle001_FR"?Localization.Get("xuiRebirthStationProcessing"):"COOKING":"PAUSED — HEAT OFF":Number(r,"overdue")>=RebirthCookingHeatRules.Grace?"OVERCOOKING — TAKE NOW":"READY TO TAKE";
+    public static string Status(Recipe r,bool heated)=>Burnt(r)?"BURNT":!Ready(r)?heated||!RebirthCookingBatch.NeedsHeat(r)?r.craftingArea=="WorkbenchMortarPestle001_FR"?Localization.Get("xuiRebirthStationProcessing"):"COOKING":"PAUSED — HEAT OFF":Evaporated(r)?"EVAPORATED — TAKE NOW":Number(r,"overdue")>=RebirthCookingHeatRules.Grace?(IsDrink(r)?"EVAPORATING — TAKE NOW":"OVERCOOKING — TAKE NOW"):"READY TO TAKE";
     public static string Timer(Recipe r)
     {
-        if(Ready(r)&&!RebirthCookingBatch.NeedsHeat(r))return "Ready";
-        float seconds=!Ready(r)?Remaining(r):Burnt(r)?0:Number(r,"overdue")<RebirthCookingHeatRules.Grace?RebirthCookingHeatRules.Grace-Number(r,"overdue"):RebirthCookingHeatRules.BurnAfter(Text(r,"method"))-Number(r,"overdue");
+        bool ready=Ready(r);
+        if(ready&&!RebirthCookingBatch.NeedsHeat(r))return "Ready";
+        bool done=ready&&(Burnt(r)||Evaporated(r));
+        float overdue=ready&&!done?Number(r,"overdue"):0f;
+        float seconds=!ready?Remaining(r):done?0:overdue<RebirthCookingHeatRules.Grace?RebirthCookingHeatRules.Grace-overdue:RebirthCookingHeatRules.BurnAfter(Text(r,"method"))-overdue;
         string clock=FormatDuration(seconds);
-        return clock+(!Ready(r)?"":Burnt(r)?"":" to "+(Number(r,"overdue")<RebirthCookingHeatRules.Grace?"overcooking":"burning"));
+        return clock+(!ready?"":done?"":" to "+(IsDrink(r)?overdue<RebirthCookingHeatRules.Grace?"evaporating":"empty":overdue<RebirthCookingHeatRules.Grace?"overcooking":"burning"));
     }
     public static string FormatDuration(double seconds)
     {
@@ -79,7 +98,9 @@ public static class RebirthCookingHeat
         Advance(stack.recipe,dt,heated);stack.craftingTimeLeft=Remaining(stack.recipe);
         if(!wasReady&&Ready(stack.recipe))
         {
-            if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.CraftingUiLoggingEnabled)) Log.Out("[REBIRTH Cooking] Food ready; overcooking at "+RebirthCookingHeatRules.Grace+"s, burnt at "+RebirthCookingHeatRules.BurnAfter(Text(stack.recipe,"method"))+"s after completion.");
+            if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.CraftingUiLoggingEnabled)) Log.Out(IsDrink(stack.recipe)
+                ?"[REBIRTH Cooking] Drink ready; evaporation at "+RebirthCookingHeatRules.Grace+"s, empty at "+RebirthCookingHeatRules.BurnAfter(Text(stack.recipe,"method"))+"s after completion."
+                :"[REBIRTH Cooking] Food ready; overcooking at "+RebirthCookingHeatRules.Grace+"s, burnt at "+RebirthCookingHeatRules.BurnAfter(Text(stack.recipe,"method"))+"s after completion.");
             
         }
         if(Ready(stack.recipe)&&Number(stack.recipe,"reported")==0)
@@ -96,7 +117,7 @@ public static class RebirthCookingHeat
             (stack.Owner as XUiC_RebirthCraftingQueue)?.SyncVisiblePresentationAfterNativeMutation();
             return;
         }
-        if(Burnt(stack.recipe)&&station.WorkstationData.GetIsBurning()){station.fuelWindow?.TurnOff();station.WorkstationData.TileEntity.IsBurning=false;}
+        if((Burnt(stack.recipe)||Evaporated(stack.recipe))&&station.WorkstationData.GetIsBurning()){station.fuelWindow?.TurnOff();station.WorkstationData.TileEntity.IsBurning=false;}
     }
     public static bool TickTile(TileEntityWorkstation tile,float dt)
     {
@@ -118,7 +139,7 @@ public static class RebirthCookingHeat
                     tile.cycleRecipeQueue();tile.setModified();return false;
                 }
             }
-            if(Burnt(entry.Recipe))tile.IsBurning=false;
+            if(Burnt(entry.Recipe)||Evaporated(entry.Recipe))tile.IsBurning=false;
             tile.setModified();
         }
         return false;
@@ -177,6 +198,17 @@ public static class RebirthCookingHeat
     {
         var value=RebirthCookingBatch.Preview(recipe);
         value.SetMetadata("rebirth.cooking.source",recipe.GetName());
+        if(IsDrink(recipe))
+        {
+            if(RebirthConsumableResolver.TryResolve(ItemClass.GetForId(recipe.itemValueType),out var drink))
+            {
+                float original=RebirthCookingItemStats.Value(value,"water");
+                float remaining=RebirthCookingHeatRules.EvaporatedVolume(original,Number(recipe,"overdue"),Text(recipe,"method"));
+                value.SetMetadata("rebirth.cooking.water",remaining);
+                RebirthLiquidContainerService.SetRemainingMl(value,drink,remaining);
+            }
+            return value;
+        }
         foreach(string stat in new[]{"nutrition","water","comfort","energy"})
             if(value.TryGetMetadata("rebirth.cooking."+stat,out float n))value.SetMetadata("rebirth.cooking."+stat,RebirthCookingHeatRules.FoodStat(stat,n,Number(recipe,"overdue"),Text(recipe,"method")));
         if(!Burnt(recipe)&&Number(recipe,"overdue")>=RebirthCookingHeatRules.Grace&&RebirthCookingBatch.NeedsHeat(recipe)&&Ready(recipe))

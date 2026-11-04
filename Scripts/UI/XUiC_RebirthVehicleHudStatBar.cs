@@ -93,13 +93,12 @@ public sealed class XUiC_RebirthVehicleHudStatBar : XUiC_HUDStatBar
     {
         int width=ViewComponent?.Size.x??180;
         bool fuel=statType==HUDStatTypes.VehicleFuel;
-        string prefix=fuel?"vehicleFuel":"vehicleCondition";
-        Resize(prefix+"Card",0,0,width,44);
-        Resize(prefix+"Frame",0,0,width,44);
-        Resize(prefix+"Caption",32,-3,Math.Max(1,width-148),18);
+        Resize(fuel?"vehicleFuelCard":"vehicleConditionCard",0,0,width,44);
+        Resize(fuel?"vehicleFuelFrame":"vehicleConditionFrame",0,0,width,44);
+        Resize(fuel?"vehicleFuelCaption":"vehicleConditionCaption",32,-3,Math.Max(1,width-148),18);
         Resize("TextContent",Math.Max(32,width-112),-3,104,18);
         // Icon occupies x=8..26. Keep both bar layers beyond its right edge.
-        Resize(prefix+"Track",32,-27,Math.Max(1,width-40),10);
+        Resize(fuel?"vehicleFuelTrack":"vehicleConditionTrack",32,-27,Math.Max(1,width-40),10);
         Resize("BarContent",32,-27,Math.Max(1,width-40),10);
     }
     private void Resize(string id,int x,int y,int width,int height)

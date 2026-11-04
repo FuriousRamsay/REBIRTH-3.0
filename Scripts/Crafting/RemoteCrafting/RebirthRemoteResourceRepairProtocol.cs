@@ -119,6 +119,7 @@ internal static class RebirthRemoteResourceRepairProtocol
                 catch{/* Unknown original remains retained, never applied. */}
             }
         }
+        if(pending.Count==0)return;
         foreach(var entry in pending.Values.ToArray())
         {
             if(!RebirthRemoteResourceRepairAdoption.QueryScope(player,entry.Original)||now<entry.Next)continue;

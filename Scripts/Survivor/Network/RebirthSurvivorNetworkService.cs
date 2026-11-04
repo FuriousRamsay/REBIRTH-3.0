@@ -76,6 +76,7 @@ public static class RebirthSurvivorNetworkService
 
     private static void OnPlayerSpawnedInWorld(ref ModEvents.SPlayerSpawnedInWorldData data)
     {
+        if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         if (!RebirthWorldCharacterRepository.IsServerAuthority) return;
         // Starter delivery also resolves the stable player identity. Remember it
         // before either operation rather than relying on another handler's order.

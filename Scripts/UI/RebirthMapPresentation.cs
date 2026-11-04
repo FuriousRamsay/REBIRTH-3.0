@@ -13,7 +13,7 @@ internal sealed class RebirthMapInteraction
     internal void Reset(){zoomFrame=panFrame=-3;dragging=false;}
     internal bool Suppress(XUiC_RebirthMapArea map)
     {
-        if(map.ZoomSlider?.BlocksMapInput==true)return true;
+        if(map.ZoomSlider?.BlocksMapInput==true||map.SupplyButton?.BlocksMapInput==true)return true;
         if(dragging){if(Input.GetMouseButton(0))return true;dragging=false;}
         return IsMoving(map.zoomScale,map.targetZoomScale,Time.frameCount,zoomFrame,panFrame);
     }
@@ -145,7 +145,7 @@ internal static class RebirthMapDragGesture
     {
         var map=__instance as XUiC_RebirthMapArea;
         if(map==null)return true;
-        if(map.ZoomSlider?.BlocksMapInput==true)return false;
+        if(map.ZoomSlider?.BlocksMapInput==true||map.SupplyButton?.BlocksMapInput==true)return false;
         map.Interaction.Drag(__1!=EDragType.DragEnd&&Input.GetMouseButton(0));
         return true;
     }

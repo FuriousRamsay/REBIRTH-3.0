@@ -12,7 +12,9 @@ using System.Runtime.CompilerServices;
 internal static class RebirthElectricalSourceIdentity
 {
     private const string Prefix="RebirthElectricalSourceV1:";
-    internal sealed class CommitBefore{internal BlockValue Block;internal TileEntity Tile;}
+    // This Harmony state is captured on every Chunk.SetBlock call, including
+    // changes unrelated to electrical sources.
+    internal struct CommitBefore{internal bool Captured;internal BlockValue Block;internal TileEntity Tile;}
     // Scalar JSON image avoids serializing native Vector3i computed properties.
     private sealed class DeferredImage
     {
@@ -140,8 +142,9 @@ internal static class RebirthElectricalSourceIdentity
     internal static void Committed(Chunk chunk,WorldBase world,int x,int y,int z,BlockValue before,TileEntity beforeTile=null,bool observedTile=false)
     {
         if(world==null||world.IsRemote()||world.IsEditor()||!ThreadManager.IsMainThread()||!ReferenceEquals(world,GameManager.Instance?.World))return;
-        var local=new Vector3i(x,y,z);var position=chunk.GetWorldPos()+local;var after=chunk.GetBlock(local);
+        var local=new Vector3i(x,y,z);var after=chunk.GetBlock(local);
         if(before.type==after.type&&(!observedTile||ReferenceEquals(beforeTile,chunk.GetTileEntity(local))))return; // power/meta changes are the same source
+        var position=chunk.GetWorldPos()+local;
         bool upgraded=upgrading!=null&&ReferenceEquals(upgrading.World,world)&&upgrading.Position==position&&
             RebirthInfrastructureWorkService.IsElectricalBlock(before.Block)&&RebirthInfrastructureWorkService.IsElectricalBlock(after.Block);
         string key=Key(local);string previous=null;RebirthElectricalServiceRecord deferred=null;
@@ -167,11 +170,11 @@ internal static class RebirthElectricalSourceIdentity
 internal static class RebirthElectricalSourceBlockCommit
 {
     private static void Prefix(Chunk __instance,int __1,int __2,int __3,out RebirthElectricalSourceIdentity.CommitBefore __state)
-    {var local=new Vector3i(__1,__2,__3);__state=new RebirthElectricalSourceIdentity.CommitBefore{Block=__instance.GetBlock(local),Tile=__instance.GetTileEntity(local)};}
+    {var local=new Vector3i(__1,__2,__3);__state=new RebirthElectricalSourceIdentity.CommitBefore{Captured=true,Block=__instance.GetBlock(local),Tile=__instance.GetTileEntity(local)};}
     private static void Postfix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,RebirthElectricalSourceIdentity.CommitBefore __state)
         =>RebirthElectricalSourceIdentity.Committed(__instance,__0,__1,__2,__3,__state.Block,__state.Tile,true);
     private static Exception Finalizer(Chunk __instance,WorldBase __0,int __1,int __2,int __3,RebirthElectricalSourceIdentity.CommitBefore __state,Exception __exception)
-    {if(__exception!=null&&__state!=null)try{RebirthElectricalSourceIdentity.Committed(__instance,__0,__1,__2,__3,__state.Block,__state.Tile,true);}catch{}return __exception;}
+    {if(__exception!=null&&__state.Captured)try{RebirthElectricalSourceIdentity.Committed(__instance,__0,__1,__2,__3,__state.Block,__state.Tile,true);}catch{}return __exception;}
 }
 
 [HarmonyPatch(typeof(Chunk),"read",new[]{typeof(PooledBinaryReader),typeof(uint),typeof(bool)})]

@@ -59,7 +59,16 @@ public sealed class XUiC_RebirthTraderWorkspace : XUiC_TraderWindowGroup
         if(stashCoin!=null)stashCoin.IsVisible=equipped;
         if(stashButtonCoin!=null)stashButtonCoin.IsVisible=equipped;
         var heading=GetChildById("sellBackpackHeading")?.ViewComponent;if(heading!=null)heading.IsVisible=equipped;
-        if(stashTotal!=null){stashTotal.IsVisible=equipped;if(equipped)stashTotal.SetTextImmediately(RebirthBackpackSaleQuote.Format(xui,stash).Replace(" $",string.Empty));}
+        if(stashTotal!=null)
+        {
+            bool wasVisible=stashTotal.IsVisible;
+            stashTotal.IsVisible=equipped;
+            if(equipped)
+            {
+                string quote=RebirthBackpackSaleQuote.Format(xui,stash).Replace(" $",string.Empty);
+                if(!wasVisible||stashTotal.Text!=quote)stashTotal.SetTextImmediately(quote);
+            }
+        }
         if(stashSell?.ViewComponent!=null){stashSell.ViewComponent.IsVisible=equipped;stashSell.ViewComponent.Enabled=equipped&&!stash.TransferPending&&!stashSales.Running&&stash.OccupiedSlots>0;}
         int money=RebirthSkillWaveABuyPatch.CurrencyCount(xui);
         if(wallet!=null && money!=lastMoney){lastMoney=money;wallet.Text=money.ToString("N0",System.Globalization.CultureInfo.InvariantCulture)+" $";}

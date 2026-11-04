@@ -67,6 +67,13 @@ internal static class RebirthCookingPointerDrop
         bool up=pointer.GetMouseButtonUp(UICamera.MouseButton.LeftButton);
         if(down){state.Source=null;state.Cursor=null;state.CursorWindow=null;state.CursorImage=null;state.HeldFrame=-1;state.ReleaseFrame=-1;state.ShiftBlocked=false;state.Claimed=false;state.Trace=null;}
         if(InputUtils.ShiftKeyPressed)state.ShiftBlocked=true;
+        // No drag or release can be admitted without a left-button frame. Keep
+        // the same idle cleanup without querying NGUI drag state or the cursor.
+        if(!down&&!held&&!up)
+        {
+            state.ReleaseFrame=-1;state.Cursor=null;state.Source=null;
+            return;
+        }
         var mouse=UICamera.GetMouse?.Invoke(0);var cursor=owner.xui.DragAndDropWindow?.CurrentStack;
         var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         if(held&&!state.ShiftBlocked&&mouse?.dragStarted==true&&OwnsSource(owner,mouse.pressed)&&cursor!=null&&!cursor.IsEmpty())

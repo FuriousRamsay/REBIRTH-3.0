@@ -96,8 +96,13 @@ internal sealed class RebirthPoiInheritedActorOutcomes
                 // actor receipt, not a later matching ID or guessed generation.
                 RebirthPoiResetActorOutcome prior;
                 if(obligation.Reset==Guid.Empty||obligation.Epoch==long.MaxValue||record.Epoch!=obligation.Epoch+1||record.LastResetId!=obligation.Reset||record.LastAuthoredReset==null||!record.LastAuthoredReset.PriorActors.TryGetValue(original.Token,out prior)||prior.SourceEpoch!=obligation.Epoch||prior.SourceGeneration!=obligation.Generation||prior.Descriptor!=obligation.Descriptor||prior.ActorDigest!=obligation.Digest||prior.EntityId!=original.EntityId)continue;
-                var matches=record.Observations.Volumes.Values.Where(v=>v.Descriptor==obligation.Descriptor&&v.Actors.ContainsKey(original.Token)).ToArray();
-                if(matches.Length!=1)continue;volume=matches[0];actor=volume.Actors[original.Token];
+                foreach(var candidate in record.Observations.Volumes.Values)
+                {
+                    if(candidate.Descriptor!=obligation.Descriptor||!candidate.Actors.ContainsKey(original.Token))continue;
+                    if(volume!=null){volume=null;break;}
+                    volume=candidate;
+                }
+                if(volume==null)continue;actor=volume.Actors[original.Token];
                 if(actor.EntityId!=original.EntityId||actor.ClassName!=original.Class||actor.Inheritance==null||actor.Inheritance.ResetTransaction!=obligation.Reset||actor.Inheritance.SurvivalReceipt!=prior.Receipt)continue;
             }
             if(actor.Dead)continue;

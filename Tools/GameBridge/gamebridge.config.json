@@ -1,14 +1,12 @@
-﻿{
-    "port":  8765,
-    "world":  "West Xuyofu Territory",
-    "save":  "RebirthBridgeCamper",
-    "baselineSave":  "Camper",
-    "windowed":  true,
-    "width":  1280,
-    "height":  720,
-    "buildConfiguration":  "Debug",
-    "extraArgs":  [
-
-                  ],
-    "startHour":  9
+{
+  "port": 8765,
+  "world": "West Xuyofu Territory",
+  "save": "CodexTestPurgeFresh20261102",
+  "baselineSave": "PurgeTest",
+  "windowed": true,
+  "width": 1280,
+  "height": 720,
+  "buildConfiguration": "Debug",
+  "extraArgs": [],
+  "startHour": 9
 }

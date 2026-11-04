@@ -1,0 +1,13 @@
+{
+  "name":"Stable fire simulation selection smoke",
+  "status":"AUTHORED_NOT_RUN",
+  "stopOnFailure":true,
+  "preconditions":"Lead-owned disposable save with separately prepared visible burning blocks and completed prior simulation, guard ON, safe camera position. Compare equivalent baseline/proposal fixtures. Existing fire diagnostics/profiler must independently witness selected positions/counters and sort cost. This read-only dwell cannot itself prove fairness or timing gains. Never run against the user's game.",
+  "steps":[
+    {"action":{"command":"surroundings","args":{}}},
+    {"screenshot":"stable_fire_selection_start"},
+    {"wait":12},
+    {"screenshot":"stable_fire_selection_after_window"},
+    {"expectNoErrors":true}
+  ]
+}

@@ -85,6 +85,7 @@ internal sealed class RebirthPurgeMilestoneStore
                 if(root.Name!="purge_milestones" || root.Attributes().Count()!=3 || !int.TryParse((string)root.Attribute("version"),out version) || version<1 || version>4 || (string)root.Attribute("world")!=binding.NativeWorldId)return false;
                 predecessor=(string)root.Attribute("predecessor");if(predecessor!= "" && !RebirthPoiManifestCodec.LowerHex(predecessor,64))return false;
                 var parsed=new Dictionary<string,Receipt>(StringComparer.Ordinal);
+                var biomeNames=new HashSet<string>(StringComparer.Ordinal);
                 foreach(var node in root.Elements())
                 {
                     bool discovery=node.Name=="discovery";if(node.Name!="completion"&&!discovery||discovery&&version<2||node.HasElements||parsed.Count>=1024)return false;
@@ -92,7 +93,7 @@ internal sealed class RebirthPurgeMilestoneStore
                     RebirthPoiClearanceCodec.Shape(node,discovery?"discovery":"completion",fields+(version>=3?",numerator":"")+(version>=4?",mode,eligibleUnits,clearedUnits":""),"");
                     string biome=(string)node.Attribute("biome");
                     var r=new Receipt(biome,int.Parse((string)node.Attribute("percent"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("eligible"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("cleared"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("revision"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("generation"),CultureInfo.InvariantCulture),discovery?(string)node.Attribute("id"):"completion",discovery?int.Parse((string)node.Attribute("tier"),CultureInfo.InvariantCulture):-1,version>=3?int.Parse((string)node.Attribute("numerator"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("mode"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("eligibleUnits"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("clearedUnits"),CultureInfo.InvariantCulture):0);
-                    parsed.Add(r.Key,r);if(parsed.Values.Select(v=>v.Biome).Distinct(StringComparer.Ordinal).Count()>64)return false;
+                    parsed.Add(r.Key,r);biomeNames.Add(r.Biome);if(biomeNames.Count>64)return false;
                 }
                 values=parsed;return true;
             }
@@ -147,8 +148,9 @@ internal sealed class RebirthPurgeMilestoneStore
                 if(final!=original)return false;
                 if(File.Exists(path+".candidate")){PublishCandidate(Read(path+".candidate"));return true;}
                 var candidateValues=new Dictionary<string,Receipt>(receipts,StringComparer.Ordinal);
+                var biomeNames=new HashSet<string>(candidateValues.Values.Select(v=>v.Biome),StringComparer.Ordinal);
                 foreach(var receipt in earned)
-                { if(receipt==null)return false;if(!candidateValues.ContainsKey(receipt.Key))candidateValues.Add(receipt.Key,receipt);if(candidateValues.Count>1024||candidateValues.Values.Select(v=>v.Biome).Distinct(StringComparer.Ordinal).Count()>64)return false; }
+                { if(receipt==null)return false;if(!candidateValues.ContainsKey(receipt.Key)){candidateValues.Add(receipt.Key,receipt);biomeNames.Add(receipt.Biome);}if(candidateValues.Count>1024||biomeNames.Count>64)return false; }
                 if(candidateValues.Count==receipts.Count)return true;
                 string candidate=Encode(candidateValues,original==null?"":Hash(original));
                 using(var stream=new FileStream(path+".candidate",FileMode.CreateNew,FileAccess.Write,FileShare.None))

@@ -1,0 +1,727 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/windows/window[@name='windowPowerSourceStats' or @name='windowPowerSourceSlots']"/>
+      <append xpath="/windows"><window name="windowPowerSourceStats" width="971" height="260" controller="PowerSourceStats" anchor="Center" cursor_area="true">
+		<rect name="bankStatsPanel" width="971" height="260"><sprite width="971" height="260" sprite="menu_empty" color="25,25,31,205" globalopacitymod="0" depth="0"/><sprite width="971" height="260" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4"/><label pos="14,-8" width="940" height="28" font_size="28" color="188,132,231,255" text_key="xuiStats" depth="5"/><sprite pos="0,-38" width="971" height="2" sprite="menu_empty" color="181,140,255,255" depth="5"/><rect name="bankMetric0" pos="18,-54" width="305" height="100" visible="true"><sprite width="305" height="100" sprite="menu_empty" color="18,18,24,220" globalopacitymod="0" depth="1"/><sprite pos="14,-14" width="24" height="24" sprite="ui_game_symbol_electric_max_power" depth="3"/><label pos="48,-12" width="243" height="30" font_size="22" color="235,235,239,255" text="{maxoutputtitle}" depth="3"/><label pos="16,-51" width="274" height="38" font_size="32" color="220,214,165,255" text="{maxoutput} W" depth="3"/></rect><rect name="bankMetric1" pos="333,-54" width="305" height="100" visible="true"><sprite width="305" height="100" sprite="menu_empty" color="18,18,24,220" globalopacitymod="0" depth="1"/><sprite pos="14,-14" width="24" height="24" sprite="ui_game_symbol_electric_power" depth="3"/><label pos="48,-12" width="243" height="30" font_size="22" color="235,235,239,255" text="{powertitle}" depth="3"/><label pos="16,-51" width="274" height="38" font_size="32" color="220,214,165,255" text="{power} W" depth="3"/></rect><rect name="bankMetric2" pos="648,-54" width="305" height="100" visible="{showfuel}"><sprite width="305" height="100" sprite="menu_empty" color="18,18,24,220" globalopacitymod="0" depth="1"/><sprite pos="14,-14" width="24" height="24" sprite="ui_game_symbol_gas" depth="3"/><label pos="48,-12" width="243" height="30" font_size="22" color="235,235,239,255" text="{fueltitle}" depth="3"/><label pos="16,-51" width="274" height="38" font_size="32" color="220,214,165,255" text="{fuel} / {maxfuel}" depth="3"/>
+        <!-- Required by native PowerSourceStats.Init; actual fuel and refuel-preview gauge. -->
+        <sprite name="bankFuelTrack" pos="16,-92" width="274" height="6" sprite="menu_empty" color="45,45,54,255" depth="3"/>
+        <sprite name="sprFillPotential" pos="16,-92" width="274" height="6" sprite="menu_empty" type="filled" color="125,94,160,255" fill="{potentialfuelfill}" depth="4"/>
+        <sprite name="sprFuelFill" pos="16,-92" width="274" height="6" sprite="menu_empty" type="filled" color="220,214,165,255" fill="{fuelfill}" depth="5"/>
+      </rect><rect name="btnOn" depth="3" pos="18,-184" height="44" width="458">
+				<sprite depth="8" name="backgroundMain" sprite="menu_empty3px" color="83,77,94,255" type="sliced" fillcenter="false"/>
+				<sprite depth="2" name="background" pos="3,-3" sprite="menu_empty" width="452" height="32" color="24,24,29,250" type="sliced"/>
+				<rect depth="3" pos="1,-3" width="452" height="31">
+					<button name="clickable" sprite="menu_empty" defaultcolor="27,25,33,255" hoversprite="ui_game_select_row" hovercolor="83,64,109,255" type="sliced" hoverscale="1.0" width="452"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="11,-3" sprite="ui_game_symbol_electric_switch" color="[black_half_alpha]"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="9,-3" sprite="ui_game_symbol_electric_switch" color="[black_half_alpha]"/>
+
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="9,-1" sprite="ui_game_symbol_electric_switch" color="[black_half_alpha]"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="11,-1" sprite="ui_game_symbol_electric_switch" color="[black_half_alpha]"/>
+
+					<sprite depth="2" name="sprOnOff" width="24" height="24" pos="10,-2" color="[iconColor]" sprite="ui_game_symbol_electric_switch"/>
+					<label depth="2" name="lblOnOff" pos="40,-3" justify="left" text="TURN ON" text_key="xuiTurnOn" font_size="24" width="180" color="245,245,247,255"/>
+				</rect>
+			</rect>
+			<rect name="btnRefuel" depth="3" pos="491,-184" height="44" visible="{showfuel}" width="458">
+				<sprite depth="8" name="backgroundMain" sprite="menu_empty3px" color="83,77,94,255" type="sliced" fillcenter="false"/>
+				<sprite depth="2" name="background" pos="3,-3" sprite="menu_empty" width="452" height="32" color="24,24,29,250" type="sliced"/>
+				<rect depth="3" pos="1,-3" width="452" height="31">
+					<button name="clickable" sprite="menu_empty" defaultcolor="27,25,33,255" hoversprite="ui_game_select_row" hovercolor="83,64,109,255" type="sliced" hoverscale="1.0" width="452"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="11,-3" sprite="ui_game_symbol_gas" color="[black_half_alpha]"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="9,-3" sprite="ui_game_symbol_gas" color="[black_half_alpha]"/>
+
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="9,-1" sprite="ui_game_symbol_gas" color="[black_half_alpha]"/>
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="11,-1" sprite="ui_game_symbol_gas" color="[black_half_alpha]"/>
+
+					<sprite depth="2" name="windowIcon" width="24" height="24" pos="10,-2" color="[iconColor]" sprite="ui_game_symbol_gas"/>
+					<label depth="2" name="windowName" pos="40,-3" justify="left" text="REFUEL" text_key="xuiRefuel" font_size="24" width="180" color="245,245,247,255"/>
+				</rect>
+			</rect>
+		</rect></window>
+
+	<window name="windowPowerSourceSlots" width="971" height="537" anchor="Center" cursor_area="true"><rect name="bankComponentsPanel" width="971" height="537"><sprite width="971" height="537" sprite="menu_empty" color="25,25,31,205" globalopacitymod="0" depth="0"/><sprite width="971" height="537" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4"/><label pos="14,-8" width="940" height="28" font_size="28" color="188,132,231,255" text_key="xuiSlots" depth="5"/><sprite pos="0,-38" width="971" height="2" sprite="menu_empty" color="181,140,255,255" depth="5"/><grid name="inventory" pos="18,-56" rows="2" cols="3" width="945" height="400" cell_width="315" cell_height="200" repeat_content="true" controller="RebirthPowerSourceSlots, RebirthUtils" depth="5"><rect name="bankComponentCell" width="305" height="190"><sprite width="305" height="190" sprite="menu_empty" color="18,18,24,220" globalopacitymod="0" depth="1"/><rect pos="89,-27" width="128" height="128"><item_stack name="0" controller="RebirthBankPowerSlot, RebirthUtils" cell_size="128"/></rect></rect></grid><label pos="20,-476" width="930" height="45" font_size="20" color="220,220,227,255" text_key="xuiRebirthBankComponentsHelp" depth="5"/></rect></window><window name="rebirthBankBackpack" width="841" height="813" anchor="Center" controller="RebirthBankBackpackWindow, RebirthUtils" cursor_area="true"><rect name="editorBackpack" pos="0,0" width="841" height="813" controller="RebirthEditorBackpack, RebirthUtils">
+              <sprite depth="0" width="841" height="813" sprite="menu_empty" color="25,25,31,205" globalopacitymod="0"/>
+              <label depth="5" pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text="SELECTED ITEM" upper_case="true"/>
+              <sprite depth="3" pos="0,-38" width="841" height="2" sprite="menu_empty" color="181,140,255,255"/>
+              <label name="editorBagItemName" depth="5" pos="139,-54" width="685" height="40" font_size="34" color="255,255,255,255"/>
+              <label name="editorBagItemDescription" depth="5" pos="139,-92" width="685" height="165" font_size="28" color="235,235,239,255"/>
+              <label pos="17,-339" width="145" height="28" font_size="28" color="188,132,231,255" text="BACKPACK" depth="5" pivot="left"/>
+              <label name="editorBagCapacity" pos="165,-339" width="425" height="26" font_size="19" color="220,214,165,255" depth="5" pivot="left"/>
+              <button name="editorBagFilter" pos="629,-339" width="28" height="28" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_assemble" style="press, hover" tooltip="Filter: mods and cosmetic mods" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_right="rbBackpackTheorySection" pivot="center"/>
+              <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="667,-339" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="editorBagFilter" nav_right="rbBackpackSellSection"/>
+              <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="705,-339" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="editorBagSort"/>
+              <button name="editorBagSort" pos="743,-339" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_sort" style="press, hover" tooltip="Sort inventory" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="rbBackpackSellSection" nav_right="editorBagLock" pivot="center"/>
+              <button name="editorBagLock" pos="781,-339" width="28" height="28" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_lock" style="press, hover" tooltip="Lock slots" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagSort" pivot="center"/>
+              <rect name="editorBagScroll" pos="17,-366" width="807" height="433" controller="RebirthCharacterOverviewList, RebirthUtils">
+  <panel name="listViewport" width="779" height="433" clipping="SoftClip" depth="10" clippingsize="779,433" clippingcenter="389.5,-216.5">
+    <rect name="listContent" width="779" height="1136">
+      <rect name="editorRow0" pos="0,0" width="779" height="69">
+        <rect name="editorCell0" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot0" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="0" cell_size="69"/>
+        </rect>
+        <rect name="editorCell1" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot1" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="1" cell_size="69"/>
+        </rect>
+        <rect name="editorCell2" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot2" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="2" cell_size="69"/>
+        </rect>
+        <rect name="editorCell3" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot3" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="3" cell_size="69"/>
+        </rect>
+        <rect name="editorCell4" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot4" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="4" cell_size="69"/>
+        </rect>
+        <rect name="editorCell5" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot5" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="5" cell_size="69"/>
+        </rect>
+        <rect name="editorCell6" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot6" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="6" cell_size="69"/>
+        </rect>
+        <rect name="editorCell7" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot7" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="7" cell_size="69"/>
+        </rect>
+        <rect name="editorCell8" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot8" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="8" cell_size="69"/>
+        </rect>
+        <rect name="editorCell9" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot9" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="9" cell_size="69"/>
+        </rect>
+        <rect name="editorCell10" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot10" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="10" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow1" pos="0,-71" width="779" height="69">
+        <rect name="editorCell11" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot11" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="11" cell_size="69"/>
+        </rect>
+        <rect name="editorCell12" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot12" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="12" cell_size="69"/>
+        </rect>
+        <rect name="editorCell13" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot13" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="13" cell_size="69"/>
+        </rect>
+        <rect name="editorCell14" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot14" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="14" cell_size="69"/>
+        </rect>
+        <rect name="editorCell15" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot15" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="15" cell_size="69"/>
+        </rect>
+        <rect name="editorCell16" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot16" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="16" cell_size="69"/>
+        </rect>
+        <rect name="editorCell17" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot17" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="17" cell_size="69"/>
+        </rect>
+        <rect name="editorCell18" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot18" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="18" cell_size="69"/>
+        </rect>
+        <rect name="editorCell19" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot19" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="19" cell_size="69"/>
+        </rect>
+        <rect name="editorCell20" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot20" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="20" cell_size="69"/>
+        </rect>
+        <rect name="editorCell21" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot21" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="21" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow2" pos="0,-142" width="779" height="69">
+        <rect name="editorCell22" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot22" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="22" cell_size="69"/>
+        </rect>
+        <rect name="editorCell23" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot23" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="23" cell_size="69"/>
+        </rect>
+        <rect name="editorCell24" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot24" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="24" cell_size="69"/>
+        </rect>
+        <rect name="editorCell25" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot25" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="25" cell_size="69"/>
+        </rect>
+        <rect name="editorCell26" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot26" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="26" cell_size="69"/>
+        </rect>
+        <rect name="editorCell27" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot27" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="27" cell_size="69"/>
+        </rect>
+        <rect name="editorCell28" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot28" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="28" cell_size="69"/>
+        </rect>
+        <rect name="editorCell29" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot29" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="29" cell_size="69"/>
+        </rect>
+        <rect name="editorCell30" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot30" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="30" cell_size="69"/>
+        </rect>
+        <rect name="editorCell31" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot31" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="31" cell_size="69"/>
+        </rect>
+        <rect name="editorCell32" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot32" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="32" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow3" pos="0,-213" width="779" height="69">
+        <rect name="editorCell33" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot33" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="33" cell_size="69"/>
+        </rect>
+        <rect name="editorCell34" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot34" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="34" cell_size="69"/>
+        </rect>
+        <rect name="editorCell35" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot35" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="35" cell_size="69"/>
+        </rect>
+        <rect name="editorCell36" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot36" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="36" cell_size="69"/>
+        </rect>
+        <rect name="editorCell37" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot37" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="37" cell_size="69"/>
+        </rect>
+        <rect name="editorCell38" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot38" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="38" cell_size="69"/>
+        </rect>
+        <rect name="editorCell39" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot39" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="39" cell_size="69"/>
+        </rect>
+        <rect name="editorCell40" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot40" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="40" cell_size="69"/>
+        </rect>
+        <rect name="editorCell41" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot41" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="41" cell_size="69"/>
+        </rect>
+        <rect name="editorCell42" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot42" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="42" cell_size="69"/>
+        </rect>
+        <rect name="editorCell43" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot43" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="43" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow4" pos="0,-284" width="779" height="69">
+        <rect name="editorCell44" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot44" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="44" cell_size="69"/>
+        </rect>
+        <rect name="editorCell45" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot45" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="45" cell_size="69"/>
+        </rect>
+        <rect name="editorCell46" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot46" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="46" cell_size="69"/>
+        </rect>
+        <rect name="editorCell47" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot47" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="47" cell_size="69"/>
+        </rect>
+        <rect name="editorCell48" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot48" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="48" cell_size="69"/>
+        </rect>
+        <rect name="editorCell49" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot49" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="49" cell_size="69"/>
+        </rect>
+        <rect name="editorCell50" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot50" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="50" cell_size="69"/>
+        </rect>
+        <rect name="editorCell51" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot51" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="51" cell_size="69"/>
+        </rect>
+        <rect name="editorCell52" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot52" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="52" cell_size="69"/>
+        </rect>
+        <rect name="editorCell53" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot53" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="53" cell_size="69"/>
+        </rect>
+        <rect name="editorCell54" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot54" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="54" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow5" pos="0,-355" width="779" height="69">
+        <rect name="editorCell55" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot55" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="55" cell_size="69"/>
+        </rect>
+        <rect name="editorCell56" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot56" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="56" cell_size="69"/>
+        </rect>
+        <rect name="editorCell57" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot57" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="57" cell_size="69"/>
+        </rect>
+        <rect name="editorCell58" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot58" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="58" cell_size="69"/>
+        </rect>
+        <rect name="editorCell59" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot59" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="59" cell_size="69"/>
+        </rect>
+        <rect name="editorCell60" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot60" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="60" cell_size="69"/>
+        </rect>
+        <rect name="editorCell61" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot61" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="61" cell_size="69"/>
+        </rect>
+        <rect name="editorCell62" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot62" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="62" cell_size="69"/>
+        </rect>
+        <rect name="editorCell63" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot63" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="63" cell_size="69"/>
+        </rect>
+        <rect name="editorCell64" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot64" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="64" cell_size="69"/>
+        </rect>
+        <rect name="editorCell65" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot65" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="65" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow6" pos="0,-426" width="779" height="69">
+        <rect name="editorCell66" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot66" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="66" cell_size="69"/>
+        </rect>
+        <rect name="editorCell67" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot67" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="67" cell_size="69"/>
+        </rect>
+        <rect name="editorCell68" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot68" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="68" cell_size="69"/>
+        </rect>
+        <rect name="editorCell69" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot69" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="69" cell_size="69"/>
+        </rect>
+        <rect name="editorCell70" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot70" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="70" cell_size="69"/>
+        </rect>
+        <rect name="editorCell71" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot71" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="71" cell_size="69"/>
+        </rect>
+        <rect name="editorCell72" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot72" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="72" cell_size="69"/>
+        </rect>
+        <rect name="editorCell73" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot73" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="73" cell_size="69"/>
+        </rect>
+        <rect name="editorCell74" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot74" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="74" cell_size="69"/>
+        </rect>
+        <rect name="editorCell75" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot75" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="75" cell_size="69"/>
+        </rect>
+        <rect name="editorCell76" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot76" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="76" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow7" pos="0,-497" width="779" height="69">
+        <rect name="editorCell77" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot77" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="77" cell_size="69"/>
+        </rect>
+        <rect name="editorCell78" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot78" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="78" cell_size="69"/>
+        </rect>
+        <rect name="editorCell79" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot79" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="79" cell_size="69"/>
+        </rect>
+        <rect name="editorCell80" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot80" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="80" cell_size="69"/>
+        </rect>
+        <rect name="editorCell81" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot81" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="81" cell_size="69"/>
+        </rect>
+        <rect name="editorCell82" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot82" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="82" cell_size="69"/>
+        </rect>
+        <rect name="editorCell83" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot83" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="83" cell_size="69"/>
+        </rect>
+        <rect name="editorCell84" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot84" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="84" cell_size="69"/>
+        </rect>
+        <rect name="editorCell85" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot85" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="85" cell_size="69"/>
+        </rect>
+        <rect name="editorCell86" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot86" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="86" cell_size="69"/>
+        </rect>
+        <rect name="editorCell87" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot87" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="87" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow8" pos="0,-568" width="779" height="69">
+        <rect name="editorCell88" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot88" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="88" cell_size="69"/>
+        </rect>
+        <rect name="editorCell89" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot89" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="89" cell_size="69"/>
+        </rect>
+        <rect name="editorCell90" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot90" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="90" cell_size="69"/>
+        </rect>
+        <rect name="editorCell91" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot91" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="91" cell_size="69"/>
+        </rect>
+        <rect name="editorCell92" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot92" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="92" cell_size="69"/>
+        </rect>
+        <rect name="editorCell93" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot93" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="93" cell_size="69"/>
+        </rect>
+        <rect name="editorCell94" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot94" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="94" cell_size="69"/>
+        </rect>
+        <rect name="editorCell95" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot95" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="95" cell_size="69"/>
+        </rect>
+        <rect name="editorCell96" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot96" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="96" cell_size="69"/>
+        </rect>
+        <rect name="editorCell97" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot97" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="97" cell_size="69"/>
+        </rect>
+        <rect name="editorCell98" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot98" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="98" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow9" pos="0,-639" width="779" height="69">
+        <rect name="editorCell99" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot99" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="99" cell_size="69"/>
+        </rect>
+        <rect name="editorCell100" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot100" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="100" cell_size="69"/>
+        </rect>
+        <rect name="editorCell101" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot101" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="101" cell_size="69"/>
+        </rect>
+        <rect name="editorCell102" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot102" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="102" cell_size="69"/>
+        </rect>
+        <rect name="editorCell103" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot103" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="103" cell_size="69"/>
+        </rect>
+        <rect name="editorCell104" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot104" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="104" cell_size="69"/>
+        </rect>
+        <rect name="editorCell105" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot105" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="105" cell_size="69"/>
+        </rect>
+        <rect name="editorCell106" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot106" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="106" cell_size="69"/>
+        </rect>
+        <rect name="editorCell107" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot107" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="107" cell_size="69"/>
+        </rect>
+        <rect name="editorCell108" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot108" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="108" cell_size="69"/>
+        </rect>
+        <rect name="editorCell109" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot109" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="109" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow10" pos="0,-710" width="779" height="69">
+        <rect name="editorCell110" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot110" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="110" cell_size="69"/>
+        </rect>
+        <rect name="editorCell111" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot111" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="111" cell_size="69"/>
+        </rect>
+        <rect name="editorCell112" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot112" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="112" cell_size="69"/>
+        </rect>
+        <rect name="editorCell113" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot113" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="113" cell_size="69"/>
+        </rect>
+        <rect name="editorCell114" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot114" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="114" cell_size="69"/>
+        </rect>
+        <rect name="editorCell115" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot115" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="115" cell_size="69"/>
+        </rect>
+        <rect name="editorCell116" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot116" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="116" cell_size="69"/>
+        </rect>
+        <rect name="editorCell117" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot117" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="117" cell_size="69"/>
+        </rect>
+        <rect name="editorCell118" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot118" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="118" cell_size="69"/>
+        </rect>
+        <rect name="editorCell119" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot119" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="119" cell_size="69"/>
+        </rect>
+        <rect name="editorCell120" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot120" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="120" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow11" pos="0,-781" width="779" height="69">
+        <rect name="editorCell121" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot121" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="121" cell_size="69"/>
+        </rect>
+        <rect name="editorCell122" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot122" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="122" cell_size="69"/>
+        </rect>
+        <rect name="editorCell123" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot123" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="123" cell_size="69"/>
+        </rect>
+        <rect name="editorCell124" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot124" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="124" cell_size="69"/>
+        </rect>
+        <rect name="editorCell125" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot125" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="125" cell_size="69"/>
+        </rect>
+        <rect name="editorCell126" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot126" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="126" cell_size="69"/>
+        </rect>
+        <rect name="editorCell127" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot127" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="127" cell_size="69"/>
+        </rect>
+        <rect name="editorCell128" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot128" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="128" cell_size="69"/>
+        </rect>
+        <rect name="editorCell129" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot129" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="129" cell_size="69"/>
+        </rect>
+        <rect name="editorCell130" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot130" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="130" cell_size="69"/>
+        </rect>
+        <rect name="editorCell131" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot131" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="131" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow12" pos="0,-852" width="779" height="69">
+        <rect name="editorCell132" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot132" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="132" cell_size="69"/>
+        </rect>
+        <rect name="editorCell133" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot133" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="133" cell_size="69"/>
+        </rect>
+        <rect name="editorCell134" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot134" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="134" cell_size="69"/>
+        </rect>
+        <rect name="editorCell135" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot135" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="135" cell_size="69"/>
+        </rect>
+        <rect name="editorCell136" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot136" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="136" cell_size="69"/>
+        </rect>
+        <rect name="editorCell137" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot137" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="137" cell_size="69"/>
+        </rect>
+        <rect name="editorCell138" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot138" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="138" cell_size="69"/>
+        </rect>
+        <rect name="editorCell139" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot139" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="139" cell_size="69"/>
+        </rect>
+        <rect name="editorCell140" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot140" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="140" cell_size="69"/>
+        </rect>
+        <rect name="editorCell141" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot141" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="141" cell_size="69"/>
+        </rect>
+        <rect name="editorCell142" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot142" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="142" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow13" pos="0,-923" width="779" height="69">
+        <rect name="editorCell143" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot143" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="143" cell_size="69"/>
+        </rect>
+        <rect name="editorCell144" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot144" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="144" cell_size="69"/>
+        </rect>
+        <rect name="editorCell145" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot145" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="145" cell_size="69"/>
+        </rect>
+        <rect name="editorCell146" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot146" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="146" cell_size="69"/>
+        </rect>
+        <rect name="editorCell147" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot147" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="147" cell_size="69"/>
+        </rect>
+        <rect name="editorCell148" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot148" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="148" cell_size="69"/>
+        </rect>
+        <rect name="editorCell149" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot149" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="149" cell_size="69"/>
+        </rect>
+        <rect name="editorCell150" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot150" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="150" cell_size="69"/>
+        </rect>
+        <rect name="editorCell151" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot151" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="151" cell_size="69"/>
+        </rect>
+        <rect name="editorCell152" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot152" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="152" cell_size="69"/>
+        </rect>
+        <rect name="editorCell153" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot153" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="153" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow14" pos="0,-994" width="779" height="69">
+        <rect name="editorCell154" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot154" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="154" cell_size="69"/>
+        </rect>
+        <rect name="editorCell155" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot155" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="155" cell_size="69"/>
+        </rect>
+        <rect name="editorCell156" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot156" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="156" cell_size="69"/>
+        </rect>
+        <rect name="editorCell157" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot157" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="157" cell_size="69"/>
+        </rect>
+        <rect name="editorCell158" pos="284,0" width="69" height="69">
+          <item_stack name="editorSlot158" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="158" cell_size="69"/>
+        </rect>
+        <rect name="editorCell159" pos="355,0" width="69" height="69">
+          <item_stack name="editorSlot159" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="159" cell_size="69"/>
+        </rect>
+        <rect name="editorCell160" pos="426,0" width="69" height="69">
+          <item_stack name="editorSlot160" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="160" cell_size="69"/>
+        </rect>
+        <rect name="editorCell161" pos="497,0" width="69" height="69">
+          <item_stack name="editorSlot161" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="161" cell_size="69"/>
+        </rect>
+        <rect name="editorCell162" pos="568,0" width="69" height="69">
+          <item_stack name="editorSlot162" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="162" cell_size="69"/>
+        </rect>
+        <rect name="editorCell163" pos="639,0" width="69" height="69">
+          <item_stack name="editorSlot163" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="163" cell_size="69"/>
+        </rect>
+        <rect name="editorCell164" pos="710,0" width="69" height="69">
+          <item_stack name="editorSlot164" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="164" cell_size="69"/>
+        </rect>
+      </rect>
+      <rect name="editorRow15" pos="0,-1065" width="779" height="69">
+        <rect name="editorCell165" pos="0,0" width="69" height="69">
+          <item_stack name="editorSlot165" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="165" cell_size="69"/>
+        </rect>
+        <rect name="editorCell166" pos="71,0" width="69" height="69">
+          <item_stack name="editorSlot166" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="166" cell_size="69"/>
+        </rect>
+        <rect name="editorCell167" pos="142,0" width="69" height="69">
+          <item_stack name="editorSlot167" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="167" cell_size="69"/>
+        </rect>
+        <rect name="editorCell168" pos="213,0" width="69" height="69">
+          <item_stack name="editorSlot168" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="168" cell_size="69"/>
+        </rect>
+      </rect>
+    </rect>
+  </panel>
+  <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" depth="20" on_press="true" on_hover="true"/>
+  <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" depth="50" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1"/>
+</rect>
+              <simplebutton name="editorBagModify" pos="17,-272" width="228" height="32" caption="MODIFY" font_size="22" defaultcolor="25,25,31,255" depth="10" bordercolor="240,240,244,255"/>
+              <sprite name="editorModifyIcon" pos="31,-277" width="24" height="20" sprite="ui_game_symbol_assemble" depth="14" color="255,255,255,255" foregroundlayer="true"/>
+              <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="467,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent"/>
+              <sprite name="modifyFrameeditorBackpack" width="841" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4"/>
+            <rect pos="17,-54" width="92" height="92"><item_stack name="editorSelectionPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="92" repeat_i="0" allow_dropping="false"/></rect></rect>
+            </window><window name="rebirthBankItemInfo" width="606" height="392" controller="RebirthTurretItemInfo, RebirthUtils" cursor_area="true" anchor="Center" visible="false" depth="200">
+          <sprite width="606" type="sliced" name="rebirthTurretInfoBackdrop" color="28,21,40,255" height="392" depth="-1" sprite="menu_empty2px"/>
+          <rect name="header" height="43" depth="1">
+            <headerbg/>
+            <sprite depth="2" name="windowIcon" style="icon32px" pos="4,-5" sprite="{itemgroupicon}"/>
+            <label depth="2" name="windowName" pos="39,-6" width="340" height="32" text="{itemname}" font_size="32"/>
+            <label depth="2" pos="575,-8" width="200" height="28" text="{pricelabel} {itemcost}{markup}" pivot="topright" justify="right"/>
+            <sprite depth="4" name="costIcon" sprite="ui_game_symbol_coin" size="24,24" pos="577,-10" color="[white]" foregroundlayer="true"/>
+          </rect>
+          <rect name="contentInfo" height="346" depth="1" pos="0,-46">
+            <sprite depth="5" name="backgroundMain" sprite="menu_empty3px" width="603" height="347" color="[black]" type="sliced" fillcenter="false"/>
+            <rect depth="1" pos="3,0" name="preview" width="147" height="130">
+              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="153" height="133" color="[black]" type="sliced" fillcenter="false"/>
+              <sprite depth="1" color="[darkGrey]" pos="0,0" type="sliced"/>
+              <sprite depth="7" name="itemPreview" width="110" height="110" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" pos="74,-58" pivot="center" foregroundlayer="true"/>
+              <sprite depth="12" name="itemtypeicon" width="32" height="32" sprite="ui_game_symbol_{itemtypeicon}" pos="4,-8" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+              <sprite depth="4" name="durabilityBackground" height="20" width="145" color="185,0,0,255" type="sliced" pos="1, -107" visible="{hasdurability}"/>
+              <filledsprite depth="5" name="removedurabilityBar" height="20" width="145" color="48,48,48,255" type="filled" pos="1, -107" fill="{removeddurabilityfill}" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}"/>
+              <filledsprite depth="8" name="durabilityBar" height="20" width="145" color="{durabilitycolor}" type="filled" pos="1, -107" fill="{durabilityfill}" fillspritepad="true" visible="{hasdurability}"/>
+              <label depth="12" name="durabilityValue" pos="0,-98" width="145" height="32" text="{durabilitytext}" font_size="30" justify="{durabilityjustify}" effect="outline"/>
+            </rect>
+            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,-130" width="153" height="216" color="[black]" type="sliced" fillcenter="false"/>
+            <rect pos="3,-133" width="147" visible="{shownormaloptions}">
+              <grid name="itemActions" rows="5" cols="1" pos="0,0" width="147" cell_width="147" cell_height="42" controller="ItemActionList" repeat_content="true">
+                <item_action_entry/>
+              </grid>
+            </rect>
+            <rect pos="3,-132" width="147" visible="{showtraderoptions}">
+              <sprite color="[mediumGrey]" type="sliced" height="44"/>
+              <rect name="counterControl" width="120" height="42" pos="27,0" controller="Counter">
+                <button depth="2" name="countDown" style="icon30px, press, held" pos="-10,-20" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]"/>
+                <textfield name="count_input" depth="2" pos="7,-6" width="40" height="28" character_limit="4" validation="integer" virtual_keyboard_prompt="vkPromptCount"/>
+                <button depth="2" name="countUp" style="icon30px, press, held" pos="64,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]"/>
+                <button depth="2" name="countMax" style="icon30px, press" pos="96,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]"/>
+              </rect>
+              <grid name="vendorItemActions" rows="4" cols="1" pos="0,-43" width="147" cell_width="147" cell_height="42" controller="ItemActionList" repeat_content="true">
+                <item_action_entry/>
+              </grid>
+            </rect>
+            <!-- <sprite depth="3" name="fillerBackground" pos="3,-343" height="15" width="147" color="[mediumGrey]" type="sliced"/> -->
+            <rect depth="2" name="searchControls" width="448" height="43" pos="152,0" visible="{showstatanddescription}">
+              <sprite depth="1" color="[mediumGrey]" type="sliced" width="449" height="44"/>
+              <button depth="4" name="statButton" style="icon30px, press" pos="22,-22" sprite="ui_game_symbol_ping" pivot="center" tooltip="Stats" tooltip_key="lblStats" sound="[paging_click]" selected="true"/>
+              <button depth="4" name="descriptionButton" style="icon30px, press" pos="65,-22" sprite="ui_game_symbol_book" pivot="center" tooltip="Description" tooltip_key="lblDescription" sound="[paging_click]"/>
+            </rect>
+            <rect depth="1" pos="153,0" name="description" width="447" height="271" visible="{showonlydescription}">
+              <sprite depth="1" color="[darkGrey]" type="sliced"/>
+              <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="453" height="272" color="[black]" type="sliced" fillcenter="false"/>
+              <label depth="3" name="descriptionText" pos="6,-5" text="{itemdescription}" width="440" parse_actions="true"/>
+              <!--label depth="3" name="statText" pos="6,-2" width="254" text="{itemstats1}" />
+				<label depth="3" name="statText2" pos="227,-2" width="220" text="{itemstats2}" /> -->
+            </rect>
+            <rect depth="1" pos="153,-43" name="description" width="447" height="228" visible="{showstatanddescription}">
+              <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="453" height="229" color="[black]" type="sliced" fillcenter="false"/>
+              <rect depth="3" visible="{showstats}" width="453">
+                <rect pos="-3,0" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="35" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="34" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle1}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat1}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-33" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="34" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkGrey]" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle2}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat2}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-64" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="34" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="33" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle3}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat3}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-94" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkGrey]" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle4}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat4}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-127" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="35" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="34" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle5}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat5}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-159" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkGrey]" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle6}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat6}" justify="right" color="[selectedColor]"/>
+                </rect>
+                <rect pos="-3,-192" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false"/>
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="35" type="sliced"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle7}" justify="left" color="[white]"/>
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat7}" justify="right" color="[selectedColor]"/>
+                </rect>
+              </rect>
+              <rect visible="{showdescription}">
+                <sprite depth="1" color="[darkGrey]" type="sliced"/>
+                <label depth="3" name="descriptionText" pos="6,-5" text="{itemdescription}" width="440" parse_actions="true"/>
+              </rect>
+              <!--label depth="3" name="statText" pos="6,-2" width="254" text="{itemstats1}" />
+				<label depth="3" name="statText2" pos="227,-2" width="220" text="{itemstats2}" /> -->
+            </rect>
+            <grid name="parts" rows="1" cols="6" pos="153,-271" cell_width="75" cell_height="75" repeat_content="true" controller="PartList" visible="{isnotcomparing}">
+              <item_stack name="0"/>
+            </grid>
+            <rect visible="{iscomparing}" pos="153,-271" width="450" height="75">
+              <sprite depth="1" color="[mediumGrey]" type="sliced"/>
+              <label depth="3" name="descriptionText" pos="6,-20" text_key="xuiCompareNoModded" justify="center" color="[selectedColor]"/>
+            </rect>
+          </rect>
+          <button pos="612,-2" tooltip_key="xuiClose" name="rebirthTurretCloseInfo" style="press, hover" width="28" height="28" hovercolor="255,255,255,255" defaultcolor="211,191,241,255" sprite="ui_game_symbol_x" depth="30"/>
+        </window>
+        <window name="rebirthPowerSourceWorkspace" width="1840" height="900" pos="-920,450" anchor="Center" controller="RebirthPowerSourceWorkspace, RebirthUtils" depth="-10" cursor_area="true"><rect name="rebirthBankHeader" width="1840" height="900"><sprite width="1840" height="900" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4"/><sprite pos="8,-8" width="1824" height="44" sprite="menu_empty" color="25,25,31,220" globalopacitymod="0" depth="1"/><label name="rebirthBankTitle" pos="22,-15" width="1780" height="32" font_size="28" color="188,132,231,255" depth="3"/><sprite pos="8,-52" width="1824" height="2" sprite="menu_empty" color="181,140,255,255" depth="3"/></rect><rebirth_item_stats_popup/></window></append>
+    </if>
+  </conditional>
+</configs>

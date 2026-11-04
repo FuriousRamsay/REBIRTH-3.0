@@ -119,6 +119,12 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("trade-native-owner-read",RebirthNpcTradeOwnerLoad.Install);
                 RunStepOnce("forge-direct-crafting", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthForgeCraftingModeNativeOptionsPatch)); });
                 RunStepOnce("station-matching-tool-transfer", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationMatchingToolTransfer)); });
+                RunStepOnce("station-fuel-type-admission", delegate
+                {
+                    RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationFuelAddAdmission));
+                    RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationFuelSwapAdmission));
+                    RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationFuelSingleAdmission));
+                });
                 RunStepOnce("inventory-info-window-lookup", RebirthInventoryInfoWindowLookup.Install);
                 RunStepOnce("ui-input-style-subscriptions", RebirthInputStyleSubscriptions.Install);
                 RunStepOnce("toolbelt-capacity", delegate { string report = RebirthToolbeltCapacityInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });

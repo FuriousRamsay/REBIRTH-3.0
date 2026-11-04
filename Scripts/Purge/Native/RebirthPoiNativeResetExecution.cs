@@ -54,7 +54,12 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
     internal bool TryAdmitBeforeMutation() { return IsOriginalCurrent&&Batch.TryAdmitBeforeMutation(); }
     internal bool IsOriginalCurrent {get{try{return Envelope.IsOriginalCurrent&&ownerCurrent();}catch{return false;}} }
     internal RebirthPoiNativeResetEnvelope.Target TargetFor(PrefabInstance prefab)
-    {return IsOriginalCurrent?Envelope.Targets.FirstOrDefault(t=>ReferenceEquals(t.Prefab,prefab)):null;}
+    {
+        if(!IsOriginalCurrent)return null;
+        foreach(var target in Envelope.Targets)
+            if(ReferenceEquals(target.Prefab,prefab))return target;
+        return null;
+    }
     internal RebirthPoiNativeCopyReceiptScope BeginCopyReceipts(RebirthPoiNativeResetEnvelope.Target target,object owner)
     {
         if(!IsOriginalCurrent||target==null||target.Authored==null||!Envelope.Targets.Contains(target))return null;
@@ -71,8 +76,16 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
     }
     private RebirthPoiAuthoredRuntimeBinding ResetBinding(RebirthPoiNativeResetEnvelope.Target target,RebirthPoiAuthoredResetKind kind,object runtime)
     {
-        var slots=target.Authored.Slots.Where(s=>s.Expected.Kind==kind).Where(s=>{int id;object actual;return s.TryReadRuntime(out id,out actual)&&ReferenceEquals(actual,runtime)&&target.Accepts(s,id,actual);}).ToArray();
-        if(slots.Length!=1)return null;var slot=slots[0];int nativeId;object value;if(!slot.TryReadRuntime(out nativeId,out value))return null;
+        RebirthPoiNativeAuthoredManifest.Slot slot=null;
+        int matches=0;
+        foreach(var candidate in target.Authored.Slots)
+        {
+            if(candidate.Expected.Kind!=kind)continue;
+            int id;object actual;
+            if(candidate.TryReadRuntime(out id,out actual)&&ReferenceEquals(actual,runtime)&&target.Accepts(candidate,id,actual))
+            {matches++;slot=candidate;}
+        }
+        if(matches!=1)return null;int nativeId;object value;if(!slot.TryReadRuntime(out nativeId,out value))return null;
         Dictionary<string,RebirthPoiAuthoredRuntimeBinding> receipts;
         if(!copyReceipts.TryGetValue(target,out receipts)){receipts=new Dictionary<string,RebirthPoiAuthoredRuntimeBinding>(StringComparer.Ordinal);copyReceipts.Add(target,receipts);}
         RebirthPoiAuthoredRuntimeBinding receipt;
@@ -111,14 +124,21 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
     {
         var target=TargetFor(volume==null?null:volume.prefabInstance);if(target==null||!ReferenceEquals(world,Envelope.World)||!verified){Batch.AbortUncertain();return;}
         if(target.Entry.Plan.IsAuthored){var receipt=ResetBinding(target,RebirthPoiAuthoredResetKind.Sleeper,volume);if(receipt==null)Batch.AbortUncertain();else Batch.AuthoredEffectReset(target.Entry.Identity,world,Envelope.Transaction,receipt);return;}
-        var ids=target.Sleepers.Where(p=>ReferenceEquals(p.Value,volume)).Select(p=>p.Key).ToArray();if(ids.Length!=1){Batch.AbortUncertain();return;}int id=ids[0];
+        int id=0;bool found=false;
+        foreach(var pair in target.Sleepers)if(ReferenceEquals(pair.Value,volume))
+        {if(found){Batch.AbortUncertain();return;}id=pair.Key;found=true;}
+        if(!found){Batch.AbortUncertain();return;}
         if(target.AuxiliarySleepers.Contains(id))auxiliary[target].Add(id);else Batch.VolumeReset(target.Entry.Identity,world,Envelope.Transaction,id);
     }
     internal void TriggerResult(TriggerVolume volume,bool verified)
     {
         var target=TargetFor(volume==null?null:volume.prefabInstance);if(target==null||!verified){Batch.AbortUncertain();return;}
         if(target.Entry.Plan.IsAuthored){var receipt=ResetBinding(target,RebirthPoiAuthoredResetKind.Trigger,volume);if(receipt==null)Batch.AbortUncertain();else Batch.AuthoredEffectReset(target.Entry.Identity,Envelope.World,Envelope.Transaction,receipt);return;}
-        var ids=target.Triggers.Where(p=>ReferenceEquals(p.Value,volume)).Select(p=>p.Key).ToArray();if(ids.Length!=1){Batch.AbortUncertain();return;}Batch.TriggerReset(target.Entry.Identity,Envelope.World,Envelope.Transaction,ids[0]);
+        int id=0;bool found=false;
+        foreach(var pair in target.Triggers)if(ReferenceEquals(pair.Value,volume))
+        {if(found){Batch.AbortUncertain();return;}id=pair.Key;found=true;}
+        if(!found){Batch.AbortUncertain();return;}
+        Batch.TriggerReset(target.Entry.Identity,Envelope.World,Envelope.Transaction,id);
     }
     internal void RefreshResult(PrefabInstance prefab,bool verified)
     {

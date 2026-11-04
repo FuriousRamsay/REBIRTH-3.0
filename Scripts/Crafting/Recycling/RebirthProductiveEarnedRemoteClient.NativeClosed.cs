@@ -156,6 +156,7 @@ internal static partial class RebirthProductiveEarnedRemoteClient
     }
     private static void PumpNativeClosures(double now)
     {
+        if(nativeClosures.Count==0)return;
         foreach(var pair in nativeClosures.ToArray())
         {
             var close=pair.Value;

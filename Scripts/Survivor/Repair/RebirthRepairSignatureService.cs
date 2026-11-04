@@ -36,6 +36,7 @@ public static class RebirthRepairSignatureService
     private static readonly object Gate = new object();
     private static DateTime NextCleanupUtc = DateTime.MinValue;
     private static readonly Dictionary<int, List<RebirthPendingRepairSignature>> Pending = new Dictionary<int, List<RebirthPendingRepairSignature>>();
+    private static volatile bool hasPending;
     private static readonly Queue<RebirthRepairConditionCorrection> Corrections = new Queue<RebirthRepairConditionCorrection>();
     private static bool installed;
     private static bool nativeInventoryCommitPatched;
@@ -91,6 +92,7 @@ public static class RebirthRepairSignatureService
             for (int i = list.Count - 1; i >= 0; i--)
                 if (SameKey(list[i], itemType, seed, quality)) list.RemoveAt(i);
             list.Add(pending);
+            hasPending = true;
         }
         return true;
     }
@@ -286,8 +288,8 @@ public static class RebirthRepairSignatureService
 
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data) { ClearRuntime(); }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data) { ClearRuntime(); }
-    private static void ClearRuntime() { lock (Gate) { Pending.Clear(); Corrections.Clear(); } }
-    private static void Cleanup() { lock (Gate) CleanupLocked(); }
+    private static void ClearRuntime() { lock (Gate) { Pending.Clear(); Corrections.Clear(); hasPending = false; } }
+    private static void Cleanup() { if (!hasPending) return; lock (Gate) CleanupLocked(); }
     private static void CleanupLocked()
     {
         if (Pending.Count == 0) return;
@@ -302,6 +304,7 @@ public static class RebirthRepairSignatureService
             if (kv.Value.Count == 0) empty.Add(kv.Key);
         }
         for (int i = 0; i < empty.Count; i++) Pending.Remove(empty[i]);
+        if (Pending.Count == 0) hasPending = false;
     }
 
     private static RebirthPendingRepairSignature TakePending(int playerId, int type, ushort seed, ushort quality, bool remove)

@@ -35,6 +35,22 @@ internal static class Program
   var undercount=twoCredits.Write();undercount.Element("player").SetAttributeValue("count",1);
   Check(!RebirthPoiSupplyCredits.Read(undercount).Matches(twoDeaths),"saved total cannot understate retained credited original deaths");
   Check(twoCredits.Matches(twoDeaths),"exact retained credited death total remains valid");
+  var originRules=new RebirthPurgeSupplyPolicy.Rules(2,0,0,100);
+  var firstOrigin=new RebirthPurgeSupplyOrigin(11,0,0);
+  var secondOrigin=new RebirthPurgeSupplyOrigin(22,0,0);
+  var thirdOrigin=new RebirthPurgeSupplyOrigin(33,0,0);
+  var sources=new[]{new RebirthPurgeSupplyOriginSource("first",new RebirthPurgeOfflineCredit(1,1,firstOrigin)),
+      new RebirthPurgeSupplyOriginSource("second",new RebirthPurgeOfflineCredit(1,2,secondOrigin)),
+      new RebirthPurgeSupplyOriginSource("third",new RebirthPurgeOfflineCredit(1,3,thirdOrigin))};
+  Check(RebirthPurgeSupplyOrigins.TryEarn(new RebirthPurgeSupplyAccount(player),3,sources,originRules,0,out var originAccount)&&
+      originAccount.EarnedDrops==1&&originAccount.SpentCredits==2&&originAccount.Origins.Destination(1).X==22&&
+      (long)originAccount.Origins.Write().Element("balance").Attribute("count")==1,
+      "multiple offline segments preserve last consumed drop origin and residual credit");
+  sources[2]=new RebirthPurgeSupplyOriginSource("third",new RebirthPurgeOfflineCredit(2,4,thirdOrigin));
+  Check(RebirthPurgeSupplyOrigins.TryEarn(originAccount,4,sources,originRules,0,out var nextOriginAccount)&&
+      nextOriginAccount.EarnedDrops==2&&nextOriginAccount.SpentCredits==4&&nextOriginAccount.Origins.Destination(2).X==33&&
+      !nextOriginAccount.Origins.Write().Elements("balance").Any(),
+      "residual and new offline segment redeem without changing destination order");
   var dir=Path.Combine(Path.GetTempPath(),"rebirth-supply-credit-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
   bool armed=false;var binding=new RebirthPoiWorldBinding(scope,world.ToString("N").ToUpperInvariant(),dir,()=>true);
   Check(RebirthPoiWorldStore.TryOpen(binding,out var store,stage=>{if(armed&&stage=="afterManifestCandidateWritten")throw new IOException("lost publication reply");})==RebirthPoiStoreResult.Published,"actual atomic store opens");
@@ -79,4 +95,7 @@ class GameManager {public static GameManager Instance;public World World;}
 class ConnectionManager {public bool IsServer;}
 class SingletonMonoBehaviour<T> {public static T Instance;}
 class ThreadManager {public static bool IsMainThread()=>true;}
-class GameIO {public static string GetSaveGameDir()=>System.IO.Path.GetTempPath();}class Log {public static void Warning(string value){}}
+class GameIO {public static string GetSaveGameDir()=>System.IO.Path.GetTempPath();public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>System.IO.Path.GetTempPath();}class Log {public static void Warning(string value){}}
+class Platform {public enum UserDataStorageType { Local }}
+enum EnumGamePrefs { GameSaveStorageType,GameWorld,GameName }
+class GamePrefs {public static int GetInt(EnumGamePrefs preference)=>0;public static string GetString(EnumGamePrefs preference)=>string.Empty;}

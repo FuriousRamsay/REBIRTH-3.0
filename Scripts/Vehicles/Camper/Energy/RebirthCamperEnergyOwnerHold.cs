@@ -12,7 +12,7 @@ internal static class RebirthCamperEnergyOwnerHold
     {internal Hold Hold;internal int Area,Slot;internal ItemStack Desired;}
     private static readonly Dictionary<Guid,Hold> holds=new Dictionary<Guid,Hold>();
     private static Permit permit;
-    internal static bool Blocks(object value)=>holds.Values.Any(h=>ReferenceEquals(value,h.Player.bag)||ReferenceEquals(value,h.Player.inventory)||
+    internal static bool Blocks(object value)=>holds.Count!=0&&holds.Values.Any(h=>ReferenceEquals(value,h.Player.bag)||ReferenceEquals(value,h.Player.inventory)||
         ReferenceEquals(value,h.Player.bag.ItemGrid)||ReferenceEquals(value,h.Player.inventory.ItemGrid)||ReferenceEquals(value,h.Player.PlayerUI?.xui?.DragAndDropWindow));
     internal static bool Prepare(EntityPlayerLocal player,RebirthCamperEnergyTransferFrame frame)
     {

@@ -328,6 +328,12 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
         if (!IsCraftingBridge || pager == null || ViewComponent == null || !ViewComponent.IsVisible)
             return;
 
+        bool pressed = Input.GetMouseButtonDown(0);
+        // The ready trace needs one resolved rect. Once ready, idle frames have no
+        // pointer work; a new press or an active drag still reads live geometry.
+        if (craftingReadyLogged && !pressed && !craftingRawPointerDrag)
+            return;
+
         float left, right, bottom, top;
         if (!TryGetControllerScreenRect(this, out left, out right, out bottom, out top))
         {
@@ -357,7 +363,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
         Vector2 mouse = (Vector2)Input.mousePosition;
         bool inside = mouse.x >= left && mouse.x <= right && mouse.y >= bottom && mouse.y <= top;
 
-        if (Input.GetMouseButtonDown(0) && inside)
+        if (pressed && inside)
         {
             craftingRawPointerDrag = true;
             ApplyCraftingPageFromScreenY(mouse.y, bottom, top, "mouse-down");

@@ -32,6 +32,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
     private XUiV_Label countLabel;
     private XUiV_Label timerLabel;
     private XUiController cookingDetails;
+    private XUiController cookingTake;
     private XUiV_Label cookingTitle, cookingExplanation, cookingQuality;
     private bool cancelInputAllowed = true;
 
@@ -53,6 +54,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         timerLabel = GetChildById("rebirthQueueDisplayTimer")?.ViewComponent as XUiV_Label;
 
         cookingDetails = GetChildById("rebirthCookingDetails");
+        cookingTake = GetChildById("rebirthCookingTake");
         cookingTitle = cookingDetails?.GetChildById("detailTitle")?.ViewComponent as XUiV_Label;
         cookingExplanation = cookingDetails?.GetChildById("detailConsequences")?.ViewComponent as XUiV_Label;
         cookingQuality = cookingDetails?.GetChildById("detailQuality")?.ViewComponent as XUiV_Label;
@@ -60,7 +62,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         if (displayCancel != null)
             displayCancel.OnPress += Cancel_OnPress;
 
-        var take=GetChildById("rebirthCookingTake");
+        var take=cookingTake;
         if(take!=null)take.OnPress+=(sender,button)=>{
             if((button!=0&&button!=-1)||RebirthConsoleInputGuardRuntime.BlocksGameplayInput())return;
             if(RebirthCookingHeat.Ready(recipe))RebirthCookingHeat.Take(this);else RebirthCookingHeat.Cancel(this);
@@ -221,7 +223,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             SetProgress(1-RebirthCookingHeat.Remaining(recipe)/Math.Max(1,RebirthCookingHeat.Number(recipe,"duration")),true);
             bool ready=RebirthCookingHeat.Ready(recipe);
             bool milling=recipe.craftingArea=="WorkbenchMortarPestle001_FR";
-            var action=GetChildById("rebirthCookingTake");
+            var action=cookingTake;
             SetRectIfChanged(action,ViewComponent.Size.x-(milling?32:146),-10,milling?24:136,32);
             if(action!=null)action.ViewComponent.IsVisible=!milling||!ready;
             SetRectIfChanged(action?.GetChildById("actionFill"),0,0,milling?24:136,32);
@@ -317,13 +319,14 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         var explanationLabel=cookingExplanation;
         SetRectIfChanged(details.GetChildById("detailConsequences"),0,-26,width,60);
         bool ready=RebirthCookingHeat.Ready(batch),burnt=RebirthCookingHeat.Burnt(batch);
+        bool drink=RebirthCookingHeat.IsDrink(batch),evaporated=RebirthCookingHeat.Evaporated(batch);
         bool cold=!RebirthCookingBatch.NeedsHeat(batch);
         bool over=ready&&!cold&&RebirthCookingHeat.Number(batch,"overdue")>=RebirthCookingHeatRules.Grace;
-        string phase=burnt?"Burnt":!ready?"Cooking":cold?"Cold":over?"Overcooking":"Ready";
+        string phase=burnt?"Burnt":!ready?(drink?"DrinkCooking":"Cooking"):cold?"Cold":evaporated?"Evaporated":over?(drink?"Evaporating":"Overcooking"):drink?"DrinkReady":"Ready";
         SetLabelText(cookingTitle,Localization.Get("rbCookingDetail"+phase));
         string explanation=Localization.Get("rbCookingConsequence"+phase);
         var station=windowGroup.Controller as XUiC_RebirthCookingStation;
-        if(ready&&!cold&&!burnt&&!(station?.WorkstationData.GetIsBurning()??false))explanation=Localization.Get("rbCookingDeteriorationPaused")+" "+explanation;
+        if(ready&&!cold&&!burnt&&!evaporated&&!(station?.WorkstationData.GetIsBurning()??false))explanation=Localization.Get("rbCookingDeteriorationPaused")+" "+explanation;
         SetLabelText(cookingExplanation,explanation);
         // The very same item calculation is used by Take(), including the burnt-item replacement.
         ItemValue output=RebirthCookingHeat.Output(batch);
@@ -442,8 +445,8 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             return;
 
         bool managed=RebirthCookingHeat.Managed(recipe)&&recipe.craftingArea!="WorkbenchMortarPestle001_FR";
-        if(GetChildById("rebirthCookingDetails")?.ViewComponent is XUiView details)details.IsVisible=managed&&recipe.craftingArea!="WorkbenchMortarPestle001_FR";
-        if(GetChildById("rebirthCookingTake")?.ViewComponent is XUiView take)take.IsVisible=managed&&(recipe.craftingArea!="WorkbenchMortarPestle001_FR"||!RebirthCookingHeat.Ready(recipe));
+        if(cookingDetails?.ViewComponent is XUiView details)details.IsVisible=managed&&recipe.craftingArea!="WorkbenchMortarPestle001_FR";
+        if(cookingTake?.ViewComponent is XUiView take)take.IsVisible=managed&&(recipe.craftingArea!="WorkbenchMortarPestle001_FR"||!RebirthCookingHeat.Ready(recipe));
         bool hasRecipe = HasRecipeForPresentation && !managed;
         bool enabled = hasRecipe && cancelInputAllowed;
         if (displayCancel.ViewComponent.IsVisible != hasRecipe)

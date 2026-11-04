@@ -18,6 +18,7 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
     private static LocalPlayerUI lastPlayerUi;
     private static World lastWorld;
     private static string versionText;
+    internal static long DiscoveryPasses { get; private set; }
 
     public override void Init()
     {
@@ -28,7 +29,8 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
     public override void OnOpen()
     {
         base.OnOpen();
-        InvalidateDiscovery();
+        // HUD reopen keeps valid owners. RefreshVersion already detects world,
+        // player-UI and native window-map replacement; Init admits new managers.
         RefreshVersion();
     }
 
@@ -81,6 +83,7 @@ public sealed class XUiC_RebirthVersionLabel : XUiController
         versionText = "[BC84E7]REBIRTH[-]  " + modVersion + " / 7DTD v " + version.Major + "." +
             version.Minor / 10 + "." + version.Minor % 10 + " (b" + version.Build + ")";
         labels.Clear();
+        DiscoveryPasses++;
         foreach (var manager in Resources.FindObjectsOfTypeAll<NGUIWindowManager>())
         {
             if (manager.windowMap == null || !manager.windowMap.TryGetValue(EnumNGUIWindow.Version, out var window) || window == null) continue;

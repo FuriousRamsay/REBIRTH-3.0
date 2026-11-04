@@ -25,7 +25,6 @@ public sealed class XUiC_RebirthCreativeWorkspace : XUiController
     private RebirthScreenLayout layout;
     private XUiController header;
     private bool headerVisible;
-    internal bool PresentationInteractionBusy { get; private set; }
 
     public override void Init()
     {
@@ -47,13 +46,9 @@ public sealed class XUiC_RebirthCreativeWorkspace : XUiController
     }
     public override void Update(float dt)
     {
-        // Sample global cursor/press state once for the off-screen presentation guards.
-        // No repeated button polling in every hidden backpack cell.
         var cursor = xui?.playerUI?.CursorController;
-        PresentationInteractionBusy = xui?.DragAndDropWindow == null || !xui.DragAndDropWindow.IsEmpty() ||
-            (cursor != null && (cursor.GetMouseButton(UICamera.MouseButton.LeftButton) ||
-                cursor.GetMouseButton(UICamera.MouseButton.RightButton)));
-        if(IsWorkspaceOpen&&cursor!=null&&(cursor.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||cursor.GetMouseButtonUp(UICamera.MouseButton.LeftButton)))
+        if(RebirthLogSettings.UiRouteLoggingEnabled&&IsWorkspaceOpen&&cursor!=null&&
+            (cursor.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||cursor.GetMouseButtonUp(UICamera.MouseButton.LeftButton)))
             RebirthCreativeTransferTrace.Write(xui,"pointer.edge",null,
                 "hoverTarget="+(cursor.HoverTarget?.Controller?.GetType().Name??"none")+
                 " bagOpen="+(BackpackView?.InventoryOpen??false)+" catalogueBlocked="+(Catalogue?.InputBlocked??false));
@@ -313,16 +308,20 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
     }
     public override void Update(float dt)
     {
-        var input=xui?.playerUI?.CursorController;
-        if(input!=null&&(input.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||input.GetMouseButtonUp(UICamera.MouseButton.LeftButton))&&
+        var input=RebirthLogSettings.UiRouteLoggingEnabled?xui?.playerUI?.CursorController:null;
+        bool tracePointerEdge=input!=null&&
+            (input.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||input.GetMouseButtonUp(UICamera.MouseButton.LeftButton));
+        if(tracePointerEdge&&
             (isOver||ViewComponent?.UiTransformIsHovered==true))
             RebirthCreativeTransferTrace.Write(xui,"catalogue.update.enter",this,
                 "presented="+presented+" active="+(ViewComponent?.UiTransform?.gameObject.activeInHierarchy??false));
         if (!presented || ViewComponent?.UiTransform == null || !ViewComponent.UiTransform.gameObject.activeInHierarchy)
             return;
         var workspace = XUiC_RebirthCreativeWorkspace.ActiveInstance;
+        // A held cursor must not reactivate the clipped buffer rows. Visible cells
+        // still receive native drag/drop polling below, including the release frame.
         bool pinned = IsSelected || IsHolding || IsLocked || IsDragAndDrop || hovered ||
-            (Catalogue != null && Catalogue.FrameClock < wakeUntil) || workspace?.BackpackView?.SelectedItem == this || workspace?.PresentationInteractionBusy == true ||
+            (Catalogue != null && Catalogue.FrameClock < wakeUntil) || workspace?.BackpackView?.SelectedItem == this ||
             Catalogue?.FrameAssemblyActive == true;
         if (Catalogue != null && !Catalogue.IsInsideViewport(CatalogueIndex) && !pinned)
         {
@@ -372,7 +371,7 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
             // Never clear that hint on a skipped path. Row/filter changes explicitly increment the
             // presentation version above, and interaction does not wait for the safety interval.
             RebirthCreativeSlotUpdateMode mode = RebirthCreativeSlotUpdatePolicy.Choose(reasons, childFlushPasses);
-            if(input!=null&&(input.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||input.GetMouseButtonUp(UICamera.MouseButton.LeftButton))&&
+            if(tracePointerEdge&&
                 (isOver||ViewComponent.UiTransformIsHovered))
                 RebirthCreativeTransferTrace.Write(xui,"catalogue.update.mode",this,"mode="+mode+" reasons="+reasons);
 #if REBIRTH_UI_DIAGNOSTICS

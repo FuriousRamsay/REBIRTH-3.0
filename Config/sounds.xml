@@ -123,4 +123,5 @@
 <SoundDataNode name="purge_cleared"><AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" /><AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeDiscovered" /><Noise ID="5" noise="10" time="4" /><LowestPitch name="1" /><HighestPitch name="1" /><LocalCrouchVolumeScale value="1" /><CrouchNoiseScale value="1" /><NoiseScale value="1" /><MaxVoices value="3" /><MaxRepeatRate value="0.01" /></SoundDataNode>
 <SoundDataNode name="purge_unlock"><AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" /><AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeUnlock" /><Noise ID="5" noise="10" time="4" /><LowestPitch name="1" /><HighestPitch name="1" /><LocalCrouchVolumeScale value="1" /><CrouchNoiseScale value="1" /><NoiseScale value="1" /><MaxVoices value="3" /><MaxRepeatRate value="0.01" /></SoundDataNode>
   </append>
+  <include filename="_Seeker/sounds.xml"/>
 </configs>

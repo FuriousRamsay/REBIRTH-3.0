@@ -21,8 +21,12 @@ internal static partial class RebirthRemoteResourceBlockProtocol
     private static RebirthRemoteResourceClientOriginalJournal ClientAcks()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteBlockAdmissionAcks"));
     internal static bool IsActive=>installed;
     internal static bool BlocksNative(ItemActionRepair action,ItemActionData data)
-        =>installed&&data?.invData?.holdingEntity is EntityPlayerLocal player&&clientPending.Values.Any(value=>!value.UsedTerminal&&ClientCurrent(player,value)&&
-            ReferenceEquals(value.Action,action)&&ReferenceEquals(value.Data,data));
+    {
+        if(!installed||clientPending.Count==0||data?.invData?.holdingEntity is not EntityPlayerLocal player)return false;
+        foreach(var value in clientPending.Values)
+            if(!value.UsedTerminal&&ReferenceEquals(value.Action,action)&&ReferenceEquals(value.Data,data)&&ClientCurrent(player,value))return true;
+        return false;
+    }
     internal static void Install()
     {
         if(installed)return;
@@ -135,6 +139,7 @@ internal static partial class RebirthRemoteResourceBlockProtocol
                 catch{/* Retain original; unreadable local evidence is never a fresh admission. */}
             }
         }
+        if(clientPending.Count==0)return;
         foreach(var value in clientPending.Values.ToArray())
         {
             if(!ClientTerminalScope(player,value)||now<value.Next)continue;

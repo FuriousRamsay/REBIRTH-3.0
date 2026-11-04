@@ -494,6 +494,11 @@ internal static partial class RebirthVehicleClientCustody
     }
     private static void ContinueWindowClose(EntityPlayerLocal owner)
     {
+        if(entries.Count==0)return;
+        bool closePending=false;
+        foreach(var entry in entries.Values)
+            if(entry.ClosePending){closePending=true;break;}
+        if(!closePending)return;
         foreach(var e in entries.Values.Where(v=>v.ClosePending).ToArray())
         {
             var group=e.DropGroup;

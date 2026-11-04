@@ -9,7 +9,7 @@ internal static partial class RebirthProductiveEarnedCoordinator
             (value.LoadedCleanup!=null||value.PartialSuccessor?.Returned==true||value.PartialSuccessor==null&&value.Terminal!=null&&!value.Terminal.PendingNextWork));
     private static void PumpLoadedNativeCleanup()
     {
-        if(!ThreadManager.IsMainThread())return;
+        if(!ThreadManager.IsMainThread()||retained.Count==0)return;
         foreach(var original in retained.Values.ToArray())
         {
             try

@@ -9,6 +9,7 @@ using UnityEngine;
 internal static class RebirthPoiMapPresentation
 {
     private static readonly Dictionary<string, NavObject> owned = new Dictionary<string, NavObject>(StringComparer.Ordinal);
+    private static readonly List<string> leaving = new List<string>();
     private static readonly Dictionary<NavObject,HashSet<string>> iconOwners=new Dictionary<NavObject,HashSet<string>>();
     private static Dictionary<long, List<RebirthPoiMapRecord>> cells = new Dictionary<long, List<RebirthPoiMapRecord>>();
     private static Dictionary<long, List<RebirthPoiMapRecord>> building;
@@ -25,7 +26,7 @@ internal static class RebirthPoiMapPresentation
     // active-ownership only and is removed before native unregister/pool reuse.
     private static readonly Dictionary<NavObject,bool> compassBeforeFilter = new Dictionary<NavObject,bool>();
     internal static bool Dimmed(int filter)=>filter>=0&&filter<dimmed.Length&&dimmed[filter];
-    internal static bool Owns(NavObject icon) => icon != null && owned.Values.Contains(icon);
+    internal static bool Owns(NavObject icon) => icon != null && iconOwners.ContainsKey(icon);
     internal static RebirthPoiMapRecord Record(NavObject icon)
     {
         if(icon==null)return null;
@@ -42,7 +43,7 @@ internal static class RebirthPoiMapPresentation
     internal static void Reset()
     {
         if (NavObjectManager.HasInstance) foreach (var icon in owned.Values.Distinct()) { compassBeforeFilter.Remove(icon); NavObjectManager.Instance.UnRegisterNavObject(icon); }
-        owned.Clear(); iconOwners.Clear(); compassHidden.Clear(); compassFiltered.Clear(); compassBeforeFilter.Clear(); scan?.Dispose(); scan = null; cells.Clear(); building = null; original = null; indexed = null; next = 0;
+        owned.Clear(); leaving.Clear(); iconOwners.Clear(); compassHidden.Clear(); compassFiltered.Clear(); compassBeforeFilter.Clear(); scan?.Dispose(); scan = null; cells.Clear(); building = null; original = null; indexed = null; next = 0;
     }
     private static void AddOwner(string key,NavObject icon)
     {
@@ -149,8 +150,9 @@ internal static class RebirthPoiMapPresentation
                 wanted[id.Key] = record;
             }
         }
-        foreach (string key in owned.Keys.Where(k => !wanted.ContainsKey(k)).ToArray())
-        { Release(key, manager); }
+        leaving.Clear();
+        foreach (string key in owned.Keys) if (!wanted.ContainsKey(key)) leaving.Add(key);
+        foreach (string key in leaving) Release(key, manager);
         foreach (var pair in wanted)
         {
             var record = pair.Value;
@@ -215,7 +217,7 @@ internal static class RebirthPoiMapPresentation
 [HarmonyPatch(typeof(XUiC_MapArea), "updateNavObjectList")]
 internal static class RebirthPoiMapSpriteHook
 {
-    private static void Postfix(XUiC_MapArea __instance) { RebirthPoiMapPresentation.RefreshMapSprites(__instance); }
+    private static void Postfix(XUiC_MapArea __instance) { RebirthPoiMapPresentation.RefreshMapSprites(__instance); if(__instance is XUiC_RebirthMapArea map)map.SupplyButton?.RefreshMapMarkers(); }
 }
 [HarmonyPatch(typeof(XUiC_MapArea), "UpdateWaypointSelection")]
 internal static class RebirthPoiMapHoverHook

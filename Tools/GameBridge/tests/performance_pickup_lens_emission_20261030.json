@@ -1,0 +1,13 @@
+{
+  "name": "Pickup rear lens emission stable-state smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable save only, guard ON, safe stationary player viewing a separately prepared genuine camper pickup rear. Repeat with native headlights off/on and after real braking/reverse input using the existing camper input scenarios. Inspect captures for unchanged red/clear lens emission, darkness when off and preserved wrap/paint. This read-only dwell does not toggle vehicle state, prove absence of renderer uploads or measure FPS; focused source-region checks cover suppression semantics. Never run in the user's game.",
+  "steps": [
+    {"action":{"command":"surroundings","args":{}}},
+    {"screenshot":"pickup_lens_emission_before_dwell"},
+    {"wait":2},
+    {"screenshot":"pickup_lens_emission_after_dwell"},
+    {"expectNoErrors":true}
+  ]
+}

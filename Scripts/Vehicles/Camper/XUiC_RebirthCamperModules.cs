@@ -89,7 +89,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         summaryInstalled=installed;summaryCapacity=capacity;RefreshSummary();
     }
     private void SummaryLabel(string id,string text)
-    {var label=GetChildById(id)?.ViewComponent as XUiV_Label;if(label!=null)label.Text=text;}
+    {var label=GetChildById(id)?.ViewComponent as XUiV_Label;if(label!=null&&label.Text!=text)label.Text=text;}
     private void RefreshSummary()
     {
         SummaryIcon("camperInstalledIcon",crafting?"ui_game_symbol_workbench":"ui_game_symbol_purgesupplies");
@@ -118,7 +118,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         SummaryLabel("camperSecondaryValue",value);
     }
     private void SummaryIcon(string id,string sprite)
-    {var icon=GetChildById(id)?.ViewComponent as XUiV_Sprite;if(icon!=null){icon.UIAtlas="UIAtlas";icon.SpriteName=sprite;}}
+    {var icon=GetChildById(id)?.ViewComponent as XUiV_Sprite;if(icon!=null){if(icon.UIAtlas!="UIAtlas")icon.UIAtlas="UIAtlas";if(icon.SpriteName!=sprite)icon.SpriteName=sprite;}}
     public override void OnOpen()
     {
         refusalWarnings=0;

@@ -73,9 +73,8 @@ public static class QuickStackAcceptedCategoryRegistry
 
         // Keep old saves compatible if a category was stored against a clicked
         // child/multiblock coordinate rather than TileEntity.ToWorldPos().
-        Dictionary<Vector3i, HashSet<QuickStackCategory>> migrations =
-            new Dictionary<Vector3i, HashSet<QuickStackCategory>>();
-        List<Vector3i> removeAliases = new List<Vector3i>();
+        Dictionary<Vector3i, HashSet<QuickStackCategory>> migrations = null;
+        List<Vector3i> removeAliases = null;
 
         foreach (KeyValuePair<Vector3i, HashSet<QuickStackCategory>> pair in accepted)
         {
@@ -87,6 +86,11 @@ public static class QuickStackAcceptedCategoryRegistry
 
             if (canonical != pair.Key)
             {
+                if (migrations == null)
+                {
+                    migrations = new Dictionary<Vector3i, HashSet<QuickStackCategory>>();
+                    removeAliases = new List<Vector3i>();
+                }
                 HashSet<QuickStackCategory> merged;
                 if (!migrations.TryGetValue(canonical, out merged))
                 {
@@ -103,9 +107,10 @@ public static class QuickStackAcceptedCategoryRegistry
         }
 
         bool changed = false;
-        for (int i = 0; i < removeAliases.Count; i++)
+        for (int i = 0; removeAliases != null && i < removeAliases.Count; i++)
             changed |= accepted.Remove(removeAliases[i]);
 
+        if (migrations != null)
         foreach (KeyValuePair<Vector3i, HashSet<QuickStackCategory>> migration in migrations)
         {
             HashSet<QuickStackCategory> values;

@@ -1,0 +1,13 @@
+{
+  "name": "Cold-loaded cleared station native reset",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Authorized disposable Purge save only, cold-loaded site_utility_07 already Cleared with3published death proofs, player on-foot inside it. Capture the before/after observer replies and require the SAME POI key with epoch+1 and a completed reset outside this runner; native-start logging alone is not reset completion. Guard stays ON." },
+    { "console": "rbpurgetestobserve" },
+    { "console": "cr" },
+    { "expectLog": { "contains": "ResetPOIS site_utility_07", "min": 1 } },
+    { "wait": 2 },
+    { "console": "rbpurgetestobserve" },
+    { "expectNoErrors": true }
+  ]
+}

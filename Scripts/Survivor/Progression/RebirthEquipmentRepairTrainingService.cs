@@ -32,7 +32,6 @@ public static class RebirthEquipmentRepairTrainingService
         public float CapturedAt;
         public float UseTimes;
         public float MaxUseTimes;
-        public string ItemName = string.Empty;
     }
 
     private sealed class RepairHistory
@@ -50,9 +49,11 @@ public static class RebirthEquipmentRepairTrainingService
         public float ExpiresAt;
     }
 
-    private static readonly Dictionary<string, RepairHistory> HistoryByItem = new Dictionary<string, RepairHistory>(StringComparer.Ordinal);
+    private static readonly Dictionary<(int PlayerId, int ItemType, ushort Seed), RepairHistory> HistoryByItem = new Dictionary<(int PlayerId, int ItemType, ushort Seed), RepairHistory>();
     private static readonly Dictionary<string, PendingRepair> PendingByReceipt = new Dictionary<string, PendingRepair>(StringComparer.Ordinal);
     private static readonly Dictionary<string, float> ConsumedReceipts = new Dictionary<string, float>(StringComparer.Ordinal);
+    [ThreadStatic] private static List<string> pendingReceiptKeys;
+    [ThreadStatic] private static bool pendingReceiptKeysBusy;
     private static bool installed;
     private static float nextSample;
     private static long clientReceiptCounter;
@@ -185,7 +186,7 @@ public static class RebirthEquipmentRepairTrainingService
             if(value.HasMetadata("RebirthRepairOriginalV1")){HistoryByItem.Remove(ItemKey(playerId,value.type,value.Seed));continue;}
             float maxUse = value.MaxUseTimes;
             if (value.type <= 0 || maxUse <= 0f) continue;
-            string key = ItemKey(playerId, value.type, value.Seed);
+            var key = ItemKey(playerId, value.type, value.Seed);
             RepairHistory history;
             if (!HistoryByItem.TryGetValue(key, out history) || history == null)
             {
@@ -193,15 +194,13 @@ public static class RebirthEquipmentRepairTrainingService
                 HistoryByItem[key] = history;
             }
             history.LastSeenAt = now;
-            string itemName = value.ItemClass != null ? value.ItemClass.GetItemName() : string.Empty;
             RepairWitness last = history.States.Count > 0 ? history.States[history.States.Count - 1] : null;
             if (last != null && Mathf.Abs(last.UseTimes - value.UseTimes) <= Epsilon && Mathf.Abs(last.MaxUseTimes - maxUse) <= Epsilon)
             {
                 last.CapturedAt = now;
-                if (!string.IsNullOrEmpty(itemName)) last.ItemName = itemName;
                 continue;
             }
-            history.States.Add(new RepairWitness { CapturedAt = now, UseTimes = value.UseTimes, MaxUseTimes = maxUse, ItemName = itemName ?? string.Empty });
+            history.States.Add(new RepairWitness { CapturedAt = now, UseTimes = value.UseTimes, MaxUseTimes = maxUse });
             while (history.States.Count > MaxStateChangesPerItem) history.States.RemoveAt(0);
         }
     }
@@ -211,7 +210,7 @@ public static class RebirthEquipmentRepairTrainingService
         ItemValue current;
         if (!TryFindInventoryItem(player, itemType, seed, out current) || current == null || current.ItemClass == null || current.MaxUseTimes <= 0f) return false;
         if(current.HasMetadata("RebirthRepairOriginalV1"))return false; // Original journal cannot also use the primitive legacy witness.
-        string key = ItemKey(player.entityId, itemType, seed);
+        var key = ItemKey(player.entityId, itemType, seed);
         RepairHistory history;
         if (!HistoryByItem.TryGetValue(key, out history) || history == null || history.States.Count == 0) return false;
 
@@ -243,8 +242,7 @@ public static class RebirthEquipmentRepairTrainingService
         {
             CapturedAt = now,
             UseTimes = current.UseTimes,
-            MaxUseTimes = current.MaxUseTimes,
-            ItemName = itemName ?? string.Empty
+            MaxUseTimes = current.MaxUseTimes
         });
         RebirthSkillEventRouter.OnEquipmentRepairCompleted(player, itemName, restored, maxUse);
         return true;
@@ -253,22 +251,38 @@ public static class RebirthEquipmentRepairTrainingService
     private static void ProcessPending(World world, float now)
     {
         if (PendingByReceipt.Count == 0 || world == null) return;
-        List<string> keys = new List<string>(PendingByReceipt.Keys);
-        for (int i = 0; i < keys.Count; i++)
+        bool reuse = !pendingReceiptKeysBusy;
+        List<string> keys = reuse ? (pendingReceiptKeys ??= new List<string>()) : new List<string>(PendingByReceipt.Count);
+        if (reuse) pendingReceiptKeysBusy = true;
+        try
         {
-            string receiptKey = keys[i];
-            PendingRepair pending;
-            if (!PendingByReceipt.TryGetValue(receiptKey, out pending) || pending == null) continue;
-            if (now > pending.ExpiresAt)
+            // Keep a stable key snapshot while receipts are removed below.
+            keys.AddRange(PendingByReceipt.Keys);
+            for (int i = 0; i < keys.Count; i++)
             {
+                string receiptKey = keys[i];
+                PendingRepair pending;
+                if (!PendingByReceipt.TryGetValue(receiptKey, out pending) || pending == null) continue;
+                if (now > pending.ExpiresAt)
+                {
+                    PendingByReceipt.Remove(receiptKey);
+                    continue;
+                }
+                EntityPlayer player = world.GetEntity(pending.PlayerId) as EntityPlayer;
+                if (!IsServerAuthority(player)) continue;
+                if (!TryConsumeWitness(player, pending.ItemType, pending.Seed, now)) continue;
                 PendingByReceipt.Remove(receiptKey);
-                continue;
+                ConsumedReceipts[receiptKey] = now;
             }
-            EntityPlayer player = world.GetEntity(pending.PlayerId) as EntityPlayer;
-            if (!IsServerAuthority(player)) continue;
-            if (!TryConsumeWitness(player, pending.ItemType, pending.Seed, now)) continue;
-            PendingByReceipt.Remove(receiptKey);
-            ConsumedReceipts[receiptKey] = now;
+        }
+        finally
+        {
+            keys.Clear();
+            if (reuse)
+            {
+                if (keys.Capacity > 1024) pendingReceiptKeys = null;
+                pendingReceiptKeysBusy = false;
+            }
         }
     }
 
@@ -311,15 +325,25 @@ public static class RebirthEquipmentRepairTrainingService
 
     private static void Prune(float now)
     {
-        List<string> removeHistory = new List<string>();
-        foreach (KeyValuePair<string, RepairHistory> pair in HistoryByItem)
-            if (pair.Value == null || now - pair.Value.LastSeenAt > WitnessRetentionSeconds) removeHistory.Add(pair.Key);
-        for (int i = 0; i < removeHistory.Count; i++) HistoryByItem.Remove(removeHistory[i]);
+        List<(int PlayerId, int ItemType, ushort Seed)> removeHistory = null;
+        foreach (KeyValuePair<(int PlayerId, int ItemType, ushort Seed), RepairHistory> pair in HistoryByItem)
+            if (pair.Value == null || now - pair.Value.LastSeenAt > WitnessRetentionSeconds)
+            {
+                if (removeHistory == null) removeHistory = new List<(int PlayerId, int ItemType, ushort Seed)>();
+                removeHistory.Add(pair.Key);
+            }
+        if (removeHistory != null)
+            for (int i = 0; i < removeHistory.Count; i++) HistoryByItem.Remove(removeHistory[i]);
 
-        List<string> removeReceipts = new List<string>();
+        List<string> removeReceipts = null;
         foreach (KeyValuePair<string, float> pair in ConsumedReceipts)
-            if (now - pair.Value > WitnessRetentionSeconds) removeReceipts.Add(pair.Key);
-        for (int i = 0; i < removeReceipts.Count; i++) ConsumedReceipts.Remove(removeReceipts[i]);
+            if (now - pair.Value > WitnessRetentionSeconds)
+            {
+                if (removeReceipts == null) removeReceipts = new List<string>();
+                removeReceipts.Add(pair.Key);
+            }
+        if (removeReceipts != null)
+            for (int i = 0; i < removeReceipts.Count; i++) ConsumedReceipts.Remove(removeReceipts[i]);
     }
 
     private static long NextClientReceipt(int playerId)
@@ -328,10 +352,8 @@ public static class RebirthEquipmentRepairTrainingService
         return unchecked(clientReceiptSession ^ ((long)playerId << 32) ^ sequence);
     }
 
-    private static string ItemKey(int playerId, int itemType, ushort seed)
-    {
-        return playerId.ToString() + ":" + itemType.ToString() + ":" + seed.ToString();
-    }
+    private static (int PlayerId, int ItemType, ushort Seed) ItemKey(int playerId, int itemType, ushort seed)
+        => (playerId, itemType, seed);
 
     private static string ReceiptKey(int playerId, long receipt)
     {

@@ -153,5 +153,6 @@
   <!-- Unfinished Entity Studio diagnostic; manual spawning only. -->
   <include filename="_EntityStudio/farmer_diagnostic_entityclasses.xml"/>
   <include filename="_Vehicles/standard_entityclasses.xml"/>
+  <include filename="_Seeker/entityclasses.xml"/>
 </configs>
 

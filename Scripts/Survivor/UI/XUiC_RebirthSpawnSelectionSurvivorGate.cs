@@ -337,20 +337,28 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
     {
         base.Update(dt);
         if (ProcessStandaloneSpawnSelectorRequest()) return;
-        for (int i = 0; i < rowArtBinders.Length; i++) if (rowArtBinders[i] != null) rowArtBinders[i].Update();
-        if (selectedArtBinder != null) selectedArtBinder.Update();
-        RebirthNativePlayerProfileBridge.Tick(xui);
-
-        if (traitNativeInitialSyncFrames > 0)
+        // The embedded selector is deliberately hidden in V3.2; its artwork and
+        // scrollbars need frame updates only if that panel is actually visible.
+        bool selectorVisible = ViewComponent?.IsVisible == true;
+        if (selectorVisible)
         {
-            traitNativeInitialSyncFrames--;
-            UpdateTraitNativeScroll();
+            for (int i = 0; i < rowArtBinders.Length; i++) if (rowArtBinders[i] != null) rowArtBinders[i].Update();
+            if (selectedArtBinder != null) selectedArtBinder.Update();
         }
-        PollProfileNativeScroll();
-        PollProgressionNativeScroll();
-        PollTraitNativeScroll();
-        PollWeaknessNativeScroll();
-        PollStartingItemNativeScroll();
+        RebirthNativePlayerProfileBridge.Tick(xui);
+        if (selectorVisible)
+        {
+            if (traitNativeInitialSyncFrames > 0)
+            {
+                traitNativeInitialSyncFrames--;
+                UpdateTraitNativeScroll();
+            }
+            PollProfileNativeScroll();
+            PollProgressionNativeScroll();
+            PollTraitNativeScroll();
+            PollWeaknessNativeScroll();
+            PollStartingItemNativeScroll();
+        }
 
         float now = Time.realtimeSinceStartup;
         if (now >= nextRefreshTime)

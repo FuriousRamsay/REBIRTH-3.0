@@ -210,8 +210,8 @@ internal static partial class RebirthRecyclerPlacedSettlement
     {internal OwnerPublication Publication;internal ItemStackGrid Grid;internal int Slot,Completed;internal ItemStack Value;internal bool Consumed,Observed;}
     [ThreadStatic]private static OwnerSlotPermit ownerSlotPermit;
     private static readonly List<OwnerPublication> ownerPublications=new List<OwnerPublication>();
-    internal static bool HoldsOwner(EntityPlayerLocal actor)=>actor!=null&&(RecyclerClientOwnerHeld(actor)||LoadedOwnerHeld(actor)||JoinedRecyclerOwnerHeld(actor)||AuthorityOwnerHeld(actor)||ownerPublications.Any(value=>ReferenceEquals(value.Original.Actor,actor)&&value.Original.Current()));
-    internal static bool HoldsStation(TileEntityWorkstation station)=>station!=null&&(ViewedCompletionHeld(station)||LoadedUnusedStationHeld(station)||ClosedAuthorityStationHeld(station)||RecyclerClientStationHeld(station)||RemoteRecyclerStationHeld(station)||ColdStationHeld(station)||AuthorityStationHeld(station)||ownerPublications.Any(value=>
+    internal static bool HoldsOwner(EntityPlayerLocal actor)=>actor!=null&&(RecyclerClientOwnerHeld(actor)||LoadedOwnerHeld(actor)||JoinedRecyclerOwnerHeld(actor)||AuthorityOwnerHeld(actor)||ownerPublications.Count!=0&&ownerPublications.Any(value=>ReferenceEquals(value.Original.Actor,actor)&&value.Original.Current()));
+    internal static bool HoldsStation(TileEntityWorkstation station)=>station!=null&&(ViewedCompletionHeld(station)||LoadedUnusedStationHeld(station)||ClosedAuthorityStationHeld(station)||RecyclerClientStationHeld(station)||RemoteRecyclerStationHeld(station)||ColdStationHeld(station)||AuthorityStationHeld(station)||ownerPublications.Count!=0&&ownerPublications.Any(value=>
         ReferenceEquals(value.Original.World,GameManager.Instance?.World)&&ReferenceEquals(value.Original.Station,station)&&
         ReferenceEquals(value.Original.World.GetTileEntity(station.ToWorldPos()),station)));
     internal static bool ConsumeOwnerSlot(ItemStackGrid grid,int slot,ItemStack value)

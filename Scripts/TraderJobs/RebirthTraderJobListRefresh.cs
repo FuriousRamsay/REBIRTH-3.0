@@ -19,7 +19,7 @@ public static class RebirthTraderJobListRefresh
     private static World acceptedListWorld;private static Dialog acceptedListDialog;private static int acceptedListTrader=-1,acceptedListPlayer=-1;
     internal static bool RejectUncorrelatedList(World world,int trader,int player)
     {
-        if(world==null||!world.IsRemote()||RebirthSandboxOptionManager.Current.TraderJobList!=RebirthTraderJobListMode.Random)return false;
+        if(world==null||!world.IsRemote()||(!RebirthSandboxOptionManager.Current.IsPurge&&RebirthSandboxOptionManager.Current.TraderJobList!=RebirthTraderJobListMode.Random))return false;
         var local=world.GetPrimaryPlayer();if(local==null||local.entityId!=player)return false;
         if(local.PlayerUI?.windowManager?.IsWindowOpen("dialog")!=true)return false;
         var group=LocalPlayerUI.GetUIForPlayer(local)?.xui?.Dialog?.DialogWindowGroup;
@@ -100,7 +100,6 @@ public static class RebirthTraderJobListRefresh
         DialogResponse response,
         EntityPlayer player)
     {
-        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         RebirthTraderDebug.Trace(
             "JOBS_ENTRY begin response=" + SafeResponse(response) +
             " mode=" + RebirthSandboxOptionManager.Current.TraderJobList);
@@ -141,7 +140,9 @@ public static class RebirthTraderJobListRefresh
             "JOBS_ENTRY capacityTarget tier=" + targetTier +
             " statement='" + targetStatement + "'");
 
-        if (RebirthSandboxOptionManager.Current.TraderJobList !=
+        // Purge always requests a current server list, including Fixed mode.
+        // Reuse the existing authenticated/correlated list flow, not map/UI state.
+        if (!RebirthSandboxOptionManager.Current.IsPurge && RebirthSandboxOptionManager.Current.TraderJobList !=
             RebirthTraderJobListMode.Random)
         {
             if (string.Equals(
@@ -262,7 +263,6 @@ public static class RebirthTraderJobListRefresh
             !string.IsNullOrEmpty(questResponse.Quest.QuestClass.QuestType))
             return false;
 
-        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         Quest offered = questResponse.Quest;
         var originalJournal = player.QuestJournal;
         var originalManager = ui.windowManager;
@@ -871,7 +871,7 @@ public static class RebirthTraderRandomFetchServerPatch
         if (__instance == null ||
             connection == null ||
             !connection.IsServer ||
-            RebirthSandboxOptionManager.Current.TraderJobList != RebirthTraderJobListMode.Random ||
+            (!RebirthSandboxOptionManager.Current.IsPurge && RebirthSandboxOptionManager.Current.TraderJobList != RebirthTraderJobListMode.Random) ||
             __instance.eventType != NetPackageNPCQuestList.NPCQuestEventTypes.FetchList)
             return;
 

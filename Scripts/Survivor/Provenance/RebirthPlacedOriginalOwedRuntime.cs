@@ -15,8 +15,8 @@ internal static partial class RebirthPlacedOriginalDeathPartition
     private static World owedWorld;private static string owedDirectory;private static OwedPermit owedPermit;
     private static void OwedScope(World world){if(ReferenceEquals(owedWorld,world)&&owedDirectory==GameIO.GetSaveGameDir())return;owedAttempts.Clear();owedCompleted.Clear();owedPermit=null;owedWorld=world;owedDirectory=GameIO.GetSaveGameDir();}
     private static bool OwedAttemptCurrent(OwedAttempt a)=>a!=null&&OwedCurrent(a.Player,a.Child)&&ReferenceEquals(a.World,GameManager.Instance?.World)&&a.Directory==GameIO.GetSaveGameDir()&&a.Player.IsSpawned();
-    internal static bool IsOwedHeld(EntityPlayerLocal player)=>owedAttempts.Values.Any(a=>ReferenceEquals(a.Player,player)&&a.Child.Phase<3&&OwedAttemptCurrent(a));
-    internal static bool BlocksOwed(ItemStackGrid grid)=>owedAttempts.Values.Any(a=>a.Child.Phase<3&&OwedAttemptCurrent(a)&&(ReferenceEquals(grid,a.Player.bag?.ItemGrid)||ReferenceEquals(grid,a.Player.inventory?.ItemGrid)));
+    internal static bool IsOwedHeld(EntityPlayerLocal player)=>owedAttempts.Count!=0&&owedAttempts.Values.Any(a=>ReferenceEquals(a.Player,player)&&a.Child.Phase<3&&OwedAttemptCurrent(a));
+    internal static bool BlocksOwed(ItemStackGrid grid)=>owedAttempts.Count!=0&&owedAttempts.Values.Any(a=>a.Child.Phase<3&&OwedAttemptCurrent(a)&&(ReferenceEquals(grid,a.Player.bag?.ItemGrid)||ReferenceEquals(grid,a.Player.inventory?.ItemGrid)));
     internal static bool ConsumeOwed(ItemStackGrid grid,int index,ItemStack value)
     {
         var p=owedPermit;if(p==null||p.Used||!OwedAttemptCurrent(p.Attempt)||p.Attempt.Child.Phase!=2||p.Attempt.Child.Applied||!ReferenceEquals(p.Grid,grid)||p.Slot!=index||!ReferenceEquals(p.Value,value)||!RebirthCamperEnergyActorImage.Capture(p.Attempt.Player).Matches(RebirthPlacedOriginal.ReadActor(p.Attempt.Child.Before)))return false;p.Used=true;return true;
@@ -110,7 +110,7 @@ internal static partial class RebirthPlacedOriginalDeathPartition
     }
     internal static void UpdateOwed(World world)
     {
-        try{if(!ThreadManager.IsMainThread()||world?.GetPrimaryPlayer() is not EntityPlayerLocal player)return;OwedScope(world);foreach(var attempt in owedAttempts.Values.ToArray()){if(!OwedIdentity(player,attempt.Child)||UnityEngine.Time.realtimeSinceStartup<attempt.Next)continue;attempt.Next=UnityEngine.Time.realtimeSinceStartup+1f;if(OwedAttemptCurrent(attempt))ApplyOwed(attempt);else {RequestOwedRejection(player,attempt.Child);RetryOwedUnused(player,attempt.Child);RetryOwedDelete(player,attempt.Child);RetryOwedPhysical(player,attempt.Child);}owedCompleted.TryGetValue(attempt.Child.Parent,out int completed);SendOwed(player,new XElement("placedOwedQuery",new XAttribute("parent",attempt.Child.Parent.ToString("N")),new XAttribute("after",completed)).ToString(SaveOptions.DisableFormatting));}}catch{}
+        try{if(!ThreadManager.IsMainThread()||world?.GetPrimaryPlayer() is not EntityPlayerLocal player)return;OwedScope(world);if(owedAttempts.Count==0)return;foreach(var attempt in owedAttempts.Values.ToArray()){if(!OwedIdentity(player,attempt.Child)||UnityEngine.Time.realtimeSinceStartup<attempt.Next)continue;attempt.Next=UnityEngine.Time.realtimeSinceStartup+1f;if(OwedAttemptCurrent(attempt))ApplyOwed(attempt);else {RequestOwedRejection(player,attempt.Child);RetryOwedUnused(player,attempt.Child);RetryOwedDelete(player,attempt.Child);RetryOwedPhysical(player,attempt.Child);}owedCompleted.TryGetValue(attempt.Child.Parent,out int completed);SendOwed(player,new XElement("placedOwedQuery",new XAttribute("parent",attempt.Child.Parent.ToString("N")),new XAttribute("after",completed)).ToString(SaveOptions.DisableFormatting));}}catch{}
     }
     private static void RetryOwed(EntityPlayerLocal player,Guid parent)
     {

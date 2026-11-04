@@ -819,13 +819,13 @@ public static class AdvancedFarmingDynamicLightOpacityService
                 if (chunk == null)
                     continue;
 
+                int lx = World.toBlockXZ(x);
+                int lz = World.toBlockXZ(z);
                 bool anyChangedInColumn = false;
                 for (int y = minY; y <= maxY; y++)
                 {
                     int index = MakeVolumeIndex(x, y, z, minX, minY, minZ, widthX, widthZ);
                     byte desired = index >= 0 ? newSun[index] : (byte)0;
-                    int lx = World.toBlockXZ(x);
-                    int lz = World.toBlockXZ(z);
                     byte current = chunk.GetLight(lx, y, lz, Chunk.LIGHT_TYPE.SUN);
                     if (current != desired)
                     {

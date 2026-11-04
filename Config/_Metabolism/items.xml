@@ -10,8 +10,8 @@
     <property name="RebirthInitialVolumeMl" value="500" />
     <property name="RebirthManualSipMl" value="125" />
     <property name="RebirthAutoSipMl" value="50" />
-    <property name="RebirthHydrationEquippable" value="false" />
-    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
     <property name="RebirthLiquidHydrationYield" value="0.75" />
     <property name="RebirthReusableContainer" value="false" />
     <property name="RebirthEmptyItem" value="drinkJarEmpty" />
@@ -93,8 +93,8 @@
     <property name="RebirthInitialVolumeMl" value="500" />
     <property name="RebirthManualSipMl" value="125" />
     <property name="RebirthAutoSipMl" value="50" />
-    <property name="RebirthHydrationEquippable" value="false" />
-    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
     <property name="RebirthLiquidHydrationYield" value="1" />
     <property name="RebirthReusableContainer" value="false" />
     <property name="RebirthEmptyItem" value="drinkJarEmpty" />
@@ -113,8 +113,8 @@
     <property name="RebirthInitialVolumeMl" value="500" />
     <property name="RebirthManualSipMl" value="125" />
     <property name="RebirthAutoSipMl" value="50" />
-    <property name="RebirthHydrationEquippable" value="false" />
-    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
     <property name="RebirthLiquidHydrationYield" value="1" />
     <property name="RebirthReusableContainer" value="false" />
     <property name="RebirthEmptyItem" value="drinkJarEmpty" />
@@ -133,8 +133,8 @@
     <property name="RebirthInitialVolumeMl" value="500" />
     <property name="RebirthManualSipMl" value="125" />
     <property name="RebirthAutoSipMl" value="50" />
-    <property name="RebirthHydrationEquippable" value="false" />
-    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
     <property name="RebirthLiquidHydrationYield" value="0.75" />
     <property name="RebirthReusableContainer" value="false" />
     <property name="RebirthEmptyItem" value="drinkJarEmpty" />
@@ -353,10 +353,36 @@
   <append xpath="/items/item[@name='foodCanBeef']">
     <property name="RebirthMetabolismType" value="Food" />
     <property name="RebirthNutritionUnits" value="15" />
-    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthFoodWaterMl" value="0" />
     <property name="RebirthStomachVolumeMl" value="160" />
     <property name="RebirthDigestionProfile" value="normal" />
     <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <!-- Canned variants override the inherited beef payload. Native hydration points convert at25ml/point. -->
+  <remove xpath="/items/item[starts-with(@name,'foodCan')]//triggered_effect[@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')]" />
+  <append xpath="/items/item[@name='foodCanChicken' or @name='foodCanLamb' or @name='foodCanChili' or @name='foodCanSham' or @name='foodCanPasta' or @name='foodCanSalmon']">
+    <property name="RebirthNutritionUnits" value="15" />
+    <property name="RebirthFoodWaterMl" value="0" />
+  </append>
+  <append xpath="/items/item[@name='foodCanCatfood' or @name='foodCanDogfood']">
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="0" />
+  </append>
+  <append xpath="/items/item[@name='foodCanTuna']">
+    <property name="RebirthNutritionUnits" value="5" />
+    <property name="RebirthFoodWaterMl" value="0" />
+  </append>
+  <append xpath="/items/item[@name='foodCanMiso' or @name='foodCanSoup']">
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="250" />
+  </append>
+  <append xpath="/items/item[@name='foodCanPeas' or @name='foodCanPears']">
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="125" />
+  </append>
+  <append xpath="/items/item[@name='foodCanStock']">
+    <property name="RebirthNutritionUnits" value="5" />
+    <property name="RebirthFoodWaterMl" value="250" />
   </append>
   <set xpath="/items/item[@name='foodCharredMeat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
   <remove xpath="/items/item[@name='foodCharredMeat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />

@@ -11,6 +11,7 @@ public sealed class XUiC_RebirthMapArea : XUiC_MapArea
     internal readonly RebirthMapInteraction Interaction=new RebirthMapInteraction();
     private readonly RebirthMapBoundary boundary=new RebirthMapBoundary();
     private XUiC_RebirthMapZoomSlider zoomSlider;
+    private XUiC_RebirthPurgeSupplyButton supplyButton;
     private bool interactionWasSuppressed;
     internal bool RefreshingFittedCenter {get;private set;}
     internal float WorldFitMaximum(float maximum)=>boundary.MaximumZoom(this,maximum);
@@ -24,6 +25,7 @@ public sealed class XUiC_RebirthMapArea : XUiC_MapArea
         try{DragMap(Vector2.zero);}finally{RefreshingFittedCenter=false;}
     }
     internal XUiC_RebirthMapZoomSlider ZoomSlider=>zoomSlider??(zoomSlider=GetChildByType<XUiC_RebirthMapZoomSlider>());
+    internal XUiC_RebirthPurgeSupplyButton SupplyButton=>supplyButton??(supplyButton=GetChildByType<XUiC_RebirthPurgeSupplyButton>());
     internal bool SuppressMapHover=>Interaction.Suppress(this);
     internal void ClearMapHover()
     {
@@ -61,8 +63,8 @@ public sealed class XUiC_RebirthMapArea : XUiC_MapArea
     public int ActiveCanvasWidth => MapView?.ViewComponent?.Size.x ?? CanvasWidth;
     public int ActiveCanvasHeight => MapView?.ViewComponent?.Size.y ?? CanvasHeight;
     public override void Init(){ResetLayoutReferences();if(!installed){installed=true;var h=new Harmony("rebirth.map.rectangular");RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWideMapRender));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWideMapPointer));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWideMapDrag));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWideMapLocalPointer));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWideMapHover));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapOverviewZoom));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapResponsiveWheel));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapTeleportBounds));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapHoverSelection));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapObjectHover));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapPressGuard));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapDragGesture));RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthMapPlayableView));}base.Init();}
-    public override void OnOpen(){ResetLayoutReferences();Interaction.Reset();boundary.Reset();zoomSlider=null;interactionWasSuppressed=false;base.OnOpen();ResizeTexture();}
-    public override void OnClose(){overview.Close(this);Interaction.Reset();boundary.Reset();zoomSlider=null;interactionWasSuppressed=false;base.OnClose();}
+    public override void OnOpen(){ResetLayoutReferences();Interaction.Reset();boundary.Reset();zoomSlider=null;supplyButton=null;interactionWasSuppressed=false;base.OnOpen();ResizeTexture();}
+    public override void OnClose(){overview.Close(this);Interaction.Reset();boundary.Reset();zoomSlider=null;supplyButton=null;interactionWasSuppressed=false;base.OnClose();}
     public override void Update(float dt){FitToNavigation();ResizeTexture();targetZoomScale=Mathf.Min(targetZoomScale,RebirthMapOverview.Limit(this));if(!RebirthMapOverview.Supported(this))zoomScale=Mathf.Min(zoomScale,RebirthMapOverview.NativeMaximum(ActiveCanvasWidth,ActiveCanvasHeight));base.Update(dt);ResizeTexture();overview.Update(this);boundary.Render(this);bool suppressed=SuppressMapHover;if(suppressed){if(!interactionWasSuppressed)closeAllPopups();ClearMapHover();}interactionWasSuppressed=suppressed;}
     private void ResizeTexture(){int width=ActiveCanvasWidth,height=ActiveCanvasHeight;cTexMiddle=new Vector2i(width/2,height/2);if(xuiTexture!=null&&(xuiTexture.Size.x!=width||xuiTexture.Size.y!=height)){xuiTexture.Size=new Vector2i(width,height);if(bMapInitialized)xuiTexture.updateData();}}
     private void FitToNavigation()
@@ -122,7 +124,7 @@ internal static class RebirthWideMapDrag
     {
         var map=__instance as XUiC_RebirthMapArea;
         if(map==null)return true;
-        if(!map.RefreshingFittedCenter&&map.ZoomSlider?.BlocksMapInput==true)return false;
+        if(!map.RefreshingFittedCenter&&(map.ZoomSlider?.BlocksMapInput==true||map.SupplyButton?.BlocksMapInput==true))return false;
         if(!map.RefreshingFittedCenter)map.Interaction.Pan();
         if(map.ViewComponent?.UiTransform!=null)delta/=Mathf.Max(.01f,map.ViewComponent.UiTransform.localScale.x);
         return true;

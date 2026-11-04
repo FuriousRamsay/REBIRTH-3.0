@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayMutantAlert">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Alert1" />
+      <Channel name="Mouth" />
+      <Priority name="0" />
+      <maxVoicesPerEntity value="1" />
+      <LowestPitch name=".95" />
+      <HighestPitch name="1" />
+      <LocalCrouchVolumeScale value="1.0" />
+      <CrouchNoiseScale value="1" />
+      <NoiseScale value="0.9" />
+      <MaxVoices value="10" />
+      <MaxRepeatRate value="1.111" />
+    </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayMutantAttack">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Attack1" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Attack2" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Attack3" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Attack4" />
+      <Channel name="Mouth" />
+      <Priority name="0" />
+      <maxVoicesPerEntity value="1" />
+      <LowestPitch name=".95" />
+      <HighestPitch name="1" />
+      <LocalCrouchVolumeScale value="1.0" />
+      <CrouchNoiseScale value="1" />
+      <NoiseScale value="0.9" />
+      <MaxVoices value="10" />
+      <MaxRepeatRate value="1.111" />
+    </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayMutantHit">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Hit1" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Hit2" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Hit3" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Hit4" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Hit5" />
+      <Channel name="Mouth" />
+      <Priority name="0" />
+      <maxVoicesPerEntity value="1" />
+      <LowestPitch name=".95" />
+      <HighestPitch name="1" />
+      <LocalCrouchVolumeScale value="1.0" />
+      <CrouchNoiseScale value="1" />
+      <NoiseScale value="0.9" />
+      <MaxVoices value="10" />
+      <MaxRepeatRate value="1.111" />
+    </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayMutantDeath">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMutant_Death" />
+      <Channel name="Mouth" />
+      <Priority name="0" />
+      <maxVoicesPerEntity value="1" />
+      <LowestPitch name=".95" />
+      <HighestPitch name="1" />
+      <LocalCrouchVolumeScale value="1.0" />
+      <CrouchNoiseScale value="1" />
+      <NoiseScale value="0.9" />
+      <MaxVoices value="10" />
+      <MaxRepeatRate value="1.111" />
+    </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayKamikaze">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab" />
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayKamikaze" />
+      <Channel name="Mouth" />
+      <Priority name="0" />
+      <maxVoicesPerEntity value="1" />
+      <LowestPitch name=".95" />
+      <HighestPitch name="1" />
+      <LocalCrouchVolumeScale value="1.0" />
+      <CrouchNoiseScale value="1" />
+      <NoiseScale value="0.9" />
+      <MaxVoices value="10" />
+      <MaxRepeatRate value="1.111" />
+    </SoundDataNode>
+  </append>
+</configs>

@@ -1,0 +1,33 @@
+{
+  "name": "Vehicle tuning retained after closing UI — native acceptance capture",
+  "stopOnFailure": true,
+  "notes": "NOT RUN. Separately authorized disposable local host, debug enabled, player mounted in healthy camper on safe clear level road. Set chosen live value in tuner before Drive. Close/Escape then drive and reopen; manually compare value and actual response. No owner-game takeover. SOURCE proposals intentionally excluded.",
+  "steps": [
+    {
+      "console": "rebirthvehicletune"
+    },
+    {
+      "screenshot": "vehicle_tuner_retained_before"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "move": {
+        "forward": 1,
+        "seconds": 2
+      }
+    },
+    {
+      "console": "rebirthvehicletune"
+    },
+    {
+      "screenshot": "vehicle_tuner_retained_after_drive"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

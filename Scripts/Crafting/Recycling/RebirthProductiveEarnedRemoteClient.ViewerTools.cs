@@ -16,6 +16,7 @@ internal static partial class RebirthProductiveEarnedRemoteClient
     }
     private static void PumpViewerToolRequests()
     {
+        if(viewerToolRequests.Count==0)return;
         double now=DateTime.UtcNow.Ticks/(double)TimeSpan.TicksPerSecond;
         foreach(var value in viewerToolRequests.ToArray())
         {

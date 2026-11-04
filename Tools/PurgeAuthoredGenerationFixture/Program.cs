@@ -10,7 +10,10 @@ class GameManager { public static GameManager Instance; public World World; }
 class ConnectionManager { public bool IsServer=true; }
 class SingletonMonoBehaviour<T> { public static T Instance; }
 class ThreadManager { public static bool IsMainThread()=>true; }
-class GameIO { public static string Path; public static string GetSaveGameDir()=>Path; }
+class GameIO { public static string Path; public static string GetSaveGameDir()=>Path; public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>System.IO.Path.GetTempPath(); }
+class Platform { public enum UserDataStorageType { Local } }
+enum EnumGamePrefs { GameSaveStorageType, GameWorld, GameName }
+class GamePrefs { public static int GetInt(EnumGamePrefs preference)=>0; public static string GetString(EnumGamePrefs preference)=>string.Empty; }
 class NativeIterator:IEnumerator{public Action Effects;public int Advances;public object Current=>null;public bool MoveNext(){Advances++;if(Advances==1){Effects?.Invoke();return true;}return false;}public void Reset(){throw new NotSupportedException();}}
 static class Program
 {
@@ -40,7 +43,12 @@ static class Program
  var malformed=RebirthPoiResetPlan.Write(plan);malformed.SetAttributeValue("version",1);Invalid(()=>RebirthPoiResetPlan.Read(malformed),"v1 cannot silently reinterpret authored slots");
  Guid generation=Guid.NewGuid();var actor=new RebirthPoiActorObservation(Guid.NewGuid(),100,"zombieArlene",1);var room=new RebirthPoiVolumeObservation(7,H('a'),new[]{actor});var original=new RebirthPoiPartialObservation(generation,0,1,new[]{room});
  Check(original.RollOverVerifiedReset(plan)==null,"authored missing bindings withheld");Check(original.RollOverVerifiedReset(plan,binding)==null,"living old actor omitted outcome withheld");
- var survived=new RebirthPoiResetActorOutcome(actor.Token,actor.EntityId,0,generation,H('a'),actor.CausalDigest,RebirthPoiPriorActorDisposition.Survived,Guid.NewGuid());binding=new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{survived});var rolled=original.RollOverVerifiedReset(plan,binding);Check(rolled!=null&&rolled.Volumes.Count==2&&rolled.Volumes[21].Actors.Count==0,"newly registered combat room included");var inherited=rolled.Volumes[7].Actors[actor.Token];Check(!inherited.Dead&&inherited.EntityId==100&&inherited.Inheritance.OriginEpoch==0&&inherited.Inheritance.OriginGeneration==generation&&inherited.Inheritance.ResetTransaction==tx,"survivor retained with exact saved origin");
+ var survived=new RebirthPoiResetActorOutcome(actor.Token,actor.EntityId,0,generation,H('a'),actor.CausalDigest,RebirthPoiPriorActorDisposition.Survived,Guid.NewGuid());
+ var secondSleeper=new RebirthPoiResetActorOutcome(Guid.NewGuid(),101,0,generation,H('b'),actor.CausalDigest,RebirthPoiPriorActorDisposition.Survived,Guid.NewGuid());
+ Check(new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{survived,secondSleeper}).PriorActors.Count==2,"each authored sleeper descriptor admits its prior actor");
+ var triggerOnly=new RebirthPoiResetActorOutcome(Guid.NewGuid(),102,0,generation,H('c'),actor.CausalDigest,RebirthPoiPriorActorDisposition.Survived,Guid.NewGuid());
+ Invalid(()=>new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{triggerOnly}),"trigger descriptor cannot admit a prior sleeper actor");
+ binding=new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{survived});var rolled=original.RollOverVerifiedReset(plan,binding);Check(rolled!=null&&rolled.Volumes.Count==2&&rolled.Volumes[21].Actors.Count==0,"newly registered combat room included");var inherited=rolled.Volumes[7].Actors[actor.Token];Check(!inherited.Dead&&inherited.EntityId==100&&inherited.Inheritance.OriginEpoch==0&&inherited.Inheritance.OriginGeneration==generation&&inherited.Inheritance.ResetTransaction==tx,"survivor retained with exact saved origin");
  Check(rolled.Canonical==original.RollOverVerifiedReset(plan,binding).Canonical,"same original outcomes deterministic retry");Check(RebirthPoiPartialObservation.Read(RebirthPoiPartialObservation.Write(rolled)).Canonical==rolled.Canonical,"inheritance payload roundtrip");
  var badOutcome=new RebirthPoiResetActorOutcome(actor.Token,101,0,generation,H('a'),actor.CausalDigest,RebirthPoiPriorActorDisposition.Survived,Guid.NewGuid());Check(original.RollOverVerifiedReset(plan,new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{badOutcome}))==null,"different original actor refused");
  var removed=new RebirthPoiResetActorOutcome(actor.Token,100,0,generation,H('a'),actor.CausalDigest,RebirthPoiPriorActorDisposition.NativeRemoved,Guid.NewGuid());Check(original.RollOverVerifiedReset(plan,new RebirthPoiAuthoredResetBindings(plan,runtime,0,new[]{removed})).Volumes[7].Actors.Count==0,"explicit native removal assertion resolves old participant");

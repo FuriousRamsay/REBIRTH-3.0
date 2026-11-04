@@ -158,10 +158,12 @@ internal static partial class RebirthProductiveEarnedUiDeferredTransport
     {if(authorityNativeInstalled)return;RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(AuthorityNativeLockRequest));authorityNativeInstalled=true;RebirthProductiveEarnedUiQueueOwner.ActualAddObserved+=AuthorityNativePublication.ObserveAdd;}
     internal static void PumpAuthorityNative(World world)
     {
-        foreach(var source in authorityLocalLoaded.Where(value=>!ReferenceEquals(value.World,world)).ToArray())
-        {authorityLocalLoaded.Remove(source);source.Dispose();}
-        foreach(var source in authorityNative.Values.ToArray())
-            if(!ReferenceEquals(source.World,world))source.Dispose();else try{source.TrySeal();}catch{}
+        if(authorityLocalLoaded.Count!=0)
+            foreach(var source in authorityLocalLoaded.Where(value=>!ReferenceEquals(value.World,world)).ToArray())
+            {authorityLocalLoaded.Remove(source);source.Dispose();}
+        if(authorityNative.Count!=0)
+            foreach(var source in authorityNative.Values.ToArray())
+                if(!ReferenceEquals(source.World,world))source.Dispose();else try{source.TrySeal();}catch{}
         PumpAuthorityNativeRequests(world);
     }
     private static AuthorityNativePublication PendingAuthority(TileEntityWorkstation station)=>station==null?null:

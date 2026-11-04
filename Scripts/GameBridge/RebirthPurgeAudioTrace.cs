@@ -13,14 +13,15 @@ public sealed class ConsoleCmdRebirthPurgeAudioTrace : ConsoleCmdAbstract
     private static readonly JArray samples = new JArray();
     private static string error;
     private static int generation;
+    public override bool IsExecuteOnClient => true;
     public override string[] getCommands() => new[] { "rbpurgeaudiotrace" };
     public override string getDescription() => "Observe native Purge clips in disposable CodexTest.";
     public override string getHelp() => "rbpurgeaudiotrace start [seconds 1..120] | status | stop";
     public override void Execute(List<string> args, CommandSenderInfo sender)
     {
         var world = GameManager.Instance?.World;
-        if (sender.RemoteClientInfo != null || world == null || world.IsRemote()
-            || !RebirthGameBridge.IsRunning || GamePrefs.GetString(EnumGamePrefs.GameName) != "CodexTest")
+        if (sender.RemoteClientInfo != null || world == null
+            || !RebirthPurgeFeedbackTrace.Allowed)
         { SdtdConsole.Instance.Output("*** ERROR local CodexTest Bridge required."); return; }
         if (args.Count >= 1 && args[0] == "start")
         {
@@ -49,7 +50,7 @@ public sealed class ConsoleCmdRebirthPurgeAudioTrace : ConsoleCmdAbstract
             while (running && token == generation && Time.realtimeSinceStartup - start < seconds)
             {
                 if (!ReferenceEquals(GameManager.Instance?.World, world) || !RebirthGameBridge.IsRunning
-                    || GamePrefs.GetString(EnumGamePrefs.GameName) != "CodexTest") break;
+                    || !RebirthPurgeFeedbackTrace.Allowed) break;
                 try
                 {
                     foreach (var source in UnityEngine.Object.FindObjectsOfType<AudioSource>())

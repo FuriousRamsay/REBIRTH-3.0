@@ -19,6 +19,19 @@ public static class RebirthOverviewWaterRequest
         RebirthConsumableDefinition definition;
         return item!=null&&RebirthConsumableResolver.TryResolve(item,out definition)&&definition!=null&&definition.IsDrink&&definition.HydrationEquippable;
     }
+    public static void DispatchFromBackpackSlot(EntityPlayer player,int slot)
+    {
+        if(player?.world==null||slot<0)return;
+        if(!player.world.IsRemote())
+        {
+            string message;
+            bool ok=RebirthMetabolismService.EquipHydrationFromBackpackSlot(player,slot,out message);
+            RebirthSurvivorSupportUiFeedback.Receive(ok,message);
+            return;
+        }
+        bool pending=player is EntityPlayerLocal local&&RebirthHydrationOwningAction.Begin(local,true,slot,false);
+        RebirthSurvivorSupportUiFeedback.Receive(pending,Localization.Get(pending?"xuiRebirthHydrationTransferPending":"xuiRebirthHydrationTransferUnavailable"));
+    }
     public static void Dispatch(EntityPlayer player,ItemValue item,bool unequip=false)
     {
         if(player?.world==null)return;

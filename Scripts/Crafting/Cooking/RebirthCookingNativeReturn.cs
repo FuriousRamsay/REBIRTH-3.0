@@ -73,14 +73,16 @@ internal static class RebirthCookingNativeReturn
     internal static bool Blocks(object target)
     {
         if(target==null||!ThreadManager.IsMainThread())return false;Bootstrap();
+        if(Active.Count==0&&!unknown)return false;
         object endpoint=target is ItemStackGrid grid?grid.holder:target is Bag bag?bag.ItemGrid?.holder:target;
         if(endpoint is TEFeatureStorage storage)endpoint=storage.Parent;
-        foreach(var pair in Active.ToArray())
-        {
-            var attempt=pair.Value;
-            if(!Pending(attempt)){attempt.Dispose();Active.Remove(pair.Key);if(unknown)loaded=false;continue;}
-            if(ReferenceEquals(attempt.Source.Endpoint,endpoint)&&attempt.Source.Current())return true;
-        }
+        if(Active.Count!=0)
+            foreach(var pair in Active.ToArray())
+            {
+                var attempt=pair.Value;
+                if(!Pending(attempt)){attempt.Dispose();Active.Remove(pair.Key);if(unknown)loaded=false;continue;}
+                if(ReferenceEquals(attempt.Source.Endpoint,endpoint)&&attempt.Source.Current())return true;
+            }
         if(unknown&&(endpoint is TileEntityComposite||endpoint is TileEntityWorkstation||endpoint is EntityVehicle||endpoint is EntityDrone)){loaded=false;return true;}
         return false;
     }

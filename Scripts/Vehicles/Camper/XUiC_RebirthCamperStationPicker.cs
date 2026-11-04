@@ -127,8 +127,12 @@ public sealed class XUiC_RebirthCamperStationPicker : XUiController
             if(accent!=null)accent.IsVisible=fuelMissing;
             void CardText(string id,string value){if(GetChildById(id+index)?.ViewComponent is XUiV_Label label)label.Text=value;}
             CardText("stationCategory",installed.InstalledItem.itemValue.ItemClass.GetLocalizedItemName());
-            CardText("stationRecipeName",active==null?Localization.Get("xuiCamperWorkshopNoRecipe"):cooking?RebirthCookingHeat.Name(active.Recipe):Localization.Get(active.Recipe.GetName()));
-            CardText("stationRecipeTime",active==null?string.Empty:cooking?RebirthCookingHeat.Timer(active.Recipe):RebirthCookingHeat.FormatDuration(active.CraftingTimeLeft));
+            string recipeName=active==null?Localization.Get("xuiCamperWorkshopNoRecipe"):
+                cooking?RebirthCookingHeat.Name(active.Recipe):Localization.Get(active.Recipe.GetName());
+            string recipeTime=active==null?string.Empty:
+                cooking?RebirthCookingHeat.Timer(active.Recipe):RebirthCookingHeat.FormatDuration(active.CraftingTimeLeft);
+            CardText("stationRecipeName",recipeName);
+            CardText("stationRecipeTime",recipeTime);
             if(GetChildById("stationRecipeIcon"+index)?.ViewComponent is XUiV_Sprite recipeIcon)
             {var output=active?.Recipe?.GetOutputItemClass();recipeIcon.IsVisible=output!=null;if(output!=null){recipeIcon.SpriteName=output.GetIconName();recipeIcon.Color=output.GetIconTint();}}
             CardText("stationFuel",Localization.Get("xuiCamperWorkshopFuel")+" "+(state.isModuleUsed[3]?RebirthCookingHeat.FormatDuration(state.BurnTotalTimeLeft):"—"));
@@ -156,7 +160,7 @@ public sealed class XUiC_RebirthCamperStationPicker : XUiController
             if(details!=null)
             {
                 string tool=missing?new ItemValue(active.Recipe.craftingToolType,false).ItemClass?.GetLocalizedItemName():null;
-                details.Text=(active==null?string.Empty:(cooking?RebirthCookingHeat.Name(active.Recipe):Localization.Get(active.Recipe.GetName()))+" · "+(cooking?RebirthCookingHeat.Timer(active.Recipe):RebirthCookingHeat.FormatDuration(active.CraftingTimeLeft))+"\n")+
+                details.Text=(active==null?string.Empty:recipeName+" · "+recipeTime+"\n")+
                     (ready||string.IsNullOrEmpty(tool)?string.Empty:"\n"+string.Format(Localization.Get("xuiRebirthCamperCardTool"),tool));
             }
         }

@@ -13,7 +13,7 @@ internal static partial class RebirthPlacedOriginalDeathPartition
     {
         internal Guid Parent,Operation;internal string World,Owner,Creation,Partition,Head,Before,After,Proof=string.Empty;internal int Deaths,Sequence,Row,DeliveredBefore,Quantity,Slot,Phase;internal bool Belt,Applied;
     }
-    private static string ChildBody(OwedChild value){var xml=XElement.Parse(BareChildBody(value));xml.SetAttributeValue("checksum",Hash(BareChildBody(value)));return xml.ToString(SaveOptions.DisableFormatting);}
+    private static string ChildBody(OwedChild value){var bare=BareChildBody(value);var xml=XElement.Parse(bare);xml.SetAttributeValue("checksum",Hash(bare));return xml.ToString(SaveOptions.DisableFormatting);}
     private static string BareChildBody(OwedChild c)=>new XElement("placedOwedChild",new XAttribute("version",1),new XAttribute("parent",c.Parent.ToString("N")),new XAttribute("operation",c.Operation.ToString("N")),new XAttribute("world",c.World),new XAttribute("owner",c.Owner),new XAttribute("creation",c.Creation),new XAttribute("partition",c.Partition),new XAttribute("head",c.Head),new XAttribute("deliveredBefore",c.DeliveredBefore),new XAttribute("deaths",c.Deaths),new XAttribute("sequence",c.Sequence),new XAttribute("row",c.Row),new XAttribute("quantity",c.Quantity),new XAttribute("slot",c.Slot),new XAttribute("belt",c.Belt),new XAttribute("phase",c.Phase),new XAttribute("applied",c.Applied),new XAttribute("proof",c.Proof),new XElement("before",c.Before),new XElement("after",c.After)).ToString(SaveOptions.DisableFormatting);
     private static OwedChild DecodeChild(string image)
     {
@@ -55,7 +55,7 @@ internal static partial class RebirthPlacedOriginalDeathPartition
     {if(quantity<1||quantity>ushort.MaxValue||phase!=3&&phase!=4)throw new InvalidDataException();return phase==3?quantity:0;}
     private sealed class OwedHead
     {internal Guid Parent;internal string Partition;internal int Sequence;internal int[] Delivered;}
-    private static string HeadBody(OwedHead value){var xml=XElement.Parse(BareHeadBody(value));xml.SetAttributeValue("checksum",Hash(BareHeadBody(value)));return xml.ToString(SaveOptions.DisableFormatting);}
+    private static string HeadBody(OwedHead value){var bare=BareHeadBody(value);var xml=XElement.Parse(bare);xml.SetAttributeValue("checksum",Hash(bare));return xml.ToString(SaveOptions.DisableFormatting);}
     private static string BareHeadBody(OwedHead h)=>new XElement("placedOwedHead",new XAttribute("version",1),new XAttribute("parent",h.Parent.ToString("N")),new XAttribute("partition",h.Partition),new XAttribute("sequence",h.Sequence),h.Delivered.Select(value=>new XElement("delivered",value))).ToString(SaveOptions.DisableFormatting);
     private static OwedHead DecodeHead(string image)
     {

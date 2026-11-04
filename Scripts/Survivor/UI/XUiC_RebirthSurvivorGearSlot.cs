@@ -14,6 +14,7 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
     private float equipAt, pickupUntil;
     private float nextTooltipRefresh;
     private string tooltipItemId;
+    private bool waterDragStartedEmpty, waterDragHoldingItem, waterCursorWasEmpty=true;
     public override bool ParseAttribute(string name, string value)
     {
         if(name=="gear_slot"){slotId=value;return true;}
@@ -22,8 +23,17 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
     public override void Init()
     {
         base.Init();
-        OnPress += (sender,button)=> { if(button!=0 && button!=-1)return; Interact(false); };
-        OnDrag += (sender,type,delta)=> { if(type==EDragType.DragStart)Interact(true); };
+        OnPress += (sender,button)=> {
+            if(button!=0 && button!=-1)return;
+            if(slotId!=RebirthSurvivorGearService.SupportSlotId ||
+                (InputUtils.ShiftKeyPressed && xui?.DragAndDropWindow?.CurrentStack.IsEmpty()==true))
+                Interact(false);
+        };
+        OnDrag += (sender,type,delta)=> {
+            if(type!=EDragType.DragStart)return;
+            if(slotId!=RebirthSurvivorGearService.SupportSlotId ||
+                xui?.DragAndDropWindow?.CurrentStack.IsEmpty()==true)Interact(true);
+        };
     }
     private void Interact(bool dragging)
     {
@@ -38,6 +48,11 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
             RebirthTraitSupportProfileDefinition profile;
             if(!(slotId==RebirthSurvivorGearService.SupportSlotId&&RebirthOverviewWaterRequest.Accepts(stack.itemValue))&&
                 (!RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(stack.itemValue.ItemClass.GetItemName(),out profile)||profile.GearSlotId!=slotId))return;
+            if(slotId==RebirthSurvivorGearService.SupportSlotId&&RebirthOverviewWaterRequest.Accepts(stack.itemValue))
+            {
+                EquipWaterFromCursor(player,stack);
+                return;
+            }
             // Put the exact cursor item back in a real owned slot before the server validates it.
             // Never manufacture an item from a drag payload or clear a cursor after a failed transfer.
             bool externalGear=player.world!=null&&player.world.IsRemote()&&
@@ -109,6 +124,33 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
                 pendingSession=connection?.connectionToServer!=null&&connection.connectionToServer.Length>0?connection.connectionToServer[0]:null;}
         }
     }
+    private void EquipWaterFromCursor(EntityPlayer player,ItemStack stack)
+    {
+        var cursor=xui?.DragAndDropWindow;
+        if(cursor==null)return;
+        // The cursor is native custody while dragging. Move it into a witnessed
+        // physical source, then start the exact-slot hydration transaction now.
+        // A deferred item-name search can select the wrong stack and briefly
+        // display the deposited drink alongside the equipped one.
+        var bag=player.bag?.ItemGrid?.items;
+        var belt=player.inventory?.ItemGrid?.items;
+        if(bag==null||belt==null||
+            !RebirthGearInventorySnapshot.TryCapture(bag,belt,
+                RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length),out var before))return;
+        var remaining=stack.Clone();
+        bool added=xui.PlayerInventory.AddItemToBackpack(remaining);
+        if(!added&&remaining.count>0)
+        {
+            if(remaining.count<stack.count)cursor.SetCurrentStack(remaining,false);
+            return;
+        }
+        cursor.SetCurrentStack(ItemStack.Empty.Clone(),false);
+        if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,
+            RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length),out var after)||
+            !RebirthGearCursorDepositWitness.TryLocate(before,after,
+                RebirthNativeItemCodec.Encode(stack.itemValue),stack.count,out var sourceIndex))return;
+        RebirthOverviewWaterRequest.DispatchFromBackpackSlot(player,sourceIndex);
+    }
     private string ReadEquippedItem(EntityPlayer player)
     {
         if(slotId==RebirthSurvivorGearService.SupportSlotId){string water=RebirthOverviewWaterRequest.EquippedItem(player);if(!string.IsNullOrEmpty(water))return water;}
@@ -134,6 +176,8 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
     public override void Update(float dt)
     {
         base.Update(dt);
+        if(slotId==RebirthSurvivorGearService.SupportSlotId)
+            UpdateWaterDropGesture();
         // Ownership changes update immediately; otherwise avoid constructing the same
         // localized tooltip every frame. Periodic refresh still permits language changes.
         if (tooltipItemId != EquippedItemId || Time.realtimeSinceStartup >= nextTooltipRefresh)
@@ -178,6 +222,31 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
             cell.HandleStackSwap();pendingPickup=null;pendingPickupTransaction=null;break;
         }
     }
+    private void UpdateWaterDropGesture()
+    {
+        var pointer=xui?.playerUI?.CursorController;
+        var cursor=xui?.DragAndDropWindow;
+        if(pointer==null||cursor==null)return;
+        if(pointer.GetMouseButtonDown(UICamera.MouseButton.LeftButton))
+        {
+            // The backpack's native slot may have already picked up the item
+            // earlier in this frame. Use the prior frame's custody state.
+            waterDragStartedEmpty=waterCursorWasEmpty;
+            waterDragHoldingItem=false;
+        }
+        if(pointer.GetMouseButton(UICamera.MouseButton.LeftButton) && waterDragStartedEmpty &&
+            !cursor.CurrentStack.IsEmpty() && RebirthOverviewWaterRequest.Accepts(cursor.CurrentStack.itemValue))
+            waterDragHoldingItem=true;
+        if(pointer.GetMouseButtonUp(UICamera.MouseButton.LeftButton))
+        {
+            bool dropped=waterDragStartedEmpty && waterDragHoldingItem &&
+                ViewComponent?.UiTransformIsHovered==true;
+            waterDragStartedEmpty=false;
+            waterDragHoldingItem=false;
+            if(dropped)Interact(true);
+        }
+        waterCursorWasEmpty=cursor.CurrentStack.IsEmpty();
+    }
     private bool SamePendingPeer()
     {
         var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -188,7 +257,9 @@ public sealed class XUiC_RebirthSurvivorGearSlot : XUiController
     public override void OnClose()
     {
         // A staged item remains safely in the backpack if the screen closes early.
-        pendingEquip=null;pendingPickup=null;pendingCreationId=null;pendingPickupTransaction=null;base.OnClose();
+        pendingEquip=null;pendingPickup=null;pendingCreationId=null;pendingPickupTransaction=null;
+        waterDragStartedEmpty=false;waterDragHoldingItem=false;
+        waterCursorWasEmpty=true;base.OnClose();
     }
 }
 
@@ -200,6 +271,13 @@ public static class RebirthSurvivorGearQuickEquip
     {
         var owner=__instance.GetParentByType<XUiC_RebirthSurvivorCharacter>();
         if(owner==null || !owner.IsCharacterWindowOpen || __instance.StackLocation!=XUiC_ItemStack.StackLocationTypes.Backpack || __instance.ItemStack.IsEmpty())return true;
+        if(RebirthOverviewWaterRequest.Accepts(__instance.ItemStack.itemValue))
+        {
+            if(!InputUtils.ShiftKeyPressed)return true;
+            if(!__instance.IsLocked&&!__instance.StackLock)
+                RebirthOverviewWaterRequest.DispatchFromBackpackSlot(__instance.xui.playerUI.entityPlayer,__instance.SlotNumber);
+            return false;
+        }
         RebirthTraitSupportProfileDefinition profile;
         if(!RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(__instance.ItemStack.itemValue.ItemClass.GetItemName(),out profile) || profile.Kind!="survivor_gear")return true;
         if(!__instance.IsLocked && !__instance.StackLock)

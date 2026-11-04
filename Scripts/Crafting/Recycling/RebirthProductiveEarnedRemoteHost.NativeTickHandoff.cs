@@ -27,8 +27,9 @@ internal static partial class RebirthProductiveEarnedRemoteHost
             ObserveWorld();ObserveEarly();
             if(TryFinishNativeClearedHandoffs(station))return;
             if(!CanRunNativeHandoffSettlement(station))return;
-            foreach(var retained in pending.Values.Where(value=>!value.ViewerToolsOnly&&ReferenceEquals(value.Station,station)).ToArray())
-                if(TryAdoptRemoteSavedPending(retained,null)||TryAdoptRemoteSavedRoot(retained,null)||TryAdoptRemoteSavedEarnedOriginal(retained,null))return;
+            if(pending.Count!=0)
+                foreach(var retained in pending.Values.Where(value=>!value.ViewerToolsOnly&&ReferenceEquals(value.Station,station)).ToArray())
+                    if(TryAdoptRemoteSavedPending(retained,null)||TryAdoptRemoteSavedRoot(retained,null)||TryAdoptRemoteSavedEarnedOriginal(retained,null))return;
             if(!RebirthProductiveEarnedSavedNativeSource.TryObserved(station,out var source)||!source.PrimaryCurrent()||
                 !source.CurrentIdentity(world,station,source.Frame.Birth,source.Frame.Operation)||
                 !RebirthProductiveEarnedNativeBody.MatchesCurrent(station,source.Native,source.NativeOffset))return;
@@ -43,22 +44,30 @@ internal static partial class RebirthProductiveEarnedRemoteHost
             }
             if(Guid.TryParseExact(incarnation,"N",out var custody)&&custody!=Guid.Empty)source.CustodyBirth=custody;
             TryReleaseLoadedViewerTools(station,source);
-            foreach(var hold in coldEarly.Where(value=>value.Position.Equals(station.ToWorldPos())).ToArray())
+            if(coldEarly.Count!=0)
             {
-                using(var decoder=RebirthProductiveEarnedObservationBudget.TryEnterDecoder())
+                foreach(var hold in coldEarly.Where(value=>value.Position.Equals(station.ToWorldPos())).ToArray())
                 {
-                    if(decoder==null||!RebirthProductiveEarnedArtifact.TryReadRemoteObservedOriginal(station,hold.Birth,hold.Operation,out var artifact,out var image))continue;
-                    string header=hold.Path.Substring(0,hold.Path.Length-5)+".header";
-                    if(!Safe(header)||File.Exists(header+".tmp"))continue;
-                    var frame=RebirthProductiveEarnedRowProof.Decode(image);byte[] headerBytes=Read(header);
-                    if(!decoder.Admit(frame,image.Length)||!TryReadHeader(headerBytes,hold.Owner,hold.Creation,hold.Deaths,station,frame,Digest(image),out var nonce)||nonce!=hold.Nonce)continue;
-                    var restored=new Context{World=world,Station=station,Artifact=artifact,Image=image,Operation=hold.Operation,Nonce=nonce,
-                        Owner=hold.Owner,Creation=hold.Creation,Deaths=hold.Deaths,Directory=Path.GetFullPath(GameIO.GetSaveGameDir()),HeaderPath=header,Header=headerBytes,WorldKey=hold.World};
-                    if(TryAdoptRemoteSavedPending(restored,source)||TryAdoptRemoteSavedRoot(restored,source)||TryAdoptRemoteSavedEarnedOriginal(restored,source))return;
+                    using(var decoder=RebirthProductiveEarnedObservationBudget.TryEnterDecoder())
+                    {
+                        if(decoder==null||!RebirthProductiveEarnedArtifact.TryReadRemoteObservedOriginal(station,hold.Birth,hold.Operation,out var artifact,out var image))continue;
+                        string header=hold.Path.Substring(0,hold.Path.Length-5)+".header";
+                        if(!Safe(header)||File.Exists(header+".tmp"))continue;
+                        var frame=RebirthProductiveEarnedRowProof.Decode(image);byte[] headerBytes=Read(header);
+                        if(!decoder.Admit(frame,image.Length)||!TryReadHeader(headerBytes,hold.Owner,hold.Creation,hold.Deaths,station,frame,Digest(image),out var nonce)||nonce!=hold.Nonce)continue;
+                        var restored=new Context{World=world,Station=station,Artifact=artifact,Image=image,Operation=hold.Operation,Nonce=nonce,
+                            Owner=hold.Owner,Creation=hold.Creation,Deaths=hold.Deaths,Directory=Path.GetFullPath(GameIO.GetSaveGameDir()),HeaderPath=header,Header=headerBytes,WorldKey=hold.World};
+                        if(TryAdoptRemoteSavedPending(restored,source)||TryAdoptRemoteSavedRoot(restored,source)||TryAdoptRemoteSavedEarnedOriginal(restored,source))return;
+                    }
                 }
             }
-            if(!EarlyBlocks(station)&&!pending.Values.Any(value=>ReferenceEquals(value.Station,station)))
-                RebirthProductiveEarnedCoordinator.RestoreSavedNativeAtTick(station);
+            if(!EarlyBlocks(station))
+            {
+                bool pendingForStation=false;
+                foreach(var retained in pending.Values)
+                    if(ReferenceEquals(retained.Station,station)){pendingForStation=true;break;}
+                if(!pendingForStation)RebirthProductiveEarnedCoordinator.RestoreSavedNativeAtTick(station);
+            }
         }
         catch{/* An unqualified native source keeps its existing financial hold. */}
         finally

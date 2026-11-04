@@ -65,6 +65,9 @@ public static class RebirthTraderVoices
     public static bool Prepare(string trader, string category, string original, out string replacement)
     {
         replacement=original;
+        // Match EntityTrader.PlayVoiceSetEntry before custom assets or fallback
+        // speech can bypass the native sandbox dialogue setting.
+        if (!TraderInfo.TraderDialog) { Trace("suppressed=trader-dialog-disabled"); return false; }
         if (GameManager.IsDedicatedServer) { Trace("fallback=dedicated-no-local-playback"); return false; }
         if (LocalPlayerUI.GetUIForPrimaryPlayer()?.entityPlayer == null) { Trace("fallback=local-player-not-ready"); return false; }
         if (!RebirthTraderVoicePreferences.ValidTrader(trader)) { Trace("fallback=unknown-trader"); return false; }
@@ -113,6 +116,7 @@ public static class RebirthTraderVoices
     }
     public static void PlayConfirmed(EntityNPC npc,string category,string originalEvent)
     {
+        if (!TraderInfo.TraderDialog) { Trace("suppressed=trader-dialog-disabled"); return; }
         string trader=Trader(npc);
         if(RebirthTraderVoicePreferences.Get(trader)==0)return;
         string original="trader_"+trader.ToLowerInvariant()+"_"+originalEvent;

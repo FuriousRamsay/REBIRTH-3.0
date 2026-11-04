@@ -34,3 +34,20 @@ public sealed class NetPackageRebirthPurgeStartStatusV1:NetPackage
     {if(world?.IsRemote()==true)RebirthPurgeTruckStart.Status(world,actor,worldId,state,vehicle);}
     public int GetLength()=>26;
 }
+
+// Separate message: existing readiness V1 wire format and IDs stay unchanged.
+[Preserve]
+public sealed class NetPackageRebirthPurgeStartRelocateV1:NetPackage
+{
+    private int actor,revision;private Guid worldId;private UnityEngine.Vector3 position;private float heading;
+    public override NetPackageDirection PackageDirection=>NetPackageDirection.ToClient;
+    internal NetPackageRebirthPurgeStartRelocateV1 Setup(int player,Guid world,int site,SpawnPosition anchor)
+    {actor=player;worldId=world;revision=site;position=anchor.position;heading=anchor.heading;return this;}
+    public override void read(PooledBinaryReader r)
+    {if(r.ReadByte()!=1)throw new InvalidDataException("Purge relocation version.");actor=r.ReadInt32();var bytes=r.ReadBytes(16);if(bytes.Length!=16)throw new EndOfStreamException();worldId=new Guid(bytes);revision=r.ReadInt32();position=new UnityEngine.Vector3(r.ReadSingle(),r.ReadSingle(),r.ReadSingle());heading=r.ReadSingle();if(revision<=0)throw new InvalidDataException("Purge relocation revision.");}
+    public override void write(PooledBinaryWriter w)
+    {base.write(w);w.Write((byte)1);w.Write(actor);w.Write(worldId.ToByteArray());w.Write(revision);w.Write(position.x);w.Write(position.y);w.Write(position.z);w.Write(heading);}
+    public override void ProcessPackage(World world,GameManager callbacks)
+    {if(world?.IsRemote()==true)RebirthPurgeTruckStart.RelocateClient(world,actor,worldId,revision,position,heading);}
+    public int GetLength()=>41;
+}

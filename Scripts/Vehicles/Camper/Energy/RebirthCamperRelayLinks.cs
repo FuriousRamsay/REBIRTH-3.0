@@ -115,8 +115,20 @@ internal static partial class RebirthCamperRelayWiring
     private static bool Matches(TileEntity tile,Link link,Guid owner)
     {
         var bytes=Marker(tile);
-        return bytes?.Length==32&&new Guid(bytes.Take(16).ToArray())==link.Stamp&&new Guid(bytes.Skip(16).Take(16).ToArray())==owner
+        return bytes?.Length==32&&MarkerGuid(bytes,0)==link.Stamp&&MarkerGuid(bytes,16)==owner
             &&tile.blockValue.type==link.Block&&!tile.IsRemoving;
+    }
+    // Guid(byte[]) stores its first three fields little-endian. Read exactly
+    // that layout without allocating slices; caller admits the 32-byte marker.
+    private static Guid MarkerGuid(byte[] bytes,int offset)
+    {
+        unchecked
+        {
+            return new Guid(bytes[offset]|bytes[offset+1]<<8|bytes[offset+2]<<16|bytes[offset+3]<<24,
+                (short)(bytes[offset+4]|bytes[offset+5]<<8),(short)(bytes[offset+6]|bytes[offset+7]<<8),
+                bytes[offset+8],bytes[offset+9],bytes[offset+10],bytes[offset+11],
+                bytes[offset+12],bytes[offset+13],bytes[offset+14],bytes[offset+15]);
+        }
     }
     internal static void ReleaseDestroyed(EntityVehicle vehicle)
     {

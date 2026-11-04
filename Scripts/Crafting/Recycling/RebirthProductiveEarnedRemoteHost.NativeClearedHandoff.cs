@@ -18,6 +18,7 @@ internal static partial class RebirthProductiveEarnedRemoteHost
     private static bool TryFinishNativeClearedHandoffs(TileEntityWorkstation station)
     {
         if(RebirthProductiveEarnedCoordinator.TryNativeMarker(station,out _))return false;
+        if(coldEarly.Count==0)return false;
         foreach(var hold in coldEarly.Where(value=>value.Position.Equals(station.ToWorldPos())).ToArray())
         {
             IDisposable workspace=null;RebirthProductiveEarnedObservationBudget.Decoder decoder=null;

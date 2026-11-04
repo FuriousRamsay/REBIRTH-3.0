@@ -802,17 +802,12 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         Recipe selectedRecipe = CurrentRecipe;
         selectedEntry = null;
 
-        float remainder = currentRowStride > 0
-            ? scrollOffsetPixels - firstVisibleIndex * currentRowStride
-            : 0f;
-        int yShift = Mathf.RoundToInt(remainder);
+        PositionRows();
 
         for (int i = 0; i < rows.Length; i++)
         {
             int sourceIndex = firstVisibleIndex + i;
             XUiC_RebirthCraftingRecipeEntry row = rows[i];
-            if (row.ViewComponent != null)
-                row.ViewComponent.Position = new Vector2i(0, -i * currentRowStride + yShift);
 
             if (i <= VisibleRows && sourceIndex >= 0 && sourceIndex < recipeInfos.Count)
             {
@@ -832,6 +827,21 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         if (emptyState != null)
             emptyState.IsVisible = recipeInfos.Count == 0;
         UpdateScrollbarGeometry();
+    }
+
+    private void PositionRows()
+    {
+        float remainder = currentRowStride > 0
+            ? scrollOffsetPixels - firstVisibleIndex * currentRowStride
+            : 0f;
+        int yShift = Mathf.RoundToInt(remainder);
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            XUiC_RebirthCraftingRecipeEntry row = rows[i];
+            if (row.ViewComponent != null)
+                row.ViewComponent.Position = new Vector2i(0, -i * currentRowStride + yShift);
+        }
     }
 
     private void SelectRecipe(Recipe recipe, XUiC_RebirthCraftingRecipeEntry sourceRow)
@@ -1097,15 +1107,27 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
             if (Math.Abs(scrollOffsetPixels - targetScrollOffsetPixels) > 0f)
             {
                 scrollOffsetPixels = targetScrollOffsetPixels;
-                rowsDirty = true;
+                if (rowsDirty)
+                    return;
+                PositionRows();
+                UpdateScrollbarGeometry();
             }
             return;
         }
 
         float speed = Math.Max(360f, currentRowStride * 20f);
+        int previousFirstVisibleIndex = firstVisibleIndex;
         scrollOffsetPixels = Mathf.MoveTowards(scrollOffsetPixels, targetScrollOffsetPixels, Math.Max(0f, dt) * speed);
         UpdateFirstVisibleIndex();
-        rowsDirty = true;
+        if (firstVisibleIndex != previousFirstVisibleIndex)
+            rowsDirty = true;
+        else if (!rowsDirty)
+        {
+            // The same recipes still occupy the virtual rows. Move their views without
+            // repeating localization, icon, favorite and availability binding every frame.
+            PositionRows();
+            UpdateScrollbarGeometry();
+        }
     }
 
     private void SetScrollTarget(float value, bool immediate)

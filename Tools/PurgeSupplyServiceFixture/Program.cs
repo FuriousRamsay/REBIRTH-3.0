@@ -1,13 +1,15 @@
 using System;using System.Collections.Generic;using System.IO;using System.Linq;
 // Controlled availability input; native equipment resolution is not exercised.
-class RebirthPurgeSupplyEquipment {internal static bool Available=true;internal static bool TryTier(string player,out int tier){tier=0;return Available;}}
+class RebirthPurgeSupplyEquipment {internal static bool Available=true;internal static int Resets;internal static void Reset(){Resets++;}internal static bool TryTier(string player,out int tier){tier=0;return Available;}}
 class Program
 {
  static int checks;static void Check(bool value,string text){if(!value)throw new Exception(text);checks++;Console.WriteLine("PASS "+text);}
  static void Step(){UnityEngine.Time.realtimeSinceStartup+=1;RebirthPurgeSupplyService.Pulse();}
- static void Main()
+ static void Main(){try{Run();}catch(Exception e){Console.Error.WriteLine(e);Environment.ExitCode=1;}finally{if(fixtureDirectory!=null)try{Directory.Delete(fixtureDirectory,true);}catch(Exception e){Console.Error.WriteLine("Owned fixture cleanup: "+e.Message);Environment.ExitCode=1;}}}
+ static string fixtureDirectory;
+ static void Run()
  {
-  var dir=Path.Combine(Path.GetTempPath(),"rebirth-supply-service-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(Path.Combine(dir,"Config"));
+  var dir=Path.Combine(Path.GetTempPath(),"rebirth-supply-service-"+Guid.NewGuid().ToString("N"));fixtureDirectory=dir;Directory.CreateDirectory(Path.Combine(dir,"Config"));
   File.WriteAllText(Path.Combine(dir,"Config","_purge_supplies.xml"),"<purge_supplies version='1' baseKills='75' increment='5' maximumBonus='150' flightRadius='100'/>");RebirthPurgeSupplyPolicy.Load(dir);
   bool live=true;var scope=new object();var world=Guid.NewGuid();var binding=new RebirthPoiWorldBinding(scope,world.ToString("N").ToUpperInvariant(),dir,()=>live);
   RebirthPoiWorldStore.TryOpen(binding,out var store);RebirthPoiWorldLifecycle.Instance.Store=store;
@@ -22,13 +24,13 @@ class Program
   RebirthPurgeSupplyEquipment.Available=false;
   Step();Check(RebirthPurgeSupplyService.Published.Count==0,"130-record aggregation stays bounded and does not publish incomplete sum");
   for(int n=0;n<8;n++)Step();
-  Check(!RebirthPurgeSupplyService.Published.ContainsKey(player),"unavailable owner equipment withholds redemption without inventing full price");
+  Check(RebirthPurgeSupplyService.Published[player].ObservedCredits==130&&RebirthPurgeSupplyService.Published[player].EarnedDrops==1&&RebirthPurgeSupplyService.Published[player].SpentCredits==75,"documented Oct31 offline pricing earns at no-glove price when equipment is unavailable");
   RebirthPurgeSupplyEquipment.Available=true;
   for(int n=0;n<5;n++)Step();
   Check(RebirthPurgeSupplyService.Published[player].ObservedCredits==130&&RebirthPurgeSupplyService.Published[player].EarnedDrops==1&&RebirthPurgeSupplyService.Published[player].SpentCredits==75,"connected service earns exact cumulative quota");
   var file=Path.Combine(dir,"RebirthData","Purge","Supplies","world.xml");var original=File.ReadAllText(file);
   for(int n=0;n<5;n++)Step();Check(File.ReadAllText(file)==original,"idle service does not rewrite account file");
-  RebirthPurgeSupplyService.Reset();for(int n=0;n<5;n++)Step();
+  int resets=RebirthPurgeSupplyEquipment.Resets;RebirthPurgeSupplyService.Reset();Check(RebirthPurgeSupplyEquipment.Resets==resets+1,"service lifecycle reset clears equipment cache");for(int n=0;n<5;n++)Step();
   Check(RebirthPurgeSupplyService.Published[player].EarnedDrops==1&&File.ReadAllText(file)==original,"restart does not grant original credits twice");
   var extra=new RebirthPoiIdentity("extra",3000,2,3,0,10,10,10,"forest");store.TryDiscover(store.Published,extra);
   Step();var extra2=new RebirthPoiIdentity("extra2",3016,2,3,0,10,10,10,"forest");store.TryDiscover(store.Published,extra2);
@@ -57,7 +59,7 @@ class GameManager {public static GameManager Instance;public World World;}
 class ConnectionManager {public bool IsServer;}
 class SingletonMonoBehaviour<T> {public static T Instance;}
 class ThreadManager {public static bool IsMainThread()=>true;}
-class GameIO {public static string GetSaveGameDir()=>System.IO.Path.GetTempPath();}
+class GameIO {public static string GetSaveGameDir()=>System.IO.Path.GetTempPath();public static string GetSaveGameRootDir(Platform.UserDataStorageType storage)=>System.IO.Path.GetTempPath();}
 class Log {public static void Warning(string value){}}
 namespace UnityEngine {internal static class Time {internal static float realtimeSinceStartup;}}
 internal static class RebirthPurgeReleasePolicy {internal static bool Enabled=true;}
@@ -70,3 +72,7 @@ internal static class RebirthPurgeSupplyCrateSerialization
  internal static bool TryReadAuthoritative(EntitySupplyCrate crate,Guid world,out RebirthPurgeSupplyCrateStamp stamp)
  { stamp=crate?.Stamp;return stamp!=null&&stamp.World==world; }
 }
+
+namespace Platform { public enum UserDataStorageType { Local } }
+public enum EnumGamePrefs { GameSaveStorageType,GameWorld,GameName }
+public static class GamePrefs { public static int GetInt(EnumGamePrefs pref)=>0;public static string GetString(EnumGamePrefs pref)=>"unused"; }

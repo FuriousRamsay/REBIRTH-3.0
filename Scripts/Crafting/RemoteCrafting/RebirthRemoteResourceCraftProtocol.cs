@@ -141,7 +141,7 @@ internal static class RebirthRemoteResourceCraftProtocol
                 catch{/* Corrupt retained identity cannot be made into a fresh action. */}
             }
         }
-        foreach(var value in pending.Values.ToArray())
+        if(pending.Count>0)foreach(var value in pending.Values.ToArray())
         {
             if(!Current(player,value)||now<value.Next)continue;value.Next=now+1;
             try
@@ -172,6 +172,7 @@ internal static class RebirthRemoteResourceCraftProtocol
     }
     private static void DrainLocalRequests(EntityPlayerLocal player,World current)
     {
+        if(localRequests.Count==0)return;
         foreach(var pair in localRequests.ToArray())
         {
             localRequests.Remove(pair.Key);var request=pair.Value;

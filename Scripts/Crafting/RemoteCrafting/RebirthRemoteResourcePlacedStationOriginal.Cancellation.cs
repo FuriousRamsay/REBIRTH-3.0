@@ -154,10 +154,10 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
         }
     }
     internal static bool CancellationBlocks(TileEntityWorkstation station)=>station!=null&&
-        (HasCancellationHostCustody(station)||cancellationServers.Values.Any(value=>value.Accepted!=null&&value.Memory?.Current==true&&value.Directory==GameIO.GetSaveGameDir()&&
+        (HasCancellationHostCustody(station)||cancellationServers.Count>0&&cancellationServers.Values.Any(value=>value.Accepted!=null&&value.Memory?.Current==true&&value.Directory==GameIO.GetSaveGameDir()&&
             (ReferenceEquals(value.Station,station)||ReferenceEquals(value.LoadOriginal?.Loaded?.Tile,station)&&value.LoadOriginal.Loaded.Installed()))||
-         restartCancellations.Values.Any(value=>value.Memory?.Current==true&&ReferenceEquals(value.Load?.Loaded?.Tile,station)&&value.Load.Loaded.Installed())||
-         cancellationClients.Values.Any(value=>value.Stage!=0&&ReferenceEquals(value.Station,station)&&value.Current()));
+         restartCancellations.Count>0&&restartCancellations.Values.Any(value=>value.Memory?.Current==true&&ReferenceEquals(value.Load?.Loaded?.Tile,station)&&value.Load.Loaded.Installed())||
+         cancellationClients.Count>0&&cancellationClients.Values.Any(value=>value.Stage!=0&&ReferenceEquals(value.Station,station)&&value.Current()));
     internal static bool ConsumeCancellationStationSetter(TileEntityWorkstation station,MethodBase method,object[] arguments)
     {
         var once=cancellationStationPermit;

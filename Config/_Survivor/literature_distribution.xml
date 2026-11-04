@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <survivor_literature_distribution schema_version="1">
-  <policy reusable_items="true" per_character_read_markers="unchanged" loot_entry_group="groupJunk" loot_probability_template="veryLow" max_titles_per_distribution_roll="1" />
+  <policy reusable_items="true" per_character_read_markers="unchanged" junk_loot="false" loot_probability_template="veryLow" max_titles_per_distribution_roll="1" />
   <tier id="theory.field_notes" relative_weight="1.00" count="42">
     <item id="rebirthFieldNotesSpears" />
     <item id="rebirthFieldNotesClubs" />

@@ -1,0 +1,86 @@
+{
+  "name": "Standalone bank reopen batch (prepared, NOT RUN)",
+  "stopOnFailure": true,
+  "preconditions": [
+    "Only an authorized profiler-launched disposable fixture; currently in-game looking at a placed bank within activation range, empty cursor, all windows closed. No user-save coordinates or startup included.",
+    "Run separately for battery/generator/solar. Equip varying-quality native components and mixed-count backpack items beforehand. Review screenshots and hover shared stats card manually; repeating open alone is not visual/item-transfer acceptance.",
+    "Additional manual acceptance: Modify has no Back; Escape returns; selected quality centered on rail, quantities right-aligned and same size as Crafting; six bank slots show real quality/fill/count, native constraints/locking while on, refuel, transfer item/count conservation and no new errors."
+  ],
+  "steps": [
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "powersource"
+    },
+    {
+      "screenshot": "bank-open-1"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "powersource"
+    },
+    {
+      "screenshot": "bank-open-2"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "powersource"
+    },
+    {
+      "screenshot": "bank-open-3"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    }
+  ]
+}

@@ -141,7 +141,7 @@ internal static class RebirthCamperEnergyAccess
         catch(Exception error){Log.Error("[REBIRTH EnergyFlow] busy-check-failed vehicle="+vehicle?.entityId+" error="+error);return true;}
     }
     internal static byte[] ActorHash(RebirthCamperEnergyActorImage actor)
-    {using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream,Encoding.UTF8,true)){actor.Write(writer);writer.Flush();using(var hash=SHA256.Create())return hash.ComputeHash(stream.ToArray());}}
+    {using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream,Encoding.UTF8,true)){actor.Write(writer);writer.Flush();using(var hash=SHA256.Create())return hash.ComputeHash(stream.GetBuffer(),0,checked((int)stream.Length));}}
     private static void Send(ClientSession s,RebirthCamperEnergyCommand command,Guid source,int slot,bool on,int bagSlot=-1)
     {
         if(command==RebirthCamperEnergyCommand.Query)on=s.BoundsDesired??RebirthCamperEnergyBoundsDisplay.IsShown(s.Vehicle,s.Player);

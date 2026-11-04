@@ -104,7 +104,7 @@ internal static partial class RebirthRemoteResourceFetchedStationOriginal
                 {player.Buffs.SetCustomVar(RebirthRemoteResourceOwnerAction.Receipt(original.Operation),10f,true);GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);}
             }
         }
-        foreach(var ended in EndedQueries.Values.ToArray())
+        if(EndedQueries.Count>0)foreach(var ended in EndedQueries.Values.ToArray())
         {
             if(now<ended.Next||!EndedZeroClientScope(player,ended.Original))continue;
             ended.Next=now+5;var persistent=GameManager.Instance.GetPersistentLocalPlayer();if(persistent?.PrimaryId==null)continue;
@@ -112,7 +112,7 @@ internal static partial class RebirthRemoteResourceFetchedStationOriginal
             NetPackageRebirthRemoteRepairOriginal.Send(player.entityId,persistent.PrimaryId,ended.Original,query.ToString(SaveOptions.DisableFormatting));
             // No new-life native10, upload, hold, callback, or financial ACK.
         }
-        foreach(var request in ClientRequests.Values.ToArray())
+        if(ClientRequests.Count>0)foreach(var request in ClientRequests.Values.ToArray())
         {
             if(RebirthRemoteResourcePreAdmissionRefusal.HasClientTerminal(request.Original)){ClientRequests.Remove(request.Original.Operation);continue;}
             if(now<request.Next||!RebirthRemoteResourceClientOriginal.Current(player,request.Original))continue;

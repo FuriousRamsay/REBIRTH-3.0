@@ -1,0 +1,70 @@
+<configs>
+  <!-- World salvage shells inherit the working station's value for gameplay
+       properties. Restore the native low value and prevent sale of shells. -->
+  <append xpath="/blocks/block[@name='cntForgeWorkstationBroken' or @name='cntCollapsedWorkbench' or @name='cntCollapsedWorkbenchEmpty' or @name='cntCollapsedCementMixer' or @name='cntCollapsedChemistryStation']">
+    <property name="EconomicValue" value="1" />
+    <property name="SellableToTrader" value="false" />
+  </append>
+
+  <!-- A placed candle is made from one candle (24 Dukes). The table variant
+       inherits this value; do not assign a separate price to world decor. -->
+  <append xpath="/blocks/block[@name='candleWallLight']">
+    <property name="EconomicValue" value="24" />
+  </append>
+
+  <!-- This player torch is the placed form of meleeToolTorch (value 10). -->
+  <append xpath="/blocks/block[@name='wallTorchLightPlayer']">
+    <property name="EconomicValue" value="10" />
+  </append>
+
+  <!-- Pickup of camping chairs returns this helper. Native folding-chair
+       helpers cost 5; keep the same low salvage value. -->
+  <append xpath="/blocks/block[@name='chairCampingVariantHelper']">
+    <property name="EconomicValue" value="5" />
+  </append>
+
+  <!-- Recoverable paintings and frames have no native price. Comparable
+       paintingAbstract variants are 5; keep these decor pickups at 5 too. -->
+  <append xpath="/blocks/block[property[@name='CreativeMode' and @value='Player'] and (starts-with(@name,'pictureCanvas_') or starts-with(@name,'pictureFrame') or @name='paintingBen' or @name='paintingDerek' or @name='paintingDuke' or @name='paintingKen' or @name='paintingLorien' or @name='paintingNoah')]">
+    <property name="EconomicValue" value="5" />
+  </append>
+
+  <!-- Empty cloth carriers yield only a little cloth. The purse and duffle
+       inherit from the backpack; secure pickup copies inherit this too. -->
+  <append xpath="/blocks/block[@name='cntBackpack01']">
+    <property name="EconomicValue" value="5" />
+  </append>
+
+  <!-- Wooden bookcases and small wall cabinets use the native 17-Duke
+       kitchen-cabinet value. The open/closed medicine variants inherit it. -->
+  <append xpath="/blocks/block[@name='cntBookcaseCornerEmpty' or @name='cntBookcaseCornerFull' or @name='cntBookcaseEmpty' or @name='cntBookcaseFull' or @name='cntMedicineCabinetOpen' or @name='cntMedicineCabinetFaucetOpen']">
+    <property name="EconomicValue" value="17" />
+  </append>
+
+  <!-- Luggage yields one or two polymers on destruction; the medium open
+       parent covers all big/medium/pile colors and both visual states. -->
+  <append xpath="/blocks/block[@name='cntLuggageMediumOpen' or @name='cntSuitcase']">
+    <property name="EconomicValue" value="17" />
+  </append>
+
+  <!-- The small plastic basket yields five polymers (5 x 16); colored full
+       and empty baskets inherit this value. Cart value remains 100. -->
+  <append xpath="/blocks/block[@name='cntShoppingBasketEmptyWhite']">
+    <property name="EconomicValue" value="80" />
+  </append>
+
+  <!-- Scrap appliances: the wall oven matches native washer/dryer value 60;
+       the CRT is the same size/class of recoverable electrical decor. -->
+  <append xpath="/blocks/block[@name='cntwallOvenEmptyWhite' or @name='tvCRT']">
+    <property name="EconomicValue" value="60" />
+  </append>
+
+  <!-- Grills fall between the five-Duke campfire and 156-Duke kitchen stove.
+       Closed storage forms inherit the open form's scrap-appliance value. -->
+  <append xpath="/blocks/block[@name='cntCharcoalGrillOpen']">
+    <property name="EconomicValue" value="25" />
+  </append>
+  <append xpath="/blocks/block[@name='cntGasGrillOpen']">
+    <property name="EconomicValue" value="50" />
+  </append>
+</configs>

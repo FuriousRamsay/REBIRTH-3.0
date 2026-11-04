@@ -211,11 +211,12 @@ public static class RebirthRecipeOutputs
     }
     public static bool TryPlan(Recipe recipe, int completedApplications, out IReadOnlyList<ItemStack> outputs, out string reason)
     {
-        var result = new List<ItemStack>(); outputs = result.AsReadOnly(); reason = null;
+        outputs = Array.Empty<ItemStack>(); reason = null;
         if (!ThreadManager.IsMainThread() || recipe == null || completedApplications <= 0)
         { reason = "xuiRebirthRecipeOutputsUnavailable"; return false; }
         if(recipe.ingredients?.Count>0&&recipe.ingredients[0]?.itemValue?.HasMetadata(FrozenField)==true)
         {
+            var frozenResult = new List<ItemStack>(); outputs = frozenResult.AsReadOnly();
             try
             {
                 if(!recipe.ingredients[0].itemValue.TryGetMetadata(FrozenField,out string frame)||!TryReadFrozenOutputs(frame,out var frozen))return false;
@@ -223,13 +224,14 @@ public static class RebirthRecipeOutputs
                 {
                     if(item==null||item.IsEmpty()||item.count<1)return false;
                     long count=(long)item.count*completedApplications;if(count>int.MaxValue)return false;
-                    var copy=item.Clone();copy.count=(int)count;result.Add(copy);
+                    var copy=item.Clone();copy.count=(int)count;frozenResult.Add(copy);
                 }
                 return true;
             }
             catch{reason="xuiRebirthRecipeOutputsUnavailable";return false;}
         }
         if (!TryGet(recipe, out var definition)) return true;
+        var result = new List<ItemStack>(); outputs = result.AsReadOnly();
         foreach (var entry in definition.Outputs)
         {
             var item = ItemClass.GetItem(entry.ItemName, true);
@@ -237,10 +239,10 @@ public static class RebirthRecipeOutputs
                 || !string.Equals(item.ItemClass.GetItemName(), entry.ItemName, StringComparison.OrdinalIgnoreCase))
             {
                 Issue("missing-output-item:" + definition.RecipeName + "#" + definition.CraftingArea + ":" + entry.ItemName);
-                reason = "xuiRebirthRecipeOutputsUnavailable"; outputs = new List<ItemStack>().AsReadOnly(); return false;
+                reason = "xuiRebirthRecipeOutputsUnavailable"; outputs = Array.Empty<ItemStack>(); return false;
             }
             long count = (long)entry.Count * completedApplications;
-            if (count > int.MaxValue) { reason = "xuiRebirthRecipeOutputsUnavailable"; outputs = new List<ItemStack>().AsReadOnly(); return false; }
+            if (count > int.MaxValue) { reason = "xuiRebirthRecipeOutputsUnavailable"; outputs = Array.Empty<ItemStack>(); return false; }
             result.Add(new ItemStack(item.Clone(), (int)count));
         }
         // Multiplicity is completed recipe applications, NEVER recipe.count or

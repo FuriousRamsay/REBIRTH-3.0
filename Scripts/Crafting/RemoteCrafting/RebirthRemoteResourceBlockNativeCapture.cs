@@ -16,12 +16,16 @@ internal static class RebirthRemoteResourceBlockNativeCapture
         internal RebirthRemoteResourceClientOriginal.Intent Original;
         internal Vector3i Position;internal int Slot;internal Func<bool> Permission;
         internal string BeforeTool,AfterTool,Changes;internal bool Failed,Texture,Invoked,ApplyingLocal;
-        internal bool Current()=>!Failed&&ReferenceEquals(current,this)&&Permission?.Invoke()==true&&
-            RebirthRemoteResourceClientOriginal.Current(Player,Original)&&ReferenceEquals(Player.world,World)&&Directory==GameIO.GetSaveGameDir()&&
-            ReferenceEquals(Data?.invData?.holdingEntity,Player)&&ReferenceEquals(Player.inventory.holdingItemData,Data.invData)&&ReferenceEquals(Data.invData.world,World)&&Data.invData.slotIdx==Slot&&Player.inventory.holdingItemIdx==Slot&&
-            Data.indexInEntityOfAction>=0&&Data.indexInEntityOfAction<Data.invData.item.Actions.Length&&ReferenceEquals(Data.invData.item.Actions[Data.indexInEntityOfAction],Action)&&
-            Data.invData.actionData!=null&&Data.indexInEntityOfAction<Data.invData.actionData.Count&&ReferenceEquals(Data.invData.actionData[Data.indexInEntityOfAction],Data)&&
-            (RebirthNativeItemCodec.Encode(Data.invData.itemValue)==BeforeTool||RebirthNativeItemCodec.Encode(Data.invData.itemValue)==AfterTool);
+        internal bool Current()
+        {
+            if(Failed||!ReferenceEquals(current,this)||Permission?.Invoke()!=true||
+                !RebirthRemoteResourceClientOriginal.Current(Player,Original)||!ReferenceEquals(Player.world,World)||Directory!=GameIO.GetSaveGameDir()||
+                !ReferenceEquals(Data?.invData?.holdingEntity,Player)||!ReferenceEquals(Player.inventory.holdingItemData,Data.invData)||!ReferenceEquals(Data.invData.world,World)||Data.invData.slotIdx!=Slot||Player.inventory.holdingItemIdx!=Slot||
+                Data.indexInEntityOfAction<0||Data.indexInEntityOfAction>=Data.invData.item.Actions.Length||!ReferenceEquals(Data.invData.item.Actions[Data.indexInEntityOfAction],Action)||
+                Data.invData.actionData==null||Data.indexInEntityOfAction>=Data.invData.actionData.Count||!ReferenceEquals(Data.invData.actionData[Data.indexInEntityOfAction],Data))return false;
+            string tool=RebirthNativeItemCodec.Encode(Data.invData.itemValue);
+            return tool==BeforeTool||tool==AfterTool;
+        }
         internal bool TryGet(out string exactNativeChanges,out bool clearTexture)
         {exactNativeChanges=null;clearTexture=false;try{if(!Current()||!Invoked||Changes==null)return false;exactNativeChanges=Changes;clearTexture=Texture;return true;}catch{Failed=true;return false;}}
         public void Dispose(){if(ReferenceEquals(current,this))current=null;}

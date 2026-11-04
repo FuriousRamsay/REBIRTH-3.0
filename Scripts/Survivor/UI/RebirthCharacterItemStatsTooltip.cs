@@ -72,6 +72,8 @@ public static class RebirthCharacterItemStatsTooltip
                     if(cardSurface!=null){rootCache.Surface=cardSurface;return cardSurface;}
                 }
         }
+        var bank = XUiC_RebirthPowerSourceWorkspace.ActiveInstance;
+        if(bank?.IsWorkspaceOpen==true&&(ui==null||bank.xui==ui))return bank;
         var editor = XUiC_RebirthItemEditorHeader.ActiveInstance;
         if (editor?.IsEditorOpen == true && (ui == null || editor.xui == ui)) return editor;
         var context = RebirthContextNavigationService.Session;
@@ -94,6 +96,7 @@ public static class RebirthCharacterItemStatsTooltip
         get
         {
             XUiController surface = ActiveSurface(Hovered?.xui);
+            if (surface is XUiC_RebirthPowerSourceWorkspace bank) return bank.Backpack?.SelectedItem;
             if (surface is XUiC_RebirthItemEditorHeader editor) return Owners(editor).Editor;
             if (surface is XUiC_RebirthVehicleRestoration vehicle) return vehicle.GetChildByType<XUiC_RebirthEditorBackpack>()?.SelectedItem;
             if (surface is XUiC_RebirthContainerWorkspace context) return context.TooltipSelection;
@@ -186,7 +189,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     {
         base.Init();
         for (XUiController p = Parent; p != null; p = p.Parent)
-            if (p is XUiC_RebirthItemEditorHeader || p is XUiC_RebirthVehicleRestoration || p is XUiC_RebirthContainerWorkspace ||
+            if (p is XUiC_RebirthPowerSourceWorkspace || p is XUiC_RebirthItemEditorHeader || p is XUiC_RebirthVehicleRestoration || p is XUiC_RebirthContainerWorkspace ||
                 p is XUiC_RebirthCreativeWorkspace || p is XUiC_RebirthPersonalCrafting || p is XUiC_RebirthStationWorkspace || p is XUiC_RebirthCookingStation ||
                 p is XUiC_RebirthSurvivorCharacter || p is XUiC_RebirthCookingWorkspace ||
                 p is XUiC_RebirthBackpackLibrary || p is XUiC_RebirthBackpackSellStash ||

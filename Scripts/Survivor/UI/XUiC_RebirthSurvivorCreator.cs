@@ -4820,7 +4820,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
 
     private void PollTraitNativeScroll(bool negative)
     {
-        if (syncingTraitNativeScroll || model == null) return;
+        if (syncingTraitNativeScroll || model == null || model.Step != RebirthSurvivorCreatorStep.Traits) return;
         XUiController scrollView = negative ? negativeTraitNativeScrollView : positiveTraitNativeScrollView;
         int total = negative ? model.GetNegativeTraitCount() : model.GetPositiveTraitCount();
         int maxOffset = Math.Max(0, total - TraitSideRows);
@@ -4854,7 +4854,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     }
     private void PollCreatorNativeScroll(bool profile)
     {
-        if(syncingCreatorNativeScroll)return;
+        if(syncingCreatorNativeScroll||(!profile&&(model==null||model.Step!=RebirthSurvivorCreatorStep.Background)))return;
         XUiController scrollView=profile?profileNativeScrollView:backgroundNativeScrollView;
         int total=profile?(nativeProfileSnapshot!=null?nativeProfileSnapshot.Count:0):(model!=null?model.GetBackgroundCount():0);
         int visible=profile?NativeProfileVisibleRows:BackgroundRows;

@@ -1,0 +1,14 @@
+{
+  "name": "Fire visual reconciliation smoke after budget optimization",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable save, guard ON, a separately prepared genuine burning-block fixture in view, safe player position. Use the same fixture, camera, settings and profiler window for baseline/proposal comparisons. This script does not create a fire, certify light/sound caps or measure FPS. Inspect captures and existing fire diagnostics for stable visuals, sound and contact behavior; actual-source boundary checks separately establish projection equivalence. Never run against the user's game.",
+  "steps": [
+    {"action":{"command":"surroundings","args":{}}},
+    {"action":{"command":"state","args":{"Sections":"player,stats,world"}}},
+    {"screenshot":"fire_visual_budget_before_dwell"},
+    {"wait":6},
+    {"screenshot":"fire_visual_budget_after_dwell"},
+    {"expectNoErrors":true}
+  ]
+}

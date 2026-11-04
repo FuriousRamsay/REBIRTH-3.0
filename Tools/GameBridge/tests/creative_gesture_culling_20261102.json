@@ -1,0 +1,19 @@
+{
+  "name": "Creative gesture offscreen culling evidence — capture only",
+  "stopOnFailure": true,
+  "notes": "NOT RUN. Owner-controlled native acceptance after rebuilt DLL. Separately authorized disposable host only. Prepare Creative open, backpack populated beyond viewport, and hold a real cursor item before capture. Compare idle/drag profile and manually inspect clip edges. Automatic PASS is capture/errors only, not proof of custody or FPS.",
+  "steps": [
+    {
+      "screenshot": "creative_gesture_culling_held"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "creative_gesture_culling_held_after"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Native Delete Save cancel/confirm for disposable Reveal only",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Destructive ONLY to CodexTestPurgeReveal20261102. Requires that disposable save and its known GUID-local files, menu continueGame already open, profiler-owned lease. Never substitute a real save. Record filesystem counts before/cancel/confirm with the exact preflight scope. This scenario is not repeatable once its fixture has been consumed."},
+    {"expectWindowOpen": "continueGame"},
+    {"expectUi": {"text": "CodexTestPurgeReveal20261102"}},
+    {"action": {"command": "click", "args": {"text": "CodexTestPurgeReveal20261102"}}},
+    {"action": {"command": "click", "args": {"id": "btnDeleteSave"}}},
+    {"expectUi": {"path": "messageBox/messageBox/content/descriptionText", "text": "Are you sure you want to delete the save game\nCodexTestPurgeReveal20261102?"}},
+    {"action": {"command": "click", "args": {"path": "messageBox/messageBox/content/buttons/btnRect2/btn2"}}},
+    {"expectUi": {"text": "CodexTestPurgeReveal20261102"}},
+    {"action": {"command": "click", "args": {"id": "btnDeleteSave"}}},
+    {"wait": 2},
+    {"expectUi": {"path": "messageBox/messageBox/content/descriptionText", "text": "Are you sure you want to delete the save game\nCodexTestPurgeReveal20261102?"}},
+    {"screenshot": "confirmed_disposable_reveal_delete_scope"},
+    {"action": {"command": "click", "args": {"path": "messageBox/messageBox/content/buttons/btnRect0/btn0"}}},
+    {"wait": 2},
+    {"expectNoUi": {"text": "CodexTestPurgeReveal20261102"}},
+    {"expectLog": {"contains": "[REBIRTH save deletion] confirmed cleanup complete", "min": 1}},
+    {"expectNoErrors": true}
+  ]
+}

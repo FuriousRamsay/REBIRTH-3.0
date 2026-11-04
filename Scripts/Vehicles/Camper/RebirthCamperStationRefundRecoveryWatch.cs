@@ -100,6 +100,8 @@ internal static class RebirthCamperStationRefundRecoveryWatch
             if(lease==null||!RebirthWorldCharacterService.TryGet(player,out var record)||record?.Progression==null)return;
             if(!RebirthCamperStationWindowSession.TryGetCurrent(player,out var station,out var address)||
                 RebirthCamperStationSaveEvidence.IsPending(station))return;
+            if(record.Progression.CamperStationRefundDeliveries.Count==0&&
+                record.Progression.StationRefundArchives.Count==0)return;
             var jobs=new HashSet<string>(record.Progression.CamperStationRefundDeliveries.Keys,StringComparer.Ordinal);
             foreach(var archive in record.Progression.StationRefundArchives.Values)
                 if(archive!=null&&archive.IsMobile&&!archive.IsCompletion)jobs.Add(archive.JobId);

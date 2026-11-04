@@ -29,6 +29,7 @@ public sealed class XUiC_RebirthPurgeStatisticsPanel:XUiController
     private object objectiveSource,mapSource;
     private long generation=long.MinValue,textRevision=long.MinValue,mapRevision=long.MinValue;
     private int page,renderedMode=-1,renderedTarget=-1;
+    private int publishedItemCount=int.MinValue;
     private bool wasVisible,dirty;
     private float poll;
     private RebirthPoiMapRecord[] records=Array.Empty<RebirthPoiMapRecord>();
@@ -63,7 +64,7 @@ public sealed class XUiC_RebirthPurgeStatisticsPanel:XUiController
         if(previous!=null)previous.OnPress+=(sender,button)=>{if((button==0||button==-1)&&page>0){page--;dirty=true;}};
         if(next!=null)next.OnPress+=(sender,button)=>{if((button==0||button==-1)&&(long)(page+1)*PoiRows<records.Length){page++;dirty=true;}};
     }
-    public override void OnClose(){wasVisible=false;poiIndex.Reset();records=Array.Empty<RebirthPoiMapRecord>();previewUris.Clear();for(int i=0;i<PoiRows;i++)ClearPicture(i);mapSource=objectiveSource=null;base.OnClose();}
+    public override void OnClose(){wasVisible=false;publishedItemCount=int.MinValue;poiIndex.Reset();records=Array.Empty<RebirthPoiMapRecord>();previewUris.Clear();for(int i=0;i<PoiRows;i++)ClearPicture(i);mapSource=objectiveSource=null;base.OnClose();}
     public override void Update(float dt)
     {
         base.Update(dt);
@@ -71,7 +72,8 @@ public sealed class XUiC_RebirthPurgeStatisticsPanel:XUiController
         if(!visible){wasVisible=false;return;}
         // Keep the reusable list's extent authoritative even when this panel's
         // expensive text/card rendering is unchanged or throttled.
-        poiScroll?.SetItemCount(poiIndex.Known?records.Length:0,string.Empty);
+        int itemCount=poiIndex.Known?records.Length:0;
+        if(poiScroll!=null&&itemCount!=publishedItemCount){poiScroll.SetItemCount(itemCount,string.Empty);publishedItemCount=itemCount;}
         if(!wasVisible){wasVisible=true;dirty=true;poll=0;var player=xui?.playerUI?.entityPlayer as EntityPlayerLocal;if(player!=null)RebirthStatisticsService.RequestSnapshot(player,true);}
         poiIndex.Pulse(RebirthPoiMapSync.LocalMap,RebirthPoiMapSync.LocalWorld,RebirthPoiMapSync.LocalSession,RebirthPoiMapSync.LocalRevision,RebirthUiProjectionTextCache.Revision,BiomeLabel,PoiLabel);
         if(indexGeneration!=poiIndex.Generation)

@@ -81,7 +81,11 @@ internal static class RebirthVehicleConditionIntegration
     }
     internal static void Flush(EntityVehicle entity)
     {
-        if(entity?.world==null||entity.world.IsRemote()||!RebirthVehicleAssemblyIndex.TryGetEntity(entity,out var assembly)||assembly==null)return;
+        if(entity?.world==null||entity.world.IsRemote())return;
+        // An already loaded empty record has no native wear to publish. Keep
+        // the first index/metadata read so saved deferred wear is still found.
+        if(deferred.TryGetValue(entity,out var loaded)&&loaded.Loaded&&!loaded.Invalid&&loaded.Rows.Count==0)return;
+        if(!RebirthVehicleAssemblyIndex.TryGetEntity(entity,out var assembly)||assembly==null)return;
         var pending=Load(entity);if(pending.Invalid||pending.Rows.Count==0)return;
         if(assembly.AssemblyId!=pending.Assembly){Reject(pending,"Deferred wear assembly identity mismatch; native metadata retained.");return;}
         Save(entity,pending,false);

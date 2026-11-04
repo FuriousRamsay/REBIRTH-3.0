@@ -73,9 +73,11 @@ internal static class RebirthPurgeDiscoveryService
                 if(!scan.MoveNext()){scan.Dispose();scan=null;break;}
                 var entry=scan.Current;HashSet<int> eligible;
                 if(!tiers.TryGetValue(entry.Identity.Biome,out eligible)||!eligible.Contains(entry.Tier))continue;
-                if(!NearPlayer(entry.Identity))continue;
                 RebirthPoiClearanceRecord existing;
-                if(snapshot.TryGet(entry.Identity,out existing))
+                bool known=snapshot.TryGet(entry.Identity,out existing);
+                if(known&&!existing.ResetOnly)continue;
+                if(!NearPlayer(entry.Identity))continue;
+                if(known)
                 {
                     // A saved empty reset envelope is promoted only when the authored
                     // combat census positively qualifies it; pending native resets wait.

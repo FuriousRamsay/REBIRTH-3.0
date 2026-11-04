@@ -45,6 +45,11 @@ public static class RebirthJournalGuideService
         Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
     }
 
+    internal static void RetireDeletedWorld(string worldKey)
+    {
+        if (!string.IsNullOrEmpty(path) && string.Equals(Path.GetFileName(Path.GetDirectoryName(path)), worldKey, StringComparison.Ordinal)) Reset();
+        else if (!string.IsNullOrEmpty(failedLoadPath) && string.Equals(Path.GetFileName(Path.GetDirectoryName(failedLoadPath)), worldKey, StringComparison.Ordinal)) Reset();
+    }
     public static void ObserveBackpackEquip(EntityPlayer player)
     {
         if (player == null || !ReferenceEquals(player.world?.GetPrimaryPlayer(), player)) return;

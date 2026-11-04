@@ -10,6 +10,12 @@ public static class RebirthCookingHeatRules
     public static void SetDebugTimes(float grace,float burn) { Grace=grace;debugBurn=burn; }
     public static void ResetDebugTimes() { Grace=120;debugBurn=0; }
     public static float Retention(float overdue,string method)=>Math.Max(.05f,1-.95f*Math.Max(0,overdue-Grace)/(BurnAfter(method)-Grace));
+    public static float EvaporatedVolume(float original,float overdue,string method)
+    {
+        if(overdue<=Grace)return Math.Max(0f,original);
+        float span=Math.Max(1f,BurnAfter(method)-Grace);
+        return Math.Max(0f,original*(1f-(overdue-Grace)/span));
+    }
     public static float FoodStat(string stat,float original,float overdue,string method)
     {
         float retained=original>0?original*Retention(overdue,method):original;

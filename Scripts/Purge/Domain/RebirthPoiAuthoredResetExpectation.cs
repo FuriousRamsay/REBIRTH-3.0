@@ -54,19 +54,23 @@ internal sealed class RebirthPoiAuthoredResetBindings
     public RebirthPoiAuthoredResetBindings(RebirthPoiResetPlan originalPlan,IEnumerable<RebirthPoiAuthoredRuntimeBinding> bindings,long originalEpoch,IEnumerable<RebirthPoiResetActorOutcome> priorActors=null)
     {
         if(originalPlan==null||bindings==null||originalEpoch<0||originalEpoch==long.MaxValue)throw new ArgumentException("Authored reset bindings require original authored intent.");
+        var expectedByKey=originalPlan.IsAuthored?originalPlan.Authored.ToDictionary(e=>e.Key,StringComparer.Ordinal):null;
         var map=new Dictionary<string,RebirthPoiAuthoredRuntimeBinding>(StringComparer.Ordinal);var native=new HashSet<string>(StringComparer.Ordinal);var receipts=new HashSet<Guid>();
+        var sleeperDescriptors=new HashSet<string>(StringComparer.Ordinal);
         foreach(var binding in bindings)
         {
             if(binding==null||map.Count>=8192||map.ContainsKey(binding.ExpectationKey))throw new ArgumentException("Duplicate or excessive native binding.");
-            var expected=originalPlan.Authored.FirstOrDefault(e=>e.Key==binding.ExpectationKey);
+            RebirthPoiAuthoredResetExpectation expected=null;
+            if(expectedByKey!=null)expectedByKey.TryGetValue(binding.ExpectationKey,out expected);
             string kind;
             if(originalPlan.IsAuthored){if(expected==null||expected.Descriptor!=binding.Descriptor||expected.OriginalNativeId.HasValue&&expected.OriginalNativeId.Value!=binding.NativeId)throw new ArgumentException("Foreign or changed original authored binding.");kind=((int)expected.Kind).ToString(CultureInfo.InvariantCulture);}
             else {kind=binding.ExpectationKey.StartsWith("1:",StringComparison.Ordinal)?"1":binding.ExpectationKey.StartsWith("2:",StringComparison.Ordinal)?"2":null;if(kind==null||binding.ExpectationKey!=kind+":"+binding.NativeId.ToString(CultureInfo.InvariantCulture)||!(kind=="1"?originalPlan.Volumes:originalPlan.Triggers).Contains(binding.NativeId))throw new ArgumentException("Legacy native-ID binding differs from original intent.");}
             if(!native.Add(kind+":"+binding.NativeId.ToString(CultureInfo.InvariantCulture))||!receipts.Add(binding.Receipt))throw new ArgumentException("Aliased native binding receipt.");
             map.Add(binding.ExpectationKey,binding);
+            if(kind=="1")sleeperDescriptors.Add(binding.Descriptor);
         }
         if(map.Count!=(originalPlan.IsAuthored?originalPlan.Authored.Count:originalPlan.Volumes.Count+originalPlan.Triggers.Count))throw new ArgumentException("Incomplete authored generation binding.");
-        var prior=new Dictionary<Guid,RebirthPoiResetActorOutcome>();foreach(var outcome in priorActors??Enumerable.Empty<RebirthPoiResetActorOutcome>()){if(outcome==null||prior.Count>=8192||outcome.SourceEpoch!=originalEpoch||prior.ContainsKey(outcome.Token)||!map.Values.Any(b=>b.ExpectationKey.StartsWith("1:",StringComparison.Ordinal)&&b.Descriptor==outcome.Descriptor)||!receipts.Add(outcome.Receipt))throw new ArgumentException("Invalid prior actor disposition set.");prior.Add(outcome.Token,outcome);}PriorActors=new ReadOnlyDictionary<Guid,RebirthPoiResetActorOutcome>(prior);
+        var prior=new Dictionary<Guid,RebirthPoiResetActorOutcome>();foreach(var outcome in priorActors??Enumerable.Empty<RebirthPoiResetActorOutcome>()){if(outcome==null||prior.Count>=8192||outcome.SourceEpoch!=originalEpoch||prior.ContainsKey(outcome.Token)||!sleeperDescriptors.Contains(outcome.Descriptor)||!receipts.Add(outcome.Receipt))throw new ArgumentException("Invalid prior actor disposition set.");prior.Add(outcome.Token,outcome);}PriorActors=new ReadOnlyDictionary<Guid,RebirthPoiResetActorOutcome>(prior);
         OriginalEpoch=originalEpoch;OriginalPlan=originalPlan;Bindings=new ReadOnlyDictionary<string,RebirthPoiAuthoredRuntimeBinding>(map);
     }
     public string Canonical {get{return new XElement("authoredReset",new XAttribute("epoch",OriginalEpoch),RebirthPoiResetPlan.Write(OriginalPlan),Write()).ToString(SaveOptions.DisableFormatting);} }

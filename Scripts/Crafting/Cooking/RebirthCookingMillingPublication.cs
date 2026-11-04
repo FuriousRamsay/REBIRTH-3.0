@@ -63,8 +63,13 @@ internal static partial class RebirthCookingMillingPublication
     private sealed class MillingSync{internal Original Original;internal MillingSync Previous;}
     [ThreadStatic]private static MillingSync syncingMilling;
     [ThreadStatic]private static Original publishingTile;
-    private static bool Same(ItemStack[] a,ItemStack[] b)=>a!=null&&b!=null&&a.Length==b.Length&&
-        a.Select((item,index)=>RebirthStationGridIngredients.IsSameStackSnapshot(item,b[index])).All(value=>value);
+    private static bool Same(ItemStack[] a,ItemStack[] b)
+    {
+        if(a==null||b==null||a.Length!=b.Length)return false;
+        for(int i=0;i<a.Length;i++)
+            if(!RebirthStationGridIngredients.IsSameStackSnapshot(a[i],b[i]))return false;
+        return true;
+    }
     internal static bool Held(TileEntityWorkstation station)=>HasMobileColdHold(station)||HasStaticMillingSource(station)||pending.Any(value=>!value.UnusedAdmission&&ReferenceEquals(value.World,GameManager.Instance?.World)&&ReferenceEquals(value.Station,station));
     internal static bool HoldsOwner(EntityPlayerLocal actor)=>actor!=null&&pending.Any(value=>!value.UnusedAdmission&&ReferenceEquals(value.Actor,actor)&&ReferenceEquals(value.World,GameManager.Instance?.World)&&actor.Died==value.Deaths&&!actor.IsDead());
     internal static bool CanAdvance(XUiC_RecipeStack card)=>!Held(card?.GetParentByType<XUiC_WorkstationWindowGroup>()?.WorkstationData?.TileEntity);

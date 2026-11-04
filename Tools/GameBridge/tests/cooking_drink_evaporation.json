@@ -1,0 +1,18 @@
+{
+  "name": "Cooking: a ready drink evaporates instead of burning",
+  "stopOnFailure": true,
+  "preconditions": "Authorized disposable save only. A campfire at 14,45,995 has a just-completed 500 mL boiled-water batch with fuel and heat on. Do not use a real player save. Reset cooking debug timers afterwards.",
+  "steps": [
+    { "console": "rbcooking times 2 12" },
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "waitForUi": { "text": "EVAPORATING - DRINK STATS PER SERVING", "window": "workstation_campfire", "timeout": 15 } },
+    { "screenshot": "drink_evaporating" },
+    { "waitForUi": { "text": "EVAPORATED - DRINK STATS PER SERVING", "window": "workstation_campfire", "timeout": 20 } },
+    { "expectNoUi": { "text": "BURNT", "window": "workstation_campfire" } },
+    { "screenshot": "drink_evaporated" },
+    { "console": "rbcooking reset" },
+    { "expectNoErrors": true }
+  ]
+}

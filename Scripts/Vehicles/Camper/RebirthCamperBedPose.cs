@@ -79,6 +79,7 @@ namespace Rebirth.Vehicles.Camper
         private Transform model;
         private AnimationClip clip;
         private readonly List<Body> bodies = new List<Body>();
+        private readonly List<Animator> currentBodies = new List<Animator>();
         private float nextBind;
         private string failure;
         private bool warned;
@@ -98,27 +99,52 @@ namespace Rebirth.Vehicles.Camper
                 string expectedClip = nativeSlot == 4 ? "rebirthCamperBedLying" : "rebirthCamperCabinSeat" + nativeSlot;
                 var holder = model == null ? null : model.Find(holderPath);
                 var asset = holder == null ? null : holder.GetComponent<Animator>();
-                var clips = asset?.runtimeAnimatorController?.animationClips.Where(c => c != null && c.name == expectedClip).Distinct().ToArray();
-                if (asset == null || asset.enabled || clips == null || clips.Length != 1 || clips[0].humanMotion || clips[0].legacy)
+                var clips = asset?.runtimeAnimatorController?.animationClips;
+                AnimationClip selectedClip = null;
+                int matchingClips = 0;
+                if (clips != null)
+                    foreach (var candidate in clips)
+                        if (candidate != null && candidate.name == expectedClip &&
+                            (selectedClip == null || !EqualityComparer<AnimationClip>.Default.Equals(selectedClip, candidate)))
+                        { selectedClip = candidate; matchingClips++; }
+                if (asset == null || asset.enabled || matchingClips != 1 || selectedClip.humanMotion || selectedClip.legacy)
                     throw new InvalidOperationException("Authored native generic camper clip dependency missing/invalid for slot " + nativeSlot + "; pair the candidate asset with this runtime.");
-                clip = clips[0];
+                clip = selectedClip;
                 if (camper.vehicle.GetIKTargets(nativeSlot) != null)
                     throw new InvalidOperationException("Authored camper slot " + nativeSlot + " has conflicting native IK targets.");
                 var avatar = actor.emodel?.avatarController as AvatarMultiBodyController;
                 if (avatar == null) throw new InvalidOperationException("Player MultiBody controller unavailable.");
-                var current = avatar.BodyAnimators.Select(b => b.Animator).Where(a => a != null && a.isActiveAndEnabled).Distinct().ToArray();
-                if (current.Length == 0 || current.Any(a => a.avatar == null || !a.avatar.isValid || a.isHuman || a.runtimeAnimatorController == null))
+                currentBodies.Clear();
+                foreach (var nativeBody in avatar.BodyAnimators)
+                {
+                    var animator = nativeBody.Animator;
+                    if (animator != null && animator.isActiveAndEnabled && !currentBodies.Contains(animator))
+                        currentBodies.Add(animator);
+                }
+                bool invalidBody = currentBodies.Count == 0;
+                foreach (var animator in currentBodies)
+                    if (animator.avatar == null || !animator.avatar.isValid || animator.isHuman || animator.runtimeAnimatorController == null)
+                    { invalidBody = true; break; }
+                if (invalidBody)
                     throw new InvalidOperationException("All active player body animators must retain the native valid generic BaseRig avatar.");
                 var layout = holder.Find("NativeRigLayout");
                 if (layout == null) throw new InvalidOperationException("Native camper skeletal binding layout missing; rebuild the candidate.");
-                foreach (var animator in current) ValidateLayout(layout, animator.transform, "");
+                foreach (var animator in currentBodies) ValidateLayout(layout, animator.transform, "");
                 layoutValidated = true;
-                foreach (var previous in bodies.ToArray())
-                    if (!current.Contains(previous.Animator) || previous.Animator.runtimeAnimatorController != previous.Controller)
-                    { Restore(previous); bodies.Remove(previous); }
-                foreach (var animator in current)
+                for (int i = 0; i < bodies.Count;)
                 {
-                    if (bodies.Any(b => b.Animator == animator && b.Graph.IsValid())) continue;
+                    var previous = bodies[i];
+                    if (!currentBodies.Contains(previous.Animator) || previous.Animator.runtimeAnimatorController != previous.Controller)
+                    { Restore(previous); bodies.RemoveAt(i); }
+                    else i++;
+                }
+                foreach (var animator in currentBodies)
+                {
+                    bool alreadyBound = false;
+                    foreach (var existingBody in bodies)
+                        if (existingBody.Animator == animator && existingBody.Graph.IsValid())
+                        { alreadyBound = true; break; }
+                    if (alreadyBound) continue;
                     var native = animator.GetCurrentAnimatorStateInfo(0);
                     var body = new Body { Animator = animator, Controller = animator.runtimeAnimatorController,
                         State = native.fullPathHash, Time = native.normalizedTime, RootMotion = animator.applyRootMotion };
@@ -185,7 +211,7 @@ namespace Rebirth.Vehicles.Camper
                 && body.Animator.runtimeAnimatorController == body.Controller
                 && body.Animator.HasState(0, body.State)) body.Animator.Play(body.State, 0, body.Time);
         }
-        internal void Stop() { foreach (var body in bodies) Restore(body); bodies.Clear(); layoutValidated = false; }
+        internal void Stop() { foreach (var body in bodies) Restore(body); bodies.Clear(); currentBodies.Clear(); layoutValidated = false; }
         private void OnDisable() { Stop(); }
         private void OnDestroy() { Stop(); }
     }

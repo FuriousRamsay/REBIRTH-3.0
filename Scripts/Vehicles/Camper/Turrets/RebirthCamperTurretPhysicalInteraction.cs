@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
 internal sealed class RebirthCamperTurretPhysicalTarget:MonoBehaviour
 {
+    private sealed class HitDistanceComparer:IComparer<RaycastHit>
+    {public int Compare(RaycastHit a,RaycastHit b)=>a.distance.CompareTo(b.distance);}
+    private static readonly IComparer<RaycastHit> DistanceComparer=new HitDistanceComparer();
+    [ThreadStatic]private static RaycastHit[] hitBuffer;
+    [ThreadStatic]private static bool hitBufferBusy;
     internal EntityVehicle Vehicle;
     internal int Corner;
     internal static void Attach(EntityVehicle vehicle,int corner,Transform pitch)
@@ -27,18 +33,34 @@ internal sealed class RebirthCamperTurretPhysicalTarget:MonoBehaviour
         target=null;
         if(player==null||player.IsDead()||player.AttachedToEntity!=null||player.PlayerUI?.windowManager?.IsInputActive()!=false)return false;
         var ray=player.GetLookRay();ray.origin-=Origin.position;
-        var hits=Physics.RaycastAll(ray,Constants.cCollectItemDistance,Physics.AllLayers,QueryTriggerInteraction.Collide);
-        Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
-        foreach(var hit in hits)
+        bool borrowed=!hitBufferBusy;
+        if(borrowed)hitBufferBusy=true;
+        try
         {
-            var c=hit.collider;if(!c||c.transform.IsChildOf(player.RootTransform))continue;
-            var candidate=c.GetComponent<RebirthCamperTurretPhysicalTarget>();
-            if(candidate&&RebirthCamperTurretAccess.CanUse(candidate.Vehicle,player)
-                &&RebirthCamperTurretRuntime.For(candidate.Vehicle).Observe().Slots[candidate.Corner].HasTurret)
-            {target=candidate;return true;}
-            if(!c.isTrigger)return false;
+            RaycastHit[] hits;
+            int count;
+            if(borrowed)
+            {
+                if(hitBuffer==null)hitBuffer=new RaycastHit[64];
+                count=Physics.RaycastNonAlloc(ray,hitBuffer,Constants.cCollectItemDistance,Physics.AllLayers,QueryTriggerInteraction.Collide);
+                hits=count<hitBuffer.Length?hitBuffer:Physics.RaycastAll(ray,Constants.cCollectItemDistance,Physics.AllLayers,QueryTriggerInteraction.Collide);
+                if(count>=hitBuffer.Length)count=hits.Length;
+            }
+            else
+            {hits=Physics.RaycastAll(ray,Constants.cCollectItemDistance,Physics.AllLayers,QueryTriggerInteraction.Collide);count=hits.Length;}
+            Array.Sort(hits,0,count,DistanceComparer);
+            for(int i=0;i<count;i++)
+            {
+                var c=hits[i].collider;if(!c||c.transform.IsChildOf(player.RootTransform))continue;
+                var candidate=c.GetComponent<RebirthCamperTurretPhysicalTarget>();
+                if(candidate&&RebirthCamperTurretAccess.CanUse(candidate.Vehicle,player)
+                    &&RebirthCamperTurretRuntime.For(candidate.Vehicle).Observe().Slots[candidate.Corner].HasTurret)
+                {target=candidate;return true;}
+                if(!c.isTrigger)return false;
+            }
+            return false;
         }
-        return false;
+        finally{if(borrowed)hitBufferBusy=false;}
     }
 }
 [HarmonyPatch(typeof(PlayerMoveController),"HandleInteraction")]

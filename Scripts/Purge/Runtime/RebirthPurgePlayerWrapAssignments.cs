@@ -20,6 +20,8 @@ internal static class RebirthPurgePlayerWrapAssignments
         new Assignment("EOS_00026266d8b842f981e60ea4640fdc8f", "modVehicleWrapGenmaSaotome"),
         new Assignment("EOS_0002d44f5ff04025b6661810fd559abe", "modVehicleWrapMissBanjo"),
         new Assignment("EOS_0002bb72bdeb454295e656063b9d8838", "modVehicleWrapHeyWeps"),
+        new Assignment("EOS_00020c11f0154642955bcacae4539348", "modVehicleWrapViper"),
+        new Assignment("EOS_0002788fc39c49f4a9a8b1c1ffead8d4", "modVehicleWrapStallionsDen"),
         // Replace the sample EOS with the complete ID
         // printed by rebirth playerid, then uncomment one row per assigned wrap.
         // Repeating the same EOS with different items gives that player both:

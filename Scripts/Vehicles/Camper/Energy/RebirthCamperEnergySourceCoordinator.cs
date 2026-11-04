@@ -18,8 +18,13 @@ internal static class RebirthCamperEnergySourceCoordinator
     // Applied receipts may still be retiring the owner's bookkeeping marker.
     // Once the vehicle receipt is terminal and the local owner inventory hold is
     // gone, that metadata acknowledgement must not freeze unrelated controls.
-    internal static bool IsBusy(EntityVehicle vehicle)=>pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle)&&
-        (p.Stage!=4||!(p.Player is EntityPlayerLocal local)||RebirthCamperEnergyOwnerHold.Blocks(local.bag)));
+    internal static bool IsBusy(EntityVehicle vehicle)
+    {
+        foreach(var p in pending.Values)
+            if(ReferenceEquals(p.Vehicle,vehicle)&&
+                (p.Stage!=4||!(p.Player is EntityPlayerLocal local)||RebirthCamperEnergyOwnerHold.Blocks(local.bag)))return true;
+        return false;
+    }
     internal static void Install()
     {
         if(installed)return;

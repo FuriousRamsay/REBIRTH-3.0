@@ -362,6 +362,7 @@ internal static class RebirthVehicleCursorStorageProtocol
     private static void Tick(ref ModEvents.SGameUpdateData data)
     {
         if(!ThreadManager.IsMainThread()||Time.realtimeSinceStartup<nextTick)return;nextTick=Time.realtimeSinceStartup+0.25f;
+        if(servers.Count==0&&clients.Count==0)return;
         foreach(var entry in servers.ToArray())
         {
             var r=entry.Value;

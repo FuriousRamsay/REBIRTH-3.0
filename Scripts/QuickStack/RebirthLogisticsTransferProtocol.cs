@@ -344,7 +344,7 @@ internal sealed class RebirthLogisticsCompositePublication:IDisposable
         try{RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(Write));ModEvents.GameUpdate.RegisterHandler(Update);installed=true;}catch{harmony.UnpatchSelf();throw;}
     }
     private static void Update(ref ModEvents.SGameUpdateData data)
-    {foreach(var item in pending.ToArray())try{if(!item.Current())item.Dispose();}catch{item.Dispose();}}
+    {if(pending.Count==0)return;foreach(var item in pending.ToArray())try{if(!item.Current())item.Dispose();}catch{item.Dispose();}}
     [HarmonyPatch(typeof(TileEntityComposite),"write")]
     private static class Write
     {

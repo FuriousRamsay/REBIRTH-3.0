@@ -518,7 +518,8 @@ public sealed class RebirthSurvivorCreatorViewModel
 
     public int GetBackgroundCount()
     {
-        return GetSortedBackgrounds().Count;
+        RebirthSurvivorDefinitionBundle bundle = RebirthSurvivorDefinitionRegistry.Bundle;
+        return bundle != null && bundle.Backgrounds != null ? bundle.Backgrounds.Count : 0;
     }
 
     public RebirthSurvivorTraitChoice[] GetTraitPage(int pageSize)
@@ -556,8 +557,8 @@ public sealed class RebirthSurvivorCreatorViewModel
         return page.ToArray();
     }
 
-    public int GetPositiveTraitCount() { return GetTraitSideList(false).Count; }
-    public int GetNegativeTraitCount() { return GetTraitSideList(true).Count; }
+    public int GetPositiveTraitCount() { return CountTraitSide(false); }
+    public int GetNegativeTraitCount() { return CountTraitSide(true); }
 
     public void SetTraitCategoryFilter(RebirthSurvivorTraitCategoryFilter filter)
     {
@@ -854,18 +855,7 @@ public sealed class RebirthSurvivorCreatorViewModel
 
         foreach (RebirthTraitDefinition trait in bundle.Traits)
         {
-            if (trait == null || trait.Availability == RebirthDefinitionAvailability.Deferred) continue;
-            if (negativeSide)
-            {
-                if (trait.Polarity != RebirthTraitPolarity.Negative) continue;
-            }
-            else
-            {
-                // The approved dual-pane design has no third neutral column. Mixed Traits remain
-                // selectable here as zero-point choices and are explicitly badged MIXED in the row.
-                if (trait.Polarity == RebirthTraitPolarity.Negative) continue;
-            }
-            if (!MatchesTraitCategory(trait)) continue;
+            if (!IncludedOnTraitSide(trait, negativeSide)) continue;
             list.Add(trait);
         }
 
@@ -890,6 +880,24 @@ public sealed class RebirthSurvivorCreatorViewModel
             return StringComparer.CurrentCultureIgnoreCase.Compare(RebirthSurvivorUiText.TraitDisplayName(a), RebirthSurvivorUiText.TraitDisplayName(b));
         });
         return list;
+    }
+
+    private int CountTraitSide(bool negativeSide)
+    {
+        RebirthSurvivorDefinitionBundle bundle = RebirthSurvivorDefinitionRegistry.Bundle;
+        if (bundle == null) return 0;
+        int count = 0;
+        foreach (RebirthTraitDefinition trait in bundle.Traits)
+            if (IncludedOnTraitSide(trait, negativeSide)) count++;
+        return count;
+    }
+
+    private bool IncludedOnTraitSide(RebirthTraitDefinition trait, bool negativeSide)
+    {
+        if (trait == null || trait.Availability == RebirthDefinitionAvailability.Deferred) return false;
+        // The approved dual-pane design places Mixed Traits in the positive pane.
+        if (negativeSide ? trait.Polarity != RebirthTraitPolarity.Negative : trait.Polarity == RebirthTraitPolarity.Negative) return false;
+        return MatchesTraitCategory(trait);
     }
 
     private bool MatchesTraitCategory(RebirthTraitDefinition trait)

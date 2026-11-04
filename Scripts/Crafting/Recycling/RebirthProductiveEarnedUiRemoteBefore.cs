@@ -62,7 +62,13 @@ internal static class RebirthProductiveEarnedUiRemoteBefore
     private sealed class Read
     {internal Original Source;internal NetPackageTileEntity Packet;internal byte[] Body;internal int Reads;internal bool Complete;internal IDisposable Allocation;}
     private static readonly Dictionary<Guid,Original> originals=new Dictionary<Guid,Original>();
-    internal static bool BlocksStation(TileEntityWorkstation station)=>originals.Values.Any(value=>ReferenceEquals(value.Station,station)&&ReferenceEquals(value.World,GameManager.Instance?.World));
+    internal static bool BlocksStation(TileEntityWorkstation station)
+    {
+        foreach (var value in originals.Values)
+            if (ReferenceEquals(value.Station, station) && ReferenceEquals(value.World, GameManager.Instance?.World))
+                return true;
+        return false;
+    }
     [ThreadStatic]private static Read reading;
     internal static bool Register(EntityPlayer actor,ClientInfo peer,TileEntityWorkstation station,string creation,Guid operation,byte[] image,out RebirthProductiveEarnedWire.Reply reply)
     {

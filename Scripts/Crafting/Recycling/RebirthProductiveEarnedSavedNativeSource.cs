@@ -228,8 +228,14 @@ internal static partial class RebirthProductiveEarnedSavedNativeSource
         source=null;var world=GameManager.Instance?.World;if(world?.IsRemote()!=false)return false;
         lock(cachedLoadGate)
         {
-            var matches=cachedLoadRequests.Where(request=>request.Loaded?.Installed(world)==true&&ReferenceEquals(request.Loaded.Tile,station)).ToArray();
-            if(matches.Length!=1)return false;source=matches[0].Custody;return source.PrimaryCurrent();
+            CachedLoadRequest match=null;
+            foreach(var request in cachedLoadRequests)
+            {
+                if(request.Loaded?.Installed(world)!=true||!ReferenceEquals(request.Loaded.Tile,station))continue;
+                if(match!=null)return false;
+                match=request;
+            }
+            if(match==null)return false;source=match.Custody;return source.PrimaryCurrent();
         }
     }
     internal static void Release(Evidence source)

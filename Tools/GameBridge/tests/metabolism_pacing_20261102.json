@@ -1,0 +1,91 @@
+{
+  "name": "Metabolism pacing and consume-animation evidence (owner acceptance capture)",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Only a separately authorized disposable CodexTest host save; never owner real save. No god mode. Guard stays enabled. Manual review of snapshots/log/UI required; automatic PASS is capture smoke only.",
+  "steps": [
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "rbmet emptyneeds"
+    },
+    {
+      "give": {
+        "item": "drinkJarBoiledWater",
+        "toolbelt": 1
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "action": "Primary",
+        "seconds": 3
+      }
+    },
+    {
+      "give": {
+        "item": "foodHoneyGlazedSham",
+        "toolbelt": 2
+      }
+    },
+    {
+      "select": {
+        "slot": 2
+      }
+    },
+    {
+      "press": {
+        "action": "Primary",
+        "seconds": 3
+      }
+    },
+    {
+      "console": "rbmet stomach"
+    },
+    {
+      "screenshot": "metabolism_pacing_ingested"
+    },
+    {
+      "wait": 60
+    },
+    {
+      "console": "rbmet stomach"
+    },
+    {
+      "console": "rbmet rates"
+    },
+    {
+      "wait": 60
+    },
+    {
+      "console": "rbmet stomach"
+    },
+    {
+      "console": "rbmet rates"
+    },
+    {
+      "wait": 60
+    },
+    {
+      "console": "rbmet stomach"
+    },
+    {
+      "console": "rbmet rates"
+    },
+    {
+      "screenshot": "metabolism_pacing_3min"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

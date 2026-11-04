@@ -385,9 +385,7 @@
       <item group="rebirthLiteratureDiscoveryAdvanced" prob="0.18" />
     </lootgroup>
   </insertBefore>
-  <append xpath="/lootcontainers/lootgroup[@name='groupJunk']">
-    <item group="rebirthLiteratureDistribution" loot_prob_template="veryLow" />
-  </append>
+  <!-- REBIRTH learning materials belong to designated reading loot, never junk. -->
   <append xpath="/lootcontainers/lootgroup[@name='groupBookcase01']">
     <item group="rebirthLiteratureTheoryFieldNotes" loot_prob_template="med" />
     <item group="rebirthLiteratureTheoryPrimers" loot_prob_template="medLow" />

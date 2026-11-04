@@ -121,7 +121,13 @@ internal static class RebirthPoiClearanceCodec
     }
     internal static XElement Single(XElement parent,string name)
     {
-        var nodes=parent.Elements(name).Take(2).ToArray(); if(nodes.Length>1) throw new FormatException(); return nodes.Length==0?null:nodes[0];
+        using(var nodes=parent.Elements(name).GetEnumerator())
+        {
+            if(!nodes.MoveNext())return null;
+            var first=nodes.Current;
+            if(nodes.MoveNext())throw new FormatException();
+            return first;
+        }
     }
     internal static void Shape(XElement node,string name,string attributes,string children)
     {

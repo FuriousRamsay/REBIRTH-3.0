@@ -17,7 +17,7 @@ internal static class RebirthPurgeScanner
         internal Guid World, Session;
         internal long Sequence, Epoch;
         internal long LifetimeKills=-1;
-        internal bool Approximate;
+        internal bool Approximate, Assisted;
         internal int[] Targets=Array.Empty<int>();
     }
     private sealed class Counter { internal long Epoch; internal int Areas,Entities; internal bool Approximate; }
@@ -40,6 +40,10 @@ internal static class RebirthPurgeScanner
         internal string PoiKey;
         internal long Epoch;
         internal int Maximum;
+        internal int AuditSignature;
+        internal float AuditStableSince;
+        internal bool AuditWritten;
+        internal bool CommandMarkers;
     }
     private static readonly Dictionary<int,RoomHistory> roomHistory=new Dictionary<int,RoomHistory>();
     private static readonly Dictionary<int,NavObject> markers=new Dictionary<int,NavObject>();
@@ -52,6 +56,29 @@ internal static class RebirthPurgeScanner
     internal static void Reset()
     {
         ClearMarkers();projectedActors.Clear();counters.Clear();CounterRevision++;current=null;owner=null;cursor=0;next=0;receivedAt=0;sequence=0;playerDue.Clear();roomHistory.Clear();
+    }
+    // Marker admission is scoped to the existing player/POI/epoch projection,
+    // not a continuing activation job. Leaving the POI removes its history.
+    internal static bool SetCommandMarkers(EntityPlayer player,RebirthPoiIdentity identity,bool enabled)
+    {
+        if(player==null)return false;
+        RoomHistory history;
+        if(!enabled)
+        {
+            if(!roomHistory.TryGetValue(player.entityId,out history)||!history.CommandMarkers)return false;
+            history.CommandMarkers=false;return true;
+        }
+        if(identity==null)return false;
+        RebirthPoiWorldStore store;RebirthPoiClearanceRecord record=null;
+        if(RebirthPoiWorldLifecycle.Instance.TryGetEvidenceStore(out store)&&store.Published!=null)
+            store.Published.TryGet(identity,out record);
+        long epoch=record?.Epoch??0;
+        if(!roomHistory.TryGetValue(player.entityId,out history)||history.PoiKey!=identity.Key||history.Epoch!=epoch)
+        {
+            if(roomHistory.Count>512)roomHistory.Clear();
+            history=new RoomHistory{PoiKey=identity.Key,Epoch=epoch};roomHistory[player.entityId]=history;
+        }
+        history.CommandMarkers=true;return true;
     }
     private static void ClearMarkers()
     {
@@ -122,7 +149,8 @@ internal static class RebirthPurgeScanner
                 if(entryBudget--<=0){actors=live.ToArray();return true;}
                 if(!seen.Add(id))continue;
                 var entity=world.GetEntity(id) as EntityAlive;
-                if(entity!=null&&entity.IsAlive()&&entity.IsSleeper)live.Add(entity);
+                if(entity!=null&&entity.IsAlive()&&entity.IsSleeper&&RebirthPoiCombatantPolicy.IsRequired(
+                    EntityClass.GetEntityClass(entity.entityClass)?.entityClassName))live.Add(entity);
                 if(seen.Count>=8192){actors=live.ToArray();return true;}
             }
         }
@@ -143,7 +171,8 @@ internal static class RebirthPurgeScanner
         RebirthPoiWorldStore store;RebirthPoiClearanceRecord record=null;
         if(RebirthPoiWorldLifecycle.Instance.TryGetEvidenceStore(out store)&&store.Published!=null)
             store.Published.TryGet(identity,out record);
-        if(record!=null&&(record.ResetOnly||record.State!=RebirthPoiClearanceState.Discovered))return result;
+        if(record!=null&&(record.ResetOnly||record.State!=RebirthPoiClearanceState.Discovered))
+        {roomHistory.Remove(player.entityId);return result;}
         result.PoiKey=identity.Key;result.Epoch=record?.Epoch??0;
         result.Prefab=identity.Prefab;result.X=identity.X;result.Y=identity.Y;result.Z=identity.Z;
         result.Tier=prefab.prefab.DifficultyTier;
@@ -156,13 +185,13 @@ internal static class RebirthPurgeScanner
             if(roomBudget--<=0||observedRooms>=result.Rooms)break;
             if(room==null||!ReferenceEquals(room.prefabInstance,prefab))continue;
             observedRooms++;
-            if(room.wasCleared)result.Cleared++;
+            if(RebirthPurgeSleeperPolicy.CombatSettled(room))result.Cleared++;
             else
             {
                 remaining++;
                 // The original counter uses current native population, with one
                 // estimated enemy for an uncleared room that has not populated.
-                result.Enemies=(int)Math.Min(1000000L,(long)result.Enemies+Math.Max(1,room.numSpawned));
+                result.Enemies=(int)Math.Min(1000000L,(long)result.Enemies+Math.Max(1,room.numSpawned-RebirthPurgeSleeperPolicy.ExcludedNativeMembers(room)));
                 if(room.numSpawned<=0||room.isSpawning)result.Approximate=true;
             }
         }
@@ -189,6 +218,19 @@ internal static class RebirthPurgeScanner
             history=new RoomHistory{PoiKey=identity.Key,Epoch=result.Epoch};roomHistory[player.entityId]=history;
         }
         history.Maximum=Math.Max(history.Maximum,remaining);
+        int auditSignature=result.Rooms*397^result.Cleared*31^result.Enemies*17^actors.Length;
+        if(history.AuditSignature!=auditSignature)
+        {
+            history.AuditSignature=auditSignature;
+            history.AuditStableSince=Time.realtimeSinceStartup;
+            history.AuditWritten=false;
+        }
+        // One snapshot per stable low-remaining state, never per-frame log spam.
+        if(remaining>0&&remaining<=4&&!history.AuditWritten&&Time.realtimeSinceStartup-history.AuditStableSince>=15f)
+        {
+            history.AuditWritten=true;
+            RebirthPurgeSleeperAudit.Capture(player,"scanner-stalled-15s");
+        }
         int max=history.Maximum;
         // Presentation may be available before evidence. Never use it to
         // override an existing reset/fault owner or mutate clearance state.
@@ -196,13 +238,19 @@ internal static class RebirthPurgeScanner
             RebirthPoiNativeEvidence.Instance.IsWithheld(identity))return result;
         foreach(var entity in actors)
             if(entity.IsSleeper && entity.Buffs.GetCustomVar("$sleeperActivated")==1)ActivatePending(world,prefab,entity);
-        if(!Threshold(result.Tier,result.Rooms,result.Cleared))return result;
+        result.Assisted=history.CommandMarkers||RebirthPurgeSleeperCommand.IsTracking(world,player,prefab);
+        if(!result.Assisted&&!Threshold(result.Tier,result.Rooms,result.Cleared))return result;
         var targets=new List<int>();
         // The projection supports the full 8192-actor observation bound, rather
         // than silently dropping markers in large authored POIs.
         foreach(var entity in actors)
         {
             if(!entity.IsSleeper)continue;
+            if(result.Assisted)
+            {
+                if((entity.position-player.position).sqrMagnitude<=10000f)targets.Add(entity.entityId);
+                continue;
+            }
             bool admitted=false;
             if(max>0&&(max>1||remaining>0))
             {
@@ -297,6 +345,7 @@ internal static class RebirthPurgeScanner
             var entity=world.GetEntity(id) as EntityAlive;
             if(entity!=null)projectedActors[id]=entity;
         }
+        if(current!=null&&current.Assisted!=view.Assisted)ClearMarkers();
         current=view;receivedAt=Time.realtimeSinceStartup;
     }
     private static bool IsCurrent(World world,EntityPlayerLocal player)
@@ -348,12 +397,12 @@ internal static class RebirthPurgeScanner
             EntityAlive projected;
             if(entity==null||!entity.IsAlive()||!entity.IsSleeper||
                 projectedActors.TryGetValue(id,out projected)&&!ReferenceEquals(projected,entity)||
-                (entity.position-player.position).sqrMagnitude>2500f)continue;
+                (entity.position-player.position).sqrMagnitude>(current.Assisted?10000f:2500f))continue;
             projectedActors[id]=entity;
             visibleActors.Add(id);NavObject marker;
             if(!markers.TryGetValue(id,out marker))
             {
-                marker=NavObjectManager.Instance.RegisterNavObject("rebirth_purge_scanner",entity.position,string.Empty,false,-1000000-id,player);
+                marker=NavObjectManager.Instance.RegisterNavObject(current.Assisted?"rebirth_poisleeper_debug":"rebirth_purge_scanner",entity.position,string.Empty,false,-1000000-id,player);
                 if(marker==null)continue;markers.Add(id,marker);
             }
             marker.TrackedPosition=entity.position;marker.IsActive=true;marker.ForceDisabled=false;

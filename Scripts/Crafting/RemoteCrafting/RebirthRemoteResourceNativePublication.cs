@@ -208,7 +208,13 @@ internal static class RebirthRemoteResourceNativePublication
     {
         internal string Key;internal ChunkCustomData Value;internal byte[] Bytes,Span;internal long Offset=-1;
     }
-    private static bool Same(ItemStack[] a,ItemStack[] b)=>a!=null&&b!=null&&a.Length==b.Length&&a.Select((item,index)=>RebirthStationGridIngredients.IsSameStackSnapshot(item,b[index])).All(value=>value);
+    private static bool Same(ItemStack[] a,ItemStack[] b)
+    {
+        if(a==null||b==null||a.Length!=b.Length)return false;
+        for(int index=0;index<a.Length;index++)
+            if(!RebirthStationGridIngredients.IsSameStackSnapshot(a[index],b[index]))return false;
+        return true;
+    }
     private static bool Matches(byte[] bytes,long offset,byte[] span)
     {if(bytes==null||span==null||offset<8||offset>bytes.Length-span.Length)return false;for(int index=0;index<span.Length;index++)if(bytes[(int)offset+index]!=span[index])return false;return true;}
     internal static Watch Begin(RebirthRemoteResourceNativeBinding source,Func<bool> originalCurrent,params string[] exactChunkMarkerKeys)
@@ -377,7 +383,15 @@ internal static class RebirthRemoteResourceNativePublication
         catch{harmony.UnpatchSelf();throw;}
     }
     private static void Update(ref ModEvents.SGameUpdateData data)
-    {foreach(var watch in pending.ToArray())try{if(!watch.Current())watch.Dispose();}catch{watch.Dispose();}}
+    {
+        Watch[] watches;
+        lock(publicationGate)
+        {
+            if(pending.Count==0)return;
+            watches=pending.ToArray();
+        }
+        foreach(var watch in watches)try{if(!watch.Current())watch.Dispose();}catch{watch.Dispose();}
+    }
     [HarmonyPatch(typeof(RebirthStationPublicationEvidence),nameof(RebirthStationPublicationEvidence.After))]
     private static class SavedPayload
     {

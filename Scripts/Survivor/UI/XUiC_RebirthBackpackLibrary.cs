@@ -34,9 +34,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
     private int selected=-1,page;
     private RebirthBackpackLibraryView displayed;
     private readonly List<int> available=new List<int>();
-    private readonly List<ItemStack> availableImages=new List<ItemStack>();
     private readonly XUiV_Label[] availableLabels=new XUiV_Label[169];
-    private readonly ItemStack[] bagImages=new ItemStack[169];
     private readonly XUiController[] bagControls=new XUiController[169]; private readonly XUiV_Sprite[] bagIcons=new XUiV_Sprite[169];
     private string feedback;
     private bool requestOutstanding;
@@ -416,17 +414,32 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             if(displayed==null||view==null||displayed.CreationId!=view.CreationId||displayed.GearRevision!=view.GearRevision)selected=-1;
             displayed=view;
         }
-        available.Clear();availableImages.Clear();var bag=player?.bag?.ItemGrid.items;
+        available.Clear();var bag=player?.bag?.ItemGrid.items;
         for(int i=0;i<169;i++)
         {
             bool exists=bag!=null&&i<bag.Length;
             if(exists)available.Add(i);
-            var cell=exists?bag[i]:null;bagImages[i]=cell?.Clone();var item=cell!=null&&!cell.IsEmpty()?cell.itemValue.ItemClass:null;
-            var control=bagControls[i];if(control?.ViewComponent!=null)control.ViewComponent.IsVisible=exists;
+            var cell=exists?bag[i]:null;var item=cell!=null&&!cell.IsEmpty()?cell.itemValue.ItemClass:null;
+            var control=bagControls[i];
+            if(control?.ViewComponent!=null&&control.ViewComponent.IsVisible!=exists)control.ViewComponent.IsVisible=exists;
             var icon=bagIcons[i];
-            if(icon!=null){icon.IsVisible=item!=null;if(item!=null)icon.SpriteName=item.GetIconName();}
-            if(availableLabels[i]!=null)availableLabels[i].Text=item==null?string.Empty:cell.count.ToString();
-            if(control?.ViewComponent!=null)control.ViewComponent.ToolTip=string.Empty;
+            if(icon!=null)
+            {
+                bool visible=item!=null;
+                if(icon.IsVisible!=visible)icon.IsVisible=visible;
+                if(visible)
+                {
+                    string sprite=item.GetIconName();
+                    if(icon.SpriteName!=sprite)icon.SpriteName=sprite;
+                }
+            }
+            var label=availableLabels[i];
+            if(label!=null)
+            {
+                string count=item==null?string.Empty:cell.count.ToString();
+                if(label.Text!=count)label.Text=count;
+            }
+            if(control?.ViewComponent!=null&&control.ViewComponent.ToolTip!=string.Empty)control.ViewComponent.ToolTip=string.Empty;
         }
         backpackScroll?.SetItemCount(((bag?.Length??0)+12)/13,string.Empty);
         ItemStack inspection=null;
@@ -471,14 +484,36 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         for(int i=0;i<slots.Length;i++)
         {
             bool enabled=view!=null&&i<view.Capacity;
-            if(slots[i] is XUiC_RebirthBackpackSectionNativeSlot native){native.SlotNumber=i;ItemStack full=null;if(enabled)view.TryGetSlot(i,out full);native.ItemStack=full?.Clone()??ItemStack.Empty.Clone();}
-            var highlight=highlights[i]?.ViewComponent;if(highlight!=null)highlight.IsVisible=enabled&&i==selected;
-            if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.IsVisible=enabled;
+            if(slots[i] is XUiC_RebirthBackpackSectionNativeSlot native){native.SlotNumber=i;ItemStack full=null;if(enabled)view.TryGetSlot(i,out full);native.ItemStack=full??ItemStack.Empty.Clone();}
+            var highlight=highlights[i]?.ViewComponent;
+            bool selectedHighlight=enabled&&i==selected;
+            if(highlight!=null&&highlight.IsVisible!=selectedHighlight)highlight.IsVisible=selectedHighlight;
+            var slotView=slots[i]?.ViewComponent;
+            if(slotView!=null&&slotView.IsVisible!=enabled)slotView.IsVisible=enabled;
             string itemId=string.Empty;int count=0;if(enabled)view.TryGetDisplaySlot(i,out itemId,out count);
             var item=string.IsNullOrEmpty(itemId)?null:ItemClass.GetItem(itemId,false)?.ItemClass;
-            if(icons[i]!=null){icons[i].IsVisible=item!=null;if(item!=null)icons[i].SpriteName=item.GetIconName();}
-            if(counts[i]!=null)counts[i].Text=item==null?string.Empty:count.ToString();
-            if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.ToolTip=item==null?Localization.Get("xuiRebirthTheoryEmpty"):string.Empty;
+            var icon=icons[i];
+            if(icon!=null)
+            {
+                bool visible=item!=null;
+                if(icon.IsVisible!=visible)icon.IsVisible=visible;
+                if(visible)
+                {
+                    string sprite=item.GetIconName();
+                    if(icon.SpriteName!=sprite)icon.SpriteName=sprite;
+                }
+            }
+            var label=counts[i];
+            if(label!=null)
+            {
+                string displayCount=item==null?string.Empty:count.ToString();
+                if(label.Text!=displayCount)label.Text=displayCount;
+            }
+            if(slotView!=null)
+            {
+                string tip=item==null?Localization.Get("xuiRebirthTheoryEmpty"):string.Empty;
+                if(slotView.ToolTip!=tip)slotView.ToolTip=tip;
+            }
         }
         RebirthSelectedDurability.Render(this,"theorySelectedDurability",selectedBag>=0?bagControls[selectedBag]:selected>=0&&selected<slots.Length?slots[selected]:null);
     }

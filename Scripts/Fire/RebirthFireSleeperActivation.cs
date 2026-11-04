@@ -76,6 +76,7 @@ public static class RebirthFireSleeperActivation
     private static readonly HashSet<VolumeKey> ActivatedVolumes = new HashSet<VolumeKey>();
     private static readonly Dictionary<PrefabKey, float> FireAffectedPrefabs = new Dictionary<PrefabKey, float>();
     private static readonly List<PrefabKey> ExpiredPrefabKeys = new List<PrefabKey>();
+    private static float nextPrefabPrune;
 
     private const int MaxPendingVolumes = 128;
     private const int MaxVolumeStartsPerUpdate = 2;
@@ -209,6 +210,7 @@ public static class RebirthFireSleeperActivation
         ActivatedVolumes.Clear();
         FireAffectedPrefabs.Clear();
         ExpiredPrefabKeys.Clear();
+        nextPrefabPrune = 0f;
     }
 
     private static PrefabInstance FindPrefab(Vector3i position)
@@ -229,6 +231,11 @@ public static class RebirthFireSleeperActivation
     {
         if (FireAffectedPrefabs.Count == 0) return;
         float now = Time.realtimeSinceStartup;
+        // Falling-block admission checks the exact expiry itself. This pass only
+        // retires old associations, so scanning every tracked POI each frame
+        // provides no gameplay benefit.
+        if (now < nextPrefabPrune) return;
+        nextPrefabPrune = now + 1f;
         ExpiredPrefabKeys.Clear();
         foreach (KeyValuePair<PrefabKey, float> pair in FireAffectedPrefabs)
             if (pair.Value < now) ExpiredPrefabKeys.Add(pair.Key);

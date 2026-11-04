@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/nav_object_classes">
+    <nav_object_class name="FuriousRamsaySeeker">
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_enemy_dot" />
+        <property name="min_distance" value="0" />
+        <property name="max_distance" value="-1" />
+        <property name="color" value="255,0,0,255" />
+        <property name="has_pulse" value="true" />
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_enemy_dot" />
+        <property name="up_sprite_name" value="ui_game_symbol_enemy_dot_up" />
+        <property name="down_sprite_name" value="ui_game_symbol_enemy_dot_down" />
+        <property name="min_distance" value="3" />
+        <property name="max_distance" value="-1" />
+        <property name="max_scale_distance" value="64" />
+        <property name="color" value="255,0,0,255" />
+        <property name="has_pulse" value="false" />
+        <property name="icon_clamped" value="true" />
+      </compass_settings>
+      <onscreen_settings>
+        <property name="sprite_name" value="ui_game_symbol_enemy_dot" />
+        <property name="min_distance" value="1000" />
+        <property name="max_distance" value="-1" />
+        <property name="color" value="255,0,0,255" />
+        <property name="has_pulse" value="false" />
+        <property name="show_distance" value="true" />
+        <property name="max_scale_distance" value="64" />
+        <property name="offset" value="0,0,0" />
+        <property name="use_head_offset" value="false" />
+        <property name="show_offscreen" value="false" />
+      </onscreen_settings>
+    </nav_object_class>
+  </append>
+</configs>

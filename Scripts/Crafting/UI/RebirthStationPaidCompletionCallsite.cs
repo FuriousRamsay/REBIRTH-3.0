@@ -19,6 +19,8 @@ internal static class RebirthStationPaidCompletionCallsite
     // 3.4b9 has the exact same 494-byte completion body as b6, in a new image.
     private const string NativeMvid34b9="b181c006-3dca-4211-80fe-9efc360eeb10";
     private const string NativeImage34b9="086755F825EEE6ABD4A13789F2F428D9043D36C8C54EBB3B38A9518B4A5146FC";
+    private const string NativeMvid34b10="0dfd4a8c-e2eb-4a72-8af4-f69f7c5b1480";
+    private const string NativeImage34b10="CB54022CCC862AA673E0EE55DAFE67D842B364C80DF6916958D171E959656C58";
     private sealed class Fault { }
     private sealed class PendingCompletion
     {
@@ -140,6 +142,7 @@ internal static class RebirthStationPaidCompletionCallsite
         if(mvid==NativeMvid){expectedImage=NativeImage;expectedBody=NativeBody;}
         else if(mvid==NativeMvid34){expectedImage=NativeImage34;expectedBody=NativeBody34;}
         else if(mvid==NativeMvid34b9){expectedImage=NativeImage34b9;expectedBody=NativeBody34;}
+        else if(mvid==NativeMvid34b10){expectedImage=NativeImage34b10;expectedBody=NativeBody34;}
         else throw new InvalidOperationException("Unsupported native station version.");
         // Qualify one reviewed module/image/body tuple, never an independent cross-product.
         using(var sha=SHA256.Create())

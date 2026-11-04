@@ -26,16 +26,16 @@ public static class RebirthCamperInventorySnapshot
                     foreach (var entry in stack.itemValue.Metadata)
                         if (entry.Value == null) throw new InvalidDataException("Incomplete native item metadata.");
                 }
-                byte[] item;
+                byte[] item;int itemLength;
                 using (var native = new MemoryStream())
                 using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
                 {
                     Encoding previous=writer.Encoding;
-                    try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(native);stack.itemValue.Write(writer);writer.Flush();item=native.ToArray();}
+                    try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(native);stack.itemValue.Write(writer);writer.Flush();item=native.GetBuffer();itemLength=checked((int)native.Length);}
                     finally{writer.Encoding=previous;}
                 }
-                if (item.Length == 0 || item.Length > MaximumItemBytes) throw new InvalidDataException("Native item frame is too large.");
-                header.Write(stack.count); header.Write(item.Length); header.Write(item);
+                if (itemLength == 0 || itemLength > MaximumItemBytes) throw new InvalidDataException("Native item frame is too large.");
+                header.Write(stack.count); header.Write(itemLength); header.Write(item,0,itemLength);
             }
             header.Flush(); return memory.ToArray();
         }
@@ -53,6 +53,7 @@ public static class RebirthCamperInventorySnapshot
             if (length < 0 || length > short.MaxValue || length > (memory.Length - memory.Position) / 8)
                 throw new InvalidDataException("Invalid snapshot dimensions.");
             var result = new ItemStack[length];
+            byte[] expectedEmpty=null;
             for (int slot = 0; slot < length; slot++)
             {
                 int count = header.ReadInt32(), size = header.ReadInt32();
@@ -66,18 +67,21 @@ public static class RebirthCamperInventorySnapshot
                     // Accept only its exact current native encoding, never a failed decode
                     // of a populated item (including malformed/unsupported metadata).
                     value = new ItemValue();
-                    using (var empty = new MemoryStream())
-                    using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
+                    if(expectedEmpty==null)
                     {
-                        Encoding previous=writer.Encoding;
-                        try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(empty);value.Write(writer);writer.Flush();}
-                        finally{writer.Encoding=previous;}
-                        byte[] expected = empty.ToArray();
-                        if (count != 0 || expected.Length != item.Length)
-                            throw new InvalidDataException("Unsupported canonical native item snapshot; retain original custody.");
-                        for (int i = 0; i < expected.Length; i++)
-                            if (expected[i] != item[i]) throw new InvalidDataException("Invalid empty native item snapshot.");
+                        using (var empty = new MemoryStream())
+                        using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
+                        {
+                            Encoding previous=writer.Encoding;
+                            try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(empty);value.Write(writer);writer.Flush();}
+                            finally{writer.Encoding=previous;}
+                            expectedEmpty = empty.ToArray();
+                        }
                     }
+                    if (count != 0 || expectedEmpty.Length != item.Length)
+                        throw new InvalidDataException("Unsupported canonical native item snapshot; retain original custody.");
+                    for (int i = 0; i < expectedEmpty.Length; i++)
+                        if (expectedEmpty[i] != item[i]) throw new InvalidDataException("Invalid empty native item snapshot.");
                 }
                 result[slot] = new ItemStack(value, count);
             }

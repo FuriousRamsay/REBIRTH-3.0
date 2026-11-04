@@ -112,6 +112,7 @@ internal sealed class RebirthPoiWorldStore
                     long revision=expected.Revision+1;
                     var changed=new Dictionary<string,RebirthPoiClearanceLedger>(StringComparer.Ordinal);
                     var shards=expected.Shards.ToDictionary(p=>p.Key,p=>p.Value,StringComparer.Ordinal);
+                    List<string> orderedShardIds=null;
                     var seen=new HashSet<string>(StringComparer.Ordinal);
                     foreach(var identity in identities)
                     {
@@ -123,8 +124,11 @@ internal sealed class RebirthPoiWorldStore
                         RebirthPoiClearanceLedger successor;
                         if(!one.TryDiscover(binding.Scope,binding.WorldId,expected.Revision,identity,out successor))return RebirthPoiStoreResult.Conflict;
                         bool placed=false;
-                        foreach(var pair in shards.OrderBy(p=>p.Key,StringComparer.Ordinal).ToArray())
+                        if(orderedShardIds==null)
+                        {orderedShardIds=new List<string>(shards.Keys);orderedShardIds.Sort(StringComparer.Ordinal);}
+                        foreach(string shardId in orderedShardIds)
                         {
+                            var pair=new KeyValuePair<string,RebirthPoiClearanceLedger>(shardId,shards[shardId]);
                             if(pair.Value.Records.Count>=RebirthPoiWorldSnapshot.RecordsPerShard)continue;
                             var values=pair.Value.Records.ToDictionary(p=>p.Key,p=>p.Value,StringComparer.Ordinal);
                             values.Add(identity.Key,successor.Records[identity.Key]);
@@ -135,6 +139,7 @@ internal sealed class RebirthPoiWorldStore
                         {
                             if(shards.Count>=RebirthPoiWorldSnapshot.MaximumShards)return RebirthPoiStoreResult.Conflict;
                             string id=Guid.NewGuid().ToString("N");shards.Add(id,successor);changed.Add(id,successor);
+                            orderedShardIds.Insert(~orderedShardIds.BinarySearch(id,StringComparer.Ordinal),id);
                         }
                     }
                     if(changed.Count==0)return Witness(expected)?RebirthPoiStoreResult.Duplicate:RebirthPoiStoreResult.Conflict;

@@ -68,6 +68,7 @@ internal static partial class RebirthLogisticsOriginalTransport
     private static int physicalSendBytes;
     private static void PhysicalSendTick()
     {
+        if(physicalSends.Count==0)return;
         foreach(var pair in physicalSends.ToArray())
         {
             var value=pair.Value;
@@ -129,6 +130,7 @@ internal static partial class RebirthLogisticsOriginalTransport
     internal static void Tick()
     {
         if(!Active||!ThreadManager.IsMainThread())return;
+        if(jobs.Count==0)return;
         foreach(var pair in jobs.ToArray())
         {
             var job=pair.Value;
@@ -489,7 +491,7 @@ internal static partial class RebirthLogisticsOriginalTransport
     internal static void Request(EntityPlayerLocal player,QuickStackRadialAction action,string target,string selection,Action onCompleted=null)
     {
         if(!Active||player?.world?.IsRemote()!=true||!ReferenceEquals(player.world.GetPrimaryPlayer(),player))return;
-        RebirthLogisticsHeaderAdmission.Tick(player);
+        RebirthLogisticsHeaderAdmission.Tick(player,true);
         if(RebirthLogisticsOwnerReceipt.HasPendingOriginal(player)||RebirthLogisticsHeaderAdmission.HasPending){ClientTick();return;}
         if(!player.IsSpawned()||player.IsDead())return;
         clientWorld=player.world;clientOperation=Guid.NewGuid();clientEpoch=(ulong)DateTime.UtcNow.Ticks;clientRequest=1;

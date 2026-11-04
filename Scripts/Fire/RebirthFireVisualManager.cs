@@ -705,6 +705,9 @@ public static class RebirthFireVisualManager
                     soundCount++;
                 }
             }
+            // Later candidates cannot change either capped projection.
+            if (lightCount >= FireLightCap && soundCount >= FireSoundCap)
+                break;
         }
 
         // Final 2.6 kept extinguished positions only as re-ignition cooldowns.
@@ -1199,9 +1202,11 @@ public static class RebirthFireVisualManager
             if (light == null)
                 continue;
             bool shouldEnable = DesiredLight.Contains(position);
-            if (light.enabled && !shouldEnable)
+            bool enabled = light.enabled;
+            if (enabled && !shouldEnable)
                 lightsDisabled++;
-            light.enabled = shouldEnable;
+            if (enabled != shouldEnable)
+                light.enabled = shouldEnable;
         }
     }
 

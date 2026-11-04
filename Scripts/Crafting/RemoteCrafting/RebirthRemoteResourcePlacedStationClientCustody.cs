@@ -36,7 +36,8 @@ internal static partial class RebirthRemoteResourcePlacedStationClientCustody
         fresh.Add(original.Operation,new Capture{Entry=entry,Original=original,Station=station,Chunk=station.GetChunk()});return true;
     }
     internal static bool Blocks(TileEntityWorkstation station)=>RebirthRemoteResourcePlacedStationOriginal.CancellationBlocks(station)||station!=null&&
-        (held.Values.Any(value=>ReferenceEquals(value.Station,station)&&value.Current())||fresh.Values.Any(value=>ReferenceEquals(value.Station,station)&&value.Current()));
+        (held.Count>0&&held.Values.Any(value=>ReferenceEquals(value.Station,station)&&value.Current())||
+         fresh.Count>0&&fresh.Values.Any(value=>ReferenceEquals(value.Station,station)&&value.Current()));
     internal static bool OwnsOriginal(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)
         =>original!=null&&held.TryGetValue(original.Operation,out var hold)&&ReferenceEquals(hold.Player,player)&&hold.Original.Digest==original.Digest&&hold.Current()&&
             LockManager.Instance?.IsLockedByLocalPlayer(hold.Station,0)==true;

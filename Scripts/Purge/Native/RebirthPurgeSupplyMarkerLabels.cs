@@ -8,7 +8,7 @@ using UnityEngine;
 // Optional map presentation only. Native cache owns existence/position; crate stamps own access.
 internal static class RebirthPurgeSupplyMarkerLabels
 {
-    private sealed class Label { internal Vector3i Position; internal string Owner; }
+    private sealed class Label { internal Vector3i Position; internal string Owner,Player; }
     private static readonly Dictionary<int,Label> labels=new Dictionary<int,Label>();
     private static readonly Dictionary<Vector3i,string> positions=new Dictionary<Vector3i,string>();
     private static RebirthPoiWorldBinding binding;
@@ -35,8 +35,14 @@ internal static class RebirthPurgeSupplyMarkerLabels
     internal static void Capture(EntitySupplyCrate crate,string owner)
     {
         if(crate?.world==null||crate.world.IsRemote()||string.IsNullOrEmpty(owner)||labels.Count>=16384&&!labels.ContainsKey(crate.entityId))return;
-        labels[crate.entityId]=new Label{Position=new Vector3i(crate.position),Owner=owner};
+        Guid world;RebirthPurgeSupplyCrateStamp stamp;
+        string player=Guid.TryParseExact((crate.world as World)?.worldState?.Guid,"N",out world)&&RebirthPurgeSupplyCrateSerialization.TryReadAuthoritative(crate,world,out stamp)?stamp.Player:null;
+        labels[crate.entityId]=new Label{Position=new Vector3i(crate.position),Owner=owner,Player=player};
     }
+    // Owner filter is presentation only, never loot/access authority. Old v1
+    // labels have no stable key and fail closed until the original crate loads.
+    internal static bool Owned(int id,Vector3i position,string player)
+    {Label label;return binding!=null&&binding.IsCurrent&&labels.TryGetValue(id,out label)&&label.Position.Equals(position)&&label.Player==player;}
     internal static void Bind(AIDirectorAirDropComponent director)
     {
         if(director==null)return;
@@ -54,7 +60,8 @@ internal static class RebirthPurgeSupplyMarkerLabels
                 using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=4194304}))
                 {
                     var root=XDocument.Load(reader).Root;
-                    if(root==null||root.Name!="supply_marker_labels"||(string)root.Attribute("world")!=binding.NativeWorldId||(int?)root.Attribute("version")!=1)throw new FormatException("Marker label save differs from current world.");
+                    int? version=(int?)root?.Attribute("version");
+                    if(root==null||root.Name!="supply_marker_labels"||(string)root.Attribute("world")!=binding.NativeWorldId||version!=1&&version!=2)throw new FormatException("Marker label save differs from current world.");
                     int count=0;
                     var loaded=new Dictionary<int,Label>();
                     foreach(var node in root.Elements("label"))
@@ -63,7 +70,8 @@ internal static class RebirthPurgeSupplyMarkerLabels
                         int id=(int)node.Attribute("id");
                         string owner=RebirthPurgeDiscoveryNotification.CleanDisplayName((string)node.Attribute("owner"));
                         if(id<=0||string.IsNullOrEmpty(owner)||loaded.ContainsKey(id))throw new FormatException("Invalid supply marker label.");
-                        loaded.Add(id,new Label{Owner=owner,Position=new Vector3i((int)node.Attribute("x"),(int)node.Attribute("y"),(int)node.Attribute("z"))});
+                        string player=(string)node.Attribute("player");if(player!=null&&!RebirthPoiSupplyCredits.ValidKey(player))throw new FormatException("Invalid marker owner key.");
+                        loaded.Add(id,new Label{Owner=owner,Player=player,Position=new Vector3i((int)node.Attribute("x"),(int)node.Attribute("y"),(int)node.Attribute("z"))});
                     }
                     foreach(var pair in loaded)if(!labels.ContainsKey(pair.Key)&&labels.Count<16384)labels.Add(pair.Key,pair.Value);
                 }
@@ -130,8 +138,8 @@ internal static class RebirthPurgeSupplyMarkerLabels
         {
             if(!Safe())return;
             Reindex(__instance,false);
-            var root=new XElement("supply_marker_labels",new XAttribute("version",1),new XAttribute("world",binding.NativeWorldId));
-            foreach(var pair in labels)root.Add(new XElement("label",new XAttribute("id",pair.Key),new XAttribute("x",pair.Value.Position.x),new XAttribute("y",pair.Value.Position.y),new XAttribute("z",pair.Value.Position.z),new XAttribute("owner",pair.Value.Owner)));
+            var root=new XElement("supply_marker_labels",new XAttribute("version",2),new XAttribute("world",binding.NativeWorldId));
+            foreach(var pair in labels)root.Add(new XElement("label",new XAttribute("id",pair.Key),new XAttribute("x",pair.Value.Position.x),new XAttribute("y",pair.Value.Position.y),new XAttribute("z",pair.Value.Position.z),new XAttribute("owner",pair.Value.Owner),pair.Value.Player==null?null:new XAttribute("player",pair.Value.Player)));
             Directory.CreateDirectory(Path.GetDirectoryName(path));if(!Safe())return;
             new XDocument(root).Save(path+".tmp");
             if(File.Exists(path))File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);

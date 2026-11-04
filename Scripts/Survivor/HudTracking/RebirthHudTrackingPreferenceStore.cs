@@ -11,6 +11,7 @@ public sealed class RebirthHudTrackingPreferenceContext
     public string WorldKey = string.Empty;
     public string PlayerStorageKey = string.Empty;
     public string FilePath = string.Empty;
+    internal volatile bool Retired;
     public string DebugKey { get { return WorldKey + "/" + PlayerStorageKey; } }
 }
 
@@ -47,7 +48,17 @@ public static class RebirthHudTrackingPreferenceStore
                 error = "normalized world path is empty";
                 return false;
             }
-            string worldKey = RebirthStablePlayerIdentity.ComputeStorageKey(normalizedWorldPath);
+            // A path can be deleted and reused. It is not a world identity.
+            var world = GameManager.Instance?.World;
+            Guid worldId;
+            string worldText = world?.IsRemote() == true
+                ? GamePrefs.GetString(EnumGamePrefs.GameGuidClient) : world?.worldState?.Guid;
+            if (world == null || !Guid.TryParse(worldText, out worldId) || worldId == Guid.Empty)
+            {
+                error = "current world identity is unavailable";
+                return false;
+            }
+            string worldKey = RebirthStablePlayerIdentity.ComputeStorageKey(normalizedWorldPath + "|" + worldId.ToString("N"));
             string userData = (GameIO.GetUserGameDataDir() ?? string.Empty).Trim();
             if (userData.Length == 0)
             {
@@ -139,6 +150,7 @@ public static class RebirthHudTrackingPreferenceStore
     {
         error = string.Empty;
         if (context == null || string.IsNullOrEmpty(context.FilePath)) { error = "preference context is missing"; return false; }
+        if (context.Retired) { error = "preference world was deleted"; return false; }
         RebirthHudTrackingPreferences value = preferences != null ? preferences.Clone() : new RebirthHudTrackingPreferences();
         value.SchemaVersion = CurrentSchemaVersion;
         value.NormalizeOrder();

@@ -47,7 +47,7 @@ public static class RebirthStationGridQueue
                 if(bindAdditionalOutputs){writer.Write("REBIRTH-output-definition-v1");writer.Write(RebirthRecipeOutputs.DefinitionIdentity(source));}
             }
             using (var hash = SHA256.Create())
-                return BitConverter.ToString(hash.ComputeHash(bytes.ToArray())).Replace("-", "");
+                return BitConverter.ToString(hash.ComputeHash(bytes.GetBuffer(), 0, checked((int)bytes.Length))).Replace("-", "");
         }
     }
 

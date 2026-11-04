@@ -1,15 +1,21 @@
 <configs>
-  <!-- Default native trader sell markdown is 0.2. Preserve purchase value and
-       lower only selling value; colored/helper variants inherit these bases. -->
+  <!-- Preserve purchase/base value while lowering POI-bed resale. At 2600 and
+       1330 base values these scales start near 39 and 40 Dukes, leaving room
+       for up to 2.5x combined sell modifiers before the 100-Duke ceiling. -->
   <conditional>
     <if cond="xpath('/blocks/block[@name=&quot;bed02&quot; or @name=&quot;bunkBedMade&quot; or @name=&quot;gurneyBed&quot;]/property[@name=&quot;EconomicSellScale&quot;]') != null">
       <remove xpath="/blocks/block[@name='bed02' or @name='bunkBedMade' or @name='gurneyBed']/property[@name='EconomicSellScale']" />
     </if>
   </conditional>
   <append xpath="/blocks/block[@name='bed02']">
-    <property name="EconomicSellScale" value="0.19" />
+    <property name="EconomicSellScale" value="0.015" />
   </append>
   <append xpath="/blocks/block[@name='bunkBedMade' or @name='gurneyBed']">
-    <property name="EconomicSellScale" value="0.375" />
+    <property name="EconomicSellScale" value="0.03" />
+  </append>
+  <!-- Player-recoverable wheelchairs share the 1330 base value but had no
+       sell scale. Color variants inherit from the white base. -->
+  <append xpath="/blocks/block[@name='wheelchairWhite']">
+    <property name="EconomicSellScale" value="0.03" />
   </append>
 </configs>

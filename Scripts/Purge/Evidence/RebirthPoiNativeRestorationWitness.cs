@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 // One original native replacement. Missing ledger readiness never creates a new participant.
 internal sealed class RebirthPoiNativeRestorationWitness
@@ -39,13 +38,19 @@ internal sealed class RebirthPoiNativeRestorationWitness
             Volume.pendingSpawnMap.Count==initialPending&&!Volume.pendingSpawnMap.Contains(originalId)&&
             Volume.spawnsAvailable!=null&&Volume.spawnsAvailable.Contains(point)&&World.GetEntity(originalId)==null)
         { NativeDeferred=true;return false; }
-        var added=Volume.respawnMap.Keys.Where(id=>!initialIds.Contains(id)).ToArray();
-        if(Volume.respawnMap.ContainsKey(originalId)||added.Length!=1||initialIds.Any(id=>id!=originalId&&!Volume.respawnMap.ContainsKey(id))||
-            Volume.numSpawned!=initialSpawned||SleeperVolume.TickSpawnCount!=initialTick+1||Volume.pendingSpawnMap.Count!=initialPending+1||
-            !Volume.pendingSpawnMap.Contains(added[0])||!Volume.respawnMap.TryGetValue(added[0],out var native)||
-            native.className!=className||native.spawnPointIndex!=point||added[0]<=originalId)
+        int successorId=-1,addedCount=0;
+        foreach(var id in Volume.respawnMap.Keys)
+            if(!initialIds.Contains(id)){successorId=id;if(++addedCount>1)break;}
+        if(Volume.respawnMap.ContainsKey(originalId)||addedCount!=1)
         {failed=true;return false;}
-        successor=added[0];return true;
+        foreach(var id in initialIds)
+            if(id!=originalId&&!Volume.respawnMap.ContainsKey(id))
+            {failed=true;return false;}
+        if(Volume.numSpawned!=initialSpawned||SleeperVolume.TickSpawnCount!=initialTick+1||Volume.pendingSpawnMap.Count!=initialPending+1||
+            !Volume.pendingSpawnMap.Contains(successorId)||!Volume.respawnMap.TryGetValue(successorId,out var native)||
+            native.className!=className||native.spawnPointIndex!=point||successorId<=originalId)
+        {failed=true;return false;}
+        successor=successorId;return true;
     }
     internal int SuccessorEntityId=>successor;
     internal bool TryCompleteActualSpawn(EntityAlive entity,out RebirthPoiActorObservation observation)

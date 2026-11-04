@@ -11,6 +11,12 @@ using UnityEngine.Scripting;
 public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
 {
     private static readonly string[] HeatControls = { "toolsTitle", "cookingTools", "fuelTitle", "burnTimeLeft", "cookingFuel" };
+    private static readonly string[] LayoutBackgrounds = { "knownBg", "ingredientsBg", "resultBg", "stationBg", "rebirthCraftingQueueRegionBg", "rebirthCraftingInventoryRegionBg" };
+    private static readonly string[] ResultStatNames = { "Nutrition", "Water", "Comfort", "Time" };
+    private static readonly string[] StatSuffixes = { "Icon", "Label", "" };
+    private static readonly string[] FoodStatControls = { "statNutrition", "statWater", "statComfort", "statTime" };
+    private static readonly string[] ReferenceControls = { "referenceTitle", "referenceStatus", "prepStatus", "prepTrack", "prepProgress", "prepare", "bookReferenceIcon", "magazineReferenceIcon", "magazineReferenceText" };
+    private static readonly string[] BatchControls = { "batchMin", "batchMinus", "batchPlus", "batchMax" };
     private readonly RebirthCraftSkillPreview outcomeSkillPreview = new RebirthCraftSkillPreview();
 
     public readonly RebirthCookingPreparation Preparation = new RebirthCookingPreparation();
@@ -241,7 +247,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
             return;
         }
         var actions=xui.playerUI.playerInput?.GUIActions;
-        if(actions!=null && UIInput.selection==null && !Find("substitutionPopup").ViewComponent.IsVisible && actions.DPad_Up.WasPressed && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput())Cook();
+        if(actions!=null && UIInput.selection==null && actions.DPad_Up.WasPressed && !Find("substitutionPopup").ViewComponent.IsVisible && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput())Cook();
         ApplyRecipeScroll(dt);
         if ((refresh -= dt) > 0) return;
         refresh = .75f;
@@ -267,6 +273,11 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         }
     }
     private void Show(string id,bool value) { var c=Find(id); if(c?.ViewComponent!=null)if(c.ViewComponent.IsVisible!=value)c.ViewComponent.IsVisible=value; }
+    private void Scale(string id,float value)
+    {
+        var transform=Find(id)?.ViewComponent?.UiTransform;
+        if(transform!=null)transform.localScale=Vector3.one*value;
+    }
     private void Move(XUiController c,int x,int y)
     {
         if(c?.ViewComponent==null)return;
@@ -284,14 +295,12 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(station.UsesSharedMillingPresentation)return;
         RebirthCamperStationScreenFrame.Apply(this);
         RebirthPersonalCraftingLayoutService.ApplySharedTopLayout(this,1856);
-        foreach(string id in new[]{"knownBg","ingredientsBg","resultBg","stationBg","rebirthCraftingQueueRegionBg","rebirthCraftingInventoryRegionBg"})
+        foreach(string id in LayoutBackgrounds)
             if(Find(id)?.ViewComponent is XUiV_Sprite bg)
             {var color=bg.Color;color.a=RebirthPersonalCraftingPanelOpacity.Alpha;if(bg.Color!=color)bg.Color=color;}
-        foreach(var item in new[]{new[]{"cookingTools","1"},new[]{"cookingFuel","1"},new[]{"cookingOutput","0.9"}})
-        {
-            var v=Find(item[0])?.ViewComponent;
-            if(v?.UiTransform!=null)v.UiTransform.localScale=Vector3.one*float.Parse(item[1],System.Globalization.CultureInfo.InvariantCulture);
-        }
+        Scale("cookingTools",1f);
+        Scale("cookingFuel",1f);
+        Scale("cookingOutput",.9f);
         Hide(xui.FindWindowGroupByName("windowpaging")?.Controller);
         Text("stationName",Localization.Get(station.Workstation)); Text("stationTitle","");
         if(Find("stationIcon")?.ViewComponent is XUiV_Sprite icon)
@@ -307,6 +316,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
     }
     private void ApplyRecipeScroll(float dt)
     {
+        if(dt>0f&&recipePixels==recipeTarget)return;
         int max=Math.Max(0,visibleRecipes.Count-RecipeRows)*44;
         recipeTarget=Mathf.Clamp(recipeTarget,0,max);
         recipePixels=Mathf.Clamp(Mathf.Lerp(recipePixels,recipeTarget,Mathf.Clamp01(dt*18)),0,max);
@@ -316,7 +326,13 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(Find("recipeViewport")?.ViewComponent is XUiV_Panel clip && clip.UiTransform!=null)
         {
             var panel=clip.UiTransform.GetComponent<UIPanel>();
-            if(panel!=null){var region=new Vector4(165,-176,330,352);if(panel.baseClipRegion!=region)panel.baseClipRegion=region;panel.clipping=UIDrawCall.Clipping.SoftClip;panel.clipSoftness=Vector2.zero;}
+            if(panel!=null)
+            {
+                var region=new Vector4(165,-176,330,352);
+                if(panel.baseClipRegion!=region)panel.baseClipRegion=region;
+                if(panel.clipping!=UIDrawCall.Clipping.SoftClip)panel.clipping=UIDrawCall.Clipping.SoftClip;
+                if(panel.clipSoftness!=Vector2.zero)panel.clipSoftness=Vector2.zero;
+            }
         }
         var track=Find("recipeTrack");
         RebirthScrollbarPresentation.Render(track,Find("recipeThumb"),new Vector2i(350,-124),
@@ -327,7 +343,21 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(!rendering)ReadInventoryCounts();
         string search=(Find("cookingSearch") as XUiC_TextInput)?.Text??"";
         bool previous=rendering;rendering=true;
-        try{return catalogue.Where(r=>station.IsMilling ? RebirthCapabilityService.EvaluateRecipe(xui.playerUI.entityPlayer,r.GetName()).IsAllowed : RebirthCookingCatalogue.Known(xui.playerUI.entityPlayer,r)).Where(r=>(category==0 || RebirthCookingCatalogue.IsDrink(r) == (category==2))).Where(r=>Localization.Get(r.GetName()).IndexOf(search,StringComparison.CurrentCultureIgnoreCase)>=0).OrderByDescending(r=>MissingTool(r)==null&&Feasible(r)>0).ToList();}
+        try
+        {
+            var ready=new List<Recipe>();
+            var unavailable=new List<Recipe>();
+            foreach(var recipe in catalogue)
+            {
+                if(!(station.IsMilling ? RebirthCapabilityService.EvaluateRecipe(xui.playerUI.entityPlayer,recipe.GetName()).IsAllowed : RebirthCookingCatalogue.Known(xui.playerUI.entityPlayer,recipe)))continue;
+                if(category!=0&&RebirthCookingCatalogue.IsDrink(recipe)!=(category==2))continue;
+                if(Localization.Get(recipe.GetName()).IndexOf(search,StringComparison.CurrentCultureIgnoreCase)<0)continue;
+                if(MissingTool(recipe)==null&&Feasible(recipe)>0)ready.Add(recipe);
+                else unavailable.Add(recipe);
+            }
+            ready.AddRange(unavailable);
+            return ready;
+        }
         finally{rendering=previous;}
     }
     private int Feasible(Recipe recipe)
@@ -465,23 +495,26 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         inventoryCounts.Clear();
         inventoryStateFingerprint=17;
         var player=xui.playerUI.entityPlayer;
-        var available=new List<ItemStack>(player.bag.ItemGrid.items);
+        foreach(var stack in player.bag.ItemGrid.items)CountAvailableStack(stack);
         var belt=player.inventory.ItemGrid.items;
         int beltLimit=RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length);
-        for(int i=0;i<beltLimit;i++)available.Add(belt[i]);
+        for(int i=0;i<beltLimit;i++)CountAvailableStack(belt[i]);
         if(RemoteResourcesRuntimePolicy.Enabled)
         {
-            if(player.world.IsRemote())RemoteResourceClientAvailability.AppendStacks(player,available);
-            else RemoteResourceSnapshotCache.Get(player).AppendClonedStacks(available);
-        }
-        foreach(var stack in available)
-        {
-            if(UsableCount(stack)==0)continue;
-            inventoryStateFingerprint=unchecked(inventoryStateFingerprint*31+FingerprintStack(stack));
-            inventoryCounts.TryGetValue(stack.itemValue.type,out int count);
-            long combined=(long)count+stack.count;inventoryCounts[stack.itemValue.type]=combined>int.MaxValue?int.MaxValue:(int)combined;
+            var remote=new List<ItemStack>();
+            if(player.world.IsRemote())RemoteResourceClientAvailability.AppendStacks(player,remote);
+            else RemoteResourceSnapshotCache.Get(player).AppendClonedStacks(remote);
+            foreach(var stack in remote)CountAvailableStack(stack);
         }
         RebirthCookingDiagnostics.Inventory(profile);
+    }
+    private void CountAvailableStack(ItemStack stack)
+    {
+        if(UsableCount(stack)==0)return;
+        inventoryStateFingerprint=unchecked(inventoryStateFingerprint*31+FingerprintStack(stack));
+        inventoryCounts.TryGetValue(stack.itemValue.type,out int count);
+        long combined=(long)count+stack.count;
+        inventoryCounts[stack.itemValue.type]=combined>int.MaxValue?int.MaxValue:(int)combined;
     }
     private int InventoryCount(ItemValue item)
     {
@@ -779,6 +812,25 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         return new[]{original}.Concat(choices).Distinct().Where(id=>id!=current&&
             !ghosts.Where((g,i)=>i!=slot&&g!=null).Any(g=>g.itemValue.ItemClass.GetItemName()==id)&&
             Available(ItemClass.GetItem(id))>=need).ToArray();
+    }
+    private bool HasAvailableSubstitute(int slot,RebirthCookingCatalogue.Dish dish)
+    {
+        if(station.IsMilling||selected==null||slot<0||slot>=selected.ingredients.Count)return false;
+        string original=selected.ingredients[slot].itemValue.ItemClass.GetItemName();
+        if(dish==null||!dish.Substitutes.TryGetValue(original,out var choices))return false;
+        string current=ghosts[slot]?.itemValue.ItemClass.GetItemName()??original;
+        if(!TryBatchQuantity(selected.ingredients[slot].count,batch,out int need))return false;
+        if(SubstituteCandidateAvailable(slot,original,current,need))return true;
+        foreach(string choice in choices)
+            if(SubstituteCandidateAvailable(slot,choice,current,need))return true;
+        return false;
+    }
+    private bool SubstituteCandidateAvailable(int slot,string id,string current,int need)
+    {
+        if(id==current)return false;
+        for(int i=0;i<ghosts.Length;i++)
+            if(i!=slot&&ghosts[i]!=null&&ghosts[i].itemValue.ItemClass.GetItemName()==id)return false;
+        return Available(ItemClass.GetItem(id))>=need;
     }
     private void ShowSubstitutes(int slot)
     {
@@ -1335,6 +1387,8 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(quantityInput!=null&&UIInput.selection!=quantityInput.uiInput&&quantityInput.Text!=batch.ToString())quantityInput.Text=batch.ToString();
         var craftAction=xui.playerUI.playerInput?.GUIActions?.DPad_Up;
         Text("cookShortcut",craftAction?.GetBindingString(false,_emptyStyle:XUiUtils.EmptyBindingStyle.EmptyString,_displayStyle:XUiUtils.DisplayStyle.KeyboardWithAngleBrackets)?.Trim('<','>')??"");
+        bool hasRecipeSubstitutes=false;
+        var selectedDish=!station.IsMilling&&selected!=null?RebirthCookingCatalogue.Get(selected.GetName()):null;
         for(int i=0;i<12;i++)
         {
             var g=ghosts[i];var loaded=slots[i].ItemStack;
@@ -1345,16 +1399,17 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
             Show("millingIngredientName"+i, milling && value != null);
             int have=value==null?0:InventoryCount(value)+UsableCount(loaded),need=g==null?(!loaded.IsEmpty()?Math.Max(1,loaded.count/batch)*batch:0):(TryGhostQuantity(i,batch,out int requiredTotal)?requiredTotal:int.MaxValue);
             Text("need"+i,value==null?"":need+" ["+(have>=need?"70C47E":"E05D5D")+"]("+have+")[-]");
-            var sub=!station.IsMilling&&selected!=null&&i<selected.ingredients.Count?RebirthCookingCatalogue.Get(selected.GetName()):null;
-            Show("sub"+i,AvailableSubstitutes(i).Length>0);
+            bool hasSubstitutes=HasAvailableSubstitute(i,selectedDish);
+            Show("sub"+i,hasSubstitutes);
+            if(i<9&&hasSubstitutes)hasRecipeSubstitutes=true;
             string tip=value==null?"":string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingIngredientTooltip", "{0}\nRequired: {1} | Available: {2}"),Localization.Get(value.ItemClass.GetItemName()),need,have);
-            if(sub!=null&&sub.Substitutes.TryGetValue(selected.ingredients[i].itemValue.ItemClass.GetItemName(),out var swaps))
+            if(selectedDish!=null&&i<selected.ingredients.Count&&selectedDish.Substitutes.TryGetValue(selected.ingredients[i].itemValue.ItemClass.GetItemName(),out var swaps))
                 tip+=string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingSubstitutionsTooltip", "\nSubstitutions: {0}\nUse the swap button to choose."),string.Join(", ",swaps.Select(s=>Localization.Get(s))));
             if(slots[i].SuggestedTooltip!=tip){slots[i].SuggestedTooltip=tip;slots[i].IsDirty=true;}
         }
         Text("resultName",result==null?RebirthSurvivorUiText.L("xuiRebirthCookingAddIngredients", "Add ingredients"):(hiddenRecipe?(milling ? Localization.Get("xuiRebirthStationUnfamiliarRecipe") : RebirthSurvivorUiText.L("xuiRebirthCookingUnfamiliarDish", "Unfamiliar dish")):Localization.Get(result.GetName())));
         if(Find("resultIcon")?.ViewComponent is XUiV_Sprite resultIcon)resultIcon.SpriteName=hiddenRecipe?UnknownIcon:result?.GetIcon()??"";
-        foreach(string stat in new[]{"Nutrition","Water","Comfort","Time"})Text("stat"+stat,"—");
+        foreach(string stat in ResultStatNames)Text("stat"+stat,"—");
         Text("outcomeName",result==null?(milling ? Localization.Get("xuiRebirthStationNoRecipe") : RebirthSurvivorUiText.L("xuiRebirthCookingNoMealSelected", "No meal selected")):(hiddenRecipe?(milling ? Localization.Get("xuiRebirthStationUnfamiliarRecipe") : RebirthSurvivorUiText.L("xuiRebirthCookingUnfamiliarDish", "Unfamiliar dish")):Localization.Get(result.GetName()))+" ×"+(result.count*batch));
         string skillId = result == null ? "skill.cooking" : RebirthServiceCraftSkillService.ClassifyRecipe(result.GetName());
         bool hasSkill = result != null && !string.IsNullOrEmpty(skillId);
@@ -1378,7 +1433,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         Recipe readyRecipe;string readyBlocker;bool ready=TryCookingPreflight(false,out readyRecipe,out readyBlocker);
         Text("outcomeStatus",missing!=null?"[FF9696]"+Localization.Get("xuiTools")+": "+missing+"[-]":missingFuel?"[F07070]"+Localization.Get("xuiRebirthMissingFuel")+"[-]":!ready?"[F07070]"+RebirthCookingPlayerMessages.Display(readyBlocker)+"[-]":milling?"[70C47E]"+Localization.Get("xuiRebirthStationReadyToProcess")+"[-]":"[70C47E]"+RebirthSurvivorUiText.L("xuiRebirthCookingReadyToCook","Ready to cook")+"[-]");
         Text("outcomeHint",missing!=null?"":result==null?RebirthSurvivorUiText.L("xuiRebirthCookingChooseRecipeHint", "Choose a recipe or assemble ingredients."):!loadedIngredients?RebirthSurvivorUiText.L("xuiRebirthCookingPullOrPlaceHint", "Pull ingredients or place them in the grid."):station.CraftingRequirementsValid(result)&&!RebirthCookingBatch.NeedsHeat(result)?milling ? Localization.Get("xuiRebirthMillingNoFuel") : RebirthSurvivorUiText.L("xuiRebirthCookingColdPreparation", "Cold preparation — no fuel required."):"");
-        Text("ingredientGuide",selected==null?milling ? Localization.Get("xuiRebirthMillingIngredientGuide") : RebirthSurvivorUiText.L("xuiRebirthCookingDiscoveryGuide", "Combine ingredients to discover a dish or make an improvised meal."):Enumerable.Range(0,9).Any(i=>AvailableSubstitutes(i).Length>0)?RebirthSurvivorUiText.L("xuiRebirthCookingSwapGuide", "Select a swap icon to choose an available alternative before pulling ingredients."):"");
+        Text("ingredientGuide",selected==null?milling ? Localization.Get("xuiRebirthMillingIngredientGuide") : RebirthSurvivorUiText.L("xuiRebirthCookingDiscoveryGuide", "Combine ingredients to discover a dish or make an improvised meal."):hasRecipeSubstitutes?RebirthSurvivorUiText.L("xuiRebirthCookingSwapGuide", "Select a swap icon to choose an available alternative before pulling ingredients."):"");
         string stats="";
         bool showEnergy=false;
         Text("mealQuality","");Text("actualComfort","");
@@ -1411,7 +1466,7 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
             if(hasMood)stats+=string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingBaseComfortStats", "\nBase comfort: {0}"),mood.BaseMoodInfluence.ToString("0.#"));
             stats+=string.Format(RebirthSurvivorUiText.L("xuiRebirthCookingOutputTimeStats", "\nOutput: {0}    Cook time: {1}"),result.count*batch,RebirthCookingHeat.FormatDuration(preview.craftingTime*batch));
         }
-        foreach(string suffix in new[]{"Icon","Label",""})
+        foreach(string suffix in StatSuffixes)
         {
             Show("statEnergy"+suffix,showEnergy);
             var time=Find("statTime"+suffix)?.ViewComponent;
@@ -1422,8 +1477,8 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         bool hasReferences = dish != null && (dish.Books.Count > 0 || dish.Magazines.Count > 0);
         Show("resultDescriptionReader", result != null && !foodResult);
         Text("resultDescription", result != null && !foodResult ? RebirthRecipeDescriptionText.GetForRecipe(result) : "");
-        foreach (string stat in new[] { "statNutrition", "statWater", "statComfort", "statTime" })
-            foreach (string suffix in new[] { "Icon", "Label", "" }) Show(stat + suffix, result == null || foodResult);
+        foreach (string stat in FoodStatControls)
+            foreach (string suffix in StatSuffixes) Show(stat + suffix, result == null || foodResult);
         Show("nonFoodStats", result != null && !foodResult && (!hasReferences || milling));
         if (result != null && !foodResult)
         {
@@ -1478,14 +1533,14 @@ public sealed partial class XUiC_RebirthCookingWorkspace : XUiController
         if(Find("prepProgress")?.ViewComponent is XUiV_Sprite bar)bar.Fill=Preparation.Progress(Now);
         Caption("prepare",remaining>0?RebirthSurvivorUiText.L("xuiRebirthCookingPrepareAgain", "PREPARE AGAIN"):RebirthSurvivorUiText.L("xuiRebirthCookingPrepare", "PREPARE"));
         Enable("prepare",!Preparation.IsPreparing&&!preparingRequest&&result!=null&&(book!=null||magazine!=null));
-        foreach (string id in new[] { "referenceTitle", "referenceStatus", "prepStatus", "prepTrack", "prepProgress", "prepare", "bookReferenceIcon", "magazineReferenceIcon", "magazineReferenceText" })
+        foreach (string id in ReferenceControls)
             Show(id, hasReferences);
 
         Enable("pullIngredients",!pulling&&!Preparation.IsPreparing&&selected!=null);
         Enable("cook",!Preparation.IsPreparing&&!preparingRequest&&!submittingCook&&result!=null&&missing==null&&loadedIngredients&&!queueOccupied);
         int maximum=Math.Max(1,MaximumBatch());
         bool adjust=!Preparation.IsPreparing&&!preparingRequest&&!submittingCook&&!pulling;
-        foreach(string id in new[]{"batchMin","batchMinus","batchPlus","batchMax"})
+        foreach(string id in BatchControls)
         {
             bool allowed=adjust&&(id=="batchMin"||id=="batchMinus"?batch>1:batch<maximum);
             Enable(id,allowed);

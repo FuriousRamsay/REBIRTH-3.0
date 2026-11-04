@@ -13,6 +13,10 @@ public sealed class XUiC_RebirthCraftingInfoWindow : XUiC_CraftingInfoWindow
 {
     private static readonly System.Reflection.FieldInfo RecipeField = AccessTools.Field(typeof(XUiC_CraftingInfoWindow), "recipe");
     private XUiController viewKnowledgeButton;
+    private RebirthCraftOutcomeService.Snapshot cachedOutcome;
+    private EntityPlayer outcomePlayer;
+    private Recipe outcomeRecipe;
+    private int outcomeFrame = -1, outcomeCount, outcomeTier;
 
     public override void Init()
     {
@@ -90,7 +94,16 @@ public sealed class XUiC_RebirthCraftingInfoWindow : XUiC_CraftingInfoWindow
         XUiC_RecipeCraftCount count = GetChildByType<XUiC_RecipeCraftCount>();
         int batches = count != null ? Math.Max(1, count.Count) : 1;
         EntityPlayer player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
-        return RebirthCraftOutcomeService.Build(player, selected, batches, SelectedCraftingTier);
+        int tier = SelectedCraftingTier;
+        int frame = Time.frameCount;
+        if (cachedOutcome == null || outcomeFrame != frame || outcomePlayer != player ||
+            outcomeRecipe != selected || outcomeCount != batches || outcomeTier != tier)
+        {
+            cachedOutcome = RebirthCraftOutcomeService.Build(player, selected, batches, tier);
+            outcomeFrame = frame; outcomePlayer = player; outcomeRecipe = selected;
+            outcomeCount = batches; outcomeTier = tier;
+        }
+        return cachedOutcome;
     }
 
     private static string GetKnowledgeFocusId(Recipe selected)

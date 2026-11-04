@@ -1,0 +1,11 @@
+<configs>
+  <conditional><if cond="character_progression('Rebirth')">
+    <setattribute xpath="/xui/window_group[@name='powersource']" name="open_backpack_on_open">false</setattribute>
+    <remove xpath="/xui/window_group[@name='powersource']/window[@name='windowNonPagingHeader']" />
+    <append xpath="/xui/window_group[@name='powersource']">
+      <window name="rebirthBankBackpack" />
+      <window name="rebirthBankItemInfo" />
+      <window name="rebirthPowerSourceWorkspace" />
+    </append>
+  </if></conditional>
+</configs>

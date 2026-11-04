@@ -170,6 +170,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     private XUiV_Label overviewBackpackName;
     private XUiV_Label overviewBeltName;
     private XUiV_Label overviewSupportName;
+    private XUiV_Label overviewDrinkSlotState;
     private string renderedSupportWaterItem = string.Empty;
 
     private string selectedProgressionSkillId = string.Empty;
@@ -196,6 +197,8 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     private XUiV_Sprite conditionSelectedIcon;
     private XUiV_Label conditionSelectedName;
     private XUiV_Label conditionSelectedCategory;
+    private XUiV_Sprite conditionSelectedDietIcon;
+    private XUiV_Label conditionSelectedDietName;
     private XUiV_Label conditionSelectedDuration;
     private XUiV_Label conditionSelectedDescription;
     private XUiV_Label conditionSelectedStatus;
@@ -290,7 +293,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         overviewBackgroundName = Label("survivorOverviewBackgroundName");
         Wire("btnPc134UnequipBackpack", delegate { RequestUnequip(RebirthSurvivorGearService.BackpackSlotId); });
         Wire("btnPc134UnequipBelt", delegate { RequestUnequip(RebirthSurvivorGearService.BeltSlotId); });
-        Wire("btnPc134UnequipSupport", delegate { if(!string.IsNullOrEmpty(RebirthOverviewWaterRequest.EquippedItem(xui.playerUI.entityPlayer)))RebirthOverviewWaterRequest.Dispatch(xui.playerUI.entityPlayer,null,true);else RequestUnequip(RebirthSurvivorGearService.SupportSlotId); });
         overviewBackpackIcon = Sprite("survivorOverviewGearBackpackIcon");
         overviewWalkmanIcon = Sprite("survivorOverviewGearWalkmanIcon");
         Wire("btnWalkmanLibrary", delegate { if(RebirthSurvivorGearService.HasEquippedWalkman(xui.playerUI.entityPlayer)) xui.playerUI.windowManager.Open("rebirthMusicLibrary",true); });
@@ -299,6 +301,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         overviewBackpackName = Label("survivorOverviewGearBackpackName");
         overviewBeltName = Label("survivorOverviewGearBeltName");
         overviewSupportName = Label("survivorOverviewGearSupportName");
+        overviewDrinkSlotState = Label("survivorOverviewDrinkSlotState");
 
         progressionSkillsContent = GetChildById("survivorProgressionSkillsContent");
         progressionKnowledgeContent = GetChildById("survivorProgressionKnowledgeContent");
@@ -394,6 +397,8 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         conditionSelectedIcon = Sprite("survivorConditionSelectedIcon");
         conditionSelectedName = Label("survivorConditionSelectedName");
         conditionSelectedCategory = Label("survivorConditionSelectedCategory");
+        conditionSelectedDietIcon = Sprite("survivorConditionSelectedDietIcon");
+        conditionSelectedDietName = Label("survivorConditionSelectedDietName");
         conditionSelectedDuration = Label("survivorConditionSelectedDuration");
         conditionSelectedDescription = Label("survivorConditionSelectedDescription");
         conditionSelectedStatus = Label("survivorConditionSelectedStatus");
@@ -680,7 +685,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
             if (metabolismChanged && !string.Equals(renderedSupportWaterItem,
                 RebirthOverviewWaterRequest.EquippedItem(livePlayer), StringComparison.Ordinal))
                 RenderOverviewGearSlot(RebirthSurvivorGearService.SupportSlotId, overviewSupportName, overviewSupportIcon,
-                    L("xuiRebirthSurvivorGearSupport", "Support"), "rb_slot_support");
+                    L("xuiRebirthSurvivorGearSupport", "Support"), "drinkJarGrey");
             return;
         }
         if (!force && !characterChanged && tab == Tab.Condition
@@ -882,7 +887,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         RenderOverviewGearSlot(RebirthSurvivorGearService.BackpackSlotId, overviewBackpackName, overviewBackpackIcon, L("xuiRebirthSurvivorGearBackpack", "Backpack"), "rb_slot_backpack");
         RenderOverviewGearSlot(RebirthSurvivorGearService.WalkmanSlotId, null, overviewWalkmanIcon, L("xuiRebirthGearSlotWalkman", "Walkman"), "WalkmanMod_FR");
         RenderOverviewGearSlot(RebirthSurvivorGearService.BeltSlotId, overviewBeltName, overviewBeltIcon, L("xuiRebirthSurvivorGearBelt", "Belt"), "rb_slot_belt");
-        RenderOverviewGearSlot(RebirthSurvivorGearService.SupportSlotId, overviewSupportName, overviewSupportIcon, L("xuiRebirthSurvivorGearSupport", "Support"), "rb_slot_support");
+        RenderOverviewGearSlot(RebirthSurvivorGearService.SupportSlotId, overviewSupportName, overviewSupportIcon, L("xuiRebirthSurvivorGearSupport", "Support"), "drinkJarGrey");
     }
 
     private void RenderOverviewTraits()
@@ -1148,17 +1153,23 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
             if(!string.IsNullOrEmpty(waterItem))itemId=waterItem;
         }
         string gearKind = slotId == RebirthSurvivorGearService.WalkmanSlotId ? "Walkman" : slotId == RebirthSurvivorGearService.BackpackSlotId ? "Backpack" : slotId == RebirthSurvivorGearService.BeltSlotId ? "Belt" : "Support";
-        SetVisible(ProjectionView("btnPc134Unequip" + gearKind), slotId==RebirthSurvivorGearService.SupportSlotId&&!string.IsNullOrEmpty(waterItem));
         var input=ProjectionView("survivorGearInput"+gearKind) as XUiC_RebirthSurvivorGearSlot;
         if(input!=null)input.EquippedItemId=itemId;
+        if(slotId==RebirthSurvivorGearService.SupportSlotId)
+            Set(overviewDrinkSlotState,
+                L(string.IsNullOrEmpty(itemId)?"xuiRebirthDrinkSlotEmptyState":"xuiRebirthDrinkSlotOccupiedState",
+                  string.IsNullOrEmpty(itemId)?"EMPTY":"IN SLOT"));
         if(slotId==RebirthSurvivorGearService.WalkmanSlotId)SetVisible(ProjectionView("btnWalkmanLibrary"),!string.IsNullOrEmpty(itemId));
         if (string.IsNullOrEmpty(itemId))
         {
             Set(label, emptyLabel);
-            SetTooltip(icon, emptyLabel + " — Empty\nEquip a compatible item from Inventory.");
-            bool walkman = slotId == RebirthSurvivorGearService.WalkmanSlotId;
-            SetSprite(icon, walkman ? "ItemIconAtlasGreyscale" : "RebirthUiIcons", emptyIcon,
-                new Color32(200,200,200,180));
+            SetTooltip(icon, slotId == RebirthSurvivorGearService.SupportSlotId
+                ? L("xuiRebirthDrinkSlotEmptyHint", "Drink slot — Empty\nPlace a drink from your backpack here.")
+                : emptyLabel + " — Empty\nEquip a compatible item from Inventory.");
+            bool drinkSlot = slotId == RebirthSurvivorGearService.SupportSlotId;
+            SetSprite(icon, drinkSlot ? "ItemIconAtlas" :
+                slotId == RebirthSurvivorGearService.WalkmanSlotId ? "ItemIconAtlasGreyscale" : "RebirthUiIcons", emptyIcon,
+                drinkSlot ? new Color32(110,110,110,175) : new Color32(200,200,200,180));
             return;
         }
         Set(label, emptyLabel);
@@ -1484,6 +1495,9 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         SetVisible(conditionSelectedIcon != null ? conditionSelectedIcon.Controller : null, hasSelected);
         if (!hasSelected)
         {
+            SetVisible(conditionSelectedDietIcon != null ? conditionSelectedDietIcon.Controller : null, false);
+            SetVisible(conditionSelectedDietName != null ? conditionSelectedDietName.Controller : null, false);
+            SetVisible(conditionSelectedCategory != null ? conditionSelectedCategory.Controller : null, true);
             Set(conditionSelectedName, L("xuiRebirthConditionNoneActive", "No conditions available"));
             Set(conditionSelectedCategory, string.Empty);
             Set(conditionSelectedDuration, string.Empty);
@@ -1503,7 +1517,19 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         SetVisible(conditionSelectedIcon != null ? conditionSelectedIcon.Controller : null, hasSelectedIcon);
         if (hasSelectedIcon) SetSprite(conditionSelectedIcon, string.IsNullOrEmpty(selected.Atlas) ? "RebirthSurvivorIcons" : selected.Atlas, selected.Icon, selected.IconColor);
         Set(conditionSelectedName, selected.Name);
+        bool isDietSatisfaction = string.Equals(selected.Id, "rebirth:diet_satisfaction", StringComparison.OrdinalIgnoreCase);
+        RebirthDietDefinition selectedDiet = null;
+        bool hasSelectedDiet = isDietSatisfaction && snapshot != null &&
+            RebirthSurvivorDefinitionRegistry.TryGetDiet(snapshot.DietId, out selectedDiet) && selectedDiet != null;
+        SetVisible(conditionSelectedCategory != null ? conditionSelectedCategory.Controller : null, !hasSelectedDiet);
+        SetVisible(conditionSelectedDietName != null ? conditionSelectedDietName.Controller : null, hasSelectedDiet);
+        SetVisible(conditionSelectedDietIcon != null ? conditionSelectedDietIcon.Controller : null, hasSelectedDiet);
         Set(conditionSelectedCategory, selected.Category);
+        if (hasSelectedDiet)
+        {
+            Set(conditionSelectedDietName, RebirthSurvivorUiText.L(selectedDiet.NameKey, selectedDiet.Id));
+            SetSprite(conditionSelectedDietIcon, "RebirthSurvivorIcons", selectedDiet.IconKey, Color.white);
+        }
         Set(conditionSelectedDuration, selected.Duration);
         Set(conditionSelectedDescription, selected.Description);
         SetTooltip(conditionSelectedDescription, selected.Description);

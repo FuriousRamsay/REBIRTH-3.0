@@ -176,15 +176,17 @@ public sealed class RebirthGearInventoryPlan
         if (stack.ItemData.Length == 0 || stack.ItemData.Length > 262144
             || stack.ItemData.Length > encodedBudget) return false;
         encodedBudget -= stack.ItemData.Length;
-        // Require canonical encoding so equivalent bytes cannot use different ledger keys.
-        try
-        {
-            byte[] bytes = Convert.FromBase64String(stack.ItemData);
-            if (bytes.Length == 0 || Convert.ToBase64String(bytes) != stack.ItemData) return false;
-        }
-        catch (FormatException) { return false; }
         long previous;
-        totals.TryGetValue(stack.ItemData, out previous);
+        if (!totals.TryGetValue(stack.ItemData, out previous))
+        {
+            // A key enters totals only after canonical validation in this call.
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(stack.ItemData);
+                if (bytes.Length == 0 || Convert.ToBase64String(bytes) != stack.ItemData) return false;
+            }
+            catch (FormatException) { return false; }
+        }
         totals[stack.ItemData] = previous + (long)sign * stack.Count;
         return true;
     }

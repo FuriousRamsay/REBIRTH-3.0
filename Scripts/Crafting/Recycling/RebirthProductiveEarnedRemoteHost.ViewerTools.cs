@@ -93,6 +93,7 @@ internal static partial class RebirthProductiveEarnedRemoteHost
             RebirthProductiveEarnedArtifact.RemoteAuthority(value.Actor,value.Sender,station,value.Creation));
     private static void PruneReleasedViewerTools()
     {
+        if(pending.Count==0)return;
         foreach(var value in pending.Values.Where(item=>item.ViewerToolsOnly&&(item.ViewerToolsReleased&&item.Tools?.Saved==true||item.Tools==null)).ToArray())
         {
             if(ReferenceEquals(value.World,GameManager.Instance?.World)&&RebirthProductiveEarnedArtifact.RemoteAuthority(value.Actor,value.Sender,value.Station,value.Creation)&&

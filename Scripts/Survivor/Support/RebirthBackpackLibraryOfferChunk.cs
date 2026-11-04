@@ -10,17 +10,19 @@ public sealed class RebirthBackpackLibraryOfferChunk
     public int Index {get;private set;}
     private readonly byte[] payload;
     public int BodyLength=>(Guid.TryParse(CreationId,out _)?43:99)+payload.Length;
-    private RebirthBackpackLibraryOfferChunk(string creation,Guid transaction,int total,int index,byte[] bytes)
-    {CreationId=creation;TransactionId=transaction;TotalBytes=total;Index=index;payload=(byte[])bytes.Clone();}
+    private RebirthBackpackLibraryOfferChunk(string creation,Guid transaction,int total,int index,byte[] bytes,bool copy)
+    {CreationId=creation;TransactionId=transaction;TotalBytes=total;Index=index;payload=copy?(byte[])bytes.Clone():bytes;}
     public static bool TryCreate(Guid creation,Guid transaction,int total,int index,byte[] bytes,out RebirthBackpackLibraryOfferChunk chunk)
         =>TryCreate(creation.ToString("N"),transaction,total,index,bytes,out chunk);
     public static bool TryCreate(string creation,Guid transaction,int total,int index,byte[] bytes,out RebirthBackpackLibraryOfferChunk chunk)
+        =>TryCreate(creation,transaction,total,index,bytes,true,out chunk);
+    private static bool TryCreate(string creation,Guid transaction,int total,int index,byte[] bytes,bool copy,out RebirthBackpackLibraryOfferChunk chunk)
     {
         chunk=null;
         if(!RebirthSurvivorRequestScope.TryNormalize(creation,out var normalized)||transaction==Guid.Empty||total<=0||total>RebirthBackpackLibraryWireCodec.MaxBytes||
             index<0||index>=(total+RebirthBackpackLibraryOfferAssembly.ChunkBytes-1)/RebirthBackpackLibraryOfferAssembly.ChunkBytes||
             bytes==null||bytes.Length!=Math.Min(RebirthBackpackLibraryOfferAssembly.ChunkBytes,total-index*RebirthBackpackLibraryOfferAssembly.ChunkBytes))return false;
-        chunk=new RebirthBackpackLibraryOfferChunk(normalized,transaction,total,index,bytes);return true;
+        chunk=new RebirthBackpackLibraryOfferChunk(normalized,transaction,total,index,bytes,copy);return true;
     }
     public void Write(BinaryWriter writer)
     {
@@ -42,7 +44,7 @@ public sealed class RebirthBackpackLibraryOfferChunk
             int total=reader.ReadInt32(),index=reader.ReadInt32(),count=reader.ReadUInt16();
             if(count<=0||count>RebirthBackpackLibraryOfferAssembly.ChunkBytes)return false;
             var bytes=reader.ReadBytes(count);
-            return bytes.Length==count&&TryCreate(creation,transaction,total,index,bytes,out chunk);
+            return bytes.Length==count&&TryCreate(creation,transaction,total,index,bytes,false,out chunk);
         }
         catch{return false;}
     }

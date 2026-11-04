@@ -1,0 +1,13 @@
+{
+  "name": "Empty completion recovery remains observable through inventory open/close",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Profiler-owned disposable save only, safe cleared POI, inventory initially closed. Capture numeric scanAdmissions/emptySkips before and after this scenario; assert stable admissions and increasing skips separately. This scenario alone is not an FPS improvement proof."},
+    {"wait": 5},
+    {"expectPurge": {"checks": [{"field": "completionRecoveryDiagnostic", "op": "!=", "value": "unobserved"}]}},
+    {"action": {"command": "key", "args": {"name": "Tab"}}},
+    {"wait": 3},
+    {"action": {"command": "key", "args": {"name": "Escape"}}},
+    {"expectNoErrors": true}
+  ]
+}

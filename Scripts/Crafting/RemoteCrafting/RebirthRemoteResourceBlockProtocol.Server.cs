@@ -95,7 +95,8 @@ internal static partial class RebirthRemoteResourceBlockProtocol
             }
             catch{serverUnresolved.Add(operation);}
         }
-        var jobs=acceptedJobs.Values.ToArray();if(jobs.Length==0)return;
+        if(acceptedJobs.Count==0)return;
+        var jobs=acceptedJobs.Values.ToArray();
         for(int i=0;i<Math.Min(4,jobs.Length);i++){serverCursor%=jobs.Length;PumpAccepted(world,jobs[serverCursor++]);}
     }
     private static bool OwnerScope(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,bool originalLife)

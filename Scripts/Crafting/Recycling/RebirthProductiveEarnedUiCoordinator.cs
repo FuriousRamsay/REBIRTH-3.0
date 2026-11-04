@@ -73,10 +73,22 @@ internal static partial class RebirthProductiveEarnedUiCoordinator
         RebirthHarmonyBootstrap.PatchClassOnce(new HarmonyLib.Harmony("rebirth.productive.ui.queue.rotation"),typeof(RebirthProductiveEarnedUiQueueRotation));
         RebirthHarmonyBootstrap.PatchClassOnce(new HarmonyLib.Harmony("rebirth.productive.ui.queue.rotation"),typeof(RebirthProductiveEarnedUiQueueRefresh));
     }
-    internal static bool Blocks(TileEntityWorkstation station)=>station!=null&&station is not RebirthCamperStationState&&
-        (handoffs.Values.Any(value=>ReferenceEquals(value.Binding.Station,station)&&(value.Binding.RecipientSource!=null||value.Binding.LocalOwnerSource!=null))||RebirthProductiveEarnedUiRemote.BlocksQueueHandoff(station)||RebirthProductiveEarnedUiRemoteBefore.BlocksStation(station)||
-            RebirthProductiveEarnedUiOriginal.Enabled&&(coldUnknown||handoffs.Values.Any(value=>ReferenceEquals(value.Binding.Station,station))||
-                originals.Values.Any(value=>ReferenceEquals(value.Binding.Station,station)&&!value.TerminalSaved)));
+    internal static bool Blocks(TileEntityWorkstation station)
+    {
+        if (station == null || station is RebirthCamperStationState) return false;
+        foreach (var value in handoffs.Values)
+            if (ReferenceEquals(value.Binding.Station, station) &&
+                (value.Binding.RecipientSource != null || value.Binding.LocalOwnerSource != null)) return true;
+        if (RebirthProductiveEarnedUiRemote.BlocksQueueHandoff(station) ||
+            RebirthProductiveEarnedUiRemoteBefore.BlocksStation(station)) return true;
+        if (!RebirthProductiveEarnedUiOriginal.Enabled) return false;
+        if (coldUnknown) return true;
+        foreach (var value in handoffs.Values)
+            if (ReferenceEquals(value.Binding.Station, station)) return true;
+        foreach (var value in originals.Values)
+            if (ReferenceEquals(value.Binding.Station, station) && !value.TerminalSaved) return true;
+        return false;
+    }
     internal static bool BlocksCancellation(XUiC_RecipeStack card)=>Blocks(card?.GetParentByType<XUiC_WorkstationWindowGroup>()?.WorkstationData?.TileEntity);
     private static NativePublication BeginPublication(Original original,string purpose,byte[] expected,int offset)
     {

@@ -76,7 +76,14 @@ internal static class RebirthPoiRemoteRallyOwner
         if(now>=nextPrune)
         {
             nextPrune=now+1;
-            foreach(var key in peers.Where(p=>!p.Value.Current || p.Value.Expires<now).Select(p=>p.Key).ToArray())peers.Remove(key);
+            List<ClientInfo> stale=null;
+            foreach(var pair in peers)
+                if(!pair.Value.Current || pair.Value.Expires<now)
+                {
+                    if(stale==null)stale=new List<ClientInfo>();
+                    stale.Add(pair.Key);
+                }
+            if(stale!=null)foreach(var key in stale)peers.Remove(key);
         }
         if(pending==null)return;
         if(!pending.IsOriginalCurrent || !ReferenceEquals(GameManager.Instance?.World,clientWorld) || now>=deadline)

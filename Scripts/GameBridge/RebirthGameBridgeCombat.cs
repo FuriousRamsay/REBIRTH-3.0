@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using InControl;
 using Newtonsoft.Json.Linq;
 
@@ -57,6 +58,7 @@ public static class RebirthGameBridgeCombat
             case "/enemyspawns": EnemySpawns(req); return true;
             case "/lootbags": LootBagsEndpoint(req); return true;
             case "/loadout": RebirthGameBridgeSkills.Loadout(req); return true;
+            case "/weaponprofile": RebirthGameBridgeSkills.ObserveWeapon(req); return true;
             case "/skillsetup": RebirthGameBridgeSkills.SetupSkill(req); return true;
             case "/stationtoolsetup": RebirthGameBridgeStationToolSetup.Apply(req); return true;
             case "/purgeinformationpreview": RebirthGameBridgePurgeInformationPreview.Apply(req); return true;
@@ -2265,6 +2267,18 @@ public static class RebirthGameBridgeCombat
             ["vehicleForwardPressed"] = va != null && va.MoveForward.IsPressed, ["actionSetStack"] = ui != null ? string.Join(" > ", ui.ActionSetManager.PlayerActions.ConvertAll(s => s.GetType().Name + (s.Enabled ? "(on)" : "(off)")).ToArray()) : "",
             ["attached"] = true, ["engineRunning"] = veh.IsEngineRunning, ["fuel"] = veh.vehicle.GetFuelLevel(),
             ["speed"] = vr != null ? vr.velocity.magnitude : -1f, ["rbActive"] = veh.RBActive, ["kinematic"] = vr != null && vr.isKinematic,
+            ["velocityMaxForward"] = veh.vehicle.VelocityMaxForward,
+            ["velocityMaxTurboForward"] = veh.vehicle.VelocityMaxTurboForward,
+            ["motorTorqueForward"] = veh.vehicle.MotorTorqueForward,
+            ["motorTorqueTurboForward"] = veh.vehicle.MotorTorqueTurboForward,
+            ["rampLimit"] = veh.velocityMax, ["brakeTorque"] = veh.brakeTorque,
+            ["tuningPhysicsInstalled"] = HarmonyLib.Harmony.GetPatchInfo(HarmonyLib.AccessTools.Method(typeof(EntityVehicle),nameof(EntityVehicle.PhysicsFixedUpdate)))?.Prefixes.Any(
+                patch=>patch.PatchMethod.DeclaringType?.Name=="RebirthVehicleTuningPhysicsBaseline") ?? false,
+            ["coastBrakingInstalled"] = HarmonyLib.Harmony.GetPatchInfo(HarmonyLib.AccessTools.Method(typeof(EntityVehicle),nameof(EntityVehicle.SetWheelsForces)))?.Prefixes.Any(
+                patch=>patch.PatchMethod.DeclaringType?.Name=="RebirthCamperCoastBraking") ?? false,
+#if REBIRTH_DEBUG
+            ["driveAudit"] = new JArray(RebirthVehicleDriveAudit.Snapshot(veh)),
+#endif
             ["moveForward"] = veh.movementInput != null ? veh.movementInput.moveForward : -99f,
             ["moveStrafe"] = veh.movementInput != null ? veh.movementInput.moveStrafe : -99f,
             ["wheelMotor"] = veh.wheelMotor, ["motorTorque"] = veh.motorTorque, ["hasDriver"] = veh.hasDriver,

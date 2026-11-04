@@ -26,6 +26,7 @@ public static class RebirthCamperRemoteStationClient
         internal bool OverviewQueryPending;
     }
     private static readonly Dictionary<int,Session> sessions=new Dictionary<int,Session>();
+    private static readonly List<Session> sessionSnapshot=new List<Session>();
     public static bool IsReady {get;private set;}
     internal static Newtonsoft.Json.Linq.JObject CaptureCommandAudit(EntityPlayerLocal player)
     {
@@ -162,7 +163,10 @@ public static class RebirthCamperRemoteStationClient
     {
         if(!IsReady||!ThreadManager.IsMainThread()||sessions.Count==0)return;
         float now=UnityEngine.Time.realtimeSinceStartup;
-        foreach(var s in new List<Session>(sessions.Values))
+        sessionSnapshot.Clear();sessionSnapshot.AddRange(sessions.Values);
+        try
+        {
+        foreach(var s in sessionSnapshot)
         {
             // Retire presentation even when no command is pending or the old
             // remote World has ended. Durable originals remain in the outbox.
@@ -194,6 +198,8 @@ public static class RebirthCamperRemoteStationClient
             }
             catch(Exception error){s.CommandUncertain=true;Log.Warning("[CamperStation] Original status query retained: "+error.Message);}
         }
+        }
+        finally{sessionSnapshot.Clear();}
     }
     private static void ReceiveCore(EntityVehicle vehicle,Guid token,RebirthCamperTransferSnapshot snapshot,byte action,bool accepted)
     {

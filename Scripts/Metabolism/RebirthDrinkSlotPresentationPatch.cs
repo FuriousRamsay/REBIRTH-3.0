@@ -33,18 +33,18 @@ internal static class RebirthDrinkSlotPresentationPatch
         var views=Cache.GetValue(__instance,slot=>new Views(slot));
         if(views.Fill!=null)
         {
-            views.Fill.IsVisible=true;
+            if(!views.Fill.IsVisible)views.Fill.IsVisible=true;
             float fill=RebirthLiquidContainerService.GetFill01(stack.itemValue,definition);
             if(!Mathf.Approximately(views.Fill.Fill,fill))views.Fill.Fill=fill;
             if(views.Fill.Color!=Blue||views.Fill.Sprite?.color!=Blue)views.Fill.SetColorImmediately(Blue);
         }
-        if(views.Removed!=null)views.Removed.IsVisible=false;
+        if(views.Removed?.IsVisible==true)views.Removed.IsVisible=false;
         if(views.Count!=null)
         {
             if(views.LastCount!=stack.count){views.LastCount=stack.count;views.CountText=stack.count.ToString(CultureInfo.InvariantCulture);}
             string text=views.CountText;
             if(views.Count.Text!=text)views.Count.SetTextImmediately(text);
-            views.Count.Alignment=NGUIText.Alignment.Right;
+            if(views.Count.Alignment!=NGUIText.Alignment.Right)views.Count.Alignment=NGUIText.Alignment.Right;
         }
         RebirthSelectedDurability.RenderDragCursor(__instance);
     }

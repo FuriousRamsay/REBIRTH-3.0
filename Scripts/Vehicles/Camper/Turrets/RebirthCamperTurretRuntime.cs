@@ -66,22 +66,31 @@ internal sealed partial class RebirthCamperTurretRuntime
         if(Time.time<nextBind[corner])return null;nextBind[corner]=Time.time+2;
         return BindDue(corner,root);
     }
-    // Captured search predicates allocate only when a hierarchy search is due.
     private Gun BindDue(int corner,Transform root)
     {
         var t=root.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="REBIRTHCamperTurretSlot"+corner);if(!t)return null;
-        var g=new Gun{Corner=t,Yaw=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretYaw"),Pitch=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretPitch"),Muzzle=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretMuzzle")};
+        var g=new Gun{Corner=t};
+        Transform limits=null,yawLimits=null;
+        foreach(var child in t.GetComponentsInChildren<Transform>(true))
+        {
+            switch(child.name)
+            {
+                case "TurretYaw": if(!g.Yaw)g.Yaw=child;break;
+                case "TurretPitch": if(!g.Pitch)g.Pitch=child;break;
+                case "TurretMuzzle": if(!g.Muzzle)g.Muzzle=child;break;
+                case "TurretPitchLimits": if(!limits)limits=child;break;
+                case "TurretYawLimits": if(!yawLimits)yawLimits=child;break;
+            }
+        }
         if(!g.Yaw||!g.Pitch||!g.Muzzle)return null;
         // Asset metadata keeps old bundles compatible while allowing a new
         // whole-body rig to stop before its fixed inner bearing ring.
-        var limits=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretPitchLimits");
         if(limits)
         {
             var range=limits.localPosition;
             if(!float.IsNaN(range.x)&&!float.IsNaN(range.y)&&range.x>=-75&&range.x<0&&range.y>0&&range.y<=75)
             {g.PitchMinimum=range.x;g.PitchMaximum=range.y;}
         }
-        var yawLimits=t.GetComponentsInChildren<Transform>(true).FirstOrDefault(c=>c.name=="TurretYawLimits");
         if(yawLimits)
         {
             var range=yawLimits.localPosition;

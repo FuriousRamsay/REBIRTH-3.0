@@ -33,7 +33,7 @@ internal static partial class RebirthProductiveEarnedUiDeferredTransport
                 RebirthLogisticsEndpointIdentity.TryGetIncarnation(value.Scope.World,station,out var birth)&&birth==value.Scope.CustodyBirth.ToString("N"))return true;
         return false;
     }
-    internal static bool HasHostRecipientQueueAuthority=>ThreadManager.IsMainThread()&&hostOwners.Values.Any(value=>value.Final?.Current()==true);
+    internal static bool HasHostRecipientQueueAuthority=>ThreadManager.IsMainThread()&&hostOwners.Count>0&&hostOwners.Values.Any(value=>value.Final?.Current()==true);
     internal static bool TryGetReadyScope(Guid group,out RecipientScope scope)
     {
         scope=null;if(!ThreadManager.IsMainThread()||!hostOwners.TryGetValue(group,out var value)||!value.Ready||!value.Scope.Current())return false;

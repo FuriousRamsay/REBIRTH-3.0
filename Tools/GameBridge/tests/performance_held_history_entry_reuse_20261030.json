@@ -1,0 +1,15 @@
+{
+  "name": "Held-profile history native selection smoke",
+  "status": "AUTHORED_NOT_RUN",
+  "stopOnFailure": true,
+  "preconditions": "Lead-owned disposable game only, guard ON, safe player and separately prepared genuine melee/tool and ranged items in toolbelt slots1and2. Verify item/profile display across real slot switches; use existing authorized melee/ranged scenarios separately for native timing/delayed-hit acceptance when appropriate. This selection smoke does not attack, award progress, qualify projectile grace or measure FPS. Never run in the user's game or capture NPC profiling.",
+  "steps": [
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"wait":1},
+    {"action":{"command":"select","args":{"slot":2}}},
+    {"wait":1},
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"action":{"command":"state","args":{"Sections":"player,inventory"}}},
+    {"expectNoErrors":true}
+  ]
+}

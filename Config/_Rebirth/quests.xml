@@ -1,4 +1,7 @@
 <configs>
+  <!-- Remove direct native attribute-chip reward choices as well as loot routes.
+       Keep the quest and its other native rewards for existing saves. -->
+  <remove xpath="/quests/quest/reward[@id='modArmorPerception' or @id='modArmorStrength' or @id='modArmorFortitude' or @id='modArmorAgility' or @id='modArmorIntellect']"/>
   <!-- Normal jobs are available immediately; retain the quest definition for existing saves. -->
   <remove xpath="/quests/quest_list/quest[@id='intro_buried_supplies']"/>
   <setattribute xpath="/quests/quest_list/quest[@cvar='IntroComplete,TraderToTraderQuests']" name="cvar">TraderToTraderQuests</setattribute>
@@ -36,6 +39,8 @@
     <reward type="Item" id="vehicleBicyclePlaceable" value="1"/>
   </append>
   <!-- Direct native hunting rewards bypass loot groups. Keep reward choice and quantity. -->
+  <!-- The homesteading challenge also grants its schematic directly. -->
+  <setattribute xpath="/quests/quest/reward[@type='Item' and @id='plantedGraceCorn1Schematic']" name="id">rebirthTheoryFarmingPrimer</setattribute>
   <setattribute xpath="/quests/quest/reward[@type=&quot;Item&quot; and (@id='bookHuntingJournalCoyotes' or @id='bookHuntingJournalDeer' or @id='bookHuntingJournalWolves' or @id='bookHuntingJournalMountainLions' or @id='bookHuntingJournalBears')]" name="id">rebirthFieldNotesTracking</setattribute>
   <!-- REBIRTH trader introduction route: forest, desert, snow, wasteland, burnt. -->
   <set xpath="/quests/quest[@id='tier2_nexttrader']/objective[@type='Goto']/property[@name='location_tag']/@value">TraderBob</set>

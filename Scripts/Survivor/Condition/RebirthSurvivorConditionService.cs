@@ -18,6 +18,7 @@ public static class RebirthSurvivorConditionService
     }
 
     private static readonly Dictionary<int, RuntimeClock> Clocks = new Dictionary<int, RuntimeClock>();
+    private static readonly HashSet<int> LivePlayerIds = new HashSet<int>();
     private static readonly Dictionary<string, RebirthConditionResolvedSnapshot> ResolvedByStableKey = new Dictionary<string, RebirthConditionResolvedSnapshot>(StringComparer.Ordinal);
     private static bool installed;
     private static float nextGlobalTick;
@@ -85,6 +86,7 @@ public static class RebirthSurvivorConditionService
     private static void ResetRuntime()
     {
         Clocks.Clear();
+        LivePlayerIds.Clear();
         ResolvedByStableKey.Clear();
         nextGlobalTick = 0f;
     }
@@ -138,12 +140,13 @@ public static class RebirthSurvivorConditionService
         visibleChanged |= RebirthHealthCapacityService.Tick(player, record, elapsed);
         if (!string.IsNullOrEmpty(record.StablePlayerKey))
             ResolvedByStableKey[record.StablePlayerKey] = RebirthConditionResolver.Resolve(player, record, metabolism);
+        // Track condition mutations immediately; packet throttling must not hide them from shutdown persistence.
+        RebirthWorldCharacterService.MarkDirty(record, "condition-active-tick");
         clock.UnsyncedSeconds += elapsed;
         if (clock.UnsyncedSeconds < RebirthConditionRuntimeConfig.OwnerSyncSeconds && !visibleChanged) return;
         if (clock.UnsyncedSeconds < RebirthConditionRuntimeConfig.OwnerSyncSeconds) return;
 
         clock.UnsyncedSeconds = 0f;
-        RebirthWorldCharacterService.MarkDirty(record, "condition-active-tick");
         RebirthSurvivorNetworkService.SendOwnerState(player, Math.Max(0L, record.Revision - 1L), false, "condition-active-tick");
     }
 
@@ -157,11 +160,11 @@ public static class RebirthSurvivorConditionService
     private static void PruneDeadClocks(List<EntityPlayer> players)
     {
         if (Clocks.Count == 0) return;
-        HashSet<int> live = new HashSet<int>();
-        for (int i = 0; i < players.Count; i++) if (players[i] != null) live.Add(players[i].entityId);
+        LivePlayerIds.Clear();
+        for (int i = 0; i < players.Count; i++) if (players[i] != null) LivePlayerIds.Add(players[i].entityId);
         List<int> remove = null;
         foreach (KeyValuePair<int, RuntimeClock> pair in Clocks)
-            if (!live.Contains(pair.Key)) { if (remove == null) remove = new List<int>(); remove.Add(pair.Key); }
+            if (!LivePlayerIds.Contains(pair.Key)) { if (remove == null) remove = new List<int>(); remove.Add(pair.Key); }
         if (remove != null) for (int i = 0; i < remove.Count; i++) Clocks.Remove(remove[i]);
     }
 }

@@ -105,7 +105,7 @@ internal sealed class RebirthPoiNativeResetEnvelope
             int ordinal=i;var start=definition.startPos;var size=definition.size;var flags=definition.flags;var minimumCount=definition.spawnCountMin;var maximumCount=definition.spawnCountMax;
             authoredGuards.Add(()=>authored.Count==authoredCount&&authored[ordinal].startPos.Equals(start)&&authored[ordinal].size.Equals(size)&&authored[ordinal].flags==flags&&authored[ordinal].spawnCountMin==minimumCount&&authored[ordinal].spawnCountMax==maximumCount&&(authored[ordinal].minScript??string.Empty)==script&&WorldRoomSame(world,minimum,maximum,id,volume));
             if(volume==null){if(!noncombat)return false;continue;}
-            if(!ReferenceEquals(volume.prefabInstance,prefab)||!volume.BoxMin.Equals(minimum)||!volume.BoxMax.Equals(maximum)||volume.flags!=definition.flags||volume.spawnCountMin!=definition.spawnCountMin||volume.spawnCountMax!=definition.spawnCountMax||sleepers.ContainsKey(id))return false;
+            if(!ReferenceEquals(volume.prefabInstance,prefab)||!volume.BoxMin.Equals(minimum)||!volume.BoxMax.Equals(maximum)||!RebirthPoiSleeperShapePolicy.FlagsMatch(volume.flags,definition.flags)||volume.spawnCountMin!=definition.spawnCountMin||volume.spawnCountMax!=definition.spawnCountMax||sleepers.ContainsKey(id))return false;
             sleepers.Add(id,volume);if(noncombat)auxiliary.Add(id);else{if(!combat.Volumes.Contains(volume))return false;combatIds.Add(id);}
         }
         if(prefab.sleeperVolumes.Any(v=>v!=null&&!sleepers.Values.Contains(v)))return false;
@@ -124,6 +124,14 @@ internal sealed class RebirthPoiNativeResetEnvelope
     }
     private static bool WorldRoomSame(World world,Vector3i minimum,Vector3i maximum,int originalId,SleeperVolume original)
     {int current=world.FindSleeperVolume(minimum,maximum);return current==originalId&&(current<0||ReferenceEquals(world.GetSleeperVolume(current),original));}
+    private static bool ChunksCurrent(Target target)
+    {
+        var keys=new List<long>();foreach(long key in target.Prefab.GetOccupiedChunks())keys.Add(key);
+        if(keys.Count!=target.Entry.Plan.Chunks.Count)return false;
+        keys.Sort();
+        for(int i=0;i<keys.Count;i++)if(keys[i]!=target.Entry.Plan.Chunks[i])return false;
+        return true;
+    }
     internal bool IsBaseCurrent
     {
         get
@@ -134,8 +142,7 @@ internal sealed class RebirthPoiNativeResetEnvelope
                 for(int i=0;i<Targets.Count;i++)
                 {
                     var target=Targets[i];if(!ReferenceEquals(originalList[i],target.Prefab)||!target.Authored.IsOriginalAuthoredCurrent)return false;
-                    var keys=new List<long>();foreach(long key in target.Prefab.GetOccupiedChunks())keys.Add(key);
-                    if(!keys.OrderBy(k=>k).SequenceEqual(target.Entry.Plan.Chunks))return false;
+                    if(!ChunksCurrent(target))return false;
                 }
                 return true;
             }
@@ -180,8 +187,7 @@ internal sealed class RebirthPoiNativeResetEnvelope
                 for(int i=0;i<Targets.Count;i++)
                 {
                     var target=Targets[i];if(!ReferenceEquals(originalList[i],target.Prefab)||(target.Entry.Plan.IsAuthored?!target.TypedRuntimeCurrent(World):!target.Combat.StillMatches())||!target.AuthoredCurrent())return false;
-                    var keys=new List<long>();foreach(long key in target.Prefab.GetOccupiedChunks())keys.Add(key);
-                    if(!keys.OrderBy(k=>k).SequenceEqual(target.Entry.Plan.Chunks))return false;
+                    if(!ChunksCurrent(target))return false;
                     foreach(var pair in target.Sleepers)if(!ReferenceEquals(World.GetSleeperVolume(pair.Key),pair.Value)||World.FindSleeperVolume(pair.Value.BoxMin,pair.Value.BoxMax)!=pair.Key)return false;
                     foreach(var pair in target.Triggers)if(!ReferenceEquals(World.GetTriggerVolume(pair.Key),pair.Value)||World.FindTriggerVolume(pair.Value.BoxMin,pair.Value.BoxMax)!=pair.Key)return false;
                 }

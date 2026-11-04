@@ -14,8 +14,10 @@ internal static class RebirthPurgeInformationService
         internal string Id => Entry?.Id ?? TopicId;
         internal string Sprite;
         internal bool Manual;
+        internal bool AtReveal;
         internal float NotBefore;
-        // Open() only schedules the window: the request stays queued until OnOpen acknowledges it.
+        // Native OnOpen can acknowledge synchronously; presentation follows in
+        // the manager update. Keep the request until that callback is received.
         internal float RequestedAt;
         internal int Attempts;
         internal bool Acknowledged;
@@ -34,6 +36,18 @@ internal static class RebirthPurgeInformationService
     private static float nextBlockedTrace;
     // Retries after external closes are bounded per session; explicit player closes never retry.
     internal static int EarlyCloseRequeues;
+    internal static string Diagnostic(EntityPlayerLocal player)
+    {
+        var ui=LocalPlayerUI.GetUIForPlayer(player)?.windowManager;
+        var head=pending.Count>0?pending.Peek():null;
+        return "pending="+pending.Count+", head="+(head?.Id??"none")+", atReveal="+(head?.AtReveal??false)+
+            ", notBefore="+(head?.NotBefore??0)+", requestedAt="+(head?.RequestedAt??0)+", attempts="+(head?.Attempts??0)+
+            ", acknowledged="+(head?.Acknowledged??false)+", expiresAt="+(head?.ExpiresAt??0)+
+            ", lastBlock="+(lastBlockedReason??"none")+", spawned="+(player?.IsSpawned()??false)+
+            ", introAnimation="+(player?.bIntroAnimActive??false)+", handoff="+RebirthPurgeTruckStart.StartHandoffActive(player)+
+            ", modal="+(ui?.IsModalWindowOpen()??false)+", input="+(ui?.IsInputActive()??false)+
+            ", time="+Time.realtimeSinceStartup+", frame="+Time.frameCount;
+    }
     internal static void Acknowledge(string id)
     {
         foreach(var request in pending)if(request.Id==id&&request.RequestedAt>0)request.Acknowledged=true;
@@ -41,7 +55,8 @@ internal static class RebirthPurgeInformationService
     internal static void Reset(){EarlyCloseRequeues=0;pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredManualPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();lastBlockedReason=null;nextBlockedTrace=0;}
     private static void TraceBlocked(Pending request,string reason,float now)
     {
-        if(request==null||now<request.NotBefore+10f||
+        if(request==null||!RebirthPurgeIntroDiagnostics.Enabled||
+           (!request.AtReveal&&now<request.NotBefore+10f)||
            (lastBlockedReason==reason&&now<nextBlockedTrace))return;
         lastBlockedReason=reason;nextBlockedTrace=now+30f;
         Log.Out("[REBIRTH Purge Information] queued="+request.Id+" blocked="+reason);
@@ -90,9 +105,23 @@ internal static class RebirthPurgeInformationService
             else request.NotBefore=Math.Max(request.NotBefore,notBefore);
             return;
         }
-        float scheduled=manual?0:Math.Max(notBefore,id=="PurgeIntro"?Time.realtimeSinceStartup+5:0);
+        float scheduled=manual?0:Math.Max(Time.realtimeSinceStartup,notBefore);
         pending.Enqueue(new Pending{Player=player,Entry=entry,TopicId=id,Sprite=sprite,Manual=manual,
             NotBefore=scheduled,ExpiresAt=!manual&&id=="PurgeIntro"?scheduled+60f:0});
+    }
+    // Called only after the first-entry loading/attachment lease has retired.
+    internal static void RevealIntro(EntityPlayerLocal player)
+    {
+        var topic=RebirthPurgeInformationTopics.Find("PurgeIntro");
+        if(topic==null)return;
+        RebirthPurgeInformationTopics.Request(player,"PurgeIntro");
+        // First-entry briefing owns this reveal. Keep other queued teaching in order behind it.
+        var queued=pending.ToArray();pending.Clear();
+        foreach(var request in queued)if(ReferenceEquals(request.Player,player)&&request.Id=="PurgeIntro"&&!request.Manual)
+        {request.AtReveal=true;request.NotBefore=Time.realtimeSinceStartup;request.ExpiresAt=request.NotBefore+60f;pending.Enqueue(request);}
+        foreach(var request in queued)if(!(ReferenceEquals(request.Player,player)&&request.Id=="PurgeIntro"&&!request.Manual))pending.Enqueue(request);
+        if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] reveal entity="+player?.entityId+" queued="+pending.Count);
+        next=0;Pulse();
     }
     internal static void Pulse()
     {
@@ -107,7 +136,10 @@ internal static class RebirthPurgeInformationService
         if(pending.Count==0 && ReferenceEquals(restoredPlayer,currentPlayer) &&
             (receipts==null || ReferenceEquals(restoredReceipts,receipts))&&!supplyRecovery&&!manualRecovery)return;
         float now=Time.realtimeSinceStartup;
-        if(now<next)return;
+        // Closing native progress is queued. Until the reveal request is submitted, retry on
+        // the next UI frame instead of adding the ordinary half-second teaching poll delay.
+        bool revealWaiting=pending.Count>0&&pending.Peek().AtReveal&&pending.Peek().RequestedAt==0;
+        if(now<next&&!revealWaiting)return;
         next=now+.5f;
         if(manualRecovery)
         {
@@ -137,7 +169,7 @@ internal static class RebirthPurgeInformationService
         }
         if(currentPlayer!=null && !ReferenceEquals(restoredPlayer,currentPlayer))
         {
-            // The legacy startup quest opened the introduction after five seconds.
+            // The first-start handoff opens the introduction at gameplay reveal.
             // Journal unlock/dismissal supplies the existing per-save once-only state.
             RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,"PurgeIntro");
             List<RebirthJournalEntry> unread;
@@ -160,16 +192,22 @@ internal static class RebirthPurgeInformationService
                     var topic=RebirthPurgeInformationTopics.Find(entry.Id);
                     if(topic==null)continue;
                     RebirthPurgeInformationTopics.UnlockReadingRecipe(currentPlayer,topic);
-                    // The introduction belongs to the first-start handoff only. Restoring an
-                    // unread Journal entry must not spring it on a later login.
-                    if(entry.Id=="PurgeIntro")continue;
+                    // World-GUID-scoped unread introductions remain pending until actually dismissed.
+                    if(entry.Id=="PurgeIntro")
+                    {
+                        if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry))continue;
+                        bool introQueued=false;
+                        foreach(var queued in pending)if(queued.Player==currentPlayer&&queued.Id==entry.Id){introQueued=true;break;}
+                        if(!introQueued)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite,AtReveal=true});
+                        continue;
+                    }
                     // Dismissal hides the automatic window, not the earned reading recipe.
                     if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)||RebirthJournalGuideService.IsPurgeReadingOnly(entry)||
                         ReferenceEquals(readingPlayer,currentPlayer)&&readingOnly.Contains(entry.Id))continue;
                     bool exists=false;
                     foreach(var queued in pending)if(queued.Player==currentPlayer && queued.Id==entry.Id){exists=true;break;}
                     if(!exists)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite,
-                        NotBefore=entry.Id=="PurgeIntro"?now+5:0});
+                        NotBefore=0});
                 }
             }
         }
@@ -201,7 +239,9 @@ internal static class RebirthPurgeInformationService
         {pending.Dequeue();return;}
         // Opening during the starter-truck handoff (loading cover, intro animation) lets that startup close the
         // window unseen, and its close would then record the introduction as dismissed.
-        if(!request.Manual && (player.bIntroAnimActive||RebirthPurgeTruckStart.StartHandoffActive(player)))
+        // AtReveal is already protected by the truck loading/attachment lease.
+        // A lingering native revive-animation flag must not postpone visible gameplay's briefing.
+        if(!request.Manual && ((!request.AtReveal&&player.bIntroAnimActive)||RebirthPurgeTruckStart.StartHandoffActive(player)))
         {TraceBlocked(request,"start-handoff",now);return;}
         var ui=LocalPlayerUI.GetUIForPlayer(player);
         var manager=ui?.windowManager;
@@ -212,25 +252,39 @@ internal static class RebirthPurgeInformationService
                 !player.Spawned?"player-not-spawned":manager.IsInputActive()?"input-active":"modal-open",now);
             return;
         }
-        // Do not interrupt a player near a live hostile, even if their HUD is the only UI.
-        nearby.Clear();
-        world.GetEntitiesInBounds(typeof(EntityAlive),
-            new Bounds(player.position,new Vector3(100,100,100)),nearby);
-        bool unsafeToRead=false;
-        foreach(var entity in nearby)
+        // The owner requested the first-entry briefing at reveal, including when a
+        // hostile happens to be nearby. Ordinary teaching/manual reading keeps its safety gate.
+        if(!request.AtReveal)
         {
-            var alive=entity as EntityAlive;
-            if(alive!=null && alive!=player && !alive.IsDead() &&
-                (alive.EntityClass?.bIsEnemyEntity==true || alive.GetAttackTarget()==player ||
-                 alive is EntityRebirthNPC && FactionManager.Instance!=null &&
-                 RebirthNpcFactionCombatResolver.Classify(FactionManager.Instance.GetRelationshipValue(alive,player))==RebirthNpcCombatDisposition.Hostile))
-            {unsafeToRead=true;break;}
+            // Do not interrupt a player near a live hostile, even if their HUD is the only UI.
+            nearby.Clear();
+            world.GetEntitiesInBounds(typeof(EntityAlive),
+                new Bounds(player.position,new Vector3(100,100,100)),nearby);
+            bool unsafeToRead=false;
+            foreach(var entity in nearby)
+            {
+                var alive=entity as EntityAlive;
+                if(alive!=null && alive!=player && !alive.IsDead() &&
+                    (alive.EntityClass?.bIsEnemyEntity==true || alive.GetAttackTarget()==player ||
+                     alive is EntityRebirthNPC && FactionManager.Instance!=null &&
+                     RebirthNpcFactionCombatResolver.Classify(FactionManager.Instance.GetRelationshipValue(alive,player))==RebirthNpcCombatDisposition.Hostile))
+                {unsafeToRead=true;break;}
+            }
+            nearby.Clear();
+            if(unsafeToRead){TraceBlocked(request,"hostile-nearby",now);return;}
         }
-        nearby.Clear();
-        if(unsafeToRead){TraceBlocked(request,"hostile-nearby",now);return;}
+        // Native openInternal invokes OnOpen synchronously even while isShowing
+        // is queued for the next frame. Arm the acknowledgement BEFORE Open.
+        float previousRequest=request.RequestedAt;
+        int previousAttempts=request.Attempts;
+        request.RequestedAt=now;request.Attempts++;
         if(XUiC_RebirthPurgeInformation.Open(ui.xui,request.Entry,request.Sprite,request.Manual))
-        {request.RequestedAt=now;request.Attempts++;lastBlockedReason=null;nextBlockedTrace=0;}
-        else TraceBlocked(request,"window-controller-unavailable",now);
+        {lastBlockedReason=null;nextBlockedTrace=0;}
+        else
+        {
+            request.RequestedAt=previousRequest;request.Attempts=previousAttempts;
+            TraceBlocked(request,"window-controller-unavailable",now);
+        }
     }
 }
 
@@ -264,6 +318,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
         base.OnOpen();
         openedAt=Time.realtimeSinceStartup;playerClosed=false;
         if(entry!=null)RebirthPurgeInformationService.Acknowledge(entry.Id);
+        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] opened entity="+xui?.playerUI?.entityPlayer?.entityId+" frame="+Time.frameCount);
         if(title!=null)title.Text=entry?.Title??string.Empty;
         if(body!=null)body.Text=entry?.Body??string.Empty;
         if(art!=null)art.SpriteName=sprite??"ThePurgeTitle";
@@ -271,6 +326,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     }
     public override void OnClose()
     {
+        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] closed explicit="+playerClosed+" visibleSeconds="+(Time.realtimeSinceStartup-openedAt));
         // Dismissal is an explicit player action; see below.
         var player=xui?.playerUI?.entityPlayer;
         if(entry?.Authored==true&&player!=null&&
@@ -321,13 +377,15 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     internal static bool Open(XUi ui,RebirthJournalEntry guide,string image,bool manual=false)
     {
         var controller=ui?.GetChildByType<XUiC_RebirthPurgeInformation>();
-        if(controller==null || controller.windowGroup==null)return false;
+        if(controller==null || controller.windowGroup==null || ui.playerUI.windowManager.IsFullHUDDisabled())return false;
         controller.entry=guide;controller.sprite=image;controller.manualReading=manual;
         // Own the explicit Cancel press below: native auto-Escape closes on press,
         // before a release handler can mark this as a deliberate dismissal.
         ui.playerUI.windowManager.Open((GUIWindow)controller.windowGroup,true,true);
-        // WindowManager schedules opening; isShowing can remain false until its next update.
-        // Accept the request now so manual rereading cannot leave a duplicate queued.
+        // OnOpen acknowledges the admitted request; isShowing may still remain
+        // false until the manager's next update.
         return true;
     }
 }
+
+internal static class RebirthPurgeIntroDiagnostics { internal static bool Enabled=true; }

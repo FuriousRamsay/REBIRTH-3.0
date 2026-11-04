@@ -8,6 +8,7 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
 {
     internal EntityVehicle Vehicle;
     private readonly Dictionary<System.Guid,WireNode> cables=new Dictionary<System.Guid,WireNode>();
+    private readonly HashSet<System.Guid> live=new HashSet<System.Guid>();
     private float next;
     private void LateUpdate()
     {
@@ -16,7 +17,7 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
         RebirthCamperRelayWiring.Frame frame;
         try{frame=RebirthCamperRelayWiring.Read(Vehicle);}catch{return;}
         if(frame==null)return;
-        var live=new HashSet<System.Guid>();
+        live.Clear();
         // Share only this pass's successful relay lookups. Connection frame/stamp/tile
         // admission and transform positions are still observed for every external link.
         var relays=new RebirthCamperRelayWiring.RelayLookup();
@@ -49,7 +50,17 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
             node.SourcePosition=relay.position;node.LocalPosition=endpoint;
             if(node.gameObject.activeSelf!=show)node.gameObject.SetActive(show);
         }
-        foreach(var id in cables.Keys.Where(id=>!live.Contains(id)).ToArray()){if(cables[id])Object.Destroy(cables[id].gameObject);cables.Remove(id);}
+        // Most passes retain every cable. Allocate a removal snapshot only when
+        // needed; keep destruction outside dictionary enumeration as before.
+        List<System.Guid> removed=null;
+        foreach(var id in cables.Keys)
+            if(!live.Contains(id))
+            {
+                if(removed==null)removed=new List<System.Guid>();
+                removed.Add(id);
+            }
+        if(removed!=null)
+            foreach(var id in removed){if(cables[id])Object.Destroy(cables[id].gameObject);cables.Remove(id);}
     }
     private void OnDestroy(){foreach(var node in cables.Values)if(node)Object.Destroy(node.gameObject);cables.Clear();}
 }

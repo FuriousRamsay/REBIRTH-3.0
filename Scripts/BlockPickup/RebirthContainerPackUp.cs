@@ -147,7 +147,7 @@ public static class RebirthContainerPackUp
             foreach (var item in items) (item ?? ItemStack.Empty).Write(writer);
             writer.Flush();
             if (bytes.Length > MaxPayload / 2) throw new InvalidDataException("Packed container contents exceed payload limit");
-            return Convert.ToBase64String(bytes.ToArray());
+            return Convert.ToBase64String(bytes.GetBuffer(), 0, checked((int)bytes.Length));
         }
     }
     // Vehicle management uses the same packed-item representation as world

@@ -740,3 +740,17 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
 
     private static string L(string key, string fallback) { return RebirthUiProjectionTextCache.L(key, fallback); }
 }
+
+/// <summary>
+/// The closed manager overlay contains hundreds of passive display controls.
+/// Its opener is a sibling, so the parent can keep updating while these hidden
+/// descendants sleep. The normal native child update resumes when it opens.
+/// </summary>
+[Preserve]
+public sealed class XUiC_RebirthHudTrackingOverlay : XUiController
+{
+    public override void Update(float dt)
+    {
+        if (ViewComponent?.IsVisible == true) base.Update(dt);
+    }
+}
