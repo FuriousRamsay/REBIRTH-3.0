@@ -152,7 +152,9 @@ public static class RebirthEntityTraderExpandedJobGenerationPatch
                 // 2.6 parity: completed vanilla trader POIs never constrain
                 // SetupPosition. REBIRTH's listing Postfix applies active/recent
                 // repeat restrictions after a valid candidate exists.
-                __instance.usedPOILocations.Clear();
+                // Purge keeps them so each candidate takes the next nearest POI.
+                if (!RebirthSandboxOptionManager.Current.IsPurge)
+                    __instance.usedPOILocations.Clear();
 
                 if (quest.SetupPosition(
                         __instance,

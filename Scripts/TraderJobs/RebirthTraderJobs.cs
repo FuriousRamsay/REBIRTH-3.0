@@ -530,7 +530,11 @@ public static class RebirthEntityTraderJobListingPatch
     public static void Postfix(EntityTrader __instance, EntityPlayer player, int currentTier, ref List<Quest> __result)
     {
         if (__result == null) return;
+        int generatedOffers = __result.Count;
         RebirthPurgeTraderJobPolicy.Filter(GameManager.Instance?.World, __result);
+        bool purge = RebirthSandboxOptionManager.Current.IsPurge;
+        Vector3 traderOrigin = __instance.traderArea != null ? (Vector3)__instance.traderArea.Position : __instance.position;
+        if (purge) RebirthPurgeTraderJobPolicy.LogListing(__instance, generatedOffers, __result.Count);
 
         QuestJournal journal = player != null ? player.QuestJournal : null;
         int max = RebirthSandboxOptionManager.Current.MaxJobs;
@@ -580,7 +584,13 @@ public static class RebirthEntityTraderJobListingPatch
                 Age = pass == 2 ? prefabAge : physicalAge
             });
         }
-        ranked.Sort(CompareCandidates);
+        // Purge offers are the nearest non-cleared POIs, so distance decides who gets a slot.
+        if (purge)
+            ranked.Sort((a, b) =>
+                (a.Quest.Position - traderOrigin).sqrMagnitude.CompareTo(
+                    (b.Quest.Position - traderOrigin).sqrMagnitude));
+        else
+            ranked.Sort(CompareCandidates);
 
         int fetch = 0, buried = 0, restore = 0;
 
@@ -769,10 +779,11 @@ public static class RebirthEntityTraderJobListingPatch
 
         // 2.6 parity: random/type-valid selection happens first, then only the
         // accepted normal offers are sorted by distance for presentation.
+        Vector3 listOrigin = purge ? traderOrigin : player.position;
         filtered.Sort(
             (a, b) =>
-                (a.Position - player.position).sqrMagnitude.CompareTo(
-                    (b.Position - player.position).sqrMagnitude));
+                (a.Position - listOrigin).sqrMagnitude.CompareTo(
+                    (b.Position - listOrigin).sqrMagnitude));
 
         // Special progression jobs remain available independently of MaxJobs.
         for (int i = 0; i < specials.Count; i++)

@@ -22,6 +22,7 @@ public static class RebirthTraderJobsInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderQuantitySelectionPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTierVehicleDisplayPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTierVehicleItemPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderJobCardRefreshGate));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderJobsToNextTierPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthEntityTraderExpandedJobGenerationPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthEntityTraderJobListingPatch));

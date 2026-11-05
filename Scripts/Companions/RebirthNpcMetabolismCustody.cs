@@ -200,8 +200,14 @@ internal static partial class RebirthNpcMetabolismCustody
     }
     private static void RetireReplacedConsumptionWorld()
     {
-        if(!ThreadManager.IsMainThread())return;var world=GameManager.Instance?.World;if(world==null)return;
-        foreach(var original in pending.Values.Where(value=>!ReferenceEquals(value.World,world)||value.Actor!=null&&!ReferenceEquals(world.GetEntity(value.Actor.entityId),value.Actor)).ToArray())
+        // Runs every game update; almost always there is nothing pending.
+        if(pending.Count==0||!ThreadManager.IsMainThread())return;var world=GameManager.Instance?.World;if(world==null)return;
+        List<Original> replaced=null;
+        foreach(var value in pending.Values)
+            if(!ReferenceEquals(value.World,world)||value.Actor!=null&&!ReferenceEquals(world.GetEntity(value.Actor.entityId),value.Actor))
+                (replaced??(replaced=new List<Original>())).Add(value);
+        if(replaced==null)return;
+        foreach(var original in replaced)
         {
             // The full immutable WAL remains. This retires observations only;
             // neither a financial outcome nor a native receipt is fabricated.
@@ -209,7 +215,7 @@ internal static partial class RebirthNpcMetabolismCustody
         }
     }
     internal static void Tick()
-    {if(!ThreadManager.IsMainThread()||!nativeObserversInstalled)return;RetireReplacedConsumptionWorld();PumpOwnerObservationRetirement();RetireClientNativeObservations();RetireNpcBodyObservations();RetireNativeOwnerObservations();PumpColdNeverIssuedBodies();PumpColdConsumptionOriginals();foreach(var original in pending.Values.Take(4).ToArray())if(!original.Busy)Advance(original);}
+    {if(!ThreadManager.IsMainThread()||!nativeObserversInstalled)return;RetireReplacedConsumptionWorld();PumpOwnerObservationRetirement();RetireClientNativeObservations();RetireNpcBodyObservations();RetireNativeOwnerObservations();PumpColdNeverIssuedBodies();PumpColdConsumptionOriginals();if(pending.Count!=0)foreach(var original in pending.Values.Take(4).ToArray())if(!original.Busy)Advance(original);}
     private static void ObserveScenario(Original original,string stage)
     {
 #if REBIRTH_DEBUG

@@ -3,6 +3,38 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <append xpath="/gameevents">
+        <action_sequence name="rebirthCamperRewardFuel250">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="ammoGasCan"/>
+            <property name="added_item_counts" value="250"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthCamperRewardFuel500">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="ammoGasCan"/>
+            <property name="added_item_counts" value="500"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthCamperRewardFuel1000">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="ammoGasCan"/>
+            <property name="added_item_counts" value="1000"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthCamperRewardRecipe">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthCamperRecipeBundle"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
         <action_sequence name="rebirthLessonRewardFood">
           <property name="allow_user_trigger" value="false"/>
           <property name="action_type" value="Game"/>

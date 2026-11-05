@@ -159,6 +159,7 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("trader-placement", RebirthTraderPlacementExceptionsInstaller.Install);
                 RunStepOnce("trader-loot", RebirthTraderLootPolicyInstaller.Install);
                 RunStepOnce("trader-jobs", RebirthTraderJobsInstaller.Install);
+                RunStepOnce("trader-stations", RebirthTraderStationPlaceholdersInstaller.Install);
                 RunStepOnce("workstation-fuel", delegate
                 {
                     string report = RebirthWorkstationFuelPreservationInstaller.Install();

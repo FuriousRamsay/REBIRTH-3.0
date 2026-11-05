@@ -278,7 +278,7 @@ internal static class RebirthCookingOutputPlanPublication
             if(stage>0)
             {
                 if(stage==3&&station is RebirthCamperStationState mobile)
-                    accepted=RebirthCamperCookingQueueAdmission.TryRetireObservedOutput(player,mobile,recipe,()=>Current()&&RebirthCookingOutputDelivery.HasSavedOwner(identity,recipe,3));
+                    {accepted=RebirthCamperCookingQueueAdmission.TryRetireObservedOutput(player,mobile,recipe,()=>Current()&&RebirthCookingOutputDelivery.HasSavedOwner(identity,recipe,3));if(accepted)RebirthCamperChallenges.CreditMeal(player,recipe);}
                 else accepted=RebirthCookingOutputDelivery.HasSavedOwner(identity,recipe,stage)&&Current();
             }
             else

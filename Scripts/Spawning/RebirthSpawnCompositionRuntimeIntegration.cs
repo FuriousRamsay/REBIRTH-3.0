@@ -36,6 +36,17 @@ public static class RebirthSpawnCompositionRuntimeIntegration
         InstallPatch(typeof(RebirthSpawnBiomeContextPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthPurgeBiomeZombieSpawnPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnWanderingContextPatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthGamestageMultiplierPatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthScreamerMaxPatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthScreamerNights), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeSelection), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeStart), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeFrequencyPatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHerdSpawn), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeSizePatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHerdAfterHordeNight), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeDespawnWatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthWanderingHordeDespawnTimers), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnBloodMoonContextPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnSleeperContextPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthPoiRiskCharacterStatsBindingPatch), ref installed, ref failures);
@@ -155,7 +166,7 @@ public static class RebirthSpawnBiomeContextPatch
         {
             Surface = RebirthSpawnSurface.Biome,
             ProgressionMode = RebirthSpawnCompositionRuntimeIntegration.SelectedProgressionMode(),
-            GameStage = RebirthSpawnCompositionRuntimeIntegration.AmbientGameStage(__instance.world, _spawnData.area),
+            GameStage = RebirthEventSpawnPolicy.ApplyGamestage(RebirthSpawnCompositionRuntimeIntegration.AmbientGameStage(__instance.world, _spawnData.area)),
             Biome = RebirthSpawnCompositionRuntimeIntegration.BiomeName(__instance.world, _spawnData.biomeId),
             HistoryKey = "biome:" + _spawnData.biomeId
         });
@@ -176,7 +187,7 @@ public static class RebirthSpawnWanderingContextPatch
     {
         __state = false;
         if (__instance == null || __instance.spawnType == AIWanderingHordeSpawner.SpawnType.Bandits || !RebirthSpawnCompositionRuntimeIntegration.IsAuthoritative(_world)) return;
-        int gs = __instance.spawner != null ? Math.Max(0, __instance.spawner.partyLevel) : 0;
+        int gs = RebirthWanderingHerds.TryGet(__instance, out var hordeState) ? hordeState.GameStage : __instance.spawner != null ? Math.Max(0, __instance.spawner.partyLevel) : 0;
         RebirthSpawnCompositionRuntimeIntegration.Push(new RebirthSpawnContext
         {
             Surface = RebirthSpawnSurface.WanderingHorde,

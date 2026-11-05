@@ -68,10 +68,18 @@ public static class RebirthNpcTradeOfferRegistry
         }
     }
 
+    // Rebirth progression has no use for Legendary Parts. The list is built once per launch,
+    // but progression belongs to the world, so the check happens at lookup.
+    internal static bool HiddenInThisWorld(string itemKey)
+    {
+        return string.Equals(itemKey,"resourceLegendaryParts",StringComparison.OrdinalIgnoreCase)
+            && RebirthXmlOptionConditionResolver.IsCharacterProgression("Rebirth");
+    }
+
     public static bool TryResolve(string profileId, string itemKey, out RebirthNpcTradeOffer offer)
     {
         offer=null;
-        if(string.IsNullOrWhiteSpace(profileId)||string.IsNullOrWhiteSpace(itemKey))return false;
+        if(string.IsNullOrWhiteSpace(profileId)||string.IsNullOrWhiteSpace(itemKey)||HiddenInThisWorld(itemKey))return false;
         lock (Sync) return Offers.TryGetValue(Key(profileId, itemKey), out offer)
             || Offers.TryGetValue(Key("*", itemKey), out offer);
     }
@@ -89,6 +97,7 @@ public static class RebirthNpcTradeOfferRegistry
                 if(string.Equals(o.ProfileId,profileId,StringComparison.OrdinalIgnoreCase))selected[o.ItemKey]=o;
         }
         List<RebirthNpcTradeOffer> result=new List<RebirthNpcTradeOffer>(selected.Values);
+        result.RemoveAll(o=>HiddenInThisWorld(o.ItemKey));
         result.Sort(delegate(RebirthNpcTradeOffer a,RebirthNpcTradeOffer b){return string.Compare(a.ItemKey,b.ItemKey,StringComparison.OrdinalIgnoreCase);});return result.ToArray();
     }
     public static int Count { get { lock (Sync) return Offers.Count; } }

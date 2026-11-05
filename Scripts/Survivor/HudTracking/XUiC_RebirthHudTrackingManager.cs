@@ -231,6 +231,7 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
 
         Wire("btnSurvivorProgressionHudTracking", Open_OnPressed);
         Wire("btnSurvivorHudTrackingClose", Close_OnPressed);
+        Wire("pc136TrackingInputShield", Shield_OnPressed);
         Wire("btnSurvivorHudTrackingToggleEnabled", ToggleEnabled_OnPressed);
         Wire("btnSurvivorHudTrackingClear", Clear_OnPressed);
         Wire("btnSurvivorHudTrackingFilterSkill", delegate { SetFilter(RebirthHudTrackType.Skill); });
@@ -412,6 +413,21 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
     }
 
     private void Close_OnPressed(XUiController sender, int mouseButton) { CloseManager(); }
+    // The input shield spans the whole screen, including behind the panel's non-interactive areas.
+    private void Shield_OnPressed(XUiController sender, int mouseButton)
+    {
+        if (mouseButton != 0 && mouseButton != -1) return;
+        var transform = overlay?.ViewComponent?.UiTransform;
+        var camera = xui?.playerUI?.camera;
+        if (transform == null || camera == null) return;
+        var ray = camera.ScreenPointToRay((Vector3)xui.playerUI.CursorController.GetScreenPosition());
+        float distance;
+        if (!new Plane(transform.forward, transform.position).Raycast(ray, out distance)) return;
+        Vector3 local = transform.InverseTransformPoint(ray.GetPoint(distance));
+        Vector2i size = overlay.ViewComponent.Size;
+        bool inside = local.x >= 0f && local.x <= size.x && local.y <= 0f && local.y >= -size.y;
+        if (!inside) CloseManager();
+    }
 
     private void ToggleEnabled_OnPressed(XUiController sender, int mouseButton)
     {

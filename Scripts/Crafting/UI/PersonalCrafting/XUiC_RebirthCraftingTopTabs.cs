@@ -44,7 +44,8 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
         for (int i = 0; i < tabs.Length; i++)
             ApplyVisual(tabs[i], false);
         // Character shares this bar but does not run the Crafting layout service.
-        string[] names = { "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal", "Companions" };
+        // Companions is hidden until the feature is ready, and the remaining tabs share its width.
+        string[] names = { "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal" };
         int width = (ViewComponent.Size.x - 3 * (names.Length - 1)) / names.Length;
         for (int i = 0; i < names.Length; i++)
         {

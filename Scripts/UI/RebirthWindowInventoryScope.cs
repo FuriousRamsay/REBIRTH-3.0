@@ -16,6 +16,7 @@ public static class RebirthWindowInventoryScope
         if(Showing(ui,XUiC_RebirthSurvivorCharacter.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthPersonalCrafting.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthItemEditorHeader.ActiveInstance))return true;
+        if(Showing(ui,XUiC_RebirthPowerSourceWorkspace.ActiveInstance))return true;
         var manager=ui.playerUI?.windowManager;
         return manager!=null&&(manager.IsWindowOpen("rebirthBackpackLibrary")
             ||manager.IsWindowOpen("rebirthBackpackSellStash")

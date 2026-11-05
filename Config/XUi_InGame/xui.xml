@@ -1,6 +1,11 @@
 <configs>
   <include filename="../_Turret/turret_xui.xml" />
   <include filename="standalone_bank_xui.xml" />
+  <append xpath="/xui">
+    <window_group name="rebirthTradeAmmo">
+      <window name="windowRebirthTradeAmmo" />
+    </window_group>
+  </append>
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/xui/window_group[@name='trader']" name="controller">RebirthTraderWorkspace, RebirthUtils</setattribute>

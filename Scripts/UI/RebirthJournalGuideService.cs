@@ -106,7 +106,8 @@ public static class RebirthJournalGuideService
         bool loading = false;
         try
         {
-            string target = RebirthJournalStore.ResolvePath() + ".guides.xml";
+            string legacyTarget;
+            string target = RebirthJournalStore.ResolveGuideStatePath(out legacyTarget);
             // Force refreshes must not bypass a failed load's retry delay.
             // A different character/world remains immediately loadable.
             if(target==failedLoadPath&&Time.realtimeSinceStartup<nextLoadRetry)return;
@@ -124,10 +125,15 @@ public static class RebirthJournalGuideService
                         Body=Localization.Get((string)e.Element("body")), Type="Lore", Authored=true, Image=(string)e.Element("image") },
                     Trigger=(string)e.Attribute("trigger"), Challenges=((string)e.Attribute("challenges")??"").Split(',') });
                 }
-                if (File.Exists(path) || File.Exists(path+".bak"))
+                // Saves written before this state moved into the save folder keep their
+                // history: import once from the old location and leave that file untouched.
+                bool hasCurrent = File.Exists(path) || File.Exists(path+".bak");
+                string source = hasCurrent ? path : legacyTarget;
+                if (File.Exists(source) || File.Exists(source+".bak"))
                 {
                     XDocument saved; bool recovered; string error;
-                    if (!RebirthAtomicXmlFile.TryLoadFinalThenBackup(path,out saved,out recovered,out error) || saved.Root?.Name != "guideState")
+                    dirty = source != path;
+                    if (!RebirthAtomicXmlFile.TryLoadFinalThenBackup(source,out saved,out recovered,out error) || saved.Root?.Name != "guideState")
                         throw new IOException(error ?? "Invalid journal guide state");
                     foreach (var e in saved.Root.Elements("entry"))
                     {

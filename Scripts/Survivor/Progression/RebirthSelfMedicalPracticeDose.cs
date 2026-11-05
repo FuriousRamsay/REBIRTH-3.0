@@ -147,9 +147,9 @@ internal static class RebirthSelfMedicalPracticeDose
             if (method?.DeclaringType != typeof(ItemActionEat) ||
                 (method.Name != "consume" && method.Name != "ExecuteInstantAction")) return false;
             string mvid = method.Module.ModuleVersionId.ToString();
-            bool native34 = mvid == "47c87570-1f44-4ad3-872b-95a9f98d316c";
-            if (!native34 && mvid != "1a9a4203-3d95-4c90-b094-8926dec1ee9c") return false;
-            if (native34)
+            // Game patches rebuild the assembly without touching these methods, so 3.4 onward
+            // pins the exact method bodies. RewriteUnchangedOrExact then re-verifies every dose site.
+            if (mvid != "1a9a4203-3d95-4c90-b094-8926dec1ee9c")
             {
                 bool consume = method.Name == "consume";
                 var parameters = method.GetParameters();
@@ -171,12 +171,12 @@ internal static class RebirthSelfMedicalPracticeDose
                     if (BitConverter.ToString(hash.ComputeHash(il)).Replace("-", "") !=
                         (consume ? "C417DB13AC2DBE440FA64EF97DD1E0C007A8DB0FDABECD36C9B978E6451D7AC2" :
                         "B5CD857448E5263CDAB6019882D73432B5C07337D5CE5C12BA2EBB4E07242A79")) return false;
+                return true;
             }
             using (var stream = File.OpenRead(method.Module.Assembly.Location))
             using (var hash = SHA256.Create())
                 return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "") ==
-                    (native34 ? "874515D3B7DBE6E920D773887ECCE9DDF4C51D225C01E0A3E2EC394C02ED95F4" :
-                    "FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705");
+                    "FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705";
         }
         catch (Exception) { return false; }
     }

@@ -97,7 +97,24 @@ internal static class RebirthCamperPhysicalTargets
         float reach = Constants.cCollectItemDistance;
         return reach > 0 && (point - eye).sqrMagnitude < reach * reach && Clear(eye, point, p, v);
     }
+    // Up to five prompt and input callers ask this each frame; they share one physics query.
+    private static int focusedFrame = -1;
+    private static EntityPlayerLocal focusedPlayer;
+    private static EntityVehicle focusedVehicle;
+    private static string focusedTarget;
+    private static bool focusedResult;
     internal static bool TryGetFocused(EntityPlayerLocal p, out EntityVehicle vehicle, out string targetId)
+    {
+        int frame = Time.frameCount;
+        if (frame != focusedFrame || !ReferenceEquals(p, focusedPlayer))
+        {
+            focusedResult = FindFocused(p, out focusedVehicle, out focusedTarget);
+            focusedFrame = frame; focusedPlayer = p;
+        }
+        vehicle = focusedVehicle; targetId = focusedTarget;
+        return focusedResult;
+    }
+    private static bool FindFocused(EntityPlayerLocal p, out EntityVehicle vehicle, out string targetId)
     {
         vehicle = null; targetId = null;
         if (!PlayerCurrent(p) || Constants.cCollectItemDistance <= 0) return false;

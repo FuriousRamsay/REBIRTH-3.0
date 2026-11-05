@@ -58,7 +58,7 @@ public static class RebirthBackgroundBonusTextFallback
         {"xuiRebirthBackgroundBonusScholarAndMentor","Scholar and Mentor"},
         {"xuiRebirthBackgroundBonusScholarAndMentorDesc","Teachers learn Knowledge faster from books and training materials and students they teach gain a temporary learning bonus in that subject."},
         {"xuiRebirthBackgroundBonusNothingIsJunk","Nothing Is Junk / Expert Packing"},
-        {"xuiRebirthBackgroundBonusNothingIsJunkDesc","Recover more useful materials when dismantling. Expert Packing adds 13 usable backpack slots (one full inventory row). The extra row also adds 13 slots you can fill without becoming encumbered."},
+        {"xuiRebirthBackgroundBonusNothingIsJunkDesc","Recover more useful materials when dismantling. Expert Packing adds 11 usable backpack slots (one full inventory row). The extra row also adds 11 slots you can fill without becoming encumbered."},
     };
     public static string Get(string key,string fallback) => key!=null&&Text.TryGetValue(key,out var text)?text:fallback;
 }

@@ -189,6 +189,57 @@
   </append>
   <include filename="loot_player_sizes_26.xml"/>
   <include filename="loot_player_additional_sizes_26.xml"/>
+  <!-- 2.6 loose vehicle parts: pickup gives the listed part, one random roll for comma lists. -->
+  <append xpath="/blocks/block[@name='decoCarMotorFlat']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="smallEngine,partMotorcycleEngine_FR,partV6Engine_FR,partV8Engine_FR,smallEngine"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarMotorFlipped']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="smallEngine,partMotorcycleEngine_FR,partV6Engine_FR,partV8Engine_FR,smallEngine"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarRadiatorFlat']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partCarRadiator_FR,partTruckRadiator_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarRadiatorFlipped']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partCarRadiator_FR,partTruckRadiator_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarTireFlat']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partMinibikeWheel_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarTireFlat02']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partTruckWheel2_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarTireSmallFlat']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partBicycleWheel_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarTireSmallFlat02']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partMinibikeWheel_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarWheelFlat']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partCarWheel_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
+  <append xpath="/blocks/block[@name='decoCarWheelFlat02']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="ReplacementBlockName" value="partMilitaryTruckWheel_FR"/>
+    <property name="isReplacementItem" value="true"/>
+  </append>
   <include filename="snack_storage_26.xml"/>
   <include filename="legacy_broken_vending_bath_storage_26.xml"/>
 </configs>

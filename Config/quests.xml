@@ -4,4 +4,6 @@
       <include filename="_Rebirth/quests.xml"/>
     </if>
   </conditional>
+  <!-- Rebirth progression has no use for Legendary Parts. -->
+  <conditional><if cond="character_progression('Rebirth')"><remove xpath="/quests/quest/reward[@id='resourceLegendaryParts']"/></if></conditional>
 </configs>

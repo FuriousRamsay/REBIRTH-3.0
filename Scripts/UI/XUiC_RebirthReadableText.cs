@@ -46,7 +46,12 @@ public sealed class XUiC_RebirthReadableText : XUiController
         ViewComponent.Size=new Vector2i(width,height);
         if(viewport!=null)viewport.Size=new Vector2i(System.Math.Max(1,width-22),height);
         if(text!=null)text.Size=new Vector2i(System.Math.Max(1,width-30),height);
-        foreach(var child in Children)if(child.ViewComponent is XUiV_ScrollBar bar)RebirthScrollbarPresentation.SizeNativeHost(bar,height);
+        foreach(var child in Children)if(child.ViewComponent is XUiV_ScrollBar bar)
+        {
+            // The template places the bar from the authored width, so it must follow a resize.
+            bar.Position=new Vector2i(width-RebirthScrollbarPresentation.TrackWidth,bar.Position.y);
+            RebirthScrollbarPresentation.SizeNativeHost(bar,height);
+        }
         ResetReadingPosition();
     }
     public override void Update(float dt)

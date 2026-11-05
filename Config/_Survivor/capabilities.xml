@@ -1201,8 +1201,7 @@
   <capability id="capability.recipe.forge" category="metalworking" target_type="recipe" target_id="forge" visibility="visible">
     <requires_all>
       <knowledge id="procedure.metalworking.heat_treatment" />
-      <skill id="skill.metalworking" minimum="15" recommended="35" />
-      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="35" />
     </requires_all>
   </capability>
   <capability id="capability.recipe.workbench" category="construction" target_type="recipe" target_id="workbench" visibility="visible">

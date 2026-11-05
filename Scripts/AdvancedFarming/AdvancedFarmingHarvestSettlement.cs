@@ -83,13 +83,13 @@ internal static partial class AdvancedFarmingHarvestSettlement
     {
         if(chunk==null||world==null||!before.Captured)return;
         var after=chunk.GetBlock(local);
-        string key=SourceKey(local);
-        if(before.Block.Block is not BlockPlantGrowingRebirth&&before.Block.Block is not BlockWildCropPickupRebirth&&after.Block is not BlockPlantGrowingRebirth&&after.Block is not BlockWildCropPickupRebirth&&!chunk.ChunkCustomData.dict.ContainsKey(key))return;
+        if(before.Block.Block is not BlockPlantGrowingRebirth&&before.Block.Block is not BlockWildCropPickupRebirth&&after.Block is not BlockPlantGrowingRebirth&&after.Block is not BlockWildCropPickupRebirth&&(chunk.ChunkCustomData.dict.Count==0||!chunk.ChunkCustomData.dict.ContainsKey(SourceKey(local))))return;
         // Damage alone is the same physical stage. Replant/growth, replacement,
         // orientation change and replacement tile rotate identity. Unload does not.
         if(SameSourceStage(before.Block,after)&&ReferenceEquals(before.Tile,chunk.GetTileEntity(local)))return;
         AdvancedFarmingHarvestProtocol.SourceChanged(world,new Vector3i(chunk.X*16+local.x,local.y,chunk.Z*16+local.z));
         if(world.IsRemote())return;
+        string key=SourceKey(local);
         if(chunk.ChunkCustomData.dict.ContainsKey(key)){chunk.ChunkCustomData.Remove(key);chunk.isModified=true;}
     }
     internal static void InstallSourceIdentity(Harmony harmony)=>RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(AdvancedFarmingHarvestSourceCommit));

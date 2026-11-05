@@ -246,7 +246,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private bool workingShowClearedPois;
     private bool WorkingPurge => workingTheme == RebirthWorldTheme.Purge;
     [XuiXmlBinding("rebirth_theme_available")] public bool ThemeAvailable => RebirthPurgeReleasePolicy.Enabled;
-    [XuiXmlBinding("rebirth_theme_editable")] public bool ThemeEditable => !RebirthSandboxUiSession.IsExistingSaveContext;
+    // The session check reads the save folder from disk, so bindings share one answer per quarter second.
+    private float nextThemeEditableCheck;
+    private bool themeEditableCached;
+    [XuiXmlBinding("rebirth_theme_editable")] public bool ThemeEditable
+    {
+        get
+        {
+            if (Time.unscaledTime >= nextThemeEditableCheck)
+            {
+                nextThemeEditableCheck = Time.unscaledTime + .25f;
+                themeEditableCached = !RebirthSandboxUiSession.IsExistingSaveContext;
+            }
+            return themeEditableCached;
+        }
+    }
     [XuiXmlBinding("rebirth_theme_default")] public bool ThemeDefault => !WorkingPurge;
     [XuiXmlBinding("rebirth_theme_changed")] public bool ThemeChanged => GetBaselineState().Theme != workingTheme;
     [XuiXmlBinding("rebirth_show_cleared_pois_default")] public bool ShowClearedPoisDefault => !workingShowClearedPois;
@@ -926,6 +940,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             SeekerFrequency = workingSeekerFrequency,
             SeekerRestriction = workingSeekerRestriction,
             SeekerHordeDay = workingSeekerHordeDay,
+            KamikazeMode = workingKamikazeMode,
+            TornadoMode = workingTornadoMode,
+            ScreamerNights = workingScreamerNights,
+            TornadoMultiplier = workingTornadoMultiplier,
+            ScreamerMax = workingScreamerMax,
+            GamestageMultiplier = workingGamestageMultiplier,
+            BossEventZombieAnimals = workingBossEventZombieAnimals,
+            WanderingHordeFrequency = workingWanderingHordeFrequency,
+            WanderingHordeSize = workingWanderingHordeSize,
+            WanderingHerdRestriction = workingWanderingHerdRestriction,
+            DemolisherMode = workingDemolisherMode,
+            WanderingHerdChance = workingWanderingHerdChance,
+            WanderingHerdAfterHordeNight = workingWanderingHerdAfterHordeNight,
+            WanderingHerdDuration = workingWanderingHerdDuration,
+            WanderingHordeDespawn = workingWanderingHordeDespawn,
             ProtectCrate = workingProtectCrate
         };
     }
@@ -1007,6 +1036,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         workingSeekerFrequency = state.SeekerFrequency;
         workingSeekerRestriction = state.SeekerRestriction;
         workingSeekerHordeDay = state.SeekerHordeDay;
+        workingKamikazeMode = state.KamikazeMode;
+        workingTornadoMode = state.TornadoMode;
+        workingScreamerNights = state.ScreamerNights;
+        workingTornadoMultiplier = state.TornadoMultiplier;
+        workingScreamerMax = state.ScreamerMax;
+        workingGamestageMultiplier = state.GamestageMultiplier;
+        workingBossEventZombieAnimals = state.BossEventZombieAnimals;
+        workingWanderingHordeFrequency = state.WanderingHordeFrequency;
+        workingWanderingHordeSize = state.WanderingHordeSize;
+        workingWanderingHerdRestriction = state.WanderingHerdRestriction;
+        workingDemolisherMode = state.DemolisherMode;
+        workingWanderingHerdChance = state.WanderingHerdChance;
+        workingWanderingHerdAfterHordeNight = state.WanderingHerdAfterHordeNight;
+        workingWanderingHerdDuration = state.WanderingHerdDuration;
+        workingWanderingHordeDespawn = state.WanderingHordeDespawn;
         InvalidateWorkingProjection();
     }
 
@@ -1918,6 +1962,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.SeekerFrequency, ref workingSeekerFrequency, SeekerFrequencyValues);
         changed |= RandomizeEnumOption(RebirthSandboxOptionId.SeekerRestriction, ref workingSeekerRestriction, RebirthSeekerRestriction.Anywhere, RebirthSeekerRestriction.Off);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SeekerHordeDay, ref workingSeekerHordeDay);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.KamikazeMode, ref workingKamikazeMode, RebirthKamikazeMode.Never, RebirthKamikazeMode.Always);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.TornadoMode, ref workingTornadoMode, RebirthTornadoMode.BiomesOnly, RebirthTornadoMode.Never);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.ScreamerNights, ref workingScreamerNights, RebirthScreamerNightMode.None, RebirthScreamerNightMode.Higher);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.TornadoMultiplier, ref workingTornadoMultiplier, TornadoMultiplierValues);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.ScreamerMax, ref workingScreamerMax, ScreamerMaxValues);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.GamestageMultiplier, ref workingGamestageMultiplier, GamestageMultiplierValues);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.BossEventZombieAnimals, ref workingBossEventZombieAnimals);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.WanderingHordeFrequency, ref workingWanderingHordeFrequency, RebirthWanderingHordeFrequency.Off, RebirthWanderingHordeFrequency.Random);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.WanderingHordeSize, ref workingWanderingHordeSize, RebirthWanderingHordeSize.X1, RebirthWanderingHordeSize.Random);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.WanderingHerdRestriction, ref workingWanderingHerdRestriction, RebirthWanderingHerdRestriction.Low, RebirthWanderingHerdRestriction.Highest);
+        changed |= RandomizeEnumOption(RebirthSandboxOptionId.DemolisherMode, ref workingDemolisherMode, RebirthDemolisherMode.Never, RebirthDemolisherMode.Always);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.WanderingHerdChance, ref workingWanderingHerdChance, WanderingHerdChanceValues);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.WanderingHerdAfterHordeNight, ref workingWanderingHerdAfterHordeNight, WanderingHerdAfterHordeNightValues);
+        changed |= RandomizeIndexedIntegerOption(RebirthSandboxOptionId.WanderingHerdDuration, ref workingWanderingHerdDuration, WanderingHerdDurationValues);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.WanderingHordeDespawn, ref workingWanderingHordeDespawn);
         changed |= RandomizeEnumOption(RebirthSandboxOptionId.BossEvents, ref workingBossEventStartLevel, RebirthBossEventStartLevel.Off, RebirthBossEventStartLevel.PlayerLevel30);
         if (RebirthBossEventStartLevelPolicy.IsEnabled(workingBossEventStartLevel))
         {
@@ -2071,6 +2130,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxSeekerFrequency != null) cbxSeekerFrequency.OnValueChanged += SeekerFrequency_OnValueChanged;
         if (cbxSeekerRestriction != null) cbxSeekerRestriction.OnValueChanged += SeekerRestriction_OnValueChanged;
         if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.OnValueChanged += SeekerHordeDay_OnValueChanged;
+        if (cbxKamikazeMode != null) cbxKamikazeMode.OnValueChanged += KamikazeMode_OnValueChanged;
+        if (cbxTornadoMode != null) cbxTornadoMode.OnValueChanged += TornadoMode_OnValueChanged;
+        if (cbxScreamerNights != null) cbxScreamerNights.OnValueChanged += ScreamerNights_OnValueChanged;
+        if (cbxTornadoMultiplier != null) cbxTornadoMultiplier.OnValueChanged += TornadoMultiplier_OnValueChanged;
+        if (cbxScreamerMax != null) cbxScreamerMax.OnValueChanged += ScreamerMax_OnValueChanged;
+        if (cbxGamestageMultiplier != null) cbxGamestageMultiplier.OnValueChanged += GamestageMultiplier_OnValueChanged;
+        if (cbxBossEventZombieAnimals != null) cbxBossEventZombieAnimals.OnValueChanged += BossEventZombieAnimals_OnValueChanged;
+        if (cbxWanderingHordeFrequency != null) cbxWanderingHordeFrequency.OnValueChanged += WanderingHordeFrequency_OnValueChanged;
+        if (cbxWanderingHordeSize != null) cbxWanderingHordeSize.OnValueChanged += WanderingHordeSize_OnValueChanged;
+        if (cbxWanderingHerdRestriction != null) cbxWanderingHerdRestriction.OnValueChanged += WanderingHerdRestriction_OnValueChanged;
+        if (cbxDemolisherMode != null) cbxDemolisherMode.OnValueChanged += DemolisherMode_OnValueChanged;
+        if (cbxWanderingHerdChance != null) cbxWanderingHerdChance.OnValueChanged += WanderingHerdChance_OnValueChanged;
+        if (cbxWanderingHerdAfterHordeNight != null) cbxWanderingHerdAfterHordeNight.OnValueChanged += WanderingHerdAfterHordeNight_OnValueChanged;
+        if (cbxWanderingHerdDuration != null) cbxWanderingHerdDuration.OnValueChanged += WanderingHerdDuration_OnValueChanged;
+        if (cbxWanderingHordeDespawn != null) cbxWanderingHordeDespawn.OnValueChanged += WanderingHordeDespawn_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged += BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged += BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged += BossEventMaximumPerDay_OnValueChanged;
@@ -2170,6 +2244,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxSeekerFrequency != null) cbxSeekerFrequency.OnValueChanged -= SeekerFrequency_OnValueChanged;
         if (cbxSeekerRestriction != null) cbxSeekerRestriction.OnValueChanged -= SeekerRestriction_OnValueChanged;
         if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.OnValueChanged -= SeekerHordeDay_OnValueChanged;
+        if (cbxKamikazeMode != null) cbxKamikazeMode.OnValueChanged -= KamikazeMode_OnValueChanged;
+        if (cbxTornadoMode != null) cbxTornadoMode.OnValueChanged -= TornadoMode_OnValueChanged;
+        if (cbxScreamerNights != null) cbxScreamerNights.OnValueChanged -= ScreamerNights_OnValueChanged;
+        if (cbxTornadoMultiplier != null) cbxTornadoMultiplier.OnValueChanged -= TornadoMultiplier_OnValueChanged;
+        if (cbxScreamerMax != null) cbxScreamerMax.OnValueChanged -= ScreamerMax_OnValueChanged;
+        if (cbxGamestageMultiplier != null) cbxGamestageMultiplier.OnValueChanged -= GamestageMultiplier_OnValueChanged;
+        if (cbxBossEventZombieAnimals != null) cbxBossEventZombieAnimals.OnValueChanged -= BossEventZombieAnimals_OnValueChanged;
+        if (cbxWanderingHordeFrequency != null) cbxWanderingHordeFrequency.OnValueChanged -= WanderingHordeFrequency_OnValueChanged;
+        if (cbxWanderingHordeSize != null) cbxWanderingHordeSize.OnValueChanged -= WanderingHordeSize_OnValueChanged;
+        if (cbxWanderingHerdRestriction != null) cbxWanderingHerdRestriction.OnValueChanged -= WanderingHerdRestriction_OnValueChanged;
+        if (cbxDemolisherMode != null) cbxDemolisherMode.OnValueChanged -= DemolisherMode_OnValueChanged;
+        if (cbxWanderingHerdChance != null) cbxWanderingHerdChance.OnValueChanged -= WanderingHerdChance_OnValueChanged;
+        if (cbxWanderingHerdAfterHordeNight != null) cbxWanderingHerdAfterHordeNight.OnValueChanged -= WanderingHerdAfterHordeNight_OnValueChanged;
+        if (cbxWanderingHerdDuration != null) cbxWanderingHerdDuration.OnValueChanged -= WanderingHerdDuration_OnValueChanged;
+        if (cbxWanderingHordeDespawn != null) cbxWanderingHordeDespawn.OnValueChanged -= WanderingHordeDespawn_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged -= BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged -= BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged -= BossEventMaximumPerDay_OnValueChanged;
@@ -2539,6 +2628,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             PopulateBoolean(cbxDisableHiringRestrictions, workingDisableHiringRestrictions);
             PopulateBoolean(cbxSmartLooting, workingSmartLooting);
             PopulateSeekerOptions();
+            PopulateEventSpawnOptions();
+            PopulateWanderingHordeOptions();
             if (cbxBossEvents != null)
             {
                 cbxBossEvents.Elements.Clear();
@@ -2748,6 +2839,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             if (cbxSeekerFrequency != null) cbxSeekerFrequency.SelectedIndex = workingSeekerFrequency / 10;
             if (cbxSeekerRestriction != null) cbxSeekerRestriction.SelectedIndex = (int)workingSeekerRestriction;
             if (cbxSeekerHordeDay != null) cbxSeekerHordeDay.SelectedIndex = workingSeekerHordeDay ? 1 : 0;
+            if (cbxKamikazeMode != null) cbxKamikazeMode.SelectedIndex = (int)workingKamikazeMode;
+            if (cbxTornadoMode != null) cbxTornadoMode.SelectedIndex = (int)workingTornadoMode;
+            if (cbxScreamerNights != null) cbxScreamerNights.SelectedIndex = (int)workingScreamerNights;
+            if (cbxTornadoMultiplier != null) cbxTornadoMultiplier.SelectedIndex = System.Array.IndexOf(RebirthEventSpawnPolicy.TornadoSteps, workingTornadoMultiplier);
+            if (cbxScreamerMax != null) cbxScreamerMax.SelectedIndex = workingScreamerMax - 3;
+            if (cbxGamestageMultiplier != null) cbxGamestageMultiplier.SelectedIndex = (workingGamestageMultiplier - 50) / 10;
+            if (cbxBossEventZombieAnimals != null) cbxBossEventZombieAnimals.SelectedIndex = workingBossEventZombieAnimals ? 1 : 0;
+            if (cbxWanderingHordeFrequency != null) cbxWanderingHordeFrequency.SelectedIndex = (int)workingWanderingHordeFrequency;
+            if (cbxWanderingHordeSize != null) cbxWanderingHordeSize.SelectedIndex = (int)workingWanderingHordeSize;
+            if (cbxWanderingHerdRestriction != null) cbxWanderingHerdRestriction.SelectedIndex = (int)workingWanderingHerdRestriction;
+            if (cbxDemolisherMode != null) cbxDemolisherMode.SelectedIndex = (int)workingDemolisherMode;
+            if (cbxWanderingHerdChance != null) cbxWanderingHerdChance.SelectedIndex = workingWanderingHerdChance / 10;
+            if (cbxWanderingHerdAfterHordeNight != null) cbxWanderingHerdAfterHordeNight.SelectedIndex = workingWanderingHerdAfterHordeNight / 10;
+            if (cbxWanderingHerdDuration != null) cbxWanderingHerdDuration.SelectedIndex = workingWanderingHerdDuration - 1;
+            if (cbxWanderingHordeDespawn != null) cbxWanderingHordeDespawn.SelectedIndex = workingWanderingHordeDespawn ? 1 : 0;
             if (cbxBossEvents != null) cbxBossEvents.SelectedIndex = (int)workingBossEventStartLevel;
             if (cbxBossEventFrequency != null) cbxBossEventFrequency.SelectedIndex = (int)workingBossEventFrequency;
             if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.SelectedIndex = GetValueIndex(BossEventMaximumPerDayRandomizerValues, workingBossEventMaximumPerDay, 1);

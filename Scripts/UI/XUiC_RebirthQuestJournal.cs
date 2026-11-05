@@ -10,11 +10,47 @@ public sealed class XUiC_RebirthQuestBriefing : XUiC_QuestDescriptionWindow
 {
     private float nextRefresh;
     private Quest lastQuest;
+    private XUiV_Texture poiPreview;
+    private Texture poiCropped;
+    private Quest poiQuest;
+    private string poiUri=string.Empty,poiBoundUri=string.Empty,poiPlaceholder="rb_preview_missing";
+    public override void Init() {
+        base.Init();
+        poiPreview=GetChildById("questPoiPreview")?.ViewComponent as XUiV_Texture;
+    }
+    public override void Cleanup() {
+        XUiC_RebirthTraderJobCard.DetachPreview(poiPreview);
+        base.Cleanup();
+    }
+    private void ResolvePoiPreview() {
+        var q=CurrentQuest;
+        if(ReferenceEquals(poiQuest,q)&&poiUri.Length>0)return;
+        poiQuest=q;
+        poiPlaceholder="rb_preview_missing";
+        poiUri=q!=null?XUiC_RebirthTraderJobCard.PoiPreviewUri(q,out poiPlaceholder):string.Empty;
+    }
+    public override bool GetBindingValueInternal(ref string value,string bindingName) {
+        switch(bindingName) {
+            case "questpoipreviewuri":
+                ResolvePoiPreview();
+                // The binding owns loading, but this window owns disposing the replaced JPEG.
+                if(poiBoundUri!=poiUri){poiBoundUri=poiUri;poiCropped=null;XUiC_RebirthTraderJobCard.DetachPreview(poiPreview);}
+                value=poiUri;return true;
+            case "questpoipreviewvisible":ResolvePoiPreview();value=(poiUri.Length>0).ToString();return true;
+            case "questpoiplaceholdervisible":ResolvePoiPreview();value=(poiUri.Length==0).ToString();return true;
+            case "questpoiplaceholdersprite":ResolvePoiPreview();value=poiPlaceholder;return true;
+        }
+        return base.GetBindingValueInternal(ref value,bindingName);
+    }
     public override void Update(float dt) {
         base.Update(dt);
         var q=CurrentQuest;
+        var loaded=poiPreview?.Texture;
+        if(loaded!=null&&!ReferenceEquals(poiCropped,loaded)){poiCropped=loaded;XUiC_RebirthTraderJobCard.CropPreview(poiPreview,loaded);}
         if(q==lastQuest && Time.realtimeSinceStartup<nextRefresh)return;
         lastQuest=q;nextRefresh=Time.realtimeSinceStartup+.25f;
+        // A quest's location can arrive after it is first shown.
+        if(q!=null&&poiUri.Length==0){string missing=poiUri;ResolvePoiPreview();if(poiUri!=missing)RefreshBindings();}
         string state="Select a quest", tier="—", distance="—", tracking="—";
         if(q!=null){
             switch(q.CurrentState){

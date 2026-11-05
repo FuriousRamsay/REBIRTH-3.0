@@ -630,6 +630,7 @@ internal static partial class RebirthRepairOriginalCorrection
     }
     private static void PruneUploads(World world)
     {
+        if(Uploads.Count==0)return;
         foreach(var pair in Uploads.ToArray())
         {
             var upload=pair.Value;

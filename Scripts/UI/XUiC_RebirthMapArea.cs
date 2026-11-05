@@ -156,14 +156,34 @@ internal static class RebirthWideMapHover
 [Preserve]
 public sealed class XUiC_RebirthMapWaypointEntry : XUiC_MapWaypointListEntry
 {
-    public override void Update(float dt){base.Update(dt);if(Tracking!=null)Tracking.Color=new Color32(143,209,143,255);RebirthMapRowStyle.Apply(Background);}
+    private readonly RebirthMapRowDoubleClick doubleClick=new RebirthMapRowDoubleClick();
+    public override void Init(){base.Init();Background.Controller.OnPress+=(sender,button)=>{if(doubleClick.Press(Waypoint,button))waypointList.onShowOnMapPressed(sender,button);};}
+    // Style first: base.Update commits the view, so a native 64-grey deselect must not reach a rendered frame.
+    public override void Update(float dt){RebirthMapRowStyle.Apply(Background);base.Update(dt);if(Tracking!=null)Tracking.Color=new Color32(143,209,143,255);RebirthMapRowStyle.Apply(Background);}
 }
 [Preserve]
 public sealed class XUiC_RebirthMapInviteEntry : XUiC_MapInvitesListEntry
 {
     private XUiV_Sprite trackingIndicator;
-    public override void Init(){base.Init();trackingIndicator=GetChildById("Tracking")?.ViewComponent as XUiV_Sprite;}
-    public override void Update(float dt){base.Update(dt);if(trackingIndicator!=null)trackingIndicator.Color=new Color32(143,209,143,255);RebirthMapRowStyle.Apply(Background);}
+    private readonly RebirthMapRowDoubleClick doubleClick=new RebirthMapRowDoubleClick();
+    public override void Init(){base.Init();trackingIndicator=GetChildById("Tracking")?.ViewComponent as XUiV_Sprite;Background.Controller.OnPress+=(sender,button)=>{if(doubleClick.Press(Waypoint,button))waypointList.onInviteShowOnMapPressed(sender,button);};}
+    public override void Update(float dt){RebirthMapRowStyle.Apply(Background);base.Update(dt);if(trackingIndicator!=null)trackingIndicator.Color=new Color32(143,209,143,255);RebirthMapRowStyle.Apply(Background);}
+}
+// Pooled rows change waypoint while scrolling, so a double click must be on the same waypoint.
+internal sealed class RebirthMapRowDoubleClick
+{
+    private const float Window=.4f;
+    private object last;
+    private float lastAt=-1f;
+    public bool Press(object row,int button)
+    {
+        // XUi reports a left press as 0 or -1 depending on its source.
+        if(row==null||(button!=0&&button!=-1)){last=null;return false;}
+        float now=Time.unscaledTime;
+        bool isDouble=ReferenceEquals(last,row)&&now-lastAt<=Window;
+        last=isDouble?null:row;lastAt=now;
+        return isDouble;
+    }
 }
 internal static class RebirthMapRowStyle
 {

@@ -40,10 +40,6 @@ internal static class RebirthWorkstationDamagePolicy
                     if (seen.Add(method))
                     {
                         harmony.Patch(method, prefix: prefix);
-                        if (method.Name == "OnBlockDamaged")
-                            harmony.Patch(method,
-                                prefix: new HarmonyMethod(typeof(RebirthWorkstationSalvage), nameof(RebirthWorkstationSalvage.BeforeDamage)),
-                                finalizer: new HarmonyMethod(typeof(RebirthWorkstationSalvage), nameof(RebirthWorkstationSalvage.AfterDamage)));
                     }
                 }
             }

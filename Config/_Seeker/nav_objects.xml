@@ -33,5 +33,14 @@
         <property name="show_offscreen" value="false" />
       </onscreen_settings>
     </nav_object_class>
+    <nav_object_class name="RebirthTornadoNav">
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_tornado"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="-1"/>
+        <property name="color" value="46,162,219,255"/>
+        <property name="has_pulse" value="true"/>
+      </map_settings>
+    </nav_object_class>
   </append>
 </configs>

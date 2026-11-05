@@ -9,6 +9,15 @@ public sealed class RebirthBlockPickupTargetDecision
     public readonly BlockValue Target;
     public readonly int Count;
     public readonly string Reason;
+    private readonly ItemValue[] alternatives;
+
+    public RebirthBlockPickupTargetDecision(ItemValue[] randomItems, int count, string reason)
+        : this(randomItems[0], BlockValue.Air, count, reason)
+    {
+        alternatives = randomItems;
+    }
+
+    public bool HasRandomResult { get { return alternatives != null; } }
 
     public RebirthBlockPickupTargetDecision(ItemValue targetItem, BlockValue targetBlock, int count, string reason)
     {
@@ -45,6 +54,8 @@ public sealed class RebirthBlockPickupTargetDecision
 
     public ItemValue CreateItemValue()
     {
+        if (alternatives != null)
+            return alternatives[UnityEngine.Random.Range(0, alternatives.Length)].Clone();
         return IsValid ? TargetItem.Clone() : ItemValue.None;
     }
 }
@@ -175,6 +186,20 @@ public static class RebirthBlockPickupTargetResolver
         if (!string.IsNullOrEmpty(legacyReplacement))
         {
             bool isItem = ParseBool(GetProperty(source, PropertyLegacyReplacementIsItem));
+            string legacyList = GetProperty(source, PropertyLegacyReplacementName);
+            if (isItem && legacyList.IndexOf(',') >= 0)
+            {
+                // 2.6: each listed name is an equal roll; repeating a name makes it more likely.
+                var rolled = new List<ItemValue>();
+                foreach (string part in legacyList.Split(','))
+                {
+                    RebirthBlockPickupTargetDecision option = ResolveNamedTarget(part.Trim(), count, "legacy ReplacementBlockName", false);
+                    if (option.IsValid) rolled.Add(option.TargetItem);
+                    else Log.Warning("[REBIRTH BlockPickup] Invalid ReplacementBlockName entry '" + part + "' on block " + sourceName + ".");
+                }
+                if (rolled.Count > 0)
+                    return new RebirthBlockPickupTargetDecision(rolled.ToArray(), count, "legacy random ReplacementBlockName");
+            }
             RebirthBlockPickupTargetDecision configured = ResolveNamedTarget(
                 legacyReplacement, count, "legacy ReplacementBlockName", !isItem);
             if (configured.IsValid)

@@ -1429,7 +1429,7 @@ internal static class RebirthProtectCrateLootOpenPatch
         if (!RebirthProtectCrateRuntimePolicy.Enabled || !_runOpenTimer || _lootContainer == null) return;
 
         EntitySupplyCrate crate = _entity as EntitySupplyCrate;
-        if (crate == null || !crate.onGround || (crate.bag != null && crate.bag.Touched)) return;
+        if (crate == null || !crate.onGround || RebirthLootSearchGate.CrateSearchFinished(crate)) return;
 
         __state.Applied = true;
         __state.OriginalOpenTime = _lootContainer.openTime;

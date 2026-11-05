@@ -2,6 +2,7 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <include filename="_Rebirth/challenges.xml"/>
+      <conditional><if cond="isoption('IsPurge', 'bool', 'true')"><include filename="_Purge/camper_challenges.xml"/></if></conditional>
     </if>
   </conditional>
 </configs>

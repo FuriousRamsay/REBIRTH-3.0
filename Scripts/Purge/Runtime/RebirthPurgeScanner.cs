@@ -148,7 +148,9 @@ internal static class RebirthPurgeScanner
             {
                 if(entryBudget--<=0){actors=live.ToArray();return true;}
                 if(!seen.Add(id))continue;
-                var entity=world.GetEntity(id) as EntityAlive;
+                // GetEntity force-finishes an entity still being created, stalling the frame. A pending
+                // sleeper can wait for the next half-second pulse.
+                world.Entities.dict.TryGetValue(id,out var known);var entity=known as EntityAlive;
                 if(entity!=null&&entity.IsAlive()&&entity.IsSleeper&&RebirthPoiCombatantPolicy.IsRequired(
                     EntityClass.GetEntityClass(entity.entityClass)?.entityClassName))live.Add(entity);
                 if(seen.Count>=8192){actors=live.ToArray();return true;}
@@ -342,7 +344,9 @@ internal static class RebirthPurgeScanner
         projectedActors.Clear();
         foreach(int id in view.Targets)
         {
-            var entity=world.GetEntity(id) as EntityAlive;
+            // GetEntity force-finishes an entity still being created, stalling the frame. A pending
+                // sleeper can wait for the next half-second pulse.
+                world.Entities.dict.TryGetValue(id,out var known);var entity=known as EntityAlive;
             if(entity!=null)projectedActors[id]=entity;
         }
         if(current!=null&&current.Assisted!=view.Assisted)ClearMarkers();
@@ -393,7 +397,9 @@ internal static class RebirthPurgeScanner
         visibleActors.Clear();
         foreach(int id in current.Targets)
         {
-            var entity=world.GetEntity(id) as EntityAlive;
+            // GetEntity force-finishes an entity still being created, stalling the frame. A pending
+                // sleeper can wait for the next half-second pulse.
+                world.Entities.dict.TryGetValue(id,out var known);var entity=known as EntityAlive;
             EntityAlive projected;
             if(entity==null||!entity.IsAlive()||!entity.IsSleeper||
                 projectedActors.TryGetValue(id,out projected)&&!ReferenceEquals(projected,entity)||

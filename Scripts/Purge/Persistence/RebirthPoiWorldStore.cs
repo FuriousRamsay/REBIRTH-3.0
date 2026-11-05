@@ -26,6 +26,8 @@ internal sealed class RebirthPoiWorldStore
     private RebirthPoiWorldStore(RebirthPoiWorldBinding scope,Action<string> inject)
     { binding=scope; fault=inject; manifestPath=Path.Combine(scope.Directory,"world.xml"); }
     public RebirthPoiWorldSnapshot Published { get { lock(gate) return binding.IsCurrent?published:null; } }
+    // For a read gate that checks the snapshot's own binding at its own pace; everyone else uses Published.
+    internal RebirthPoiWorldSnapshot PublishedForGate { get { lock(gate) return published; } }
     public bool HasPending { get { lock(gate) return pending!=null; } }
     public static RebirthPoiStoreResult TryOpen(RebirthPoiWorldBinding binding,out RebirthPoiWorldStore store,Action<string> inject=null)
     {
@@ -238,9 +240,11 @@ internal sealed class RebirthPoiWorldStore
         try
         {
             // A successful atomic publish followed by a lost response is witnessed, not repeated.
-            if(!OriginalFinal(retained.Candidate.Manifest))
+            string final;
+            if(!ReadFinal(out final)) return RebirthPoiStoreResult.Conflict;
+            if(final!=retained.Candidate.Manifest)
             {
-                if(!OriginalFinal(retained.Original.Manifest)) return RebirthPoiStoreResult.Conflict;
+                if(final!=retained.Original.Manifest) return RebirthPoiStoreResult.Conflict;
                 if(!binding.IsCurrent) return RebirthPoiStoreResult.StaleScope;
                 if(retained.ShardWrites!=null)
                 foreach(var write in retained.ShardWrites.OrderBy(p=>p.Key,StringComparer.Ordinal))
@@ -251,14 +255,15 @@ internal sealed class RebirthPoiWorldStore
                     else WriteNew(path,write.Value);
                     Hit("afterShardWrite");if(!binding.IsCurrent)return RebirthPoiStoreResult.StaleScope;
                 }
-                Hit("beforeManifestPublish"); if(!binding.IsCurrent || !OriginalFinal(retained.Original.Manifest)) return RebirthPoiStoreResult.StaleScope;
+                // PublishManifest re-reads the final immediately before replacing it.
+                Hit("beforeManifestPublish"); if(!binding.IsCurrent) return RebirthPoiStoreResult.StaleScope;
                 PublishManifest(retained.Candidate.Manifest,retained.Original.Manifest);
                 Hit("afterManifestPublish");
             }
             Hit("beforeWitness");
-            if(!binding.IsCurrent || !Witness(retained.Candidate) || !binding.IsCurrent) return RebirthPoiStoreResult.Uncertain;
+            if(!binding.IsCurrent || !WitnessPublished(retained) || !binding.IsCurrent) return RebirthPoiStoreResult.Uncertain;
             Hit("beforeCachePublish");
-            if(!binding.IsCurrent || !ReferenceEquals(pending,retained) || (published!=null && !ReferenceEquals(published,retained.Original)) || !OriginalFinal(retained.Candidate.Manifest)) return RebirthPoiStoreResult.StaleScope;
+            if(!binding.IsCurrent || !ReferenceEquals(pending,retained) || (published!=null && !ReferenceEquals(published,retained.Original))) return RebirthPoiStoreResult.StaleScope;
             published=retained.Candidate; pending=null;
             // Detached projection notifications follow positive publication. A
             // presentation listener failure cannot undo or reclassify the commit.
@@ -283,6 +288,41 @@ internal sealed class RebirthPoiWorldStore
         if(!binding.IsCurrent || !SafePath(manifestPath)) return false;
         if(expected==null) return !File.Exists(manifestPath);
         return File.Exists(manifestPath) && Read(manifestPath,RebirthPoiManifestCodec.MaximumCharacters*4L)==expected && binding.IsCurrent;
+    }
+    private bool ReadFinal(out string text)
+    {
+        text=null;
+        if(!binding.IsCurrent || !SafePath(manifestPath)) return false;
+        if(File.Exists(manifestPath)) text=Read(manifestPath,RebirthPoiManifestCodec.MaximumCharacters*4L);
+        return binding.IsCurrent;
+    }
+    // A live save proves the files it just wrote. Unchanged shards were proved by the save that
+    // wrote them and must still exist. Recovery has no write list and takes the full reload below,
+    // as does every world load, so full verification still runs at each start.
+    private bool WitnessPublished(Pending retained)
+    {
+        var expected=retained.Candidate;
+        if(retained.ShardWrites==null) return Witness(expected);
+        if(!OriginalFinal(expected.Manifest)) return false;
+        long revision; Dictionary<string,RebirthPoiShardReference> references;
+        if(!RebirthPoiManifestCodec.TryRead(expected.Manifest,binding,out revision,out references) ||
+            revision!=expected.Revision || references.Count!=expected.References.Count) return false;
+        foreach(var pair in references)
+        {
+            if(!binding.IsCurrent) return false;
+            string path=Path.Combine(binding.Directory,pair.Value.File),written,text;
+            if(!SafePath(path)) return false;
+            if(!retained.ShardWrites.TryGetValue(pair.Value.File,out written))
+            {
+                if(!File.Exists(path)) return false;
+                continue;
+            }
+            try { text=Read(path,RebirthPoiClearanceCodec.MaximumCharacters*4L); } catch { return false; }
+            RebirthPoiClearanceLedger ledger;
+            if(text!=written || ContentHash(text)!=pair.Value.Hash || !RebirthPoiClearanceCodec.TryRead(text,binding.WorldId,binding.Scope,out ledger) ||
+                ledger.Revision!=pair.Value.Revision || ledger.Records.Count!=pair.Value.Count) return false;
+        }
+        return binding.IsCurrent;
     }
     private bool Witness(RebirthPoiWorldSnapshot expected)
     {

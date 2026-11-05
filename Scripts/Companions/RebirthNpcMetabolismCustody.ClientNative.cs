@@ -94,6 +94,7 @@ internal static partial class RebirthNpcMetabolismCustody
     }
     private static void RetireClientNativeObservations()
     {
+        if(clientNativeReads.Count==0)return;
         if(!ThreadManager.IsMainThread())return;
         lock(clientNativeGate)
             foreach(var scope in clientNativeReads.Where(value=>value.World!=null&&(!ReferenceEquals(value.World,GameManager.Instance?.World)||!ReferenceEquals(value.Connection,SingletonMonoBehaviour<ConnectionManager>.Instance?.connectionToServer?[0]))).ToArray())DropClientNativeRead(scope);

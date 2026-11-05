@@ -26,7 +26,7 @@
             Prefab preview is inset inside the rounded frame and uses a 282x159 center-crop target.
             The controller preserves source aspect ratio and crops excess edges instead of stretching.
           -->
-          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" texture="{jobpreviewuri}" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
+          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
           <sprite depth="3" name="jobPreviewPlaceholder" pos="6,-6" width="282" height="159" atlas="RebirthTraderJobs" sprite="{jobplaceholdersprite}" visible="{jobplaceholdervisible}"/>
           <sprite depth="7" name="previewBorder" pos="6,-6" width="282" height="159" sprite="menu_empty2px" type="sliced" fillcenter="false" color="{joblinecolor}"/>
 
@@ -561,7 +561,7 @@
             Prefab preview is inset inside the rounded frame and uses a 282x159 center-crop target.
             The controller preserves source aspect ratio and crops excess edges instead of stretching.
           -->
-          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" texture="{jobpreviewuri}" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
+          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
           <sprite depth="3" name="jobPreviewPlaceholder" pos="6,-6" width="282" height="159" atlas="RebirthTraderJobs" sprite="{jobplaceholdersprite}" visible="{jobplaceholdervisible}"/>
           <sprite depth="7" name="previewBorder" pos="6,-6" width="282" height="159" sprite="menu_empty2px" type="sliced" fillcenter="false" color="{joblinecolor}"/>
 

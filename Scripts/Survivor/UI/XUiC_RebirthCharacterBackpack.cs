@@ -36,6 +36,21 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     private bool selectionRendered, renderedAssembling;
     private float nextSelectionCheck;
     private XUiV_Label selectedSummary, selectedDescription;
+    private XUiController bonusTab;
+    private bool showBonuses = true;
+    private string renderedBonusRaw;
+
+    // 2.6 star tab: an item with bonuses opens on them, and the star switches to its description.
+    private void ApplyDescription()
+    {
+        var stack = renderedStack;
+        bool has = stack != null && !stack.IsEmpty();
+        string bonuses = has ? RebirthArmorBonusText.DescribeAll(stack.itemValue) : string.Empty;
+        if (bonusTab?.ViewComponent != null) bonusTab.ViewComponent.IsVisible = bonuses.Length > 0;
+        selectedDescription?.SetTextImmediately(!has ? "" : bonuses.Length > 0 && showBonuses
+            ? bonuses : XUiC_RebirthCraftingItemContext.ResolveBaseDescription(stack, xui));
+    }
+
     private XUiV_Sprite selectedIcon;
     private XUiC_ItemActionEntry[] actionViews;
     private XUiController SelectionSource => xui?.DragAndDropWindow?.IsEmpty()==false
@@ -59,6 +74,8 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         actions = GetChildByType<XUiC_ItemActionList>();
         selectedSummary = GetChildById("characterBagSummary")?.ViewComponent as XUiV_Label;
         selectedDescription = GetChildById("characterBagDescription")?.ViewComponent as XUiV_Label;
+        bonusTab = GetChildById("characterBagBonusTab");
+        if (bonusTab != null) bonusTab.OnPress += delegate { showBonuses = !showBonuses; ApplyDescription(); };
         selectedIcon = GetChildById("characterBagSelectedIcon")?.ViewComponent as XUiV_Sprite;
         actionViews = actions?.GetChildrenByType<XUiC_ItemActionEntry>() ?? new XUiC_ItemActionEntry[0];
         GetChildById("characterBagFilter").OnPress += Filter;
@@ -284,17 +301,19 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         bool has = stack != null && !stack.IsEmpty();
         bool assembling = xui.AssembleItem.CurrentItem != null;
         int liquidFingerprint = RebirthConsumableItemPresentation.LiquidFingerprint(stack);
-        if (liquidFingerprint == renderedLiquidFingerprint && selectionRendered && renderedSource == source && renderedAssembling == assembling &&
+        string bonusRaw = null;
+        if (has) stack.itemValue.TryGetMetadata(RebirthArmorBonusStorage.MetadataKey, out bonusRaw);
+        if (liquidFingerprint == renderedLiquidFingerprint && string.Equals(bonusRaw, renderedBonusRaw) && selectionRendered && renderedSource == source && renderedAssembling == assembling &&
             ((!has && renderedStack == null) || (has && renderedStack != null && renderedStack.Equals(stack)))) return;
         if(renderedSource!=source)actionType=-1;
-        selectionRendered = true; renderedSource = source; renderedAssembling = assembling;
+        selectionRendered = true; renderedBonusRaw = bonusRaw; showBonuses = true; renderedSource = source; renderedAssembling = assembling;
         renderedStack = has ? stack.Clone() : null;
         renderedLiquidFingerprint = liquidFingerprint;
         if (selectedName != null) selectedName.SetTextImmediately(has ? stack.itemValue.ItemClass.GetLocalizedItemName() : "");
         string liquidSummary = has ? RebirthConsumableItemPresentation.LiquidSummary(stack) : "";
         selectedSummary?.SetTextImmediately(has && liquidSummary.Length == 0
             ? XUiC_RebirthCraftingItemContext.BuildSummary(stack) : liquidSummary);
-        selectedDescription?.SetTextImmediately(has ? XUiC_RebirthCraftingItemContext.ResolveDescription(stack, xui) : "");
+        ApplyDescription();
         var icon = selectedIcon;
         if (icon != null)
         {

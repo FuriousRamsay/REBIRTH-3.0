@@ -39,9 +39,9 @@
       <property name="SellableToTrader" value="false" />
       <property name="WorkstationWindow" value="workstation_WorkbenchToolbox001_FR" />
       <property name="DescriptionKey" value="WorkbenchToolbox001_FRDesc" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedToolbox" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedToolbox" />
     </block>
     <block name="ModifierStation">
       <property name="Class" value="Workstation" />
@@ -90,8 +90,8 @@
       <property name="Tags" value="workstationSkill,twitch_workstation" />
       <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
       <property name="CraftSound" value="" />
-      <property name="RebirthSalvageShell" value="CollapsedModifierStation" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="CollapsedModifierStation" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
     <block name="WorkbenchCircularMachine001_FR">
@@ -136,8 +136,8 @@
       <property name="SellableToTrader" value="false" />
       <property name="WorkstationWindow" value="workstation_WorkbenchCircularMachine001_FR" />
       <property name="DescriptionKey" value="WorkbenchCircularMachine001_FRDesc" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedCircularMachine" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedCircularMachine" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
     <block name="WorkbenchDistiller001_FR">
@@ -181,8 +181,8 @@
       <property name="SellableToTrader" value="false" />
       <property name="WorkstationWindow" value="workstation_WorkbenchDistiller001_FR" />
       <property name="DescriptionKey" value="WorkbenchDistiller001_FRDesc" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedDistiller" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedDistiller" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
     <block name="WorkbenchShredder001_FR">
@@ -226,8 +226,8 @@
       <property name="SellableToTrader" value="false" />
       <property name="WorkstationWindow" value="workstation_WorkbenchShredder001_FR" />
       <property name="DescriptionKey" value="WorkbenchShredder001_FRDesc" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedShredder" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedShredder" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
     <block name="WorkbenchResearchTable001_FR">
@@ -268,9 +268,9 @@
       <property name="SellableToTrader" value="false" />
       <property name="WorkstationWindow" value="workstation_WorkbenchResearchTable001_FR" />
       <property name="DescriptionKey" value="WorkbenchResearchTable001_FRDesc" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedResearchTable" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedResearchTable" />
     </block>
     <block name="SonjaOutfitDesigner">
       <property name="Class" value="Workstation" />
@@ -319,8 +319,8 @@
       <property name="Tags" value="workstationSkill,twitch_workstation" />
       <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
       <property name="CraftSound" value="" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedSonjaOutfitDesigner" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedSonjaOutfitDesigner" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
     <block name="SonjaAmmoRecyclerStation">
@@ -370,29 +370,35 @@
       <property name="Tags" value="workstationSkill,twitch_workstation" />
       <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
       <property name="CraftSound" value="" />
-      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedSonjaAmmoRecyclerStation" />
-      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+      <drop event="Destroy" name="FuriousRamsayCollapsedSonjaAmmoRecyclerStation" count="1" tool_category="Disassemble" />
       <drop event="Fall" name="resourceScrapIron" count="0" />
     </block>
   </append>
   <append xpath="/blocks/block[@name='forge']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedForge" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedForge" count="1" tool_category="Disassemble" />
   </append>
   <append xpath="/blocks/block[@name='workbench']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedWorkbench" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedWorkbench" count="1" tool_category="Disassemble" />
   </append>
   <append xpath="/blocks/block[@name='cementMixer']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedCementMixer" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedCementMixer" count="1" tool_category="Disassemble" />
   </append>
   <append xpath="/blocks/block[@name='chemistryStation']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedChemistryStation" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedChemistryStation" count="1" tool_category="Disassemble" />
   </append>
   <conditional><if cond="character_progression('Rebirth')">
   <append xpath="/blocks/block[@name='WorkbenchGasStove001_FR']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedGasStove" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedGasStove" count="1" tool_category="Disassemble" />
   </append>
   <append xpath="/blocks/block[@name='WorkbenchIronOven001_FR']">
-    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedIronOven001_FR" />
+    <drop event="Harvest" name="resourceScrapIron" count="0" tool_category="Disassemble" />
+    <drop event="Destroy" name="FuriousRamsayCollapsedIronOven001_FR" count="1" tool_category="Disassemble" />
   </append>
   </if></conditional>
   <remove xpath="/blocks/block[@name='cntForgeWorkstationBroken']" />
@@ -400,6 +406,7 @@
   <remove xpath="/blocks/block[@name='cntCollapsedWorkbenchEmpty']" />
   <remove xpath="/blocks/block[@name='cntCollapsedCementMixer']" />
   <remove xpath="/blocks/block[@name='cntCollapsedChemistryStation']" />
+  <remove xpath="/blocks/block[@name='forge' or @name='workbench' or @name='cementMixer' or @name='chemistryStation']/drop[@event='Harvest']" />
   <set xpath="/blocks/block[@name='forge']/property[@name='Material']/@value">MstonePickUp</set>
   <set xpath="/blocks/block[@name='workbench']/property[@name='Material']/@value">MwoodPickUp</set>
   <set xpath="/blocks/block[@name='cementMixer']/property[@name='Material']/@value">MmetalPickUp</set>

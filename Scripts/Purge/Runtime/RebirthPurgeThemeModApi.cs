@@ -73,6 +73,7 @@ public sealed class RebirthPurgeThemeModApi : IModApi
             harmony.CreateClassProcessor(typeof(RebirthPurgeTraderGenerationHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeCachedTraderListingHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeQuestCandidateHook)).Patch();
+            harmony.CreateClassProcessor(typeof(RebirthPurgeNearestPoiHook)).Patch();
             harmony.CreateClassProcessor(typeof(RebirthPurgeQuestRemovalScopeHook)).Patch();
             ModEvents.GameStarting.RegisterHandler(Starting);
             installed = true;

@@ -55,7 +55,8 @@ public sealed class XUiC_RebirthTraderWorkspace : XUiC_TraderWindowGroup
         if(player?.world!=null&&Time.realtimeSinceStartup>=nextStashRequest){nextStashRequest=Time.realtimeSinceStartup+1f;RebirthBackpackSellStashClientViews.Request(player.world,player.entityId);}
         RebirthBackpackSellStashView stash=null;
         if(player?.world!=null)RebirthBackpackSellStashClientViews.TryGet(player.world,player.entityId,out stash);
-        bool equipped=RebirthBackpackSectionProjectionPolicy.Matches(player,stash)&&stash.Capacity>0;
+        // The section only shows while the stash actually holds something to sell.
+        bool equipped=RebirthBackpackSectionProjectionPolicy.Matches(player,stash)&&stash.Capacity>0&&stash.OccupiedSlots>0;
         if(stashCoin!=null)stashCoin.IsVisible=equipped;
         if(stashButtonCoin!=null)stashButtonCoin.IsVisible=equipped;
         var heading=GetChildById("sellBackpackHeading")?.ViewComponent;if(heading!=null)heading.IsVisible=equipped;
@@ -190,6 +191,9 @@ public sealed class XUiC_RebirthTraderActionEntry : XUiC_ItemActionEntry
 {
     public override void Update(float dt)
     {
+        // The list assigns the action before children update: strip the native <W> brackets
+        // now and commit immediately, so the bracketed text never reaches a rendered frame.
+        NormalizeShortcut();
         base.Update(dt);
         bool visible = ItemActionEntry != null;
         if (ViewComponent.IsVisible != visible) ViewComponent.IsVisible = visible;
@@ -200,9 +204,13 @@ public sealed class XUiC_RebirthTraderActionEntry : XUiC_ItemActionEntry
             keyboardButton.Position = new Vector2i(buttonWidth - 48, keyboardButton.Position.y);
             keyboardButton.Size = new Vector2i(32, keyboardButton.Size.y);
             keyboardButton.TryUpdatePosition();
-            string text = keyboardButton.Text;
-            if (!string.IsNullOrEmpty(text) && text[0] == '<') keyboardButton.Text = text.Trim('<','>');
+            NormalizeShortcut();
         }
+    }
+    private void NormalizeShortcut()
+    {
+        string text = keyboardButton?.Text;
+        if (!string.IsNullOrEmpty(text) && text[0] == '<') keyboardButton.SetTextImmediately(text.Trim('<','>'));
     }
 }
 

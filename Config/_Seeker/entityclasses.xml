@@ -697,5 +697,36 @@
       </effect_group>
       <property name="Class" value="EntityRebirthSeekerMinion, RebirthUtils" />
     </entity_class>
+    <entity_class name="rebirthWindTornado" extends="zombieTemplateMale">
+      <property name="Tags" value="entity,melee,rebirthWindTornado,invisible,nottarget"/>
+      <property name="UserSpawnType" value="Menu"/>
+      <property name="NavObject" value="RebirthTornadoNav"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Demons.unity3d?Invisible2"/>
+      <property name="SizeScale" value="1"/>
+      <property name="StaticSizeScale" value="1"/>
+      <property name="RootMotion" value="false"/>
+      <property name="HasRagdoll" value="false"/>
+      <property name="MaxViewAngle" value="360"/>
+      <property name="MoveSpeed" value=".5"/>
+      <property name="MoveSpeedAggro" value=".5, .5"/>
+      <property name="MoveSpeedPanic" value=".5"/>
+      <property name="MoveSpeedRand" value="0"/>
+      <property name="ExperienceGain" value="0"/>
+      <property name="LootDropProb" value="0"/>
+      <property class="Explosion">
+        <property name="ParticleIndex" value="0"/>
+        <property name="BlastPower" value="0"/>
+        <property name="BlockDamage" value="2000"/>
+        <property name="RadiusBlocks" value="6"/>
+        <property name="EntityDamage" value="0"/>
+        <property name="RadiusEntities" value="0"/>
+      </property>
+      <effect_group name="Base Effects">
+        <triggered_effect trigger="onSelfFirstSpawn" action="AttachPrefabToEntity" prefab="#@modfolder:Resources/FR_Magic.unity3d?WindTornado" parent_transform="Footsteps" local_offset="0,0,0" local_rotation="0,0,0"/>
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="rebirthWindTornadoBlast"/>
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="rebirthWindTornadoKnock"/>
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="rebirthWindTornadoVanish"/>
+      </effect_group>
+    </entity_class>
   </append>
 </configs>

@@ -164,7 +164,7 @@ public static class RebirthSelectedDurability
     }
     // Native preview widgets share the real slot's geometry rather than using another
     // cell_size template whose constant rail height/font do not scale with its icon.
-    public static void CopyNativePresentation(XUiController target, XUiController source, bool infoWindow = false, ItemStack referenceStack = null)
+    public static void CopyNativePresentation(XUiController target, XUiController source, bool infoWindow = false, ItemStack referenceStack = null, bool fitRailToSlot = false)
     {
         if (target == null || source == null || ReferenceEquals(target,source)) return; if(referenceStack!=null&&referenceStack.IsEmpty())return;
         var inspectedStack=referenceStack??(source as XUiC_ItemStack)?.ItemStack;
@@ -176,12 +176,13 @@ public static class RebirthSelectedDurability
         if(sourceIcon==null||targetIcon==null)return;
         var actualViews=NativeCache.GetValue(source,c=>new NativeViews(c,false));
         float ratio=targetIcon.Size.x/(float)Math.Max(1,sourceIcon.Size.x);
+        XUiView railSlot=fitRailToSlot?target.ViewComponent:null;
         Vector2 from=TopLeft(sourceIcon),to=TopLeft(targetIcon);
-        CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,false);
+        CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,false,railSlot);
         if(referenceStack==null)CopyState(targetViews.Track,actualViews.Track);
-        CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,false);
+        CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,false,railSlot);
         if(referenceStack==null)CopyState(targetViews.Fill,actualViews.Fill);
-        CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,false);
+        CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,false,railSlot);
         if(referenceStack==null)CopyState(targetViews.Damage,actualViews.Damage);
         var inspected=inspectedStack;
         var value=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue;
@@ -265,14 +266,19 @@ public static class RebirthSelectedDurability
         if(target==null||source==null)return;
         target.Fill=source.Fill;target.IsVisible=source.IsVisible;CommitRailColor(target,source.Color);
     }
-    private static void CopySprite(XUiV_Sprite target,XUiV_Sprite source,Vector2 from,Vector2 to,float ratio,bool copyState)
+    // Native slot outline spans x=0..cell-2 (template "background"), so it is not centred on the cell.
+    private const int RailOutlineWidthOffset = 2;
+    private const int RailMargin = 1;
+    private static void CopySprite(XUiV_Sprite target,XUiV_Sprite source,Vector2 from,Vector2 to,float ratio,bool copyState,XUiView railSlot=null)
     {
         if(target==null||source==null)return;
         Vector2 position=TopLeft(source);
         target.Pivot=UIWidget.Pivot.TopLeft;
         if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
-        target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
-        target.Size=source.Size;target.SpriteName=source.SpriteName;
+        // A slot-fitted rail takes its horizontal span from the outline and is never scaled, so it cannot leave it.
+        target.Position=new Vector2i(railSlot!=null?RailMargin:Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
+
+        target.Size=railSlot!=null?new Vector2i(railSlot.Size.x-RailOutlineWidthOffset-RailMargin*2,Mathf.RoundToInt(source.Size.y*ratio)):source.Size;target.SpriteName=source.SpriteName;
         // Native drag rails default to padded atlas sprites, while the real
         // backpack quality fill is unpadded. Geometry alone leaves a different
         // visible footprint. Keep the invoking slot's native fill presentation.
@@ -284,7 +290,7 @@ public static class RebirthSelectedDurability
         // updateData; TryUpdatePosition alone does not commit that geometry.
         target.Update(0f);
         target.TryUpdatePosition();
-        if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
+        if(target.UiTransform!=null)target.UiTransform.localScale=railSlot!=null?Vector3.one:new Vector3(ratio,ratio,1f);
     }
     private static void ConfigureRail(XUiV_Sprite target, Vector2i size, string sprite, float fill, Color color)
     {

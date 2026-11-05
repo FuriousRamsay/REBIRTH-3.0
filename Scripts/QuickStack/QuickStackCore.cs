@@ -153,6 +153,9 @@ public static class QuickStackCategoryRegistry
         // Native runtime identity outranks those heuristics, but never knowledge.
         if (item is ItemClassModifier)
             return QuickStackCategory.ItemModifiers;
+        // Survivor gear equips through an eat-based action, which must not read as food.
+        if (item.Actions != null && item.Actions.Length > 0 && item.Actions[0] is ItemActionEquipSurvivorGearRebirth)
+            return QuickStackCategory.Clothing;
         // Native harvesting/repair tools use meleeTool* names but still perform
         // melee actions. Keep this authored family ahead of generic melee weapons.
         // *Parts are authored crafting components, not usable tools; leave their

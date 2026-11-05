@@ -5,6 +5,9 @@
   <!-- v93: 2.6 parity. Do not show vanilla "jobsnone" as a fallback when
        REBIRTH capacity hides every jobshaveN response. -->
   <remove xpath="/dialogs/dialog[@id='trader']/response[@id='jobsnone']"/>
+  <append xpath="/dialogs/dialog[@id='trader']/response[@id='dronecommands']">
+    <requirement type="DialogRequirementRebirthHasDrone, RebirthUtils" requirementtype="Hide"/>
+  </append>
 
   <!-- Restore the 2.6 REBIRTH multi-job availability rule. Vanilla 3.1
        QuestStatus/NotStarted hides Jobs after one active quest from the trader. -->
@@ -118,5 +121,12 @@
       <response id="ShowMe" text="rebirth_dialog_ShowMe" ref_text="Show Me your inventory"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><requirement type="DialogRequirementRebirthDogInventoryEnabled, RebirthUtils" requirementtype="Hide"/><action type="DialogActionRebirthDog, RebirthUtils" id="Inventory"/></response>
       <response id="Remove" text="Remove Me (Admin)"><requirement type="DialogRequirementRebirthDogAdmin, RebirthUtils" requirementtype="Hide"/><action type="DialogActionRebirthDog, RebirthUtils" id="AdminRemove"/></response>
     </dialog>
+  </append>
+  <!-- 2.6 Briston ammo exchange, offered by every native trader. -->
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='start']/response_entry[@id='shop']">
+    <response_entry id="rebirthTradeAmmo" />
+  </insertAfter>
+  <append xpath="/dialogs/dialog[@id='trader']">
+    <response id="rebirthTradeAmmo" text="ttTradeAmmo"><action type="DialogActionRebirthTradeAmmo, RebirthUtils" /></response>
   </append>
 </configs>

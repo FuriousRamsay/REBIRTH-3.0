@@ -16,7 +16,7 @@ internal sealed class RebirthTraderSaleStash
     {
         if(running||RebirthConsoleInputGuardRuntime.BlocksGameplayInput())return;var ui=owner.xui;var p=ui?.playerUI?.entityPlayer;
         if(p?.world==null||p.IsDead()||!p.IsSpawned()||ui.IsUsingItemActionEntryUse||p.inventory.IsHoldingItemActionRunning()||!(ui.Trader?.Trader is EntityTrader trader)||ui.DragAndDropWindow?.IsEmpty()!=true||RebirthBackpackLibraryReservation.IsHeld(p)||RebirthGearOwnerReservation.IsHeld(p)||
-            !RebirthBackpackSellStashClientViews.TryGet(p.world,p.entityId,out var view)||view.TransferPending||!RebirthBackpackSectionProjectionPolicy.Matches(p,view))return;
+            !RebirthBackpackSellStashClientViews.TryGet(p.world,p.entityId,out var view)||view.TransferPending||view.OccupiedSlots<=0||!RebirthBackpackSectionProjectionPolicy.Matches(p,view))return;
         player=p;creation=view.CreationId;receipt=null;
         if(p.world.IsRemote())
         {

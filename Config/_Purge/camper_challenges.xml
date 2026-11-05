@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <insertBefore xpath="/challenges/challenge_group[@name='rebirthLearnFood']">
+    <challenge_group category="RebirthLearning" name="rebirthLearnCamper" title_key="rebirthLearnCamper"/>
+    <challenge name="rebirthCamperDrive" title_key="rebirthCamperDrive" short_description_key="rebirthCamperDrive" description_key="rebirthCamperDriveDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperDrive" reward_event="rebirthCamperRewardFuel500" reward_text_key="rebirthCamperRewardFuel500">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.drive" count="1000" stat_text_key="rebirthCamperDriveObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperCamp" title_key="rebirthCamperCamp" short_description_key="rebirthCamperCamp" description_key="rebirthCamperCampDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperCamp" reward_event="rebirthCamperRewardFuel250" reward_text_key="rebirthCamperRewardFuel250">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.camp" count="1" stat_text_key="rebirthCamperCampObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperLights" title_key="rebirthCamperLights" short_description_key="rebirthCamperLights" description_key="rebirthCamperLightsDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperLights" reward_event="rebirthCamperRewardFuel500" reward_text_key="rebirthCamperRewardFuel500">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.lights" count="1" stat_text_key="rebirthCamperLightsObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperWorkshop" title_key="rebirthCamperWorkshop" short_description_key="rebirthCamperWorkshop" description_key="rebirthCamperWorkshopDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperWorkshop" reward_event="rebirthCamperRewardFuel250" reward_text_key="rebirthCamperRewardFuel250">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.workshop" count="1" stat_text_key="rebirthCamperWorkshopObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperPantry" title_key="rebirthCamperPantry" short_description_key="rebirthCamperPantry" description_key="rebirthCamperPantryDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperPantry" reward_event="rebirthCamperRewardFuel250" reward_text_key="rebirthCamperRewardFuel250">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.pantry" count="1" stat_text_key="rebirthCamperPantryObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperDinner" title_key="rebirthCamperDinner" short_description_key="rebirthCamperDinner" description_key="rebirthCamperDinnerDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperDinner" reward_event="rebirthCamperRewardRecipe" reward_text_key="rebirthCamperRewardRecipe">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.dinner" count="1" stat_text_key="rebirthCamperDinnerObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperForwardBase" title_key="rebirthCamperForwardBase" short_description_key="rebirthCamperForwardBase" description_key="rebirthCamperForwardBaseDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperForwardBase" reward_event="rebirthCamperRewardFuel1000" reward_text_key="rebirthCamperRewardFuel1000">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.forwardbase" count="1" stat_text_key="rebirthCamperForwardBaseObjective"/>
+    </challenge>
+    <challenge name="rebirthCamperWrap" title_key="rebirthCamperWrap" short_description_key="rebirthCamperWrap" description_key="rebirthCamperWrapDesc" group="rebirthLearnCamper" icon="rb_challenge_CamperWrap" reward_event="rebirthCamperRewardFuel250" reward_text_key="rebirthCamperRewardFuel250">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.camper.wrap" count="1" stat_text_key="rebirthCamperWrapObjective"/>
+    </challenge>
+  </insertBefore>
+</configs>

@@ -271,4 +271,9 @@
       <property name="DescriptionKey" value="FuriousRamsayCollapsedToolboxDesc" />
     </item>
   </append>
+  <append xpath="/items/item[@name='meleeToolSalvageT1Wrench' or @name='meleeToolSalvageT2Ratchet' or @name='meleeToolSalvageT3ImpactDriver']">
+    <effect_group name="PickUp">
+      <passive_effect name="DamageModifier" operation="perc_add" value="1000" tags="pickup" />
+    </effect_group>
+  </append>
 </configs>

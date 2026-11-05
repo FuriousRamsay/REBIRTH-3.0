@@ -149,6 +149,21 @@ public static class RebirthXmlOptionConditionResolver
             case "seekerfrequency": value = s.SeekerFrequency; return true;
             case "seekerrestriction": value = s.SeekerRestriction; return true;
             case "seekerhordeday": value = s.SeekerHordeDay; return true;
+            case "kamikazemode": value = s.KamikazeMode; return true;
+            case "tornadomode": value = s.TornadoMode; return true;
+            case "screamernights": value = s.ScreamerNights; return true;
+            case "tornadomultiplier": value = s.TornadoMultiplier; return true;
+            case "screamermax": value = s.ScreamerMax; return true;
+            case "gamestagemultiplier": value = s.GamestageMultiplier; return true;
+            case "bosseventzombieanimals": value = s.BossEventZombieAnimals; return true;
+            case "wanderinghordefrequency": value = s.WanderingHordeFrequency; return true;
+            case "wanderinghordesize": value = s.WanderingHordeSize; return true;
+            case "wanderingherdrestriction": value = s.WanderingHerdRestriction; return true;
+            case "demolishermode": value = s.DemolisherMode; return true;
+            case "wanderingherdchance": value = s.WanderingHerdChance; return true;
+            case "wanderingherdafterhordenight": value = s.WanderingHerdAfterHordeNight; return true;
+            case "wanderingherdduration": value = s.WanderingHerdDuration; return true;
+            case "wanderinghordedespawn": value = s.WanderingHordeDespawn; return true;
             default: return false;
         }
     }

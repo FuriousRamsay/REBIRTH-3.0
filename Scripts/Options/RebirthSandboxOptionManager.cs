@@ -90,13 +90,35 @@ public enum RebirthSandboxOptionId
     SeekerNotifications = 79,
     SeekerFrequency = 80,
     SeekerRestriction = 81,
-    SeekerHordeDay = 82
+    SeekerHordeDay = 82,
+    WanderingHordeFrequency = 83,
+    WanderingHordeSize = 84,
+    WanderingHerdRestriction = 85,
+    DemolisherMode = 86,
+    WanderingHerdChance = 87,
+    WanderingHerdAfterHordeNight = 88,
+    WanderingHerdDuration = 89,
+    WanderingHordeDespawn = 90,
+    KamikazeMode = 91,
+    TornadoMode = 92,
+    ScreamerNights = 93,
+    TornadoMultiplier = 94,
+    ScreamerMax = 95,
+    GamestageMultiplier = 96,
+    BossEventZombieAnimals = 97
 }
 
 
 
 
 public enum RebirthSeekerMode { Never = 0, NotQuesting = 1, NotHordeNight = 2, Always = 3 }
+public enum RebirthKamikazeMode { Never = 0, NotInPois = 1, NotHordeNight = 2, NotHordeNightOrPois = 3, Always = 4 }
+public enum RebirthTornadoMode { BiomesOnly = 0, HordeNightOnly = 1, Always = 2, Never = 3 }
+public enum RebirthScreamerNightMode { None = 0, Lower = 1, Default = 2, Higher = 3 }
+public enum RebirthWanderingHordeFrequency { Off = 0, Default = 1, High = 2, Higher = 3, Highest = 4, GradualSlower = 5, Gradual = 6, GradualFaster = 7, Random = 8 }
+public enum RebirthWanderingHordeSize { X1 = 0, X2 = 1, X3 = 2, X4 = 3, X5 = 4, X6 = 5, GradualSlower = 6, Gradual = 7, GradualFaster = 8, Random = 9 }
+public enum RebirthWanderingHerdRestriction { Low = 0, Normal = 1, High = 2, Highest = 3 }
+public enum RebirthDemolisherMode { Never = 0, Reduced = 1, ReducedNotInPois = 2, NotInPois = 3, NotHordeNight = 4, Always = 5 }
 
 public enum RebirthSeekerRestriction { Anywhere = 0, OnlyQuesting = 1, NotQuesting = 2, OutdoorsOnly = 3, OutdoorsAndNotQuesting = 4, Off = 5 }
 
@@ -496,6 +518,21 @@ public sealed class RebirthSandboxState
     public int SeekerFrequency = 100;
     public RebirthSeekerRestriction SeekerRestriction = RebirthSeekerRestriction.Anywhere;
     public bool SeekerHordeDay = true;
+    public RebirthKamikazeMode KamikazeMode = RebirthKamikazeMode.NotInPois;
+    public RebirthTornadoMode TornadoMode = RebirthTornadoMode.HordeNightOnly;
+    public RebirthScreamerNightMode ScreamerNights = RebirthScreamerNightMode.None;
+    public int TornadoMultiplier = 100;
+    public int ScreamerMax = 6;
+    public int GamestageMultiplier = 100;
+    public bool BossEventZombieAnimals = true;
+    public RebirthWanderingHordeFrequency WanderingHordeFrequency = RebirthWanderingHordeFrequency.Random;
+    public RebirthWanderingHordeSize WanderingHordeSize = RebirthWanderingHordeSize.Random;
+    public RebirthWanderingHerdRestriction WanderingHerdRestriction = RebirthWanderingHerdRestriction.Highest;
+    public RebirthDemolisherMode DemolisherMode = RebirthDemolisherMode.ReducedNotInPois;
+    public int WanderingHerdChance = 30;
+    public int WanderingHerdAfterHordeNight = 50;
+    public int WanderingHerdDuration = 5;
+    public bool WanderingHordeDespawn = false;
 
     public RebirthSandboxState Clone()
     {
@@ -574,6 +611,21 @@ public sealed class RebirthSandboxState
             SeekerFrequency = SeekerFrequency,
             SeekerRestriction = SeekerRestriction,
             SeekerHordeDay = SeekerHordeDay,
+            KamikazeMode = KamikazeMode,
+            TornadoMode = TornadoMode,
+            ScreamerNights = ScreamerNights,
+            TornadoMultiplier = TornadoMultiplier,
+            ScreamerMax = ScreamerMax,
+            GamestageMultiplier = GamestageMultiplier,
+            BossEventZombieAnimals = BossEventZombieAnimals,
+            WanderingHordeFrequency = WanderingHordeFrequency,
+            WanderingHordeSize = WanderingHordeSize,
+            WanderingHerdRestriction = WanderingHerdRestriction,
+            DemolisherMode = DemolisherMode,
+            WanderingHerdChance = WanderingHerdChance,
+            WanderingHerdAfterHordeNight = WanderingHerdAfterHordeNight,
+            WanderingHerdDuration = WanderingHerdDuration,
+            WanderingHordeDespawn = WanderingHordeDespawn,
             ProtectCrate = ProtectCrate
         };
     }
@@ -734,6 +786,21 @@ public sealed class RebirthSandboxOptionManager
     public int SeekerFrequency { get { return currentState.SeekerFrequency; } }
     public RebirthSeekerRestriction SeekerRestriction { get { return currentState.SeekerRestriction; } }
     public bool SeekerHordeDay { get { return currentState.SeekerHordeDay; } }
+    public RebirthKamikazeMode KamikazeMode { get { return currentState.KamikazeMode; } }
+    public RebirthTornadoMode TornadoMode { get { return currentState.TornadoMode; } }
+    public RebirthScreamerNightMode ScreamerNights { get { return currentState.ScreamerNights; } }
+    public int TornadoMultiplier { get { return currentState.TornadoMultiplier; } }
+    public int ScreamerMax { get { return currentState.ScreamerMax; } }
+    public int GamestageMultiplier { get { return currentState.GamestageMultiplier; } }
+    public bool BossEventZombieAnimals { get { return currentState.BossEventZombieAnimals; } }
+    public RebirthWanderingHordeFrequency WanderingHordeFrequency { get { return currentState.WanderingHordeFrequency; } }
+    public RebirthWanderingHordeSize WanderingHordeSize { get { return currentState.WanderingHordeSize; } }
+    public RebirthWanderingHerdRestriction WanderingHerdRestriction { get { return currentState.WanderingHerdRestriction; } }
+    public RebirthDemolisherMode DemolisherMode { get { return currentState.DemolisherMode; } }
+    public int WanderingHerdChance { get { return currentState.WanderingHerdChance; } }
+    public int WanderingHerdAfterHordeNight { get { return currentState.WanderingHerdAfterHordeNight; } }
+    public int WanderingHerdDuration { get { return currentState.WanderingHerdDuration; } }
+    public bool WanderingHordeDespawn { get { return currentState.WanderingHordeDespawn; } }
     public bool ProtectCrate { get { return currentState.ProtectCrate; } }
     public int Revision { get { return revision; } }
     public string CurrentCode { get { return Encode(currentState); } }
@@ -1553,6 +1620,21 @@ public sealed class RebirthSandboxOptionManager
         if (state.SeekerFrequency != 100) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerFrequency) + IndexToAlpha(state.SeekerFrequency / 10);
         if (state.SeekerRestriction != RebirthSeekerRestriction.Anywhere) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerRestriction) + IndexToAlpha((int)state.SeekerRestriction);
         if (!state.SeekerHordeDay) result += IndexToAlpha2((int)RebirthSandboxOptionId.SeekerHordeDay) + IndexToAlpha(0);
+        if (state.KamikazeMode != RebirthKamikazeMode.NotInPois) result += IndexToAlpha2((int)RebirthSandboxOptionId.KamikazeMode) + IndexToAlpha((int)state.KamikazeMode);
+        if (state.TornadoMode != RebirthTornadoMode.HordeNightOnly) result += IndexToAlpha2((int)RebirthSandboxOptionId.TornadoMode) + IndexToAlpha((int)state.TornadoMode);
+        if (state.ScreamerNights != RebirthScreamerNightMode.None) result += IndexToAlpha2((int)RebirthSandboxOptionId.ScreamerNights) + IndexToAlpha((int)state.ScreamerNights);
+        if (state.TornadoMultiplier != 100) result += IndexToAlpha2((int)RebirthSandboxOptionId.TornadoMultiplier) + IndexToAlpha(System.Array.IndexOf(RebirthEventSpawnPolicy.TornadoSteps, state.TornadoMultiplier));
+        if (state.ScreamerMax != 6) result += IndexToAlpha2((int)RebirthSandboxOptionId.ScreamerMax) + IndexToAlpha(state.ScreamerMax - 3);
+        if (state.GamestageMultiplier != 100) result += IndexToAlpha2((int)RebirthSandboxOptionId.GamestageMultiplier) + IndexToAlpha((state.GamestageMultiplier - 50) / 10);
+        if (!state.BossEventZombieAnimals) result += IndexToAlpha2((int)RebirthSandboxOptionId.BossEventZombieAnimals) + IndexToAlpha(0);
+        if (state.WanderingHordeFrequency != RebirthWanderingHordeFrequency.Random) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHordeFrequency) + IndexToAlpha((int)state.WanderingHordeFrequency);
+        if (state.WanderingHordeSize != RebirthWanderingHordeSize.Random) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHordeSize) + IndexToAlpha((int)state.WanderingHordeSize);
+        if (state.WanderingHerdRestriction != RebirthWanderingHerdRestriction.Highest) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHerdRestriction) + IndexToAlpha((int)state.WanderingHerdRestriction);
+        if (state.DemolisherMode != RebirthDemolisherMode.ReducedNotInPois) result += IndexToAlpha2((int)RebirthSandboxOptionId.DemolisherMode) + IndexToAlpha((int)state.DemolisherMode);
+        if (state.WanderingHerdChance != 30) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHerdChance) + IndexToAlpha(state.WanderingHerdChance / 10);
+        if (state.WanderingHerdAfterHordeNight != 50) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHerdAfterHordeNight) + IndexToAlpha(state.WanderingHerdAfterHordeNight / 10);
+        if (state.WanderingHerdDuration != 5) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHerdDuration) + IndexToAlpha(state.WanderingHerdDuration - 1);
+        if (state.WanderingHordeDespawn) result += IndexToAlpha2((int)RebirthSandboxOptionId.WanderingHordeDespawn) + IndexToAlpha(1);
         if (state.GuardDistance != RebirthCompanionDistancePolicy.GuardDefault)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.GuardDistance) + IndexToAlpha(RebirthCompanionDistancePolicy.GuardDistanceToIndex(state.GuardDistance));
         if (state.FullControlDistance != RebirthCompanionDistancePolicy.FullControlDefault)
@@ -1940,6 +2022,21 @@ public sealed class RebirthSandboxOptionManager
             else if (optionIndex == (int)RebirthSandboxOptionId.SeekerFrequency) { if (valueIndex > 20) return false; decoded.SeekerFrequency = valueIndex * 10; }
             else if (optionIndex == (int)RebirthSandboxOptionId.SeekerRestriction) { if (valueIndex > 5) return false; decoded.SeekerRestriction = (RebirthSeekerRestriction)valueIndex; }
             else if (optionIndex == (int)RebirthSandboxOptionId.SeekerHordeDay) { if (valueIndex > 1) return false; decoded.SeekerHordeDay = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.KamikazeMode) { if (valueIndex > 4) return false; decoded.KamikazeMode = (RebirthKamikazeMode)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.TornadoMode) { if (valueIndex > 3) return false; decoded.TornadoMode = (RebirthTornadoMode)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.ScreamerNights) { if (valueIndex > 3) return false; decoded.ScreamerNights = (RebirthScreamerNightMode)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.TornadoMultiplier) { if (valueIndex > 7) return false; decoded.TornadoMultiplier = RebirthEventSpawnPolicy.TornadoSteps[valueIndex]; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.ScreamerMax) { if (valueIndex > 7) return false; decoded.ScreamerMax = 3 + valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.GamestageMultiplier) { if (valueIndex > 15) return false; decoded.GamestageMultiplier = 50 + valueIndex * 10; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.BossEventZombieAnimals) { if (valueIndex > 1) return false; decoded.BossEventZombieAnimals = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHordeFrequency) { if (valueIndex > 8) return false; decoded.WanderingHordeFrequency = (RebirthWanderingHordeFrequency)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHordeSize) { if (valueIndex > 9) return false; decoded.WanderingHordeSize = (RebirthWanderingHordeSize)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHerdRestriction) { if (valueIndex > 3) return false; decoded.WanderingHerdRestriction = (RebirthWanderingHerdRestriction)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.DemolisherMode) { if (valueIndex > 5) return false; decoded.DemolisherMode = (RebirthDemolisherMode)valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHerdChance) { if (valueIndex > 10) return false; decoded.WanderingHerdChance = valueIndex * 10; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHerdAfterHordeNight) { if (valueIndex > 10) return false; decoded.WanderingHerdAfterHordeNight = valueIndex * 10; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHerdDuration) { if (valueIndex > 7) return false; decoded.WanderingHerdDuration = 1 + valueIndex; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHordeDespawn) { if (valueIndex > 1) return false; decoded.WanderingHordeDespawn = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.ReservedCompanionInventory)
             {
                 // v244 briefly exposed Companion Inventory as values 0..2. The option has

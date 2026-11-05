@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configs>
   <include filename="../_Turret/turret_windows.xml" />
+  <include filename="trade_ammo_windows.xml" />
   <include filename="../_Purge/information_windows.xml" />
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -5364,6 +5365,7 @@
               <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
               <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
             </rect>
+            <button depth="8" name="characterBagBonusTab" style="icon30px, press" pos="410,-124" defaultcolor="181,140,255" sprite="ui_game_symbol_star" pivot="center" tooltip="Bonuses" sound="[paging_click]" visible="false" />
             <label name="characterBagDescription" pos="14,-140" width="408" height="106" font_size="20" color="240,240,244,255" depth="6" globalopacitymod="0" />
             <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="200,-8" width="222" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
             <label name="characterBagDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" />
@@ -19079,8 +19081,8 @@
                 <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="508" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                 <sprite depth="1" name="background" pos="-1,1" height="45" width="504" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                 <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                <label depth="4" name="Name" pos="92,-8" width="308" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                 <label depth="4" name="Distance" pos="408,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
               </rect>
             </grid>
@@ -19115,8 +19117,8 @@
                 <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="508" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                 <sprite depth="1" name="background" pos="-1,1" height="45" width="504" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                 <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                <label depth="4" name="Name" pos="92,-8" width="308" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                 <label depth="4" name="Distance" pos="408,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
               </rect>
             </grid>
@@ -19135,29 +19137,32 @@
           <rect name="content" pos="0,-46" height="234" depth="1" width="1328">
             <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="1328" height="234" color="24,24,29,250" type="sliced" fillcenter="false" />
             <sprite color="24,24,29,250" type="sliced" width="1328" height="234" />
-            <label depth="3" name="descriptionText" pos="16,-90" text="{questdescription}" width="1296" height="132" font_size="20" />
+            <texture name="questPoiPreview" depth="3" pos="16,-10" width="282" height="159" texture="{questpoipreviewuri}" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" globalopacitymod="0" visible="{questpoipreviewvisible}" />
+            <sprite name="questPoiPreviewPlaceholder" depth="3" pos="16,-10" width="282" height="159" atlas="RebirthTraderJobs" sprite="{questpoiplaceholdersprite}" globalopacitymod="0" visible="{questpoiplaceholdervisible}" />
+            <sprite name="questPoiPreviewBorder" depth="4" pos="16,-10" width="282" height="159" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+            <label depth="3" name="descriptionText" pos="314,-90" text="{questdescription}" width="998" height="132" font_size="20" />
             <rect visible="{showempty}">
-              <label pos="16,-94" depth="3" name="descriptionText" height="60" text="DESCRIPTION NOT AVAILABLE AT THIS TIME." text_key="xuiDescriptionNotAvailable" justify="left" pivot="topleft" font_size="18" width="1304" />
+              <label pos="314,-94" depth="3" name="descriptionText" height="60" text="DESCRIPTION NOT AVAILABLE AT THIS TIME." text_key="xuiDescriptionNotAvailable" justify="left" pivot="topleft" font_size="18" width="1304" />
             </rect>
-            <rect pos="16,-10" width="312" height="66">
-              <sprite width="312" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
-              <label pos="10,-6" width="292" height="22" text="STATUS" font_size="18" color="181,140,255,255" />
-              <label name="questSummaryStatus" pos="10,-32" width="292" height="26" font_size="20" color="235,235,239,255" />
+            <rect pos="314,-10" width="238" height="66">
+              <sprite width="238" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+              <label pos="10,-6" width="218" height="22" text="STATUS" font_size="18" color="181,140,255,255" />
+              <label name="questSummaryStatus" pos="10,-32" width="218" height="26" font_size="20" color="235,235,239,255" />
             </rect>
-            <rect pos="344,-10" width="312" height="66">
-              <sprite width="312" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
-              <label pos="10,-6" width="292" height="22" text="TIER" font_size="18" color="181,140,255,255" />
-              <label name="questSummaryTier" pos="10,-32" width="292" height="26" font_size="20" color="235,235,239,255" />
+            <rect pos="564,-10" width="238" height="66">
+              <sprite width="238" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+              <label pos="10,-6" width="218" height="22" text="TIER" font_size="18" color="181,140,255,255" />
+              <label name="questSummaryTier" pos="10,-32" width="218" height="26" font_size="20" color="235,235,239,255" />
             </rect>
-            <rect pos="672,-10" width="312" height="66">
-              <sprite width="312" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
-              <label pos="10,-6" width="292" height="22" text="DISTANCE" font_size="18" color="181,140,255,255" />
-              <label name="questSummaryDistance" pos="10,-32" width="292" height="26" font_size="20" color="235,235,239,255" />
+            <rect pos="814,-10" width="238" height="66">
+              <sprite width="238" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+              <label pos="10,-6" width="218" height="22" text="DISTANCE" font_size="18" color="181,140,255,255" />
+              <label name="questSummaryDistance" pos="10,-32" width="218" height="26" font_size="20" color="235,235,239,255" />
             </rect>
-            <rect pos="1000,-10" width="312" height="66">
-              <sprite width="312" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
-              <label pos="10,-6" width="292" height="22" text="HUD TRACKING" font_size="18" color="181,140,255,255" />
-              <label name="questSummaryTracking" pos="10,-32" width="292" height="26" font_size="20" color="235,235,239,255" />
+            <rect pos="1064,-10" width="248" height="66">
+              <sprite width="248" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+              <label pos="10,-6" width="218" height="22" text="HUD TRACKING" font_size="18" color="181,140,255,255" />
+              <label name="questSummaryTracking" pos="10,-32" width="218" height="26" font_size="20" color="235,235,239,255" />
             </rect>
           </rect>
           <sprite name="rebirthQuestFrame" depth="20" width="1328" height="280" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
@@ -21663,6 +21668,7 @@
         <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
         <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
       </rect>
+      <button depth="8" name="characterBagBonusTab" style="icon30px, press" pos="512,-100" defaultcolor="181,140,255" sprite="ui_game_symbol_star" pivot="center" tooltip="Bonuses" sound="[paging_click]" visible="false" />
       <label name="characterBagDescription" pos="116,-116" width="410" height="128" font_size="20" color="240,240,244,255" depth="6" globalopacitymod="0" />
       <rect name="creativeInventoryControls" pos="675,-365" width="141" controller="ContainerStandardControls" move_start_bottom_left="true" height="28">
         <button depth="3" name="btnClearInventory" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="96,0" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{creativewindowopen}" defaultcolor="[iconColor]" hovercolor="[hoverColor]" selectedcolor="[selectedColor]" width="26" height="26" hoverscale="1" nav_right="btnSort" />
@@ -22080,144 +22086,144 @@
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow1" pos="0,-46">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow2" pos="0,-92">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow3" pos="0,-138">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow4" pos="0,-184">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow5" pos="0,-230">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow6" pos="0,-276">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow7" pos="0,-322">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow8" pos="0,-368">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow9" pos="0,-414">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow10" pos="0,-460">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow11" pos="0,-506">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow12" pos="0,-552">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow13" pos="0,-598">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow14" pos="0,-644">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow15" pos="0,-690">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow16" pos="0,-736">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                   <rect width="484" height="43" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow17" pos="0,-782">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="480" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="-1,1" height="45" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                    <label depth="4" name="Name" pos="92,-8" width="280" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                    <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
                   </rect>
                 </rect>
@@ -22226,8 +22232,8 @@
                 <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="508" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                 <sprite depth="1" name="background" pos="-1,1" height="45" width="504" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                 <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-4" foregroundlayer="true" visible="{istracking}" />
-                <label depth="4" name="Name" pos="92,-8" width="308" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-4" foregroundlayer="true" visible="{istracking}" />
+                <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                 <label depth="4" name="Distance" pos="408,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
               </rect>
               <rect name="listNativeScrollbar" pos="484,0" width="24" height="{# questsautoaccept ? 714 : 436}">
@@ -22808,176 +22814,176 @@
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow1" pos="0,-36">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow2" pos="0,-72">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow3" pos="0,-108">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow4" pos="0,-144">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow5" pos="0,-180">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow6" pos="0,-216">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow7" pos="0,-252">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow8" pos="0,-288">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow9" pos="0,-324">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow10" pos="0,-360">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow11" pos="0,-396">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow12" pos="0,-432">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow13" pos="0,-468">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow14" pos="0,-504">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow15" pos="0,-540">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow16" pos="0,-576">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow17" pos="0,-612">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow18" pos="0,-648">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow19" pos="0,-684">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow20" pos="0,-720">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                   <rect width="484" height="34" controller="QuestEntry" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="24,24,29,250" hover_color="48,48,56,255" sound="[recipe_click]" failed_color="255,0,0,255" complete_color="[disabledLabelColor]" finished_color="0,255,0,255" shared_color="[iconColor]" failed_icon="ui_game_symbol_x" complete_icon="ui_game_symbol_check" finished_icon="ui_game_symbol_check" shared_icon="ui_game_symbol_players" sound_play_on_hover="[default_hover]" name="questRow21" pos="0,-756">
                     <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="480" height="34" color="65,65,74,255" type="sliced" fillcenter="false" />
                     <sprite depth="1" name="background" pos="0,0" height="34" width="480" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                     <sprite depth="5" name="Icon" style="icon32px" pos="8,-5" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" width="24" height="24" />
-                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                    <label depth="4" name="Name" pos="92,-17" width="280" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" />
+                    <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                    <label depth="4" name="Name" pos="36,-17" width="310" height="28" text="{questname}" color="{textstatecolor}" font_size="18" pivot="left" overflow="shrinkcontent" />
                     <label depth="4" name="Distance" pos="382,-17" width="88" height="28" text="{distance}" justify="right" font_size="18" pivot="left" />
                   </rect>
                 </rect>
@@ -22986,8 +22992,8 @@
                 <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="508" height="49" color="65,65,74,255" type="sliced" fillcenter="false" />
                 <sprite depth="1" name="background" pos="-1,1" height="45" width="504" color="{rowstatecolor}" sprite="{rowstatesprite}" type="sliced" />
                 <sprite depth="5" name="Icon" style="icon32px" pos="8,-3" foregroundlayer="true" sprite="{questicon}" color="{iconcolor}" />
-                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="52,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
-                <label depth="4" name="Name" pos="92,-8" width="308" height="30" text="{questname}" color="{textstatecolor}" font_size="18" />
+                <sprite depth="4" name="Tracking" sprite="ui_game_symbol_compass" style="icon32px" pos="352,-5" foregroundlayer="true" visible="{istracking}" width="24" height="24" />
+                <label depth="4" name="Name" pos="36,-8" width="310" height="30" text="{questname}" color="{textstatecolor}" font_size="18" overflow="shrinkcontent" />
                 <label depth="4" name="Distance" pos="408,-8" width="88" height="30" text="{distance}" justify="right" font_size="18" />
               </rect>
               <rect name="listNativeScrollbar" pos="484,0" width="24" height="{# questsautoaccept ? 714 : 436}">
@@ -23420,16 +23426,16 @@
       <setattribute xpath="/windows/window[@name='windowChallengeEntryDescription']/sprite[@depth='0']" name="color">24,24,29,185</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeEntryDescription']//sprite[@color='24,24,29,250' and not(@fillcenter='false') and not(@depth='0')]" name="color">24,24,29,0</setattribute>
       <append xpath="//*[@name='questSummaryStatus']/..">
-        <sprite width="312" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
+        <sprite width="238" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
       </append>
       <append xpath="//*[@name='questSummaryTier']/..">
-        <sprite width="312" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
+        <sprite width="238" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
       </append>
       <append xpath="//*[@name='questSummaryDistance']/..">
-        <sprite width="312" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
+        <sprite width="238" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
       </append>
       <append xpath="//*[@name='questSummaryTracking']/..">
-        <sprite width="312" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
+        <sprite width="248" height="66" pos="0,0" sprite="menu_empty" type="sliced" color="24,24,29,255" depth="1" globalopacitymod="0" />
       </append>
       <setattribute xpath="//*[@name='survivorConditionsListPanel']/sprite[@depth='1']" name="color">24,24,29,175</setattribute>
       <setattribute xpath="//*[@name='survivorConditionDetailsPanel']/sprite[@depth='1']" name="color">24,24,29,175</setattribute>
@@ -27383,7 +27389,7 @@
           <label name="theoryInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
           <rect name="theoryDescriptionReader" pos="124,-114" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
             <defaultscrollbar />
-            <scrollview name="readableTextViewport" width="748" height="176" clippingsoftness="0,4">
+            <scrollview name="readableTextViewport" depth="10" width="748" height="176" clippingsoftness="0,4">
               <label name="theoryInspectDescription" width="740" height="176" font_size="26" overflow="resizeheight" support_bb_code="true" />
             </scrollview>
           </rect>
@@ -28440,7 +28446,7 @@
           <label name="sellInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
           <rect name="sellDescriptionReader" pos="124,-114" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
             <defaultscrollbar />
-            <scrollview name="readableTextViewport" width="748" height="176" clippingsoftness="0,4">
+            <scrollview name="readableTextViewport" depth="10" width="748" height="176" clippingsoftness="0,4">
               <label name="sellInspectDescription" width="740" height="176" font_size="26" overflow="resizeheight" support_bb_code="true" />
             </scrollview>
           </rect>

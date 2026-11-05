@@ -1,5 +1,19 @@
 <configs>
   <append xpath="/items">
+    <item name="rebirthCamperRecipeBundle">
+      <property name="Extends" value="resourcePaper" />
+      <property name="CustomIcon" value="rebirthCookingCardCmeatstew" />
+      <property name="DescriptionKey" value="rebirthCamperRecipeBundleDesc" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="90" />
+      <property class="Action0">
+        <property name="Class" value="OpenBundle" />
+        <property name="Delay" value="0" />
+        <property name="Sound_start" value="close_garbage" />
+        <property name="Random_item" value="rebirthRecipeBlueberryCrumble,rebirthRecipeGumboStew,rebirthRecipeHoboStew,rebirthRecipeMeatStew,rebirthRecipeMushroomPotPie,rebirthRecipeMushroomSkillet,rebirthRecipePickledVegetables,rebirthRecipePumpkinVegetableSoup,rebirthRecipeShamChowder,rebirthRecipeVegetableStew" />
+        <property name="Random_item_count" value="1,1,1,1,1,1,1,1,1,1" />
+      </property>
+    </item>
     <item name="FuriousRamsayInfo_Purge1Intro">
       <property name="Extends" value="blankNoteMaster" />
       <property name="CreativeMode" value="Dev" />

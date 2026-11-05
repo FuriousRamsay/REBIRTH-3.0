@@ -1344,7 +1344,7 @@ xuiRebirthBackgroundTeacher,Teacher
 xuiRebirthBackgroundTeacherDesc,General knowledge acquisition and broad fundamentals. Small broad starting Skill biases; no advanced specialist Knowledge.
 xuiRebirthBackgroundTeacherArtAlt,Background artwork depicting general knowledge acquisition and broad fundamentals.
 xuiRebirthBackgroundScavenger,Scavenger
-xuiRebirthBackgroundScavengerDesc,"Salvage, dismantling, material recovery, and inventory organization. Strong Salvage bias; no repair specialization. Expert Packing: 13 extra usable backpack slots; encumbrance slots stay the same."
+xuiRebirthBackgroundScavengerDesc,"Salvage, dismantling, material recovery, and inventory organization. Strong Salvage bias; no repair specialization. Expert Packing: 11 extra usable backpack slots you can fill without becoming encumbered."
 xuiRebirthBackgroundScavengerArtAlt,"Background artwork depicting salvage, inventory organization, improvised repair."
 xuiRebirthBackgroundTruckDriver,Truck Driver
 xuiRebirthBackgroundTruckDriverDesc,Vehicle operation and roadside maintenance. Basic Vehicle Repair Knowledge; modest Mechanics bias.
@@ -1807,29 +1807,29 @@ rebirthSupportErgonomicGripModDesc,Tool and melee support that reduces part of r
 xuiRebirthGearSlotBackpack,Backpack
 xuiRebirthGearSlotBelt,Belt
 xuiRebirthGearSlotSupport,Support
-xuiRebirthGearDaypack,Daypack
-xuiRebirthGearFieldPack,Field Pack
-xuiRebirthGearHikingPack,Hiking Pack
-xuiRebirthGearExpeditionPack,Expedition Pack
-rebirthGearDaypack,Daypack
+xuiRebirthGearDaypack,Day Backpack
+xuiRebirthGearFieldPack,Field Backpack
+xuiRebirthGearHikingPack,Hiking Backpack
+xuiRebirthGearExpeditionPack,Expedition Backpack
+rebirthGearDaypack,Day Backpack
 rebirthGearDaypackDesc,[B58CFF]Equip requirements:[-] None.\n[B58CFF]Capacity:[-] [8FD18F]+11 usable slots[-] (1 row).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 6 slots for learning materials.\n[B58CFF]Sell Stash:[-] 10 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearFieldPack,Field Pack
+rebirthGearFieldPack,Field Backpack
 rebirthGearFieldPackDesc,[D6C978]Equip requirements:[-] Strength 60 and Constitution 60.\n[B58CFF]Capacity:[-] [8FD18F]+33 usable slots[-] (3 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 18 slots for learning materials.\n[B58CFF]Sell Stash:[-] 30 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearHikingPack,Hiking Pack
+rebirthGearHikingPack,Hiking Backpack
 rebirthGearHikingPackDesc,[D6C978]Equip requirements:[-] Strength 70 and Constitution 70.\n[B58CFF]Capacity:[-] [8FD18F]+55 usable slots[-] (5 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 30 slots for learning materials.\n[B58CFF]Sell Stash:[-] 50 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearExpeditionPack,Expedition Pack
+rebirthGearExpeditionPack,Expedition Backpack
 rebirthGearExpeditionPackDesc,[D6C978]Equip requirements:[-] Strength 80 and Constitution 80.\n[B58CFF]Capacity:[-] [8FD18F]+77 usable slots[-] (7 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 42 slots for learning materials.\n[B58CFF]Sell Stash:[-] 70 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-xuiRebirthGearExpandedDaypack,Expanded Daypack
-xuiRebirthGearExpandedFieldPack,Expanded Field Pack
-xuiRebirthGearExpandedHikingPack,Expanded Hiking Pack
-xuiRebirthGearExpandedExpeditionPack,Expanded Expedition Pack
-rebirthGearExpandedDaypack,Expanded Daypack
+xuiRebirthGearExpandedDaypack,Expanded Day Backpack
+xuiRebirthGearExpandedFieldPack,Expanded Field Backpack
+xuiRebirthGearExpandedHikingPack,Expanded Hiking Backpack
+xuiRebirthGearExpandedExpeditionPack,Expanded Expedition Backpack
+rebirthGearExpandedDaypack,Expanded Day Backpack
 rebirthGearExpandedDaypackDesc,[D6C978]Equip requirements:[-] Strength 55 and Constitution 55.\n[B58CFF]Capacity:[-] [8FD18F]+22 usable slots[-] (2 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 12 slots for learning materials.\n[B58CFF]Sell Stash:[-] 20 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearExpandedFieldPack,Expanded Field Pack
+rebirthGearExpandedFieldPack,Expanded Field Backpack
 rebirthGearExpandedFieldPackDesc,[D6C978]Equip requirements:[-] Strength 65 and Constitution 65.\n[B58CFF]Capacity:[-] [8FD18F]+44 usable slots[-] (4 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 24 slots for learning materials.\n[B58CFF]Sell Stash:[-] 40 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearExpandedHikingPack,Expanded Hiking Pack
+rebirthGearExpandedHikingPack,Expanded Hiking Backpack
 rebirthGearExpandedHikingPackDesc,[D6C978]Equip requirements:[-] Strength 75 and Constitution 75.\n[B58CFF]Capacity:[-] [8FD18F]+66 usable slots[-] (6 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 36 slots for learning materials.\n[B58CFF]Sell Stash:[-] 60 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
-rebirthGearExpandedExpeditionPack,Expanded Expedition Pack
+rebirthGearExpandedExpeditionPack,Expanded Expedition Backpack
 rebirthGearExpandedExpeditionPackDesc,[D6C978]Equip requirements:[-] Strength 85 and Constitution 85.\n[B58CFF]Capacity:[-] [8FD18F]+88 usable slots[-] (8 rows).\nKeeps the same 22 encumbered slots.\n[B58CFF]Theory storage:[-] 48 slots for learning materials.\n[B58CFF]Sell Stash:[-] 80 slots for items you want to sell.\nEquip this backpack to access both sections beside the inventory sorting controls.
 xuiRebirthGearSlotOuterwearLining,Outerwear Lining
 xuiRebirthGearColdWeatherLining,Cold-Weather Lining
@@ -4824,7 +4824,7 @@ rebirthPracticeTipTitle,Learning through practice
 rebirthPracticeTip,Improve skills by using them. Theory books support learning; recipe cards and manuals unlock knowledge. Open a skill to see activities that train it. There are no skill points to spend.
 rebirthCampfireProcessing,Non-food processing
 rebirthProcessingFinishFood,Finish or cancel the cooking batch before opening non-food processing.
-rebirthNerdOutfitDescription,Heavy Armor. Your lack of fashion sense lets you focus on your inventions. REBIRTH skills grow through practice and separate Theory study. Full Set Bonus: Tools and weapons degrade slower.
+rebirthNerdOutfitDescription,Heavy Armor. Your lack of fashion sense lets you focus on your inventions. REBIRTH skills grow through practice and separate Theory study.
 rebirthForgettingElixirDescription,"This elixir does not reset REBIRTH practical skills, Theory, recipe knowledge or character choices."
 rebirthForgettingElixirTooltip,Elixir used. REBIRTH progression is unchanged.
 rebirthLearningCategory,Life in Rebirth
@@ -8802,7 +8802,7 @@ rebirthTraderVoiceBobTitle,Bob Dialogue Style
 rebirthTraderVoiceSection,Trader Dialogue
 rebirthTraderVoiceDescription,Changes this trader's dialogue personality while keeping their own voice. Saved separately for each player.
 rbJournal_StorageGear_title,Carry more with backpacks and toolbelts
-rbJournal_StorageGear_body,"Open Character. Under Survivor Gear, put a backpack in the Backpack slot or a toolbelt in the Belt slot. Shift-click the item in your inventory to equip it, or drag it into the matching slot. You can also select the item and choose Equip.\n\nA Daypack adds 13 backpack slots. Each better backpack adds another row of 13. Your 26 encumbrance slots stay the same. A Utility Toolbelt adds two toolbelt slots; better belts add more.\n\nMake room before removing storage gear. Items that no longer fit must be dropped: backpack overflow goes into a recovery backpack, while toolbelt overflow drops on the ground. Collect them before leaving."
+rbJournal_StorageGear_body,"Open Character. Under Survivor Gear, put a backpack in the Backpack slot or a toolbelt in the Belt slot. Shift-click the item in your inventory to equip it, or drag it into the matching slot. You can also select the item and choose Equip.\n\nA Day Backpack adds 11 backpack slots. Each better backpack adds another row of 11. Your 22 encumbrance slots stay the same. A Utility Toolbelt adds two toolbelt slots; better belts add more.\n\nMake room before removing storage gear. Items that no longer fit must be dropped: backpack overflow goes into a recovery backpack, while toolbelt overflow drops on the ground. Collect them before leaving."
 rebirthFieldNotesSpearsDesc,[B58CFF]Study to improve Spears Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesClubsDesc,[B58CFF]Study to improve Clubs Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesSwordsDesc,[B58CFF]Study to improve Swords Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
@@ -9272,7 +9272,7 @@ rebirthLearnWorkshop,11 - Workshop and technical skills
 rebirthLearnDevices,"12 - Explosives, turrets and drones"
 rebirthLearnSpecial,13 - Optional special disciplines
 rebirthLearningLegacy,Earlier learning records
-rebirthLessonStoragePackDesc,"Open Crafting and search for Daypack. Craft one using 10 Cloth Fragments and 20 Plant Fibers. Crafting it completes this lesson. To use it, open Character and place it in the Backpack equipment slot. It adds one row of 11 slots; the number of encumbered slots stays the same."
+rebirthLessonStoragePackDesc,"Open Crafting and search for Day Backpack. Craft one using 10 Cloth Fragments and 20 Plant Fibers. Crafting it completes this lesson. To use it, open Character and place it in the Backpack equipment slot. It adds one row of 11 slots; the number of encumbered slots stays the same."
 rebirthLessonStorageBeltDesc,"Open Crafting and search for Utility Toolbelt. Craft one using 6 Cloth Fragments and 2 Scrap Iron. Crafting it completes this lesson. To use it, open Character and place it in the Belt equipment slot. It adds two toolbelt slots."
 rebirthWaterEquipHeld,EQUIP HELD
 xuiRebirthMetabolismAutoSipOn,AUTO SIP: ON
@@ -10077,7 +10077,7 @@ xuiRebirthPurgeStatsCardLaunched,Your supply drops launched
 xuiRebirthPurgeStatsTarget,Target: {0}% clearance in each biome  •  {1:N0} eligible POIs worldwide
 xuiRebirthPurgeStatsBiomes,Biome progress
 xuiRebirthPurgeStatsPois,Discovered locations
-xuiRebirthPurgeStatsBiome,Cleared {0:N0} / {1:N0} required  •  Discovered {2:N0} / {3:N0}
+xuiRebirthPurgeStatsBiome,Cleared {0:N0} / {1:N0} required  •  Discovered {2:N0} / {3:N0}  •  {4} %
 xuiRebirthPurgeStatsPoi,"{0}  •  Tier {1}  •  {2}  •  ({3}, {4})"
 xuiRebirthPurgeStatsNoPois,Discover a Purge location to begin your world progress list.
 xuiRebirthPurgeStatsDiscovered,Discovered
@@ -10166,7 +10166,7 @@ xuiRebirthPurgePoints,points
 xuiRebirthPurgeObjectiveTargetTier,Target: {0}% of available tier points in each biome.
 xuiRebirthPurgeObjectiveBiomeTier,{0}: {1} / {2} points required; {3} points left. Discovered {4} / {5} POIs.
 xuiRebirthPurgeStatsTargetTier,Target: {0}% of tier points in each biome • {1:N0} eligible POIs worldwide
-xuiRebirthPurgeStatsBiomeTier,Points {0} / {1} required • Discovered {2} / {3}
+xuiRebirthPurgeStatsBiomeTier,Points {0} / {1} required • Discovered {2} / {3} • {4} %
 xuiRebirthCamperCardMissingTools,Missing required tools
 xuiRebirthCamperCardNeedsFuel,Needs fuel
 xuiRebirthCamperCardIdle,Idle
@@ -10229,7 +10229,7 @@ xuiRebirthCamperPhysicalUnavailable,Install the corresponding station or power s
 SonjaRecyclerStation,Recycling Station
 SonjaRecyclerStationDesc,Recycle items into component materials with a working battery. Also crafts Workbench recipes.
 xuiRebirthRecycling,RECYCLING
-xuiRebirthRecyclingDrop,Place an item to recycle.
+xuiRebirthRecyclingDrop,"Shift-click a purple item to scrap it, or drop it here. Click a purple item to see what it scraps into."
 xuiRebirthRecyclingInputOccupied,Recycling input is occupied.
 xuiRebirthRecyclingToolsRequired,Install the required recycling tools.
 xuiRebirthRecyclingQueueFull,Not enough queue space for every recycling output.
@@ -12087,3 +12087,375 @@ modVehicleWrapNavezganeExplorerCompare50,Wrap Test C - Explorer 50%
 modVehicleWrapNavezganeExplorerCompare50Desc,Navezgane Explorer comparison C. 6.71 MB; 71% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.
 modVehicleWrapNavezganeExplorerCompare35,Wrap Test D - Explorer 35%
 modVehicleWrapNavezganeExplorerCompare35Desc,Navezgane Explorer comparison D. 3.83 MB; 83% smaller than the current wrap. Install in the vehicle cosmetic slot to compare. Creative test copy; not found in loot or sold by traders.
+rebirthLearnCamper,00 - The camper
+rebirthCamperRecipeBundle,Camper Cook's Recipe
+rebirthCamperRecipeBundleDesc,Open to learn what recipe is inside. It holds one random food recipe.
+rebirthCamperRewardFuel250,250 Gas
+rebirthCamperRewardFuel500,500 Gas
+rebirthCamperRewardFuel1000,1000 Gas
+rebirthCamperRewardRecipe,1 random food recipe
+rebirthCamperDrive,Back on the road
+rebirthCamperDriveDesc,Your truck is your base. Get behind the wheel of your camper and drive it 1 km.
+rebirthCamperDriveObjective,Meters driven
+rebirthCamperCamp,Set up camp
+rebirthCamperCampDesc,"Park your camper, open its energy panel and enter Camp Mode."
+rebirthCamperCampObjective,Enter Camp Mode
+rebirthCamperLights,Lights on
+rebirthCamperLightsDesc,"In Camp Mode near a POI, use your generator or battery bank to power at least 5 of its lights for 5 minutes in a row."
+rebirthCamperLightsObjective,Power 5 POI lights for 5 minutes
+rebirthCamperWorkshop,Mobile workshop
+rebirthCamperWorkshopDesc,Open camper management and place a crafting station in a module position.
+rebirthCamperWorkshopObjective,Place a crafting station
+rebirthCamperPantry,Mobile pantry
+rebirthCamperPantryDesc,Open camper management and place a storage container in a module position.
+rebirthCamperPantryObjective,Place a storage container
+rebirthCamperDinner,Dinner at camp
+rebirthCamperDinnerDesc,Cook a meal at a station installed in your camper.
+rebirthCamperDinnerObjective,Cook a meal at a camper station
+rebirthCamperForwardBase,Forward base
+rebirthCamperForwardBaseDesc,Take the fight further. Enter Camp Mode in a different biome from your first camp.
+rebirthCamperForwardBaseObjective,Camp in a different biome
+rebirthCamperWrap,Make it yours
+rebirthCamperWrapDesc,Find a camper wrap out in the world and apply it to your camper.
+rebirthCamperWrapObjective,Apply a looted wrap
+cntShippingCrateConstructionSupplies,Construction Shipping Crate
+xuiRebirthWanderingHordeFrequency,Wandering Horde Frequency
+xuiRebirthWanderingHordeFrequencyDesc,Adjusts how often wandering hordes arrive. Gradual options increase over the days. Random rolls again for each horde.
+xuiRebirthWanderingHordeFrequencyOff,None
+xuiRebirthWanderingHordeFrequencyDefault,Default
+xuiRebirthWanderingHordeFrequencyHigh,High
+xuiRebirthWanderingHordeFrequencyHigher,Higher
+xuiRebirthWanderingHordeFrequencyHighest,Highest
+xuiRebirthWanderingHordeFrequencyGradualSlower,Gradual (Slower)
+xuiRebirthWanderingHordeFrequencyGradual,Gradual
+xuiRebirthWanderingHordeFrequencyGradualFaster,Gradual (Faster)
+xuiRebirthWanderingHordeFrequencyRandom,Random
+xuiRebirthWanderingHordeSize,Wandering Horde Size
+xuiRebirthWanderingHordeSizeDesc,Adjusts the size of wandering hordes. Gradual options increase over the days. Random rolls again for each horde.
+xuiRebirthWanderingHordeSizeX1,1x
+xuiRebirthWanderingHordeSizeX2,2x
+xuiRebirthWanderingHordeSizeX3,3x
+xuiRebirthWanderingHordeSizeX4,4x
+xuiRebirthWanderingHordeSizeX5,5x
+xuiRebirthWanderingHordeSizeX6,6x
+xuiRebirthWanderingHordeSizeGradualSlower,Gradual (Slower)
+xuiRebirthWanderingHordeSizeGradual,Gradual
+xuiRebirthWanderingHordeSizeGradualFaster,Gradual (Faster)
+xuiRebirthWanderingHordeSizeRandom,Random
+xuiRebirthWanderingHordeDespawn,Wandering Horde Despawn
+xuiRebirthWanderingHordeDespawnDesc,Wandering horde zombies leave shortly after reaching their destination unless a player is near or targeted.
+xuiRebirthWanderingHerdChance,Outbreak Chance
+xuiRebirthWanderingHerdChanceDesc,Outbreaks are random wandering hordes that just keep on coming. Sets the chance of encountering one.
+xuiRebirthWanderingHerdDuration,Outbreak Duration
+xuiRebirthWanderingHerdDurationDesc,"Average outbreak duration in real minutes, give or take 30 seconds. Horde night or a scout horde ends it early."
+xuiRebirthWanderingHerdRestriction,Outbreak Restriction
+xuiRebirthWanderingHerdRestrictionDesc,"Caps the zombies an outbreak can use with Gamestage progression. Low stops at Feral, Medium at Radiated and High at Tainted. Highest has no cap."
+xuiRebirthWanderingHerdRestrictionLow,Low
+xuiRebirthWanderingHerdRestrictionNormal,Medium
+xuiRebirthWanderingHerdRestrictionHigh,High
+xuiRebirthWanderingHerdRestrictionHighest,Highest
+xuiRebirthWanderingHerdAfterHordeNight,Outbreak After Horde Night
+xuiRebirthWanderingHerdAfterHordeNightDesc,Sets the chance of an outbreak right after horde night.
+xuiRebirthDemolisherMode,Demolition Zombies
+xuiRebirthDemolisherModeDesc,"Choose where Demolition zombies can appear and how often. Reduced makes them about 4 times rarer. Boss events never use them."
+xuiRebirthDemolisherModeNever,None
+xuiRebirthDemolisherModeReduced,Reduced
+xuiRebirthDemolisherModeReducedNotInPois,"Reduced, Not in POIs"
+xuiRebirthDemolisherModeNotInPois,Not in POIs
+xuiRebirthDemolisherModeNotHordeNight,Not on Horde Night
+xuiRebirthDemolisherModeAlways,Always
+xuiRebirthKamikazeMode,Kamikaze Zombies
+xuiRebirthKamikazeModeDesc,Choose where Kamikaze zombies can appear.
+xuiRebirthKamikazeModeNever,Never
+xuiRebirthKamikazeModeNotInPois,Not in POIs
+xuiRebirthKamikazeModeNotHordeNight,Not on Horde Night
+xuiRebirthKamikazeModeNotHordeNightOrPois,Not on Horde Night or in POIs
+xuiRebirthKamikazeModeAlways,Always
+xuiRebirthTornadoMode,Tornadoes
+xuiRebirthTornadoModeDesc,Choose when tornadoes can appear. They break blocks outside horde night and stun nearby survivors.
+xuiRebirthTornadoModeBiomesOnly,Biomes Only
+xuiRebirthTornadoModeHordeNightOnly,Horde Night Only
+xuiRebirthTornadoModeAlways,Always
+xuiRebirthTornadoModeNever,Never
+xuiRebirthTornadoMultiplier,Tornado Multiplier
+xuiRebirthTornadoMultiplierDesc,Scales how often tornadoes appear.
+xuiRebirthScreamerNights,Screamer Nights
+xuiRebirthScreamerNightsDesc,"On some nights, players of level 20 or higher draw extra screamers. Higher makes them more frequent and more likely."
+xuiRebirthScreamerNightsNone,None
+xuiRebirthScreamerNightsLower,Lower
+xuiRebirthScreamerNightsDefault,Default
+xuiRebirthScreamerNightsHigher,Higher
+xuiRebirthScreamerMax,Maximum Screamers
+xuiRebirthScreamerMaxDesc,No more scouts are sent while this many screamers are alive near the target.
+xuiRebirthGamestageMultiplier,Gamestage Multiplier
+xuiRebirthGamestageMultiplierDesc,Scales the gamestage used to choose enemies. Biome progression ignores it for most spawns.
+xuiRebirthBossEventZombieAnimals,Zombie Animal Boss Events
+xuiRebirthBossEventZombieAnimalsDesc,Lets boss events at player level 35 or higher use a zombie bear with zombie dogs and boars.
+xuiRebirthOptionSectionZombieSpawning,Zombie Spawning
+xuiRebirthOptionSectionZombieBehavior,Zombie Behavior
+xuiRebirthOptionSectionEntitiesGeneral,General
+xuiRebirthOptionSectionPoiRisk,POI Risk
+xuiRebirthOptionSectionPoiSense,POI Sense
+xuiRebirthOptionSectionWorldTheme,World Theme
+xuiRebirthOptionSectionWorldDensity,Trees and Vehicles
+xuiRebirthOptionSectionWorldFire,Fire
+xuiRebirthOptionSectionWorldWeather,Weather and Atmosphere
+xuiRebirthOptionSectionWorldFarming,Farming and Forestry
+xuiRebirthOptionSectionTraderJobs,Trader Jobs
+xuiRebirthOptionSectionTraderRecovery,Job Recovery
+xuiRebirthOptionSectionTraderAreas,Trader Areas
+xuiRebirthOptionSectionBossEvents,Boss Events
+xuiRebirthOptionSectionSeekers,Seekers
+xuiRebirthOptionSectionSpecialZombies,Special Zombies
+xuiRebirthOptionSectionScreamers,Screamers
+xuiRebirthOptionSectionWanderingHordes,Wandering Hordes
+xuiRebirthOptionSectionOutbreaks,Outbreaks
+xuiRebirthOptionSectionTornadoes,Tornadoes
+xuiRebirthOptionSectionInventoryResources,Inventory and Resources
+xuiRebirthOptionSectionBaseAccess,Base and Access
+xuiRebirthOptionSectionQolGameplay,Gameplay
+xuiRebirthOptionSectionQolSystem,System
+xuiRebirthOptionSectionCompanionDisplay,Display
+xuiRebirthOptionSectionCompanionDistances,Distances
+xuiRebirthOptionSectionCharacterProgression,Progression
+xuiRebirthOptionSectionMiscInterface,Interface
+xuiRebirthOptionSectionMiscGameplay,Gameplay
+ttTradeAmmo,Trade Ammo
+xuiTradeAmmoDescription,"You tell me what type of ammo you want and we'll see what you have to trade for it. You'll get a better exchange rate if you increase your [8c5483]Bartering[-] and [8c5483]Trading[-] skills. Right now I can offer you a [d0d19f]{0}[-] exchange rate, based on materials."
+xuiTradeAmmoDescription2,Keep what you don't want to trade in your [c79595]toolbelt[-] or [c79595]locked inventory slots[-].
+xuiTradeAmmoYouHave,[88bbbd]What do you want to trade in?[-]:
+xuiTradeAmmoPickAmmo,[c79595]What type of ammo do you want in return?[-]:
+xuiTradeAmmoYouGet,"[95c7a2]For that type, I'll give you this many[-]:"
+armorAssassinBootsDesc,"Medium Armor\nSilent, but deadly. Sprinting while sneaking makes no extra sound."
+armorAssassinGlovesDesc,Medium Armor\nDexterity is the key to unleashing your fury. Increases attack speed with all weapons governed by agility.
+armorAssassinHelmetDesc,Medium Armor\nThey'll never see it coming. Deal more damage when sneaking.
+armorAssassinOutfitDesc,"Medium Armor\nMove unseen, unheard, and unharmed. Increases sneak effectiveness."
+armorAthleticBootsDesc,"Light Armor\nYou don't have to be the fastest, you just have to not be the slowest. Increases run speed."
+armorAthleticGlovesDesc,Light Armor\nStronger grip that won't wear you down. Increases max stamina.
+armorAthleticHelmetDesc,"Light Armor\nLook the part to strike a better deal. Food, drinks, and drugs cost less."
+armorAthleticOutfitDesc,Light Armor\nAthleticism boosts vigor in battle. Increases max health
+armorBikerBootsDesc,Medium Armor\nNothing says kick ass more than a pair of leather biker boots. Use less stamina with melee weapons.
+armorBikerGlovesDesc,Medium Armor\nImprove your punch and look nasty doing it too. Increases melee weapon damage.
+armorBikerHelmetDesc,Medium Armor\nTake a hit while looking intimidating at the same time. Increases stun resistance.
+armorBikerOutfitDesc,Medium Armor\nLook and feel like a badass. Increases max health.
+armorCommandoBootsDesc,Medium Armor\nThese carbon fiber toed ass kickers make you look tough and help you run faster. Increases run speed.
+armorCommandoGlovesDesc,Medium Armor\nProtect your trigger finger and dish out the pain. Increases damage with all ranged weapons.
+armorCommandoHelmetDesc,Medium Armor\nProtect your skull from incoming attacks. Adds stun resistance.
+armorCommandoOutfitDesc,Medium Armor\nTrue commandos endure without flinching. Faster critical injury recovery.
+armorEnforcerBootsDesc,Light Armor\nChase down those punks like a badass homicide cop. Increases run speed.
+armorEnforcerGlovesDesc,Light Armor\nA true wheelman wears gloves. Vehicles use less fuel.
+armorEnforcerHelmetDesc,Light Armor\nLook like a boss in this getup. Increases bartering.
+armorEnforcerOutfitDesc,"Light Armor\nStylish, lightweight, and breathable materials that can take a beating. Increases resistance to critical injuries."
+armorFarmerBootsDesc,Medium Armor\nNothing beats a comfortable pair of boots out in the field. Adds a chance to gain a seed when harvesting.
+armorFarmerGlovesDesc,Medium Armor\nGet a grip and shoot everything that moves. Increases rifle damage.
+armorFarmerHelmetDesc,Medium Armor\nKeep the sun out of your eyes and on the prize. Increases the chance to find seeds in loot.
+armorFarmerOutfitDesc,Medium Armor\nBeing ready for the square dance isn't all these overalls are good for. Adds a chance to harvest an extra crop.
+armorLumberjackBootsDesc,Light Armor\nThe form-fitting ankle support prevents quick fatigue in the woods. Reduces stamina cost when sprinting.
+armorLumberjackGlovesDesc,Light Armor\nWho said an axe is a terrible weapon? Increases melee damage with axes.
+armorLumberjackHelmetDesc,Light Armor\nBe the boss of the lumber yard. Increases wood harvest.
+armorLumberjackOutfitDesc,"Light Armor\nWith a vest full of pockets, you'll have room for that. Reduces encumbrance."
+armorMinerBootsDesc,Heavy Armor\nThese steel toed boots keep your feet protected. Reduces fall damage.
+armorMinerGlovesDesc,Heavy Armor\nCrack rock like a pro with these gloves. Increases damage of mining tools.
+armorMinerHelmetDesc,Heavy Armor\nLight the way to higher yields. Increases mining tool harvest.
+armorMinerOutfitDesc,Heavy Armor\nThe ergonomic fit will keep you mining all night without getting tired. Reduces stamina cost of mining tools.
+armorNerdBootsDesc,Heavy Armor\nProtection with a spring in your step. Reduces fall damage.
+armorNerdGlovesDesc,Heavy Armor\nProtect those cold clammy soft hands from the elements and become an intellectual badass. Deal more damage with intellect based weapons.
+armorNerdHelmetDesc,"Heavy Armor\nYou might not win any dates, but you'll win at leveling up your skills. Increases experience gain."
+armorNerdOutfitDesc,Heavy Armor\nYour lack of fashion sense gives you the ability to focus on your inventions. Adds a chance to gain two crafting skill points when reading magazines.
+armorNomadBootsDesc,Heavy Armor\nSeasoned travelers know the importance of proper footwear. Increases run speed.
+armorNomadGlovesDesc,"Heavy Armor\nIntegrated with materials that absorb radiation, these gloves are capable of inflicting increased melee damage on radiated foes. Deal more melee damage against Radiated, Charged, and Infernal enemies."
+armorNomadHelmetDesc,"Heavy Armor\nGuarded against the severe conditions of the wasteland, this headgear enables the Nomad to wander further. Reduces food and water use."
+armorNomadOutfitDesc,Heavy Armor\nNomadic life means carrying everything with you. Reduces encumbrance.
+armorPreacherBootsDesc,Light Armor\nYou can't kick ass for the Lord if you're dead! Decreases treated healing time of abrasions and breaks.
+armorPreacherGlovesDesc,Light Armor\nSmite thy enemy. Increases damage dealt to the undead.
+armorPreacherHelmetDesc,"Light Armor\nEarned through acts of kindness, fairness, and heroic deeds, the Preacher's positive reputation is well respected by the trading community. Receive a discount on purchased items."
+armorPreacherOutfitDesc,"Light Armor\nBlessed by the Lord, these threads will keep you protected from evil. Reduces incoming damage."
+armorRaiderBootsDesc,Heavy Armor\nShock absorbing soles will soften your falls. Reduces fall damage.
+armorRaiderGlovesDesc,Heavy Armor\nMetal plates increase the momentum of your swing. Increases melee weapon damage.
+armorRaiderHelmetDesc,"Heavy Armor\nThe chaos of battle can be jarring, but this helmet will leave you unshaken. Increases stun resistance."
+armorRaiderOutfitDesc,Heavy Armor\nA nearly impenetrable defense is worth its weight. Reduces critical injuries to be less severe.
+armorRangerBootsDesc,Medium Armor\nCover more ground and stay in the fight longer. Increases max stamina.
+armorRangerGlovesDesc,Medium Armor\nKill varmints with enhanced grip and precision. Increases rifle and revolver damage.
+armorRangerHelmetDesc,"Medium Armor\nRangers are ruthless negotiators, especially while wearing a well crafted hat. Increases bartering."
+armorRangerOutfitDesc,Medium Armor\nA rugged leather duster that keeps you in the fight longer. Increases max health.
+armorRogueBootsDesc,"Light Armor\nDesigned for withstanding harsh impacts, these boots protect you from fall damage. Increases safe fall distance."
+armorRogueGlovesDesc,Light Armor\nTime is everything when breaking into locks. Increases lockpicking speed and success rate.
+armorRogueHelmetDesc,Light Armor\nA cunning thief always knows where to look. Increases loot stage.
+armorRogueOutfitDesc,"Light Armor\nThieves know how to get in, and get out undetected. Increases sneak effectiveness."
+armorScavengerBootsDesc,Medium Armor\nSalvage longer with these custom fitted boots. Reduces stamina usage when salvaging.
+armorScavengerGlovesDesc,Medium Armor\nProtect those knuckles and concentrate on your salvaging efforts. Increase resources when salvaging.
+armorScavengerHelmetDesc,Medium Armor\nYou're bound to learn something from taking all that stuff apart. Gain more XP when salvaging.
+armorScavengerOutfitDesc,Medium Armor\nDeep pockets help bring the goods home. Reduces encumbrance.
+xuiRebirthArmorBonusHeading,Bonuses
+aeBonusFmt_entity_damage_axes,+{0} damage with axes
+aeBonusFmt_entity_damage_batons,+{0} damage with batons
+aeBonusFmt_entity_damage_clubs,+{0} damage with clubs
+aeBonusFmt_entity_damage_hammers,+{0} damage with hammers
+aeBonusFmt_entity_damage_knives,+{0} damage with knives
+aeBonusFmt_entity_damage_knuckles,+{0} damage with knuckles
+aeBonusFmt_entity_damage_scythes,+{0} damage with scythes
+aeBonusFmt_entity_damage_spears,+{0} damage with spears
+aeBonusFmt_entity_damage_swords,+{0} damage with swords
+aeBonusFmt_entity_damage_unarmed,+{0} damage with bare hands
+aeBonusFmt_entity_damage_bows,+{0} damage with bows
+aeBonusFmt_entity_damage_pistols,+{0} damage with pistols
+aeBonusFmt_entity_damage_revolvers,+{0} damage with revolvers
+aeBonusFmt_entity_damage_heavy_handguns,+{0} damage with heavy handguns
+aeBonusFmt_entity_damage_shotguns,+{0} damage with shotguns
+aeBonusFmt_entity_damage_assault_rifles,+{0} damage with assault rifles
+aeBonusFmt_entity_damage_tactical_rifles,+{0} damage with tactical rifles
+aeBonusFmt_entity_damage_long_range_rifles,+{0} damage with long-range rifles
+aeBonusFmt_entity_damage_melee,+{0} damage with all melee weapons
+aeBonusFmt_entity_damage_ranged,+{0} damage with all ranged weapons
+aeBonusFmt_entity_damage_all,+{0} damage with all weapons
+aeBonusFmt_entity_damage_all_greater,+{0} damage with all weapons
+aeBonusFmt_reload_speed_bows_common,+{0} reload speed with bows
+aeBonusFmt_reload_speed_bows_uncommon,+{0} reload speed with bows
+aeBonusFmt_reload_speed_pistols_common,+{0} reload speed with pistols
+aeBonusFmt_reload_speed_pistols_uncommon,+{0} reload speed with pistols
+aeBonusFmt_reload_speed_revolvers_common,+{0} reload speed with revolvers
+aeBonusFmt_reload_speed_revolvers_uncommon,+{0} reload speed with revolvers
+aeBonusFmt_reload_speed_heavy_handguns_common,+{0} reload speed with heavy handguns
+aeBonusFmt_reload_speed_heavy_handguns_uncommon,+{0} reload speed with heavy handguns
+aeBonusFmt_reload_speed_shotguns_common,+{0} reload speed with shotguns
+aeBonusFmt_reload_speed_shotguns_uncommon,+{0} reload speed with shotguns
+aeBonusFmt_reload_speed_assault_rifles_common,+{0} reload speed with assault rifles
+aeBonusFmt_reload_speed_assault_rifles_uncommon,+{0} reload speed with assault rifles
+aeBonusFmt_reload_speed_tactical_rifles_common,+{0} reload speed with tactical rifles
+aeBonusFmt_reload_speed_tactical_rifles_uncommon,+{0} reload speed with tactical rifles
+aeBonusFmt_reload_speed_long_range_rifles_common,+{0} reload speed with long-range rifles
+aeBonusFmt_reload_speed_long_range_rifles_uncommon,+{0} reload speed with long-range rifles
+aeBonusFmt_reload_speed_ranged_rare,+{0} reload speed with all ranged weapons
+aeBonusFmt_reload_speed_ranged_legendary,+{0} reload speed with all ranged weapons
+aeBonusFmt_rpm_bows_common,+{0} fire rate with bows
+aeBonusFmt_rpm_bows_uncommon,+{0} fire rate with bows
+aeBonusFmt_rpm_pistols_common,+{0} fire rate with pistols
+aeBonusFmt_rpm_pistols_uncommon,+{0} fire rate with pistols
+aeBonusFmt_rpm_revolvers_common,+{0} fire rate with revolvers
+aeBonusFmt_rpm_revolvers_uncommon,+{0} fire rate with revolvers
+aeBonusFmt_rpm_heavy_handguns_common,+{0} fire rate with heavy handguns
+aeBonusFmt_rpm_heavy_handguns_uncommon,+{0} fire rate with heavy handguns
+aeBonusFmt_rpm_shotguns_common,+{0} fire rate with shotguns
+aeBonusFmt_rpm_shotguns_uncommon,+{0} fire rate with shotguns
+aeBonusFmt_rpm_assault_rifles_common,+{0} fire rate with assault rifles
+aeBonusFmt_rpm_assault_rifles_uncommon,+{0} fire rate with assault rifles
+aeBonusFmt_rpm_tactical_rifles_common,+{0} fire rate with tactical rifles
+aeBonusFmt_rpm_tactical_rifles_uncommon,+{0} fire rate with tactical rifles
+aeBonusFmt_rpm_long_range_rifles_common,+{0} fire rate with long-range rifles
+aeBonusFmt_rpm_long_range_rifles_uncommon,+{0} fire rate with long-range rifles
+aeBonusFmt_rpm_ranged_rare,+{0} fire rate with all ranged weapons
+aeBonusFmt_rpm_ranged_legendary,+{0} fire rate with all ranged weapons
+aeBonusFmt_apm_axes_common,+{0} attack speed with axes
+aeBonusFmt_apm_axes_uncommon,+{0} attack speed with axes
+aeBonusFmt_apm_batons_common,+{0} attack speed with batons
+aeBonusFmt_apm_batons_uncommon,+{0} attack speed with batons
+aeBonusFmt_apm_clubs_common,+{0} attack speed with clubs
+aeBonusFmt_apm_clubs_uncommon,+{0} attack speed with clubs
+aeBonusFmt_apm_hammers_common,+{0} attack speed with hammers
+aeBonusFmt_apm_hammers_uncommon,+{0} attack speed with hammers
+aeBonusFmt_apm_knives_common,+{0} attack speed with knives
+aeBonusFmt_apm_knives_uncommon,+{0} attack speed with knives
+aeBonusFmt_apm_knuckles_common,+{0} attack speed with knuckles
+aeBonusFmt_apm_knuckles_uncommon,+{0} attack speed with knuckles
+aeBonusFmt_apm_scythes_common,+{0} attack speed with scythes
+aeBonusFmt_apm_scythes_uncommon,+{0} attack speed with scythes
+aeBonusFmt_apm_spears_common,+{0} attack speed with spears
+aeBonusFmt_apm_spears_uncommon,+{0} attack speed with spears
+aeBonusFmt_apm_swords_common,+{0} attack speed with swords
+aeBonusFmt_apm_swords_uncommon,+{0} attack speed with swords
+aeBonusFmt_apm_unarmed_common,+{0} attack speed with bare hands
+aeBonusFmt_apm_unarmed_uncommon,+{0} attack speed with bare hands
+aeBonusFmt_apm_melee_rare,+{0} attack speed with all melee weapons
+aeBonusFmt_apm_melee_legendary,+{0} attack speed with all melee weapons
+aeBonusFmt_penetration_pistols,+{0} penetration with pistols
+aeBonusFmt_penetration_revolvers,+{0} penetration with revolvers
+aeBonusFmt_penetration_heavy_handguns,+{0} penetration with heavy handguns
+aeBonusFmt_penetration_assault_rifles,+{0} penetration with assault rifles
+aeBonusFmt_penetration_tactical_rifles,+{0} penetration with tactical rifles
+aeBonusFmt_penetration_long_range_rifles,+{0} penetration with long-range rifles
+aeBonusFmt_penetration_bows,+{0} penetration with bows
+aeBonusFmt_penetration_spears,+{0} penetration with spears
+aeBonusFmt_penetration_shotguns,+{0} penetration with shotguns
+aeBonusFmt_penetration_sidearms,+{0} penetration with sidearms
+aeBonusFmt_penetration_rifles,+{0} penetration with rifles
+aeBonusFmt_penetration_bows_spears_shotguns,+{0} penetration with bows, spears and shotguns
+aeBonusFmt_penetration_ranged_rare,+{0} penetration with all ranged weapons
+aeBonusFmt_penetration_ranged_spears_legendary,+{0} penetration with all ranged weapons and spears
+aeBonusFmt_target_armor_axes,-{0} target armor with axes
+aeBonusFmt_target_armor_batons,-{0} target armor with batons
+aeBonusFmt_target_armor_clubs,-{0} target armor with clubs
+aeBonusFmt_target_armor_hammers,-{0} target armor with hammers
+aeBonusFmt_target_armor_knives,-{0} target armor with knives
+aeBonusFmt_target_armor_knuckles,-{0} target armor with knuckles
+aeBonusFmt_target_armor_scythes,-{0} target armor with scythes
+aeBonusFmt_target_armor_spears,-{0} target armor with spears
+aeBonusFmt_target_armor_swords,-{0} target armor with swords
+aeBonusFmt_target_armor_unarmed,-{0} target armor with bare hands
+aeBonusFmt_target_armor_bows,-{0} target armor with bows
+aeBonusFmt_target_armor_pistols,-{0} target armor with pistols
+aeBonusFmt_target_armor_revolvers,-{0} target armor with revolvers
+aeBonusFmt_target_armor_heavy_handguns,-{0} target armor with heavy handguns
+aeBonusFmt_target_armor_shotguns,-{0} target armor with shotguns
+aeBonusFmt_target_armor_assault_rifles,-{0} target armor with assault rifles
+aeBonusFmt_target_armor_tactical_rifles,-{0} target armor with tactical rifles
+aeBonusFmt_target_armor_long_range_rifles,-{0} target armor with long-range rifles
+aeBonusFmt_target_armor_melee,-{0} target armor with all melee weapons
+aeBonusFmt_target_armor_ranged,-{0} target armor with all ranged weapons
+aeBonusFmt_target_armor_rare,-{0} target armor
+aeBonusFmt_target_armor_legendary,-{0} target armor
+aeBonusFmt_dismember_axes,+{0} dismember chance with axes
+aeBonusFmt_dismember_batons,+{0} dismember chance with batons
+aeBonusFmt_dismember_clubs,+{0} dismember chance with clubs
+aeBonusFmt_dismember_hammers,+{0} dismember chance with hammers
+aeBonusFmt_dismember_knives,+{0} dismember chance with knives
+aeBonusFmt_dismember_knuckles,+{0} dismember chance with knuckles
+aeBonusFmt_dismember_scythes,+{0} dismember chance with scythes
+aeBonusFmt_dismember_spears,+{0} dismember chance with spears
+aeBonusFmt_dismember_swords,+{0} dismember chance with swords
+aeBonusFmt_dismember_unarmed,+{0} dismember chance with bare hands
+aeBonusFmt_dismember_bows,+{0} dismember chance with bows
+aeBonusFmt_dismember_pistols,+{0} dismember chance with pistols
+aeBonusFmt_dismember_revolvers,+{0} dismember chance with revolvers
+aeBonusFmt_dismember_heavy_handguns,+{0} dismember chance with heavy handguns
+aeBonusFmt_dismember_shotguns,+{0} dismember chance with shotguns
+aeBonusFmt_dismember_assault_rifles,+{0} dismember chance with assault rifles
+aeBonusFmt_dismember_tactical_rifles,+{0} dismember chance with tactical rifles
+aeBonusFmt_dismember_long_range_rifles,+{0} dismember chance with long-range rifles
+aeBonusFmt_dismember_melee,+{0} dismember chance with all melee weapons
+aeBonusFmt_dismember_ranged,+{0} dismember chance with all ranged weapons
+aeBonusFmt_dismember_rare,+{0} dismember chance
+aeBonusFmt_dismember_legendary,+{0} dismember chance
+aeBonusFmt_harvest_knives_common,+{0} wild crop harvest with knives
+aeBonusFmt_harvest_knives_uncommon,+{0} wild crop harvest with knives
+aeBonusFmt_harvest_scythes_common,+{0} wild crop harvest with scythes
+aeBonusFmt_harvest_scythes_uncommon,+{0} wild crop harvest with scythes
+aeBonusFmt_harvest_axes_common,+{0} wild crop harvest with axes
+aeBonusFmt_harvest_axes_uncommon,+{0} wild crop harvest with axes
+aeBonusFmt_harvest_swords_common,+{0} wild crop harvest with swords
+aeBonusFmt_harvest_swords_uncommon,+{0} wild crop harvest with swords
+aeBonusFmt_harvest_bladed_rare,+{0} wild crop and +1 grown crop harvest with bladed weapons
+aeBonusFmt_harvest_bladed_legendary,+{0} wild crop and +2 grown crop harvest with bladed weapons
+aeBonusFmt_block_damage_mining_common,+{0} block damage with mining tools
+aeBonusFmt_block_damage_mining_uncommon,+{0} block damage with mining tools
+aeBonusFmt_block_damage_mining_rare,+{0} block damage with mining tools
+aeBonusFmt_block_damage_mining_legendary,+{0} block damage with mining tools
+aeBonusFmt_block_damage_logging_common,+{0} block damage with axes and chainsaws
+aeBonusFmt_block_damage_logging_uncommon,+{0} block damage with axes and chainsaws
+aeBonusFmt_block_damage_logging_rare,+{0} block damage with axes and chainsaws
+aeBonusFmt_block_damage_logging_legendary,+{0} block damage with axes and chainsaws
+aeBonusFmt_block_damage_salvage_common,+{0} salvage speed with salvage tools
+aeBonusFmt_block_damage_salvage_uncommon,+{0} salvage speed with salvage tools
+aeBonusFmt_block_damage_salvage_rare,+{0} salvage speed with salvage tools
+aeBonusFmt_block_damage_salvage_legendary,+{0} salvage speed with salvage tools
+aeBonusFmt_trained_damage_rare,Up to +{0} damage, growing with your skill in the weapon
+aeBonusFmt_trained_damage_legendary,Up to +{0} damage, growing with your skill in the weapon
+aeBonusFmt_explosion_pipe_bombs,+{0} explosive damage with pipe bombs
+aeBonusFmt_explosion_grenades,+{0} explosive damage with grenades
+aeBonusFmt_explosion_dynamite,+{0} explosive damage with dynamite
+aeBonusFmt_explosion_timed_charge,+{0} explosive damage with timed charges
+aeBonusFmt_explosion_arrows,+{0} explosive damage with exploding arrows and bolts
+aeBonusFmt_explosion_rockets,+{0} explosive damage with rockets
+aeBonusFmt_explosion_throwables,+{0} explosive damage with throwables
+aeBonusFmt_explosion_projectiles,+{0} explosive damage with projectiles
+aeBonusFmt_explosion_all,+{0} explosive damage
+aeBonusFmt_explosion_all_legendary,+{0} explosive damage

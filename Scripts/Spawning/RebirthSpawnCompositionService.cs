@@ -156,9 +156,11 @@ public static class RebirthSpawnCompositionService
             return true;
 
         string name = entityClass.entityClassName ?? string.Empty;
-        return name.IndexOf("screamer", StringComparison.OrdinalIgnoreCase) >= 0 ||
-               name.IndexOf("demolition", StringComparison.OrdinalIgnoreCase) >= 0 ||
-               name.IndexOf("demolisher", StringComparison.OrdinalIgnoreCase) >= 0;
+        if (name.IndexOf("screamer", StringComparison.OrdinalIgnoreCase) >= 0) return true;
+        if (!RebirthDemolisherPolicy.IsDemolisher(name)) return false;
+        // Boss selection has no active surface and stays excluded.
+        RebirthSpawnContext active = RebirthSpawnCompositionRuntimeIntegration.Current;
+        return active == null || !RebirthDemolisherPolicy.Allows(active.Surface);
     }
 
     public static bool IsForbiddenRestrictedSpawnEntity(int entityClassId)
@@ -220,6 +222,8 @@ public static class RebirthSpawnCompositionService
                  || context.GameStage < e.MinGs || context.GameStage > e.MaxGs)) continue;
             if (!IsRuntimeEntityRegistered(e)) continue;
             if (IsRestrictedNoSpecialSurface(context.Surface) && IsForbiddenRestrictedSpawnEntity(e.Id)) continue;
+            if (RebirthDemolisherPolicy.IsDemolisher(e.Name) && !RebirthDemolisherPolicy.Allows(context.Surface)) continue;
+            if (!RebirthEventSpawnPolicy.Allows(e.Name, context.Surface)) continue;
             if (context.ProgressionMode == RebirthSpawnProgressionMode.Gamestage && (context.GameStage < e.MinGs || context.GameStage > e.MaxGs)) continue;
             if (context.ProgressionMode == RebirthSpawnProgressionMode.Biome && e.Biomes.Count > 0)
             {
@@ -231,12 +235,16 @@ public static class RebirthSpawnCompositionService
             list.Add(e);
         }
 
+        // 2.6 rule: never the same entity twice in a row. It stays eligible only when nothing else is.
+        int lastEntity = LastEntity(history, context.HistoryKey);
+        bool excludeLast = lastEntity != 0 && HasOtherEntity(eligible, lastEntity);
         List<RebirthSpawnCategory> categories = new List<RebirthSpawnCategory>();
         List<double> categoryWeights = new List<double>();
         foreach (KeyValuePair<RebirthSpawnCategory, List<RebirthEntityRule>> pair in eligible)
         {
             RebirthCategoryRule rule;
             if (!data.Categories.TryGetValue(pair.Key, out rule) || pair.Value.Count == 0) continue;
+            if (excludeLast && pair.Value.Count == 1 && pair.Value[0].Id == lastEntity) continue;
             double weight = context.ProgressionMode == RebirthSpawnProgressionMode.Gamestage
                 ? Evaluate(rule.GameStageCurve, context.GameStage)
                 : GetBiomeWeight(rule, context.Biome);
@@ -264,7 +272,9 @@ public static class RebirthSpawnCompositionService
             for (int i = 0; i < candidates.Count; i++)
             {
                 double tm = GetThemeMultiplier(context.PrefabName, candidates[i]);
-                double hm = GetHistoryMultiplier(history, context.HistoryKey, candidates[i].Id);
+                if (RebirthDemolisherPolicy.IsDemolisher(candidates[i].Name)) tm *= RebirthDemolisherPolicy.WeightScale;
+                tm *= RebirthEventSpawnPolicy.WeightScale(candidates[i].Name);
+                double hm = excludeLast && candidates[i].Id == lastEntity ? 0.0 : GetHistoryMultiplier(history, context.HistoryKey, candidates[i].Id);
                 if (buildTrace) { themeMultipliers.Add(tm); historyMultipliers.Add(hm); }
                 double logWeight = IsFinitePositive(candidates[i].EntityWeight) && IsFinitePositive(tm) && IsFinitePositive(hm)
                     ? Math.Log(candidates[i].EntityWeight) + Math.Log(tm) + Math.Log(hm)
@@ -498,6 +508,21 @@ public static class RebirthSpawnCompositionService
         }
     }
     private static string GetThemeDescription(string prefab){RebirthPrefabTheme p;if(string.IsNullOrEmpty(prefab)||s_data==null||!s_data.Prefabs.TryGetValue(prefab,out p))return "none";StringBuilder sb=new StringBuilder();for(int i=0;i<p.Themes.Count;i++){if(i>0)sb.Append(',');sb.Append(p.Themes[i].Key).Append('@').Append(p.Themes[i].Value.ToString("0.###",CultureInfo.InvariantCulture));}return sb.ToString();}
+    private static int LastEntity(Dictionary<string, Queue<int>> history,string key)
+    {
+        if(history==null||string.IsNullOrEmpty(key))return 0;
+        Queue<int> q;
+        if(!history.TryGetValue(key,out q)||q==null)return 0;
+        int last=0;
+        foreach(int value in q)last=value;
+        return last;
+    }
+    private static bool HasOtherEntity(Dictionary<RebirthSpawnCategory, List<RebirthEntityRule>> eligible,int id)
+    {
+        foreach(KeyValuePair<RebirthSpawnCategory, List<RebirthEntityRule>> pair in eligible)
+            for(int i=0;i<pair.Value.Count;i++)if(pair.Value[i].Id!=id)return true;
+        return false;
+    }
     private static double GetHistoryMultiplier(Dictionary<string, Queue<int>> history,string key,int id)
     {
         if(history==null||string.IsNullOrEmpty(key))return 1;

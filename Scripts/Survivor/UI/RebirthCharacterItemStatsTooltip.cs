@@ -293,7 +293,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             !RebirthStationGridIngredients.IsSameStackSnapshot(stack,baseline) &&
             XUiM_ItemStack.CanCompare(stack.itemValue.ItemClass, baseline.itemValue.ItemClass) &&
             food == RebirthCharacterItemStatsTooltip.FoodPopup(baseline.itemValue);
-        bool showXmlName = surface is XUiC_RebirthCreativeWorkspace;
+        const bool showXmlName = false; // Players see item names, not internal IDs. Set true to show IDs in tooltips.
         int fingerprint = ProjectionFingerprint(stack, compare ? baseline : null, compare, showXmlName);
         unchecked
         {
@@ -325,6 +325,13 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
                 SelectedValue = compare && RebirthItemSaleEstimate.TryGet(xui, baseline, out comparisonEstimate) ? comparisonEstimate.ToString("N0", CultureInfo.InvariantCulture) : "",
                 Icon = "ui_game_symbol_coin"
             });
+        }
+        var armorBonuses = RebirthArmorBonusStorage.Read(stack.itemValue);
+        if (armorBonuses.Length > 0)
+        {
+            data.Add(new RowData { Title = Localization.Get("xuiRebirthArmorBonusHeading"), Value = "", Heading = true, Height = 38 });
+            for (int bonusIndex = 0; bonusIndex < armorBonuses.Length; bonusIndex++)
+                data.Add(new RowData { Title = RebirthArmorBonusText.Plain(armorBonuses[bonusIndex]), Value = "", FullWidth = true });
         }
         // Reserve the final two rows so the category section cannot be truncated by stats.
         int bodyCapacity=weaponRows?rows.Length-2:StatisticsRowCapacity+1;

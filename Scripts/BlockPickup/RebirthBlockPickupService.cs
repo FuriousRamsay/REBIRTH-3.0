@@ -203,7 +203,9 @@ public static class RebirthBlockPickupService
         if (!target.IsValid || target.TargetItem.ItemClass == null)
             return;
 
-        string localizedName = target.TargetItem.ItemClass.GetLocalizedItemName();
+        string localizedName = target.HasRandomResult
+            ? block.GetLocalizedBlockName()
+            : target.TargetItem.ItemClass.GetLocalizedItemName();
         if (string.IsNullOrEmpty(localizedName))
             localizedName = Localization.Get(target.TargetName ?? block.GetBlockName());
 

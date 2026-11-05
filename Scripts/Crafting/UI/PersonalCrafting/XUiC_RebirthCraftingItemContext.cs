@@ -15,6 +15,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthCraftingItemContext : XUiController
 {
+    internal static ItemStack LastInspected;
     private const int MaxVisibleActions = 6;
     private const int ContextHeight = 232;
     private const int CombatPanelHeight = 206;
@@ -612,6 +613,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
             return;
         }
 
+        LastInspected = selectedSlot.ItemStack;
         ItemStack stack = selectedSlot.ItemStack;
         ItemValue value = stack.itemValue;
         ItemClass itemClass = value != null ? value.ItemClassOrMissing : null;
@@ -1004,6 +1006,13 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
     }
 
     public static string ResolveDescription(ItemStack stack, XUi ui = null)
+    {
+        string description = ResolveBaseDescription(stack, ui);
+        string bonuses = stack != null && !stack.IsEmpty() ? RebirthArmorBonusText.DescribeAll(stack.itemValue) : string.Empty;
+        return bonuses.Length > 0 ? bonuses + "\n\n" + description : description;
+    }
+
+    public static string ResolveBaseDescription(ItemStack stack, XUi ui = null)
     {
         if (stack == null || stack.IsEmpty() || stack.itemValue == null)
             return string.Empty;

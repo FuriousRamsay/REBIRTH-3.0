@@ -150,5 +150,10 @@
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
   <include filename="_Vehicles/standard_items.xml"/>
   <include filename="_Seeker/items.xml"/>
+  <!-- Full set bonuses are removed. -->
+  <remove xpath="/items/item//effect_group[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/items/item//triggered_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/items/item//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/items/item//triggered_effect[contains(@buff,'SetBonus')]" />
 </configs>
 

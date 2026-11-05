@@ -126,7 +126,7 @@ public static class RebirthBlockPickupClassifier
         string name = block.GetBlockName() ?? string.Empty;
 
         // Absolute denials: XML is not allowed to re-enable these categories.
-        if (IsVehicleBlock(block))
+        if (IsVehicleBlock(block) && !IsLooseVehiclePart(block))
             return Deny("vehicle or automotive block");
         if (IsStructuralInfrastructureFamily(name))
             return Deny("structural infrastructure block family");
@@ -227,6 +227,13 @@ public static class RebirthBlockPickupClassifier
                 return true;
         }
         return false;
+    }
+
+    // 2.6: loose parts lying in the world are picked up as a vehicle part item.
+    private static bool IsLooseVehiclePart(Block block)
+    {
+        return !string.IsNullOrEmpty(GetProperty(block, "ReplacementBlockName")) &&
+            string.Equals(GetProperty(block, "isReplacementItem"), "true", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsVehicleBlock(Block block)

@@ -54,6 +54,97 @@
         <passive_effect name="WalkSpeed" operation="base_set" value="0.55"/>
       </effect_group>
     </buff>
+    <buff name="FuriousRamsayBossBuffTier1C" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="19"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="10"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="20"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.00"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.65"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier1D" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="24"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="15"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="25"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.20"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.75"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier1E" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="29"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="20"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="30"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.30"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.85"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier1F" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="34"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="25"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="35"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.40"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.95"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier2Animal" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="10"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="10"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier3Animal" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="1.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="15"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="15"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier4Animal" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="2"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="20"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="20"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayBossBuffTier5Animal" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="2.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="25"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="25"/>
+      </effect_group>
+    </buff>
+    <buff name="rebirthBossAnimalMinion" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="0.25"/>
+      </effect_group>
+    </buff>
 
     <buff name="FuriousRamsaySupportBuffTier1" hidden="true" remove_on_death="true">
       <stack_type value="ignore"/>
@@ -78,6 +169,102 @@
         <passive_effect name="PhysicalDamageResist" operation="base_add" value="10"/>
         <passive_effect name="RunSpeed" operation="base_set" value="0.90"/>
         <passive_effect name="WalkSpeed" operation="base_set" value="0.55"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMinionBuffTier2" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="0.5"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="5"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="15"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.00"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.65"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMinionBuffTier3" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="0.75"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="8"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="20"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.10"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.75"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMinionBuffTier4" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="1"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="10"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="25"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.20"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.85"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayMinionBuffTier5" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="1.25"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="12"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="30"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.30"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.95"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsaySupportBuffTier2" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="7"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="8"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="20"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.00"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.65"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsaySupportBuffTier3" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="7.5"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="12"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="25"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.10"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.75"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsaySupportBuffTier4" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="8"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="16"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="30"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.20"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.85"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsaySupportBuffTier5" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="8.5"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="20"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="35"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="1.30"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.95"/>
       </effect_group>
     </buff>
   </append>
@@ -314,4 +501,10 @@
   <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@operation">base_add</set>
   <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@value">50</set>
   <include filename="_Seeker/buffs.xml"/>
+  <!-- Full set bonuses are removed. -->
+  <remove xpath="/buffs/buff//effect_group[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/buffs/buff//triggered_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/buffs/buff//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
+  <remove xpath="/buffs/buff//triggered_effect[contains(@buff,'SetBonus')]" />
+  <remove xpath="/buffs/buff[contains(@name,'SetBonus')]" />
 </configs>

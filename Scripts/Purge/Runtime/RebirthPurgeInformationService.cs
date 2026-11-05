@@ -388,4 +388,4 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     }
 }
 
-internal static class RebirthPurgeIntroDiagnostics { internal static bool Enabled=true; }
+internal static class RebirthPurgeIntroDiagnostics { internal static bool Enabled=false; }

@@ -161,6 +161,7 @@ internal static partial class RebirthNpcMetabolismCustody
     {if(data!=null&&nativeOwners.TryGetValue(data,out var scope)&&!scope.Hydrated){scope.HydrationEntered=false;scope.Actor=null;}}
     private static void RetireNativeOwnerObservations()
     {
+        if(nativeOwners.Count==0)return;
         foreach(var scope in nativeOwners.Values.Where(value=>!ReferenceEquals(value.World,GameManager.Instance?.World)||value.Hydrated&&value.Actor!=null&&!ReferenceEquals(value.World.GetEntity(value.Actor.entityId),value.Actor)).ToArray())ReleaseNativeOwner(scope);
     }
     private static bool HoldsNativeOwner(EntityPlayer actor)=>actor!=null&&nativeOwners.Values.Any(scope=>ReferenceEquals(scope.Actor,actor)&&ReferenceEquals(scope.World,actor.world)&&

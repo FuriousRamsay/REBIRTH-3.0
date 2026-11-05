@@ -154,5 +154,6 @@
   <include filename="_EntityStudio/farmer_diagnostic_entityclasses.xml"/>
   <include filename="_Vehicles/standard_entityclasses.xml"/>
   <include filename="_Seeker/entityclasses.xml"/>
+  <set xpath="/entity_classes/entity_class[@name='animalZombieBear' or @name='animalZombieBoar' or @name='animalDireWolf']/property[@name='LootDropProb']/@value">0</set>
 </configs>
 

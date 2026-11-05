@@ -78,6 +78,7 @@ internal static partial class RebirthNpcMetabolismCustody
     }
     private static void RetireNpcBodyObservations()
     {
+        if(nativeBodies.Count==0)return;
         var world=GameManager.Instance?.World;
         foreach(var entry in nativeBodies.Where(pair=>!ReferenceEquals(pair.Value.World,world)).ToArray())
         {nativeBodies.Remove(entry.Key);entry.Value.Memory?.Dispose();entry.Value.Memory=null;entry.Value.Payload=null;entry.Value.Body=null;entry.Value.World=null;}

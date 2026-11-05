@@ -166,7 +166,7 @@
               <label depth="12" name="durabilityValue" pos="0,-98" width="145" height="32" text="{durabilitytext}" font_size="30" justify="{durabilityjustify}" effect="outline" />
             </rect>
             <label name="selectedName" pos="180,-58" width="410" height="64" font_size="29" color="245,245,247,255" text="{itemname}" />
-            <label name="selectedDescription" pos="180,-126" width="410" height="170" font_size="23" color="214,214,220,255" text="{itemdescription}" parse_actions="true" overflow="clampcontent" />
+            <label name="selectedDescription" pos="180,-126" width="410" height="100" font_size="23" color="214,214,220,255" text="{itemdescription}" parse_actions="true" overflow="clampcontent" />
             <rect name="traderStat1" pos="620,-62" width="446" height="32">
               <label name="traderStatTitle1" width="300" height="30" font_size="24" text="{itemstattitle1}" color="230,230,234,255" />
               <label pos="305,0" width="141" height="30" font_size="24" text="{itemstat1}" color="201,198,105,255" justify="right" />
@@ -195,7 +195,7 @@
               <label name="traderStatTitle7" width="300" height="30" font_size="24" text="{itemstattitle7}" color="230,230,234,255" />
               <label pos="305,0" width="141" height="30" font_size="24" text="{itemstat7}" color="201,198,105,255" justify="right" />
             </rect>
-            <rect name="traderModificationArea" pos="180,-300" width="320" height="48" visible="{rebirthtraderhasmods}">
+            <rect name="traderModificationArea" pos="180,-228" width="320" height="48" visible="{rebirthtraderhasmods}">
               <grid name="parts" rows="1" cols="6" pos="0,0" cell_width="48" cell_height="48" repeat_content="true" controller="PartList" visible="{isnotcomparing}">
                 <item_stack name="0" width="46" height="46" />
               </grid>
@@ -208,7 +208,7 @@
             <sprite name="transactionCoin" pos="244,-395" width="28" height="28" sprite="ui_game_symbol_coin" color="201,198,105,255" />
             <label name="transactionPrice" pos="282,-392" width="105" height="36" font_size="32" text="{rebirthtradertransactiontotal}{markup}" color="232,224,147,255" />
             <rect pos="16,-389" width="1054" visible="{shownormaloptions}">
-              <grid name="itemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
+              <grid name="itemActions" rows="1" cols="4" arrangement="horizontal" pos="0,93" width="1056" cell_width="264" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
                 <rebirth_trader_action action_width="260" />
               </grid>
             </rect>
@@ -221,7 +221,7 @@
                 <button depth="2" name="countUp" style="icon30px, press, held" pos="150,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
                 <button depth="2" name="countMax" style="icon30px, press" pos="180,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" tooltip_key="rebirthTraderMaximum" />
               </rect>
-              <grid name="vendorItemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
+              <grid name="vendorItemActions" rows="1" cols="4" arrangement="horizontal" pos="0,93" width="1056" cell_width="264" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
                 <rebirth_trader_action action_width="260" />
               </grid>
             </rect>

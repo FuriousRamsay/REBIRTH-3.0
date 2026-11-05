@@ -20,6 +20,7 @@ internal static partial class RebirthNpcMetabolismCustody
     }
     private static void PumpOwnerObservationRetirement()
     {
+        if(ownerActions.Count==0)return;
         if(!ThreadManager.IsMainThread())return;
         var world=GameManager.Instance?.World;var connection=SingletonMonoBehaviour<ConnectionManager>.Instance?.connectionToServer?[0];
         foreach(var original in ownerActions.Values.Where(value=>!ReferenceEquals(value.World,world)||!ReferenceEquals(value.Connection,connection)).ToArray())

@@ -309,7 +309,9 @@ public static class RebirthPoiSenseRuntimePolicy
                 return true;
             if (!hasEntity) continue;
 
-            EntityAlive entity = world.GetEntity(entityId) as EntityAlive;
+            // Entities.dict, not GetEntity: a sleeper still spawning must not be forced to finish on this thread.
+            world.Entities.dict.TryGetValue(entityId, out var known);
+            EntityAlive entity = known as EntityAlive;
             if (entity == null || !entity.IsAlive() || entity.IsSleeping) continue;
 
             state.ActiveCount++;
@@ -338,7 +340,9 @@ public static class RebirthPoiSenseRuntimePolicy
                 return true;
             if (!hasEntity) continue;
 
-            EntityAlive entity = world.GetEntity(entityId) as EntityAlive;
+            // Entities.dict, not GetEntity: a sleeper still spawning must not be forced to finish on this thread.
+            world.Entities.dict.TryGetValue(entityId, out var known);
+            EntityAlive entity = known as EntityAlive;
             if (entity == null || !entity.IsAlive() || !entity.IsSleeping) continue;
 
             Candidate candidate;
@@ -775,7 +779,8 @@ public static class RebirthPoiSenseRuntimePolicy
             if (volume == null || volume.respawnMap == null) continue;
             foreach (KeyValuePair<int, SleeperVolume.RespawnData> entry in volume.respawnMap)
             {
-                EntityAlive entity = world.GetEntity(entry.Key) as EntityAlive;
+                world.Entities.dict.TryGetValue(entry.Key, out var known);
+                EntityAlive entity = known as EntityAlive;
                 if (entity == null || !entity.IsAlive()) continue;
                 if (entity.IsSleeping)
                 {

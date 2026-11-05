@@ -66,10 +66,12 @@ public static class RebirthCookingLiteratureIconRefresh
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,State> states=new System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,State>();
     static void Postfix(XUiC_ItemStack __instance)
     {
+        var stack=__instance.ItemStack;
+        // Runs for every visible slot each frame. An empty slot can never hold literature.
+        if(stack==null||stack.IsEmpty())return;
         var state=states.GetValue(__instance,_=>new State());
         if(UnityEngine.Time.realtimeSinceStartup<state.Next)return;
         state.Next=UnityEngine.Time.realtimeSinceStartup+.5f;
-        var stack=__instance.ItemStack;
         if(!RebirthCookingLiterature.IsLiterature(stack))return;
         if(__instance.GetChildById("itemtypeicon")?.ViewComponent is XUiV_Sprite icon)
         {

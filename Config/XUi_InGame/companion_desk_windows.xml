@@ -607,7 +607,7 @@
     </window>
   </append>
   <append xpath="//rect[@name='rebirthCraftingTopTabs']">
-    <rect name="rebirthCraftingTabCompanions" pos="1382,0" width="194" height="52">
+    <rect name="rebirthCraftingTabCompanions" pos="1382,0" width="194" height="52" visible="false">
       <sprite name="rebirthCraftingTabCompanionsBg" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" depth="3" />
       <sprite name="rebirthCraftingTabCompanionsFrame" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" depth="4" />
       <button name="btnRebirthCraftingTabCompanions" width="194" height="52" sprite="menu_empty" type="sliced" depth="8" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" />

@@ -31,6 +31,10 @@ internal static class RebirthHydrationLocalTransfer
         var player=world.GetPrimaryPlayer();
         if(player==null)return false;
         var result=TryResume(player);
+        // Refused with nothing held means the journal on disk has no work. Starting a transfer
+        // does not wait for this tick, so the disk rescan can run less often while idle.
+        if(result==Result.Refused&&!pending.ContainsKey(player)&&!RebirthHydrationColdRecoveryLease.TryGetRetained(player,out _))
+            nextTick=now+5d;
         if(result!=Result.Applied)return false;
         RebirthMetabolismService.SendSnapshotToOwner(player,true);
         return true;

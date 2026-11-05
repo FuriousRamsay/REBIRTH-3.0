@@ -213,6 +213,19 @@ public sealed class RebirthPersonalCraftingLayoutService
             ApplyLeftInternalLayout(leftWidth, bodyHeight);
             ApplyCenterInternalLayout(centerWidth, bodyHeight);
             ApplyRightInternalLayout(rightWidth, bodyHeight);
+
+            // Scrap stations have no recipes: drop the list and give its width to input, queue and output.
+            if (owner.GetChildByType<XUiC_RebirthRecyclerInputGrid>() != null && !string.Equals(owner.Workstation, "SonjaOutfitDesigner", StringComparison.OrdinalIgnoreCase))
+            {
+                SetControllerActive(owner.GetChildById("rebirthCraftingLeftZone"), false);
+                int scrapWidth = Math.Max(1, bodyWidth - ZoneGap);
+                rightWidth = Math.Max(560, (int)Math.Round(scrapWidth * 0.46f));
+                centerWidth = Math.Max(420, scrapWidth - rightWidth);
+                SetZone("rebirthCraftingCenterZone", "rebirthCraftingCenterBackground", "rebirthCraftingCenterFrame", 0, 0, centerWidth, bodyHeight);
+                SetZone("rebirthCraftingRightZone", "rebirthCraftingRightBackground", "rebirthCraftingRightFrame", centerWidth + ZoneGap, 0, rightWidth, bodyHeight);
+                ApplyCenterInternalLayout(centerWidth, bodyHeight);
+                ApplyRightInternalLayout(rightWidth, bodyHeight);
+            }
             ApplyDebugGeometry(bodyWidth, bodyHeight, leftWidth, centerWidth, rightWidth);
         }
         ApplyDebugVisibility();
@@ -510,7 +523,21 @@ public sealed class RebirthPersonalCraftingLayoutService
             if(fuel?.ViewComponent?.UiTransform!=null)fuel.ViewComponent.UiTransform.localScale=new UnityEngine.Vector3(accessoryScale,accessoryScale,1);
             top = fuel!=null?52+(int)(166*accessoryScale):tools!=null?52+(int)(121*accessoryScale):46;
             var input=owner.GetChildById("windowForgeInput");
-            if(input!=null){SetRect(input,8,-top,228,204);top+=214;}
+            if(input!=null)
+            {
+                // Wide scrap layout: input and instructions sit beside the tools, leaving height for the queue.
+                bool scrapInput=input.GetChildByType<XUiC_RebirthRecyclerInputGrid>()!=null && !string.Equals(owner.Workstation,"SonjaOutfitDesigner",StringComparison.OrdinalIgnoreCase);
+                if(scrapInput && width>=480)
+                {
+                    int inputX=tools==null?8:244;
+                    int inputWidth=width-inputX-8;
+                    SetRect(input,inputX,-42,inputWidth,204);
+                    SetRect(input.GetChildById("recyclerYield"),82,-46,inputWidth-90,150);
+                    SetRect(input.GetChildById("recyclerGate"),3,-124,76,76);
+                    top=Math.Max(top,250);
+                }
+                else {SetRect(input,8,-top,228,204);top+=214;}
+            }
             SetRect(owner.GetChildById("stationAccessories"),0,0,width,top);
             SetRect(owner.GetChildById("stationAccessoriesBackground"),0,0,width,top);
             SetRect(owner.GetChildById("stationAccessoriesFrame"),0,0,width,top);

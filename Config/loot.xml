@@ -184,4 +184,6 @@
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/loot_food_exclusions.xml"/></if></conditional>
   <!-- Final REBIRTH-only cleanup of vanilla skill/progression loot tags. -->
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/loot_skill_tag_cleanup.xml"/></if></conditional>
+  <!-- Rebirth progression has no use for Legendary Parts. -->
+  <conditional><if cond="character_progression('Rebirth')"><remove xpath="/lootcontainers/lootgroup/item[@name='resourceLegendaryParts']"/></if></conditional>
 </configs>

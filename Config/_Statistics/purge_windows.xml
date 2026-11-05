@@ -60,394 +60,394 @@
       <rect pos="18,-304" width="504" height="500" on_scroll="true" name="purgeStatsBiomeScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
         <panel name="listViewport" width="480" height="500" depth="20" clipping="softclip" clippingsize="480,500" clippingcenter="240.0,-250.0" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
           <rect width="480" height="4608" name="listContent" pos="0,0">
-            <rect name="purgeStatsBiomeRow0" pos="0,0" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow0" pos="0,0" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName0" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue0" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill0" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill0" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow1" pos="0,-72" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow1" pos="0,-72" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName1" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue1" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill1" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill1" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow2" pos="0,-144" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow2" pos="0,-144" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName2" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue2" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill2" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill2" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow3" pos="0,-216" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow3" pos="0,-216" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName3" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue3" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill3" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill3" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow4" pos="0,-288" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow4" pos="0,-288" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName4" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue4" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill4" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill4" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow5" pos="0,-360" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow5" pos="0,-360" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName5" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue5" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill5" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill5" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow6" pos="0,-432" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow6" pos="0,-432" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName6" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue6" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill6" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill6" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow7" pos="0,-504" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow7" pos="0,-504" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName7" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue7" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill7" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill7" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow8" pos="0,-576" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow8" pos="0,-576" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName8" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue8" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill8" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill8" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow9" pos="0,-648" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow9" pos="0,-648" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName9" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue9" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill9" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill9" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow10" pos="0,-720" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow10" pos="0,-720" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName10" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue10" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill10" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill10" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow11" pos="0,-792" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow11" pos="0,-792" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName11" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue11" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill11" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill11" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow12" pos="0,-864" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow12" pos="0,-864" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName12" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue12" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill12" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill12" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow13" pos="0,-936" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow13" pos="0,-936" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName13" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue13" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill13" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill13" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow14" pos="0,-1008" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow14" pos="0,-1008" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName14" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue14" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill14" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill14" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow15" pos="0,-1080" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow15" pos="0,-1080" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName15" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue15" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill15" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill15" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow16" pos="0,-1152" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow16" pos="0,-1152" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName16" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue16" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill16" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill16" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow17" pos="0,-1224" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow17" pos="0,-1224" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName17" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue17" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill17" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill17" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow18" pos="0,-1296" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow18" pos="0,-1296" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName18" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue18" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill18" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill18" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow19" pos="0,-1368" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow19" pos="0,-1368" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName19" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue19" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill19" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill19" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow20" pos="0,-1440" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow20" pos="0,-1440" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName20" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue20" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill20" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill20" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow21" pos="0,-1512" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow21" pos="0,-1512" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName21" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue21" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill21" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill21" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow22" pos="0,-1584" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow22" pos="0,-1584" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName22" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue22" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill22" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill22" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow23" pos="0,-1656" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow23" pos="0,-1656" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName23" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue23" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill23" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill23" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow24" pos="0,-1728" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow24" pos="0,-1728" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName24" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue24" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill24" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill24" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow25" pos="0,-1800" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow25" pos="0,-1800" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName25" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue25" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill25" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill25" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow26" pos="0,-1872" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow26" pos="0,-1872" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName26" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue26" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill26" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill26" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow27" pos="0,-1944" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow27" pos="0,-1944" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName27" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue27" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill27" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill27" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow28" pos="0,-2016" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow28" pos="0,-2016" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName28" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue28" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill28" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill28" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow29" pos="0,-2088" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow29" pos="0,-2088" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName29" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue29" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill29" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill29" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow30" pos="0,-2160" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow30" pos="0,-2160" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName30" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue30" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill30" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill30" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow31" pos="0,-2232" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow31" pos="0,-2232" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName31" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue31" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill31" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill31" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow32" pos="0,-2304" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow32" pos="0,-2304" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName32" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue32" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill32" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill32" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow33" pos="0,-2376" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow33" pos="0,-2376" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName33" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue33" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill33" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill33" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow34" pos="0,-2448" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow34" pos="0,-2448" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName34" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue34" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill34" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill34" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow35" pos="0,-2520" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow35" pos="0,-2520" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName35" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue35" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill35" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill35" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow36" pos="0,-2592" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow36" pos="0,-2592" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName36" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue36" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill36" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill36" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow37" pos="0,-2664" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow37" pos="0,-2664" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName37" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue37" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill37" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill37" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow38" pos="0,-2736" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow38" pos="0,-2736" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName38" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue38" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill38" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill38" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow39" pos="0,-2808" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow39" pos="0,-2808" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName39" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue39" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill39" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill39" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow40" pos="0,-2880" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow40" pos="0,-2880" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName40" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue40" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill40" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill40" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow41" pos="0,-2952" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow41" pos="0,-2952" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName41" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue41" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill41" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill41" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow42" pos="0,-3024" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow42" pos="0,-3024" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName42" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue42" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill42" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill42" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow43" pos="0,-3096" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow43" pos="0,-3096" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName43" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue43" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill43" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill43" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow44" pos="0,-3168" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow44" pos="0,-3168" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName44" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue44" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill44" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill44" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow45" pos="0,-3240" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow45" pos="0,-3240" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName45" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue45" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill45" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill45" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow46" pos="0,-3312" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow46" pos="0,-3312" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName46" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue46" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill46" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill46" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow47" pos="0,-3384" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow47" pos="0,-3384" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName47" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue47" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill47" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill47" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow48" pos="0,-3456" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow48" pos="0,-3456" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName48" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue48" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill48" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill48" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow49" pos="0,-3528" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow49" pos="0,-3528" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName49" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue49" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill49" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill49" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow50" pos="0,-3600" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow50" pos="0,-3600" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName50" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue50" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill50" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill50" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow51" pos="0,-3672" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow51" pos="0,-3672" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName51" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue51" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill51" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill51" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow52" pos="0,-3744" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow52" pos="0,-3744" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName52" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue52" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill52" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill52" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow53" pos="0,-3816" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow53" pos="0,-3816" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName53" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue53" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill53" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill53" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow54" pos="0,-3888" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow54" pos="0,-3888" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName54" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue54" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill54" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill54" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow55" pos="0,-3960" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow55" pos="0,-3960" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName55" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue55" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill55" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill55" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow56" pos="0,-4032" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow56" pos="0,-4032" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName56" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue56" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill56" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill56" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow57" pos="0,-4104" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow57" pos="0,-4104" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName57" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue57" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill57" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill57" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow58" pos="0,-4176" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow58" pos="0,-4176" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName58" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue58" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill58" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill58" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow59" pos="0,-4248" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow59" pos="0,-4248" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName59" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue59" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill59" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill59" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow60" pos="0,-4320" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow60" pos="0,-4320" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName60" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue60" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill60" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill60" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow61" pos="0,-4392" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow61" pos="0,-4392" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName61" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue61" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill61" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill61" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow62" pos="0,-4464" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow62" pos="0,-4464" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName62" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue62" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill62" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill62" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
-            <rect name="purgeStatsBiomeRow63" pos="0,-4536" width="480" height="66" visible="false">
+            <rect name="purgeStatsBiomeRow63" pos="0,-4536" width="480" height="70" visible="false">
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeName63" width="478" height="28" font_size="20" />
               <label color="235,235,240,255" depth="4" name="purgeStatsBiomeValue63" pos="0,-28" width="478" height="28" font_size="17" overflow="shrinkcontent" />
-              <sprite pos="0,-60" width="478" height="5" sprite="menu_empty" color="65,65,74,255" />
-              <sprite name="purgeStatsBiomeFill63" pos="0,-60" width="478" height="5" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
+              <sprite pos="0,-60" width="478" height="9" sprite="menu_empty" color="65,65,74,255" />
+              <sprite name="purgeStatsBiomeFill63" pos="0,-60" width="478" height="9" sprite="menu_empty" color="102,183,169,255" type="filled" fill="0" depth="2" />
             </rect>
           </rect>
         </panel>
-        <button name="listTrack" pos="488,0" width="16" height="500" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
-        <button name="listThumb" pos="490,0" width="12" height="500" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+        <button name="listTrack" pos="488,0" width="16" height="500" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="490,0" width="12" height="500" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
       </rect>
       <label depth="4" pos="616,-258" width="1110" height="32" font_size="23" color="189,143,242,255" text_key="xuiRebirthPurgeStatsPois" />
       <label color="235,235,240,255" depth="25" name="purgeStatsPending" pos="600,-524" width="1048" height="32" font_size="18" pivot="topleft" justify="center" />
@@ -463,11 +463,11 @@
               <sprite name="purgeStatsPoiTierIcon0" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName0" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue0" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint0" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint0" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState0" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -483,11 +483,11 @@
               <sprite name="purgeStatsPoiTierIcon1" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName1" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue1" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint1" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint1" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState1" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -503,11 +503,11 @@
               <sprite name="purgeStatsPoiTierIcon2" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName2" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue2" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint2" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint2" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState2" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -523,11 +523,11 @@
               <sprite name="purgeStatsPoiTierIcon3" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName3" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue3" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint3" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint3" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState3" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -543,11 +543,11 @@
               <sprite name="purgeStatsPoiTierIcon4" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName4" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue4" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint4" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint4" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState4" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -563,11 +563,11 @@
               <sprite name="purgeStatsPoiTierIcon5" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName5" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue5" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint5" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint5" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState5" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -583,11 +583,11 @@
               <sprite name="purgeStatsPoiTierIcon6" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName6" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue6" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint6" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint6" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState6" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -603,11 +603,11 @@
               <sprite name="purgeStatsPoiTierIcon7" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName7" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue7" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint7" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint7" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState7" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -623,11 +623,11 @@
               <sprite name="purgeStatsPoiTierIcon8" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName8" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue8" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint8" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint8" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState8" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -643,11 +643,11 @@
               <sprite name="purgeStatsPoiTierIcon9" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName9" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue9" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint9" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint9" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState9" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -663,11 +663,11 @@
               <sprite name="purgeStatsPoiTierIcon10" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName10" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue10" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint10" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint10" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState10" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -683,11 +683,11 @@
               <sprite name="purgeStatsPoiTierIcon11" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName11" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue11" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint11" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint11" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState11" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -703,11 +703,11 @@
               <sprite name="purgeStatsPoiTierIcon12" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName12" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue12" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint12" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint12" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState12" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -723,11 +723,11 @@
               <sprite name="purgeStatsPoiTierIcon13" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName13" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue13" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint13" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint13" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState13" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -743,11 +743,11 @@
               <sprite name="purgeStatsPoiTierIcon14" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName14" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue14" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint14" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint14" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState14" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -763,11 +763,11 @@
               <sprite name="purgeStatsPoiTierIcon15" pos="252,-57" width="34" height="34" sprite="ui_game_symbol_Skull0" atlas="PurgeUIAtlas" color="255,255,255,255" globalopacitymod="0" depth="4" />
               <label name="purgeStatsPoiTierName15" pos="296,-62" width="118" height="26" font_size="21" color="225,225,232,255" depth="4" />
               <label name="purgeStatsPoiValue15" pos="252,-105" width="602" height="28" font_size="18" color="235,235,240,255" depth="4" overflow="shrinkcontent" />
-              <rect name="purgeStatsPoiWaypoint15" pos="872,-78" width="194" height="42" style="press, hover">
+              <rect pos="872,-78" width="194" height="42">
                 <sprite width="194" height="42" sprite="menu_empty2px" type="sliced" color="92,92,101,255" fillcenter="false" depth="4" />
                 <sprite pos="22,-21" width="24" height="24" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" depth="5" pivot="center" globalopacitymod="0" />
                 <label pos="42,-21" width="148" height="26" text_key="xuiRebirthPurgeAddWaypoint" font_size="17" color="225,225,232,255" depth="5" pivot="left" justify="left" upper_case="true" />
-                <sprite width="194" height="42" sprite="menu_empty" color="49,56,65,255" globalopacitymod="0" depth="3" />
+                <button name="purgeStatsPoiWaypoint15" width="194" height="42" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="49,56,65,255" hovercolor="74,52,101,255" hoverscale="1" style="press, hover" on_scroll="true" globalopacitymod="0" depth="3" />
               </rect>
               <sprite pos="872,-18" width="194" height="36" sprite="menu_empty2px" type="sliced" color="76,76,83,255" fillcenter="false" depth="3" />
               <label name="purgeStatsPoiState15" pos="912,-36" width="148" height="26" justify="left" font_size="20" color="133,217,151,255" depth="5" pivot="left" upper_case="true" />
@@ -776,8 +776,8 @@
             </rect>
           </rect>
         </panel>
-        <button name="listTrack" pos="1090,0" width="16" height="430" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="true" use_selection_box="false" globalopacitymod="0" />
-        <button name="listThumb" pos="1092,0" width="12" height="430" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="true" use_selection_box="false" globalopacitymod="0" />
+        <button name="listTrack" pos="1090,0" width="16" height="430" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="1092,0" width="12" height="430" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
       </rect>
       <sprite pos="18,-258" width="24" height="24" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="189,143,242,255" depth="4" />
       <sprite pos="584,-258" width="24" height="24" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="189,143,242,255" depth="4" />

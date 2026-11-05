@@ -7,13 +7,15 @@ using UnityEngine.Scripting;
 public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
 {
     public bool IsMilling => Workstation == "WorkbenchMortarPestle001_FR";
-    public bool UsesSharedMillingPresentation => GetChildById("rebirthMillingProcessor") != null;
+    private bool? usesSharedMillingPresentation;
+    public bool UsesSharedMillingPresentation => usesSharedMillingPresentation ?? GetChildById("rebirthMillingProcessor") != null;
     private RebirthCraftingPresentation sharedPresentation;
     private XUiC_RecipeStack[] cookingEntries;
     private int displayedBurnSeconds = -1;
     private string displayedBurnTime;
     public override void Init()
     {
+        usesSharedMillingPresentation=GetChildById("rebirthMillingProcessor")!=null;
         if(UsesSharedMillingPresentation) sharedPresentation=RebirthCraftingPresentation.For(this);
         // The cooking screen deliberately has no native RecipeList/CraftingInfo topology.
         if (viewComponent != null) viewComponent.InitView();

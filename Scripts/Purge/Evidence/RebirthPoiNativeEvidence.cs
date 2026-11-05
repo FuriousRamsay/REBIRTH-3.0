@@ -164,9 +164,20 @@ internal sealed class RebirthPoiNativeEvidence
         if(volume.prefabInstance==null)return false;
         try
         {
-            var snapshot=resolveStore()?.Published;
-            if(snapshot==null || snapshot.Count==0 || !snapshot.Binding.IsCurrent || !ReferenceEquals(snapshot.Binding.Scope,world))return false;
             double now=clock();
+            // The store lookup walks the world lifecycle; every volume in a tick shares one result.
+            if(respawnStore==null||now>=respawnStoreUntil){respawnStore=resolveStore();respawnStoreUntil=now+.1;}
+            var snapshot=respawnStore?.PublishedForGate;
+            if(snapshot==null || snapshot.Count==0)return false;
+            // Native asks this for every sleeper volume near every player. The identity it
+            // compares cannot change while a world stays loaded, so one check covers a burst.
+            if(!ReferenceEquals(respawnBindingChecked,snapshot.Binding) || now>=respawnBindingUntil)
+            {
+                respawnBindingChecked=null;
+                if(!snapshot.Binding.IsCurrent)return false;
+                respawnBindingChecked=snapshot.Binding;respawnBindingUntil=now+.1;
+            }
+            if(!ReferenceEquals(snapshot.Binding.Scope,world))return false;
             Candidate candidate;
             if(!candidates.TryGetValue(volume.prefabInstance,out candidate))
             {
@@ -176,23 +187,30 @@ internal sealed class RebirthPoiNativeEvidence
                 if(candidate==null){miss.Revision=snapshot.Revision;miss.Until=now+.5;return false;}
                 respawnMisses.Remove(volume.prefabInstance);
             }
-            RebirthPoiClearanceRecord record;
-            if (candidate.Fault || !candidate.Actors.ContainsKey(volume)
-                || !snapshot.TryGet(candidate.Identity,out record)
-                || record.State!=RebirthPoiClearanceState.Cleared && record.State!=RebirthPoiClearanceState.ResetPending) return false;
-            var identity=candidate.Identity;var prefab=volume.prefabInstance;
-            if(prefab.boundingBoxPosition.x!=identity.X || prefab.boundingBoxPosition.y!=identity.Y || prefab.boundingBoxPosition.z!=identity.Z
-                || prefab.boundingBoxSize.x!=identity.SizeX || prefab.boundingBoxSize.y!=identity.SizeY || prefab.boundingBoxSize.z!=identity.SizeZ
-                || prefab.rotation!=identity.Rotation || prefab.prefab==null
-                || !string.Equals(prefab.prefab.PrefabName,identity.Prefab,StringComparison.OrdinalIgnoreCase))return false;
+            if (candidate.Fault || !candidate.Actors.ContainsKey(volume)) return false;
+            // A published change raises the revision, so a cleared/reset decision is never reused across it.
             if(candidate.RespawnGateRevision!=snapshot.Revision || now>=candidate.RespawnGateUntil)
             {
-                candidate.RespawnGateValid=candidate.Manifest!=null&&candidate.Manifest.StillMatches();
+                candidate.RespawnGateValid=RespawnRecordHolds(candidate,volume.prefabInstance,snapshot);
                 candidate.RespawnGateRevision=snapshot.Revision;candidate.RespawnGateUntil=now+.5;
             }
             return candidate.RespawnGateValid;
         }
         catch{return false;}
+    }
+    private RebirthPoiWorldBinding respawnBindingChecked; private double respawnBindingUntil;
+    private RebirthPoiWorldStore respawnStore; private double respawnStoreUntil;
+    private static bool RespawnRecordHolds(Candidate candidate,PrefabInstance prefab,RebirthPoiWorldSnapshot snapshot)
+    {
+        RebirthPoiClearanceRecord record;
+        if(!snapshot.TryGet(candidate.Identity,out record)
+            || record.State!=RebirthPoiClearanceState.Cleared && record.State!=RebirthPoiClearanceState.ResetPending) return false;
+        var identity=candidate.Identity;
+        if(prefab.boundingBoxPosition.x!=identity.X || prefab.boundingBoxPosition.y!=identity.Y || prefab.boundingBoxPosition.z!=identity.Z
+            || prefab.boundingBoxSize.x!=identity.SizeX || prefab.boundingBoxSize.y!=identity.SizeY || prefab.boundingBoxSize.z!=identity.SizeZ
+            || prefab.rotation!=identity.Rotation || prefab.prefab==null
+            || !string.Equals(prefab.prefab.PrefabName,identity.Prefab,StringComparison.OrdinalIgnoreCase))return false;
+        return candidate.Manifest!=null&&candidate.Manifest.StillMatches();
     }
     public void PlayerTouch(World world,EntityPlayer player)
     {

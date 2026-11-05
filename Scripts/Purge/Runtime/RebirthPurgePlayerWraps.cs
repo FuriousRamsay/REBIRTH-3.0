@@ -5,6 +5,11 @@ using UnityEngine;
 internal static class RebirthPurgePlayerWraps
 {
     private const string PlanKey = "RebirthPurgeStarterWrapItems";
+    internal static bool IsStarterWrap(ItemValue truck, string wrap)
+    {
+        if (truck == null || !truck.TryGetMetadata(PlanKey, out string text) || string.IsNullOrEmpty(text)) return false;
+        return Array.IndexOf(text.Split(';'), wrap) >= 0;
+    }
     private const string ArmedKey = "rbPurgeStarterWrapsArmed";
     private static World lastWorld;
     private static float nextAttempt;

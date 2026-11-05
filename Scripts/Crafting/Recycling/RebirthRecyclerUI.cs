@@ -75,6 +75,8 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
         var input=station?.Input;
         var stack=input!=null && input.Length>0 ? input[0] : null;
         if(stack==null || stack.IsEmpty())stack=xui.DragAndDropWindow?.CurrentStack;
+        // 2.6: clicking a scrappable item shows what it scraps into.
+        if(stack==null || stack.IsEmpty())stack=XUiC_RebirthCraftingItemContext.LastInspected;
         string next="", why=GetChildByType<XUiC_RebirthRecyclerInputGrid>()?.GateReason;
         if(stack!=null && !stack.IsEmpty() && station!=null)
         {
@@ -211,3 +213,31 @@ internal static class RebirthRecyclerPreferredRouting
     }
 }
 
+
+/// <summary>2.6: scrappable items show a purple background while a scrap station is open.</summary>
+[HarmonyLib.HarmonyPatch(typeof(XUiC_ItemStack), "bindingBackgroundColor")]
+internal static class RebirthRecyclerScrappableHighlight
+{
+    private static readonly Color Purple = new Color32(107, 77, 110, 255);
+
+    private static void Postfix(XUiC_ItemStack __instance, ref Color __result)
+    {
+        var workspace = XUiC_RebirthStationWorkspace.ActiveInstance;
+        var station = workspace?.WorkstationData?.TileEntity;
+        if (station == null || !RebirthRecyclerRuntime.Supports(station)) return;
+        var location = __instance.StackLocation;
+        if (location != XUiC_ItemStack.StackLocationTypes.Backpack && location != XUiC_ItemStack.StackLocationTypes.ToolBelt) return;
+        var stack = __instance.ItemStack;
+        if (stack == null || stack.IsEmpty()) return;
+        if (RebirthRecyclerRules.TryResolve(stack.itemValue.type, station.block.GetBlockName(), out _)) __result = Purple;
+    }
+}
+
+[Preserve]
+public sealed class RebirthRecyclerHighlightModApi : IModApi
+{
+    public void InitMod(Mod modInstance)
+    {
+        RebirthHarmonyBootstrap.PatchClassOnce(new HarmonyLib.Harmony("rebirth.recycler.highlight"), typeof(RebirthRecyclerScrappableHighlight));
+    }
+}

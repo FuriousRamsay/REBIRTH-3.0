@@ -109,6 +109,22 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
         previewController = GetChildById("jobPreview");
     }
 
+    // Native refreshes every card every frame. Hover already refreshes itself, and data changes
+    // refresh in Update below, so the routine pass only needs to catch selection and slow changes.
+    private const float RoutineRefreshSeconds = .25f;
+    private float nextRoutineRefresh;
+    private bool lastRefreshSelected;
+    internal bool WantsNativeRefresh()
+    {
+        if (!cardMode || IsDirty || Selected != lastRefreshSelected || Time.realtimeSinceStartup >= nextRoutineRefresh)
+        {
+            lastRefreshSelected = Selected;
+            nextRoutineRefresh = Time.realtimeSinceStartup + RoutineRefreshSeconds;
+            return true;
+        }
+        return false;
+    }
+
     public override void Update(float _dt)
     {
         base.Update(_dt);
@@ -118,6 +134,7 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
 
         CardData previous = cachedData;
         CardData data = GetCardData();
+        BindPreview(data?.PreviewUri);
         if (!ReferenceEquals(previous, data)) RefreshBindings();
         if (data != null && directionArrowController != null && directionArrowController.ViewComponent != null)
             if (directionArrowController.ViewComponent.Rotation != data.DirectionAngle)
@@ -129,6 +146,7 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
     public override void OnOpen()
     {
         cachedQuest = null; cachedData = null; cachedJournal = null; nextSemanticCheck = 0;
+        lastPreviewUri = null; RebirthTraderJobPreviewCache.TrimWhileClosed();
         base.OnOpen();
     }
 
@@ -160,7 +178,6 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
                 return true;
             case "jobpreviewuri":
                 string previewUri = data != null ? data.PreviewUri : string.Empty;
-                PreparePreviewForUri(previewUri);
                 value = previewUri;
                 return true;
             case "jobbiome":
@@ -234,30 +251,37 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
         }
     }
 
-    /// <summary>
-    /// The 3.1 XUiV_Texture AutoUnload setter clears TextureUris while replacing an
-    /// already-loaded external texture. That is safe for ordinary one-shot textures,
-    /// but it breaks these reusable trader cards when Previous/Next Tier swaps the URI:
-    /// the new prefab image loads, the old texture is auto-unloaded, and the URI is
-    /// cleared out from underneath the binding.
-    ///
-    /// REBIRTH owns this one texture transition explicitly instead. Before a different
-    /// preview URI is bound, dispose the old texture/path, reset crop state, then let
-    /// the normal binding assign/load the new URI. templates.xml therefore keeps
-    /// autounload disabled for jobPreview; cleanup happens here on every URI change.
-    /// </summary>
-    private void PreparePreviewForUri(string previewUri)
+    // Accepting a job rebuilds the list and each later card takes its neighbour's URI. A native
+    // URI binding would blank and reload every shifted image, so cards share loaded textures.
+    private void BindPreview(string previewUri)
     {
         previewUri = previewUri ?? string.Empty;
-        if (string.Equals(lastPreviewUri, previewUri, StringComparison.Ordinal))
+        XUiV_Texture preview = previewController != null ? previewController.ViewComponent as XUiV_Texture : null;
+        if (preview == null) return;
+        if (!string.Equals(lastPreviewUri, previewUri, StringComparison.Ordinal))
+        {
+            lastPreviewUri = previewUri;
+            lastPreviewTexture = null;
+            preview.AutoUnload = false;
+            preview.Texture = previewUri.Length > 0 ? RebirthTraderJobPreviewCache.Get(previewUri) : null;
+            if (preview.Texture == null) preview.UVRect = new Rect(0f, 0f, 1f, 1f);
             return;
+        }
+        if (previewUri.Length > 0 && preview.Texture == null) preview.Texture = RebirthTraderJobPreviewCache.Get(previewUri);
+    }
 
-        lastPreviewUri = previewUri;
-        lastPreviewTexture = null;
+    // Shared with the quest briefing, which shows the same POI image for an accepted job.
+    internal static string PoiPreviewUri(Quest quest, out string placeholder)
+    {
+        CardData data = new CardData();
+        PopulateJobType(data, quest);
+        bool buried = string.Equals(data.JobTypeSprite, "rb_job_buried", StringComparison.Ordinal);
+        placeholder = buried ? "rb_preview_buried" : "rb_preview_missing";
+        return buried ? string.Empty : GetPreviewUri(ResolvePrefab(quest));
+    }
 
-        XUiV_Texture preview = previewController != null
-            ? previewController.ViewComponent as XUiV_Texture
-            : null;
+    internal static void DetachPreview(XUiV_Texture preview)
+    {
         if (preview == null)
             return;
 
@@ -296,6 +320,11 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
             return;
 
         lastPreviewTexture = texture;
+        CropPreview(preview, texture);
+    }
+
+    internal static void CropPreview(XUiV_Texture preview, Texture texture)
+    {
         preview.KeepSourceAspectRatio = false;
         preview.SourceAspectRatioRespectPivot = false;
 
@@ -645,5 +674,72 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
                data.BiomeName + " | " + Localization.Get("xuiTier") + " " + data.Tier + " | " +
                data.Distance + (string.IsNullOrEmpty(data.DirectionText) ? string.Empty : " (" + data.DirectionText + ")") + "\n" +
                data.CompletionDisplay;
+    }
+}
+
+// Decoded job card images, shared by reference. The cache owns them; cards and the hover popup only borrow.
+internal static class RebirthTraderJobPreviewCache
+{
+    private const int TrimAbove = 64;
+    private static readonly System.Collections.Generic.Dictionary<string, Texture> Loaded = new System.Collections.Generic.Dictionary<string, Texture>();
+    private static readonly System.Collections.Generic.HashSet<string> Requested = new System.Collections.Generic.HashSet<string>();
+
+    internal static Texture Get(string uri)
+    {
+        if (Loaded.TryGetValue(uri, out Texture texture) && texture != null) return texture;
+        if (Requested.Add(uri)) ThreadManager.StartCoroutine(Load(uri));
+        return null;
+    }
+
+    // Every card rebinds after opening, so nothing still shows a texture released here.
+    internal static void TrimWhileClosed()
+    {
+        if (Loaded.Count <= TrimAbove) return;
+        foreach (Texture texture in Loaded.Values) if (texture != null) UnityEngine.Object.Destroy(texture);
+        Loaded.Clear();
+        Requested.Clear();
+    }
+
+    private static System.Collections.IEnumerator Load(string uri)
+    {
+        // Same fetch as native XUiV_Texture for its "@file:" URIs.
+        string fetch = uri.Substring(1).Replace("#", "%23").Replace("+", "%2B");
+        using (var request = UnityEngine.Networking.UnityWebRequestTexture.GetTexture(fetch))
+        {
+            request.SendWebRequest();
+            while (!request.isDone) yield return null;
+            if (request.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
+            {
+                Log.Warning("[REBIRTH TraderJobs] Could not load job image '" + fetch + "' (" + request.error + ").");
+                yield break;
+            }
+            Texture2D source = ((UnityEngine.Networking.DownloadHandlerTexture)request.downloadHandler).texture;
+            Loaded[uri] = TextureUtils.CloneTexture(source, _createMipMaps: false, _compress: false, _makeNonReadable: true);
+            UnityEngine.Object.DestroyImmediate(source);
+        }
+    }
+}
+
+[HarmonyLib.HarmonyPatch(typeof(XUiC_DialogResponseEntry), nameof(XUiC_DialogResponseEntry.Update))]
+internal static class RebirthTraderJobCardRefreshGate
+{
+    private static void Refresh(XUiController entry)
+    {
+        if (!(entry is XUiC_RebirthTraderJobCard card) || card.WantsNativeRefresh()) entry.RefreshBindings();
+    }
+
+    private static System.Collections.Generic.IEnumerable<HarmonyLib.CodeInstruction> Transpiler(System.Collections.Generic.IEnumerable<HarmonyLib.CodeInstruction> instructions)
+    {
+        var gate = HarmonyLib.AccessTools.Method(typeof(RebirthTraderJobCardRefreshGate), nameof(Refresh));
+        bool replaced = false;
+        foreach (var instruction in instructions)
+        {
+            if (!replaced && instruction.operand is System.Reflection.MethodInfo method && method.Name == nameof(XUiController.RefreshBindings) && method.GetParameters().Length == 0)
+            {
+                replaced = true;
+                yield return new HarmonyLib.CodeInstruction(System.Reflection.Emit.OpCodes.Call, gate) { labels = instruction.labels, blocks = instruction.blocks };
+            }
+            else yield return instruction;
+        }
     }
 }

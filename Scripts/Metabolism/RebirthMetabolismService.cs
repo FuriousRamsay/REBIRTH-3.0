@@ -296,7 +296,7 @@ public static partial class RebirthMetabolismService
         float before,float afterWork,float priorStamina,float priorActivity,float useRate,float recoveryRate,
         float useModifier,float recoveryModifier)
     {
-        if(player==null||state==null||player.Stats==null)return;
+        if(!RebirthLogSettings.AutomaticLoggingDefault||player==null||state==null||player.Stats==null)return;
         if(!ReferenceEquals(lowEnergyDiagnosticWorld,player.world))
         {lowEnergyDiagnosticWorld=player.world;nextLowEnergyDiagnostic.Clear();}
         bool lost=before-state.Energy>0.75f;

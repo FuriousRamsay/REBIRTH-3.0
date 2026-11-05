@@ -278,6 +278,14 @@
 	    <HintPath>$(RebirthManagedRoot)\UnityEngine.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
+	  <Reference Include="UnityEngine.UnityWebRequestModule">
+	    <HintPath>$(RebirthManagedRoot)\UnityEngine.UnityWebRequestModule.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	  <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+	    <HintPath>$(RebirthManagedRoot)\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
 	  <Reference Include="UnityEngine.AnimationModule">
 	    <HintPath>$(RebirthManagedRoot)\UnityEngine.AnimationModule.dll</HintPath>
 	    <Private>False</Private>

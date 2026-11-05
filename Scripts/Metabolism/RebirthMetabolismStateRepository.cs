@@ -634,12 +634,18 @@ public static partial class RebirthMetabolismStateRepository
                 throw new InvalidDataException("non-finite ingestion entry value");
     }
 
+    private static Tuple<string,string> pathNameCache;
     private static string PathName
     {
         get
         {
             string root = GameIO.GetSaveGameDir();
-            return string.IsNullOrEmpty(root) ? string.Empty : Path.Combine(root, "RebirthData", "Metabolism", "players.xml");
+            if (string.IsNullOrEmpty(root)) return string.Empty;
+            var cached = System.Threading.Volatile.Read(ref pathNameCache);
+            if (cached != null && ReferenceEquals(cached.Item1, root)) return cached.Item2;
+            string path = Path.Combine(root, "RebirthData", "Metabolism", "players.xml");
+            System.Threading.Volatile.Write(ref pathNameCache, Tuple.Create(root, path));
+            return path;
         }
     }
 

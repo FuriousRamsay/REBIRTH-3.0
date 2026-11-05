@@ -232,7 +232,10 @@ public sealed class XUiC_RebirthChallengeGroupList : XUiC_ChallengeGroupList
             }
         }
         var view=Parent.ViewComponent as XUiV_ScrollView;
-        if((heightChanged||weatherBoundsChanged)&&view?.scrollView!=null){view.scrollView.InvalidateBounds();view.updateScrollbarsNextUpdate=true;}
+        // Bounds measured before the rows finish laying out stay cached and leave the list with
+        // no thumb or wheel, so remeasure until an overflowing list can actually move.
+        bool staleBounds=view?.scrollView!=null&&wantedHeight>view.Size.y&&!view.scrollView.shouldMoveVertically;
+        if((heightChanged||weatherBoundsChanged||staleBounds)&&view?.scrollView!=null){view.scrollView.InvalidateBounds();view.updateScrollbarsNextUpdate=true;}
         if(categoryChanged){category=current;view?.scrollView?.ResetPosition();}
     }
 }

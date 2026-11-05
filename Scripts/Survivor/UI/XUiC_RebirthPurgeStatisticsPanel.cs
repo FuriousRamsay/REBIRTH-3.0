@@ -118,7 +118,7 @@ public sealed class XUiC_RebirthPurgeStatisticsPanel:XUiController
         {
             bool present=ordered!=null&&i<ordered.Length;if(biomeRows[i]?.ViewComponent!=null)biomeRows[i].ViewComponent.IsVisible=present;if(!present)continue;
             var biome=ordered[i];int done=RebirthPurgeProgression.Units(biome.Cleared,biome.ClearedByTier,mode);int required=RebirthPurgeProgression.Required(RebirthPurgeProgression.Units(biome.Eligible,biome.EligibleByTier,mode),percent*75);
-            Set(biomeNames[i],BiomeName(biome.Name));Set(biomeValues[i],string.Format(CultureInfo.InvariantCulture,L(mode==1?"xuiRebirthPurgeStatsBiomeTier":"xuiRebirthPurgeStatsBiome"),RebirthPurgeProgression.Text(done,mode),RebirthPurgeProgression.Text(required,mode),biome.Discovered,biome.Eligible));
+            Set(biomeNames[i],BiomeName(biome.Name));Set(biomeValues[i],string.Format(CultureInfo.InvariantCulture,L(mode==1?"xuiRebirthPurgeStatsBiomeTier":"xuiRebirthPurgeStatsBiome"),RebirthPurgeProgression.Text(done,mode),RebirthPurgeProgression.Text(required,mode),biome.Discovered,biome.Eligible,(required>0?Math.Min(100f,done*100f/required):0f).ToString("0.#",CultureInfo.InvariantCulture)));
             if(biomeNames[i]!=null)biomeNames[i].Color=BiomeColor(biome.Name);
             if(biomeFills[i]!=null){biomeFills[i].Fill=required>0?Mathf.Clamp01((float)done/required):0;biomeFills[i].Color=BiomeColor(biome.Name);}
         }
@@ -188,7 +188,7 @@ public sealed class XUiC_RebirthPurgeStatisticsPanel:XUiController
         GameManager.ShowTooltip(player,L("xuiRebirthPurgeWaypointAdded"));
     }
     private static Color BiomeColor(string name)
-    {switch(name){case "pine_forest":case "forest":return new Color32(88,105,70,255);case "desert":return new Color32(185,149,91,255);case "snow":return new Color32(110,156,194,255);case "wasteland":return new Color32(150,110,155,255);case "burnt_forest":return new Color32(130,130,130,255);default:return new Color32(102,183,169,255);}}
+    {switch(name){case "pine_forest":case "forest":return new Color32(95,176,86,255);case "desert":return new Color32(191,188,90,255);case "wasteland":return new Color32(189,89,89,255);case "burnt_forest":case "snow":return new Color32(191,155,92,255);default:return new Color32(235,235,240,255);}}
     private static string BiomeName(string name){string key="biome_"+(name=="forest"?"pine_forest":name),text=L(key);return text==key?name.Replace('_',' '):text;}
     private XUiV_Label Label(string id)=>GetChildById(id)?.ViewComponent as XUiV_Label;
     private static void Set(XUiV_Label label,string text){if(label!=null)label.Text=text??string.Empty;}

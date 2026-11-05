@@ -16,6 +16,14 @@ public static class RebirthJournalStore {
         if(!RebirthHudTrackingPreferenceStore.TryResolveCurrentContext(out context,out error))throw new IOException(error);
         return Path.Combine(GameIO.GetUserGameDataDir(),"RebirthData","Journal",context.WorldKey,context.PlayerStorageKey+".xml");
     }
+    // Guide and popup history must follow the save, so that copying, renaming or restoring
+    // a save keeps it consistent with that save's progress. Remote clients have no copy of
+    // the host's save and keep theirs per server under the user data folder.
+    public static string ResolveGuideStatePath(out string legacyPath) {
+        legacyPath=ResolvePath()+".guides.xml";
+        if(GameManager.Instance?.World?.IsRemote()!=false)return legacyPath;
+        return Path.Combine(GameIO.GetSaveGameDir(),"RebirthData","Journal",Path.GetFileName(legacyPath));
+    }
     public static List<RebirthJournalEntry> Read(string path) {
         var result=new List<RebirthJournalEntry>();
         if(!File.Exists(path)&&!File.Exists(path+".bak"))return result;

@@ -38,7 +38,6 @@ internal sealed class RebirthPoiWorldBinding
                 // Sleeper gates call this for each volume. Compare the native
                 // path inputs without rebuilding the identical path each time.
                 (Platform.UserDataStorageType)GamePrefs.GetInt(EnumGamePrefs.GameSaveStorageType)==storage &&
-                string.Equals(GameIO.GetSaveGameRootDir(storage),root,StringComparison.Ordinal) &&
                 string.Equals(GamePrefs.GetString(EnumGamePrefs.GameWorld),worldName,StringComparison.Ordinal) &&
                 string.Equals(GamePrefs.GetString(EnumGamePrefs.GameName),gameName,StringComparison.Ordinal));
             return binding.IsCurrent;

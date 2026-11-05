@@ -123,7 +123,7 @@ internal sealed class RebirthPoiNativeManifest
         private sealed class Shape
         {
             internal object Definition;internal Vector3i Start,Size;internal int Flags,Group;
-            internal short Minimum,Maximum;internal string Script,GroupName;internal bool Used;
+            internal short Minimum,Maximum;internal string Script,GroupName;internal bool Used;internal string DescriptorKey,DescriptorValue;
             internal bool Combat=>Maximum!=0||!string.IsNullOrWhiteSpace(Script);
         }
         internal readonly World World;internal readonly PrefabInstance Prefab;
@@ -225,6 +225,11 @@ internal sealed class RebirthPoiNativeManifest
                 ((saved.Generation.ToByteArray()[7]>>4)&15)==4&&saved.Volumes.Count==CombatRooms;
         }
         private string Descriptor(Shape s)
+        {
+            if(s.DescriptorValue==null||s.DescriptorKey!=Identity.Key){s.DescriptorValue=ComputeDescriptor(s);s.DescriptorKey=Identity.Key;}
+            return s.DescriptorValue;
+        }
+        private string ComputeDescriptor(Shape s)
         {
             var minimum=origin+s.Start;var maximum=minimum+s.Size;var f=System.Globalization.CultureInfo.InvariantCulture;
             string shape=Identity.Key+"|"+minimum.x.ToString(f)+","+minimum.y.ToString(f)+","+minimum.z.ToString(f)+"|"+

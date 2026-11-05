@@ -93,12 +93,18 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (requestedFocus?.xui == xui) requestedFocus = null;
         Hide(); base.Cleanup();
     }
+    // Switching this nested panel on and off makes NGUI rebuild it on every hover change, seen as a
+    // flash. It stays active and parks off screen instead, as XUiC_RebirthContextSlot.Present does.
+    private static readonly Vector2i ParkedPosition = new Vector2i(0, -100000);
+    private bool shown;
     private void Visible(bool value)
     {
         if (ViewComponent == null) return;
-        if (ViewComponent.IsVisible != value) ViewComponent.IsVisible = value;
+        shown = value;
+        if (!ViewComponent.IsVisible) ViewComponent.IsVisible = true;
         var root = ViewComponent.UiTransform;
-        if (root != null && root.gameObject.activeSelf != value) root.gameObject.SetActive(value);
+        if (root != null && !root.gameObject.activeSelf) root.gameObject.SetActive(true);
+        if (!value && ViewComponent.Position != ParkedPosition) { ViewComponent.Position = ParkedPosition; ViewComponent.TryUpdatePosition(); }
         if (value) showingCard = source;
         else if (ReferenceEquals(showingCard, source)) showingCard = null;
     }
@@ -118,7 +124,7 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
     private void AcceptPressed(XUiController sender, int mouseButton)
     {
         if ((mouseButton != -1 && mouseButton != 0) || accepting || accept == null || !ReferenceEquals(sender, accept)
-            || ViewComponent?.IsVisible != true || !accept.Enabled) return;
+            || !shown || !accept.Enabled) return;
         var card = source;
         var token = acceptanceToken;
         if (!ValidSource(card) || token == null || !card.IsPreviewAcceptanceCurrent(token)
@@ -140,7 +146,7 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (requested) { seenRequest = requestVersion; if (!ReferenceEquals(candidate, rejectedCard) || ReferenceEquals(requestedFocus, candidate)) rejectedCard = null; }
         var pointer = UICamera.hoveredObject?.transform;
         var navigation = xui?.playerUI?.CursorController?.navigationTarget;
-        bool popupVisible = ViewComponent?.IsVisible == true;
+        bool popupVisible = shown;
         bool inPopup = popupVisible && Inside(pointer, ViewComponent);
         bool focusInPopup = popupVisible && Inside(navigation?.UiTransform, ViewComponent);
         if ((inPopup || focusInPopup) && source != null && !requested) candidate = source;

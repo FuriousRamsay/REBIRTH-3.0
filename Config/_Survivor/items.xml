@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <configs>
+  <!-- REBIRTH survivor gear replaces the native armor-slot backpacks; hidden from Creative only. -->
+  <append xpath="/items/item[@name='backpackSmall' or @name='backpackMedium' or @name='backpackLarge']"><property name="CreativeMode" value="None" /></append>
   <set xpath="/items/item[@name='drugVitamins']/property[@class='Action0']/property[@name='Class']/@value">ItemActionUseTraitSupportRebirth, RebirthUtils</set>
   <set xpath="/items/item[@name='drugPainkillers']/property[@class='Action0']/property[@name='Class']/@value">ItemActionUseTraitSupportRebirth, RebirthUtils</set>
   <set xpath="/items/item[@name='drugSteroids']/property[@class='Action0']/property[@name='Class']/@value">ItemActionUseTraitSupportRebirth, RebirthUtils</set>

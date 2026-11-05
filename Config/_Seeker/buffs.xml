@@ -195,5 +195,30 @@
         <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" target="self" stat="Health" operation="add" value="-30" />
       </effect_group>
     </buff>
+    <buff name="rebirthWindTornadoBlast" hidden="true">
+      <stack_type value="ignore"/>
+      <duration value="24"/>
+      <update_rate value="2"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="RebirthTornadoBlast, RebirthUtils"/>
+      </effect_group>
+    </buff>
+    <buff name="rebirthWindTornadoKnock" hidden="true">
+      <stack_type value="ignore"/>
+      <duration value="24"/>
+      <update_rate value="2"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" target="selfAOE" range="6" buff="buffInjuryStunned01">
+          <requirement name="!EntityTagCompare" tags="zombie,boss,invisible"/>
+        </triggered_effect>
+      </effect_group>
+    </buff>
+    <buff name="rebirthWindTornadoVanish" hidden="true">
+      <stack_type value="ignore"/>
+      <duration value="28"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffFinish" action="RebirthTornadoDespawn, RebirthUtils"/>
+      </effect_group>
+    </buff>
   </append>
 </configs>

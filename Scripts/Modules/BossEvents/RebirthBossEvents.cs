@@ -436,7 +436,7 @@ public static class RebirthBossEventDirector
             return;
         }
 
-        int seed = RebirthBossEventSeed.Create(world.Seed, day, stableId, schedule.Started);
+        int seed = RebirthBossEventSeed.CreateUnpredictable();
         if (TryStart(world, owner, options, seed, out string failure))
         {
             schedule.Started++;
@@ -664,27 +664,7 @@ public static class RebirthBossEventDirector
         OwnerSchedule schedule,
         ulong dueWorldTime)
     {
-        int worldSeed = world != null ? world.Seed : 0;
-        int day =
-            world != null
-                ? GameUtils.WorldTimeToDays(world.worldTime)
-                : 0;
-
-        int sequence = schedule != null ? schedule.Started : 0;
-        int seed =
-            RebirthBossEventSeed.Create(
-                worldSeed,
-                day,
-                stableId,
-                sequence);
-
-        unchecked
-        {
-            seed = seed * 397 ^ (int)dueWorldTime;
-            seed = seed * 397 ^ (int)(dueWorldTime >> 32);
-        }
-
-        return new Random(seed).Next(
+        return new Random(RebirthBossEventSeed.CreateUnpredictable()).Next(
             PostCooldownDelayMinGameMinutes,
             PostCooldownDelayMaxGameMinutes + 1);
     }
@@ -759,13 +739,10 @@ public static class RebirthBossEventDirector
         ClearCooldownPending(schedule);
         schedule.Times.Clear();
 
+        // Frequency, level and the daily maximum set the odds. The saved schedule keeps a reload from re-rolling a day.
         Random rng =
             new Random(
-                RebirthBossEventSeed.Create(
-                    world.Seed,
-                    day,
-                    stableId,
-                    0));
+                RebirthBossEventSeed.CreateUnpredictable());
 
         int rolledTotal =
             RebirthBossEventScheduler.RollDailyCount(
@@ -1530,7 +1507,7 @@ public static class RebirthBossEventProgression
         int gameStage,
         RebirthBossEventDifficulty difficulty)
     {
-        gameStage = Math.Max(1, gameStage);
+        gameStage = Math.Max(1, RebirthEventSpawnPolicy.ApplyGamestage(gameStage));
 
         float factor =
             difficulty == RebirthBossEventDifficulty.Low
@@ -1569,9 +1546,11 @@ public static class RebirthBossEventCompositionResolver
     public static int RollRegularCount(RebirthBossEventSize size, Random r) { if (size == RebirthBossEventSize.Small) return r.Next(4, 7); if (size == RebirthBossEventSize.Large) return r.Next(11, 16); return r.Next(7, 11); }
     public static bool TryBuild(World world, EntityPlayer owner, RebirthBossEventProgressionSnapshot p, int regularCount, Random rng, out RebirthBossEventSpawnPlan plan, out string failure)
     {
+        // 2.6 gave a quarter of events from level 35 to zombie animals.
+        bool animalEvent = p.PlayerLevel >= 35 && RebirthSandboxOptionManager.Current.BossEventZombieAnimals && rng.Next(8) >= 6;
         plan = new RebirthBossEventSpawnPlan(); failure = null;
         List<int> selected = new List<int>();
-        for (int i = 0; i < regularCount + 3; i++)
+        for (int i = 0; !animalEvent && i < regularCount + 3; i++)
         {
             bool accepted = false;
 
@@ -1675,7 +1654,18 @@ public static class RebirthBossEventCompositionResolver
                 return false;
             }
         }
+        if (animalEvent)
+        {
+            plan.BossClass = EntityClass.FromString("animalZombieBear");
+            plan.Supports.Add(EntityClass.FromString("animalZombieDog"));
+            plan.Supports.Add(EntityClass.FromString("animalZombieBoar"));
+            int animalRegulars = Math.Max(2, regularCount / 2);
+            for (int i = 0; i < animalRegulars; i++) plan.Regulars.Add(EntityClass.FromString(rng.Next(2) == 0 ? "animalZombieDog" : "animalZombieBoar"));
+        }
+        else
+        {
         plan.BossClass = selected[0]; plan.Supports.Add(selected[1]); plan.Supports.Add(selected[2]); for (int i = 3; i < selected.Count; i++) plan.Regulars.Add(selected[i]);
+        }
         int requiredPositions = 1 + plan.Supports.Count + plan.Regulars.Count;
         if (!RebirthBossEventPlacement.TryBuildAtomicPlacement(world, owner, requiredPositions, rng, plan.Positions, out plan.SpawnOrigin, out failure)) return false;
         return true;
@@ -2053,6 +2043,48 @@ public static class RebirthBossEventPresentation
         return MinionRoleBuff;
     }
 
+    // 2.6 progression: the boss grows with the level its owner had when the event started.
+    private static int BossLevel(RebirthBossEventEntityState state)
+    {
+        RebirthBossEventInstance e;
+        return state != null && RebirthBossEventRegistry.TryGet(state.EventId, out e) && e.Progression != null ? e.Progression.PlayerLevel : 0;
+    }
+    private static bool IsAnimal(EntityAlive entity) => entity != null && entity.EntityClass != null && entity.EntityClass.bIsAnimalEntity;
+    public static string GetRoleBuff(RebirthBossEventEntityState state, EntityAlive entity)
+    {
+        if (state == null) return MinionRoleBuff;
+        if (IsAnimal(entity))
+        {
+            if (state.Role != RebirthBossEventRole.Boss) return "rebirthBossAnimalMinion";
+            int animalLevel = BossLevel(state);
+            return animalLevel < 50 ? "FuriousRamsayBossBuffTier2Animal" : animalLevel < 80 ? "FuriousRamsayBossBuffTier3Animal"
+                : animalLevel < 110 ? "FuriousRamsayBossBuffTier4Animal" : "FuriousRamsayBossBuffTier5Animal";
+        }
+        int level = BossLevel(state);
+        // 2.6: minions and support grow on the same level bands as the boss.
+        int roleTier = level < 35 ? 1 : level < 50 ? 2 : level < 80 ? 3 : level < 110 ? 4 : 5;
+        if (state.Role != RebirthBossEventRole.Boss)
+            return (state.Role == RebirthBossEventRole.Support ? "FuriousRamsaySupportBuffTier" : "FuriousRamsayMinionBuffTier") + roleTier;
+        return level < 35 ? BossRoleBuff : level < 50 ? "FuriousRamsayBossBuffTier1C" : level < 80 ? "FuriousRamsayBossBuffTier1D"
+            : level < 110 ? "FuriousRamsayBossBuffTier1E" : "FuriousRamsayBossBuffTier1F";
+    }
+    public static float GetEffectiveHealthMultiplier(RebirthBossEventEntityState state, EntityAlive entity)
+    {
+        if (state == null) return 1.25f;
+        int level = BossLevel(state);
+        if (IsAnimal(entity))
+        {
+            if (state.Role != RebirthBossEventRole.Boss) return 1.25f;
+            return level < 50 ? 2f : level < 80 ? 2.5f : level < 110 ? 3f : 3.5f;
+        }
+        if (state.Role != RebirthBossEventRole.Boss)
+        {
+            int roleTier = level < 35 ? 0 : level < 50 ? 1 : level < 80 ? 2 : level < 110 ? 3 : 4;
+            return state.Role == RebirthBossEventRole.Support ? 7.5f + roleTier * 0.5f : 1.25f + roleTier * 0.25f;
+        }
+        return level < 35 ? 15f : level < 50 ? 20f : level < 80 ? 25f : level < 110 ? 30f : 35f;
+    }
+
     public static float GetEffectiveHealthMultiplier(RebirthBossEventRole role)
     {
         // v110 event balance: boss 15x, support 7.5x, regular 1.25x.
@@ -2071,6 +2103,8 @@ public static class RebirthBossEventPresentation
         {
             if (entity.Buffs.GetCustomVar("$varFuriousRamsayBoss") != 1f)
                 entity.Buffs.SetCustomVar("$varFuriousRamsayBoss", 1f);
+            if (entity.Buffs.GetCustomVar("$varFuriousRamsayOpenDoors") != 1f)
+                entity.Buffs.SetCustomVar("$varFuriousRamsayOpenDoors", 1f);
             if (entity.Buffs.GetCustomVar("$EventNavIcon") != 1f)
                 entity.Buffs.SetCustomVar("$EventNavIcon", 1f);
         }
@@ -2078,11 +2112,13 @@ public static class RebirthBossEventPresentation
         {
             if (entity.Buffs.GetCustomVar("$varFuriousRamsaySupportMinion") != 1f)
                 entity.Buffs.SetCustomVar("$varFuriousRamsaySupportMinion", 1f);
+            if (entity.Buffs.GetCustomVar("$varFuriousRamsayOpenDoors") != 1f)
+                entity.Buffs.SetCustomVar("$varFuriousRamsayOpenDoors", 1f);
             if (entity.Buffs.GetCustomVar("$EventNavIcon") != 1f)
                 entity.Buffs.SetCustomVar("$EventNavIcon", 1f);
         }
 
-        string roleBuff = GetRoleBuff(state.Role);
+        string roleBuff = GetRoleBuff(state, entity);
         if (entity.Buffs.HasBuff(roleBuff))
             return;
 
@@ -2136,7 +2172,7 @@ public static class RebirthBossEventScaling
         if (entity.gameObject != null)
             entity.gameObject.transform.localScale = Vector3.one * state.Scale;
 
-        string roleBuff = RebirthBossEventPresentation.GetRoleBuff(state.Role);
+        string roleBuff = RebirthBossEventPresentation.GetRoleBuff(state, entity);
 
         // v102 directly overwrote BaseMax with 2.5x/1.65x/1.15x. If an event
         // survives an upgrade, normalize that one-time C# scaling before the
@@ -2154,7 +2190,7 @@ public static class RebirthBossEventScaling
                 + " normalizedBaseMax=" + normalizedBaseMax);
         }
 
-        state.HealthMultiplier = RebirthBossEventPresentation.GetEffectiveHealthMultiplier(state.Role);
+        state.HealthMultiplier = RebirthBossEventPresentation.GetEffectiveHealthMultiplier(state, entity);
         // EntityDamage/BlockDamage now come from the restored XML role buff.
         // Keep the runtime damage multiplier neutral to prevent double scaling.
         state.DamageMultiplier = 1f;
@@ -2455,7 +2491,7 @@ public static class RebirthBossEventTargeting
         int healthBeforeRehydrate = entity.Health;
         int maxBeforeRehydrate = Math.Max(1, entity.GetMaxHealth());
         string roleBuff =
-            RebirthBossEventPresentation.GetRoleBuff(state.Role);
+            RebirthBossEventPresentation.GetRoleBuff(state, entity);
         bool roleBuffWasPresent =
             entity.Buffs != null &&
             entity.Buffs.HasBuff(roleBuff);
@@ -2576,7 +2612,7 @@ public static class RebirthBossEventTargeting
                     "0", CultureInfo.InvariantCulture)
                 : "n/a") +
             " roleBuff=" +
-            RebirthBossEventPresentation.GetRoleBuff(state.Role));
+            RebirthBossEventPresentation.GetRoleBuff(state, entity));
 
         return true;
     }
@@ -2649,7 +2685,7 @@ public static class RebirthBossEventTargeting
         state.OwnerEntityId = owner.entityId;
 
         string roleBuff =
-            RebirthBossEventPresentation.GetRoleBuff(state.Role);
+            RebirthBossEventPresentation.GetRoleBuff(state, entity);
         bool roleBuffPresent =
             entity.Buffs != null &&
             entity.Buffs.HasBuff(roleBuff);
@@ -2778,6 +2814,14 @@ public static class RebirthBossEventLifecycle
         PruneDead(world, e.SupportEntityIds);
         PruneDead(world, e.RegularEntityIds);
         RebirthBossEventTargeting.Maintain(world, e);
+        foreach(var original in e.SpawnOriginals)
+        {
+            if((original.Role!=1&&original.Role!=2)||original.Killed)continue;
+            Entity doorRaw;
+            if(!world.Entities.dict.TryGetValue(original.EntityId,out doorRaw))continue;
+            var doorEntity=doorRaw as EntityAlive;
+            if(doorEntity!=null&&!doorEntity.IsDead())RebirthSeekerDoors.TryOpen(doorEntity);
+        }
 
         if (e.State == RebirthBossEventState.RewardPending)
             RebirthBossEventRewardService.TryIssue(world, e);
@@ -5026,7 +5070,7 @@ public static class RebirthBossEventIdentity
         }
     }
 }
-public static class RebirthBossEventSeed { public static int Create(int worldSeed, int day, string owner, int sequence) { unchecked { int h = worldSeed; h = h * 397 ^ day; h = h * 397 ^ (owner ?? string.Empty).GetHashCode(); h = h * 397 ^ sequence; return h; } } }
+public static class RebirthBossEventSeed { public static int CreateUnpredictable() { return Guid.NewGuid().GetHashCode(); } public static int Create(int worldSeed, int day, string owner, int sequence) { unchecked { int h = worldSeed; h = h * 397 ^ day; h = h * 397 ^ (owner ?? string.Empty).GetHashCode(); h = h * 397 ^ sequence; return h; } } }
 
 public static class RebirthBossEventTestTools
 {
@@ -6569,7 +6613,7 @@ public static class RebirthBossEventHealthTrace
 
         Stat stat = entity.Stats.Health;
         string roleBuff =
-            RebirthBossEventPresentation.GetRoleBuff(state.Role);
+            RebirthBossEventPresentation.GetRoleBuff(state, entity);
 
         RebirthBossEventHealthTraceSnapshot snapshot =
             new RebirthBossEventHealthTraceSnapshot();

@@ -310,7 +310,11 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         if(knowledge!=null)knowledge.Size=new Vector2i(knowledge.Size.x,missingTool&&missingFuel?140:168);
         if(icon!=null)icon.Position=new Vector2i(icon.Position.x,missingFuel?-216:-244);
         if(label!=null)label.Position=new Vector2i(label.Position.x,missingFuel?-216:-244);
-        if(fuelIcon!=null){fuelIcon.IsVisible=missingFuel;fuelIcon.Position=new Vector2i(fuelIcon.Position.x,fuelY);}
+        if(fuelIcon!=null){
+            string fuelName=XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity?.block?.Properties.GetString("FuelType");
+            var fuelItem=string.IsNullOrEmpty(fuelName)?null:ItemClass.GetItemClass(fuelName);
+            fuelIcon.SpriteName=fuelItem?.GetIconName()??"resourceWood";
+            fuelIcon.IsVisible=missingFuel;fuelIcon.Position=new Vector2i(fuelIcon.Position.x,fuelY);}
         if(fuelLabel!=null){fuelLabel.IsVisible=missingFuel;fuelLabel.Position=new Vector2i(fuelLabel.Position.x,fuelY);}
 
     }

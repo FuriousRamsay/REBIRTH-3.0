@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Armor bonus definitions. Edit values here; a restart applies them, no rebuild needed.
+
+  family: slot (Head, Chest, Hands, Feet) owns it. A family belongs to one slot only.
+          effect is the native PassiveEffects stat the family changes.
+  bonus:  rarity Common, Uncommon, Rare or Legendary. min and max are fractions (0.04 = 4%).
+          Value bands must not overlap: each rarity is strictly above the one below.
+          skills limits a bonus to weapons of those REBIRTH skills; tags limits it by item tag.
+          op base adds to the stat; the default adds a percentage. flat values show as whole numbers.
+          context requires the game to be asking about that drop or use, as harvest does.
+-->
+<armor_bonuses>
+  <rarity_weights>
+    <!-- Base weights by kit level, then added per item quality above 1. -->
+    <level id="1" common="100" uncommon="40" rare="10" legendary="1" />
+    <level id="2" common="100" uncommon="65" rare="12" legendary="1" />
+    <level id="3" common="100" uncommon="80" rare="30" legendary="3" />
+    <quality_step uncommon="4" rare="8" legendary="4" />
+  </rarity_weights>
+
+  <family id="EntityDamage" slot="Hands" effect="EntityDamage">
+    <bonus id="entity_damage_axes" rarity="Common" min="0.04" max="0.08" skills="skill.axes" />
+    <bonus id="entity_damage_batons" rarity="Common" min="0.04" max="0.08" skills="skill.batons" />
+    <bonus id="entity_damage_clubs" rarity="Common" min="0.04" max="0.08" skills="skill.clubs" />
+    <bonus id="entity_damage_hammers" rarity="Common" min="0.04" max="0.08" skills="skill.hammers" />
+    <bonus id="entity_damage_knives" rarity="Common" min="0.04" max="0.08" skills="skill.knives" />
+    <bonus id="entity_damage_knuckles" rarity="Common" min="0.04" max="0.08" skills="skill.knuckles" />
+    <bonus id="entity_damage_scythes" rarity="Common" min="0.04" max="0.08" skills="skill.scythes" />
+    <bonus id="entity_damage_spears" rarity="Common" min="0.04" max="0.08" skills="skill.spears" />
+    <bonus id="entity_damage_swords" rarity="Common" min="0.04" max="0.08" skills="skill.swords" />
+    <bonus id="entity_damage_unarmed" rarity="Common" min="0.04" max="0.08" skills="skill.unarmed" />
+    <bonus id="entity_damage_bows" rarity="Common" min="0.04" max="0.08" skills="skill.archery" />
+    <bonus id="entity_damage_pistols" rarity="Common" min="0.04" max="0.08" skills="skill.pistols" />
+    <bonus id="entity_damage_revolvers" rarity="Common" min="0.04" max="0.08" skills="skill.revolvers" />
+    <bonus id="entity_damage_heavy_handguns" rarity="Common" min="0.04" max="0.08" skills="skill.heavy_handguns" />
+    <bonus id="entity_damage_shotguns" rarity="Common" min="0.04" max="0.08" skills="skill.shotguns" />
+    <bonus id="entity_damage_assault_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.assault_rifles" />
+    <bonus id="entity_damage_tactical_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.tactical_rifles" />
+    <bonus id="entity_damage_long_range_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.long_range_rifles" />
+    <bonus id="entity_damage_melee" rarity="Uncommon" min="0.09" max="0.12" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="entity_damage_ranged" rarity="Uncommon" min="0.09" max="0.12" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="entity_damage_all" rarity="Rare" min="0.13" max="0.15" />
+    <bonus id="entity_damage_all_greater" rarity="Legendary" min="0.16" max="0.18" />
+  </family>
+
+  <family id="ReloadSpeed" slot="Hands" effect="ReloadSpeedMultiplier">
+    <bonus id="reload_speed_bows_common" rarity="Common" min="0.04" max="0.08" skills="skill.archery" />
+    <bonus id="reload_speed_bows_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.archery" />
+    <bonus id="reload_speed_pistols_common" rarity="Common" min="0.04" max="0.08" skills="skill.pistols" />
+    <bonus id="reload_speed_pistols_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.pistols" />
+    <bonus id="reload_speed_revolvers_common" rarity="Common" min="0.04" max="0.08" skills="skill.revolvers" />
+    <bonus id="reload_speed_revolvers_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.revolvers" />
+    <bonus id="reload_speed_heavy_handguns_common" rarity="Common" min="0.04" max="0.08" skills="skill.heavy_handguns" />
+    <bonus id="reload_speed_heavy_handguns_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.heavy_handguns" />
+    <bonus id="reload_speed_shotguns_common" rarity="Common" min="0.04" max="0.08" skills="skill.shotguns" />
+    <bonus id="reload_speed_shotguns_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.shotguns" />
+    <bonus id="reload_speed_assault_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.assault_rifles" />
+    <bonus id="reload_speed_assault_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.assault_rifles" />
+    <bonus id="reload_speed_tactical_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.tactical_rifles" />
+    <bonus id="reload_speed_tactical_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.tactical_rifles" />
+    <bonus id="reload_speed_long_range_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.long_range_rifles" />
+    <bonus id="reload_speed_long_range_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.long_range_rifles" />
+    <bonus id="reload_speed_ranged_rare" rarity="Rare" min="0.15" max="0.18" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="reload_speed_ranged_legendary" rarity="Legendary" min="0.19" max="0.26" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+  </family>
+
+  <family id="RoundsPerMinute" slot="Hands" effect="RoundsPerMinute">
+    <bonus id="rpm_bows_common" rarity="Common" min="0.04" max="0.08" skills="skill.archery" />
+    <bonus id="rpm_bows_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.archery" />
+    <bonus id="rpm_pistols_common" rarity="Common" min="0.04" max="0.08" skills="skill.pistols" />
+    <bonus id="rpm_pistols_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.pistols" />
+    <bonus id="rpm_revolvers_common" rarity="Common" min="0.04" max="0.08" skills="skill.revolvers" />
+    <bonus id="rpm_revolvers_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.revolvers" />
+    <bonus id="rpm_heavy_handguns_common" rarity="Common" min="0.04" max="0.08" skills="skill.heavy_handguns" />
+    <bonus id="rpm_heavy_handguns_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.heavy_handguns" />
+    <bonus id="rpm_shotguns_common" rarity="Common" min="0.04" max="0.08" skills="skill.shotguns" />
+    <bonus id="rpm_shotguns_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.shotguns" />
+    <bonus id="rpm_assault_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.assault_rifles" />
+    <bonus id="rpm_assault_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.assault_rifles" />
+    <bonus id="rpm_tactical_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.tactical_rifles" />
+    <bonus id="rpm_tactical_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.tactical_rifles" />
+    <bonus id="rpm_long_range_rifles_common" rarity="Common" min="0.04" max="0.08" skills="skill.long_range_rifles" />
+    <bonus id="rpm_long_range_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.long_range_rifles" />
+    <bonus id="rpm_ranged_rare" rarity="Rare" min="0.15" max="0.18" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="rpm_ranged_legendary" rarity="Legendary" min="0.19" max="0.26" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+  </family>
+
+  <family id="AttacksPerMinute" slot="Hands" effect="AttacksPerMinute">
+    <bonus id="apm_axes_common" rarity="Common" min="0.04" max="0.08" skills="skill.axes" />
+    <bonus id="apm_axes_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.axes" />
+    <bonus id="apm_batons_common" rarity="Common" min="0.04" max="0.08" skills="skill.batons" />
+    <bonus id="apm_batons_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.batons" />
+    <bonus id="apm_clubs_common" rarity="Common" min="0.04" max="0.08" skills="skill.clubs" />
+    <bonus id="apm_clubs_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.clubs" />
+    <bonus id="apm_hammers_common" rarity="Common" min="0.04" max="0.08" skills="skill.hammers" />
+    <bonus id="apm_hammers_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.hammers" />
+    <bonus id="apm_knives_common" rarity="Common" min="0.04" max="0.08" skills="skill.knives" />
+    <bonus id="apm_knives_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.knives" />
+    <bonus id="apm_knuckles_common" rarity="Common" min="0.04" max="0.08" skills="skill.knuckles" />
+    <bonus id="apm_knuckles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.knuckles" />
+    <bonus id="apm_scythes_common" rarity="Common" min="0.04" max="0.08" skills="skill.scythes" />
+    <bonus id="apm_scythes_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.scythes" />
+    <bonus id="apm_spears_common" rarity="Common" min="0.04" max="0.08" skills="skill.spears" />
+    <bonus id="apm_spears_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.spears" />
+    <bonus id="apm_swords_common" rarity="Common" min="0.04" max="0.08" skills="skill.swords" />
+    <bonus id="apm_swords_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.swords" />
+    <bonus id="apm_unarmed_common" rarity="Common" min="0.04" max="0.08" skills="skill.unarmed" />
+    <bonus id="apm_unarmed_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.unarmed" />
+    <bonus id="apm_melee_rare" rarity="Rare" min="0.15" max="0.18" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="apm_melee_legendary" rarity="Legendary" min="0.19" max="0.26" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+  </family>
+
+  <family id="EntityPenetration" slot="Hands" effect="EntityPenetrationCount" op="base" flat="true">
+    <bonus id="penetration_pistols" rarity="Common" min="1" max="1" skills="skill.pistols" />
+    <bonus id="penetration_revolvers" rarity="Common" min="1" max="1" skills="skill.revolvers" />
+    <bonus id="penetration_heavy_handguns" rarity="Common" min="1" max="1" skills="skill.heavy_handguns" />
+    <bonus id="penetration_assault_rifles" rarity="Common" min="1" max="1" skills="skill.assault_rifles" />
+    <bonus id="penetration_tactical_rifles" rarity="Common" min="1" max="1" skills="skill.tactical_rifles" />
+    <bonus id="penetration_long_range_rifles" rarity="Common" min="1" max="1" skills="skill.long_range_rifles" />
+    <bonus id="penetration_bows" rarity="Common" min="1" max="1" skills="skill.archery" />
+    <bonus id="penetration_spears" rarity="Common" min="1" max="1" skills="skill.spears" />
+    <bonus id="penetration_shotguns" rarity="Common" min="1" max="1" skills="skill.shotguns" />
+    <bonus id="penetration_sidearms" rarity="Uncommon" min="1" max="1" skills="skill.pistols,skill.revolvers,skill.heavy_handguns" />
+    <bonus id="penetration_rifles" rarity="Uncommon" min="1" max="1" skills="skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="penetration_bows_spears_shotguns" rarity="Uncommon" min="1" max="1" skills="skill.archery,skill.spears,skill.shotguns" />
+    <bonus id="penetration_ranged_rare" rarity="Rare" min="1" max="1" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="penetration_ranged_spears_legendary" rarity="Legendary" min="2" max="2" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles,skill.spears" />
+  </family>
+
+  <family id="TargetArmor" slot="Hands" effect="TargetArmor" negative="true">
+    <bonus id="target_armor_axes" rarity="Common" min="-0.08" max="-0.05" skills="skill.axes" />
+    <bonus id="target_armor_batons" rarity="Common" min="-0.08" max="-0.05" skills="skill.batons" />
+    <bonus id="target_armor_clubs" rarity="Common" min="-0.08" max="-0.05" skills="skill.clubs" />
+    <bonus id="target_armor_hammers" rarity="Common" min="-0.08" max="-0.05" skills="skill.hammers" />
+    <bonus id="target_armor_knives" rarity="Common" min="-0.08" max="-0.05" skills="skill.knives" />
+    <bonus id="target_armor_knuckles" rarity="Common" min="-0.08" max="-0.05" skills="skill.knuckles" />
+    <bonus id="target_armor_scythes" rarity="Common" min="-0.08" max="-0.05" skills="skill.scythes" />
+    <bonus id="target_armor_spears" rarity="Common" min="-0.08" max="-0.05" skills="skill.spears" />
+    <bonus id="target_armor_swords" rarity="Common" min="-0.08" max="-0.05" skills="skill.swords" />
+    <bonus id="target_armor_unarmed" rarity="Common" min="-0.08" max="-0.05" skills="skill.unarmed" />
+    <bonus id="target_armor_bows" rarity="Common" min="-0.08" max="-0.05" skills="skill.archery" />
+    <bonus id="target_armor_pistols" rarity="Common" min="-0.08" max="-0.05" skills="skill.pistols" />
+    <bonus id="target_armor_revolvers" rarity="Common" min="-0.08" max="-0.05" skills="skill.revolvers" />
+    <bonus id="target_armor_heavy_handguns" rarity="Common" min="-0.08" max="-0.05" skills="skill.heavy_handguns" />
+    <bonus id="target_armor_shotguns" rarity="Common" min="-0.08" max="-0.05" skills="skill.shotguns" />
+    <bonus id="target_armor_assault_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.assault_rifles" />
+    <bonus id="target_armor_tactical_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.tactical_rifles" />
+    <bonus id="target_armor_long_range_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.long_range_rifles" />
+    <bonus id="target_armor_melee" rarity="Uncommon" min="-0.12" max="-0.09" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="target_armor_ranged" rarity="Uncommon" min="-0.12" max="-0.09" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="target_armor_rare" rarity="Rare" min="-0.16" max="-0.13" />
+    <bonus id="target_armor_legendary" rarity="Legendary" min="-0.22" max="-0.17" />
+  </family>
+
+  <family id="DismemberChance" slot="Hands" effect="DismemberChance" op="base">
+    <bonus id="dismember_axes" rarity="Common" min="0.03" max="0.05" skills="skill.axes" />
+    <bonus id="dismember_batons" rarity="Common" min="0.03" max="0.05" skills="skill.batons" />
+    <bonus id="dismember_clubs" rarity="Common" min="0.03" max="0.05" skills="skill.clubs" />
+    <bonus id="dismember_hammers" rarity="Common" min="0.03" max="0.05" skills="skill.hammers" />
+    <bonus id="dismember_knives" rarity="Common" min="0.03" max="0.05" skills="skill.knives" />
+    <bonus id="dismember_knuckles" rarity="Common" min="0.03" max="0.05" skills="skill.knuckles" />
+    <bonus id="dismember_scythes" rarity="Common" min="0.03" max="0.05" skills="skill.scythes" />
+    <bonus id="dismember_spears" rarity="Common" min="0.03" max="0.05" skills="skill.spears" />
+    <bonus id="dismember_swords" rarity="Common" min="0.03" max="0.05" skills="skill.swords" />
+    <bonus id="dismember_unarmed" rarity="Common" min="0.03" max="0.05" skills="skill.unarmed" />
+    <bonus id="dismember_bows" rarity="Common" min="0.03" max="0.05" skills="skill.archery" />
+    <bonus id="dismember_pistols" rarity="Common" min="0.03" max="0.05" skills="skill.pistols" />
+    <bonus id="dismember_revolvers" rarity="Common" min="0.03" max="0.05" skills="skill.revolvers" />
+    <bonus id="dismember_heavy_handguns" rarity="Common" min="0.03" max="0.05" skills="skill.heavy_handguns" />
+    <bonus id="dismember_shotguns" rarity="Common" min="0.03" max="0.05" skills="skill.shotguns" />
+    <bonus id="dismember_assault_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.assault_rifles" />
+    <bonus id="dismember_tactical_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.tactical_rifles" />
+    <bonus id="dismember_long_range_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.long_range_rifles" />
+    <bonus id="dismember_melee" rarity="Uncommon" min="0.06" max="0.08" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="dismember_ranged" rarity="Uncommon" min="0.06" max="0.08" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="dismember_rare" rarity="Rare" min="0.09" max="0.11" />
+    <bonus id="dismember_legendary" rarity="Legendary" min="0.12" max="0.15" />
+  </family>
+
+  <family id="WildHarvest" slot="Hands" effect="HarvestCount" op="base" flat="true" context="wildCropsHarvest">
+    <bonus id="harvest_knives_common" rarity="Common" min="1" max="1" skills="skill.knives" />
+    <bonus id="harvest_knives_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.knives" />
+    <bonus id="harvest_scythes_common" rarity="Common" min="1" max="1" skills="skill.scythes" />
+    <bonus id="harvest_scythes_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.scythes" />
+    <bonus id="harvest_axes_common" rarity="Common" min="1" max="1" skills="skill.axes" />
+    <bonus id="harvest_axes_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.axes" />
+    <bonus id="harvest_swords_common" rarity="Common" min="1" max="1" skills="skill.swords" />
+    <bonus id="harvest_swords_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.swords" />
+    <bonus id="harvest_bladed_rare" rarity="Rare" min="2" max="2" skills="skill.knives,skill.scythes,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="1" />
+    <bonus id="harvest_bladed_legendary" rarity="Legendary" min="2" max="2" skills="skill.knives,skill.scythes,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="2" />
+  </family>
+
+  <family id="BlockDamageMining" slot="Hands" effect="BlockDamage" tags="miningTool">
+    <bonus id="block_damage_mining_common" rarity="Common" min="0.05" max="0.08" />
+    <bonus id="block_damage_mining_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
+    <bonus id="block_damage_mining_rare" rarity="Rare" min="0.13" max="0.16" />
+    <bonus id="block_damage_mining_legendary" rarity="Legendary" min="0.17" max="0.22" />
+  </family>
+
+  <family id="BlockDamageLogging" slot="Hands" effect="BlockDamage" tags="axe,chainsaw">
+    <bonus id="block_damage_logging_common" rarity="Common" min="0.05" max="0.08" />
+    <bonus id="block_damage_logging_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
+    <bonus id="block_damage_logging_rare" rarity="Rare" min="0.13" max="0.16" />
+    <bonus id="block_damage_logging_legendary" rarity="Legendary" min="0.17" max="0.22" />
+  </family>
+
+  <family id="BlockDamageSalvage" slot="Hands" effect="BlockDamage" tags="salvageTool">
+    <bonus id="block_damage_salvage_common" rarity="Common" min="0.05" max="0.08" />
+    <bonus id="block_damage_salvage_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
+    <bonus id="block_damage_salvage_rare" rarity="Rare" min="0.13" max="0.16" />
+    <bonus id="block_damage_salvage_legendary" rarity="Legendary" min="0.17" max="0.22" />
+  </family>
+
+  <family id="TrainedDamage" slot="Hands" effect="EntityDamage" scale_with_weapon_skill="true">
+    <bonus id="trained_damage_rare" rarity="Rare" min="0.15" max="0.20" />
+    <bonus id="trained_damage_legendary" rarity="Legendary" min="0.21" max="0.28" />
+  </family>
+
+  <family id="ExplosionDamage" slot="Hands" effect="None" special="explosion">
+    <bonus id="explosion_pipe_bombs" rarity="Common" min="0.15" max="0.25" items="thrownAmmoPipeBomb" />
+    <bonus id="explosion_grenades" rarity="Common" min="0.15" max="0.25" items="thrownGrenade,thrownGrenadeContact" />
+    <bonus id="explosion_dynamite" rarity="Common" min="0.15" max="0.25" items="thrownDynamite" />
+    <bonus id="explosion_timed_charge" rarity="Common" min="0.15" max="0.25" items="thrownTimedCharge" />
+    <bonus id="explosion_arrows" rarity="Common" min="0.15" max="0.25" items="ammoArrowExploding,ammoCrossbowBoltExploding" />
+    <bonus id="explosion_rockets" rarity="Common" min="0.15" max="0.25" items="ammoRocketHE,ammoRocketFrag,gunExplosivesT3RocketLauncher" />
+    <bonus id="explosion_throwables" rarity="Uncommon" min="0.30" max="0.45" items="thrownAmmoPipeBomb,thrownGrenade,thrownGrenadeContact,thrownDynamite,thrownTimedCharge" />
+    <bonus id="explosion_projectiles" rarity="Uncommon" min="0.30" max="0.45" items="ammoArrowExploding,ammoCrossbowBoltExploding,ammoRocketHE,ammoRocketFrag,gunExplosivesT3RocketLauncher" />
+    <bonus id="explosion_all" rarity="Rare" min="0.50" max="0.70" items="thrownAmmoPipeBomb,thrownGrenade,thrownGrenadeContact,thrownDynamite,thrownTimedCharge,ammoArrowExploding,ammoCrossbowBoltExploding,ammoRocketHE,ammoRocketFrag,gunExplosivesT3RocketLauncher" />
+    <bonus id="explosion_all_legendary" rarity="Legendary" min="0.75" max="1.00" items="thrownAmmoPipeBomb,thrownGrenade,thrownGrenadeContact,thrownDynamite,thrownTimedCharge,ammoArrowExploding,ammoCrossbowBoltExploding,ammoRocketHE,ammoRocketFrag,gunExplosivesT3RocketLauncher" />
+  </family>
+
+</armor_bonuses>

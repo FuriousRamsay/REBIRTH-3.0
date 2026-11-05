@@ -79,6 +79,7 @@ public static class RebirthSleeperSpawnMultiplierInstaller
     {
         if (s_installed) return;
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.fresh.sleepermultipliers.3.1"), typeof(RebirthSleeperSpawnMultiplierPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.fresh.sleeperrandom"), typeof(RebirthSleeperRandomSeed));
         s_installed = true;
     }
 }
@@ -157,5 +158,16 @@ public sealed class RebirthSleeperSpawnMultiplierModApi : IModApi
             Log.Error("[REBIRTH Sleeper Multipliers] Install failed: "
                 + ex.GetType().Name + ": " + ex.Message);
         }
+    }
+}
+
+// Native seeds this from the saved world seed outside playtesting, so every load of a save copy
+// rolls the same sleepers in the same order. Use the native playtesting seed for every world.
+[HarmonyPatch(typeof(SleeperVolume), nameof(SleeperVolume.WorldInit))]
+internal static class RebirthSleeperRandomSeed
+{
+    private static void Postfix()
+    {
+        SleeperVolume.sleeperRandom = GameRandomManager.Instance.CreateGameRandom((int)System.Diagnostics.Stopwatch.GetTimestamp());
     }
 }

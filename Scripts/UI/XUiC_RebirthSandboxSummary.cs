@@ -51,6 +51,11 @@ public class XUiC_RebirthSandboxSummary : XUiController
         base.OnClose();
     }
 
+    private static void AddSummaryValue(List<string> changes, bool changed, string labelKey, string valueKey)
+    {
+        if (changed) changes.Add("[A0A0A0]" + Localization.Get(labelKey) + ":[-] " + Localization.Get(valueKey) + "[-]");
+    }
+
     public override void Update(float dt)
     {
         base.Update(dt);
@@ -325,6 +330,70 @@ public class XUiC_RebirthSandboxSummary : XUiController
             changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerRestriction") + ":[-] " + Localization.Get(new[] { "xuiSeekerRestrictionAnywhere", "xuiSeekerRestrictionQuesting", "xuiSeekerRestrictionNotQuesting", "xuiSeekerRestrictionOutdoors", "xuiSeekerRestrictionOutdoorsNotQuesting", "xuiSeekerRestrictionOff" }[(int)state.SeekerRestriction]) + "[-]");
         if (state.SeekerHordeDay != defaults.SeekerHordeDay)
             changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSeekerHordeDay") + ":[-] " + Localization.Get(state.SeekerHordeDay ? "xuiYes" : "xuiNo") + "[-]");
+        if (state.KamikazeMode != defaults.KamikazeMode)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthKamikazeMode") + ":[-] " + Localization.Get("xuiRebirthKamikazeMode" + state.KamikazeMode) + "[-]");
+        if (state.TornadoMode != defaults.TornadoMode)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthTornadoMode") + ":[-] " + Localization.Get("xuiRebirthTornadoMode" + state.TornadoMode) + "[-]");
+        if (state.ScreamerNights != defaults.ScreamerNights)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthScreamerNights") + ":[-] " + Localization.Get("xuiRebirthScreamerNights" + state.ScreamerNights) + "[-]");
+        if (state.TornadoMultiplier != defaults.TornadoMultiplier)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthTornadoMultiplier") + ":[-] " + state.TornadoMultiplier + "%[-]");
+        if (state.ScreamerMax != defaults.ScreamerMax)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthScreamerMax") + ":[-] " + state.ScreamerMax + "[-]");
+        if (state.GamestageMultiplier != defaults.GamestageMultiplier)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthGamestageMultiplier") + ":[-] " + state.GamestageMultiplier + "%[-]");
+        if (state.BossEventZombieAnimals != defaults.BossEventZombieAnimals)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthBossEventZombieAnimals") + ":[-] " + Localization.Get(state.BossEventZombieAnimals ? "xuiYes" : "xuiNo") + "[-]");
+        if (state.WanderingHordeFrequency != defaults.WanderingHordeFrequency)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHordeFrequency") + ":[-] " + Localization.Get("xuiRebirthWanderingHordeFrequency" + state.WanderingHordeFrequency) + "[-]");
+        if (state.WanderingHordeSize != defaults.WanderingHordeSize)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHordeSize") + ":[-] " + Localization.Get("xuiRebirthWanderingHordeSize" + state.WanderingHordeSize) + "[-]");
+        if (state.WanderingHerdRestriction != defaults.WanderingHerdRestriction)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHerdRestriction") + ":[-] " + Localization.Get("xuiRebirthWanderingHerdRestriction" + state.WanderingHerdRestriction) + "[-]");
+        if (state.DemolisherMode != defaults.DemolisherMode)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthDemolisherMode") + ":[-] " + Localization.Get("xuiRebirthDemolisherMode" + state.DemolisherMode) + "[-]");
+        if (state.WanderingHerdChance != defaults.WanderingHerdChance)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHerdChance") + ":[-] " + state.WanderingHerdChance + "%[-]");
+        if (state.WanderingHerdAfterHordeNight != defaults.WanderingHerdAfterHordeNight)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHerdAfterHordeNight") + ":[-] " + state.WanderingHerdAfterHordeNight + "%[-]");
+        if (state.WanderingHerdDuration != defaults.WanderingHerdDuration)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHerdDuration") + ":[-] " + state.WanderingHerdDuration + " min[-]");
+        if (state.WanderingHordeDespawn != defaults.WanderingHordeDespawn)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthWanderingHordeDespawn") + ":[-] " + Localization.Get(state.WanderingHordeDespawn ? "xuiYes" : "xuiNo") + "[-]");
+        AddSummaryValue(changes, state.RequireTimedReading != defaults.RequireTimedReading, "xuiRebirthRequireTimedReading", state.RequireTimedReading ? "xuiRebirthTimedReading" : "xuiRebirthQuickReading");
+        AddSummaryValue(changes, state.LiteratureStudyTime != defaults.LiteratureStudyTime, "xuiRebirthLiteratureStudyTime", new[] { "xuiRebirthStudyDurationQuarter", "xuiRebirthStudyDurationHalf", "xuiRebirthStudyDurationThreeQuarters", "xuiRebirthStudyDurationNormal", "xuiRebirthStudyDurationOneAndHalf", "xuiRebirthStudyDurationDouble" }[(int)state.LiteratureStudyTime]);
+        AddSummaryValue(changes, state.QuickStack != defaults.QuickStack, "xuiRebirthQuickStack", new[] { "xuiRebirthQuickStackOff", "xuiRebirthQuickStackStrict", "xuiRebirthQuickStackFull" }[(int)state.QuickStack]);
+        AddSummaryValue(changes, state.SecureAccessSharing != defaults.SecureAccessSharing, "xuiRebirthSecureAccessSharing", new[] { "xuiRebirthSecureAccessPin", "xuiRebirthSecureAccessAllies", "xuiRebirthSecureAccessParty" }[(int)state.SecureAccessSharing]);
+        AddSummaryValue(changes, state.HornActivatedDoors != defaults.HornActivatedDoors, "xuiRebirthHornActivatedDoors", new[] { "xuiRebirthHornDoorsNone", "xuiRebirthHornDoorsTrader", "xuiRebirthHornDoorsAll" }[(int)state.HornActivatedDoors]);
+        AddSummaryValue(changes, state.TraderJobRecoveryGrace != defaults.TraderJobRecoveryGrace, "xuiRebirthTraderJobRecoveryGrace", state.TraderJobRecoveryGrace ? "xuiYes" : "xuiNo");
+        AddSummaryValue(changes, state.TraderJobRecoveryGraceDuration != defaults.TraderJobRecoveryGraceDuration, "xuiRebirthTraderJobRecoveryGraceDuration", new[] { "xuiRebirthTraderJobRecoveryGrace5", "xuiRebirthTraderJobRecoveryGrace10", "xuiRebirthTraderJobRecoveryGrace15" }[(int)state.TraderJobRecoveryGraceDuration]);
+        AddSummaryValue(changes, state.BossEventStartLevel != defaults.BossEventStartLevel, "xuiRebirthBossEvents", new[] { "xuiRebirthBossEventsOff", "xuiRebirthBossEventsLevel10", "xuiRebirthBossEventsLevel15", "xuiRebirthBossEventsLevel20", "xuiRebirthBossEventsLevel25", "xuiRebirthBossEventsLevel30" }[(int)state.BossEventStartLevel]);
+        AddSummaryValue(changes, state.BossEventFrequency != defaults.BossEventFrequency, "xuiRebirthBossEventFrequency", new[] { "xuiRebirthBossFrequencyRare", "xuiRebirthBossFrequencyLow", "xuiRebirthBossFrequencyNormal", "xuiRebirthBossFrequencyHigh", "xuiRebirthBossFrequencyVeryHigh" }[(int)state.BossEventFrequency]);
+        if (state.BossEventMaximumPerDay != defaults.BossEventMaximumPerDay)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthBossEventMaximum") + ":[-] " + (state.BossEventMaximumPerDay >= 1 && state.BossEventMaximumPerDay <= 5 ? state.BossEventMaximumPerDay.ToString() : Localization.Get("xuiRebirthUnlimited")) + "[-]");
+        AddSummaryValue(changes, state.BossEventSize != defaults.BossEventSize, "xuiRebirthBossEventSize", new[] { "xuiRebirthBossSizeSmall", "xuiRebirthBossSizeNormal", "xuiRebirthBossSizeLarge", "xuiRebirthRandom" }[(int)state.BossEventSize]);
+        AddSummaryValue(changes, state.BossEventDifficulty != defaults.BossEventDifficulty, "xuiRebirthBossEventDifficulty", new[] { "xuiRebirthBossDifficultyLow", "xuiRebirthBossDifficultyNormal", "xuiRebirthBossDifficultyHigh", "xuiRebirthRandom" }[(int)state.BossEventDifficulty]);
+        AddSummaryValue(changes, state.BossEventTime != defaults.BossEventTime, "xuiRebirthBossEventTime", new[] { "xuiRebirthBossTimeDay", "xuiRebirthBossTimeAny", "xuiRebirthBossTimeNight" }[(int)state.BossEventTime]);
+        AddSummaryValue(changes, state.BossEventBloodMoonDay != defaults.BossEventBloodMoonDay, "xuiRebirthBossEventBloodMoon", state.BossEventBloodMoonDay ? "xuiYes" : "xuiNo");
+        AddSummaryValue(changes, state.BossEventRestriction != defaults.BossEventRestriction, "xuiRebirthBossEventRestriction", new[] { "xuiRebirthBossRestrictionAnywhere", "xuiRebirthBossRestrictionOutdoors", "xuiRebirthBossRestrictionQuesting", "xuiRebirthBossRestrictionNotQuesting", "xuiRebirthBossRestrictionOutdoorsNotQuesting" }[(int)state.BossEventRestriction]);
+        AddSummaryValue(changes, state.BossEventRewards != defaults.BossEventRewards, "xuiRebirthBossEventRewards", state.BossEventRewards ? "xuiYes" : "xuiNo");
+        AddSummaryValue(changes, state.BossEventNotifications != defaults.BossEventNotifications, "xuiRebirthBossEventNotifications", state.BossEventNotifications ? "xuiYes" : "xuiNo");
+        AddSummaryValue(changes, state.DisableHiringRestrictions != defaults.DisableHiringRestrictions, "xuiRebirthDisableHiringRestrictions", state.DisableHiringRestrictions ? "xuiYes" : "xuiNo");
+        AddSummaryValue(changes, state.SmartLooting != defaults.SmartLooting, "xuiRebirthSmartLooting", state.SmartLooting ? "xuiYes" : "xuiNo");
+        if (state.PurgeCompletionPercentage != defaults.PurgeCompletionPercentage)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthPurgeCompletion") + ":[-] " + state.PurgeCompletionPercentage + "%[-]");
+        // These are the player's own preferences, shown here so nothing changed stays hidden.
+        for (int voice = 0; voice < RebirthTraderVoicePreferences.Traders.Length; voice++)
+        {
+            string trader = RebirthTraderVoicePreferences.Traders[voice];
+            int voiceStyle = RebirthTraderVoicePreferences.Get(trader);
+            AddSummaryValue(changes, voiceStyle != 0, "rebirthTraderVoice" + trader + "Title", "rebirthTraderVoice" + RebirthTraderVoicePreferences.Labels[voiceStyle]);
+        }
+        int minimapTransparency = SdPlayerPrefs.GetInt("RebirthMinimapTransparency", 0);
+        if (minimapTransparency != 0)
+            changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthMinimapTransparency") + ":[-] " + minimapTransparency + "%[-]");
+        AddSummaryValue(changes, !XUiC_RebirthMiniMap.MinimapVisible, "xuiRebirthMinimapVisibility", "xuiRebirthMinimapOff");
+        AddSummaryValue(changes, RebirthGameSenseOption.Enabled, "xuiRebirthGameSense", "xuiRebirthMinimapOn");
         changedOptions = string.Join("\n", changes.ToArray());
 
         IsDirty = true;
