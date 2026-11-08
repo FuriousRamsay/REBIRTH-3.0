@@ -197,6 +197,7 @@ public static partial class RebirthRecyclerRuntime
         reason="xuiRebirthRecyclingAccessExpired";
         if(groupId==Guid.Empty||!Access(actor,station,current))return false;
         if(actor.world.IsRemote()&&!RebirthRecyclerTransport.IsNativeOwner(station,actor))return RebirthRecyclerTransport.Request(actor as EntityPlayerLocal,station,0,0,groupId,true,out reason);
+        if(!actor.world.IsRemote()&&!(station is RebirthCamperStationState))PullWindowQueue(station);
         var rows=station.Queue.Select((row,index)=>new{row,index}).Where(x=>TryGroup(x.row?.Recipe,out var id)&&id==groupId).ToArray();
         if(rows.Length==0)return false;
         if(!Read(rows[0].row.Recipe,out var group))return false;
@@ -208,6 +209,16 @@ public static partial class RebirthRecyclerRuntime
             ||RebirthNativeItemCodec.Encode(sibling.Original)!=RebirthNativeItemCodec.Encode(group.Original))return false;
         var queue=(RecipeQueueItem[])station.Queue.Clone();foreach(var entry in rows)queue[entry.index]=new RecipeQueueItem {StartingEntityId=-1};
         var refunds=new List<ItemStack>{new ItemStack(group.Original.Clone(),group.Units)};
+        if(!actor.world.IsRemote()&&!(station is RebirthCamperStationState)&&actor is EntityPlayerLocal canceller)
+        {
+            // 2.6: cancelling an unstarted scrap gives the item back at once; what does not fit is dropped at the player.
+            station.Queue=queue;station.setModified();
+            foreach(var refund in refunds)
+                if(!canceller.bag.AddItem(refund)&&!canceller.inventory.AddItem(refund))
+                    GameManager.Instance.ItemDropServer(refund,canceller.GetPosition(),UnityEngine.Vector3.zero,canceller.entityId);
+            Refresh(canceller,station);
+            reason=null;return true;
+        }
         if(station is RebirthCamperStationState mobile)
             return RebirthRecyclerOwnerDelivery.Begin(actor,mobile,CancelOperation(groupId),ItemStack.Clone(station.Input),queue,refunds,out reason,groupId);
         if(CapturePlacedActionPlan(actor,station,CancelOperation(groupId),"cancel",station.Input,queue,refunds,station.Output,station.Tools,false))return true;
@@ -274,6 +285,7 @@ public static partial class RebirthRecyclerRuntime
     {
         if(RebirthRecyclerPlacedSettlement.HoldsStation(station))return false;
         if(RebirthRemoteResourceSourceCustody.BlocksStation(station)||RebirthRemoteResourcePlacedStationClientCustody.Blocks(station)||RebirthRemoteResourcePlacedStationCustody.Blocks(station))return false;
+        PullWindowQueue(station); // An open window's crafts join the station queue before a scrap step.
         if(!IsMarked(station?.Queue?.LastOrDefault()?.Recipe))return true;
         var world=GameManager.Instance?.World;
         if(world?.IsRemote()==true&&RebirthRecyclerTransport.IsNativeOwner(station,world.GetPrimaryPlayer()))
@@ -346,6 +358,14 @@ public static partial class RebirthRecyclerRuntime
                 queue[queue.Length-1]=new RecipeQueueItem {StartingEntityId=-1};
                 bool final=!queue.Any(sibling=>TryGroup(sibling?.Recipe,out var id)&&id==group.Id);
                 var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id):new List<ItemStack>();
+                if(bonuses.Count>0&&!world.IsRemote()&&!(station is RebirthCamperStationState))
+                {
+                    // 2.6 (ScrapBonusPartDropper): bonus parts go into the station output; what does not fit is dropped at the station.
+                    foreach(var bonus in bonuses)
+                        if(ItemStack.AddToItemStackArray(output,bonus.Clone())==-1)
+                            GameManager.Instance.ItemDropServer(bonus.Clone(),station.ToWorldPos().ToVector3()+UnityEngine.Vector3.up*1.5f,UnityEngine.Vector3.zero,row.StartingEntityId,120f,false);
+                    bonuses.Clear();
+                }
                 if(bonuses.Count>0)
                 {
                     if(world.IsRemote()&&!(station is RebirthCamperStationState)&&
@@ -382,6 +402,7 @@ public static partial class RebirthRecyclerRuntime
                         ()=>IsProcessing(station)&&RebirthRecyclerTransport.IsNativeOwner(station,actor),out _,true,seconds);
                     return false;
                 }
+                if(final&&!world.IsRemote())AwardScrapSkill(world,group);
                 station.Output=output;
                 // Use native queue ordering/cycling, with one consumed output row.
                 station.Queue=queue;station.cycleRecipeQueue();
@@ -408,8 +429,8 @@ public static partial class RebirthRecyclerRuntime
             {
                 if(station is RebirthCamperStationState mobile)
                 {if(RebirthCamperStationWindowSession.Admitted(window,mobile))RebirthCamperStationQueueProjection.Refresh(window,mobile);}
-                else syncUiFromTe?.Invoke(window,null);
-                window.SetAllChildrenDirty();
+                else {SyncGrids(window);ProjectWindowQueue(window,station);}
+                // No SetAllChildrenDirty: it redrew every card and recipe row on each scrap output (flicker).
             }
     }
 }
@@ -462,7 +483,9 @@ internal static class RebirthRecyclerQueueProjectionOnly
         var station=__instance.GetParentByType<XUiC_WorkstationWindowGroup>()?.WorkstationData?.TileEntity;
         if(actor?.world?.IsRemote()==true&&!(station is RebirthCamperStationState))
             RebirthRecyclerTransport.TryAdvanceOwned(actor,station,__0);
-        __instance.IsCrafting=false;__instance.IsDirty=true;__instance.updateRecipeData();return false;
+        // The station times scrap rows; the card only shows them. Forcing IsCrafting off here every frame fought the
+        // queue (which sets the front card crafting) and redrew the cards each frame (owner 2026-11-08: flicker).
+        return false;
     }
 }
 [HarmonyPatch(typeof(XUiM_Workstation),nameof(XUiM_Workstation.SetRecipeQueueItems))]

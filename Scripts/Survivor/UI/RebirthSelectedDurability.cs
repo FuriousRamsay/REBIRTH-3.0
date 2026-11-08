@@ -30,6 +30,7 @@ public static class RebirthSelectedDurability
         var sourceRail = geometry?.GetChildById("durability")?.ViewComponent as XUiV_Sprite;
         var value = slot is XUiC_ItemStack bag ? bag.ItemStack?.itemValue
             : (slot as XUiC_EquipmentStack)?.ItemValue;
+        RebirthWeaponBonusSelectedIcon.Show(owner, iconId, value); // 2.6 bonus symbol on the selected icon.
         var number = root.GetChildById("qualityNumber")?.ViewComponent as XUiV_Label;
         if (value == null || value.IsEmpty() || icon == null || sourceIcon == null || sourceRail == null)
         {

@@ -34,7 +34,7 @@ internal static partial class RebirthCamperRelayWiring
                 Mathf.Max(2.5f,RebirthCamperEnergyConfiguration.Current.NativeTickSeconds*2.5f):0;
             int mask=powered?Supply.Mask|(1<<Corner):Supply.Mask&~(1<<Corner);
             if(Supply.Published&&mask==Supply.Mask)return;
-            Log.Out("[REBIRTH EnergyTrace] mounted-turret-power vehicle="+vehicle.entityId+
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] mounted-turret-power vehicle="+vehicle.entityId+
                 " corner="+Corner+" powered="+powered+" requested="+DemandWatts+" supplied="+watts+
                 " previousMask="+Supply.Mask+" nextMask="+mask);
             Supply.Mask=mask;Supply.Published=true;

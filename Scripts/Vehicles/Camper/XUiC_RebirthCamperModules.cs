@@ -191,6 +191,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
             }
         }
         if (icon != null) { icon.IsVisible = valid; if (valid) { icon.SpriteName = stack.itemValue.GetPropertyOverride(ItemClass.PropCustomIcon, stack.itemValue.ItemClass.GetIconName()); icon.Color = stack.itemValue.ItemClass.GetIconTint(stack.itemValue); } }
+        RebirthWeaponBonusSelectedIcon.Show(this, "camperInspectIcon", valid ? stack.itemValue : null); // 2.6 bonus symbol on the selected icon.
         var count=GetChildById("camperSelectedCount")?.ViewComponent as XUiV_Label;
         if(count!=null)count.Text=valid&&stack.count>1?stack.count.ToString():string.Empty;
         var durability=GetChildById("camperSelectedDurability");
@@ -251,7 +252,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
     }
     internal void DropHeldAtPointer()
     {
-        if(!CanInteract||xui.DragAndDropWindow==null||xui.DragAndDropWindow.IsEmpty())return;
+        if(!RebirthDragRelease.DropOnRelease||!CanInteract||xui.DragAndDropWindow==null||xui.DragAndDropWindow.IsEmpty())return;
         var camera=xui.playerUI.camera;
         if(camera==null)return;
         var ray=camera.ScreenPointToRay((UnityEngine.Vector3)xui.playerUI.CursorController.GetScreenPosition());

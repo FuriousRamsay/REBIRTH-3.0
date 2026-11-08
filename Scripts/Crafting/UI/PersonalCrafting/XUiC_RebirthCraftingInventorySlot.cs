@@ -12,6 +12,24 @@ using UnityEngine.Scripting;
 [Preserve]
 public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 {
+    private bool scrapMarked;
+    private int scrapCheckedType = -1;
+    private object scrapCheckedStation;
+
+    // 2.6: scrappable items are purple while a scrap station is open. Rechecked only when the item or station changes.
+    private void RefreshScrapHighlight()
+    {
+        var station = XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity;
+        int type = ItemStack == null || ItemStack.IsEmpty() ? 0 : ItemStack.itemValue.type;
+        if (type == scrapCheckedType && ReferenceEquals(station, scrapCheckedStation)) return;
+        scrapCheckedType = type;
+        scrapCheckedStation = station;
+        bool mark = RebirthScrapWindow.IsScrappable(ItemStack);
+        if (mark == scrapMarked) return;
+        scrapMarked = mark;
+        IsDirty = true;
+    }
+
 
 
 
@@ -50,6 +68,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
     }
     public override bool GetBindingValueInternal(ref string value, string name)
     {
+        if (name == "backgroundcolor" && scrapMarked) { value = "107,77,110,255"; return true; }
         if (name == "backgroundcolor") { value = AttributeLock ? RebirthSlotPalette.Locked : RebirthSlotPalette.Normal; return true; }
         if (name == "tooltip" && RebirthCharacterItemStatsTooltip.Build(this,ItemStack) != null) { value=""; return true; }
         return base.GetBindingValueInternal(ref value,name);
@@ -57,6 +76,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 
     public override void Update(float dt)
     {
+        RefreshScrapHighlight();
         using var inventoryTiming = RebirthInventoryTiming.Measure(0);
         if (ViewComponent?.UiTransform == null || !ViewComponent.UiTransform.gameObject.activeInHierarchy) return;
         bool pinned = pointerOver || IsSelected || IsHolding || IsDragAndDrop || rebirthContextSelected;
@@ -88,7 +108,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 
     public override void OnClose() { presentation?.Show(); base.OnClose(); }
 
-    internal bool ProjectedAttributeLock; public void ReapplyRebirthSlotPalette() { if (AttributeLock != ProjectedAttributeLock) AttributeLock = ProjectedAttributeLock; palette?.Apply(AttributeLock); }
+    internal bool ProjectedAttributeLock; public void ReapplyRebirthSlotPalette() { if (AttributeLock != ProjectedAttributeLock) AttributeLock = ProjectedAttributeLock; palette?.Apply(AttributeLock, scrapMarked); }
 
     private void ReapplySelectedItemBorder()
     {

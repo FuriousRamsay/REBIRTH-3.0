@@ -22,6 +22,72 @@
         <rebirth_item_stats_popup />
       </rect>
     </window>
+    <window name="rebirthStationRootScrap32" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9_q32 />
+            <rebirth_station_shared_14 />
+            <rebirth_station_shared_10 />
+            <rebirth_recycler_input />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootScrap64" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9_q64 />
+            <rebirth_station_shared_14 />
+            <rebirth_station_shared_10 />
+            <rebirth_recycler_input />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootModifier" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_14 />
+            <rebirth_station_shared_10 />
+            <rebirth_modifier_input />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
   </append>
   <setattribute xpath="/windows//rect[@name='rebirthExpectedOutcome']/rect[label[@text='{rebirthoutcomeresults}']]" name="height">70</setattribute>
   <setattribute xpath="/windows//rect[@name='rebirthExpectedOutcome']/rect[label[@text='{rebirthoutcomeresults}']]/sprite" name="height">68</setattribute>

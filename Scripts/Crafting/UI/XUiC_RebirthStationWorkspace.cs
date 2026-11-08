@@ -34,9 +34,12 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
             Array.Copy(output, expanded, output.Length);
             WorkstationData.SetOutputStacks(expanded);
         }
-        ExpandQueue(WorkstationData);
-        base.OnOpen();
+        // The queue holds as many rows as this window has cards: 64 at the Recycler, Shredder and Outfit Designer, 32 at the Munitions Workbench, 16 elsewhere.
+        int cards = GetChildByType<XUiC_CraftingQueue>()?.GetRecipesToCraft()?.Length ?? 0;
+        ExpandQueue(WorkstationData, cards > 16 ? cards : 16);
+        // Panels read this while they open, so it must be set first.
         ActiveInstance = this;
+        base.OnOpen();
         RefreshToolPreviews();
         RefreshFuelPreviews();
         new RebirthPersonalCraftingLayoutService(Presentation).Apply(true);
@@ -44,11 +47,11 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
         xui.playerUI.windowManager.Open("toolbelt",false);
         xui.playerUI.windowManager.Open("dragAndDrop",false);
     }
-    internal static void ExpandQueue(XUiM_Workstation data)
+    internal static void ExpandQueue(XUiM_Workstation data, int slots = 16)
     {
         var saved = data?.GetRecipeQueueItems();
-        if (saved == null || saved.Length >= 16) return;
-        var expanded = new RecipeQueueItem[16];
+        if (saved == null || saved.Length >= slots) return;
+        var expanded = new RecipeQueueItem[slots];
         for (int i=0;i<expanded.Length;i++) expanded[i]=new RecipeQueueItem();
         // Native queues execute from the last slot; retain job order and active position.
         Array.Copy(saved,0,expanded,expanded.Length-saved.Length,saved.Length);
@@ -66,6 +69,8 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
             case "cementMixer": grid.requiredTools="carBattery"; break;
             case "WorkbenchResearchTable001_FR": grid.requiredTools="FuriousRamsayFountainPen"; break;
             case "WorkbenchDistiller001_FR": grid.requiredTools="toolCookingPot"; break;
+            case "ModifierStation": grid.requiredTools="FuriousRamsayHammerPliers"; break;
+            case "AlchemyTable001_FR": grid.requiredTools="FuriousRamsayHammerPliers,toolBeaker"; break;
             case "forge": case "WorkbenchToolbox001_FR": break;
             default: grid.requiredTools=string.Empty; break;
         }
@@ -91,6 +96,8 @@ public sealed class XUiC_RebirthStationWorkspace : XUiC_WorkstationWindowGroup
                 slot.RequiredItemOnly = true;
                 slot.IsDirty = true;
             }
+        // Hide the slots this station does not use now that each slot knows its tool (owner 2026-11-08).
+        RebirthStationToolSlotVisibility.Apply(grid);
     }
     private void RefreshFuelPreviews()
     {

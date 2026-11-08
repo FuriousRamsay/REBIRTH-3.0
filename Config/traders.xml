@@ -22,4 +22,6 @@
   </conditional>
 <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_traders.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/no_weapon_parts_traders.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/primitive_weapons_traders.xml"/></if></conditional>
 </configs>

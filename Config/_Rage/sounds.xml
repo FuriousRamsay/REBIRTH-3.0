@@ -1,0 +1,27 @@
+<configs>
+  <!-- 2.6 Berserker rage sounds (rage start and rage ready). -->
+  <append xpath="/Sounds">
+		<SoundDataNode name="FuriousRamsayRage">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/>
+			<Noise ID="1" noise="7" time="3" muffled_when_crouched="1"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayRage"/>
+			<LocalCrouchVolumeScale value="1.0"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="10"/>
+			<MaxRepeatRate value="1.111"/>
+		</SoundDataNode>
+		<SoundDataNode name="FuriousRamsayOhYeah">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/>
+			<Channel name="Mouth"/>
+			<Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayOhYeah"/>
+			<LocalCrouchVolumeScale name="1.0"/>
+			<CrouchNoiseScale name="0.5"/>
+			<NoiseScale name="1"/>
+			<MaxVoices name="10"/>
+			<maxVoicesPerEntity name="1"/>
+			<MaxRepeatRate name="3.0"/>
+		</SoundDataNode>
+  </append>
+</configs>

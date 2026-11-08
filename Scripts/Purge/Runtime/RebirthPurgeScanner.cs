@@ -231,7 +231,8 @@ internal static class RebirthPurgeScanner
         if(remaining>0&&remaining<=4&&!history.AuditWritten&&Time.realtimeSinceStartup-history.AuditStableSince>=15f)
         {
             history.AuditWritten=true;
-            RebirthPurgeSleeperAudit.Capture(player,"scanner-stalled-15s");
+            // The automatic stall dump is a diagnostic; it logs only with automatic logging on (console audits always log).
+            if(RebirthLogSettings.AutomaticLoggingDefault)RebirthPurgeSleeperAudit.Capture(player,"scanner-stalled-15s");
         }
         int max=history.Maximum;
         // Presentation may be available before evidence. Never use it to

@@ -314,9 +314,9 @@
           <label name="editorSelectedHeading" depth="5" pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text_key="xuiRebirthVehicleSelectedHeading" upper_case="true" />
           <sprite name="editorSelectedRule" depth="3" pos="0,-38" width="610" height="2" sprite="menu_empty" color="181,140,255,255" />
           <rect pos="17,-54" width="80" height="80"><item_stack name="editorSelectionPreview" controller="RebirthEditorPreviewSlot, RebirthUtils" cell_size="80" repeat_i="0" allow_dropping="false" /></rect>
-          <sprite name="editorBagItemIcon" pos="17,-54" width="80" height="80" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" globalopacitymod="0" depth="6" visible="false" />
+          <sprite name="editorBagItemIcon" pos="17,-54" width="80" height="80" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" globalopacitymod="0" depth="6" visible="false" /><sprite name="editorBagItemIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="editorBagItemName" depth="5" pos="112,-54" width="475" height="40" font_size="28" color="255,255,255,255" />
-          <label name="editorBagItemDescription" depth="5" pos="112,-96" width="475" height="70" font_size="20" overflow="clampcontent" color="235,235,239,255" />
+          <label name="editorBagItemDescription" depth="5" pos="112,-96" width="475" height="100" font_size="20" overflow="shrinkcontent" color="235,235,239,255" />
           <rect name="vehicleSelectedStats" controller="RebirthVehicleSelectedStats, RebirthUtils" pos="0,0" width="610" height="338">
             <sprite name="vehicleSelMod0" depth="5" pos="17,-170" width="28" height="28" atlas="ItemIconAtlas" sprite="" visible="false" />
             <sprite name="vehicleSelMod1" depth="5" pos="49,-170" width="28" height="28" atlas="ItemIconAtlas" sprite="" visible="false" />

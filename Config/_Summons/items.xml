@@ -1,0 +1,50 @@
+<configs>
+  <!-- Skeleton attacks, with the 2.6 damage of each tier's weapon. -->
+  <append xpath="/items">
+  <item name="FuriousRamsaySkeleton1Machete">
+    <property name="Extends" value="meleeHandZombie01" />
+    <property name="CreativeMode" value="None" />
+    <property class="Action0">
+      <property name="DamageEntity" value="30" />
+      <property name="DamageBlock" value="75" />
+      <property name="Range" value="1.65" />
+    </property>
+  </item>
+  <item name="FuriousRamsaySkeleton2Spear">
+    <property name="Extends" value="meleeHandZombie01" />
+    <property name="CreativeMode" value="None" />
+    <property class="Action0">
+      <property name="DamageEntity" value="50" />
+      <property name="DamageBlock" value="100" />
+      <property name="Range" value="1.65" />
+    </property>
+  </item>
+  <item name="FuriousRamsaySkeleton3Machete">
+    <property name="Extends" value="meleeHandZombie01" />
+    <property name="CreativeMode" value="None" />
+    <property class="Action0">
+      <property name="DamageEntity" value="70" />
+      <property name="DamageBlock" value="150" />
+      <property name="Range" value="1.65" />
+    </property>
+  </item>
+  <item name="FuriousRamsaySkeleton4Spear">
+    <property name="Extends" value="meleeHandZombie01" />
+    <property name="CreativeMode" value="None" />
+    <property class="Action0">
+      <property name="DamageEntity" value="95" />
+      <property name="DamageBlock" value="200" />
+      <property name="Range" value="1.65" />
+    </property>
+  </item>
+  <item name="FuriousRamsaySkeleton5Axe">
+    <property name="Extends" value="meleeHandZombie01" />
+    <property name="CreativeMode" value="None" />
+    <property class="Action0">
+      <property name="DamageEntity" value="125" />
+      <property name="DamageBlock" value="300" />
+      <property name="Range" value="1.65" />
+    </property>
+  </item>
+  </append>
+</configs>

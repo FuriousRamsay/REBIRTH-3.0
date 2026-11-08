@@ -204,7 +204,7 @@ public static class RebirthLiquidContainerService
             return 0f;
 
         float capacity = Mathf.Max(0f, definition.ContainerCapacityMl);
-        // Native loot random durability is consumed-volume state for liquids.
+        // A saved volume (set by sips) wins; without one the drink starts full (see below).
         // Unmigrated murky containers are full; observe without rewriting a
         // native snapshot. The authoritative normalization boundary saves it.
         if(NeedsMurkyFullInitialization(itemValue,definition))return capacity;
@@ -212,12 +212,11 @@ public static class RebirthLiquidContainerService
         if (itemValue.TryGetMetadata(VolumeKey, out value) && !float.IsNaN(value) && !float.IsInfinity(value))
             return Mathf.Clamp(value, 0f, capacity);
 
-        // Invalid/missing metadata is observed as legacy state, not trusted. Reconstruct from
-        // degradation/authoring without mutating; NormalizeState is the explicit repair boundary.
-        // Observation only: legacy degradation can reconstruct volume without mutating the item.
-        if (capacity > 0f && itemValue.UseTimes > 0.001f)
-            return Mathf.Clamp(capacity - itemValue.UseTimes, 0f, capacity);
-
+        // No saved volume yet: the drink is new (loot, trader, craft). Owner rule (2026-11-07): drinks
+        // always start full. Native loot rolls random durability, and durability is the drink's
+        // consumed volume, so it is ignored here; only sips (saved volume metadata) lower the level.
+        // NormalizeState then saves this volume and resets the degradation to match. The starting
+        // volume defaults to full capacity; cooked drinks may set it from their recipe's water.
         return Mathf.Clamp(definition.InitialVolumeMl, 0f, capacity);
     }
 

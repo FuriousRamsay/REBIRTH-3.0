@@ -1,11 +1,110 @@
 <configs>
  <append xpath="/templates">
+ <rebirth_modifier_input>
+  <rect name="windowForgeInput" controller="RebirthModifierPanel, RebirthUtils" width="228" height="204" cursor_area="true">
+   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_armor"/><label depth="10" style="header.name.shrink" text_key="xuiEnchantInput" font_size="22" /></rect>
+   <grid name="modifierInput" pos="3,-46" rows="1" cols="2" cell_width="75" cell_height="75" controller="RebirthKitInputGrid, RebirthUtils" repeat_content="true"><item_stack controller="RebirthModifierSlot, RebirthUtils" name="0" /></grid>
+   <label depth="10" pos="3,-122" width="75" height="20" font_size="16" justify="center" color="201,198,105,255" text_key="xuiEnchantItemSlot" />
+   <label depth="10" pos="78,-122" width="75" height="20" font_size="16" justify="center" color="201,198,105,255" text_key="xuiEnchantKitSlot" />
+   <simplebutton name="btnEnchant" depth="4" pos="3,-150" width="150" height="34" font_size="22" caption_key="xuiEnchantAction" />
+   <label depth="10" name="recyclerGate" pos="162,-46" width="60" height="26" font_size="16" justify="left" />
+   <label depth="10" name="recyclerYield" pos="162,-74" width="60" height="126" font_size="18" justify="left" />
+  </rect>
+ </rebirth_modifier_input>
  <rebirth_recycler_input>
   <rect name="windowForgeInput" controller="RebirthRecyclerPreview, RebirthUtils" width="228" height="204" cursor_area="true">
-   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_scrap"/><label style="header.name.shrink" text_key="xuiRebirthRecycling" font_size="22" /></rect>
+   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_scrap"/><label depth="10" style="header.name.shrink" text_key="xuiRebirthRecycling" font_size="22" /></rect>
    <grid name="recyclerInput" pos="3,-46" rows="1" cols="1" cell_width="75" cell_height="75" controller="RebirthRecyclerInputGrid, RebirthUtils" repeat_content="true"><item_stack name="0" controller="RebirthRecyclerInputSlot, RebirthUtils"/></grid>
-   <label name="recyclerYield" pos="82,-46" width="143" height="144" font_size="18" justify="left" text="{recycler_yield}" />
-   <label name="recyclerGate" pos="3,-154" width="75" height="46" font_size="14" justify="left" text="{recycler_gate}" />
+   <label depth="10" name="recyclerYield" pos="82,-46" width="143" height="144" font_size="18" justify="left" text="{recycler_yield}" />
+   <label depth="10" name="recyclerGate" pos="3,-154" width="75" height="46" font_size="18" justify="left" color="255,255,255,255" text="{recycler_gate}" />
+   <rect name="scrapPreviewPanel" pos="0,-220" width="320" height="300" visible="false">
+    <sprite name="scrapPreviewBg" depth="1" width="320" height="300" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
+    <sprite name="scrapPreviewFrame" depth="2" width="320" height="300" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+    <sprite name="scrapPreviewIcon" depth="5" pos="10,-8" width="26" height="26" sprite="ui_game_symbol_scrap" />
+    <label name="scrapPreviewTitle" depth="5" pos="42,-8" width="260" height="28" font_size="22" justify="left" color="181,140,255,255" text_key="xuiRebirthScrapOutput" />
+    <sprite name="scrapPreviewRule" depth="3" pos="0,-38" width="320" height="2" sprite="menu_empty" color="181,140,255,220" />
+    <label name="scrapPreviewStatus" depth="5" pos="10,-46" width="300" height="24" font_size="16" justify="left" color="201,198,105,255" />
+    <rect name="scrapRow0" pos="8,-74" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg0" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame0" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon0" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName0" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime0" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount0" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow1" pos="8,-118" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg1" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame1" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon1" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName1" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime1" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount1" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow2" pos="8,-162" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg2" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame2" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon2" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName2" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime2" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount2" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow3" pos="8,-206" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg3" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame3" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon3" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName3" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime3" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount3" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow4" pos="8,-250" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg4" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame4" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon4" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName4" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime4" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount4" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow5" pos="8,-294" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg5" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame5" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon5" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName5" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime5" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount5" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow6" pos="8,-338" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg6" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame6" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon6" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName6" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime6" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount6" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow7" pos="8,-382" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg7" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame7" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon7" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName7" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime7" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount7" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow8" pos="8,-426" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg8" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame8" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon8" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName8" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime8" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount8" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+    <rect name="scrapRow9" pos="8,-470" width="300" height="42" visible="false">
+     <sprite name="scrapRowBg9" depth="3" width="300" height="42" sprite="menu_empty2px" type="sliced" color="28,28,34,255" />
+     <sprite name="scrapRowFrame9" depth="4" width="300" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+     <sprite name="scrapRowIcon9" depth="6" atlas="ItemIconAtlas" pos="5,-5" width="32" height="32" foregroundlayer="true" sprite="" />
+     <label name="scrapRowName9" depth="6" pos="44,-10" width="170" height="24" font_size="18" justify="left" />
+     <label name="scrapRowTime9" depth="6" pos="180,-10" width="60" height="24" font_size="16" justify="right" color="150,150,160,255" />
+     <label name="scrapRowCount9" depth="6" pos="240,-10" width="52" height="24" font_size="18" justify="right" color="168,214,148,255" />
+    </rect>
+   </rect>
   </rect>
  </rebirth_recycler_input>
  </append>

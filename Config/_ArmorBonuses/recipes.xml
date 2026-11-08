@@ -1,0 +1,42 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="kitSurvivorUpgrade" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+			<ingredient name="partRetrofitHousing" count="1"/>
+			<ingredient name="partTuningBoard" count="1"/>
+			<ingredient name="partFieldMechanismPack" count="1"/>
+			<ingredient name="partRegulatorPack" count="1"/>
+		</recipe>
+    <recipe name="kitAdjustment" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+			<ingredient name="partServiceHousing" count="1"/>
+			<ingredient name="partStabilityClampSet" count="1"/>
+			<ingredient name="partAdjustmentMatrix" count="1"/>
+			<ingredient name="partControlShunt" count="1"/>
+		</recipe>
+    <recipe name="kitRetuning" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+			<ingredient name="partStabilityClampSet" count="1"/>
+			<ingredient name="partRetuningCartridge" count="1"/>
+			<ingredient name="partProfileBridge" count="1"/>
+			<ingredient name="partControlShunt" count="1"/>
+		</recipe>
+    <recipe name="kitBreakdown" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+			<ingredient name="partServiceHousing" count="1"/>
+			<ingredient name="partStabilityClampSet" count="1"/>
+			<ingredient name="partPurgeCanister" count="1"/>
+			<ingredient name="partRetuningCartridge" count="1"/>
+		</recipe>
+    <recipe name="kitEliteReinforcement" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+			<ingredient name="partReinforcedHousing" count="1"/>
+			<ingredient name="partReinforcementCore" count="1"/>
+			<ingredient name="partStabilityFrame" count="1"/>
+			<ingredient name="partControlLattice" count="1"/>
+			<ingredient name="partRegulatorAssembly" count="1"/>
+		</recipe>
+    <recipe name="kitComprehensiveUpgrade" count="1" craft_area="workbench" tags="learnable">
+			<ingredient name="partMasterHousing" count="1"/>
+			<ingredient name="partComprehensiveCore" count="1"/>
+			<ingredient name="partControlArray" count="1"/>
+			<ingredient name="partMasterRegulator" count="1"/>
+			<ingredient name="partFieldArray" count="1"/>
+		</recipe>
+  </append>
+</configs>

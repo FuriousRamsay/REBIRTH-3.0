@@ -18,7 +18,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
 {
-    public const int MaximumQueueEntries = 50;
+    public const int MaximumQueueEntries = 64; // Recycler, Shredder and Outfit Designer hold 64, Munitions Workbench 32 (owner 2026-11-08)
 
     private const int HeaderHeight = 46;
     private const int BottomPad = 8;
@@ -440,12 +440,14 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
         lastActiveCount = active;
 
         int width = Math.Max(260, size.x);
-        int height = Math.Max(HeaderHeight + 6 + CardHeight + BottomPad, size.y);
+        // Use the real area: the rows panel clips a partly visible card instead of the viewport growing past the
+        // queue area (owner 2026-11-07: cards spilled out of a short queue).
+        int height = Math.Max(HeaderHeight + 6 + 24, size.y);
         int rowsTop = HeaderHeight + 6;
 
         if (geometryChanged)
         {
-            viewportHeight = Math.Max(CardHeight, height - rowsTop - (Columns == 1 ? 10 : BottomPad));
+            viewportHeight = Math.Max(24, height - rowsTop - (Columns == 1 ? 10 : BottomPad));
 
             // Reserve a gutter beside the card so its scrollbar never covers
             // the cooking explanation or stats.

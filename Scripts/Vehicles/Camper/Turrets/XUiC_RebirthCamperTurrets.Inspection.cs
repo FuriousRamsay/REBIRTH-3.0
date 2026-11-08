@@ -44,6 +44,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
             }
         }
         if (icon != null) { icon.IsVisible = valid; if (valid) { icon.SpriteName = stack.itemValue.GetPropertyOverride(ItemClass.PropCustomIcon, stack.itemValue.ItemClass.GetIconName()); icon.Color = stack.itemValue.ItemClass.GetIconTint(stack.itemValue); } }
+        RebirthWeaponBonusSelectedIcon.Show(this, "camperInspectIcon", valid ? stack.itemValue : null); // 2.6 bonus symbol on the selected icon.
         var count=GetChildById("camperSelectedCount")?.ViewComponent as XUiV_Label;
         if(count!=null)count.Text=valid&&stack.count>1?stack.count.ToString():string.Empty;
         var durability=GetChildById("camperSelectedDurability");

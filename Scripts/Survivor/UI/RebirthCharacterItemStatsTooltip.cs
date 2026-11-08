@@ -165,6 +165,19 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         public XUiV_Sprite Fill, Icon;
         public XUiV_Label Title, Value, SelectedValue, Details, SelectedDetails;
     }
+    private static readonly System.Collections.Generic.HashSet<string> KitNames = new System.Collections.Generic.HashSet<string>
+        { "kitSurvivorUpgrade", "kitAdjustment", "kitRetuning", "kitComprehensiveUpgrade", "kitEliteReinforcement", "kitBreakdown" };
+    private static System.Collections.Generic.IEnumerable<string> Wrap(string text, int width)
+    {
+        var line = new System.Text.StringBuilder();
+        foreach (string word in text.Split(' '))
+        {
+            if (line.Length > 0 && line.Length + 1 + word.Length > width) { yield return line.ToString(); line.Clear(); }
+            if (line.Length > 0) line.Append(' ');
+            line.Append(word);
+        }
+        if (line.Length > 0) yield return line.ToString();
+    }
     private sealed class RowData
     {
         public string Title, Value, SelectedValue = "", Icon = "ui_game_symbol_tool", Atlas = "UIAtlas";
@@ -326,12 +339,30 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
                 Icon = "ui_game_symbol_coin"
             });
         }
+        RebirthWeaponBonuses.Bonus weaponBonus; int weaponBonusLevel;
+        if (RebirthWeaponBonuses.TryRead(stack.itemValue, out weaponBonus, out weaponBonusLevel))
+        {
+            data.Add(new RowData { Title = Localization.Get("xuiRebirthWeaponBonusHeading"), Value = "", Heading = true, Height = 38 });
+            foreach (string line in RebirthWeaponBonuses.Describe(stack.itemValue, GameManager.Instance?.World?.GetPrimaryPlayer()).Split('\n'))
+                data.Add(new RowData { Title = line, Value = "", FullWidth = true });
+        }
         var armorBonuses = RebirthArmorBonusStorage.Read(stack.itemValue);
         if (armorBonuses.Length > 0)
         {
             data.Add(new RowData { Title = Localization.Get("xuiRebirthArmorBonusHeading"), Value = "", Heading = true, Height = 38 });
             for (int bonusIndex = 0; bonusIndex < armorBonuses.Length; bonusIndex++)
                 data.Add(new RowData { Title = RebirthArmorBonusText.Plain(armorBonuses[bonusIndex]), Value = "", FullWidth = true });
+        }
+        // Modifier kits show what they do, as in 2.6 (owner 2026-11-08).
+        string kitName = stack.itemValue.ItemClass?.GetItemName();
+        if (kitName != null && KitNames.Contains(kitName))
+        {
+            string text = Localization.Get(kitName + "Desc");
+            if (!string.IsNullOrEmpty(text) && text != kitName + "Desc")
+            {
+                data.Add(new RowData { Title = Localization.Get("xuiRebirthKitEffectHeading"), Value = "", Heading = true, Height = 38 });
+                foreach (string line in Wrap(text, 52)) data.Add(new RowData { Title = line, Value = "", FullWidth = true });
+            }
         }
         // Reserve the final two rows so the category section cannot be truncated by stats.
         int bodyCapacity=weaponRows?rows.Length-2:StatisticsRowCapacity+1;

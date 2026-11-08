@@ -281,7 +281,7 @@ public static class RebirthFeatureTestMatrixRegistry
             Readiness = RebirthFeatureTestReadiness.RequiredBeforeHotPathMigration,
             ScenarioSet = "common/hive/purge contexts",
             Environment = "SP/dedi",
-            Steps = "Vehicle attacks, block jump, fat aura, spider climbing, decoys, horde night.",
+            Steps = "Vehicle attacks, block jump, fat zombie area effect, spider climbing, decoys, horde night.",
             Expected = "Correct target/position behavior without hot-path overhead or dedi mismatch.",
             Notes = "Split into smaller test slices before migration."
         },

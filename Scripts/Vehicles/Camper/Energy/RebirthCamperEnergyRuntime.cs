@@ -325,11 +325,11 @@ public sealed class RebirthCamperEnergyRuntime
                 // turret sound off. Preserve the elapsed interval and debit it
                 // after proof; a prolonged hold still takes the normal safe-off path.
                 lastTick=previousTick;
-                Log.Out("[REBIRTH EnergyTrace] lease-power-retained vehicle="+vehicle.entityId+
+                RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] lease-power-retained vehicle="+vehicle.entityId+
                     " elapsed="+elapsed.ToString("0.00")+" demand="+demand);
                 return;
             }
-            Log.Out("[REBIRTH EnergyTrace] supply-hold vehicle="+vehicle.entityId+" holds="+holds.Count+
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] supply-hold vehicle="+vehicle.entityId+" holds="+holds.Count+
                 " transfer="+RebirthCamperModuleRuntime.For(vehicle).TransferPending+" consumers="+consumers.Length);
             foreach(var c in consumers)c.SetSupply(vehicle,0);return;
         }
@@ -403,7 +403,7 @@ public sealed class RebirthCamperEnergyRuntime
             }));
             var estimate=RebirthCamperEnergyRuntimeEstimate.Evaluate(state.Sources.Select(source=>source.Bank),energyDemand,
                 state.Mode,RebirthCamperEnergyConfiguration.Current.Priority,state.ConsumptionRemainder);
-            Log.Out("[REBIRTH EnergyTrace] supply-tick vehicle="+vehicle.entityId+" elapsed="+elapsed.ToString("0.00")+
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] supply-tick vehicle="+vehicle.entityId+" elapsed="+elapsed.ToString("0.00")+
                 " consumers="+consumers.Length+" demand="+demand+" supplied="+supplied+
                 " exactCost="+energyDemand.ToString("0.00")+" carry="+state.ConsumptionRemainder.ToString("0.00")+
                 " estimateSeconds="+(estimate.Seconds?.ToString("0.0")??"unknown")+" banks="+banks);

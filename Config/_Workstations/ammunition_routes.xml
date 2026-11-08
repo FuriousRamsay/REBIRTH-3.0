@@ -35,4 +35,25 @@
   <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretAP' and @craft_area='SonjaAmmoRecyclerStation']" name="craft_tool">FuriousRamsayPliers</setattribute>
   <setattribute xpath="/recipes/recipe[@name='ammoDartIron']" name="craft_tool">FuriousRamsayPliers</setattribute>
   <setattribute xpath="/recipes/recipe[@name='ammoRocketFrag']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <!-- 2.6 arrow and bolt conversions at the Munitions Workbench. -->
+  <append xpath="/recipes">
+    <recipe name="ammoArrowSteelAP" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoCrossbowBoltSteelAP" count="1" />
+		</recipe>
+    <recipe name="ammoArrowFlaming" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoCrossbowBoltFlaming" count="1" />
+		</recipe>
+    <recipe name="ammoArrowExploding" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoCrossbowBoltExploding" count="1" />
+		</recipe>
+    <recipe name="ammoCrossbowBoltSteelAP" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoArrowSteelAP" count="1" />
+		</recipe>
+    <recipe name="ammoCrossbowBoltFlaming" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoArrowFlaming" count="1" />
+		</recipe>
+    <recipe name="ammoCrossbowBoltExploding" count="1" craft_area="SonjaAmmoRecyclerStation">
+			<ingredient name="ammoArrowExploding" count="1" />
+		</recipe>
+  </append>
 </configs>

@@ -124,7 +124,7 @@ internal static class RebirthWideMapDrag
     {
         var map=__instance as XUiC_RebirthMapArea;
         if(map==null)return true;
-        if(!map.RefreshingFittedCenter&&(map.ZoomSlider?.BlocksMapInput==true||map.SupplyButton?.BlocksMapInput==true))return false;
+        if(!map.RefreshingFittedCenter&&(map.ZoomSlider?.BlocksMapInput==true||map.SupplyButton?.BlocksMapInput==true||XUiC_RebirthMapTargetCycler.AnyBlocksMapInput))return false;
         if(!map.RefreshingFittedCenter)map.Interaction.Pan();
         if(map.ViewComponent?.UiTransform!=null)delta/=Mathf.Max(.01f,map.ViewComponent.UiTransform.localScale.x);
         return true;

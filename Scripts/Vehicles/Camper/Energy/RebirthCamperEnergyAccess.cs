@@ -43,7 +43,7 @@ internal static class RebirthCamperEnergyAccess
         session.Current=()=>(physical==null||physical.Current())&&ReferenceEquals(client,session)&&nativeCurrent()&&ReferenceEquals(GameManager.Instance?.World,player.world)&&
             ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&!player.IsDead()&&RebirthCamperCharacterAccess.CurrentCreation(player)==creation;
         client=session;
-        Log.Out("[REBIRTH EnergyFlow] ui-open vehicle="+vehicle.entityId+" player="+player.entityId+" remote="+player.world.IsRemote());
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] ui-open vehicle="+vehicle.entityId+" player="+player.entityId+" remote="+player.world.IsRemote());
         view.Bind(vehicle,session.Current,()=>Close(session),(command,source,slot,on,bag)=>Command(session,command,source,slot,on,bag));
         if(physical!=null)view.SelectSource(physical.Source);
         if(!player.world.IsRemote())RebirthCamperEnergySourceCoordinator.Resume(vehicle,player,owner,creation,session.Current,_=>Refresh(session),session.Token);
@@ -54,7 +54,7 @@ internal static class RebirthCamperEnergyAccess
     {
         if(!ReferenceEquals(client,session))return;
         try{if(session.Player.world.IsRemote())Send(session,RebirthCamperEnergyCommand.Close,Guid.Empty,-1,false);}
-        finally{Log.Out("[REBIRTH EnergyFlow] ui-close vehicle="+session.Vehicle.entityId);client=null;session.Release();}
+        finally{RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] ui-close vehicle="+session.Vehicle.entityId);client=null;session.Release();}
     }
     private static void Command(ClientSession session,RebirthCamperEnergyCommand command,Guid source,int slot,bool on,int bagSlot=-1)
     {
@@ -135,7 +135,7 @@ internal static class RebirthCamperEnergyAccess
                 (RebirthCamperEnergyMaintenance.IsBusy(vehicle)?"maintenance,":"")+
                 (RebirthCamperEnergyCustody.FindPending(RebirthCamperEnergyRuntime.For(vehicle).Identity)!=null?"receipt,":"");
             if(!busyObservations.TryGetValue(vehicle.entityId,out var previous)||previous!=reasons)
-            {busyObservations[vehicle.entityId]=reasons;Log.Out("[REBIRTH EnergyFlow] busy vehicle="+vehicle.entityId+" reasons="+(reasons.Length==0?"none":reasons));}
+            {busyObservations[vehicle.entityId]=reasons;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] busy vehicle="+vehicle.entityId+" reasons="+(reasons.Length==0?"none":reasons));}
             return reasons.Length!=0;
         }
         catch(Exception error){Log.Error("[REBIRTH EnergyFlow] busy-check-failed vehicle="+vehicle?.entityId+" error="+error);return true;}
@@ -231,7 +231,7 @@ internal static class RebirthCamperEnergyAccess
         RebirthCamperEnergyCommand command,Guid source,int slot,bool on,long revision,Action refreshed,int bagSlot=-1,Guid token=default(Guid),Action<string> refused=null)
     {
         if(command==RebirthCamperEnergyCommand.Query)return;
-        Log.Out("[REBIRTH EnergyFlow] execute command="+command+" vehicle="+vehicle?.entityId+" actor="+player?.entityId+" source="+source+" slot="+slot+" bagSlot="+bagSlot+" requestedRevision="+revision+" on="+on);
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] execute command="+command+" vehicle="+vehicle?.entityId+" actor="+player?.entityId+" source="+source+" slot="+slot+" bagSlot="+bagSlot+" requestedRevision="+revision+" on="+on);
         if(Busy(vehicle)){refused?.Invoke("xuiRebirthCamperEnergySaving");RebirthCamperEnergyGestureTrace.Write("access.refused","reason=source-custody-busy command="+command);return;}
         if(command==RebirthCamperEnergyCommand.Camp||command==RebirthCamperEnergyCommand.Travel)
         {
@@ -248,7 +248,7 @@ internal static class RebirthCamperEnergyAccess
         if(command==RebirthCamperEnergyCommand.PoiLights)
         {
             bool poiAccepted=RebirthCamperEnergyDeviceAdapter.SetPoiLights(player,vehicle,on);
-            Log.Out("[REBIRTH EnergyFlow] poi-result vehicle="+vehicle.entityId+" requestedOn="+on+" accepted="+poiAccepted+" observedOn="+RebirthCamperEnergyDeviceAdapter.ObservePoi(vehicle)?.IsOn);
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-result vehicle="+vehicle.entityId+" requestedOn="+on+" accepted="+poiAccepted+" observedOn="+RebirthCamperEnergyDeviceAdapter.ObservePoi(vehicle)?.IsOn);
             if(!poiAccepted)
             {
                 if(player is EntityPlayerLocal localPoiRefused)
@@ -278,7 +278,7 @@ internal static class RebirthCamperEnergyAccess
         if(command==RebirthCamperEnergyCommand.PoiSelection)
         {
             bool limitAccepted=RebirthCamperEnergyDeviceAdapter.SetPoiLimit(player,vehicle,slot);
-            Log.Out("[REBIRTH EnergyFlow] poi-selection vehicle="+vehicle.entityId+" count="+slot+" accepted="+limitAccepted);
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-selection vehicle="+vehicle.entityId+" count="+slot+" accepted="+limitAccepted);
             if(!limitAccepted)refused?.Invoke("xuiRebirthCamperEnergyOwnerChanged");
             return;
         }

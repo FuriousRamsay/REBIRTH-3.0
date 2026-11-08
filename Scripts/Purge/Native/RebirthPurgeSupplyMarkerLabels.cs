@@ -37,6 +37,7 @@ internal static class RebirthPurgeSupplyMarkerLabels
         if(crate?.world==null||crate.world.IsRemote()||string.IsNullOrEmpty(owner)||labels.Count>=16384&&!labels.ContainsKey(crate.entityId))return;
         Guid world;RebirthPurgeSupplyCrateStamp stamp;
         string player=Guid.TryParseExact((crate.world as World)?.worldState?.Guid,"N",out world)&&RebirthPurgeSupplyCrateSerialization.TryReadAuthoritative(crate,world,out stamp)?stamp.Player:null;
+        owner=ResolveOwner(owner,player);
         labels[crate.entityId]=new Label{Position=new Vector3i(crate.position),Owner=owner,Player=player};
     }
     // Owner filter is presentation only, never loot/access authority. Old v1
@@ -100,6 +101,22 @@ internal static class RebirthPurgeSupplyMarkerLabels
         // nav object, observer or reward because an optional name is missing.
         if(__runOriginal)BeforeRefresh(__instance);
     }
+    /// <summary>Labels saved before the display-name fix hold the "its owner" placeholder; show the owner's real
+    /// display name whenever that player can be resolved (owner 2026-11-08).</summary>
+    private static string ResolveOwner(string owner,string player)
+    {
+        string placeholder=Localization.Get("xuiRebirthPurgeSupplyOwner");
+        if(!string.IsNullOrWhiteSpace(owner)&&owner!=placeholder)return owner;
+        var players=GameManager.Instance?.World?.Players?.list;
+        if(players!=null&&!string.IsNullOrEmpty(player))foreach(var candidate in players)
+        {
+            if(candidate==null||!RebirthStablePlayerIdentity.TryResolveServerEntity(candidate,out var identity)||identity==null||identity.StorageKey!=player)continue;
+            string name=RebirthPurgeDiscoveryNotification.CleanDisplayName(candidate.PlayerDisplayName);
+            if(!string.IsNullOrEmpty(name))return name;
+        }
+        return owner;
+    }
+
     private static void Reindex(AIDirectorAirDropComponent director,bool restoring)
     {
         positions.Clear();var retained=new HashSet<int>();
@@ -108,6 +125,7 @@ internal static class RebirthPurgeSupplyMarkerLabels
             Label label;
             if(!labels.TryGetValue(cache.entityId,out label)||restoring&&!label.Position.Equals(cache.blockPos))continue;
             retained.Add(cache.entityId);label.Position=cache.blockPos;
+            label.Owner=ResolveOwner(label.Owner,label.Player);
             // Coincident crates with different owners must not display the wrong owner's name.
             string old;
             positions[cache.blockPos]=positions.TryGetValue(cache.blockPos,out old)&&old!=label.Owner?string.Empty:label.Owner;

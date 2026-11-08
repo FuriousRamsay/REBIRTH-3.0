@@ -1,0 +1,32 @@
+{
+  "name": "Munitions Workbench: scrap arrows, cancel a scrap, craft ammo (2.6 behaviour)",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Needs the Munitions Workbench at 1210,38,1086 in CodexTestPurgeFresh20261102 with Pliers in its tool slot; place one with rbpropane place SonjaAmmoRecyclerStation." },
+    { "give": { "item": "ammoCrossbowBoltExploding", "count": 4 } },
+    { "give": { "item": "resourceBulletTip", "count": 1 } },
+    { "give": { "item": "resourceBulletCasing", "count": 1 } },
+    { "give": { "item": "resourceGunPowder", "count": 2 } },
+    { "console": "teleport 1210 39 1088" },
+    { "wait": 3 },
+    { "activate": { "x": 1210, "y": 38, "z": 1086, "block": 1 } },
+    { "expectWindowOpen": "workstation_SonjaAmmoRecyclerStation" },
+    { "click": { "item": "ammoCrossbowBoltExploding", "shift": 1 } },
+    { "wait": 0.5 },
+    { "expectNoItem": "ammoCrossbowBoltExploding" },
+    { "click": { "path": "workstation_SonjaAmmoRecyclerStation/rebirthStationRootRecycler/rebirthPersonalCraftingRoot/rebirthCraftingBodyZone/rebirthCraftingRightZone/rebirthCraftingQueueRegion/rebirthCraftingQueueController/rebirthCraftingQueueRowsHost/rebirthCraftingQueueSlot15/rebirthQueueCancelButton" } },
+    { "wait": 2 },
+    { "expectItem": { "name": "ammoCrossbowBoltExploding", "min": 4 } },
+    { "click": { "item": "ammoCrossbowBoltExploding", "shift": 1 } },
+    { "wait": 1 },
+    { "click": { "text": ".44 Magnum Ammo" } },
+    { "click": { "text": "Craft" } },
+    { "wait": 1 },
+    { "expectNoItem": "resourceBulletTip" },
+    { "screenshot": "munitions_queue" },
+    { "wait": 35 },
+    { "screenshot": "munitions_done" },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

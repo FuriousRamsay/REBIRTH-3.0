@@ -19,7 +19,8 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
     private const int Maximum=2*1024*1024;
     internal sealed class Record
     {
-        internal int Version=1;internal double RemainderBefore,RemainderAfter;
+        // v1/v2 retain historical receipt accounting; v3/v4 use 100 mL farm units.
+        internal int Version=3;internal double RemainderBefore,RemainderAfter;
         internal Guid Operation,Source,Previous;
         internal string World,Owner,Creation,Before,Reserved,Output,Digest=string.Empty;
         internal int Deaths,X,Y,Z,Slot,Count,WaterBefore,WaterAfter,MaxWater,State;
@@ -37,13 +38,13 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
     {if(image==null||image.Length>262144||!RebirthNativeItemCodec.TryDecode(image,out var item)||item==null||item.IsEmpty()||item.ItemClass==null)throw new InvalidDataException();return item;}
     private static bool Exact(ItemStack stack,string image,int count)=>stack!=null&&stack.count==count&&Native(stack.itemValue)==image;
     private static string Creation(EntityPlayer player,string owner)=>RebirthSurvivorMode.IsEnabledForCurrentWorld()?RebirthCamperCharacterAccess.CurrentCreation(player):"native-mode:"+owner;
-    private static string Encode(Record r)=>new XElement("waterOriginal",new XAttribute("version",r.Version),new XAttribute("operation",r.Operation.ToString("N")),new XAttribute("source",r.Source.ToString("N")),new XAttribute("previous",r.Previous.ToString("N")),new XAttribute("world",r.World),new XAttribute("owner",r.Owner),new XAttribute("creation",r.Creation),new XAttribute("deaths",r.Deaths),new XAttribute("x",r.X),new XAttribute("y",r.Y),new XAttribute("z",r.Z),new XAttribute("slot",r.Slot),new XAttribute("count",r.Count),new XAttribute("waterBefore",r.WaterBefore),new XAttribute("waterAfter",r.WaterAfter),new XAttribute("max",r.MaxWater),new XAttribute("state",r.State),new XAttribute("revision",r.Revision),new XAttribute("raw",r.Raw),new XAttribute("generation",r.Generation),new XAttribute("digest",r.Digest),new XAttribute("invoking",r.Invoking),r.Version==2?new[]{new XAttribute("remainderBefore",r.RemainderBefore),new XAttribute("remainderAfter",r.RemainderAfter)}:null,new XElement("before",r.Before),new XElement("reserved",r.Reserved),new XElement("output",r.Output)).ToString(SaveOptions.DisableFormatting);
+    private static string Encode(Record r)=>new XElement("waterOriginal",new XAttribute("version",r.Version),new XAttribute("operation",r.Operation.ToString("N")),new XAttribute("source",r.Source.ToString("N")),new XAttribute("previous",r.Previous.ToString("N")),new XAttribute("world",r.World),new XAttribute("owner",r.Owner),new XAttribute("creation",r.Creation),new XAttribute("deaths",r.Deaths),new XAttribute("x",r.X),new XAttribute("y",r.Y),new XAttribute("z",r.Z),new XAttribute("slot",r.Slot),new XAttribute("count",r.Count),new XAttribute("waterBefore",r.WaterBefore),new XAttribute("waterAfter",r.WaterAfter),new XAttribute("max",r.MaxWater),new XAttribute("state",r.State),new XAttribute("revision",r.Revision),new XAttribute("raw",r.Raw),new XAttribute("generation",r.Generation),new XAttribute("digest",r.Digest),new XAttribute("invoking",r.Invoking),(r.Version==2||r.Version==4)?new[]{new XAttribute("remainderBefore",r.RemainderBefore),new XAttribute("remainderAfter",r.RemainderAfter)}:null,new XElement("before",r.Before),new XElement("reserved",r.Reserved),new XElement("output",r.Output)).ToString(SaveOptions.DisableFormatting);
     private static Record Decode(string image)
     {
         if(image==null||image.Length>Maximum)throw new InvalidDataException();XElement e;
         using(var text=new StringReader(image))using(var reader=XmlReader.Create(text,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=Maximum}))e=XElement.Load(reader);
-        if(e.Name!="waterOriginal"||((int?)e.Attribute("version")!=1&&(int?)e.Attribute("version")!=2))throw new InvalidDataException();
-        var r=new Record{Version=(int)e.Attribute("version"),RemainderBefore=(int)e.Attribute("version")==2?(double)e.Attribute("remainderBefore"):0,RemainderAfter=(int)e.Attribute("version")==2?(double)e.Attribute("remainderAfter"):0,Operation=Guid.ParseExact((string)e.Attribute("operation"),"N"),Source=Guid.ParseExact((string)e.Attribute("source"),"N"),Previous=Guid.ParseExact((string)e.Attribute("previous"),"N"),World=(string)e.Attribute("world"),Owner=(string)e.Attribute("owner"),Creation=(string)e.Attribute("creation"),Deaths=(int)e.Attribute("deaths"),X=(int)e.Attribute("x"),Y=(int)e.Attribute("y"),Z=(int)e.Attribute("z"),Slot=(int)e.Attribute("slot"),Count=(int)e.Attribute("count"),WaterBefore=(int)e.Attribute("waterBefore"),WaterAfter=(int)e.Attribute("waterAfter"),MaxWater=(int)e.Attribute("max"),State=(int)e.Attribute("state"),Revision=(ulong)e.Attribute("revision"),Raw=(uint)e.Attribute("raw"),Generation=(long)e.Attribute("generation"),Digest=(string)e.Attribute("digest"),Invoking=(bool)e.Attribute("invoking"),Before=(string)e.Element("before"),Reserved=(string)e.Element("reserved"),Output=(string)e.Element("output")};
+        if(e.Name!="waterOriginal"||((int?)e.Attribute("version")!=1&&(int?)e.Attribute("version")!=2&&(int?)e.Attribute("version")!=3&&(int?)e.Attribute("version")!=4))throw new InvalidDataException();
+        var r=new Record{Version=(int)e.Attribute("version"),RemainderBefore=((int)e.Attribute("version")==2||(int)e.Attribute("version")==4)?(double)e.Attribute("remainderBefore"):0,RemainderAfter=((int)e.Attribute("version")==2||(int)e.Attribute("version")==4)?(double)e.Attribute("remainderAfter"):0,Operation=Guid.ParseExact((string)e.Attribute("operation"),"N"),Source=Guid.ParseExact((string)e.Attribute("source"),"N"),Previous=Guid.ParseExact((string)e.Attribute("previous"),"N"),World=(string)e.Attribute("world"),Owner=(string)e.Attribute("owner"),Creation=(string)e.Attribute("creation"),Deaths=(int)e.Attribute("deaths"),X=(int)e.Attribute("x"),Y=(int)e.Attribute("y"),Z=(int)e.Attribute("z"),Slot=(int)e.Attribute("slot"),Count=(int)e.Attribute("count"),WaterBefore=(int)e.Attribute("waterBefore"),WaterAfter=(int)e.Attribute("waterAfter"),MaxWater=(int)e.Attribute("max"),State=(int)e.Attribute("state"),Revision=(ulong)e.Attribute("revision"),Raw=(uint)e.Attribute("raw"),Generation=(long)e.Attribute("generation"),Digest=(string)e.Attribute("digest"),Invoking=(bool)e.Attribute("invoking"),Before=(string)e.Element("before"),Reserved=(string)e.Element("reserved"),Output=(string)e.Element("output")};
         if(r.Operation==Guid.Empty||!Guid.TryParse(r.World,out _)||string.IsNullOrEmpty(r.Owner)||r.Owner.Length>512||string.IsNullOrEmpty(r.Creation)||r.Creation.Length>512||r.Deaths<0||r.Slot<0||r.Slot>=20||r.Count<=0||r.Count>1000000||r.State<0||r.State>3||Encode(r)!=image)throw new InvalidDataException();
         var original=Item(r.Before);var reserved=Item(r.Reserved);var expected=Item(r.Output);var clone=Item(r.Reserved);clone.RemoveMetaData(Marker);
         // A previously completed marker is preserved on the input. The new
@@ -51,13 +52,13 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
         if(original.TryGetMetadata(Marker,out string old))clone.SetMetadata(Marker,old);
         if(Native(clone)!=r.Before||!reserved.TryGetMetadata(Marker,out string marker)||marker!=r.Operation.ToString("N")||!expected.TryGetMetadata(Marker,out string outputMarker)||outputMarker!=marker)throw new InvalidDataException();
         ItemValue fresh;
-        if(r.Version==2){if(!TryRefill(original,r.Count,out var fill))throw new InvalidDataException();fresh=fill.After.itemValue;}
+        if((r.Version==2||r.Version==4)){if(!TryRefill(original,r.Count,out var fill))throw new InvalidDataException();fresh=fill.After.itemValue;}
         else fresh=ItemClass.GetItem(AdvancedFarmingItemWaterExchange.ResolveChangedItemName(original.ItemClass.GetItemName()));if(fresh==null||fresh.IsEmpty())throw new InvalidDataException();
         // Native fresh ItemValue assigns a time-derived seed. The one original
         // output seed is captured once, never regenerated on retry or decode.
-        if(r.Version==1)fresh.Seed=expected.Seed;fresh.SetMetadata(Marker,marker);if(Native(fresh)!=r.Output)throw new InvalidDataException();
-        if(r.Version==2&&!RefillFrameValid(r,original))throw new InvalidDataException();
-        if(r.Version==1&&r.Source!=Guid.Empty&&(r.Revision==0||r.MaxWater<=0||r.MaxWater>1000000||r.WaterBefore<0||r.WaterAfter<0||r.WaterBefore==r.WaterAfter||r.WaterBefore>r.MaxWater||r.WaterAfter>r.MaxWater||AdvancedFarmingItemWaterExchange.GetWaterDelta(original.ItemClass.GetItemName(),r.Count,r.WaterBefore,r.MaxWater)!=r.WaterAfter-r.WaterBefore))throw new InvalidDataException();
+        if((r.Version==1||r.Version==3))fresh.Seed=expected.Seed;fresh.SetMetadata(Marker,marker);if(Native(fresh)!=r.Output)throw new InvalidDataException();
+        if((r.Version==2||r.Version==4)&&!RefillFrameValid(r,original))throw new InvalidDataException();
+        if((r.Version==1||r.Version==3)&&r.Source!=Guid.Empty&&(r.Revision==0||r.MaxWater<=0||r.MaxWater>1000000||r.WaterBefore<0||r.WaterAfter<0||r.WaterBefore==r.WaterAfter||r.WaterBefore>r.MaxWater||r.WaterAfter>r.MaxWater||AdvancedFarmingItemWaterExchange.GetWaterDelta(original.ItemClass.GetItemName(),r.Count,r.WaterBefore,r.MaxWater,r.Version==1)!=r.WaterAfter-r.WaterBefore))throw new InvalidDataException();
         if(r.Source==Guid.Empty&&(r.State!=0&&r.State!=3||r.Previous!=Guid.Empty||r.Revision!=0||r.Raw!=0||r.WaterBefore!=0||r.WaterAfter!=0||r.MaxWater!=0||r.Generation!=0||r.Digest.Length!=0))throw new InvalidDataException();
         if(r.State==0&&(r.Generation!=0||r.Digest.Length!=0)||r.Invoking&&(r.Source==Guid.Empty||r.State!=0)||(r.State>0&&r.State<3||r.State==3&&r.Source!=Guid.Empty)&&(r.Source==Guid.Empty||r.Digest.Length!=64||r.Digest.Any(ch=>!(ch>='0'&&ch<='9'||ch>='a'&&ch<='f'))||r.Generation<=0))throw new InvalidDataException();return r;
     }
@@ -158,7 +159,7 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
             bool refill=TryRefill(stack.itemValue,stack.count,out var fill);
             var output=refill?fill.After.itemValue:ItemClass.GetItem(AdvancedFarmingItemWaterExchange.ResolveChangedItemName(stack.itemValue.ItemClass.GetItemName()));if(output==null||output.IsEmpty())return false;
             Guid operation=Guid.NewGuid();var reserved=Item(Native(stack.itemValue));reserved.SetMetadata(Marker,operation.ToString("N"));output.SetMetadata(Marker,operation.ToString("N"));
-            var r=new Record{Version=refill?2:1,Operation=operation,World=world.worldState.Guid,Owner=identity.CanonicalId,Creation=Creation(player,identity.CanonicalId),Deaths=player.Died,X=position.x,Y=position.y,Z=position.z,Slot=slot,Count=stack.count,Before=Native(stack.itemValue),Reserved=Native(reserved),Output=Native(output)};
+            var r=new Record{Version=refill?4:3,Operation=operation,World=world.worldState.Guid,Owner=identity.CanonicalId,Creation=Creation(player,identity.CanonicalId),Deaths=player.Died,X=position.x,Y=position.y,Z=position.z,Slot=slot,Count=stack.count,Before=Native(stack.itemValue),Reserved=Native(reserved),Output=Native(output)};
             Decode(Encode(r));if(!Save(r,false))return false;Owners.Add(operation,new Attempt{Record=r,Player=player,World=world,Directory=GameIO.GetSaveGameDir()});return true;
         }catch(Exception error){Log.Warning("[REBIRTH Farming] water original retained: "+error.GetType().Name);return false;}
     }
@@ -190,8 +191,8 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
     }
     private static Guid IdentityObservation(Guid operation)
     {using(var hash=SHA256.Create())return new Guid(hash.ComputeHash(Encoding.UTF8.GetBytes("farming-water-identity:"+operation.ToString("N"))).Take(16).ToArray());}
-    private static bool MatchesStamp(Record r,TileEntityWaterTankRebirth tank)=>tank!=null&&tank.WaterIncarnation==r.Source&&tank.WaterExchangeOperation==r.Operation&&tank.WaterExchangeRevision==r.Revision&&tank.WaterExchangeBefore==r.WaterBefore&&tank.WaterExchangeAfter==r.WaterAfter&&(r.Version==1||tank.WaterExchangeBeforeRemainderMl==r.RemainderBefore&&tank.WaterExchangeAfterRemainderMl==r.RemainderAfter);
-    private static bool CanApplyPrepared(Record r,TileEntityWaterTankRebirth tank,uint raw)=>r.State==0&&!r.Invoking&&r.Source!=Guid.Empty&&r.Revision>0&&tank!=null&&tank.WaterIncarnation==r.Source&&raw==r.Raw&&tank.WaterExchangeOperation==r.Previous&&tank.WaterExchangeRevision==r.Revision-1&&tank.waterCount==r.WaterBefore&&(r.Version==1||tank.WaterRemainderMl==r.RemainderBefore);
+    private static bool MatchesStamp(Record r,TileEntityWaterTankRebirth tank)=>tank!=null&&tank.WaterIncarnation==r.Source&&tank.WaterExchangeOperation==r.Operation&&tank.WaterExchangeRevision==r.Revision&&tank.WaterExchangeBefore==r.WaterBefore&&tank.WaterExchangeAfter==r.WaterAfter&&((r.Version==1||r.Version==3)||tank.WaterExchangeBeforeRemainderMl==r.RemainderBefore&&tank.WaterExchangeAfterRemainderMl==r.RemainderAfter);
+    private static bool CanApplyPrepared(Record r,TileEntityWaterTankRebirth tank,uint raw)=>r.State==0&&!r.Invoking&&r.Source!=Guid.Empty&&r.Revision>0&&tank!=null&&tank.WaterIncarnation==r.Source&&raw==r.Raw&&tank.WaterExchangeOperation==r.Previous&&tank.WaterExchangeRevision==r.Revision-1&&tank.waterCount==r.WaterBefore&&((r.Version==1||r.Version==3)||tank.WaterRemainderMl==r.RemainderBefore);
     internal static bool CanCloseEndedNoEffect(Record r,TileEntityWaterTankRebirth tank,uint raw,int nativeDeaths,bool fatalObserved)=>fatalObserved&&r.Deaths<int.MaxValue&&nativeDeaths==r.Deaths+1&&CanApplyPrepared(r,tank,raw);
     private static void Reply(EntityPlayer owner,Record r)
     {if(owner is EntityPlayerLocal&&ReferenceEquals(GameManager.Instance?.World?.GetPrimaryPlayer(),owner))ReceiveClient((World)owner.world,owner.entityId,Encode(r));else SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(NetPackageManager.GetPackage<NetPackageFarmingWaterOriginalReply>().Setup(owner.entityId,Encode(r)),_attachedToEntityId:owner.entityId);}
@@ -225,10 +226,10 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
                     var block=world.GetBlock(position);var tank=world.GetTileEntity(position) as TileEntityWaterTankRebirth;if(!Focus(world,owner,position)||!AdvancedFarmingItemWaterExchange.IsAdvancedWaterStorage(block)||tank==null||Servers.Values.Any(x=>x.State==0&&x.X==request.X&&x.Y==request.Y&&x.Z==request.Z)){Decline(owner,request);return;}
                     int maximum=AdvancedFarmingItemWaterExchange.ResolveMaxWater(block,tank);
                     int after;double remainder=0;
-                    if(request.Version==2)
+                    if((request.Version==2||request.Version==4))
                     {if(!TryRefillAfter(request,tank,out after,out remainder)){Decline(owner,request);return;}}
                     else
-                    {int delta=AdvancedFarmingItemWaterExchange.GetWaterDelta(Item(request.Before).ItemClass.GetItemName(),request.Count,tank.waterCount,maximum);if(!NewConversionAllowed(request)||delta==0){Decline(owner,request);return;}after=tank.waterCount+delta;if(!LegacyCapacityAllows(tank,after,maximum)){Decline(owner,request);return;}}
+                    {int delta=AdvancedFarmingItemWaterExchange.GetWaterDelta(Item(request.Before).ItemClass.GetItemName(),request.Count,tank.waterCount,maximum,request.Version==1);if(!NewConversionAllowed(request)||delta==0){Decline(owner,request);return;}after=tank.waterCount+delta;if(!LegacyCapacityAllows(tank,after,maximum)){Decline(owner,request);return;}}
                     if(tank.WaterExchangeRevision==ulong.MaxValue){Decline(owner,request);return;}
                     if(tank.WaterIncarnation==Guid.Empty){tank.WaterIncarnation=Guid.NewGuid();tank.setModified();}
                     // Persist the original source incarnation BEFORE preparing an
@@ -236,7 +237,7 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
                     // or a crash between domain preparation and native mutation.
                     Guid birth=IdentityObservation(request.Operation),source=tank.WaterIncarnation;uint raw=block.rawData;
                     if(!AdvancedFarmingHarvestPublication.Observe(birth,source,world,position,()=>ReferenceEquals(world.GetTileEntity(position),tank)&&tank.WaterIncarnation==source&&world.GetBlock(position).rawData==raw,out _))return;
-                    r=Decode(Encode(request));r.Source=tank.WaterIncarnation;r.Previous=tank.WaterExchangeOperation;r.Revision=tank.WaterExchangeRevision+1;r.Raw=block.rawData;r.WaterBefore=tank.waterCount;r.WaterAfter=after;r.MaxWater=maximum;if(r.Version==2){r.RemainderBefore=tank.WaterRemainderMl;r.RemainderAfter=remainder;}
+                    r=Decode(Encode(request));r.Source=tank.WaterIncarnation;r.Previous=tank.WaterExchangeOperation;r.Revision=tank.WaterExchangeRevision+1;r.Raw=block.rawData;r.WaterBefore=tank.waterCount;r.WaterAfter=after;r.MaxWater=maximum;if((r.Version==2||r.Version==4)){r.RemainderBefore=tank.WaterRemainderMl;r.RemainderAfter=remainder;}
                     // Retain the reservation even if publication is uncertain;
                     // another original cannot claim this same source meanwhile.
                     Servers.Add(r.Operation,r);if(!Save(r,true))return;AdvancedFarmingHarvestPublication.Complete(birth);
@@ -286,7 +287,7 @@ internal static partial class AdvancedFarmingWaterExchangeOriginal
         using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream,Encoding.UTF8,true))
         {
             writer.Write(r.Operation.ToByteArray());foreach(string value in new[]{r.World,r.Owner,r.Creation,r.Before,r.Reserved,r.Output})writer.Write(value);
-            foreach(int value in new[]{r.Deaths,r.X,r.Y,r.Z,r.Slot,r.Count})writer.Write(value);if(r.Version==2)writer.Write(r.Version);writer.Flush();return Hash(stream.ToArray());
+            foreach(int value in new[]{r.Deaths,r.X,r.Y,r.Z,r.Slot,r.Count})writer.Write(value);if((r.Version==2||r.Version==4))writer.Write(r.Version);writer.Flush();return Hash(stream.ToArray());
         }
     }
     private static string Hash(byte[] bytes){using(var hash=SHA256.Create())return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-",string.Empty).ToLowerInvariant();}

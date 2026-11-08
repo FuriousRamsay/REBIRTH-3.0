@@ -17,14 +17,15 @@ internal static class RebirthPurgeSupplyAccess
         RebirthPurgeSupplyCrateStamp stamp;
         if(!Owned(crate,out stamp))return true;
         if(RebirthPurgeKillContributor.Identify(player,crate.world as World)!=stamp.Player)return false;
-        crate.spawnById=player.entityId;crate.spawnByName=player.EntityName??string.Empty;crate.spawnByAllowShare=false;
+        crate.spawnById=player.entityId;crate.spawnByName=(player as EntityPlayer)?.PlayerDisplayName??player.EntityName??string.Empty;crate.spawnByAllowShare=false;
         return true;
     }
     internal static void AfterActivationText(EntitySupplyCrate __instance,ref string __result,bool __runOriginal)
     {
         RebirthPurgeSupplyCrateStamp projection;
         if(!__runOriginal||string.IsNullOrEmpty(__result)||!RebirthPurgeSupplyCrateSerialization.TryReadProjection(__instance,out projection))return;
-        string owner=string.IsNullOrWhiteSpace(__instance.spawnByName)?Localization.Get("xuiRebirthPurgeSupplyOwner"):__instance.spawnByName;
+        string owner=GameManager.Instance?.persistentPlayers?.GetPlayerDataFromEntityID(__instance.spawnById)?.PlayerName?.DisplayName;
+        if(string.IsNullOrWhiteSpace(owner))owner=string.IsNullOrWhiteSpace(__instance.spawnByName)?Localization.Get("xuiRebirthPurgeSupplyOwner"):__instance.spawnByName;
         __result=string.Format(Localization.Get("xuiRebirthPurgeSupplyReserved"),owner)+"\n"+__result;
     }
     internal static bool BeforeLock(EntityAlive __instance,int _lockingPlayerID,ref bool __result)

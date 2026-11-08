@@ -5,8 +5,9 @@ using HarmonyLib;
 #nullable disable
 
 /// <summary>
-/// Random station helpers stay random in the wild, but a trader POI always gets the
-/// matching broken station. Only newly generated chunks are affected: saved chunks keep their blocks.
+/// Random station helpers stay random in the wild, but a trader POI is left alone: it gets the matching working
+/// station (forge, workbench, chemistry station, cement mixer), as the owner asked on 2026-11-07.
+/// Placeholders resolve when a chunk is generated, so chunks saved before this rule keep their blocks.
 /// </summary>
 internal static class RebirthTraderStationPlaceholders
 {
@@ -20,10 +21,10 @@ internal static class RebirthTraderStationPlaceholders
         {
             if (fixedTypes != null) return fixedTypes;
             var map = new Dictionary<int, int>();
-            Add(map, "cntForgeBustedRandomLootHelper", "cntForgeWorkstationBroken");
-            Add(map, "cntWorkbenchBustedRandomLootHelper", "cntCollapsedWorkbench");
-            Add(map, "cntCementMixerBustedRandomLootHelper", "cntCollapsedCementMixer");
-            Add(map, "cntChemistryStationBustedRandomLootHelper", "cntCollapsedChemistryStation");
+            Add(map, "cntForgeBustedRandomLootHelper", "forge");
+            Add(map, "cntWorkbenchBustedRandomLootHelper", "workbench");
+            Add(map, "cntCementMixerBustedRandomLootHelper", "cementMixer");
+            Add(map, "cntChemistryStationBustedRandomLootHelper", "chemistryStation");
             return fixedTypes = map;
         }
     }

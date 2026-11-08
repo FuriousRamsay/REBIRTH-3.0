@@ -18,12 +18,13 @@ public sealed class RebirthArmorBonusDefinition
     public string Id, FamilyId;
     public EquipmentSlots Slot;
     public PassiveEffects Effect;
+    public PassiveEffects[] AlsoEffects;
     public RebirthArmorBonusRarity Rarity;
     public float Min, Max;
     public bool HasTags;
     public FastTags<TagGroup.Global> Tags;
     public HashSet<string> Skills, Items;
-    public bool AddsToBase, Flat, Negative, ScaleWithWeaponSkill, HasContext, HasAltContext;
+    public bool AddsToBase, Flat, Negative, ShowAsSeconds, ScaleWithWeaponSkill, HasContext, HasAltContext;
     public FastTags<TagGroup.Global> Context, AltContext;
     public float AltValue;
     public string Special;
@@ -138,17 +139,25 @@ public static class RebirthArmorBonusCatalog
                 var slot = (EquipmentSlots)Enum.Parse(typeof(EquipmentSlots), (string)family.Attribute("slot"));
                 var effect = (PassiveEffects)Enum.Parse(typeof(PassiveEffects), (string)family.Attribute("effect"));
                 if (effect != PassiveEffects.None) relevantEffects[(int)effect] = true;
+                var alsoEffects = new List<PassiveEffects>();
+                foreach (string extra in ((string)family.Attribute("also_effects") ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var parsed = (PassiveEffects)Enum.Parse(typeof(PassiveEffects), extra);
+                    alsoEffects.Add(parsed);
+                    relevantEffects[(int)parsed] = true;
+                }
                 foreach (var bonus in family.Elements("bonus"))
                 {
                     string tags = (string)bonus.Attribute("tags") ?? (string)family.Attribute("tags");
                     string skills = (string)bonus.Attribute("skills"), items = (string)bonus.Attribute("items");
-                    string context = (string)family.Attribute("context"), altContext = (string)bonus.Attribute("alt_context");
+                    string context = (string)bonus.Attribute("context") ?? (string)family.Attribute("context"), altContext = (string)bonus.Attribute("alt_context");
                     var definition = new RebirthArmorBonusDefinition
                     {
                         Id = (string)bonus.Attribute("id"),
-                        FamilyId = familyId,
+                        FamilyId = (string)family.Attribute("roll_group") ?? familyId,
                         Slot = slot,
                         Effect = effect,
+                        AlsoEffects = alsoEffects.ToArray(),
                         Rarity = (RebirthArmorBonusRarity)Enum.Parse(typeof(RebirthArmorBonusRarity), (string)bonus.Attribute("rarity")),
                         Min = float.Parse((string)bonus.Attribute("min"), CultureInfo.InvariantCulture),
                         Max = float.Parse((string)bonus.Attribute("max"), CultureInfo.InvariantCulture),
@@ -159,6 +168,7 @@ public static class RebirthArmorBonusCatalog
                         AddsToBase = (string)family.Attribute("op") == "base",
                         Flat = (string)family.Attribute("flat") == "true",
                         Negative = (string)family.Attribute("negative") == "true",
+                        ShowAsSeconds = (string)family.Attribute("display") == "seconds",
                         ScaleWithWeaponSkill = (string)family.Attribute("scale_with_weapon_skill") == "true",
                         HasContext = !string.IsNullOrEmpty(context),
                         Context = string.IsNullOrEmpty(context) ? default(FastTags<TagGroup.Global>) : FastTags<TagGroup.Global>.Parse(context),
@@ -239,38 +249,23 @@ public static class RebirthArmorBonusRoller
         return random.NextDouble() < 0.25 ? 4 : 3;
     }
 
-    public static List<RebirthArmorRolledBonus> Roll(EquipmentSlots slot, IEnumerable<RebirthArmorRolledBonus> existing, int targetCount, int level, int quality, Random random)
+    public static List<RebirthArmorRolledBonus> Roll(EquipmentSlots slot, IEnumerable<RebirthArmorRolledBonus> existing, int targetCount, int level, int quality, Random random, IEnumerable<string> excludedIds = null)
     {
+        var excluded = excludedIds != null ? new HashSet<string>(excludedIds, StringComparer.Ordinal) : null;
         var result = new List<RebirthArmorRolledBonus>(existing);
-        var blocked = new HashSet<string>(StringComparer.Ordinal);
         var weights = RebirthArmorBonusCatalog.GetRarityWeights(level, quality);
-        // Bounded so a small pool can stop short instead of looping.
-        for (int attempt = 0; result.Count < targetCount && attempt < targetCount * 12; attempt++)
+        // The 2.6 draw: a family with even odds, then a rarity that family has, weighted by kit
+        // level and item quality, then a bonus of that rarity. A family appears once per item.
+        while (result.Count < targetCount)
         {
-            var pool = RebirthArmorBonusCatalog.Definitions
-                .Where(d => d.Slot == slot && !blocked.Contains(d.FamilyId) && !result.Any(r => r.Definition.Id == d.Id))
-                .ToList();
-            if (pool.Count == 0) break;
-
-            var rarity = RollRarity(pool, weights, random);
-            var families = pool.Where(d => d.Rarity == rarity).Select(d => d.FamilyId).Distinct().ToList();
-            string family = families[random.Next(families.Count)];
-            var options = pool.Where(d => d.Rarity == rarity && d.FamilyId == family).ToList();
+            var families = RebirthArmorBonusCatalog.Definitions
+                .Where(d => d.Slot == slot && (excluded == null || !excluded.Contains(d.Id)) && !result.Any(r => r.Definition.FamilyId == d.FamilyId))
+                .GroupBy(d => d.FamilyId).ToList();
+            if (families.Count == 0) break;
+            var family = families[random.Next(families.Count)].ToList();
+            var rarity = RollRarity(family, weights, random);
+            var options = family.Where(d => d.Rarity == rarity).ToList();
             var chosen = options[random.Next(options.Count)];
-
-            var sameFamily = result.Where(r => r.Definition.FamilyId == family).ToList();
-            if (sameFamily.Any(r => r.Definition.Rarity > rarity))
-            {
-                // A lower roll loses to a higher one and rerolls away from this family.
-                blocked.Add(family);
-                continue;
-            }
-            if (sameFamily.Any(r => r.Definition.Rarity < rarity))
-            {
-                // A higher roll stays. Lower ones go, and their slots reroll outside this family.
-                result.RemoveAll(r => r.Definition.FamilyId == family && r.Definition.Rarity < rarity);
-                blocked.Add(family);
-            }
             float value = chosen.Min + (float)random.NextDouble() * (chosen.Max - chosen.Min);
             result.Add(new RebirthArmorRolledBonus { Definition = chosen, Value = value });
         }
@@ -297,11 +292,15 @@ public static class RebirthArmorBonusRoller
 
 public static class RebirthArmorBonusText
 {
-    private static readonly string[] Colors = { "d8d8d8", "5fb056", "4f9fe0", "b58cff" };
+    private static readonly string[] Colors = { "c8c8c8", "88aaff", "ffaa55", "cc88ff" }; // 2.6 rarity text colours
 
     private static string Amount(RebirthArmorRolledBonus bonus)
     {
         float value = System.Math.Abs(bonus.Value);
+        // Weapon-skill bonuses give half their value at skill 0 and all of it at skill 100: show that range.
+        if (bonus.Definition.ScaleWithWeaponSkill && !bonus.Definition.Flat && !bonus.Definition.ShowAsSeconds)
+            return (value * 50f).ToString("0.#", CultureInfo.InvariantCulture) + "-" + (value * 100f).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+        if (bonus.Definition.ShowAsSeconds) return (1f / value).ToString("0", CultureInfo.InvariantCulture);
         return bonus.Definition.Flat ? value.ToString("0", CultureInfo.InvariantCulture) : (value * 100f).ToString("0.#", CultureInfo.InvariantCulture) + "%";
     }
 
@@ -318,11 +317,13 @@ public static class RebirthArmorBonusText
         return Localization.Get("aeBonusFmt_" + bonus.Definition.Id).Replace("{0}", amount);
     }
 
+    public static string DescribeArmor(ItemValue item) => string.Join("\n", RebirthArmorBonusStorage.Read(item).Select(Describe));
+
+    /// <summary>Armor bonuses, then the weapon bonus lines (2.6 put those last).</summary>
     public static string DescribeAll(ItemValue item)
     {
-        var bonuses = RebirthArmorBonusStorage.Read(item);
-        if (bonuses.Length == 0) return string.Empty;
-        return string.Join("\n", bonuses.Select(Describe));
+        string armor = DescribeArmor(item), weapon = RebirthWeaponBonuses.Describe(item);
+        return armor.Length == 0 ? weapon : weapon.Length == 0 ? armor : armor + "\n" + weapon;
     }
 }
 
@@ -342,13 +343,15 @@ internal static class RebirthArmorBonusEffectPatch
         for (int i = 0; i < bonuses.Length; i++)
         {
             var definition = bonuses[i].Definition;
-            if (definition.Effect != _passiveEffect || !definition.AppliesToWeapon(weapon)) continue;
+            if ((definition.Effect != _passiveEffect && Array.IndexOf(definition.AlsoEffects, _passiveEffect) < 0) || !definition.AppliesToWeapon(weapon)) continue;
             float value = bonuses[i].Value;
-            if (definition.HasContext && !_tags.Test_AnySet(definition.Context))
+            var state = _tags | _entity.CurrentMovementTag | _entity.CurrentStanceTag;
+            if (definition.HasContext && !state.Test_AnySet(definition.Context))
             {
-                if (!definition.HasAltContext || !_tags.Test_AnySet(definition.AltContext)) continue;
+                if (!definition.HasAltContext || !state.Test_AnySet(definition.AltContext)) continue;
                 value = definition.AltValue;
             }
+            if (definition.Special == "low_light" && _entity.GetCVar("_lightlevel") > RebirthArmorBonusSpecials.LowLightLevel) continue;
             if (definition.ScaleWithWeaponSkill) value *= RebirthArmorBonusWeaponSkills.Scale(_entity, weapon);
             if (definition.AddsToBase) _originalValue += value;
             else _perc_value += value;
@@ -363,8 +366,11 @@ internal static class RebirthArmorBonusTooltipPatch
     private static void Postfix(XUiC_ItemInfoWindow __instance, ref string value, string bindingName)
     {
         if (bindingName != "itemdescription" || __instance?.itemStack == null || __instance.itemStack.IsEmpty()) return;
-        string text = RebirthArmorBonusText.DescribeAll(__instance.itemStack.itemValue);
-        if (text.Length > 0) value = text + "\n\n" + value;
+        // Armor bonuses above the description; the weapon bonus and its chance below it, as in 2.6.
+        string armor = RebirthArmorBonusText.DescribeArmor(__instance.itemStack.itemValue);
+        string weapon = RebirthWeaponBonuses.Describe(__instance.itemStack.itemValue);
+        if (armor.Length > 0) value = armor + "\n\n" + value;
+        if (weapon.Length > 0) value = value + "\n\n" + weapon;
     }
 }
 
@@ -375,7 +381,8 @@ public sealed class RebirthArmorBonusModApi : IModApi
     {
         var harmony = new Harmony("rebirth.armorbonuses");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthArmorBonusEffectPatch));
-        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthArmorBonusTooltipPatch));
+        // Bonus lines now live on the 2.6 star tab (RebirthArmorBonusInfoTab).
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthArmorBonusSleeperPatch));
     }
 }
 

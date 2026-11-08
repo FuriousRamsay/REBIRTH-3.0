@@ -74,7 +74,7 @@ internal static class RebirthCamperEnergySourceCoordinator
             // leave the entire energy window busy until recovery.
             var item=vehicle.vehicle.GetUpdatedItemValue();string prior;
             if(item.TryGetMetadata(RebirthCamperEnergyState.Key,out prior)&&prior!=Convert.ToBase64String(frame.Change.Before))
-            {Log.Out("[REBIRTH EnergyFlow] begin-refused action="+action+" reason=native-source-before-drift");return false;}
+            {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] begin-refused action="+action+" reason=native-source-before-drift");return false;}
             // A refused in-memory hold must not leave a durable Prepared receipt
             // that blocks every later action in the Energy window.
             // Accepted bank OFF clears POI intent immediately after Begin.
@@ -100,7 +100,7 @@ internal static class RebirthCamperEnergySourceCoordinator
             item.SetMetadata(RebirthCamperEnergyState.Key,Convert.ToBase64String(frame.Change.Before));vehicle.SendSyncData(4);
             pending.Add(frame.Operation,new Pending {Vehicle=vehicle,Player=player,Frame=frame,Current=current,Finished=finished,
                 Directory=GameIO.GetSaveGameDir(),DeliveryScope=deliveryScope,BeforeSaved=RebirthCamperSavedVehicle.RequestSave(vehicle)});
-            Log.Out("[REBIRTH EnergyFlow] begin operation="+frame.Operation+" action="+action+" requestedRevision="+revision+" plannedRevision="+planningRevision);
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] begin operation="+frame.Operation+" action="+action+" requestedRevision="+revision+" plannedRevision="+planningRevision);
             RebirthCamperEnergyGestureTrace.Write("source.accepted","action="+action+" component="+component+" bagSlot="+backpackSlot+" revision="+planningRevision);return true;
         }
         catch(Exception error){Log.Error("[REBIRTH EnergyFlow] begin-failed vehicle="+vehicle?.entityId+" action="+action+" error="+error);return false;}
@@ -136,21 +136,21 @@ internal static class RebirthCamperEnergySourceCoordinator
                 pending.Remove(record.Operation);
                 existing.BeforeSaved?.Dispose();
                 existing.BeforeSaved=null;
-                Log.Out("[REBIRTH EnergyFlow] resume-rebind operation="+record.Operation+" oldStage="+existing.Stage);
+                RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] resume-rebind operation="+record.Operation+" oldStage="+existing.Stage);
             }
             var frame=RebirthCamperEnergyTransferFrame.Read(record);
             if(frame.Owner!=owner.CanonicalId||frame.OwnerKey!=owner.StorageKey||frame.Creation!=creation||frame.Actor!=player.entityId||
                 frame.Survivor!=RebirthSurvivorMode.IsEnabledForCurrentWorld())
-            {Log.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=owner-or-actor-scope");return false;}
+            {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=owner-or-actor-scope");return false;}
             if(record.State!=RebirthCamperTransferJournal.Phase.Applied&&!runtime.Hold(frame.Operation))
-            {Log.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=runtime-hold");return false;}
+            {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=runtime-hold");return false;}
             if(record.State==RebirthCamperTransferJournal.Phase.Prepared&&RebirthCamperEnergySavedOwner.HasSaved(owner,frame.Operation,1,frame.After))
                 record=journal.Advance(frame.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
             var p=new Pending {Vehicle=vehicle,Player=player,Frame=frame,Current=current,Finished=finished,Directory=GameIO.GetSaveGameDir(),
                 DeliveryScope=deliveryScope,Stage=record.State==RebirthCamperTransferJournal.Phase.Applied?4:record.State==RebirthCamperTransferJournal.Phase.Uncertain?3:0};
             if(p.Stage==0)p.BeforeSaved=RebirthCamperSavedVehicle.RequestSave(vehicle);
             pending.Add(frame.Operation,p);
-            Log.Out("[REBIRTH EnergyFlow] resume operation="+frame.Operation+" stage="+p.Stage+" receipt="+record.State);return true;
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] resume operation="+frame.Operation+" stage="+p.Stage+" receipt="+record.State);return true;
         }
         catch(Exception error){Log.Error("[REBIRTH EnergyFlow] resume-failed vehicle="+vehicle?.entityId+" error="+error);return false;}
     }
@@ -163,16 +163,16 @@ internal static class RebirthCamperEnergySourceCoordinator
         if(pending.Count==0)return;
         foreach(var p in pending.Values.ToArray())
         {
-            if(!Current(p)){Log.Out("[REBIRTH EnergyFlow] current-lost operation="+p.Frame.Operation+" stage="+p.Stage);Finish(p,false);continue;}
+            if(!Current(p)){RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] current-lost operation="+p.Frame.Operation+" stage="+p.Stage);Finish(p,false);continue;}
             try
             {
                 if(p.Sending)continue;
                 if(UnityEngine.Time.realtimeSinceStartup-p.LastProgressLog>=10f)
-                {p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;Log.Out("[REBIRTH EnergyFlow] waiting operation="+p.Frame.Operation+" stage="+p.Stage+" savedStage="+p.LocalSavedStage);}
+                {p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] waiting operation="+p.Frame.Operation+" stage="+p.Stage+" savedStage="+p.LocalSavedStage);}
                 if(p.Stage==0)
                 {
                     if(!RebirthCamperSavedVehicle.Verify(p.Vehicle,p.BeforeSaved,()=>Current(p)))continue;
-                    Log.Out("[REBIRTH EnergyFlow] vehicle-before-saved operation="+p.Frame.Operation);
+                    RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] vehicle-before-saved operation="+p.Frame.Operation);
                     Send(p,RebirthCamperEnergyOwnerPayload.Stage.Prepare,()=>p.Stage=1);continue;
                 }
                 if(p.Stage==1){Send(p,RebirthCamperEnergyOwnerPayload.Stage.Apply,()=>p.Stage=2);continue;}
@@ -181,14 +181,14 @@ internal static class RebirthCamperEnergySourceCoordinator
                     // Send's success requires exact native final owner AFTER.
                     // This transition is the durable paid proof; recovery no longer needs a live actor image.
                     RebirthCamperEnergyCustody.Journal().Advance(p.Frame.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
-                    p.Stage=3;Log.Out("[REBIRTH EnergyFlow] owner-applied operation="+p.Frame.Operation);continue;
+                    p.Stage=3;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] owner-applied operation="+p.Frame.Operation);continue;
                 }
                 if(p.Stage==3)
                 {
                     RebirthCamperEnergyCustody.Ready(p.Vehicle);
                     var record=RebirthCamperEnergyCustody.Journal().Read(p.Frame.Operation);
                     if(record.State!=RebirthCamperTransferJournal.Phase.Applied)continue;
-                    p.Stage=4;Log.Out("[REBIRTH EnergyFlow] vehicle-after-saved operation="+p.Frame.Operation);continue;
+                    p.Stage=4;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] vehicle-after-saved operation="+p.Frame.Operation);continue;
                 }
                 if(p.Stage==4)Send(p,RebirthCamperEnergyOwnerPayload.Stage.Retire,()=>Finish(p,true));
             }
@@ -211,9 +211,9 @@ internal static class RebirthCamperEnergySourceCoordinator
             {applied=local.Buffs.GetCustomVar(key)==1f?p.Frame.After.Matches(RebirthCamperEnergyActorImage.Capture(local)):
                 local.Buffs.GetCustomVar(key)==2f&&RebirthCamperEnergyOwnerHold.Apply(local,p.Frame);if(applied)local.Buffs.SetCustomVar(key,1f,true);}
             else {applied=local.Buffs.GetCustomVar(key)==3f||local.Buffs.GetCustomVar(key)==1f&&RebirthCamperEnergyOwnerHold.Retire(local,p.Frame);if(applied)local.Buffs.SetCustomVar(key,3f,true);}
-            if(!applied){if(UnityEngine.Time.realtimeSinceStartup-p.LastProgressLog>=2f){p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;Log.Out("[REBIRTH EnergyFlow] owner-stage-refused operation="+p.Frame.Operation+" stage="+stage+" marker="+local.Buffs.GetCustomVar(key));}return;}
+            if(!applied){if(UnityEngine.Time.realtimeSinceStartup-p.LastProgressLog>=2f){p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] owner-stage-refused operation="+p.Frame.Operation+" stage="+stage+" marker="+local.Buffs.GetCustomVar(key));}return;}
             p.LocalSavedStage=(int)stage;
-            Log.Out("[REBIRTH EnergyFlow] owner-stage-applied operation="+p.Frame.Operation+" stage="+stage);
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] owner-stage-applied operation="+p.Frame.Operation+" stage="+stage);
             GameManager.Instance.SaveLocalPlayerData();
             if(Current(p)&&RebirthCamperEnergySavedOwner.HasSaved(owner,p.Frame.Operation,savedPhase,savedImage))accepted();
             return;
@@ -226,7 +226,7 @@ internal static class RebirthCamperEnergySourceCoordinator
     private static void Finish(Pending p,bool success)
     {if(!pending.TryGetValue(p.Frame.Operation,out var active)||!ReferenceEquals(active,p))return;
         pending.Remove(p.Frame.Operation);p.BeforeSaved?.Dispose();p.BeforeSaved=null;
-        Log.Out("[REBIRTH EnergyFlow] finish operation="+p.Frame.Operation+" success="+success+" stage="+p.Stage);try{p.Finished(success);}catch{}}
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] finish operation="+p.Frame.Operation+" success="+success+" stage="+p.Stage);try{p.Finished(success);}catch{}}
     private static void Shutdown(ref ModEvents.SWorldShuttingDownData data)
     {foreach(var p in pending.Values){p.BeforeSaved?.Dispose();p.BeforeSaved=null;}pending.Clear();} // Saved journal is authority after load.
 }

@@ -3321,6 +3321,7 @@ xuiRebirthCraftDetailTabsHint,Ingredients  •  Description  •  Unlocks
 xuiRebirthRequiredMaterial,Required material
 xuiRebirthQueueEmpty,Empty
 xuiRebirthQueueCrafting,Crafting
+xuiRebirthQueueScrapping,Scrapping
 xuiRebirthQueueQueued,Queued
 xuiRebirthQueueActiveCount,{0} / {1}
 xuiRebirthQueueTime,Time
@@ -3634,13 +3635,13 @@ xuiRebirthExplorerActionArmyOfDead,Army of the Dead
 xuiRebirthExplorerActionArmyOfDeadDesc,Army of the Dead is unavailable in this release. Learning its knowledge does not currently let you summon undead.
 xuiRebirthExplorerSummoningAssetsUnavailable,Summoning is unavailable in this release.
 xuiRebirthExplorerActionRageBasic,Basic Rage
-xuiRebirthExplorerActionRageBasicDesc,Berserker Rage fueled by the 3.0 Energy system; meaningful melee combat while active trains Rage.
+xuiRebirthExplorerActionRageBasicDesc,"Defensive Rage (Page Down): 60 seconds of faster attacks, stamina, speed and jump, knocking nearby enemies down. Melee combat while enraged trains Rage."
 xuiRebirthExplorerActionRageControlled,Controlled Rage
 xuiRebirthExplorerActionRageControlledDesc,Improved Rage control earned through Rage Skill progression and study.
 xuiRebirthExplorerActionRageOffensive,Offensive Rage
-xuiRebirthExplorerActionRageOffensiveDesc,Offensive Rage specialization and the discipline gate for exploiting Rage Capsules.
+xuiRebirthExplorerActionRageOffensiveDesc,"Offensive Rage (Page Up or eat a Rage Capsule): a longer rage with fire and shock resistance. Uses one Rage Capsule."
 xuiRebirthExplorerActionRageBlood,Blood Rage
-xuiRebirthExplorerActionRageBloodDesc,Late Berserker specialization available only during an active Blood Moon.
+xuiRebirthExplorerActionRageBloodDesc,"Blood Moon Rage: starts by itself on a Blood Moon and lasts until it ends, with no food or water penalty."
 xuiRebirthExplorerActionHorrorPanther,Horror Panther
 xuiRebirthExplorerActionHorrorPantherDesc,"Witch Doctor special panther route requiring Animal Handling, Panther Handling, Black Magic and Panther Binding."
 xuiRebirthExplorerActionRagePanther,Rage Panther
@@ -8802,7 +8803,7 @@ rebirthTraderVoiceBobTitle,Bob Dialogue Style
 rebirthTraderVoiceSection,Trader Dialogue
 rebirthTraderVoiceDescription,Changes this trader's dialogue personality while keeping their own voice. Saved separately for each player.
 rbJournal_StorageGear_title,Carry more with backpacks and toolbelts
-rbJournal_StorageGear_body,"Open Character. Under Survivor Gear, put a backpack in the Backpack slot or a toolbelt in the Belt slot. Shift-click the item in your inventory to equip it, or drag it into the matching slot. You can also select the item and choose Equip.\n\nA Day Backpack adds 11 backpack slots. Each better backpack adds another row of 11. Your 22 encumbrance slots stay the same. A Utility Toolbelt adds two toolbelt slots; better belts add more.\n\nMake room before removing storage gear. Items that no longer fit must be dropped: backpack overflow goes into a recovery backpack, while toolbelt overflow drops on the ground. Collect them before leaving."
+rbJournal_StorageGear_body,"Open Character. Under Survivor Gear, put a backpack in the Backpack slot or a toolbelt in the Belt slot. Shift-click the item in your inventory to equip it, or drag it into the matching slot. You can also select the item and choose Equip.\n\nA Day Backpack adds 11 backpack slots. Each better backpack adds another row of 11. A Day Backpack increases total slots from 44 to 55 and unencumbered slots from 22 to 33, before other bonuses. A Utility Toolbelt adds two toolbelt slots; better belts add more.\n\nMake room before removing storage gear. Items that no longer fit must be dropped: backpack overflow goes into a recovery backpack, while toolbelt overflow drops on the ground. Collect them before leaving."
 rebirthFieldNotesSpearsDesc,[B58CFF]Study to improve Spears Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesClubsDesc,[B58CFF]Study to improve Clubs Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesSwordsDesc,[B58CFF]Study to improve Swords Theory.[-]\nBase gain: 4 Theory points on the first reading per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
@@ -8983,11 +8984,6 @@ rebirthElectricalTerminalBlockDesc,[B58CFF]Electrical service part.[-] Used when
 rebirthElectricalWiringHarnessDesc,[B58CFF]Generator service part.[-] Used together with an Electrical Fuse when servicing a generator.
 rebirthReinforcedStrapsDesc,[B58CFF]Equipment crafting material.[-] Used to make expanded backpacks and the Hot Weather Shell. It does not add inventory space by itself.
 rebirthPaddedLiningDesc,[B58CFF]Equipment crafting material.[-] Used to make expanded backpacks and the Cold Weather Lining. It does not add inventory space by itself.
-FuriousRamsayModFireResistDesc,[B58CFF]Dog protection module.[-] Keep this in your dog's inventory to protect the dog from burning effects. Removing it removes the protection.
-FuriousRamsayModShockResistDesc,[B58CFF]Dog protection module.[-] Keep this in your dog's inventory for protection against electrical damage and shock effects. Removing it removes the protection.
-FuriousRamsayModSmokeResistDesc,[B58CFF]Dog protection module.[-] Keep this in your dog's inventory for protection against heat damage. Removing it removes the protection.
-FuriousRamsayModFireShockResistDesc,"[B58CFF]Dog protection module.[-] Keep this in your dog's inventory for protection against burning effects, electrical damage and shock effects. Removing it removes the protection."
-FuriousRamsayModFireShockSmokeResistDesc,"[B58CFF]Dog protection module.[-] Keep this in your dog's inventory for protection against burning effects, electrical damage, shock effects and heat damage. Removing it removes the protection."
 partMotorcycleEngine_FRDesc,[B58CFF]Vehicle restoration part.[-] Install in a matching slot on a repairable vehicle. Check the vehicle's parts list to see which part it needs.
 partV6Engine_FRDesc,[B58CFF]Vehicle restoration part.[-] Install in a matching slot on a repairable vehicle. Check the vehicle's parts list to see which part it needs.
 partV8Engine_FRDesc,[B58CFF]Vehicle restoration part.[-] Install in a matching slot on a repairable vehicle. Check the vehicle's parts list to see which part it needs.
@@ -9116,7 +9112,7 @@ xuiRebirthJournalFieldTitle,Rebirth field journal
 xuiRebirthJournalEmptyHelp,Your journal keeps discoveries and personal notes together. Choose New entry to begin.
 FuriousRamsayHammerPliersDesc,[B58CFF]Hand tools.[-]\nCan be sold to a trader. [D6C978]No crafting or repair use is available in this release.[-]
 FuriousRamsayPliersDesc,[B58CFF]Hand tool.[-]\nCan be sold to a trader. [D6C978]No crafting or repair use is available in this release.[-]
-FuriousRamsayScrewdriverDesc,[B58CFF]Hand tool.[-]\nCan be sold to a trader. [D6C978]No crafting or repair use is available in this release.[-]
+FuriousRamsayScrewdriverDesc,[B58CFF]Hand tool.[-]\nCan be sold to a trader. [D6C978]Used at a Workbench to craft the Survivor’s Upgrade, Adjustment, Retuning, Breakdown, and Elite Reinforcement kits.[-]
 FuriousRamsayFountainPenDesc,[B58CFF]Fountain pen.[-]\nCan be sold to a trader. [D6C978]No writing or crafting use is available in this release.[-]
 rebirthFirearmCleaningKitDesc,[B58CFF]Firearm cleaning supplies.[-]\n[D6C978]No equipment currently uses this kit for repair or maintenance.[-]
 rebirthVehicleServicePartsKitDesc,[B58CFF]Vehicle service supplies.[-]\n[D6C978]No vehicle currently uses this kit for repair or maintenance.[-]
@@ -9842,7 +9838,7 @@ WorkbenchResearchTable001_FR,Research Table
 WorkbenchResearchTable001_FRDesc,Working station. World stations can be salvaged with a wrench ratchet or impact driver and rebuilt at a Toolbox.
 SonjaOutfitDesigner,Outfit Designer
 SonjaOutfitDesignerDesc,Working station. World stations can be salvaged with a wrench ratchet or impact driver and rebuilt at a Toolbox.
-SonjaAmmoRecyclerStation,Ammo Recycler
+SonjaAmmoRecyclerStation,Munitions Workbench
 SonjaAmmoRecyclerStationDesc,Working station. World stations can be salvaged with a wrench ratchet or impact driver and rebuilt at a Toolbox.
 FuriousRamsayWoodPlank,Wood Plank
 FuriousRamsayWoodPlankDesc,Construction material. Cut from wood by hand or in larger batches at a Circular Saw.
@@ -9872,7 +9868,7 @@ FuriousRamsayCollapsedIronOven001_FR,Repairable Iron Oven
 FuriousRamsayCollapsedIronOven001_FRDesc,Salvaged world station. Rebuild it at a Toolbox using the listed repair materials. Player-placed stations do not yield this item.
 FuriousRamsayCollapsedSonjaOutfitDesigner,Repairable Outfit Designer
 FuriousRamsayCollapsedSonjaOutfitDesignerDesc,Salvaged world station. Rebuild it at a Toolbox using the listed repair materials. Player-placed stations do not yield this item.
-FuriousRamsayCollapsedSonjaAmmoRecyclerStation,Repairable Ammo Recycler
+FuriousRamsayCollapsedSonjaAmmoRecyclerStation,Repairable Munitions Workbench
 FuriousRamsayCollapsedSonjaAmmoRecyclerStationDesc,Salvaged world station. Rebuild it at a Toolbox using the listed repair materials. Player-placed stations do not yield this item.
 
 FuriousRamsayCollapsedResearchTable,Repairable Research Table
@@ -10229,7 +10225,7 @@ xuiRebirthCamperPhysicalUnavailable,Install the corresponding station or power s
 SonjaRecyclerStation,Recycling Station
 SonjaRecyclerStationDesc,Recycle items into component materials with a working battery. Also crafts Workbench recipes.
 xuiRebirthRecycling,RECYCLING
-xuiRebirthRecyclingDrop,"Shift-click a purple item to scrap it, or drop it here. Click a purple item to see what it scraps into."
+xuiRebirthRecyclingDrop,Place an item to recycle.
 xuiRebirthRecyclingInputOccupied,Recycling input is occupied.
 xuiRebirthRecyclingToolsRequired,Install the required recycling tools.
 xuiRebirthRecyclingQueueFull,Not enough queue space for every recycling output.
@@ -10518,52 +10514,6 @@ ModLootTimeDecreaseTier5Desc,Install in gloves to reduce search time by 100% and
 "ModBiomeStabilizerDevice_snow","Stabilizer Device: Snow"
 "ModBiomeStabilizerDevice_wasteland","Stabilizer Device: Wasteland"
 "ModBiomeStabilizerDevice_burnt_forest","Stabilizer Device: Burnt Forest"
-"ModGenetics","Mod (Genetics)"
-"ModGeneticsDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nGrants the source Genetics mod perk ranks: +2 Mother Lode, Sexual Tyrannosaurus, Miner 69er, Parkour, Rule One Cardio and Pack Mule; +1 Healing Factor, Slow Metabolism, Deep Cuts, Physician, Lucky Looter, Treasure Hunter, Better Barter, Charismatic Nature and Daring Adventurer. Also grants +10% melee damage and a 5% dodge chance.\n\nInactive while any Strength, Dexterity, Constitution, Intelligence or Charisma armor mod is worn."
-"ModStrength","Mod (Strength)"
-"ModStrengthDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\n+10% melee damage while holding a melee weapon (not a tool or turret).\n+2 levels to Sexual T-Rex, Miner 69er, and Mother Lode."
-"ModStrengthMeleeDamage","Mod (Warrior's Edge)"
-"ModStrengthMeleeDamageDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\n+10% melee damage while holding a melee weapon (not a tool or turret)."
-"ModStrengthTRex","Mod (Sexual T-Rex)"
-"ModStrengthTRexDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [c27272]Sexual T-Rex[-] perk level.\n\nRead the [c27272]Sexual T-Rex[-] perks for details on the effects for each level."
-"ModStrengthMiner69er","Mod (Miner 69er)"
-"ModStrengthMiner69erDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [9c5c5c]Miner 69er[-] perk level.\n\nRead the [9c5c5c]Miner 69er[-] perks for details on the effects for each level."
-"ModStrengthMotherLode","Mod (Mother Lode)"
-"ModStrengthMotherLodeDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [784747]Mother Lode[-] perk level.\n\nRead the [784747]Mother Lode[-] perks for details on the effects for each level."
-"ModDexterity","Mod (Dexterity)"
-"ModDexterityDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\n+2 levels to Cardio and Parkour. Gives a 5% chance to avoid a weapon hit."
-"ModDexterityParkour","Mod (Parkour)"
-"ModDexterityParkourDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [9a9c5c]Parkour[-] perk level.\n\nRead the [9a9c5c]Parkour[-] perks for details on the effects for each level."
-"ModDexterityRuleOneCardio","Mod (Cardio)"
-"ModDexterityRuleOneCardioDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [bdbf71]Cardio[-] perk level.\n\nRead the [bdbf71]Cardio[-] perks for details on the effects for each level."
-"ModDexterityDodge","Mod (Voidstep)"
-"ModDexterityDodgeDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\n+Gives a 5% chance to avoid a weapon hit."
-"ModConstitution","Mod (Constitution)"
-"ModConstitutionDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to each 10-level [7abd71]Constitution[-] perk\n\n • +[85c474]1[-] to each 4/5-level [7abd71]Constitution[-] perk\n\nRead the perks for details on the effects for each level."
-"ModConstitutionHealingFactor","Mod (Healing Factor)"
-"ModConstitutionHealingFactorDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [63995c]Healing Factor[-] perk level.\n\nRead the [63995c]Healing Factor[-] perks for details on the effects for each level."
-"ModConstitutionPackMule","Mod (Pack Mule)"
-"ModConstitutionPackMuleDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [7abd71]Pack Mule[-] perk level.\n\nRead the [7abd71]Pack Mule[-] perks for details on the effects for each level."
-"ModConstitutionSlowMetabolism","Mod (Iron Gut)"
-"ModConstitutionSlowMetabolismDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [4c7546]Iron Gut[-] perk level.\n\nRead the [4c7546]Iron Gut[-] perks for details on the effects for each level."
-"ModIntelligence","Mod (Intelligence)"
-"ModIntelligenceDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to each [70a4ba]Intelligence[-] perk level.\n\nRead the perks for details on the effects for each level."
-"ModIntelligenceDeepCuts","Mod (Deep Cuts)"
-"ModIntelligenceDeepCutsDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [8cd2ed]Deep Cuts[-] perk level.\n\nRead the [8cd2ed]Deep Cuts[-] perks for details on the effects for each level."
-"ModIntelligencePhysician","Mod (Physician)"
-"ModIntelligencePhysicianDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [5a8596]Physician[-] perk level.\n\nRead the [5a8596]Physician[-] perks for details on the effects for each level."
-"ModIntelligenceLuckyLooter","Mod (Lucky Looter)"
-"ModIntelligenceLuckyLooterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [70a4ba]Lucky Looter[-] perk level.\n\nRead the [70a4ba]Lucky Looter[-] perks for details on the effects for each level."
-"ModIntelligenceTreasureHunter","Mod (Treasure Hunter)"
-"ModIntelligenceTreasureHunterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [446470]Treasure Hunter[-] perk level.\n\nRead the [446470]Treasure Hunter[-] perks for details on the effects for each level."
-"ModCharisma","Mod (Charisma)"
-"ModCharismaDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to each [b36ba7]Charisma[-] perk level.\n\nRead the perks for details on the effects for each level."
-"ModCharismaBetterBarter","Mod (Better Barter)"
-"ModCharismaBetterBarterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [8c5483]Better Barter[-] perk level.\n\nRead the [8c5483]Better Barter[-] perks for details on the effects for each level."
-"ModCharismaCharismaticNature","Mod (Charismatic Nature)"
-"ModCharismaCharismaticNatureDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n  +[85c474]1[-] to your [693f62]Charismatic Nature[-] perk level.\n\nRead the [693f62]Charismatic Nature[-] perks for details on the effects for each level."
-"ModCharismaDaringAdventurer","Mod (Daring Adventurer)"
-"ModCharismaDaringAdventurerDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [b36ba7]Daring Adventurer[-] perk level.\n\nRead the [b36ba7]Daring Adventurer[-] perks for details on the effects for each level."
 "ModRebirthTier1","Rebirth (Tier 1)"
 "ModRebirthTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]10%[-]\n\n(10% reduction of X% is not X%-10%, it is X% - 10% of X%)"
 "ModRebirthTier2","Rebirth (Tier 2)"
@@ -10744,46 +10694,6 @@ ModLootTimeDecreaseTier5Desc,Install in gloves to reduce search time by 100% and
 "ModGamestageDecreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]20%[-]\nPenalty: Reduce maximum health by [cf7474]10%[-]"
 "ModGamestageDecreaseTier5","Gamestage (Tier 5)"
 "ModGamestageDecreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]25%[-]\nPenalty: Reduce maximum health by [cf7474]12.5%[-]"
-"ModClassExperienceIncreaseTier1","Class Experience (Tier 1)"
-"ModClassExperienceIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]2%[-]"
-"ModClassExperienceIncreaseTier2","Class Experience (Tier 2)"
-"ModClassExperienceIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]4%[-]"
-"ModClassExperienceIncreaseTier3","Class Experience (Tier 3)"
-"ModClassExperienceIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]6%[-]"
-"ModClassExperienceIncreaseTier4","Class Experience (Tier 4)"
-"ModClassExperienceIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]8%[-]"
-"ModClassExperienceIncreaseTier5","Class Experience (Tier 5)"
-"ModClassExperienceIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]10%[-]"
-"ModGeneticsExperienceIncreaseTier1","Genetics Experience (Tier 1)"
-"ModGeneticsExperienceIncreaseTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]2%[-]"
-"ModGeneticsExperienceIncreaseTier2","Genetics Experience (Tier 2)"
-"ModGeneticsExperienceIncreaseTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]4%[-]"
-"ModGeneticsExperienceIncreaseTier3","Genetics Experience (Tier 3)"
-"ModGeneticsExperienceIncreaseTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]6%[-]"
-"ModGeneticsExperienceIncreaseTier4","Genetics Experience (Tier 4)"
-"ModGeneticsExperienceIncreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]8%[-]"
-"ModGeneticsExperienceIncreaseTier5","Genetics Experience (Tier 5)"
-"ModGeneticsExperienceIncreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]10%[-]"
-"ModAuraTriggerIncreaseOtherDamageSelfTier1","Class Aura (Defense - Tier 1)"
-"ModAuraTriggerIncreaseOtherDamageSelfTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
-"ModAuraTriggerIncreaseOtherDamageSelfTier2","Class Aura (Defense - Tier 2)"
-"ModAuraTriggerIncreaseOtherDamageSelfTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
-"ModAuraTriggerIncreaseOtherDamageSelfTier3","Class Aura (Defense - Tier 3)"
-"ModAuraTriggerIncreaseOtherDamageSelfTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
-"ModAuraTriggerIncreaseOtherDamageSelfTier4","Class Aura (Defense - Tier 4)"
-"ModAuraTriggerIncreaseOtherDamageSelfTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
-"ModAuraTriggerIncreaseOtherDamageSelfTier5","Class Aura (Defense - Tier 5)"
-"ModAuraTriggerIncreaseOtherDamageSelfTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
-"ModAuraTriggerIncreaseSelfDamageOtherTier1","Class Aura (Offense - Tier 1)"
-"ModAuraTriggerIncreaseSelfDamageOtherTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]5%[-]\nPenalty: reduce entity damage by [cf7474]3%[-]"
-"ModAuraTriggerIncreaseSelfDamageOtherTier2","Class Aura (Offense - Tier 2)"
-"ModAuraTriggerIncreaseSelfDamageOtherTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]10%[-]\nPenalty: reduce entity damage by [cf7474]6%[-]"
-"ModAuraTriggerIncreaseSelfDamageOtherTier3","Class Aura (Offense - Tier 3)"
-"ModAuraTriggerIncreaseSelfDamageOtherTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]15%[-]\Penalty: reduce entity damage by [cf7474]9%[-]"
-"ModAuraTriggerIncreaseSelfDamageOtherTier4","Class Aura (Offense - Tier 4)"
-"ModAuraTriggerIncreaseSelfDamageOtherTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]20%[-]\Penalty: reduce entity damage by [cf7474]12%[-]"
-"ModAuraTriggerIncreaseSelfDamageOtherTier5","Class Aura (Offense - Tier 5)"
-"ModAuraTriggerIncreaseSelfDamageOtherTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]25%[-]\Penalty: reduce entity damage by [cf7474]15%[-]"
 "ModDetermineEntityHealthTier1","Health Assessment (Tier 1)"
 "ModDetermineEntityHealthTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
 "ModDetermineEntityHealthTier2","Health Assessment (Tier 2)"
@@ -10806,59 +10716,10 @@ ModLootTimeDecreaseTier5Desc,Install in gloves to reduce search time by 100% and
 "ModCarryingCapacityIncreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]50[-] slots"
 "FuriousRamsayWalkmanMod","Walkman and Headphones"
 "FuriousRamsayWalkmanModDesc","Walkman and Headphones"
-"FuriousRamsayPerkHealingAuraMod","Healing Aura Mod"
-"FuriousRamsayPerkHealingAuraModDesc","Improve your [cc4137]HP regeneration[-] with the [cc4137]HEALING AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkStaminaAuraMod","Stamina Aura Mod"
-"FuriousRamsayPerkStaminaAuraModDesc","Improve your [e0e036]stamina regeneration[-] with the [e0e036]STAMINA AURA[-] mod.\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkMobilityAuraMod","Mobility Aura Mod"
-"FuriousRamsayPerkMobilityAuraModDesc","Improve your [53adbd]mobility[-] with the [53adbd]MOBILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkArmorPenetrationAuraMod","Armor Penetration Aura Mod"
-"FuriousRamsayPerkArmorPenetrationAuraModDesc","Improve your [9155fa]armor penetration[-] with the [9155fa]ARMOR PENETRATION AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkBlockDamageAuraMod","Block Damage Aura Mod"
-"FuriousRamsayPerkBlockDamageAuraModDesc","Improve your [c256fc]block damage[-] with the [c256fc]BLOCK DAMAGE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkFireRateAuraMod","Fire Rate Aura Mod"
-"FuriousRamsayPerkFireRateAuraModDesc","Improve your [76e381]fire rate[-] with the [76e381]FIRE RATE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkAttackSpeedAuraMod","Attack Speed Aura Mod"
-"FuriousRamsayPerkAttackSpeedAuraModDesc","Improve your [e8a276]attack speed[-] with the [e8a276]ATTACK SPEED AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkShadowAuraMod","Shadow Aura Mod"
-"FuriousRamsayPerkShadowAuraModDesc","Improve your [257685]noise and light Reduction[-] with the [257685]SHADOW AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkVitalityAuraMod","Vitality Aura Mod"
-"FuriousRamsayPerkVitalityAuraModDesc","Improve your [781c16]vitality[-] with the [781c16]VITALITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkAgilityAuraMod","Agility Aura Mod"
-"FuriousRamsayPerkAgilityAuraModDesc","Improve your [1e8529]agility[-] with the [1e8529]AGILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkPierceAuraMod","Pierce Aura Mod"
-"FuriousRamsayPerkPierceAuraModDesc","Improve how many enemies you can [741ca3]penetrate[-] with the [741ca3]PIERCE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkTradeAuraMod","Trade Aura Mod"
-"FuriousRamsayPerkTradeAuraModDesc","Improve your [3430a1]trade[-] with the [3430a1]TRADE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkFortuityAuraMod","Fortuity Aura Mod"
-"FuriousRamsayPerkFortuityAuraModDesc","Improve your [595959]loot quantity[-] with the [595959]FORTUITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
-"FuriousRamsayPerkStabilityAuraMod","Stability Aura Mod"
-"FuriousRamsayPerkStabilityAuraModDesc","Improve your [b0b000]accuracy and recoil reduction[-] with the [b0b000]STABILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
 "FuriousRamsayLootCorpses","Zed Corpse auto-loot Mod"
 "FuriousRamsayLootCorpsesDesc","Insert this mod in armor to automatically loot zombie corpses you kill and scrap their clothing.\n\nGenetic fragments, along with a few other items will go into your dog's inventory to free up yours.\n\nAmmunition you can use will stay in your inventory and everything else will go into your follower's, starting with your drone and any NPCs"
-"FuriousRamsayModFireResist","Fire Immunity Mod"
-"FuriousRamsayModShockResist","Shock Immunity Mod"
-"FuriousRamsayModSmokeResist","Explosion Immunity Mod"
-"FuriousRamsayModFireShockResist","Fire and Shock Immunity Mod"
-"FuriousRamsayModFireShockSmokeResist","Fire, Shock and Explosion Immunity Mod"
 "FuriousRamsayArmorHelmetLight","Helmet Light Mod"
 "FuriousRamsayArmorHelmetLightDesc","A light source that can be installed into any head armor, unless you like stumbling around in the dark.\n\nUse your Light Source action (F) to activate.\n\nCrafted in the Workstation."
-"FuriousRamsayAuraModHunter","Hunter Aura Mod"
-"FuriousRamsayAuraModHunterDesc","[c28682]RAIN OF ARROWS[-] increases you and your nearby Allies' chances of showering foes with deadly arrows.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModThug","Thug Aura Mod"
-"FuriousRamsayAuraModThugDesc","[f6f792]Goon's Revenge[-] increases you and your nearby Allies' chances of stunning foes within an area of effect.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModButcher","Butcher Aura Mod"
-"FuriousRamsayAuraModButcherDesc","[ff5b69]Blood Drain[-] increases you and your nearby Allies' chances of causing bleed damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModSoldier","Soldier Aura Mod"
-"FuriousRamsayAuraModSoldierDesc","[76e381]Double Damage Aura[-] increases you and your nearby Allies' chances of causing double damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModTechnogeek","Technogeek Aura Mod"
-"FuriousRamsayAuraModTechnogeekDesc","[736fe3]Short Circuit[-] increases you and your nearby Allies' chances of shocking foes.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModMadman","Madman Aura Mod"
-"FuriousRamsayAuraModMadmanDesc","[e8a276]Explosion Aura[-] increases you and your nearby Allies' chances of creating a small explosion.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModBuilder","Builder Aura Mod"
-"FuriousRamsayAuraModBuilderDesc","[c256fc]Dismemberment Aura[-] increases you and your nearby Allies' chances of dismembering foes.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
-"FuriousRamsayAuraModChef","Sous-Chef Aura Mod"
-"FuriousRamsayAuraModChefDesc","[bab8b8]Thousand Cuts Aura[-] increases you and your nearby Allies' chances of inflicting deadly slashing damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
 "modArmorInsulatedLiner","Insulated Liner"
 "modArmorInsulatedLinerDesc","Improves cold resistance when installed in armor."
 "modArmorCoolingMesh","Cooling Mesh"
@@ -12101,7 +11962,7 @@ rebirthCamperCamp,Set up camp
 rebirthCamperCampDesc,"Park your camper, open its energy panel and enter Camp Mode."
 rebirthCamperCampObjective,Enter Camp Mode
 rebirthCamperLights,Lights on
-rebirthCamperLightsDesc,"In Camp Mode near a POI, use your generator or battery bank to power at least 5 of its lights for 5 minutes in a row."
+rebirthCamperLightsDesc,"In Camp Mode inside the POI’s area, use your generator or battery bank to power at least 5 of its lights for 5 minutes in a row."
 rebirthCamperLightsObjective,Power 5 POI lights for 5 minutes
 rebirthCamperWorkshop,Mobile workshop
 rebirthCamperWorkshopDesc,Open camper management and place a crafting station in a module position.
@@ -12286,14 +12147,13 @@ armorScavengerBootsDesc,Medium Armor\nSalvage longer with these custom fitted bo
 armorScavengerGlovesDesc,Medium Armor\nProtect those knuckles and concentrate on your salvaging efforts. Increase resources when salvaging.
 armorScavengerHelmetDesc,Medium Armor\nYou're bound to learn something from taking all that stuff apart. Gain more XP when salvaging.
 armorScavengerOutfitDesc,Medium Armor\nDeep pockets help bring the goods home. Reduces encumbrance.
-xuiRebirthArmorBonusHeading,Bonuses
+xuiRebirthArmorBonusHeading,BONUSES
 aeBonusFmt_entity_damage_axes,+{0} damage with axes
 aeBonusFmt_entity_damage_batons,+{0} damage with batons
 aeBonusFmt_entity_damage_clubs,+{0} damage with clubs
 aeBonusFmt_entity_damage_hammers,+{0} damage with hammers
 aeBonusFmt_entity_damage_knives,+{0} damage with knives
 aeBonusFmt_entity_damage_knuckles,+{0} damage with knuckles
-aeBonusFmt_entity_damage_scythes,+{0} damage with scythes
 aeBonusFmt_entity_damage_spears,+{0} damage with spears
 aeBonusFmt_entity_damage_swords,+{0} damage with swords
 aeBonusFmt_entity_damage_unarmed,+{0} damage with bare hands
@@ -12357,8 +12217,6 @@ aeBonusFmt_apm_knives_common,+{0} attack speed with knives
 aeBonusFmt_apm_knives_uncommon,+{0} attack speed with knives
 aeBonusFmt_apm_knuckles_common,+{0} attack speed with knuckles
 aeBonusFmt_apm_knuckles_uncommon,+{0} attack speed with knuckles
-aeBonusFmt_apm_scythes_common,+{0} attack speed with scythes
-aeBonusFmt_apm_scythes_uncommon,+{0} attack speed with scythes
 aeBonusFmt_apm_spears_common,+{0} attack speed with spears
 aeBonusFmt_apm_spears_uncommon,+{0} attack speed with spears
 aeBonusFmt_apm_swords_common,+{0} attack speed with swords
@@ -12387,7 +12245,6 @@ aeBonusFmt_target_armor_clubs,-{0} target armor with clubs
 aeBonusFmt_target_armor_hammers,-{0} target armor with hammers
 aeBonusFmt_target_armor_knives,-{0} target armor with knives
 aeBonusFmt_target_armor_knuckles,-{0} target armor with knuckles
-aeBonusFmt_target_armor_scythes,-{0} target armor with scythes
 aeBonusFmt_target_armor_spears,-{0} target armor with spears
 aeBonusFmt_target_armor_swords,-{0} target armor with swords
 aeBonusFmt_target_armor_unarmed,-{0} target armor with bare hands
@@ -12409,7 +12266,6 @@ aeBonusFmt_dismember_clubs,+{0} dismember chance with clubs
 aeBonusFmt_dismember_hammers,+{0} dismember chance with hammers
 aeBonusFmt_dismember_knives,+{0} dismember chance with knives
 aeBonusFmt_dismember_knuckles,+{0} dismember chance with knuckles
-aeBonusFmt_dismember_scythes,+{0} dismember chance with scythes
 aeBonusFmt_dismember_spears,+{0} dismember chance with spears
 aeBonusFmt_dismember_swords,+{0} dismember chance with swords
 aeBonusFmt_dismember_unarmed,+{0} dismember chance with bare hands
@@ -12427,8 +12283,6 @@ aeBonusFmt_dismember_rare,+{0} dismember chance
 aeBonusFmt_dismember_legendary,+{0} dismember chance
 aeBonusFmt_harvest_knives_common,+{0} wild crop harvest with knives
 aeBonusFmt_harvest_knives_uncommon,+{0} wild crop harvest with knives
-aeBonusFmt_harvest_scythes_common,+{0} wild crop harvest with scythes
-aeBonusFmt_harvest_scythes_uncommon,+{0} wild crop harvest with scythes
 aeBonusFmt_harvest_axes_common,+{0} wild crop harvest with axes
 aeBonusFmt_harvest_axes_uncommon,+{0} wild crop harvest with axes
 aeBonusFmt_harvest_swords_common,+{0} wild crop harvest with swords
@@ -12447,8 +12301,8 @@ aeBonusFmt_block_damage_salvage_common,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_uncommon,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_rare,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_legendary,+{0} salvage speed with salvage tools
-aeBonusFmt_trained_damage_rare,Up to +{0} damage, growing with your skill in the weapon
-aeBonusFmt_trained_damage_legendary,Up to +{0} damage, growing with your skill in the weapon
+aeBonusFmt_trained_damage_rare,+{0} damage, higher with weapon skill
+aeBonusFmt_trained_damage_legendary,+{0} damage, higher with weapon skill
 aeBonusFmt_explosion_pipe_bombs,+{0} explosive damage with pipe bombs
 aeBonusFmt_explosion_grenades,+{0} explosive damage with grenades
 aeBonusFmt_explosion_dynamite,+{0} explosive damage with dynamite
@@ -12459,3 +12313,572 @@ aeBonusFmt_explosion_throwables,+{0} explosive damage with throwables
 aeBonusFmt_explosion_projectiles,+{0} explosive damage with projectiles
 aeBonusFmt_explosion_all,+{0} explosive damage
 aeBonusFmt_explosion_all_legendary,+{0} explosive damage
+xuiRebirthRecyclingInstructions,"Shift-click a purple item to scrap it, or drop it in the recycling slot. Click a purple item to see what it scraps into."
+xuiEnchantItemSlot,"Item"
+xuiEnchantKitSlot,"Kit"
+xuiEnchantInput,"Modification"
+xuiEnchantAction,"Apply"
+xuiEnchantNeedBothItems,"Place an item and a modification kit into the station."
+xuiEnchantNotItem,"The first input slot only accepts modifiable items."
+xuiEnchantNotAKit,"The second input slot only accepts modification kits."
+xuiEnchantNeedTool,"Hammer and Pliers must be present in the tool slot."
+xuiEnchantOutputBlocked,"Take the existing item out of the output slot first."
+xuiEnchantFailed,"Modification failed."
+xuiEnchantSuccess,"Modification complete."
+xuiEnchantUiNotReady,"Modification UI is not fully initialized."
+xuiEnchantSlotsUnavailable,"Modification slots are not available."
+kitSurvivorUpgrade,"Survivor's Upgrade Kit"
+kitAdjustment,"Adjustment Kit"
+kitRetuning,"Retuning Kit"
+kitComprehensiveUpgrade,"Comprehensive Upgrade Kit"
+kitEliteReinforcement,"Elite Reinforcement Kit"
+kitBreakdown,"Breakdown Kit"
+kitSurvivorUpgradeDesc,"Upgrades an item by rolling one bonus. Use on an item with no bonuses."
+kitAdjustmentDesc,"Adds a second bonus to an item that currently has exactly one bonus."
+kitRetuningDesc,"Rerolls an item by removing its current bonuses and rolling new bonuses. Limited to items with one or two bonuses."
+kitComprehensiveUpgradeDesc,"Adds up to four bonuses to an item that currently has no bonuses."
+kitEliteReinforcementDesc,"Upgrades a two-bonus item to add a third bonus. Small chance to also add a fourth one."
+kitBreakdownDesc,"Removes all bonuses from an item and returns it to normal."
+aeEnchantInvalidKit,"Invalid modification kit."
+aeEnchantMissingKit,"Modification kit is missing."
+aeEnchantItemOnly,"Only modifiable items can be enhanced."
+aeEnchantTransmutationItemOnly,"Survivor's Upgrade Kits can only be used on modifiable items."
+aeEnchantMissingPlayer,"Player is missing."
+aeEnchantAuthoritativeOnly,"Modification must run on the authoritative game side."
+aeEnchantMissingWorkstation,"Integration Workbench is missing."
+aeEnchantNoItem,"No item to enhance."
+aeEnchantUnsupportedItem,"This item type cannot be enhanced yet."
+aeEnchantKitNeedsNoBonuses,"A Survivor's Upgrade Kit can only be used on an item with no existing bonuses."
+aeEnchantNoEligibleBonus,"No eligible bonus is available for this item type."
+aeEnchantAdjustmentNeedsOne,"An Adjustment Kit requires an item that already has one bonus. Use a Survivor's Upgrade Kit first."
+aeEnchantAdjustmentExactOne,"An Adjustment Kit can only be used on an item with exactly one bonus."
+aeEnchantNoEligibleRequiredType,"No eligible bonus of the required type is available for this item type."
+aeEnchantRetuningNeedsBonus,"A Retuning Kit requires an item that already has at least one bonus."
+aeEnchantRetuningOneOrTwo,"A Retuning Kit can only be used on items with one or two bonuses."
+aeEnchantNoAlternativeBonuses,"No alternative bonuses are available for this item type."
+aeEnchantComprehensiveNeedsNone,"A Comprehensive Upgrade Kit can only be used on an item with no existing bonuses."
+aeEnchantNoEligibleBonuses,"No eligible bonuses are available for this item type."
+aeEnchantEliteNeedsTwo,"An Elite Reinforcement Kit can only be used on an item with exactly two bonuses."
+aeEnchantBreakdownNeedsBonus,"A Breakdown Kit requires an item that already has at least one bonus."
+partRetrofitHousing,"Retrofit Housing"
+partRetrofitHousingDesc,"Small mounting shell used to craft the Survivor's Upgrade Kit."
+partTuningBoard,"Tuning Board"
+partTuningBoardDesc,"Scavenged calibration board used to craft the Survivor's Upgrade Kit."
+partFieldMechanismPack,"Field Mechanism Pack"
+partFieldMechanismPackDesc,"Mechanical linkage module used to craft the Survivor's Upgrade Kit."
+partRegulatorPack,"Regulator Pack"
+partRegulatorPackDesc,"Compact regulation module used to craft the Survivor's Upgrade Kit."
+partServiceHousing,"Service Housing"
+partServiceHousingDesc,"Repairable mounting frame used to craft the Adjustment Kit and Breakdown Kit."
+partStabilityClampSet,"Stability Clamp Set"
+partStabilityClampSetDesc,"Clamp fixture for stabilizing parts"
+partAdjustmentMatrix,"Adjustment Matrix"
+partAdjustmentMatrixDesc,"Calibration module used to craft the Adjustment Kit."
+partControlShunt,"Control Shunt"
+partControlShuntDesc,"Inline control part used to craft the Adjustment Kit and Retuning Kit."
+partRetuningCartridge,"Retuning Cartridge"
+partRetuningCartridgeDesc,"Service cartridge used to craft the Retuning Kit and Breakdown Kit."
+partProfileBridge,"Profile Bridge"
+partProfileBridgeDesc,"Interface part used to craft the Retuning Kit."
+partPurgeCanister,"Purge Canister"
+partPurgeCanisterDesc,"Chemical stripping canister used to craft the Breakdown Kit."
+partReinforcedHousing,"Reinforced Housing"
+partReinforcedHousingDesc,"Heavy-duty mounting shell used to craft the Elite Reinforcement Kit."
+partReinforcementCore,"Reinforcement Core"
+partReinforcementCoreDesc,"Dense upgrade core used to craft the Elite Reinforcement Kit."
+partStabilityFrame,"Stability Frame"
+partStabilityFrameDesc,"Rigid structural insert used to craft the Elite Reinforcement Kit."
+partControlLattice,"Control Lattice"
+partControlLatticeDesc,"Routed control frame used to craft the Elite Reinforcement Kit."
+partRegulatorAssembly,"Regulator Assembly"
+partRegulatorAssemblyDesc,"Advanced control module used to craft the Elite Reinforcement Kit."
+partMasterHousing,"Master Housing"
+partMasterHousingDesc,"High-end mounting frame used to craft the Comprehensive Upgrade Kit."
+partComprehensiveCore,"Comprehensive Core"
+partComprehensiveCoreDesc,"Premium central core used to craft the Comprehensive Upgrade Kit."
+partControlArray,"Control Array"
+partControlArrayDesc,"Multi-channel control module used to craft the Comprehensive Upgrade Kit."
+partMasterRegulator,"Master Regulator"
+partMasterRegulatorDesc,"Top-tier regulation module used to craft the Comprehensive Upgrade Kit."
+partFieldArray,"Field Array"
+partFieldArrayDesc,"Advanced field-control module used to craft the Comprehensive Upgrade Kit."
+kitSurvivorUpgradeSchematic,"Survivor's Upgrade Schematic"
+kitBreakdownSchematic,"Breakdown Schematic"
+kitAdjustmentSchematic,"Adjustment Schematic"
+kitRetuningSchematic,"Retuning Schematic"
+kitEliteReinforcementSchematic,"Elite Reinforcement Schematic"
+kitComprehensiveUpgradeSchematic,"Comprehensive Upgrade Schematic"
+xuiRebirthModifierInstructions,"Place armor and a kit in the slots, then press Apply. The result goes to Output."
+xuiEnchantToolRequired,Install the required tool first.
+xuiEnchantOutputFull,The output is full.
+xuiEnchantSlotHint,Armor and kit go here.
+xuiRebirthPropaneTitle,Propane Refill
+xuiRebirthPropaneHelp,"Drag a propane tank into the slot, then start filling. Filling continues if you close the window."
+xuiRebirthPropaneStation,Station
+xuiRebirthPropaneTank,Tank
+xuiRebirthPropaneStart,Start
+xuiRebirthPropaneStop,Stop
+xuiRebirthPropaneNoTank,No propane tank here or in your backpack.
+xuiRebirthPropaneTankFull,This tank is already full.
+xuiRebirthPropaneEmpty,This station is out of propane.
+FuriousRamsayAmmoMachine,Ammo Machine
+FuriousRamsayAmmoMachineDesc,"Burns gasoline to turn lead, brass and powder into ammunition quickly."
+rebirthSchematicAmmoMachine,Ammo Machine Schematic
+rebirthSchematicAmmoMachineDesc,"Reusable schematic that teaches the Ammo Machine recipe. Reading does not consume it."
+xuiRebirthRecipeKnowledge_FuriousRamsayAmmoMachine,Recipe: Ammo Machine
+AlchemyTable001_FR,Alchemy Table
+AlchemyTable001_FRDesc,"Used with pliers and a beaker to make mind control ammunition. It takes the Witch Doctor discipline to work."
+rebirthSchematicAlchemyTable,Alchemy Table Schematic
+rebirthSchematicAlchemyTableDesc,"Reusable schematic that teaches the Alchemy Table recipe. Reading does not consume it."
+xuiRebirthRecipeKnowledge_AlchemyTable001_FR,Recipe: Alchemy Table
+FuriousRamsayMindControlArrowStone,Mind Control Stone Arrow
+FuriousRamsayMindControlArrowIron,Mind Control Iron Arrow
+FuriousRamsayMindControlArrowSteel,Mind Control Steel Arrow
+FuriousRamsayMindControlBoltStone,Mind Control Stone Bolt
+FuriousRamsayMindControlBoltIron,Mind Control Iron Bolt
+FuriousRamsayMindControlBoltSteel,Mind Control Steel Bolt
+xuiRebirthPropaneInsert,Insert tank
+xuiRebirthPropaneTake,Take tank
+xuiRebirthPropaneOccupied,Take the current tank out first.
+xuiRebirthPropaneInventoryFull,Your inventory is full.
+aeBonusFmt_secure_unlock_common,"{0} chance to open a locked container at once, using one lockpick"
+aeBonusFmt_secure_unlock_uncommon,"{0} chance to open a locked container at once, using one lockpick"
+aeBonusFmt_secure_unlock_rare,"{0} chance to open a locked container at once, using one lockpick"
+aeBonusFmt_secure_unlock_legendary,"{0} chance to open a locked container at once, using one lockpick"
+aeBonusFmt_head_loot_stage_common,"+{0} loot stage"
+aeBonusFmt_head_loot_stage_uncommon,"+{0} loot stage"
+aeBonusFmt_head_loot_stage_rare,"+{0} loot stage"
+aeBonusFmt_head_loot_stage_legendary,"+{0} loot stage"
+aeBonusFmt_head_scavenging_common,"Search containers {0} faster"
+aeBonusFmt_head_scavenging_uncommon,"Search containers {0} faster"
+aeBonusFmt_head_scavenging_rare,"Search containers {0} faster"
+aeBonusFmt_head_scavenging_legendary,"Search containers {0} faster"
+aeBonusFmt_head_buying_common,"Pay {0} less when buying from traders"
+aeBonusFmt_head_buying_uncommon,"Pay {0} less when buying from traders"
+aeBonusFmt_head_buying_rare,"Pay {0} less when buying from traders"
+aeBonusFmt_head_buying_legendary,"Pay {0} less when buying from traders"
+aeBonusFmt_head_selling_common,"Receive {0} more when selling to traders"
+aeBonusFmt_head_selling_uncommon,"Receive {0} more when selling to traders"
+aeBonusFmt_head_selling_rare,"Receive {0} more when selling to traders"
+aeBonusFmt_head_selling_legendary,"Receive {0} more when selling to traders"
+aeBonusFmt_head_crafting_common,"Craft items {0} faster"
+aeBonusFmt_head_crafting_uncommon,"Craft items {0} faster"
+aeBonusFmt_head_crafting_rare,"Craft items {0} faster"
+aeBonusFmt_head_crafting_legendary,"Craft items {0} faster"
+aeBonusFmt_head_harvest_orewood_common,"Gather {0} more wood, stone, ore, clay and sand"
+aeBonusFmt_head_harvest_orewood_uncommon,"Gather {0} more wood, stone, ore, clay and sand"
+aeBonusFmt_head_harvest_orewood_rare,"Gather {0} more wood, stone, ore, clay and sand"
+aeBonusFmt_head_harvest_orewood_legendary,"Gather {0} more wood, stone, ore, clay and sand"
+aeBonusFmt_head_harvest_butcher_common,"Harvest {0} more from carcasses and bodies"
+aeBonusFmt_head_harvest_butcher_uncommon,"Harvest {0} more from carcasses and bodies"
+aeBonusFmt_head_harvest_butcher_rare,"Harvest {0} more from carcasses and bodies"
+aeBonusFmt_head_harvest_butcher_legendary,"Harvest {0} more from carcasses and bodies"
+aeBonusFmt_head_harvest_salvage_common,"Salvage {0} more parts and materials"
+aeBonusFmt_head_harvest_salvage_uncommon,"Salvage {0} more parts and materials"
+aeBonusFmt_head_harvest_salvage_rare,"Salvage {0} more parts and materials"
+aeBonusFmt_head_harvest_salvage_legendary,"Salvage {0} more parts and materials"
+aeBonusFmt_body_health_common,"+{0} maximum health"
+aeBonusFmt_body_health_uncommon,"+{0} maximum health"
+aeBonusFmt_body_health_rare,"+{0} maximum health"
+aeBonusFmt_body_health_legendary,"+{0} maximum health"
+aeBonusFmt_body_carry_common,"+{0} carry capacity"
+aeBonusFmt_body_carry_uncommon,"+{0} carry capacity"
+aeBonusFmt_body_carry_rare,"+{0} carry capacity"
+aeBonusFmt_body_carry_legendary,"+{0} carry capacity"
+aeBonusFmt_feet_speed_common,"{0} increased walking, running and crouching speed"
+aeBonusFmt_feet_speed_uncommon,"{0} increased walking, running and crouching speed"
+aeBonusFmt_feet_speed_rare,"{0} increased walking, running and crouching speed"
+aeBonusFmt_feet_speed_legendary,"{0} increased walking, running and crouching speed"
+aeBonusFmt_feet_fall_common,"{0} reduced fall damage"
+aeBonusFmt_feet_fall_uncommon,"{0} reduced fall damage"
+aeBonusFmt_feet_fall_rare,"{0} reduced fall damage"
+aeBonusFmt_feet_fall_legendary,"{0} reduced fall damage"
+aeBonusFmt_feet_moving_resist_common,"{0} reduced incoming damage while moving"
+aeBonusFmt_feet_moving_resist_uncommon,"{0} reduced incoming damage while moving"
+aeBonusFmt_feet_moving_resist_rare,"{0} reduced incoming damage while moving"
+aeBonusFmt_feet_moving_resist_legendary,"{0} reduced incoming damage while moving"
+aeBonusFmt_feet_jump_common,"{0} reduced stamina cost while jumping"
+aeBonusFmt_feet_jump_uncommon,"{0} reduced stamina cost while jumping"
+aeBonusFmt_feet_jump_rare,"{0} reduced stamina cost while jumping"
+aeBonusFmt_feet_jump_legendary,"{0} reduced stamina cost while jumping"
+aeBonusFmt_feet_noise_common,"{0} reduced noise while crouched"
+aeBonusFmt_feet_noise_uncommon,"{0} reduced noise while crouched"
+aeBonusFmt_feet_noise_rare,"{0} reduced noise while crouched"
+aeBonusFmt_feet_noise_legendary,"{0} reduced noise while crouched"
+aeBonusFmt_feet_search_common,"{0} faster enemy search decay"
+aeBonusFmt_feet_search_uncommon,"{0} faster enemy search decay"
+aeBonusFmt_feet_search_rare,"{0} faster enemy search decay"
+aeBonusFmt_feet_search_legendary,"{0} faster enemy search decay"
+aeBonusFmt_feet_mine_immunity,Immune to land mines
+aeBonusFmt_feet_trash_silence,Silent footsteps on trash piles
+modAttackSpeedTier1,Attack Speed Mod Tier 1
+modAttackSpeedTier2,Attack Speed Mod Tier 2
+modAttackSpeedTier3,Attack Speed Mod Tier 3
+modAttackSpeedTier4,Attack Speed Mod Tier 4
+modAttackSpeedTier5,Attack Speed Mod Tier 5
+modAttackSpeedTier6,Attack Speed Mod Tier 6
+modFireRateTier1,Fire Rate Mod Tier 1
+modFireRateTier2,Fire Rate Mod Tier 2
+modFireRateTier3,Fire Rate Mod Tier 3
+modFireRateTier4,Fire Rate Mod Tier 4
+modFireRateTier5,Fire Rate Mod Tier 5
+modFireRateTier6,Fire Rate Mod Tier 6
+modMagazineSizeTier1,Magazine Size Mod Tier 1
+modMagazineSizeTier2,Magazine Size Mod Tier 2
+modMagazineSizeTier3,Magazine Size Mod Tier 3
+modMagazineSizeTier4,Magazine Size Mod Tier 4
+modMagazineSizeTier5,Magazine Size Mod Tier 5
+modMagazineSizeTier6,Magazine Size Mod Tier 6
+modMeleeDegradationTier1,Melee Durability Mod Tier 1
+modMeleeDegradationTier2,Melee Durability Mod Tier 2
+modMeleeDegradationTier3,Melee Durability Mod Tier 3
+modMeleeDegradationTier4,Melee Durability Mod Tier 4
+modMeleeDegradationTier5,Melee Durability Mod Tier 5
+modMeleeDegradationTier6,Melee Durability Mod Tier 6
+modMeleeEntityDamageTier1,Melee Damage Mod Tier 1
+modMeleeEntityDamageTier2,Melee Damage Mod Tier 2
+modMeleeEntityDamageTier3,Melee Damage Mod Tier 3
+modMeleeEntityDamageTier4,Melee Damage Mod Tier 4
+modMeleeEntityDamageTier5,Melee Damage Mod Tier 5
+modMeleeEntityDamageTier6,Melee Damage Mod Tier 6
+modRangedDegradationTier1,Ranged Durability Mod Tier 1
+modRangedDegradationTier2,Ranged Durability Mod Tier 2
+modRangedDegradationTier3,Ranged Durability Mod Tier 3
+modRangedDegradationTier4,Ranged Durability Mod Tier 4
+modRangedDegradationTier5,Ranged Durability Mod Tier 5
+modRangedDegradationTier6,Ranged Durability Mod Tier 6
+modRangedEntityDamageTier1,Ranged Damage Mod Tier 1
+modRangedEntityDamageTier2,Ranged Damage Mod Tier 2
+modRangedEntityDamageTier3,Ranged Damage Mod Tier 3
+modRangedEntityDamageTier4,Ranged Damage Mod Tier 4
+modRangedEntityDamageTier5,Ranged Damage Mod Tier 5
+modRangedEntityDamageTier6,Ranged Damage Mod Tier 6
+modReloadSpeedTier1,Reload Speed Mod Tier 1
+modReloadSpeedTier2,Reload Speed Mod Tier 2
+modReloadSpeedTier3,Reload Speed Mod Tier 3
+modReloadSpeedTier4,Reload Speed Mod Tier 4
+modReloadSpeedTier5,Reload Speed Mod Tier 5
+modReloadSpeedTier6,Reload Speed Mod Tier 6
+aeBonusFmt_head_loot_qty_common_dukes,"{0}% more dukes from containers"
+aeBonusFmt_head_loot_qty_common_ammo,"{0}% more ammo from containers"
+aeBonusFmt_head_loot_qty_common_brass,"{0}% more brass from containers"
+aeBonusFmt_head_loot_qty_common_food,"{0}% more food from containers"
+aeBonusFmt_head_loot_qty_common_medical,"{0}% more medical supplies from containers"
+aeBonusFmt_head_loot_qty_uncommon_dukes_ammo,"{0}% more dukes and ammo from containers"
+aeBonusFmt_head_loot_qty_uncommon_dukes_brass,"{0}% more dukes and brass from containers"
+aeBonusFmt_head_loot_qty_uncommon_dukes_food,"{0}% more dukes and food from containers"
+aeBonusFmt_head_loot_qty_uncommon_dukes_medical,"{0}% more dukes and medical supplies from containers"
+aeBonusFmt_head_loot_qty_uncommon_ammo_brass,"{0}% more ammo and brass from containers"
+aeBonusFmt_head_loot_qty_uncommon_ammo_food,"{0}% more ammo and food from containers"
+aeBonusFmt_head_loot_qty_uncommon_ammo_medical,"{0}% more ammo and medical supplies from containers"
+aeBonusFmt_head_loot_qty_uncommon_brass_food,"{0}% more brass and food from containers"
+aeBonusFmt_head_loot_qty_uncommon_brass_medical,"{0}% more brass and medical supplies from containers"
+aeBonusFmt_head_loot_qty_uncommon_food_medical,"{0}% more food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_ammo_brass,"{0}% more dukes, ammo and brass from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_ammo_food,"{0}% more dukes, ammo and food from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_ammo_medical,"{0}% more dukes, ammo and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_brass_food,"{0}% more dukes, brass and food from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_brass_medical,"{0}% more dukes, brass and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_dukes_food_medical,"{0}% more dukes, food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_ammo_brass_food,"{0}% more ammo, brass and food from containers"
+aeBonusFmt_head_loot_qty_rare_ammo_brass_medical,"{0}% more ammo, brass and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_ammo_food_medical,"{0}% more ammo, food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_rare_brass_food_medical,"{0}% more brass, food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_legendary_dukes_ammo_brass_food,"{0}% more dukes, ammo, brass and food from containers"
+aeBonusFmt_head_loot_qty_legendary_dukes_ammo_brass_medical,"{0}% more dukes, ammo, brass and medical supplies from containers"
+aeBonusFmt_head_loot_qty_legendary_dukes_ammo_food_medical,"{0}% more dukes, ammo, food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_legendary_dukes_brass_food_medical,"{0}% more dukes, brass, food and medical supplies from containers"
+aeBonusFmt_head_loot_qty_legendary_ammo_brass_food_medical,"{0}% more ammo, brass, food and medical supplies from containers"
+aeBonusFmt_body_resist_common_fatigue,"{0}% lower chance to suffer fatigue"
+aeBonusFmt_body_resist_common_sprains,"{0}% lower chance to suffer sprains"
+aeBonusFmt_body_resist_common_abrasion,"{0}% lower chance to suffer abrasions"
+aeBonusFmt_body_resist_common_laceration,"{0}% lower chance to suffer lacerations"
+aeBonusFmt_body_resist_common_infection,"{0}% lower chance to suffer infection"
+aeBonusFmt_body_resist_common_stun,"{0}% lower chance to suffer stun"
+aeBonusFmt_body_resist_common_concussion,"{0}% lower chance to suffer concussion"
+aeBonusFmt_body_resist_common_bleeding,"{0}% lower chance to suffer bleeding"
+aeBonusFmt_body_resist_uncommon_fatigue_sprains,"{0}% lower chance to suffer fatigue and sprains"
+aeBonusFmt_body_resist_uncommon_fatigue_abrasion,"{0}% lower chance to suffer fatigue and abrasions"
+aeBonusFmt_body_resist_uncommon_fatigue_laceration,"{0}% lower chance to suffer fatigue and lacerations"
+aeBonusFmt_body_resist_uncommon_fatigue_infection,"{0}% lower chance to suffer fatigue and infection"
+aeBonusFmt_body_resist_uncommon_fatigue_stun,"{0}% lower chance to suffer fatigue and stun"
+aeBonusFmt_body_resist_uncommon_fatigue_concussion,"{0}% lower chance to suffer fatigue and concussion"
+aeBonusFmt_body_resist_uncommon_fatigue_bleeding,"{0}% lower chance to suffer fatigue and bleeding"
+aeBonusFmt_body_resist_uncommon_sprains_abrasion,"{0}% lower chance to suffer sprains and abrasions"
+aeBonusFmt_body_resist_uncommon_sprains_laceration,"{0}% lower chance to suffer sprains and lacerations"
+aeBonusFmt_body_resist_uncommon_sprains_infection,"{0}% lower chance to suffer sprains and infection"
+aeBonusFmt_body_resist_uncommon_sprains_stun,"{0}% lower chance to suffer sprains and stun"
+aeBonusFmt_body_resist_uncommon_sprains_concussion,"{0}% lower chance to suffer sprains and concussion"
+aeBonusFmt_body_resist_uncommon_sprains_bleeding,"{0}% lower chance to suffer sprains and bleeding"
+aeBonusFmt_body_resist_uncommon_abrasion_laceration,"{0}% lower chance to suffer abrasions and lacerations"
+aeBonusFmt_body_resist_uncommon_abrasion_infection,"{0}% lower chance to suffer abrasions and infection"
+aeBonusFmt_body_resist_uncommon_abrasion_stun,"{0}% lower chance to suffer abrasions and stun"
+aeBonusFmt_body_resist_uncommon_abrasion_concussion,"{0}% lower chance to suffer abrasions and concussion"
+aeBonusFmt_body_resist_uncommon_abrasion_bleeding,"{0}% lower chance to suffer abrasions and bleeding"
+aeBonusFmt_body_resist_uncommon_laceration_infection,"{0}% lower chance to suffer lacerations and infection"
+aeBonusFmt_body_resist_uncommon_laceration_stun,"{0}% lower chance to suffer lacerations and stun"
+aeBonusFmt_body_resist_uncommon_laceration_concussion,"{0}% lower chance to suffer lacerations and concussion"
+aeBonusFmt_body_resist_uncommon_laceration_bleeding,"{0}% lower chance to suffer lacerations and bleeding"
+aeBonusFmt_body_resist_uncommon_infection_stun,"{0}% lower chance to suffer infection and stun"
+aeBonusFmt_body_resist_uncommon_infection_concussion,"{0}% lower chance to suffer infection and concussion"
+aeBonusFmt_body_resist_uncommon_infection_bleeding,"{0}% lower chance to suffer infection and bleeding"
+aeBonusFmt_body_resist_uncommon_stun_concussion,"{0}% lower chance to suffer stun and concussion"
+aeBonusFmt_body_resist_uncommon_stun_bleeding,"{0}% lower chance to suffer stun and bleeding"
+aeBonusFmt_body_resist_uncommon_concussion_bleeding,"{0}% lower chance to suffer concussion and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_sprains_abrasion,"{0}% lower chance to suffer fatigue, sprains and abrasions"
+aeBonusFmt_body_resist_rare_fatigue_sprains_laceration,"{0}% lower chance to suffer fatigue, sprains and lacerations"
+aeBonusFmt_body_resist_rare_fatigue_sprains_infection,"{0}% lower chance to suffer fatigue, sprains and infection"
+aeBonusFmt_body_resist_rare_fatigue_sprains_stun,"{0}% lower chance to suffer fatigue, sprains and stun"
+aeBonusFmt_body_resist_rare_fatigue_sprains_concussion,"{0}% lower chance to suffer fatigue, sprains and concussion"
+aeBonusFmt_body_resist_rare_fatigue_sprains_bleeding,"{0}% lower chance to suffer fatigue, sprains and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_abrasion_laceration,"{0}% lower chance to suffer fatigue, abrasions and lacerations"
+aeBonusFmt_body_resist_rare_fatigue_abrasion_infection,"{0}% lower chance to suffer fatigue, abrasions and infection"
+aeBonusFmt_body_resist_rare_fatigue_abrasion_stun,"{0}% lower chance to suffer fatigue, abrasions and stun"
+aeBonusFmt_body_resist_rare_fatigue_abrasion_concussion,"{0}% lower chance to suffer fatigue, abrasions and concussion"
+aeBonusFmt_body_resist_rare_fatigue_abrasion_bleeding,"{0}% lower chance to suffer fatigue, abrasions and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_laceration_infection,"{0}% lower chance to suffer fatigue, lacerations and infection"
+aeBonusFmt_body_resist_rare_fatigue_laceration_stun,"{0}% lower chance to suffer fatigue, lacerations and stun"
+aeBonusFmt_body_resist_rare_fatigue_laceration_concussion,"{0}% lower chance to suffer fatigue, lacerations and concussion"
+aeBonusFmt_body_resist_rare_fatigue_laceration_bleeding,"{0}% lower chance to suffer fatigue, lacerations and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_infection_stun,"{0}% lower chance to suffer fatigue, infection and stun"
+aeBonusFmt_body_resist_rare_fatigue_infection_concussion,"{0}% lower chance to suffer fatigue, infection and concussion"
+aeBonusFmt_body_resist_rare_fatigue_infection_bleeding,"{0}% lower chance to suffer fatigue, infection and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_stun_concussion,"{0}% lower chance to suffer fatigue, stun and concussion"
+aeBonusFmt_body_resist_rare_fatigue_stun_bleeding,"{0}% lower chance to suffer fatigue, stun and bleeding"
+aeBonusFmt_body_resist_rare_fatigue_concussion_bleeding,"{0}% lower chance to suffer fatigue, concussion and bleeding"
+aeBonusFmt_body_resist_rare_sprains_abrasion_laceration,"{0}% lower chance to suffer sprains, abrasions and lacerations"
+aeBonusFmt_body_resist_rare_sprains_abrasion_infection,"{0}% lower chance to suffer sprains, abrasions and infection"
+aeBonusFmt_body_resist_rare_sprains_abrasion_stun,"{0}% lower chance to suffer sprains, abrasions and stun"
+aeBonusFmt_body_resist_rare_sprains_abrasion_concussion,"{0}% lower chance to suffer sprains, abrasions and concussion"
+aeBonusFmt_body_resist_rare_sprains_abrasion_bleeding,"{0}% lower chance to suffer sprains, abrasions and bleeding"
+aeBonusFmt_body_resist_rare_sprains_laceration_infection,"{0}% lower chance to suffer sprains, lacerations and infection"
+aeBonusFmt_body_resist_rare_sprains_laceration_stun,"{0}% lower chance to suffer sprains, lacerations and stun"
+aeBonusFmt_body_resist_rare_sprains_laceration_concussion,"{0}% lower chance to suffer sprains, lacerations and concussion"
+aeBonusFmt_body_resist_rare_sprains_laceration_bleeding,"{0}% lower chance to suffer sprains, lacerations and bleeding"
+aeBonusFmt_body_resist_rare_sprains_infection_stun,"{0}% lower chance to suffer sprains, infection and stun"
+aeBonusFmt_body_resist_rare_sprains_infection_concussion,"{0}% lower chance to suffer sprains, infection and concussion"
+aeBonusFmt_body_resist_rare_sprains_infection_bleeding,"{0}% lower chance to suffer sprains, infection and bleeding"
+aeBonusFmt_body_resist_rare_sprains_stun_concussion,"{0}% lower chance to suffer sprains, stun and concussion"
+aeBonusFmt_body_resist_rare_sprains_stun_bleeding,"{0}% lower chance to suffer sprains, stun and bleeding"
+aeBonusFmt_body_resist_rare_sprains_concussion_bleeding,"{0}% lower chance to suffer sprains, concussion and bleeding"
+aeBonusFmt_body_resist_rare_abrasion_laceration_infection,"{0}% lower chance to suffer abrasions, lacerations and infection"
+aeBonusFmt_body_resist_rare_abrasion_laceration_stun,"{0}% lower chance to suffer abrasions, lacerations and stun"
+aeBonusFmt_body_resist_rare_abrasion_laceration_concussion,"{0}% lower chance to suffer abrasions, lacerations and concussion"
+aeBonusFmt_body_resist_rare_abrasion_laceration_bleeding,"{0}% lower chance to suffer abrasions, lacerations and bleeding"
+aeBonusFmt_body_resist_rare_abrasion_infection_stun,"{0}% lower chance to suffer abrasions, infection and stun"
+aeBonusFmt_body_resist_rare_abrasion_infection_concussion,"{0}% lower chance to suffer abrasions, infection and concussion"
+aeBonusFmt_body_resist_rare_abrasion_infection_bleeding,"{0}% lower chance to suffer abrasions, infection and bleeding"
+aeBonusFmt_body_resist_rare_abrasion_stun_concussion,"{0}% lower chance to suffer abrasions, stun and concussion"
+aeBonusFmt_body_resist_rare_abrasion_stun_bleeding,"{0}% lower chance to suffer abrasions, stun and bleeding"
+aeBonusFmt_body_resist_rare_abrasion_concussion_bleeding,"{0}% lower chance to suffer abrasions, concussion and bleeding"
+aeBonusFmt_body_resist_rare_laceration_infection_stun,"{0}% lower chance to suffer lacerations, infection and stun"
+aeBonusFmt_body_resist_rare_laceration_infection_concussion,"{0}% lower chance to suffer lacerations, infection and concussion"
+aeBonusFmt_body_resist_rare_laceration_infection_bleeding,"{0}% lower chance to suffer lacerations, infection and bleeding"
+aeBonusFmt_body_resist_rare_laceration_stun_concussion,"{0}% lower chance to suffer lacerations, stun and concussion"
+aeBonusFmt_body_resist_rare_laceration_stun_bleeding,"{0}% lower chance to suffer lacerations, stun and bleeding"
+aeBonusFmt_body_resist_rare_laceration_concussion_bleeding,"{0}% lower chance to suffer lacerations, concussion and bleeding"
+aeBonusFmt_body_resist_rare_infection_stun_concussion,"{0}% lower chance to suffer infection, stun and concussion"
+aeBonusFmt_body_resist_rare_infection_stun_bleeding,"{0}% lower chance to suffer infection, stun and bleeding"
+aeBonusFmt_body_resist_rare_infection_concussion_bleeding,"{0}% lower chance to suffer infection, concussion and bleeding"
+aeBonusFmt_body_resist_rare_stun_concussion_bleeding,"{0}% lower chance to suffer stun, concussion and bleeding"
+aeBonusFmt_body_resist_legendary_all,"{0}% lower chance to suffer any injury"
+aeBonusFmt_body_health_regen_common,"Regenerate up to 1 health every {0} seconds"
+aeBonusFmt_body_health_regen_uncommon,"Regenerate up to 1 health every {0} seconds"
+aeBonusFmt_body_health_regen_rare,"Regenerate up to 1 health every {0} seconds"
+aeBonusFmt_body_health_regen_legendary,"Regenerate up to 1 health every {0} seconds"
+aeBonusFmt_body_stamina_efficiency_common,"Stamina recovery uses {0}% less food"
+aeBonusFmt_body_stamina_efficiency_uncommon,"Stamina recovery uses {0}% less food"
+aeBonusFmt_body_stamina_efficiency_rare,"Stamina recovery uses {0}% less food"
+aeBonusFmt_body_stamina_efficiency_legendary,"Stamina recovery uses {0}% less food"
+aeBonusFmt_feet_movement_stamina_common,"{0}% less stamina drain while walking or running"
+aeBonusFmt_feet_movement_stamina_uncommon,"{0}% less stamina drain while walking or running"
+aeBonusFmt_feet_movement_stamina_rare,"{0}% less stamina drain while walking or running"
+aeBonusFmt_feet_movement_stamina_legendary,"{0}% less stamina drain while walking or running"
+aeBonusFmt_feet_sneak_sprint_uncommon,"No stamina drain while crouched and sprinting"
+aeBonusFmt_feet_shadow_blend_common,"{0}% less light exposure while crouched in low light"
+aeBonusFmt_feet_shadow_blend_uncommon,"{0}% less light exposure while crouched in low light"
+aeBonusFmt_feet_shadow_blend_rare,"{0}% less light exposure while crouched in low light"
+aeBonusFmt_feet_shadow_blend_legendary,"{0}% less light exposure while crouched in low light"
+aeBonusFmt_feet_sneak_damage_common,"+{0}% sneak damage against sleepers"
+aeBonusFmt_feet_sneak_damage_uncommon,"+{0}% sneak damage against sleepers"
+aeBonusFmt_feet_sneak_damage_rare,"+{0}% sneak damage against sleepers"
+aeBonusFmt_feet_sneak_damage_legendary,"+{0}% sneak damage against sleepers"
+aeBonusFmt_feet_sleeper_knockdown_rare,"{0}% chance to knock down sleepers you hit while crouched"
+aeBonusFmt_head_skill_xp_common_animal_handling,"{0}% more animal handling skill experience"
+aeBonusFmt_head_skill_xp_common_animal_processing,"{0}% more animal processing skill experience"
+aeBonusFmt_head_skill_xp_common_archery,"{0}% more archery skill experience"
+aeBonusFmt_head_skill_xp_common_armor_proficiency,"{0}% more armor proficiency skill experience"
+aeBonusFmt_head_skill_xp_common_assault_rifles,"{0}% more assault rifles skill experience"
+aeBonusFmt_head_skill_xp_common_athletics,"{0}% more athletics skill experience"
+aeBonusFmt_head_skill_xp_common_axes,"{0}% more axes skill experience"
+aeBonusFmt_head_skill_xp_common_bartering,"{0}% more bartering skill experience"
+aeBonusFmt_head_skill_xp_common_batons,"{0}% more batons skill experience"
+aeBonusFmt_head_skill_xp_common_chemistry,"{0}% more chemistry skill experience"
+aeBonusFmt_head_skill_xp_common_clubs,"{0}% more clubs skill experience"
+aeBonusFmt_head_skill_xp_common_construction,"{0}% more construction skill experience"
+aeBonusFmt_head_skill_xp_common_cooking,"{0}% more cooking skill experience"
+aeBonusFmt_head_skill_xp_common_deployable_turrets,"{0}% more deployable turrets skill experience"
+aeBonusFmt_head_skill_xp_common_drink_preparation,"{0}% more drink preparation skill experience"
+aeBonusFmt_head_skill_xp_common_drone_operations,"{0}% more drone operations skill experience"
+aeBonusFmt_head_skill_xp_common_electrical,"{0}% more electrical skill experience"
+aeBonusFmt_head_skill_xp_common_explosives,"{0}% more explosives skill experience"
+aeBonusFmt_head_skill_xp_common_farming,"{0}% more farming skill experience"
+aeBonusFmt_head_skill_xp_common_gunsmithing,"{0}% more gunsmithing skill experience"
+aeBonusFmt_head_skill_xp_common_hammers,"{0}% more hammers skill experience"
+aeBonusFmt_head_skill_xp_common_heavy_handguns,"{0}% more heavy handguns skill experience"
+aeBonusFmt_head_skill_xp_common_knives,"{0}% more knives skill experience"
+aeBonusFmt_head_skill_xp_common_knuckles,"{0}% more knuckles skill experience"
+aeBonusFmt_head_skill_xp_common_leadership,"{0}% more leadership skill experience"
+aeBonusFmt_head_skill_xp_common_lockpicking,"{0}% more lockpicking skill experience"
+aeBonusFmt_head_skill_xp_common_logging,"{0}% more logging skill experience"
+aeBonusFmt_head_skill_xp_common_long_range_rifles,"{0}% more long-range rifles skill experience"
+aeBonusFmt_head_skill_xp_common_maintenance,"{0}% more maintenance skill experience"
+aeBonusFmt_head_skill_xp_common_management,"{0}% more management skill experience"
+aeBonusFmt_head_skill_xp_common_mechanics,"{0}% more mechanics skill experience"
+aeBonusFmt_head_skill_xp_common_medicine,"{0}% more medicine skill experience"
+aeBonusFmt_head_skill_xp_common_metalworking,"{0}% more metalworking skill experience"
+aeBonusFmt_head_skill_xp_common_mining,"{0}% more mining skill experience"
+aeBonusFmt_head_skill_xp_common_pistols,"{0}% more pistols skill experience"
+aeBonusFmt_head_skill_xp_common_revolvers,"{0}% more revolvers skill experience"
+aeBonusFmt_head_skill_xp_common_salvage,"{0}% more salvage skill experience"
+aeBonusFmt_head_skill_xp_common_scythes,"{0}% more scythes skill experience"
+aeBonusFmt_head_skill_xp_common_shotguns,"{0}% more shotguns skill experience"
+aeBonusFmt_head_skill_xp_common_spears,"{0}% more spears skill experience"
+aeBonusFmt_head_skill_xp_common_stealth,"{0}% more stealth skill experience"
+aeBonusFmt_head_skill_xp_common_swords,"{0}% more swords skill experience"
+aeBonusFmt_head_skill_xp_common_tactical_rifles,"{0}% more tactical rifles skill experience"
+aeBonusFmt_head_skill_xp_common_tailoring,"{0}% more tailoring skill experience"
+aeBonusFmt_head_skill_xp_common_teaching,"{0}% more teaching skill experience"
+aeBonusFmt_head_skill_xp_common_tracking,"{0}% more tracking skill experience"
+aeBonusFmt_head_skill_xp_common_trading,"{0}% more trading skill experience"
+aeBonusFmt_head_skill_xp_common_unarmed,"{0}% more unarmed skill experience"
+aeBonusFmt_head_skill_xp_uncommon_swords_knives,"{0}% more swords and knives skill experience"
+aeBonusFmt_head_skill_xp_uncommon_axes_scythes,"{0}% more axes and scythes skill experience"
+aeBonusFmt_head_skill_xp_uncommon_clubs_batons,"{0}% more clubs and batons skill experience"
+aeBonusFmt_head_skill_xp_uncommon_hammers_clubs,"{0}% more hammers and clubs skill experience"
+aeBonusFmt_head_skill_xp_uncommon_knuckles_unarmed,"{0}% more knuckles and unarmed skill experience"
+aeBonusFmt_head_skill_xp_uncommon_spears_archery,"{0}% more spears and archery skill experience"
+aeBonusFmt_head_skill_xp_uncommon_pistols_revolvers,"{0}% more pistols and revolvers skill experience"
+aeBonusFmt_head_skill_xp_uncommon_revolvers_heavy_handguns,"{0}% more revolvers and heavy handguns skill experience"
+aeBonusFmt_head_skill_xp_uncommon_assault_rifles_tactical_rifles,"{0}% more assault rifles and tactical rifles skill experience"
+aeBonusFmt_head_skill_xp_uncommon_tactical_rifles_long_range_rifles,"{0}% more tactical rifles and long-range rifles skill experience"
+aeBonusFmt_head_skill_xp_uncommon_shotguns_heavy_handguns,"{0}% more shotguns and heavy handguns skill experience"
+aeBonusFmt_head_skill_xp_uncommon_explosives_deployable_turrets,"{0}% more explosives and deployable turrets skill experience"
+aeBonusFmt_head_skill_xp_uncommon_deployable_turrets_drone_operations,"{0}% more deployable turrets and drone operations skill experience"
+aeBonusFmt_head_skill_xp_uncommon_mining_logging,"{0}% more mining and logging skill experience"
+aeBonusFmt_head_skill_xp_uncommon_salvage_mechanics,"{0}% more salvage and mechanics skill experience"
+aeBonusFmt_head_skill_xp_uncommon_farming_cooking,"{0}% more farming and cooking skill experience"
+aeBonusFmt_head_skill_xp_uncommon_animal_processing_tracking,"{0}% more animal processing and tracking skill experience"
+aeBonusFmt_head_skill_xp_uncommon_animal_handling_tracking,"{0}% more animal handling and tracking skill experience"
+aeBonusFmt_head_skill_xp_uncommon_medicine_chemistry,"{0}% more medicine and chemistry skill experience"
+aeBonusFmt_head_skill_xp_uncommon_cooking_drink_preparation,"{0}% more cooking and drink preparation skill experience"
+aeBonusFmt_head_skill_xp_uncommon_maintenance_mechanics,"{0}% more maintenance and mechanics skill experience"
+aeBonusFmt_head_skill_xp_uncommon_construction_electrical,"{0}% more construction and electrical skill experience"
+aeBonusFmt_head_skill_xp_uncommon_metalworking_gunsmithing,"{0}% more metalworking and gunsmithing skill experience"
+aeBonusFmt_head_skill_xp_uncommon_lockpicking_stealth,"{0}% more lockpicking and stealth skill experience"
+aeBonusFmt_head_skill_xp_uncommon_athletics_armor_proficiency,"{0}% more athletics and armor proficiency skill experience"
+aeBonusFmt_head_skill_xp_uncommon_bartering_trading,"{0}% more bartering and trading skill experience"
+aeBonusFmt_head_skill_xp_uncommon_teaching_leadership,"{0}% more teaching and leadership skill experience"
+aeBonusFmt_head_skill_xp_uncommon_leadership_management,"{0}% more leadership and management skill experience"
+aeBonusFmt_head_skill_xp_uncommon_tailoring_armor_proficiency,"{0}% more tailoring and armor proficiency skill experience"
+aeBonusFmt_head_skill_xp_rare_swords_knives_scythes,"{0}% more swords, knives and scythes skill experience"
+aeBonusFmt_head_skill_xp_rare_clubs_batons_hammers,"{0}% more clubs, batons and hammers skill experience"
+aeBonusFmt_head_skill_xp_rare_axes_spears_knuckles,"{0}% more axes, spears and knuckles skill experience"
+aeBonusFmt_head_skill_xp_rare_pistols_revolvers_heavy_handguns,"{0}% more pistols, revolvers and heavy handguns skill experience"
+aeBonusFmt_head_skill_xp_rare_assault_rifles_tactical_rifles_long_range_rifles,"{0}% more assault rifles, tactical rifles and long-range rifles skill experience"
+aeBonusFmt_head_skill_xp_rare_archery_shotguns_stealth,"{0}% more archery, shotguns and stealth skill experience"
+aeBonusFmt_head_skill_xp_rare_explosives_deployable_turrets_drone_operations,"{0}% more explosives, deployable turrets and drone operations skill experience"
+aeBonusFmt_head_skill_xp_rare_mining_logging_salvage,"{0}% more mining, logging and salvage skill experience"
+aeBonusFmt_head_skill_xp_rare_farming_animal_processing_tracking,"{0}% more farming, animal processing and tracking skill experience"
+aeBonusFmt_head_skill_xp_rare_cooking_drink_preparation_medicine,"{0}% more cooking, drink preparation and medicine skill experience"
+aeBonusFmt_head_skill_xp_rare_construction_electrical_mechanics,"{0}% more construction, electrical and mechanics skill experience"
+aeBonusFmt_head_skill_xp_rare_metalworking_gunsmithing_maintenance,"{0}% more metalworking, gunsmithing and maintenance skill experience"
+aeBonusFmt_head_skill_xp_rare_chemistry_medicine_tailoring,"{0}% more chemistry, medicine and tailoring skill experience"
+aeBonusFmt_head_skill_xp_rare_bartering_trading_leadership,"{0}% more bartering, trading and leadership skill experience"
+aeBonusFmt_head_skill_xp_rare_teaching_leadership_management,"{0}% more teaching, leadership and management skill experience"
+aeBonusFmt_head_skill_xp_rare_lockpicking_stealth_athletics,"{0}% more lockpicking, stealth and athletics skill experience"
+aeBonusFmt_head_skill_xp_legendary_swords_knives_axes_scythes,"{0}% more swords, knives, axes and scythes skill experience"
+aeBonusFmt_head_skill_xp_legendary_clubs_batons_hammers_knuckles,"{0}% more clubs, batons, hammers and knuckles skill experience"
+aeBonusFmt_head_skill_xp_legendary_pistols_revolvers_heavy_handguns_shotguns,"{0}% more pistols, revolvers, heavy handguns and shotguns skill experience"
+aeBonusFmt_head_skill_xp_legendary_assault_rifles_tactical_rifles_long_range_rifles_archery,"{0}% more assault rifles, tactical rifles, long-range rifles and archery skill experience"
+aeBonusFmt_head_skill_xp_legendary_explosives_deployable_turrets_drone_operations_electrical,"{0}% more explosives, deployable turrets, drone operations and electrical skill experience"
+aeBonusFmt_head_skill_xp_legendary_mining_logging_salvage_farming,"{0}% more mining, logging, salvage and farming skill experience"
+aeBonusFmt_head_skill_xp_legendary_cooking_drink_preparation_medicine_chemistry,"{0}% more cooking, drink preparation, medicine and chemistry skill experience"
+aeBonusFmt_head_skill_xp_legendary_construction_mechanics_maintenance_metalworking,"{0}% more construction, mechanics, maintenance and metalworking skill experience"
+aeBonusFmt_head_skill_xp_legendary_gunsmithing_tailoring_chemistry_metalworking,"{0}% more gunsmithing, tailoring, chemistry and metalworking skill experience"
+aeBonusFmt_head_skill_xp_legendary_bartering_trading_teaching_management,"{0}% more bartering, trading, teaching and management skill experience"
+aeBonusFmt_head_skill_xp_legendary_stealth_lockpicking_athletics_tracking,"{0}% more stealth, lockpicking, athletics and tracking skill experience"
+xuiArrowRain,Rain of Arrows
+xuiRangedStun,Goon's Revenge
+xuiRangedBleed,Blood Drain
+xuiRangedDoubleDamage,Double Damage
+xuiRangedShock,Short Circuit
+xuiRangedExplosion,Explosion
+xuiRangedDismember,Dismember
+xuiRangedSlashes,Thousand Cuts
+statBonus,[a8d9a0]Bonus[-]
+statChanceToTrigger,[a8d9a0]Chance to Trigger[-]
+ttLevelFull,Level
+FuriousRamsayDismemberName,Dismemberment Ability
+FuriousRamsayDismemberDesc,You have been granted the ability to dismember your targets
+FuriousRamsayRangedDoubleDamageName,Double Damage Bonus
+FuriousRamsayRangedDoubleDamageDesc,You have been granted the ability to deal double damage for [d1d073]10[-] seconds
+xuiRebirthWeaponBonusHeading,WEAPON BONUS
+FuriousRamsayMindControlDrink,"Mind Control Brew"
+FuriousRamsayMindControlDrinkDesc,"This brew can only be consumed by a [724c70]WITCH DOCTOR[-].\n\nDrink at your own risk.\n\nFor 5 minutes, your scythe's primary attack deals double damage, and its power attack turns the undead around you, based on your [9d7bb3]BLACK MAGIC[-], at a cost of 1 health per hit."
+FuriousRamsayMindControlPotion,"Mind Control Potion"
+FuriousRamsayMindControlPotionDesc,"Can only be used by a [724c70]WITCH DOCTOR[-].\n\nOnce thrown, this potion turns the undead in an area, based on your [9d7bb3]BLACK MAGIC[-].\n\nCan also be drunk, just like the Mind Control Brew."
+FuriousRamsaySetMindControlName,"Mind Control"
+FuriousRamsaySetMindControlDesc,"You feel a connection with the undead.\n\nWith a bit of practice, you will get them to fight for you."
+FuriousRamsaySetMindControlTooltip,"You feel a connection with the undead"
+FuriousRamsayBloodMoonRageBuffCooldownDesc,Your Rage cooldown is 30 seconds
+FuriousRamsayBloodMoonRageBuffCooldownName,Rage Cooldown
+FuriousRamsayBloodMoonRageBuffName,Blood Moon Rage
+FuriousRamsayBloodMoonRageBuffTierTooltip,Your Blood Moon Rage has been triggered
+FuriousRamsayOffensiveRageBuffCooldownDesc,Your Rage cooldown is 2 minutes
+FuriousRamsayOffensiveRageBuffCooldownName,Rage Cooldown
+FuriousRamsayOffensiveRageBuffTierName,Offensive Rage
+FuriousRamsayOffensiveRageBuffTierTooltip,Your Offensive Rage has been triggered
+FuriousRamsayRageBuffCooldownName,Rage Cooldown
+FuriousRamsayRageBuffOtherDesc,"You are enraged\n\nYou feel stronger, faster and more resilient"
+FuriousRamsayRageBuffOtherName,Rage
+FuriousRamsayRageBuffOtherTooltip,You are Enraged
+FuriousRamsayRageBuffTierName,Defensive Rage
+FuriousRamsayRageBuffTierTooltip,Your Defensive Rage has been triggered
+ttHasRageCapsuleOtherCooldown,Rage Cooldown still active
+ttRageBloodmoonActive,Bloodmoon Rage is still active
+ttRageCapsuleMissing,No Rage Capsules available
+ttRageCooldownActive,Rage Cooldown is still active
+ttRageDefensiveActive,Defensive Rage is still active
+ttRageOffensiveActive,Offensive Rage is still active
+ttRageOffensiveOther,Rage is still active
+FuriousRamsayDeathRageBuffName,Death Rage
+FuriousRamsayDeathRageBuffDesc,"Your Death Rage has been triggered\n\nYou feel stronger, faster and more resilient"
+FuriousRamsayDeathRageBuffTooltip,Your Death Rage has been triggered
+FuriousRamsayDeathRageBuffCooldownName,Death Rage (Cooldown)
+FuriousRamsayDeathRageBuffCooldownDesc,Your Death Rage will become available after this cooldown period.
+rebirthRageCapsuleOther,Rage Capsule (Shared)
+rebirthRageCapsuleOtherDesc,This Rage capsule will momentarily:\n • Increase your stamina regeneration\n • Increase your attack speed\n • Increase your mobility and jump strength\n • Increase your resistance to ailments
+ttCannotUseAtThisTime,Cannot use at this time
+xuiRebirthRageOffensiveLocked,Offensive Rage needs Offensive Rage Knowledge and Rage 50
+rebirthRageDefensiveDesc,"Your Defensive Rage has been triggered\n\nWith a melee weapon or bare hands you attack faster, regenerate Stamina 500% faster, run and jump further and carry more. Enemies next to you are knocked down. The bonuses grow with your Rage rank."
+rebirthRageOffensiveDesc,"Your Offensive Rage has been triggered\n\nWith a melee weapon or bare hands you attack faster, regenerate Stamina 500% faster, run and jump further and carry more, and you resist fire and shock. It lasts longer at higher Rage ranks."
+rebirthRageBloodMoonDesc,"Under the Blood Moon, with a melee weapon or bare hands, you:\n • Jump higher\n • Regenerate Stamina [ff595f]500%[-] faster\n • Can use your Defensive or Offensive Rage triggers\n • Gain additional resistance against ailments\n • Have no food and water penalties from Rage"
+rebirthRageCooldownDesc,Your Defensive Rage will be available again when this ends. Higher Rage ranks recover faster.
+rebirthRageSharedCooldownDesc,Your Rage cooldown is 2 minutes and 40 seconds
+xuiRebirthScrapQueue,Scrap Queue
+xuiRebirthScrapOutput,Scrap Output Preview
+xuiRebirthRecyclingHelp,Shift-click or drag items here to scrap them.
+xuiRebirthCosmeticUnlocked,Cosmetic Unlocked: {0}
+xuiRebirthScrapRecipeUnlocked,Recipe Unlocked: {0}
+xuiRebirthKitEffectHeading,Effect
+xuiRebirthBonusesHeader,BONUSES
+xuiRebirthBonusesTab,Bonuses
+xuiRebirthArmorTierAll,All
+xuiRebirthArmorTierLight,Light Armor
+xuiRebirthArmorTierMedium,Medium Armor
+xuiRebirthArmorTierHeavy,Heavy Armor
+xuiRebirthScrapOutputEmpty,Select or drop a purple item to see what it scraps into.
+xuiRebirthCraftScrapQueue,Crafting/Scrap Queue
+xuiRebirthMapVehicleCycle,Owned vehicles
+xuiRebirthMapCompanionCycle,Idle companions

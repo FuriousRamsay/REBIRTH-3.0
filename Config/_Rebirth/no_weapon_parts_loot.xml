@@ -1,0 +1,6 @@
+<configs>
+  <!-- Rebirth progression: weapon parts are not found as loot. Groups holding only parts go with them. -->
+  <remove xpath="/lootcontainers//item[@group='weaponParts' or @group='gunPartsOnly' or @group='toolParts' or @group='groupWeapons_MeleeParts' or @group='groupWeapons_RangedParts']" />
+  <remove xpath="/lootcontainers/lootgroup[@name='weaponParts' or @name='gunPartsOnly' or @name='toolParts' or @name='groupWeapons_MeleeParts' or @name='groupWeapons_RangedParts']" />
+  <remove xpath="/lootcontainers//item[@name='gunBotRoboticsParts' or @name='gunBowT1WoodenBowParts' or @name='gunExplosivesT3RocketLauncherParts' or @name='gunHandgunT1PistolParts' or @name='gunMGT1AK47Parts' or @name='gunRifleT1HuntingRifleParts' or @name='gunShotgunT1DoubleBarrelParts' or @name='meleeToolAllSteelParts' or @name='meleeToolAxeT3ChainsawParts' or @name='meleeWpnBatonT2StunBatonParts' or @name='meleeWpnBladeT3MacheteParts' or @name='meleeWpnClubT3SteelClubParts' or @name='meleeWpnKnucklesT3SteelKnucklesParts' or @name='meleeWpnSledgeT3SteelSledgehammerParts' or @name='meleeWpnSpearT3SteelSpearParts']" />
+</configs>

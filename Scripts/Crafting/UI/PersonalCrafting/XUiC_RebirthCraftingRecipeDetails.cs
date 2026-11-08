@@ -248,7 +248,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private void ApplyRecipe(Recipe recipe, bool resetCount)
     {
         bool changed = selectedRecipe != recipe;
-        selectedRecipe = recipe;
+        selectedRecipe = RebirthScrapWindow.Active ? null : recipe;
         if (changed) selectedCraftingTier = ResolveCraftingTier(recipe);
         selectedCraftingTier = Math.Min(selectedCraftingTier, ResolveCraftingTier(recipe));
 
@@ -401,15 +401,41 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         RebirthBackpackSectionStats.Render(this, ItemStack.Empty, "recipeResult");
         if (knowledgeLabel != null) knowledgeLabel.Text = string.Empty;
         if (timeTitleLabel != null) timeTitleLabel.Text = Localize("xuiRebirthCraftTime", "CRAFT TIME");
-        if (timeValueLabel != null) timeValueLabel.Text = "â€”";
+        if (timeValueLabel != null) timeValueLabel.Text = "-";
         if (knowledgeButton?.ViewComponent != null) knowledgeButton.ViewComponent.IsVisible = false;
         GetChildById("rebirthCraftingKnowledgeAction").ViewComponent.IsVisible = false;
         if (emptyLabel != null)
         {
-            emptyLabel.Text = Localize("xuiRebirthSelectRecipePrompt", "Select a recipe to view its details.");
+            emptyLabel.Text = RebirthScrapWindow.IsModifier
+                ? Localize("xuiRebirthModifierInstructions", "Place armor and a kit in the slots, then press Apply. The result goes to Output.")
+                : RebirthScrapWindow.Active
+                ? Localize("xuiRebirthRecyclingInstructions", "Shift-click a purple item to scrap it, or drop it in the recycling slot. Click a purple item to see what it scraps into.")
+                : Localize("xuiRebirthSelectRecipePrompt", "Select a recipe to view its details.");
+            // White at scrap and Modifier stations (owner 2026-11-08); the ordinary recipe prompt keeps its colour.
+            if (emptyLabelColor == null) emptyLabelColor = emptyLabel.Color;
+            UnityEngine.Color wanted = RebirthScrapWindow.Active ? UnityEngine.Color.white : emptyLabelColor.Value;
+            if (emptyLabel.Color != wanted) emptyLabel.Color = wanted;
             emptyLabel.IsVisible = true;
         }
+        ApplyScrapPanel();
         actions?.RefreshState();
+    }
+
+    private UnityEngine.Color? emptyLabelColor;
+
+    // Recipe-only controls have no use at a scrap station.
+    private void ApplyScrapPanel()
+    {
+        if (!RebirthScrapWindow.Active) return;
+        foreach (string id in new[] { "rebirthCraftingRecipeCraftCount", "rebirthCraftingSelectedRecipeTimeTitle", "rebirthCraftingSelectedRecipeTimeValue", "rebirthCraftingBatchTitle", "rebirthCraftingActionsStrip" })
+        {
+            var view = owner?.GetChildById(id)?.ViewComponent;
+            if (view != null) view.IsVisible = false;
+        }
+        var requirements = owner?.GetChildById("rebirthCraftingRequirementsRegion")?.ViewComponent;
+        if (requirements != null) requirements.IsVisible = false;
+        if (owner?.GetChildById("rebirthCraftingDetailsTitle")?.ViewComponent is XUiV_Label title)
+            title.Text = RebirthScrapWindow.IsModifier ? Localize("xuiEnchantInput", "MODIFICATION") : Localize("xuiRebirthRecycling", "RECYCLING");
     }
 
     private void Knowledge_OnPress(XUiController sender, int mouseButton)

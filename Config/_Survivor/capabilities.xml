@@ -25,6 +25,67 @@
       <skill id="skill.chemistry" minimum="20" recommended="30" />
     </requires_all>
   </capability>
+  <capability id="capability.recipe.furiousramsayammomachine" category="construction" target_type="recipe" target_id="FuriousRamsayAmmoMachine" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayAmmoMachine" />
+      <skill id="skill.gunsmithing" minimum="30" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.alchemytable001_fr" category="construction" target_type="recipe" target_id="AlchemyTable001_FR" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.AlchemyTable001_FR" />
+      <skill id="skill.construction" minimum="20" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontroldrink" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlDrink" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolpotion" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlPotion" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolarrowstone" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlArrowStone" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolarrowiron" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlArrowIron" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolarrowsteel" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlArrowSteel" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolboltstone" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlBoltStone" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolboltiron" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlBoltIron" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaymindcontrolboltsteel" category="combat" target_type="recipe" target_id="FuriousRamsayMindControlBoltSteel" visibility="visible">
+    <requires_all>
+      <knowledge id="knowledge.black_magic.mind_control_i" />
+      <skill id="skill.black_magic" minimum="1" recommended="10" />
+    </requires_all>
+  </capability>
   <capability id="capability.recipe.cntwoodburningstove" category="construction" target_type="recipe" target_id="cntWoodBurningStove" visibility="visible">
     <requires_all>
       <knowledge id="recipe.cntWoodBurningStove" />

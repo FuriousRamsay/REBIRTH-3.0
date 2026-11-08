@@ -193,7 +193,7 @@ public static class RebirthProgressionRuntimeConfig
     public static float AthleticsNegativeFall = 0.10f;
     public static float AthleticsPositiveFall = -0.20f;
     public static float AthleticsDistance = 25f;
-    public static float AthleticsAward = 0.08f;
+    public static float AthleticsAward = 0.008f; // fallback only; matches athletics_award in Config/_Survivor/skill_sources.xml
     public static float StealthNegativeNoise = 0.20f;
     public static float StealthPositiveNoise = -0.25f;
     public static float StealthNegativeLight = 0.10f;

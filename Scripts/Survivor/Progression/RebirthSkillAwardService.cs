@@ -134,7 +134,7 @@ public static class RebirthSkillAwardService
 
             string attributeId=RebirthAttributeProgressionService.GetPrimaryAttributeForSkill(skillId);
             if(attributeId.Length>0)
-                RebirthAttributeProgressionService.ApplyTraining(record,attributeId,appliedSkillProgress*RebirthProgressionRuntimeConfig.SkillProgressToAttribute,out appliedAttribute);
+                RebirthAttributeProgressionService.ApplyTraining(record,attributeId,appliedSkillProgress*RebirthProgressionRuntimeConfig.SkillProgressToAttribute*RebirthArmorBonusSpecials.AttributeGainFactor(player),out appliedAttribute);
             record.Touch("skill-award:"+skillId);
         }
         // Durability remains synchronous at the accepted logical event boundary. Owner-state
@@ -171,7 +171,7 @@ public static class RebirthSkillAwardService
         out float nextValue, out float nextProgress)
     {
         return TryProjectShared(record,skillId,definition,beforeValue,beforeProgress,rawProgress,
-            RebirthTeachingService.GetSubjectLearningMultiplier(player,skillId),out nextValue,out nextProgress);
+            RebirthTeachingService.GetSubjectLearningMultiplier(player,skillId)*RebirthArmorBonusSpecials.SkillGainFactor(player,skillId),out nextValue,out nextProgress);
     }
 
     // Shared player/human-NPC arithmetic. Participant-specific entry points supply their own
@@ -243,7 +243,8 @@ public static class RebirthSkillAwardService
                 cachedLevel=nextValue;
                 multiplier=RebirthTraitSupportService.GetSkillGainMultiplier(record,nextValue)*
                     RebirthTraitGameplayModifierService.GetSkillGainMultiplier(player,record,skillId,nextValue)*
-                    RebirthTeachingService.GetSubjectLearningMultiplier(player,skillId);
+                    RebirthTeachingService.GetSubjectLearningMultiplier(player,skillId)*
+                    RebirthArmorBonusSpecials.SkillGainFactor(player,skillId);
                 if(!IsFinite(multiplier)||multiplier<0f)return false;
             }
             float raw=RebirthCraftTrainingRules.Practice(model,nextValue+nextProgress)*preparationMultiplier;

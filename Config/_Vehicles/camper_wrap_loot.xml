@@ -34,6 +34,18 @@
       <item name="modVehicleWrapSnowboundSurvivor" count="1"/>
       <item name="modVehicleWrapBurntForestEmbers" count="1"/>
       <item name="modVehicleWrapWastelandWanderer" count="1"/>
+      <item name="modVehicleWrapPurgeClearanceCrew" count="1"/>
+      <item name="modVehicleWrapMoonlockProtocol" count="1"/>
+      <item name="modVehicleWrapQueenHiveHunter" count="1"/>
+      <item name="modVehicleWrapHordeNightEngineer" count="1"/>
+      <item name="modVehicleWrapGyrocopterAirMail" count="1"/>
+      <item name="modVehicleWrapMiningGuildHauler" count="1"/>
+      <item name="modVehicleWrapWrenchandRuin" count="1"/>
+      <item name="modVehicleWrapUndergroundProspector" count="1"/>
+      <item name="modVehicleWrapLandClaimHomestead" count="1"/>
+      <item name="modVehicleWrapTreasureMapDrifter" count="1"/>
+      <item name="modVehicleWrapScreamerWarning" count="1"/>
+      <item name="modVehicleWrapDemolitionCountdown" count="1"/>
 </lootgroup>
   </insertBefore>
   <conditional>

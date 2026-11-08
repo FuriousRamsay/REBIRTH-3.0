@@ -24,9 +24,11 @@ internal static class RebirthArmorBonusSelfTest
         for (int i = 0; i < ItemClass.list.Length; i++)
         {
             var item = ItemClass.list[i];
-            if (item == null || item.Actions == null || item.Actions.Length == 0 || !(item.Actions[0] is ItemActionAttack)) continue;
+            if (item == null || item.Actions == null || item.Actions.Length == 0 || item.Actions[0] == null) continue;
             string name = item.GetItemName();
             if (!name.StartsWith("gun") && !name.StartsWith("melee") && !name.StartsWith("thrown")) continue;
+            // Monster attacks, admin tools and unfinished parts are not weapons a player uses.
+            if (name.Contains("Zombie") || name.Contains("Admin") || name.EndsWith("Parts") || name.EndsWith("Schematic")) continue;
             weapons.Add(ItemClass.GetItem(name));
         }
         return weapons;
@@ -54,14 +56,35 @@ internal static class RebirthArmorBonusSelfTest
         TestBands(console);
         TestRolls(console);
         TestPersistence(console);
+        TestKits(console);
+        TestLootArmor(console);
         string summary = "SUMMARY " + passed + " passed, " + failed + " failed, " + RebirthArmorBonusCatalog.Definitions.Count + " bonuses";
         console.Output(summary);
         Log.Out("[REBIRTH ArmorBonusTest] " + summary);
     }
 
+    // These bonuses act in their own code, so check that code sees the worn value.
+    private static void TestSpecial(EntityPlayerLocal player, RebirthArmorBonusDefinition definition, SdtdConsole console)
+    {
+        int slot = (int)definition.Slot;
+        ItemValue original = player.equipment.GetSlotItem(slot)?.Clone();
+        var plain = ItemClass.GetItem(TestArmor[definition.Slot]).Clone();
+        var bonus = plain.Clone();
+        RebirthArmorBonusStorage.Write(bonus, new[] { new RebirthArmorRolledBonus { Definition = definition, Value = definition.Max } });
+        player.equipment.SetSlotItem(slot, plain);
+        float before = RebirthArmorBonusSpecials.Best(player, definition.Slot, definition.Special);
+        player.equipment.SetSlotItem(slot, bonus);
+        float after = RebirthArmorBonusSpecials.Best(player, definition.Slot, definition.Special);
+        player.equipment.SetSlotItem(slot, original ?? ItemValue.None.Clone());
+        Report(console, before == 0f && Math.Abs(after - definition.Max) < 0.0001f, definition.Id + ": worn value " + before.ToString("0.##", CultureInfo.InvariantCulture) + " to " + after.ToString("0.##", CultureInfo.InvariantCulture));
+    }
+
     private static void TestEffect(EntityPlayerLocal player, RebirthArmorBonusDefinition definition, SdtdConsole console)
     {
+        if (definition.Effect == PassiveEffects.None && definition.Special != "explosion" && definition.Special != "secure_unlock") { TestSpecial(player, definition, console); return; }
+        if (definition.Special == "low_light") player.Buffs.SetCustomVar("_lightlevel", 0f);
         if (definition.Special == "explosion") { TestExplosion(player, definition, console); return; }
+        if (definition.Special == "secure_unlock") { Report(console, definition.Max > 0f && definition.Max <= 1f, definition.Id + ": unlock chance " + definition.Max); return; }
         string armorName;
         if (!TestArmor.TryGetValue(definition.Slot, out armorName)) { Report(console, false, definition.Id + ": no test armor for " + definition.Slot); return; }
         int slot = (int)definition.Slot;
@@ -90,6 +113,8 @@ internal static class RebirthArmorBonusSelfTest
                 float hitAfter = NativeHit(definition, weapon, player);
 
                 bool changed = Math.Abs(after - before) > 0.001f;
+                bool wrongWay = expected && changed && (definition.Negative ? after > before : after < before);
+                if (wrongWay) problems.Add(name + " moved the wrong way, " + before.ToString("0.##", CultureInfo.InvariantCulture) + " to " + after.ToString("0.##", CultureInfo.InvariantCulture));
                 if (expected && !changed) problems.Add(name + " should change, stayed " + before.ToString("0.##", CultureInfo.InvariantCulture));
                 if (!expected && changed) problems.Add(name + " should not change, went " + before.ToString("0.##", CultureInfo.InvariantCulture) + " to " + after.ToString("0.##", CultureInfo.InvariantCulture));
                 if (expected)
@@ -185,6 +210,50 @@ internal static class RebirthArmorBonusSelfTest
             }
         bool ok = duplicate + mixed + outOfBand + wrongSlot + overTarget == 0;
         Report(console, ok, rolls + " rolls: duplicates " + duplicate + ", mixed rarity in a family " + mixed + ", value out of band " + outOfBand + ", wrong slot " + wrongSlot + ", over target " + overTarget);
+    }
+
+    // Rates are measured against the 2.6 tables over many rolls of real gloves.
+    private static void TestLootArmor(SdtdConsole console)
+    {
+        var random = new Random();
+        var gloves = ItemClass.GetItem(TestArmor[EquipmentSlots.Hands]);
+        foreach (var row in new[] { new { Biome = "pine_forest", Chance = 0.50, Level = 1 }, new { Biome = "burnt_forest", Chance = 0.70, Level = 3 }, new { Biome = "wasteland", Chance = 0.70, Level = 2 } })
+        {
+            int given = 0;
+            const int rolls = 2000;
+            for (int i = 0; i < rolls; i++)
+            {
+                var item = gloves.Clone();
+                if (RebirthLootArmorBonuses.TryApply(item, row.Biome, random)) given++;
+            }
+            double rate = (double)given / rolls;
+            Report(console, Math.Abs(rate - row.Chance) < 0.05 && RebirthLootArmorBonuses.BonusLevel(row.Biome) == row.Level, "Looted gloves in " + row.Biome + ": " + rate.ToString("0.00") + " have bonuses (want " + row.Chance.ToString("0.00") + "), level " + row.Level);
+        }
+        Report(console, !RebirthLootArmorBonuses.TryApply(ItemClass.GetItem("meleeWpnClubT1BaseballBat").Clone(), "burnt_forest", random), "Looted non-armor stays plain");
+    }
+
+    private static int CountOf(ItemValue item) => RebirthArmorBonusStorage.Read(item).Length;
+
+    private static void TestKits(SdtdConsole console)
+    {
+        var random = new Random();
+        var gloves = ItemClass.GetItem(TestArmor[EquipmentSlots.Hands]).Clone();
+        ItemValue kit(string name) => ItemClass.GetItem(name);
+        ItemValue result; string fail;
+
+        bool one = RebirthArmorBonusKits.TryApply(kit("kitSurvivorUpgrade"), gloves, random, out var first, out fail) && CountOf(first) == 1;
+        Report(console, one, "Survivor Upgrade on empty armor gives 1 bonus" + (fail != null ? " (" + fail + ")" : ""));
+        bool two = one && RebirthArmorBonusKits.TryApply(kit("kitAdjustment"), first, random, out var second, out fail) && CountOf(second) >= 1;
+        Report(console, two, "Adjustment adds to a single bonus" + (fail != null ? " (" + fail + ")" : ""));
+        Report(console, one && !RebirthArmorBonusKits.TryApply(kit("kitSurvivorUpgrade"), first, random, out result, out fail), "Survivor Upgrade refused on armor with bonuses");
+        bool retune = one && RebirthArmorBonusKits.TryApply(kit("kitRetuning"), first, random, out result, out fail)
+            && RebirthArmorBonusStorage.Read(result)[0].Definition.Id != RebirthArmorBonusStorage.Read(first)[0].Definition.Id;
+        Report(console, retune, "Retuning replaces the bonus with a different one");
+        bool comp = RebirthArmorBonusKits.TryApply(kit("kitComprehensiveUpgrade"), gloves, random, out var full, out fail) && CountOf(full) >= 1;
+        Report(console, comp, "Comprehensive Upgrade fills empty armor: " + (comp ? CountOf(full) + " bonuses" : fail));
+        Report(console, comp && RebirthArmorBonusKits.TryApply(kit("kitBreakdown"), full, random, out result, out fail) && CountOf(result) == 0, "Breakdown clears all bonuses");
+        Report(console, !RebirthArmorBonusKits.TryApply(kit("kitBreakdown"), gloves, random, out result, out fail), "Breakdown refused on empty armor");
+        Report(console, !RebirthArmorBonusKits.TryApply(kit("kitSurvivorUpgrade"), ItemClass.GetItem("meleeWpnClubT1BaseballBat"), random, out result, out fail), "Kits refused on non-armor");
     }
 
     // Native item serialization is what saves and network packets use.

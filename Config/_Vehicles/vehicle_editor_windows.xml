@@ -78,7 +78,7 @@
           <sprite depth="0" width="841" height="813" sprite="menu_empty" color="25,25,31,205" globalopacitymod="0" />
           <label depth="5" pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text="SELECTED ITEM" upper_case="true" />
           <sprite depth="3" pos="0,-38" width="841" height="2" sprite="menu_empty" color="181,140,255,255" />
-          <sprite name="editorBagItemIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" globalopacitymod="0" depth="6" visible="false" />
+          <sprite name="editorBagItemIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" globalopacitymod="0" depth="6" visible="false" /><sprite name="editorBagItemIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="editorBagItemName" depth="5" pos="139,-54" width="685" height="40" font_size="34" color="255,255,255,255" />
           <label name="editorBagItemDescription" depth="5" pos="139,-92" width="368" height="165" font_size="20" color="235,235,239,255" />
           <rect name="editorBagActions" pos="14,-248" width="826" height="76" controller="RebirthItemActionList, RebirthUtils">

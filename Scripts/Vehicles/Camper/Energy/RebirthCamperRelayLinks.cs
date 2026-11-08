@@ -160,7 +160,7 @@ internal static partial class RebirthCamperRelayWiring
             tile.chunk.ChunkCustomData.Remove(StampKey(tile));tile.chunk.isModified=true;
         }
         foreach(var actor in selections.Where(pair=>ReferenceEquals(pair.Value.Vehicle,vehicle)).Select(pair=>pair.Key).ToArray())selections.Remove(actor);
-        Log.Out("[REBIRTH EnergyFlow] relay-travel-disconnect vehicle="+vehicle.entityId+" links="+frame.Links.Count);
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] relay-travel-disconnect vehicle="+vehicle.entityId+" links="+frame.Links.Count);
     }
     internal static void BlockRemoved(WorldBase world,Vector3i position)
     {

@@ -1,0 +1,56 @@
+<configs>
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayArrowVolley"> 
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayArrowVolley"/>
+			<Noise ID="5" noise="10" time="4"/>
+			<LowestPitch name="1"/>
+			<HighestPitch name="1"/>
+			<LocalCrouchVolumeScale value="1"/>
+			<CrouchNoiseScale value="1"/> 
+			<NoiseScale value="1"/> 
+			<MaxVoices value="3"/> 
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+    <SoundDataNode name="FuriousRamsayDoubleDamage">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/>
+			<Channel name="Mouth"/>
+			<Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayDoubleDamage"/>
+			<LocalCrouchVolumeScale name="1.0"/>
+			<CrouchNoiseScale name="0.5"/>
+			<NoiseScale name="1"/>
+			<MaxVoices name="10"/>
+			<maxVoicesPerEntity name="1"/>
+			<MaxRepeatRate name="3.0"/>
+		</SoundDataNode>
+    <SoundDataNode name="FuriousRamsayHeartbeat">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayHeartbeat"/>
+			<Noise ID="5" noise="10" time="4"/>
+			<LowestPitch name="1"/>
+			<HighestPitch name="1"/>
+			<LocalCrouchVolumeScale value="1"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="3"/>
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+    <SoundDataNode name="explosion_grenade_weaponbonus" muffled_when_crouched="1">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<Noise ID="5" noise="120" time="4" heat_map_strength="0" heat_map_time="0"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?explosion_grenade1"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?explosion_grenade2"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?explosion_grenade3"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?explosion_grenade4"/>
+			<AudioClip ClipName="@:Sounds/Twitch/Silly/explosion_silly.wav" AltSound="true"/>
+			<LowestPitch name="0.95"/>
+			<HighestPitch name="1.05"/>
+			<LocalCrouchVolumeScale value="1"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="3"/>
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+  </append>
+</configs>

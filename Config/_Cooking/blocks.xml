@@ -32,8 +32,9 @@
       <property name="FilterTags" value="fdecor,fother,ffurniture" />
       <property name="SortOrder1" value="70i0" />
       <property name="SellableToTrader" value="false" />
-      <property name="OpenSound" value="open_workbench" />
-      <property name="CloseSound" value="close_workbench" />
+      <property name="OpenSound" value="FuriousRamsayMortarPestle" />
+      <property name="CraftSound" value="" />
+      <property name="CloseSound" value="" />
       <drop event="Destroy" name="resourceRockSmall" count="5" />
       <drop event="Fall" name="WorkbenchMortarPestle001_FR" count="1" prob="1" stick_chance="1" />
     </block>
@@ -72,8 +73,9 @@
       <property name="FilterTags" value="fdecor,fother,ffurniture" />
       <property name="SortOrder1" value="70i0" />
       <property name="SellableToTrader" value="false" />
-      <property name="OpenSound" value="open_workbench" />
-      <property name="CloseSound" value="close_workbench" />
+      <property name="OpenSound" value="FuriousRamsayGasStove" />
+      <property name="CraftSound" value="" />
+      <property name="CloseSound" value="" />
       <property name="FuelType" value="ammoGasCan" />
       <drop event="Destroy" name="resourceScrapIron" count="5" />
       <drop event="Fall" name="WorkbenchGasStove001_FR" count="1" prob="1" stick_chance="1" />
@@ -115,8 +117,8 @@
       <property name="FilterTags" value="fdecor,fother,ffurniture" />
       <property name="SortOrder1" value="70i0" />
       <property name="SellableToTrader" value="false" />
-      <property name="OpenSound" value="open_workbench" />
-      <property name="CloseSound" value="close_workbench" />
+      <property name="OpenSound" value="FuriousRamsayIronOven" />
+      <property name="CloseSound" value="" />
       <drop event="Destroy" name="resourceScrapIron" count="5" />
       <drop event="Fall" name="WorkbenchIronOven001_FR" count="1" prob="1" stick_chance="1" />
     </block>

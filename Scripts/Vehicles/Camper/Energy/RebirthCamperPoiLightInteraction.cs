@@ -49,36 +49,11 @@ internal static class RebirthCamperPoiLightInteraction
     internal static void Expose(WorldBase world,Vector3i position,BlockValue value,EntityPlayer actor,ref BlockActivationCommand[] commands)
     {
         if(commands==null||!Managed(world,position,value,actor,out var vehicle))return;
-        // Remove the switch action; preserve native pickup eligibility and command order.
-        int kept=0,enabled=0;bool take=false,cancel=false;
-        foreach(var command in commands)
-        {
-            if(command.text=="light")continue;
-            kept++;
-            if(command.enabled){enabled++;take=command.text=="take";}
-            if(command.text=="cancel")cancel=true;
-        }
-        // Native SetCommonData executes a single entry immediately. Keep the
-        // native pickup/cancel hold menu when ON, so short E can be special
-        // without consuming the only pickup entry before the radial opens.
-        if(enabled==1&&take&&Active(vehicle))
-        {
-            var filtered=new BlockActivationCommand[kept+(cancel?0:1)];
-            int index=0;
-            foreach(var command in commands)if(command.text!="light")filtered[index++]=command;
-            if(cancel)
-            {
-                for(int i=0;i<kept;i++)if(filtered[i].text=="cancel")
-                {var command=filtered[i];command.enabled=true;filtered[i]=command;break;}
-            }
-            else filtered[kept]=new BlockActivationCommand("cancel","x",true);
-            commands=filtered;return;
-        }
-        if(kept==commands.Length)return;
-        var withoutLight=new BlockActivationCommand[kept];
-        int output=0;
-        foreach(var command in commands)if(command.text!="light")withoutLight[output++]=command;
-        commands=withoutLight;
+        // Owner 2026-11-08: the radial keeps its on/off entry for camper-powered POI lights. The "light" command is
+        // routed to the camper request by RebirthCamperPoiLightActivate (authoritative, works for clients too).
+        bool active=Active(vehicle);
+        for(int i=0;i<commands.Length;i++)
+            if(commands[i].text=="light"&&commands[i].enabled!=active){var command=commands[i];command.enabled=active;commands[i]=command;}
     }
     internal static void Prompt(WorldBase world,BlockValue value,Vector3i position,EntityAlive actor,ref string text)
     {

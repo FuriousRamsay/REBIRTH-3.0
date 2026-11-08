@@ -31,6 +31,8 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
     private readonly XUiV_Label[] milestoneDays=new XUiV_Label[MilestoneRows];
     private readonly XUiController[] milestoneRowControllers=new XUiController[MilestoneRows];
     private XUiV_Label combatSummary,damageSummary,bestSummary;
+    // Base-game character figures, read live from the player like the native character window.
+    private readonly XUiV_Label[] baseValues=new XUiV_Label[5];
     private XUiV_ScrollBar milestoneBar;
     private int visibleMilestones;
 
@@ -38,6 +40,7 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
     {
         base.Init(); presentationActive = true;
         for(int i=0;i<kpis.Length;i++)kpis[i]=Label("survivorStatisticsKpiValue"+i);
+        for(int i=0;i<baseValues.Length;i++)baseValues[i]=Label("survivorStatisticsBaseValue"+i);
         for(int i=0;i<ActivityRows;i++){activityValues[i]=Label("survivorStatisticsActivityValue"+i);activityFills[i]=Sprite("survivorStatisticsActivityFill"+i);}
         for(int r=0;r<TrendRows;r++){trendDays[r]=Label("survivorStatisticsTrendDay"+r);for(int m=0;m<TrendMetrics;m++)trendFills[r,m]=Sprite("survivorStatisticsTrendFill"+r+"_"+m);}
         for(int i=0;i<CategoryRows;i++)categoryValues[i]=Label("survivorStatisticsCategoryValue"+i);
@@ -63,11 +66,23 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
         if (!visible) { wasVisible = false; return; }
         if (!wasVisible) { Subscribe(); dirty = true; Request(true); wasVisible = true; }
         refresh += Math.Max(0f, dt);
-        if (refresh >= 0.5f) { refresh = 0f; if (snapshot == null) Request(false); }
+        if (refresh >= 0.5f) { refresh = 0f; if (snapshot == null) Request(false); RenderBaseFigures(); }
         long text = RebirthUiProjectionTextCache.Revision;
         if (dirty || projectionGeneration != RebirthStatisticsClientState.Generation || textRevision != text)
         { dirty = false; textRevision = text; Refresh(); }
         UpdateMilestoneScrollbar();
+    }
+    private void RenderBaseFigures()
+    {
+        var p = xui?.playerUI?.entityPlayer;
+        if (p == null) return;
+        string[] values = {
+            p.gameStage.ToString("N0", CultureInfo.InvariantCulture),
+            p.GetLootStage(0f, 0f).ToString("N0", CultureInfo.InvariantCulture),
+            ((int)EffectManager.GetValue(PassiveEffects.PhysicalDamageResist, null, 0f, p)).ToString(CultureInfo.InvariantCulture),
+            XUiM_Player.GetCoreTemp(p),
+            (XUiM_Player.GetXPToNextLevel(p) + p.Progression.ExpDeficit).ToString("N0", CultureInfo.InvariantCulture) };
+        for (int i = 0; i < baseValues.Length; i++) Set(baseValues[i], values[i]);
     }
     private bool PageVisible => ViewComponent != null && ViewComponent.IsVisible && ViewComponent.UiTransform != null && ViewComponent.UiTransform.gameObject.activeInHierarchy;
     public void RefreshVisiblePage() { if (!presentationActive || !PageVisible) return; Subscribe(); Request(true); dirty = true; }

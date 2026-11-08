@@ -902,6 +902,8 @@
     <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='lockTypeIcon']" name="width">14</setattribute>
     <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='lockTypeIcon']" name="height">14</setattribute>
     <append xpath="/templates/rebirth_item_stack_toolbar/rect">
+      <!-- 2.6: the weapon bonus symbol sits top left (the type, lock and favourite icons are top right here). -->
+      <sprite name="bonustypeicon" depth="8" pos="3,-3" width="14" height="14" sprite="{bonustypeicon}" visible="{hasbonustypeicon}" foregroundlayer="true"/>
       <sprite name="buckleSlotInset" pos="3,-3" width="56" height="56" sprite="menu_empty" type="sliced" fillcenter="false" color="64,65,71,255" depth="3"/>
       <sprite name="buckleSelectionOutline" pos="1,-1" width="60" height="60" sprite="menu_empty2px" type="sliced" fillcenter="false" color="255,255,255,255" visible="{buckleSelected}" depth="32"/>
     </append>

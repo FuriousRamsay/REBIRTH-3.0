@@ -684,7 +684,7 @@
       <property name="RebirthCamperWrapId" value="WastelandWanderer" />
     </item_modifier>
     <item_modifier name="modVehicleWrapPurgeClearanceCrew" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapPurgeClearanceCrewDesc" />
       <property name="CustomIcon" value="modVehicleWrapPurgeClearanceCrew" />
@@ -696,7 +696,7 @@
       <property name="RebirthCamperWrapId" value="PurgeClearanceCrew" />
     </item_modifier>
     <item_modifier name="modVehicleWrapMoonlockProtocol" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapMoonlockProtocolDesc" />
       <property name="CustomIcon" value="modVehicleWrapMoonlockProtocol" />
@@ -708,7 +708,7 @@
       <property name="RebirthCamperWrapId" value="MoonlockProtocol" />
     </item_modifier>
     <item_modifier name="modVehicleWrapQueenHiveHunter" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapQueenHiveHunterDesc" />
       <property name="CustomIcon" value="modVehicleWrapQueenHiveHunter" />
@@ -720,7 +720,7 @@
       <property name="RebirthCamperWrapId" value="QueenHiveHunter" />
     </item_modifier>
     <item_modifier name="modVehicleWrapHordeNightEngineer" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapHordeNightEngineerDesc" />
       <property name="CustomIcon" value="modVehicleWrapHordeNightEngineer" />
@@ -732,7 +732,7 @@
       <property name="RebirthCamperWrapId" value="HordeNightEngineer" />
     </item_modifier>
     <item_modifier name="modVehicleWrapGyrocopterAirMail" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapGyrocopterAirMailDesc" />
       <property name="CustomIcon" value="modVehicleWrapGyrocopterAirMail" />
@@ -744,7 +744,7 @@
       <property name="RebirthCamperWrapId" value="GyrocopterAirMail" />
     </item_modifier>
     <item_modifier name="modVehicleWrapMiningGuildHauler" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapMiningGuildHaulerDesc" />
       <property name="CustomIcon" value="modVehicleWrapMiningGuildHauler" />
@@ -756,7 +756,7 @@
       <property name="RebirthCamperWrapId" value="MiningGuildHauler" />
     </item_modifier>
     <item_modifier name="modVehicleWrapWrenchandRuin" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapWrenchandRuinDesc" />
       <property name="CustomIcon" value="modVehicleWrapWrenchandRuin" />
@@ -768,7 +768,7 @@
       <property name="RebirthCamperWrapId" value="WrenchandRuin" />
     </item_modifier>
     <item_modifier name="modVehicleWrapUndergroundProspector" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapUndergroundProspectorDesc" />
       <property name="CustomIcon" value="modVehicleWrapUndergroundProspector" />
@@ -780,7 +780,7 @@
       <property name="RebirthCamperWrapId" value="UndergroundProspector" />
     </item_modifier>
     <item_modifier name="modVehicleWrapLandClaimHomestead" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapLandClaimHomesteadDesc" />
       <property name="CustomIcon" value="modVehicleWrapLandClaimHomestead" />
@@ -792,7 +792,7 @@
       <property name="RebirthCamperWrapId" value="LandClaimHomestead" />
     </item_modifier>
     <item_modifier name="modVehicleWrapTreasureMapDrifter" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapTreasureMapDrifterDesc" />
       <property name="CustomIcon" value="modVehicleWrapTreasureMapDrifter" />
@@ -804,7 +804,7 @@
       <property name="RebirthCamperWrapId" value="TreasureMapDrifter" />
     </item_modifier>
     <item_modifier name="modVehicleWrapScreamerWarning" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapScreamerWarningDesc" />
       <property name="CustomIcon" value="modVehicleWrapScreamerWarning" />
@@ -816,7 +816,7 @@
       <property name="RebirthCamperWrapId" value="ScreamerWarning" />
     </item_modifier>
     <item_modifier name="modVehicleWrapDemolitionCountdown" installable_tags="rebirthCamperWrapCollection" modifier_tags="dye,rebirthCamperWrap" type="attachment" cosmetic_install_chance="0">
-    <property name="CreativeMode" value="None" />
+    <property name="CreativeMode" value="Player" />
       <property name="Extends" value="modGeneralMaster" />
       <property name="DescriptionKey" value="modVehicleWrapDemolitionCountdownDesc" />
       <property name="CustomIcon" value="modVehicleWrapDemolitionCountdown" />

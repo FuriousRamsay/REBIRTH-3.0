@@ -50,26 +50,26 @@
 <append xpath="/blocks">
     <block name="rebirthBossRewardCrateT1">
         <property name="Extends" value="cntLootCrateHero" />
-        <property name="LootList" value="rebirthBossRewardT1" />
+        <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="rebirthBossRewardT1" /></property></property>
         <property name="DescriptionKey" value="rebirthBossRewardCrateDesc" />
         <property name="DisplayInfo" value="Name" />
         <property name="CustomIcon" value="cntLootCrateHero" />
     </block>
     <block name="rebirthBossRewardCrateT2">
         <property name="Extends" value="rebirthBossRewardCrateT1" />
-        <property name="LootList" value="rebirthBossRewardT2" />
+        <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="rebirthBossRewardT2" /></property></property>
     </block>
     <block name="rebirthBossRewardCrateT3">
         <property name="Extends" value="rebirthBossRewardCrateT1" />
-        <property name="LootList" value="rebirthBossRewardT3" />
+        <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="rebirthBossRewardT3" /></property></property>
     </block>
     <block name="rebirthBossRewardCrateT4">
         <property name="Extends" value="rebirthBossRewardCrateT1" />
-        <property name="LootList" value="rebirthBossRewardT4" />
+        <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="rebirthBossRewardT4" /></property></property>
     </block>
     <block name="rebirthBossRewardCrateT5">
         <property name="Extends" value="rebirthBossRewardCrateT1" />
-        <property name="LootList" value="rebirthBossRewardT5" />
+        <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="rebirthBossRewardT5" /></property></property>
     </block>
 </append>
 
@@ -82,4 +82,5 @@
   <include filename="_Recycling/blocks.xml"/>
   <include filename="_Workstations/birdnest_blocks.xml"/>
   <include filename="_Economy/block_prices.xml"/>
+  <include filename="_Workstations/ported_station_blocks.xml"/>
 </configs>

@@ -6,7 +6,9 @@ using UnityEngine.Scripting;
 /// <summary>
 /// 2.6 Briston ammo exchange, offered by native traders. Ammo in the unlocked backpack is traded
 /// for another type at its value, reduced by the exchange rate. Toolbelt and locked slots are kept.
-/// Arrows change an amount by 1, or by 10 with Shift held.
+/// Each amount has a drag slider (the camper POI lights slider): press or drag along it to set the amount, or use
+/// the arrows beside it for steps of 1 (10 with Shift held).
+/// The slider for the ammo you receive is empty and disabled, as 2.6 disabled that box.
 /// </summary>
 [Preserve]
 public class XUiC_RebirthTradeAmmo : XUiController
@@ -18,6 +20,7 @@ public class XUiC_RebirthTradeAmmo : XUiController
     private static readonly float[] Values = { 1590f, 1740f, 2090f, 1500f };
     private static readonly string[] Ids = { "9mm", "44", "762", "Shell" };
 
+    private readonly RebirthDragSlider[] sliders = new RebirthDragSlider[Items.Length];
     private readonly XUiV_Label[] amountLabels = new XUiV_Label[Items.Length];
     private readonly int[] amounts = new int[Items.Length];
     private readonly int[] available = new int[Items.Length];
@@ -37,6 +40,7 @@ public class XUiC_RebirthTradeAmmo : XUiController
         {
             int index = i;
             amountLabels[i] = GetChildById("lbl" + Ids[i] + "Amount")?.ViewComponent as XUiV_Label;
+            sliders[i] = new RebirthDragSlider(GetChildById("sld" + Ids[i]), GetChildById("sld" + Ids[i] + "Fill")?.ViewComponent as XUiV_Sprite, value => Changed(index, value));
             Press("btn" + Ids[i] + "Down", delegate { Step(index, -1); });
             Press("btn" + Ids[i] + "Up", delegate { Step(index, 1); });
         }
@@ -115,11 +119,18 @@ public class XUiC_RebirthTradeAmmo : XUiController
         Refresh();
     }
 
+    // The arrows beside each slider step the amount by 1, or by 10 with Shift held.
     private void Step(int index, int direction)
     {
         if (index == selected) return;
         bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        amounts[index] = Mathf.Clamp(amounts[index] + direction * (shift ? 10 : 1), 0, available[index]);
+        Changed(index, amounts[index] + direction * (shift ? 10 : 1));
+    }
+
+    private void Changed(int index, int value)
+    {
+        if (index == selected) return;
+        amounts[index] = Mathf.Clamp(value, 0, available[index]);
         Refresh();
     }
 
@@ -128,7 +139,9 @@ public class XUiC_RebirthTradeAmmo : XUiController
         float value = 0f;
         for (int i = 0; i < Items.Length; i++)
         {
-            if (amountLabels[i] != null) amountLabels[i].Text = i == selected ? "-" : amounts[i].ToString();
+            // 2.6: the amount for the ammo you receive is 0 and cannot be changed.
+            if (amountLabels[i] != null) amountLabels[i].Text = i == selected ? "-" : amounts[i] + " / " + available[i];
+            if (sliders[i] != null) { sliders[i].Set(0, i == selected ? 0 : available[i], amounts[i]); sliders[i].Enabled = i != selected; }
             if (i != selected) value += amounts[i] * exchangeRate * Values[i];
         }
         received = (int)(value / Values[selected]);

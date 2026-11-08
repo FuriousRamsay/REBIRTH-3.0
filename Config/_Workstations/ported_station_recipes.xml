@@ -1,0 +1,158 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="FuriousRamsayAmmoMachine" count="1" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayScrewdriver" tags="learnable">
+					<ingredient name="resourceForgedSteel" count="50" />
+					<ingredient name="FuriousRamsayWoodPlank" count="30" />
+					<ingredient name="resourceMetalPipe" count="15" />
+					<ingredient name="resourceMechanicalParts" count="25" />
+					<ingredient name="resourceElectricParts" count="20" />
+				</recipe>
+    <recipe name="ammoJunkTurretRegular" craft_time="0.1" count="1" craft_area="FuriousRamsayAmmoMachine">
+					<ingredient name="resourceScrapLead" count="2" />
+					<ingredient name="resourceRockSmall" count="1" />
+				</recipe>
+    <recipe name="ammoJunkTurretShell" craft_time="0.1" count="1" craft_area="FuriousRamsayAmmoMachine" tags="learnable" >
+					<ingredient name="resourceScrapLead" count="1" />
+					<ingredient name="resourceBuckshot" count="1" />
+				</recipe>
+    <recipe name="ammoJunkTurretAP" craft_time="0.1" count="1" craft_area="FuriousRamsayAmmoMachine" tags="learnable">
+					<ingredient name="resourceScrapLead" count="3" />
+					<ingredient name="resourceScrapIron" count="3" />
+				</recipe>
+    <recipe name="ammo9mmBulletBall" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="1"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="1"/>
+					<ingredient name="resourceClayLump" count="2"/>
+					<ingredient name="resourceScrapLead" count="2"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo9mmBulletHP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="1"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="1"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo9mmBulletAP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="2"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="2"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo44MagnumBulletBall" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="2"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="2"/>
+					<ingredient name="resourceClayLump" count="2"/>
+					<ingredient name="resourceScrapLead" count="2"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo44MagnumBulletHP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="2"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="2"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo44MagnumBulletAP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="3"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="3"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo762mmBulletBall" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="3"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="3"/>
+					<ingredient name="resourceClayLump" count="2"/>
+					<ingredient name="resourceScrapLead" count="2"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo762mmBulletHP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="3"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="3"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammo762mmBulletAP" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="5"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="5"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapBrass" count="5"/>		
+				</recipe>
+    <recipe name="ammoShotgunShell" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="4"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="4"/>
+					<ingredient name="resourceClayLump" count="1"/>
+					<ingredient name="resourceScrapLead" count="3"/>
+					<ingredient name="resourcePaper" count="1"/>
+				</recipe>
+    <recipe name="ammoShotgunSlug" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="5"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="5"/>
+					<ingredient name="resourceClayLump" count="3"/>
+					<ingredient name="resourceScrapLead" count="4"/>
+					<ingredient name="resourceScrapPolymers" count="1"/>		
+				</recipe>
+    <recipe name="ammoShotgunBreachingSlug" count="1" craft_area="FuriousRamsayAmmoMachine" craft_time="0.5">
+					<ingredient name="resourceCoal" count="4"/>
+					<ingredient name="resourcePotassiumNitratePowder" count="4"/>
+					<ingredient name="resourceClayLump" count="2"/>
+					<ingredient name="resourceForgedSteel" count="3"/>
+					<ingredient name="resourceScrapPolymers" count="1"/>		
+				</recipe>
+    <recipe name="AlchemyTable001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" tags="learnable">
+					<ingredient name="FuriousRamsayWoodPlank" count="20"/>
+					<ingredient name="resourceScrapIron" count="30"/>
+					<ingredient name="resourcePaper" count="25"/>
+					<ingredient name="resourceNail" count="25"/>
+					<ingredient name="resourceBrokenGlass" count="20"/>
+				</recipe>
+    <recipe name="FuriousRamsayMindControlDrink" count="1" craft_time="20" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="drinkJarBoiledWater" count="1" />
+      <ingredient name="foodRottingFlesh" count="5" />
+      <ingredient name="resourceCropGoldenrodPlant" count="2" />
+    </recipe>
+    <recipe name="FuriousRamsayMindControlDrink" count="1" craft_time="10" craft_area="AlchemyTable001_FR" craft_tool="toolBeaker">
+      <ingredient name="drinkJarBoiledWater" count="1" />
+      <ingredient name="foodRottingFlesh" count="3" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+    </recipe>
+    <recipe name="FuriousRamsayMindControlPotion" count="1" craft_time="2" craft_area="AlchemyTable001_FR" craft_tool="toolBeaker">
+      <ingredient name="FuriousRamsayMindControlDrink" count="1" />
+    </recipe>
+    <recipe name="FuriousRamsayMindControlArrowStone" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoArrowStone" count="1" />
+					<ingredient name="foodRottingFlesh" count="1" />
+				</recipe>
+    <recipe name="FuriousRamsayMindControlArrowIron" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoArrowIron" count="1" />
+					<ingredient name="foodRottingFlesh" count="2" />
+				</recipe>
+    <recipe name="FuriousRamsayMindControlArrowSteel" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoArrowSteelAP" count="1" />
+					<ingredient name="foodRottingFlesh" count="3" />
+				</recipe>
+    <recipe name="FuriousRamsayMindControlBoltStone" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoCrossbowBoltStone" count="1" />
+					<ingredient name="foodRottingFlesh" count="1" />
+				</recipe>
+    <recipe name="FuriousRamsayMindControlBoltIron" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoCrossbowBoltIron" count="1" />
+					<ingredient name="foodRottingFlesh" count="2" />
+				</recipe>
+    <recipe name="FuriousRamsayMindControlBoltSteel" count="1" craft_time="0.5" craft_area="AlchemyTable001_FR">
+					<ingredient name="ammoCrossbowBoltSteelAP" count="1" />
+					<ingredient name="foodRottingFlesh" count="3" />
+				</recipe>
+    <recipe name="radioHam" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" craft_time="20">
+			<ingredient name="resourceForgedIron" count="10" />
+			<ingredient name="resourceScrapPolymers" count="10"/>
+			<ingredient name="resourceElectricParts" count="20"/>
+			<ingredient name="resourceBrokenGlass" count="10" />
+			<ingredient name="FuriousRamsayScrews" count="10" />
+		</recipe>
+  </append>
+</configs>

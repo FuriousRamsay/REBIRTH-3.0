@@ -1,0 +1,550 @@
+<configs>
+  <append xpath="/items">
+    <item name="kitSurvivorUpgrade">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="300" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitSurvivorUpgradeDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0001" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="kitAdjustment">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="350" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitAdjustmentDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0002" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="kitRetuning">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="400" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitRetuningDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0003" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="kitBreakdown">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="250" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitBreakdownDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0006" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="kitEliteReinforcement">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="500" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitEliteReinforcementDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0005" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="kitComprehensiveUpgrade">
+	  <property name="HoldType" value="45"/>
+	  <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+	  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="Weight" value="10" />
+      <property name="Stacknumber" value="500" />
+      <property name="EconomicValue" value="600" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="DescriptionKey" value="kitComprehensiveUpgradeDesc" />
+      <property name="DisplayInfo" value="Name,Description" />
+      <property name="Group" value="Resources" />
+      <property name="FilterTags" value="MC_resources" />
+      <property name="SortOrder1" value="E300" />
+      <property name="SortOrder2" value="0004" />
+      <property name="Tags" value="perkArmorSmith,enchantingKit" />
+    </item>
+    <item name="partRetrofitHousing">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partRetrofitHousing" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+        <property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="125" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partRetrofitHousingDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0001" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partTuningBoard">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partTuningBoard" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="85" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partTuningBoardDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E300" />
+		<property name="SortOrder2" value="0002" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partFieldMechanismPack">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partFieldMechanismPack" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="75" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partFieldMechanismPackDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E300" />
+		<property name="SortOrder2" value="0003" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partRegulatorPack">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partRegulatorPack" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="90" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partRegulatorPackDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E300" />
+		<property name="SortOrder2" value="0004" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partPurgeCanister">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partPurgeCanister" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="160" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partPurgeCanisterDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0006" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partServiceHousing">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partServiceHousing" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="100" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partServiceHousingDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0003" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partStabilityClampSet">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partStabilityClampSet" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="110" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partStabilityClampSetDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0007" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partRetuningCartridge">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partRetuningCartridge" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="145" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partRetuningCartridgeDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0004" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partAdjustmentMatrix">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partAdjustmentMatrix" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="125" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partAdjustmentMatrixDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0001" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partControlShunt">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partControlShunt" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="140" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partControlShuntDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0002" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partProfileBridge">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partProfileBridge" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="150" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partProfileBridgeDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E310" />
+		<property name="SortOrder2" value="0005" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partReinforcedHousing">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partReinforcedHousing" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="220" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partReinforcedHousingDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E330" />
+		<property name="SortOrder2" value="0005" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partReinforcementCore">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partReinforcementCore" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="350" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partReinforcementCoreDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E330" />
+		<property name="SortOrder2" value="0004" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partStabilityFrame">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partStabilityFrame" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="240" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partStabilityFrameDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E330" />
+		<property name="SortOrder2" value="0003" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partControlLattice">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partControlLattice" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="300" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partControlLatticeDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E330" />
+		<property name="SortOrder2" value="0001" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partRegulatorAssembly">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partRegulatorAssembly" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="260" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partRegulatorAssemblyDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E330" />
+		<property name="SortOrder2" value="0002" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partMasterHousing">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partMasterHousing" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="325" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partMasterHousingDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E340" />
+		<property name="SortOrder2" value="0004" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partComprehensiveCore">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partComprehensiveCore" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="500" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partComprehensiveCoreDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E340" />
+		<property name="SortOrder2" value="0001" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partControlArray">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partControlArray" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="425" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partControlArrayDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E340" />
+		<property name="SortOrder2" value="0002" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partMasterRegulator">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partMasterRegulator" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="450" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partMasterRegulatorDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E340" />
+		<property name="SortOrder2" value="0003" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="partFieldArray">
+		<property name="HoldType" value="45" />
+		<property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+		<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+		<property name="CustomIcon" value="partFieldArray" />
+		<property name="Material" value="Mmetal"/>
+		<property name="Weight" value="10" />
+		<property name="Stacknumber" value="500" />
+		<property name="EconomicValue" value="350" />
+		<property name="EconomicBundleSize" value="1" />
+		<property name="DescriptionKey" value="partFieldArrayDesc" />
+		<property name="DisplayInfo" value="Name,Description" />
+		<property name="Group" value="Resources" />
+		<property name="FilterTags" value="MC_resources" />
+		<property name="SortOrder1" value="E340" />
+		<property name="SortOrder2" value="0005" />
+		<property name="Tags" value="perkArmorSmith,enchantingPart" />
+	</item>
+    <item name="kitSurvivorUpgradeSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="500"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitSurvivorUpgrade"/>
+		  <property name="Unlocks" value="kitSurvivorUpgrade"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitSurvivorUpgrade" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="25"/>
+		  </effect_group>
+		</item>
+    <item name="kitAdjustmentSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="750"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitAdjustment"/>
+		  <property name="Unlocks" value="kitAdjustment"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitAdjustment" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="50"/>
+		  </effect_group>
+		</item>
+    <item name="kitRetuningSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="900"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitRetuning"/>
+		  <property name="Unlocks" value="kitRetuning"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitRetuning" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="50"/>
+		  </effect_group>
+		</item>
+    <item name="kitBreakdownSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="500"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitBreakdown"/>
+		  <property name="Unlocks" value="kitBreakdown"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitBreakdown" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="25"/>
+		  </effect_group>
+		</item>
+    <item name="kitEliteReinforcementSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="1100"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitEliteReinforcement"/>
+		  <property name="Unlocks" value="kitEliteReinforcement"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitEliteReinforcement" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="100"/>
+		  </effect_group>
+		</item>
+    <item name="kitComprehensiveUpgradeSchematic">
+		  <property name="Extends" value="schematicNoQualityRecipeMaster"/>
+		  <property name="EconomicValue" value="1250"/>
+		  <property name="CreativeMode" value="Player"/>
+		  <property name="CustomIcon" value="kitComprehensiveUpgrade"/>
+		  <property name="Unlocks" value="kitComprehensiveUpgrade"/>
+		  <effect_group tiered="false">
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="ModifyCVar" cvar="kitComprehensiveUpgrade" operation="set" value="1"/>
+			<triggered_effect trigger="onSelfPrimaryActionEnd" action="GiveExp" exp="200"/>
+		  </effect_group>
+		</item>
+  </append>
+</configs>

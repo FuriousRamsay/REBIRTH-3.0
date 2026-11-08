@@ -2,6 +2,7 @@
 <configs>
   <include filename="../_Turret/turret_windows.xml" />
   <include filename="trade_ammo_windows.xml" />
+  <include filename="propane_filler_windows.xml" />
   <include filename="../_Purge/information_windows.xml" />
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -1202,7 +1203,7 @@
   </append>
   <!-- Native message queue/timing, presented above the full-width toolbelt and vitals. -->
   <append xpath="/windows">
-    <window name="rebirthPurgeProgressHud" width="284" height="25" depth="28" anchor="BottomLeft" pos="14,35" controller="RebirthPurgeProgressHud, RebirthUtils" cursor_area="false">
+    <window name="rebirthPurgeProgressHud" width="284" height="52" depth="28" anchor="BottomLeft" pos="14,62" controller="RebirthPurgeProgressHud, RebirthUtils" cursor_area="false">
       <rect name="purgeProgressCard" width="284" height="25" visible="{purgeprogressvisible}">
         <texture name="purgeProgressBackground" depth="1" width="284" height="25" color="10,10,10,255" material="Materials/Transparent Colored" globalopacitymod="0" />
         <texture name="purgeBorderTop" depth="3" pos="0,0" width="284" height="2" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
@@ -1212,6 +1213,23 @@
         <label name="purgeBiomeName" depth="4" pos="8,-4" width="112" height="21" font_size="18" text="{purgebiome}" color="{purgecolor}" upper_case="true" overflow="shrinkcontent" />
         <label name="purgeBiomePercent" depth="4" pos="120,-4" width="44" height="21" font_size="18" text="{purgepercentage}" color="220,220,220,255" justify="center" />
         <label name="purgeBiomeCounts" depth="4" pos="184,-4" width="96" height="21" font_size="18" text="{purgecounts}" color="255,255,255,255" justify="right" />
+      </rect>
+      <!-- Game stage and loot stage, always shown under the biome bar while no window is open; green/red is today's change. -->
+      <rect name="stageRow" pos="0,-27" width="284" height="25" visible="{stagerowvisible}">
+        <texture name="stageRowBackground" depth="1" width="284" height="25" color="10,10,10,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="stageBorderTop" depth="3" pos="0,0" width="284" height="2" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="stageBorderBottom" depth="3" pos="0,-23" width="284" height="2" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="stageBorderLeft" depth="3" pos="0,-2" width="2" height="21" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="stageBorderRight" depth="3" pos="282,-2" width="2" height="21" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="stageDivider" depth="3" pos="141,-2" width="2" height="21" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <sprite name="gameStageIcon" depth="4" pos="7,-4" width="17" height="17" sprite="ui_game_symbol_zombie" color="181,140,255,255" foregroundlayer="true" />
+        <label name="gameStageLabel" depth="4" pos="27,-13" pivot="left" width="56" height="18" font_size="14" text_key="xuiGameStage" color="255,255,255,255" upper_case="true" overflow="shrinkcontent" />
+        <label name="gameStageValue" depth="4" pos="115,-13" pivot="right" width="32" height="21" font_size="18" text="{gamestage}" color="255,255,255,255" justify="right" />
+        <label name="gameStageDelta" depth="4" pos="116,-12" pivot="left" width="25" height="18" font_size="13" text="{gamestagedelta}" justify="left" overflow="shrinkcontent" />
+        <sprite name="lootStageIcon" depth="4" pos="150,-4" width="17" height="17" sprite="ui_game_symbol_loot_sack" color="181,140,255,255" foregroundlayer="true" />
+        <label name="lootStageLabel" depth="4" pos="170,-13" pivot="left" width="56" height="18" font_size="14" text_key="xuiLootstage" color="255,255,255,255" upper_case="true" overflow="shrinkcontent" />
+        <label name="lootStageValue" depth="4" pos="258,-13" pivot="right" width="32" height="21" font_size="18" text="{lootstage}" color="255,255,255,255" justify="right" />
+        <label name="lootStageDelta" depth="4" pos="259,-12" pivot="left" width="24" height="18" font_size="13" text="{lootstagedelta}" justify="left" overflow="shrinkcontent" />
       </rect>
     </window>
   </append>
@@ -5289,7 +5307,7 @@
             </rect>
             <sprite name="characterBagContextBg" pos="8,-42" width="420" height="292" sprite="menu_empty" color="17,17,21,245" depth="1" />
             <sprite name="characterBagContextRule" pos="0,-342" width="436" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
-            <sprite name="characterBagSelectedIcon" pos="14,-52" width="64" height="64" atlas="ItemIconAtlas" sprite="" depth="9" />
+            <sprite name="characterBagSelectedIcon" pos="14,-52" width="64" height="64" atlas="ItemIconAtlas" sprite="" depth="9" /><sprite name="characterBagSelectedIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
             <label name="characterBagSelected" pos="88,-50" width="334" height="50" font_size="23" color="245,245,248,255" depth="6" globalopacitymod="0" />
             <rect name="characterBagActions" pos="14,-254" width="408" height="154" controller="RebirthBackpackActionList, RebirthUtils">
               <rect name="characterBagAction0" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
@@ -11752,39 +11770,39 @@
         </rect>
         <rect name="survivorStatisticsPanel" pos="190,0" width="1744" height="850" visible="false" controller="RebirthSurvivorStatisticsPanel, RebirthUtils" pivot="topleft">
           <sprite depth="1" sprite="menu_empty" type="sliced" color="24,24,29,250" width="1744" height="850" name="pc134StatisticsBg" pivot="topleft" pos="0,0" globalopacitymod="0" />
-          <rect pos="14,-14" width="418" height="100" pivot="topleft">
-            <sprite name="pc155SectionOutline7" pos="0,0" width="418" height="100" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="100" pivot="topleft" pos="0,0" globalopacitymod="0" />
+          <rect pos="14,-14" width="418" height="82" pivot="topleft">
+            <sprite name="pc155SectionOutline7" pos="0,0" width="418" height="82" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="82" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
-            <label pos="90,-12" width="308" height="40" font_size="18" text_key="xuiRebirthStatisticsTimeSurvived" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <label name="survivorStatisticsKpiValue0" pos="90,-43" width="308" height="40" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <sprite name="pc135StatIcon0" pos="18,-22" width="58" height="58" atlas="UIAtlas" sprite="ui_game_symbol_clock" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="90,-10" width="308" height="30" font_size="18" text_key="xuiRebirthStatisticsTimeSurvived" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsKpiValue0" pos="90,-38" width="308" height="38" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <sprite name="pc135StatIcon0" pos="18,-14" width="54" height="54" atlas="UIAtlas" sprite="ui_game_symbol_clock" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="444,-14" width="418" height="100" pivot="topleft">
-            <sprite name="pc155SectionOutline8" pos="0,0" width="418" height="100" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="100" pivot="topleft" pos="0,0" globalopacitymod="0" />
+          <rect pos="444,-14" width="418" height="82" pivot="topleft">
+            <sprite name="pc155SectionOutline8" pos="0,0" width="418" height="82" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="82" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
-            <label pos="90,-12" width="308" height="40" font_size="18" text_key="xuiRebirthStatisticsDistanceTraveled" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <label name="survivorStatisticsKpiValue1" pos="90,-43" width="308" height="40" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <sprite name="pc135StatIcon1" pos="18,-22" width="58" height="58" atlas="UIAtlas" sprite="ui_game_symbol_run" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="90,-10" width="308" height="30" font_size="18" text_key="xuiRebirthStatisticsDistanceTraveled" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsKpiValue1" pos="90,-38" width="308" height="38" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <sprite name="pc135StatIcon1" pos="18,-14" width="54" height="54" atlas="UIAtlas" sprite="ui_game_symbol_run" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="874,-14" width="418" height="100" pivot="topleft">
-            <sprite name="pc155SectionOutline9" pos="0,0" width="418" height="100" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="100" pivot="topleft" pos="0,0" globalopacitymod="0" />
+          <rect pos="874,-14" width="418" height="82" pivot="topleft">
+            <sprite name="pc155SectionOutline9" pos="0,0" width="418" height="82" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="82" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
-            <label pos="90,-12" width="308" height="40" font_size="18" text_key="xuiZombieKills" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <label name="survivorStatisticsKpiValue2" pos="90,-43" width="308" height="40" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <sprite name="pc135StatIcon2" pos="18,-22" width="58" height="58" atlas="UIAtlas" sprite="ui_game_symbol_skull" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="90,-10" width="308" height="30" font_size="18" text_key="xuiZombieKills" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsKpiValue2" pos="90,-38" width="308" height="38" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <sprite name="pc135StatIcon2" pos="18,-14" width="54" height="54" atlas="UIAtlas" sprite="ui_game_symbol_skull" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="1304,-14" width="418" height="100" pivot="topleft">
-            <sprite name="pc155SectionOutline10" pos="0,0" width="418" height="100" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="100" pivot="topleft" pos="0,0" globalopacitymod="0" />
+          <rect pos="1304,-14" width="418" height="82" pivot="topleft">
+            <sprite name="pc155SectionOutline10" pos="0,0" width="418" height="82" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="82" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
-            <label pos="90,-12" width="308" height="40" font_size="18" text_key="xuiDeaths" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <label name="survivorStatisticsKpiValue3" pos="90,-43" width="308" height="40" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
-            <sprite name="pc135StatIcon3" pos="18,-22" width="58" height="58" atlas="UIAtlas" sprite="ui_game_symbol_skull" color="214,132,132,255" depth="10" globalopacitymod="0" />
+            <label pos="90,-10" width="308" height="30" font_size="18" text_key="xuiDeaths" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsKpiValue3" pos="90,-38" width="308" height="38" font_size="32" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <sprite name="pc135StatIcon3" pos="18,-14" width="54" height="54" atlas="UIAtlas" sprite="ui_game_symbol_skull" color="214,132,132,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="14,-124" width="418" height="72" pivot="topleft">
+          <rect pos="14,-106" width="418" height="72" pivot="topleft">
             <sprite name="pc155SectionOutline11" pos="0,0" width="418" height="72" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="72" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11792,7 +11810,7 @@
             <label name="survivorStatisticsKpiValue4" pos="90,-34" width="308" height="30" font_size="24" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
             <sprite name="pc135StatIcon4" pos="18,-16" width="40" height="40" atlas="RebirthHud" sprite="rb_hud_sun" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="444,-124" width="418" height="72" pivot="topleft">
+          <rect pos="444,-106" width="418" height="72" pivot="topleft">
             <sprite name="pc155SectionOutline12" pos="0,0" width="418" height="72" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="72" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11800,7 +11818,7 @@
             <label name="survivorStatisticsKpiValue5" pos="90,-34" width="308" height="30" font_size="24" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
             <sprite name="pc135StatIcon5" pos="18,-16" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_book" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="874,-124" width="418" height="72" pivot="topleft">
+          <rect pos="874,-106" width="418" height="72" pivot="topleft">
             <sprite name="pc155SectionOutline13" pos="0,0" width="418" height="72" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="72" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11808,7 +11826,7 @@
             <label name="survivorStatisticsKpiValue6" pos="90,-34" width="308" height="30" font_size="24" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
             <sprite name="pc135StatIcon6" pos="18,-16" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_skills" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="1304,-124" width="418" height="72" pivot="topleft">
+          <rect pos="1304,-106" width="418" height="72" pivot="topleft">
             <sprite name="pc155SectionOutline14" pos="0,0" width="418" height="72" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="418" height="72" pivot="topleft" pos="0,0" globalopacitymod="0" />
             <sprite depth="1" pos="0,0" width="418" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11816,7 +11834,48 @@
             <label name="survivorStatisticsKpiValue7" pos="90,-34" width="308" height="30" font_size="24" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
             <sprite name="pc135StatIcon7" pos="18,-16" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_trophy" color="189,143,242,255" depth="10" globalopacitymod="0" />
           </rect>
-          <rect pos="14,-212" width="330" height="262" pivot="topleft">
+                    <!-- Base-game character figures (native character window): game stage, loot stage, armor rating, feels like, XP to next level. Current life is the Time Survived card. -->
+          <rect pos="14,-188" width="332" height="46" pivot="topleft">
+            <sprite pos="0,0" width="332" height="46" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="332" height="46" pivot="topleft" pos="0,0" globalopacitymod="0" />
+            <sprite depth="1" pos="0,0" width="332" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+            <sprite name="survivorStatisticsBaseIcon0" pos="12,-9" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_zombie" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="50,-12" width="190" height="24" font_size="18" text_key="xuiGameStage" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsBaseValue0" pos="242,-9" width="78" height="30" font_size="24" color="225,225,232,255" justify="right" overflow="shrinkcontent" pivot="topleft" depth="12" />
+          </rect>
+          <rect pos="358,-188" width="332" height="46" pivot="topleft">
+            <sprite pos="0,0" width="332" height="46" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="332" height="46" pivot="topleft" pos="0,0" globalopacitymod="0" />
+            <sprite depth="1" pos="0,0" width="332" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+            <sprite name="survivorStatisticsBaseIcon1" pos="12,-9" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="50,-12" width="190" height="24" font_size="18" text_key="xuiLootstage" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsBaseValue1" pos="242,-9" width="78" height="30" font_size="24" color="225,225,232,255" justify="right" overflow="shrinkcontent" pivot="topleft" depth="12" />
+          </rect>
+          <rect pos="702,-188" width="332" height="46" pivot="topleft">
+            <sprite pos="0,0" width="332" height="46" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="332" height="46" pivot="topleft" pos="0,0" globalopacitymod="0" />
+            <sprite depth="1" pos="0,0" width="332" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+            <sprite name="survivorStatisticsBaseIcon2" pos="12,-9" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_armor_iron" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="50,-12" width="190" height="24" font_size="18" text_key="statPhysicalDamageResist" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsBaseValue2" pos="242,-9" width="78" height="30" font_size="24" color="225,225,232,255" justify="right" overflow="shrinkcontent" pivot="topleft" depth="12" />
+          </rect>
+          <rect pos="1046,-188" width="332" height="46" pivot="topleft">
+            <sprite pos="0,0" width="332" height="46" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="332" height="46" pivot="topleft" pos="0,0" globalopacitymod="0" />
+            <sprite depth="1" pos="0,0" width="332" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+            <sprite name="survivorStatisticsBaseIcon3" pos="12,-9" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_temperature" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="50,-12" width="190" height="24" font_size="18" text_key="xuiFeelsLike" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsBaseValue3" pos="242,-9" width="78" height="30" font_size="24" color="225,225,232,255" justify="right" overflow="shrinkcontent" pivot="topleft" depth="12" />
+          </rect>
+          <rect pos="1390,-188" width="332" height="46" pivot="topleft">
+            <sprite pos="0,0" width="332" height="46" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite depth="1" sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="332" height="46" pivot="topleft" pos="0,0" globalopacitymod="0" />
+            <sprite depth="1" pos="0,0" width="332" height="2" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+            <sprite name="survivorStatisticsBaseIcon4" pos="12,-9" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_trophy" color="189,143,242,255" depth="10" globalopacitymod="0" />
+            <label pos="50,-12" width="190" height="24" font_size="18" text_key="xuiXPToNextLevel" color="225,225,232,255" justify="left" overflow="shrinkcontent" pivot="topleft" depth="12" />
+            <label name="survivorStatisticsBaseValue4" pos="242,-9" width="78" height="30" font_size="24" color="225,225,232,255" justify="right" overflow="shrinkcontent" pivot="topleft" depth="12" />
+          </rect>
+<rect pos="14,-244" width="330" height="262" pivot="topleft">
             <sprite name="pc155SectionOutline15" pos="0,0" width="330" height="262" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="330" height="262" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="330" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11839,7 +11898,7 @@
             <label name="survivorStatisticsActivityValue4" pos="234,-170" width="82" height="22" font_size="18" justify="right" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
             <label pos="12,-218" width="304" height="36" font_size="16" color="225,225,232,255" depth="12" text="Share of recorded activities. Idle time excluded." overflow="clampcontent" />
           </rect>
-          <rect pos="356,-212" width="852" height="262" pivot="topleft">
+          <rect pos="356,-244" width="852" height="262" pivot="topleft">
             <sprite name="pc155SectionOutline16" pos="0,0" width="852" height="262" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="852" height="262" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="852" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11927,7 +11986,7 @@
             <sprite pos="656,-225" width="128" height="12" sprite="menu_empty" color="45,45,45,255" pivot="topleft" globalopacitymod="0" />
             <sprite name="survivorStatisticsTrendFill6_4" pos="656,-225" width="128" height="12" sprite="menu_empty" type="filled" fill="0" color="218,192,75,255" pivot="topleft" globalopacitymod="0" depth="8" />
           </rect>
-          <rect pos="1220,-212" width="510" height="262" pivot="topleft">
+          <rect pos="1220,-244" width="510" height="262" pivot="topleft">
             <sprite name="pc155SectionOutline17" pos="0,0" width="510" height="262" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
             <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="510" height="262" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="510" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
@@ -11949,17 +12008,17 @@
             <label pos="14,-224" width="330" height="21" font_size="18" text_key="xuiRebirthStatisticsBiomesVisited" color="225,225,232,255" pivot="topleft" depth="12" />
             <label name="survivorStatisticsCategoryValue7" pos="350,-224" width="146" height="21" font_size="18" justify="right" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
           </rect>
-          <rect pos="14,-488" width="560" height="338" pivot="topleft">
-            <sprite name="pc155SectionOutline18" pos="0,0" width="560" height="338" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="560" height="338" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
+          <rect pos="14,-518" width="560" height="328" pivot="topleft">
+            <sprite name="pc155SectionOutline18" pos="0,0" width="560" height="328" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="560" height="328" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="560" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
             <label pos="14,-12" width="532" height="28" font_size="20" text_key="xuiRebirthStatisticsCombatBreakdown" color="189,143,242,255" pivot="topleft" depth="12" />
             <label name="survivorStatisticsCombatSummary" pos="14,-48" width="532" height="80" font_size="19" color="225,225,232,255" overflow="clampcontent" pivot="topleft" depth="12" />
             <label name="survivorStatisticsDamageSummary" pos="14,-118" width="532" height="46" font_size="19" color="225,225,232,255" overflow="clampcontent" pivot="topleft" depth="12" />
             <label pos="14,-166" width="532" height="24" font_size="18" text_key="xuiRebirthStatisticsWeaponKills" color="225,225,232,255" pivot="topleft" depth="12" />
-            <rect name="survivorStatisticsWeaponScroll" pos="14,-194" width="532" height="132" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
+            <rect name="survivorStatisticsWeaponScroll" pos="14,-194" width="532" height="122" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
               <defaultscrollbar />
-              <scrollview name="survivorStatisticsWeaponScrollView" width="502" height="132" clippingsoftness="0,4">
+              <scrollview name="survivorStatisticsWeaponScrollView" width="502" height="122" clippingsoftness="0,4">
                 <rect name="survivorStatisticsWeaponRow0" pos="0,0" width="532" height="20" visible="false" pivot="topleft">
                   <label name="survivorStatisticsWeaponName0" pos="0,0" width="410" height="20" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
                   <label name="survivorStatisticsWeaponValue0" pos="420,0" width="112" height="20" font_size="18" justify="right" color="225,225,232,255" pivot="topleft" depth="12" />
@@ -12029,22 +12088,22 @@
             <label name="pc134WeaponsEmpty" pos="16,-185" width="510" height="46" font_size="19" color="225,225,232,255" text="No weapon kills recorded yet." pivot="topleft" depth="12" />
             <sprite pos="460,-215" width="70" height="70" atlas="UIAtlas" sprite="ui_game_symbol_skull" color="108,91,126,255" depth="8" globalopacitymod="0" />
           </rect>
-          <rect pos="586,-488" width="560" height="338" pivot="topleft">
-            <sprite name="pc155SectionOutline19" pos="0,0" width="560" height="338" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="560" height="338" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
+          <rect pos="586,-518" width="560" height="328" pivot="topleft">
+            <sprite name="pc155SectionOutline19" pos="0,0" width="560" height="328" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="560" height="328" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="560" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
             <label pos="14,-12" width="532" height="28" font_size="20" text_key="xuiRebirthStatisticsPersonalBests" color="189,143,242,255" pivot="topleft" depth="12" />
             <label name="survivorStatisticsBestSummary" pos="14,-52" width="532" height="260" font_size="19" color="225,225,232,255" overflow="clampcontent" pivot="topleft" depth="12" />
             <sprite pos="460,-215" width="70" height="70" atlas="UIAtlas" sprite="ui_game_symbol_trophy" color="108,91,126,255" depth="8" globalopacitymod="0" />
           </rect>
-          <rect pos="1158,-488" width="572" height="338" pivot="topleft">
-            <sprite name="pc155SectionOutline20" pos="0,0" width="572" height="338" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
-            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="572" height="338" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
+          <rect pos="1158,-518" width="572" height="328" pivot="topleft">
+            <sprite name="pc155SectionOutline20" pos="0,0" width="572" height="328" depth="3" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
+            <sprite sprite="menu_empty2px" type="sliced" color="24,24,29,250" width="572" height="328" pivot="topleft" pos="0,0" globalopacitymod="0" depth="1" />
             <sprite pos="0,0" width="572" height="4" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
             <label pos="14,-12" width="544" height="28" font_size="20" text_key="xuiRebirthStatisticsMilestones" color="189,143,242,255" pivot="topleft" depth="12" />
-            <rect name="survivorStatisticsMilestoneScroll" pos="14,-48" width="544" height="272" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
+            <rect name="survivorStatisticsMilestoneScroll" pos="14,-48" width="544" height="262" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
               <defaultscrollbar />
-              <scrollview name="survivorStatisticsMilestoneScrollView" width="514" height="272" clippingsoftness="0,4">
+              <scrollview name="survivorStatisticsMilestoneScrollView" width="514" height="262" clippingsoftness="0,4">
                 <rect name="survivorStatisticsMilestoneRow0" pos="0,0" width="544" height="28" visible="false" pivot="topleft">
                   <sprite pos="0,0" width="4" height="28" sprite="menu_empty" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
                   <label name="survivorStatisticsMilestoneName0" pos="12,-3" width="408" height="23" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" depth="12" />
@@ -14316,6 +14375,7 @@
           <rect name="detailTabs" pos="-5000,-5000" width="634" height="38" visible="false">
             <button depth="4" name="ingredientsButton" style="icon30px, press" pos="24,-19" sprite="ui_game_symbol_resource" pivot="center" tooltip_key="ingredient" sound="[paging_click]" selected="true" />
             <button depth="4" name="descriptionButton" style="icon30px, press" pos="68,-19" sprite="ui_game_symbol_book" pivot="center" tooltip_key="lblBookDesc" sound="[paging_click]" />
+            <button depth="4" name="rbBonusTab" style="icon30px, press" pos="111,-19" sprite="ui_game_symbol_star" defaultcolor="181,140,255" pivot="center" tooltip="Bonuses" tooltip_key="xuiRebirthBonusesTab" sound="[paging_click]" visible="{showbonusoption}" />
             <button depth="4" name="showunlocksButton" style="icon30px, press" pos="112,-19" sprite="ui_game_symbol_unlock" pivot="center" tooltip_key="xuiSkillUnlocks" sound="[paging_click]" visible="{showunlockedbytab}" />
           </rect>
           <rect depth="1" pos="8,-218" name="ingredients" width="634" height="218" visible="{showingredients}">
@@ -15054,10 +15114,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit0" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="btnRebirthCraftingFavoriteFilter" nav_down="rebirthCraftingRecipeRowHit1" />
                     <button name="rebirthCraftingRecipeFavoriteHit0" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15066,10 +15126,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit1" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit0" nav_down="rebirthCraftingRecipeRowHit2" />
                     <button name="rebirthCraftingRecipeFavoriteHit1" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15078,10 +15138,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit2" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit1" nav_down="rebirthCraftingRecipeRowHit3" />
                     <button name="rebirthCraftingRecipeFavoriteHit2" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15090,10 +15150,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit3" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit2" nav_down="rebirthCraftingRecipeRowHit4" />
                     <button name="rebirthCraftingRecipeFavoriteHit3" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15102,10 +15162,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit4" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit3" nav_down="rebirthCraftingRecipeRowHit5" />
                     <button name="rebirthCraftingRecipeFavoriteHit4" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15114,10 +15174,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit5" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit4" nav_down="rebirthCraftingRecipeRowHit6" />
                     <button name="rebirthCraftingRecipeFavoriteHit5" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15126,10 +15186,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit6" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit5" nav_down="rebirthCraftingRecipeRowHit7" />
                     <button name="rebirthCraftingRecipeFavoriteHit6" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15138,10 +15198,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit7" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit6" nav_down="rebirthCraftingRecipeRowHit8" />
                     <button name="rebirthCraftingRecipeFavoriteHit7" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15150,10 +15210,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit8" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit7" nav_down="rebirthCraftingRecipeRowHit9" />
                     <button name="rebirthCraftingRecipeFavoriteHit8" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15162,10 +15222,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit9" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit8" nav_down="btnRebirthCraftingViewKnowledge" />
                     <button name="rebirthCraftingRecipeFavoriteHit9" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -15174,10 +15234,10 @@
                     <sprite name="background" depth="1" width="336" height="38" sprite="menu_empty2px" type="sliced" color="27,27,31,248" />
                     <sprite name="rebirthCraftingRecipeSelectionFrame" depth="2" width="336" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" visible="false" />
                     <sprite name="icon" depth="4" pos="5,-4" width="30" height="30" atlas="ItemIconAtlas" sprite="menu_empty" color="255,255,255,255" />
-                    <label name="name" depth="5" pos="48,-1" width="158" height="19" font_size="16" color="240,240,242,255" overflow="clampcontent" />
-                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-19" width="158" height="19" font_size="16" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
+                    <label name="name" depth="5" pos="48,-1" width="158" height="24" font_size="20" color="240,240,242,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeCategory" depth="5" pos="48,-24" width="158" height="22" font_size="18" color="181,140,255,255" overflow="clampcontent" upper_case="true" />
                     <sprite name="unlocked" depth="10" on_hover="true" on_press="true" pos="294,-10" width="18" height="18" sprite="ui_game_symbol_lock" color="210,100,100,255" visible="false" />
-                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="18" font_size="14" justify="right" color="210,190,105,255" overflow="clampcontent" />
+                    <label name="rebirthCraftingRecipeStatus" depth="5" pos="220,-10" width="68" height="22" font_size="18" justify="right" color="210,190,105,255" overflow="clampcontent" />
                     <sprite name="favorite" depth="6" pos="316,-10" width="18" height="18" sprite="ui_game_symbol_star" color="204,167,56,255" visible="false" />
                     <button name="rebirthCraftingRecipeRowHit10" depth="8" width="336" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_up="rebirthCraftingRecipeRowHit9" nav_down="btnRebirthCraftingViewKnowledge" gamepad_selectable="false" />
                     <button name="rebirthCraftingRecipeFavoriteHit10" depth="9" pos="308,-4" width="28" height="30" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" />
@@ -17696,6 +17756,7 @@
                 <sprite name="rebirthCraftingItemContextHeaderRule" depth="3" pos="0,-38" width="730" height="2" sprite="menu_empty" color="181,140,255,220" />
                 <sprite name="rebirthCraftingItemContextIconFrame" depth="3" pos="14,-46" width="96" height="96" sprite="menu_empty2px" type="sliced" fillcenter="false" color="54,54,62,255" visible="false" />
                 <sprite name="rebirthCraftingItemContextIcon" depth="9" pos="20,-52" width="84" height="84" atlas="ItemIconAtlas" foregroundlayer="true" />
+                <sprite name="rebirthCraftingItemContextBonusIcon" depth="10" pos="22,-54" width="26" height="26" foregroundlayer="true" visible="false" />
                 <label name="rebirthCraftingItemContextTitle" depth="4" pos="14,-8" width="340" height="28" font_size="22" color="181,140,255,255" text_key="xuiRebirthSelectedItem" upper_case="true" />
                 <label name="rebirthCraftingItemContextName" depth="4" pos="124,-46" width="580" height="30" font_size="22" color="245,245,247,255" overflow="clampcontent" />
                 <label name="rebirthCraftingItemContextSummary" depth="4" pos="124,-76" width="580" height="28" font_size="22" color="201,198,105,255" overflow="clampcontent" />
@@ -17706,7 +17767,8 @@
                   <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
                 </rect>
                 <label name="rebirthCraftingItemQualityOverlay" depth="12" pos="20,-120" width="84" height="24" font_size="20" text="" color="255,255,255,255" effect="outline" justify="center" visible="false" />
-                <label name="rebirthCraftingItemContextDescription" depth="4" pos="124,-106" width="580" height="58" font_size="18" color="214,214,220,255" overflow="clampcontent" parse_actions="true" />
+                <label name="rebirthCraftingItemContextDescription" depth="4" pos="124,-106" width="580" height="58" font_size="18" color="214,214,220,255" overflow="shrinkcontent" parse_actions="true" />
+                <button name="rbBonusTab" depth="8" style="icon30px, press" pos="62,-160" sprite="ui_game_symbol_star" defaultcolor="181,140,255" pivot="center" tooltip="Bonuses" tooltip_key="xuiRebirthBonusesTab" sound="[paging_click]" visible="false" />
                 <label name="rebirthCraftingItemContextActionsTitle" depth="4" pos="14,-162" width="160" height="22" font_size="17" color="181,140,255,255" text_key="xuiRebirthActions" upper_case="true" visible="false" />
                 <label name="rebirthCraftingItemContextActionCount" depth="4" pos="656,-162" width="54" height="22" font_size="13" color="201,198,105,255" justify="right" visible="false" />
                 <rect name="rebirthCraftingItemActionList" pos="14,-198" width="702" height="34" controller="RebirthItemActionList, RebirthUtils">
@@ -17973,7 +18035,7 @@
               <sprite name="rebirthCraftingRightFrame" depth="2" width="414" height="682" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
               <rect name="rebirthCraftingQueueRegion" width="414" height="682">
                 <sprite name="rebirthCraftingQueueRegionBg" depth="1" width="414" height="682" sprite="menu_empty2px" type="sliced" color="17,17,21,0" />
-                <label depth="61" pos="14,-8" width="385" height="28" font_size="22" color="181,140,255,255" text_key="xuiRebirthCraftingQueue" upper_case="true" />
+                <label name="rebirthCraftingQueueTitle" depth="61" pos="14,-8" width="385" height="28" font_size="22" color="181,140,255,255" text_key="xuiRebirthCraftingQueue" upper_case="true" />
                 <sprite name="rebirthCraftingQueueHeaderRule" depth="60" pos="0,-38" width="414" height="2" sprite="menu_empty" color="181,140,255,220" />
                 <rect name="rebirthCraftingQueueController" width="414" height="682" controller="RebirthCraftingQueue, RebirthUtils" always_update="true" on_scroll="true">
                   <label name="rebirthCraftingQueueCapacity" depth="62" pos="264,-9" width="136" height="26" text="" font_size="15" justify="right" color="180,180,188,255" overflow="clampcontent" />
@@ -21592,7 +21654,7 @@
       </rect>
       <sprite name="characterBagContextBg" pos="8,-42" width="838" height="292" sprite="menu_empty" color="17,17,21,0" depth="1" />
       <sprite name="characterBagContextRule" pos="0,-342" width="854" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
-      <sprite name="characterBagSelectedIcon" pos="20,-52" width="84" height="84" atlas="ItemIconAtlas" sprite="" depth="9" />
+      <sprite name="characterBagSelectedIcon" pos="20,-52" width="84" height="84" atlas="ItemIconAtlas" sprite="" depth="9" /><sprite name="characterBagSelectedIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
       <label name="characterBagSelected" pos="116,-50" width="410" height="32" font_size="24" overflow="clampcontent" color="245,245,248,255" depth="6" globalopacitymod="0" />
       <rect name="characterBagActions" pos="14,-254" width="826" height="154" controller="RebirthBackpackActionList, RebirthUtils">
         <rect name="characterBagAction0" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
@@ -26113,7 +26175,7 @@
                 <label name="contextInspectHelp6" pos="0,-228" width="875" height="32" text="[BD8FF2][R][-] to take everything from a container" font_size="24" color="240,240,244,255" depth="6" overflow="shrinkcontent" />
               </rect>
               <rect name="contextInspectSelection" pos="0,0" width="922" height="393" visible="false">
-                <sprite name="contextSelectedIcon" pos="20,-68" width="86" height="86" color="255,255,255,255" sprite="" depth="9" atlas="ItemIconAtlas" />
+                <sprite name="contextSelectedIcon" pos="20,-68" width="86" height="86" color="255,255,255,255" sprite="" depth="9" atlas="ItemIconAtlas" /><sprite name="contextSelectedIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
                 <label name="contextSelectedName" pos="124,-64" width="380" height="35" text="" font_size="28" color="240,240,244,255" depth="6" overflow="shrinkcontent" />
                 <label name="contextSelectedSummary" pos="124,-105" width="380" height="38" text="" font_size="24" color="220,214,165,255" depth="6" overflow="shrinkcontent" />
                 <label name="contextSelectedDescription" pos="124,-149" width="380" height="132" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
@@ -27385,7 +27447,7 @@
           <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
           <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
           <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
-          <sprite name="theoryInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
+          <sprite name="theoryInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" /><sprite name="theoryInspectIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="theoryInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
           <rect name="theoryDescriptionReader" pos="124,-114" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
             <defaultscrollbar />
@@ -28442,7 +28504,7 @@
           <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
           <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
           <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
-          <sprite name="sellInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
+          <sprite name="sellInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" /><sprite name="sellInspectIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="sellInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
           <rect name="sellDescriptionReader" pos="124,-114" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
             <defaultscrollbar />

@@ -1,0 +1,7 @@
+<configs>
+  <!-- 2.6 dropped the Rage Capsule Other (2.5%) from feral and radiated zombie loot. 3.0 has no zombie corpse loot,
+       so it goes in the bag those zombies drop (zPackStrong). Provisional placement. -->
+  <append xpath="/lootcontainers/lootcontainer[@name='zPackStrong']">
+    <item name="rebirthRageCapsuleOther" count="1" prob=".025" force_prob="true"/>
+  </append>
+</configs>

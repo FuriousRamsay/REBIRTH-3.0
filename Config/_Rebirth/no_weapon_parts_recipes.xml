@@ -1,0 +1,79 @@
+<configs>
+  <!-- Rebirth progression has no weapon parts. Each part in a recipe becomes materials. -->
+  <remove xpath="/recipes/recipe[@name='autoTurret']/ingredient[@name='gunHandgunT1PistolParts']" />
+  <append xpath="/recipes/recipe[@name='autoTurret']"><ingredient name="resourceMechanicalParts" count="6" /></append>
+  <remove xpath="/recipes/recipe[@name='gunHandgunT1Pistol']/ingredient[@name='gunHandgunT1PistolParts']" />
+  <append xpath="/recipes/recipe[@name='gunHandgunT1Pistol']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='gunHandgunT2Magnum44']/ingredient[@name='gunHandgunT1PistolParts']" />
+  <append xpath="/recipes/recipe[@name='gunHandgunT2Magnum44']"><ingredient name="resourceMechanicalParts" count="14" /></append>
+  <remove xpath="/recipes/recipe[@name='gunHandgunT3DesertVulture']/ingredient[@name='gunHandgunT1PistolParts']" />
+  <append xpath="/recipes/recipe[@name='gunHandgunT3DesertVulture']"><ingredient name="resourceMechanicalParts" count="26" /></append>
+  <remove xpath="/recipes/recipe[@name='gunHandgunT3SMG5']/ingredient[@name='gunHandgunT1PistolParts']" />
+  <append xpath="/recipes/recipe[@name='gunHandgunT3SMG5']"><ingredient name="resourceMechanicalParts" count="26" /></append>
+  <remove xpath="/recipes/recipe[@name='gunShotgunT1DoubleBarrel']/ingredient[@name='gunShotgunT1DoubleBarrelParts']" />
+  <append xpath="/recipes/recipe[@name='gunShotgunT1DoubleBarrel']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='gunShotgunT2PumpShotgun']/ingredient[@name='gunShotgunT1DoubleBarrelParts']" />
+  <append xpath="/recipes/recipe[@name='gunShotgunT2PumpShotgun']"><ingredient name="resourceMechanicalParts" count="14" /></append>
+  <remove xpath="/recipes/recipe[@name='gunShotgunT3AutoShotgun']/ingredient[@name='gunShotgunT1DoubleBarrelParts']" />
+  <append xpath="/recipes/recipe[@name='gunShotgunT3AutoShotgun']"><ingredient name="resourceMechanicalParts" count="26" /></append>
+  <remove xpath="/recipes/recipe[@name='gunRifleT1HuntingRifle']/ingredient[@name='gunRifleT1HuntingRifleParts']" />
+  <append xpath="/recipes/recipe[@name='gunRifleT1HuntingRifle']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='gunRifleT2LeverActionRifle']/ingredient[@name='gunRifleT1HuntingRifleParts']" />
+  <append xpath="/recipes/recipe[@name='gunRifleT2LeverActionRifle']"><ingredient name="resourceMechanicalParts" count="14" /></append>
+  <remove xpath="/recipes/recipe[@name='gunRifleT3SniperRifle']/ingredient[@name='gunRifleT1HuntingRifleParts']" />
+  <append xpath="/recipes/recipe[@name='gunRifleT3SniperRifle']"><ingredient name="resourceMechanicalParts" count="26" /></append>
+  <remove xpath="/recipes/recipe[@name='gunMGT1AK47']/ingredient[@name='gunMGT1AK47Parts']" />
+  <append xpath="/recipes/recipe[@name='gunMGT1AK47']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='gunMGT2TacticalAR']/ingredient[@name='gunMGT1AK47Parts']" />
+  <append xpath="/recipes/recipe[@name='gunMGT2TacticalAR']"><ingredient name="resourceMechanicalParts" count="14" /></append>
+  <remove xpath="/recipes/recipe[@name='gunMGT3M60']/ingredient[@name='gunMGT1AK47Parts']" />
+  <append xpath="/recipes/recipe[@name='gunMGT3M60']"><ingredient name="resourceMechanicalParts" count="26" /></append>
+  <remove xpath="/recipes/recipe[@name='gunExplosivesT3RocketLauncher']/ingredient[@name='gunExplosivesT3RocketLauncherParts']" />
+  <append xpath="/recipes/recipe[@name='gunExplosivesT3RocketLauncher']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='gunBowT1WoodenBow']/ingredient[@name='gunBowT1WoodenBowParts']" />
+  <setattribute xpath="/recipes/recipe[@name='gunBowT1WoodenBow']/ingredient[@name='resourceWood']" name="count">9</setattribute>
+  <remove xpath="/recipes/recipe[@name='gunBowT3CompoundBow']/ingredient[@name='gunBowT1WoodenBowParts']" />
+  <append xpath="/recipes/recipe[@name='gunBowT3CompoundBow']"><ingredient name="resourceWood" count="52" /></append>
+  <remove xpath="/recipes/recipe[@name='gunBowT1IronCrossbow']/ingredient[@name='gunBowT1WoodenBowParts']" />
+  <setattribute xpath="/recipes/recipe[@name='gunBowT1IronCrossbow']/ingredient[@name='resourceWood']" name="count">63</setattribute>
+  <remove xpath="/recipes/recipe[@name='gunBowT3CompoundCrossbow']/ingredient[@name='gunBowT1WoodenBowParts']" />
+  <append xpath="/recipes/recipe[@name='gunBowT3CompoundCrossbow']"><ingredient name="resourceWood" count="52" /></append>
+  <remove xpath="/recipes/recipe[@name='gunBotT1JunkSledge']/ingredient[@name='gunBotRoboticsParts']" />
+  <append xpath="/recipes/recipe[@name='gunBotT1JunkSledge']"><ingredient name="resourceElectricParts" count="3" /></append>
+  <remove xpath="/recipes/recipe[@name='gunBotT2JunkTurret']/ingredient[@name='gunBotRoboticsParts']" />
+  <append xpath="/recipes/recipe[@name='gunBotT2JunkTurret']"><ingredient name="resourceElectricParts" count="3" /></append>
+  <remove xpath="/recipes/recipe[@name='gunBotT3JunkDrone']/ingredient[@name='gunBotRoboticsParts']" />
+  <setattribute xpath="/recipes/recipe[@name='gunBotT3JunkDrone']/ingredient[@name='resourceElectricParts']" name="count">13</setattribute>
+  <remove xpath="/recipes/recipe[@name='meleeToolRepairT3Nailgun']/ingredient[@name='meleeToolAxeT3ChainsawParts']" />
+  <setattribute xpath="/recipes/recipe[@name='meleeToolRepairT3Nailgun']/ingredient[@name='resourceMechanicalParts']" name="count">8</setattribute>
+  <remove xpath="/recipes/recipe[@name='m60Turret']/ingredient[@name='gunMGT1AK47Parts']" />
+  <append xpath="/recipes/recipe[@name='m60Turret']"><ingredient name="resourceMechanicalParts" count="6" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeWpnClubT3SteelClub']/ingredient[@name='meleeWpnClubT3SteelClubParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnClubT3SteelClub']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolPickT3Auger']/ingredient[@name='meleeToolAxeT3ChainsawParts']" />
+  <append xpath="/recipes/recipe[@name='meleeToolPickT3Auger']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolAxeT3Chainsaw']/ingredient[@name='meleeToolAxeT3ChainsawParts']" />
+  <append xpath="/recipes/recipe[@name='meleeToolAxeT3Chainsaw']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolAxeT2SteelAxe']/ingredient[@name='meleeToolAllSteelParts']" />
+  <append xpath="/recipes/recipe[@name='meleeToolAxeT2SteelAxe']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeWpnSpearT3SteelSpear']/ingredient[@name='meleeWpnSpearT3SteelSpearParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnSpearT3SteelSpear']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeWpnBladeT3Machete']/ingredient[@name='meleeWpnBladeT3MacheteParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnBladeT3Machete']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolPickT2SteelPickaxe']/ingredient[@name='meleeToolAllSteelParts']" />
+  <append xpath="/recipes/recipe[@name='meleeToolPickT2SteelPickaxe']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolShovelT2SteelShovel']/ingredient[@name='meleeToolAllSteelParts']" />
+  <append xpath="/recipes/recipe[@name='meleeToolShovelT2SteelShovel']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeWpnSledgeT3SteelSledgehammer']/ingredient[@name='meleeWpnSledgeT3SteelSledgehammerParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnSledgeT3SteelSledgehammer']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeWpnBatonT2StunBaton']/ingredient[@name='meleeWpnBatonT2StunBatonParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnBatonT2StunBaton']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='meleeToolSalvageT2Ratchet']/ingredient[@name='meleeToolAllSteelParts']" />
+  <setattribute xpath="/recipes/recipe[@name='meleeToolSalvageT2Ratchet']/ingredient[@name='resourceMechanicalParts']" name="count">7</setattribute>
+  <remove xpath="/recipes/recipe[@name='meleeToolSalvageT3ImpactDriver']/ingredient[@name='meleeToolAxeT3ChainsawParts']" />
+  <setattribute xpath="/recipes/recipe[@name='meleeToolSalvageT3ImpactDriver']/ingredient[@name='resourceMechanicalParts']" name="count">8</setattribute>
+  <remove xpath="/recipes/recipe[@name='meleeWpnKnucklesT3SteelKnuckles']/ingredient[@name='meleeWpnKnucklesT3SteelKnucklesParts']" />
+  <append xpath="/recipes/recipe[@name='meleeWpnKnucklesT3SteelKnuckles']"><ingredient name="resourceMechanicalParts" count="2" /></append>
+  <remove xpath="/recipes/recipe[@name='shotgunTurret']/ingredient[@name='gunShotgunT1DoubleBarrelParts']" />
+  <append xpath="/recipes/recipe[@name='shotgunTurret']"><ingredient name="resourceMechanicalParts" count="6" /></append>
+</configs>

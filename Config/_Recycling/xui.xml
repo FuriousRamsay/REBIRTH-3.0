@@ -1,4 +1,6 @@
 <configs>
- <append xpath="/xui"><window_group name="workstation_SonjaRecyclerStation" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false"><window name="rebirthBackpackSectionNavigationChrome"/><window name="rebirthStationRootRecycler"/></window_group></append>
+ <append xpath="/xui"><window_group name="workstation_SonjaRecyclerStation" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false"><window name="rebirthBackpackSectionNavigationChrome"/><window name="rebirthStationRootScrap64"/></window_group></append>
  <set xpath="/xui/window_group[@name='workstation_SonjaAmmoRecyclerStation' or @name='workstation_WorkbenchShredder001_FR' or @name='workstation_SonjaOutfitDesigner']/window[starts-with(@name,'rebirthStationRoot')]/@name">rebirthStationRootRecycler</set>
+ <set xpath="/xui/window_group[@name='workstation_WorkbenchShredder001_FR' or @name='workstation_SonjaOutfitDesigner']/window[@name='rebirthStationRootRecycler']/@name">rebirthStationRootScrap64</set>
+ <set xpath="/xui/window_group[@name='workstation_SonjaAmmoRecyclerStation']/window[@name='rebirthStationRootRecycler']/@name">rebirthStationRootScrap32</set>
 </configs>

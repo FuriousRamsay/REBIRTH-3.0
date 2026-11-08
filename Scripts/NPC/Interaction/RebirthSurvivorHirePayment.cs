@@ -525,11 +525,6 @@ internal static class RebirthSurvivorHirePayment
         float discount=1f;
         if(Progression.ProgressionClasses!=null&&Progression.ProgressionClasses.ContainsKey("perkBetterBarter"))
             discount-=Math.Min(5,Math.Max(0,player.Progression.GetProgressionValue("perkBetterBarter").Level))*.02f;
-        if(Progression.ProgressionClasses!=null&&Progression.ProgressionClasses.ContainsKey("FuriousRamsayAchievementTradeAura"))
-        {
-            int aura=player.Progression.GetProgressionValue("FuriousRamsayAchievementTradeAura").Level;
-            discount-=aura<=0?0f:aura==1?.2f:aura==2?.3f:.4f;
-        }
         long gross=baseCost+500L*(int)raw;if(gross>10000000)return false;
         cost=(int)(gross*Math.Max(.5f,discount));var item=ItemClass.GetItem(currency,false);
         if(item==null||item.IsEmpty()||!RebirthNpcPlayerInventoryEndpoint.IsFungible(item))return false;

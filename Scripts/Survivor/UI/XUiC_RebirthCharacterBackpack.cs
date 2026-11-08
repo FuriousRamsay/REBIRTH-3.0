@@ -45,10 +45,17 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     {
         var stack = renderedStack;
         bool has = stack != null && !stack.IsEmpty();
-        string bonuses = has ? RebirthArmorBonusText.DescribeAll(stack.itemValue) : string.Empty;
+        // The star tab holds armor bonuses; the weapon bonus and its chance belong to the description, as in 2.6.
+        string bonuses = has ? RebirthArmorBonusText.DescribeArmor(stack.itemValue) : string.Empty;
         if (bonusTab?.ViewComponent != null) bonusTab.ViewComponent.IsVisible = bonuses.Length > 0;
-        selectedDescription?.SetTextImmediately(!has ? "" : bonuses.Length > 0 && showBonuses
-            ? bonuses : XUiC_RebirthCraftingItemContext.ResolveBaseDescription(stack, xui));
+        string description = string.Empty;
+        if (has)
+        {
+            description = XUiC_RebirthCraftingItemContext.ResolveBaseDescription(stack, xui);
+            string weapon = RebirthWeaponBonuses.Describe(stack.itemValue);
+            if (weapon.Length > 0) description = description.Length > 0 ? description + "\n\n" + weapon : weapon;
+        }
+        selectedDescription?.SetTextImmediately(!has ? "" : bonuses.Length > 0 && showBonuses ? bonuses : description);
     }
 
     private XUiV_Sprite selectedIcon;

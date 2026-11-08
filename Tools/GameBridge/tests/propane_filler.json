@@ -1,0 +1,26 @@
+{
+  "name": "Propane refill: drag the tank into the station slot, fill, take it out",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Needs the test tank at 1204,38,1085 in CodexTestPurgeFresh20261102; place one with rbpropane place tankPropaneWhite." },
+    { "console": "rbpropane clear 1204 38 1085" },
+    { "give": { "item": "FuriousRamsayPropaneTank", "count": 1 } },
+    { "console": "rbpropane" },
+    { "console": "teleport 1208 39 1085" },
+    { "wait": 3 },
+    { "activate": { "x": 1204, "y": 38, "z": 1085, "block": 1 } },
+    { "expectWindowOpen": "looting" },
+    { "expectWindowOpen": "rebirthPropaneFiller" },
+    { "drag": { "from.item": "FuriousRamsayPropaneTank", "to.path": "rebirthContextNavigation/rebirthContextWorkspace/contextBody/contextContainerPanel/contextContainerGrid/contextSlotsViewport/contextSlotsContent/contextContainerGridSlot0" } },
+    { "wait": 1 },
+    { "expectNoItem": "FuriousRamsayPropaneTank" },
+    { "click": { "id": "btnFill", "window": "rebirthPropaneFiller" } },
+    { "wait": 4 },
+    { "screenshot": "propane_filling" },
+    { "click": { "path": "rebirthContextNavigation/rebirthContextWorkspace/contextBody/contextContainerPanel/contextContainerGrid/contextSlotsViewport/contextSlotsContent/contextContainerGridSlot0", "shift": 1 } },
+    { "wait": 1 },
+    { "expectItem": { "name": "FuriousRamsayPropaneTank", "min": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

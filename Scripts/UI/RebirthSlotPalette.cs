@@ -6,8 +6,10 @@ public sealed class RebirthSlotPalette
     public const string Normal = "58,58,65,255";
     public const string Locked = "31,31,36,255";
     private readonly XUiV_Sprite background, fill;
+    private readonly XUiC_ItemStack owner;
     public RebirthSlotPalette(XUiC_ItemStack slot)
     {
+        owner = slot;
         // Update the controller's real color inputs AND view properties. A one-time write to
         // UISprite.color alone is overwritten by {backgroundcolor} on the next binding pass.
         slot.ParseAttribute("background_color", Normal);
@@ -16,13 +18,15 @@ public sealed class RebirthSlotPalette
         fill = slot.GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
         Apply(slot.AttributeLock);
     }
-    public void Apply(bool locked)
+    public void Apply(bool locked, bool scrappable = false)
     {
         // Match Crafting's post-native palette commit. A slot's lock bit can be unchanged
         // while native hover/binding/OnEnable code changes its live sprite color. Cache the
         // views, not that bit; update only divergent properties and commit the sprite now.
         Commit(background, new Color32(30, 30, 36, 255));
-        Commit(fill, locked ? new Color32(31, 31, 36, 255) : new Color32(58, 58, 65, 255));
+        // 2.6 armor bonus rarity tint (or the encumbered-slot star) wins over the normal fill.
+        var rarity = RebirthArmorRarityVisuals.Fill(owner);
+        Commit(fill, rarity ?? (scrappable ? new Color32(107, 77, 110, 255) : locked ? new Color32(31, 31, 36, 255) : new Color32(58, 58, 65, 255)));
     }
     private static void Commit(XUiV_Sprite view, Color color)
     {

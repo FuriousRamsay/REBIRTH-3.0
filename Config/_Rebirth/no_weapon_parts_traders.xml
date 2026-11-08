@@ -1,0 +1,6 @@
+<configs>
+  <!-- Rebirth progression: traders do not sell weapon parts. -->
+  <remove xpath="/traders//item[@group='weaponsGunParts']" />
+  <remove xpath="/traders/trader_item_groups/trader_item_group[@name='weaponsGunParts']" />
+  <remove xpath="/traders//item[@name='gunBotRoboticsParts' or @name='gunBowT1WoodenBowParts' or @name='gunExplosivesT3RocketLauncherParts' or @name='gunHandgunT1PistolParts' or @name='gunMGT1AK47Parts' or @name='gunRifleT1HuntingRifleParts' or @name='gunShotgunT1DoubleBarrelParts' or @name='meleeToolAllSteelParts' or @name='meleeToolAxeT3ChainsawParts' or @name='meleeWpnBatonT2StunBatonParts' or @name='meleeWpnBladeT3MacheteParts' or @name='meleeWpnClubT3SteelClubParts' or @name='meleeWpnKnucklesT3SteelKnucklesParts' or @name='meleeWpnSledgeT3SteelSledgehammerParts' or @name='meleeWpnSpearT3SteelSpearParts']" />
+</configs>

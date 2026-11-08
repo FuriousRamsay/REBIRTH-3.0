@@ -77,7 +77,7 @@ public sealed class NetPackageRebirthSurvivorSupportActionRequest : NetPackage
         else if (action==RebirthSurvivorSupportAction.StudyLiterature) success=RebirthLiteratureService.TryReadMatchingInventoryItem(player,itemType,seed,out message);
         else if (action==RebirthSurvivorSupportAction.SetLiteratureActivity) { RebirthLiteratureStudySessionService.SetActivityHint(player,string.Equals(slotId,"slow",System.StringComparison.OrdinalIgnoreCase)); success=true; message=string.Empty; }
         else if (action==RebirthSurvivorSupportAction.ListenAudiobook) success=RebirthAudiobookListeningSessionService.TryBegin(player,itemType,seed,out message);
-        else if (action==RebirthSurvivorSupportAction.UseRageCapsule) success=RebirthRageCapsuleService.Consume(player,itemType,seed,out message);
+        else if (action==RebirthSurvivorSupportAction.UseRageCapsule) success=slotId.StartsWith("rage.",System.StringComparison.Ordinal)&&itemType==0?RebirthRageCapsuleService.Start(player,slotId,out message):RebirthRageCapsuleService.Consume(player,itemType,seed,out message);
         else if(action==RebirthSurvivorSupportAction.EquipWaterContainer) success=RebirthMetabolismService.EquipMatchingHydrationContainer(player,itemType,seed,out message);
         else if(action==RebirthSurvivorSupportAction.UnequipWaterContainer) success=RebirthMetabolismService.UnequipHydrationContainer(player,out message);
         else if(action==RebirthSurvivorSupportAction.SoloTheoryStudy&&ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(player.world,world)&&itemType==0&&seed==0) success=RebirthTheorySoloService.TryBegin(player,slotId,out message);

@@ -3697,7 +3697,10 @@ public static class RebirthBossEventRewardService
                 e.Progression.OwnerDisplayName
                 ?? string.Empty;
             candidate.spawnByAllowShare = false;
-            candidate.OverrideLootList = "airDrop";
+            // Rebirth progression uses the approved crate list for this event's tier.
+            candidate.OverrideLootList = RebirthXmlOptionConditionResolver.IsCharacterProgression("Rebirth")
+                ? "rebirthBossRewardT" + Math.Max(1, Math.Min(5, e.Progression.RewardTier)).ToString(CultureInfo.InvariantCulture)
+                : "airDrop";
             candidate.OverrideName = "sc_General";
 
             // Detached preparation only; original receipt precedes native spawn.

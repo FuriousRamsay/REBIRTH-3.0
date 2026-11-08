@@ -205,26 +205,37 @@ public static class RebirthRecyclerRules
         if (resolved.TryGetValue(inputType, out var stations) && stations.TryGetValue(normalized, out rule))
         { if (rule == null) return false; reason = null; return true; }
         string name = ItemClass.list[inputType].GetItemName(); if (string.IsNullOrEmpty(name)) return false;
+        // 2.6 RebirthScrap: an output item that no longer exists is skipped and the rest of the rule is kept
+        // (BuildOutputs unresolvedOk). A rule left with no outputs was never registered, so the next most specific
+        // matching rule applies. The most specific rule wins; the first one wins a tie, as 2.6 load order did.
         Template best = null;
+        List<RebirthRecyclerOutput> outputs = null;
+        var candidates = new List<Template>();
         foreach (var candidate in templates)
-            if (candidate.Station == normalized && candidate.Matches(name)
-                && (best == null || candidate.Specificity > best.Specificity)) best = candidate; // First wins specificity ties, as legacy load expansion did.
+            if (candidate.Station == normalized && candidate.Matches(name)) candidates.Add(candidate);
+        for (int pass = 0; pass < candidates.Count && best == null; pass++)
+        {
+            Template top = null;
+            foreach (var candidate in candidates) if (candidate != null && (top == null || candidate.Specificity > top.Specificity)) top = candidate;
+            if (top == null) break;
+            candidates[candidates.IndexOf(top)] = null;
+            var built = new List<RebirthRecyclerOutput>();
+            foreach (var output in top.Outputs)
+            {
+                int type = ResolveType(output.Name);
+                if (type < 0) { Issue(top.SourceId, "missing-output", output.Name); continue; }
+                built.Add(new RebirthRecyclerOutput(new ItemStack(new ItemValue(type, false), output.Count), output.Time));
+            }
+            if (built.Count == 0) continue;
+            best = top; outputs = built;
+        }
         if (best == null)
         {
             if (stations == null) resolved[inputType] = stations = new Dictionary<string, RebirthRecyclerRule>(StringComparer.Ordinal);
             stations[normalized] = null; return false;
         }
-        var outputs = new List<RebirthRecyclerOutput>(); bool missing = false;
-        foreach (var output in best.Outputs)
-        {
-            int type = ResolveType(output.Name);
-            if (type < 0) { Issue(best.SourceId, "missing-output", output.Name); missing = true; continue; }
-            outputs.Add(new RebirthRecyclerOutput(new ItemStack(new ItemValue(type, false), output.Count), output.Time));
-        }
-        foreach (string tool in best.Tools) if (ResolveType(tool) < 0) { Issue(best.SourceId, "missing-tool", tool); missing = true; }
-        // Removed 2.6 item definitions must never silently reduce a multioutput yield
-        // or select a less-specific replacement. Retain their literal rules for repair.
-        if (missing) { reason = "xuiRebirthRecyclingRuleUnavailable"; return false; }
+        // A required tool that no longer exists is reported (as 2.6 kept the name, it simply cannot be fitted).
+        foreach (string tool in best.Tools) if (ResolveType(tool) < 0) Issue(best.SourceId, "missing-tool", tool);
         rule = new RebirthRecyclerRule { InputType = inputType, StationId = normalized, SourceId = best.SourceId,
             MatcherSummary = best.Summary, SpecificityScore = best.Specificity, LegacyDefaultTime = best.DefaultTime,
             Outputs = outputs.AsReadOnly(), RequiredTools = best.Tools.AsReadOnly() };

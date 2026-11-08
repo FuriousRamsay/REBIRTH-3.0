@@ -632,6 +632,7 @@
               <sprite depth="1" color="[mediumGrey]" type="sliced" width="449" height="44"/>
               <button depth="4" name="statButton" style="icon30px, press" pos="22,-22" sprite="ui_game_symbol_ping" pivot="center" tooltip="Stats" tooltip_key="lblStats" sound="[paging_click]" selected="true"/>
               <button depth="4" name="descriptionButton" style="icon30px, press" pos="65,-22" sprite="ui_game_symbol_book" pivot="center" tooltip="Description" tooltip_key="lblDescription" sound="[paging_click]"/>
+              <button depth="4" name="rbBonusTab" style="icon30px, press" pos="108,-22" sprite="ui_game_symbol_star" defaultcolor="181,140,255" pivot="center" tooltip="Bonuses" tooltip_key="xuiRebirthBonusesTab" sound="[paging_click]" visible="{showbonusoption}" />
             </rect>
             <rect depth="1" pos="153,0" name="description" width="447" height="271" visible="{showonlydescription}">
               <sprite depth="1" color="[darkGrey]" type="sliced"/>

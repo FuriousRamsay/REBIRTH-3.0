@@ -1,0 +1,4 @@
+<configs>
+  <!-- Rebirth progression: primitive weapons are crafted, never sold. -->
+  <remove xpath="/traders//item[@name='gunBowT0PrimitiveBow' or @name='meleeWpnClubT0WoodenClub' or @name='meleeWpnBladeT0BoneKnife' or @name='meleeWpnKnucklesT0LeatherKnuckles' or @name='meleeWpnSpearT0StoneSpear' or @name='meleeWpnSledgeT0StoneSledgehammer']" />
+</configs>

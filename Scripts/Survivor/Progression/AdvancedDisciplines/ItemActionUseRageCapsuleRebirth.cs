@@ -23,21 +23,14 @@ public sealed class ItemActionUseRageCapsuleRebirth : ItemActionEat
     }
     private static void Dispatch(EntityPlayer player,ItemValue itemValue)
     {
+        // 2.6: eating a Rage Capsule starts Offensive Rage (Berserker); a Rage Capsule Other starts the shared rage.
+        // The owner shows the 2.6 refusal at once; the server checks again, takes the capsule and starts the buff.
         if(player==null||itemValue==null)return;
-        ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(player.world==null)
+        EntityPlayerLocal local=player as EntityPlayerLocal;
+        if(local==null||player.world==null)
         {RebirthSurvivorSupportUiFeedback.Receive(false,Localization.Get("xuiRebirthRageCapsuleUnavailable"));return;}
-        if(!player.world.IsRemote())
-        {
-            if(c==null||!c.IsServer)
-            {RebirthSurvivorSupportUiFeedback.Receive(false,Localization.Get("xuiRebirthRageCapsuleUnavailable"));return;}
-            string message;bool ok=RebirthRageCapsuleService.Consume(player,itemValue.type,itemValue.Seed,out message);
-            RebirthSurvivorSupportUiFeedback.Receive(ok,message);
-            return;
-        }
-        var request=NetPackageManager.GetPackage<NetPackageRebirthSurvivorSupportActionRequest>();
-        if(!(player is EntityPlayerLocal)||!RebirthMusicLibraryClient.CanSend(c,request))
-        {RebirthSurvivorSupportUiFeedback.Receive(false,Localization.Get("xuiRebirthRageCapsuleUnavailable"));return;}
-        c.SendToServer(request.Setup(player.entityId,RebirthSurvivorSupportAction.UseRageCapsule,itemValue,string.Empty));
+        string name=itemValue.ItemClass?.Name??string.Empty;
+        var kind=string.Equals(name,RebirthBerserkerRage.CapsuleOtherItem,System.StringComparison.OrdinalIgnoreCase)?RebirthBerserkerRage.Kind.Other:RebirthBerserkerRage.Kind.Offensive;
+        RebirthBerserkerRage.Request(local,kind,itemValue.type,itemValue.Seed);
     }
 }

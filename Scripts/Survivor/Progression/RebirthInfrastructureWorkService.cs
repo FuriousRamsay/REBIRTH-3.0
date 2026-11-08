@@ -287,7 +287,7 @@ public static partial class RebirthInfrastructureWorkService
         float workmanship=Mathf.Clamp01(r.Workmanship);
         // Normal Electrical Skill workmanship remains available to every serviced/built Rebirth system.
         float savings=Mathf.Clamp(RebirthProgressionRuntimeConfig.ElectricalMaxPowerSavings,0f,0.50f)*workmanship*condition;
-        // Power Saver is additional persisted configuration provenance, never an Electrician aura.
+        // Power Saver is additional persisted configuration provenance, never an Electrician group effect.
         // Re-service by another survivor replaces ConfiguredBy* and therefore removes this extra saving;
         // pickup/redeploy preserves it through RebirthElectricalItemProvenance.
         float configuredSaving=0f;

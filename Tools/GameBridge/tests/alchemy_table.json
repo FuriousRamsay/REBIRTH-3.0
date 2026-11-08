@@ -1,0 +1,19 @@
+{
+  "name": "Alchemy Table: open with its tools, craft mind control ammo",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Needs the test table at 1216,36,1083 in CodexTestPurgeFresh20261102; place one with rbpropane place AlchemyTable001_FR." },
+    { "console": "rbtestgrant witchdoctor" },
+    { "console": "rbtestgrant skill skill.black_magic 30" },
+    { "give": { "item": "foodRottingFlesh", "count": 5 } },
+    { "give": { "item": "ammoArrowStone", "count": 5 } },
+    { "give": { "item": "FuriousRamsayHammerPliers", "count": 1 } },
+    { "give": { "item": "toolBeaker", "count": 1 } },
+    { "console": "teleport 1215 39 1086" },
+    { "wait": 3 },
+    { "activate": { "x": 1216, "y": 36, "z": 1083, "block": 1 } },
+    { "expectWindowOpen": "workstation_AlchemyTable001_FR" },
+    { "screenshot": "alchemy_table" },
+    { "expectNoErrors": true }
+  ]
+}

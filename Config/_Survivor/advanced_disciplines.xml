@@ -116,7 +116,7 @@
       <source class="FuriousRamsayAnimalBearMale" tamed_class="RebirthTamedFuriousRamsayAnimalBearMale" />
     </category>
   </beastmaster>
-  <witch_doctor initiation_scythes_skill="20" initiation_tactical_rifles_skill="20" initiation_attunements="3" maximum_interaction_distance="6" base_domination_capacity="2" capacity_skill_step="20" max_domination_capacity="8" duration_skill_bonus_at_100="30" domination_skill_award="0.50" target_repeat_seconds="180">
+  <witch_doctor initiation_scythes_skill="20" initiation_tactical_rifles_skill="20" initiation_attunements="3" maximum_interaction_distance="6" base_domination_capacity="2" capacity_skill_step="20" max_domination_capacity="8" duration_skill_bonus_at_100="30" domination_skill_award="0.15" target_repeat_seconds="180">
     <tier id="normal" skill="1" knowledge="knowledge.black_magic.mind_control_i" base_duration_seconds="60" />
     <tier id="feral" skill="20" knowledge="knowledge.black_magic.mind_control_i" base_duration_seconds="55" />
     <tier id="radiated" skill="40" knowledge="knowledge.black_magic.mind_control_ii" base_duration_seconds="50" />

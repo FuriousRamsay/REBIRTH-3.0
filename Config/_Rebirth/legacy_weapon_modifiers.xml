@@ -1,0 +1,389 @@
+<configs>
+  <!-- 2.6 weapon mods. Players find them in boss crates and supply drops. -->
+  <append xpath="/item_modifiers">
+    <item_modifier name="modFireRateTier1" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="15" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modFireRateTier2" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="30" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modFireRateTier3" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="45" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modFireRateTier4" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="60" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modFireRateTier5" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="75" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modFireRateTier6" installable_tags="ranged" modifier_tags="modFireRate" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="FireRateModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="RoundsPerMinute" operation="base_add" value="180" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier1" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".15" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier2" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".30" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier3" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".45" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier4" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".60" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier5" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".75" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modReloadSpeedTier6" installable_tags="ranged" modifier_tags="modReloadSpeed" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="ReloadSpeedModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value=".9" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier1" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="3" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier2" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="6" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier3" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="9" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier4" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="12" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier5" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="15" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMagazineSizeTier6" installable_tags="ranged" modifier_tags="modMagazineSize" blocked_tags="noMagazineMod,noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MagazineSizeModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="MagazineSize" operation="base_add" value="18" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier1" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="5"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier2" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="10"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier3" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="15"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier4" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="20"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier5" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="25"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modAttackSpeedTier6" installable_tags="melee" modifier_tags="modAttackSpeed" blocked_tags="noMods,motorTool" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="AttackSpeedModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="AttacksPerMinute" operation="base_add" value="30"/>
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier1" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.05" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier2" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.1" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier3" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.15" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier4" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.20" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier5" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.25" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeEntityDamageTier6" installable_tags="melee" modifier_tags="modMeleeEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="MeleeEntityDamageModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.30" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier1" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier1"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.05" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier2" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier2"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.1" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier3" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier3"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.15" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier4" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier4"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.20" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier5" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier5"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.25" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modRangedEntityDamageTier6" installable_tags="ranged" modifier_tags="modRangedEntityDamage" blocked_tags="noMods" type="attachment">
+			<property name="Extends" value="modGeneralMaster"/>
+			<property name="CustomIcon" value="RangedEntityDamageModTier6"/>
+
+			<effect_group tiered="false">
+				<passive_effect name="EntityDamage" operation="perc_add" value="0.30" />
+			</effect_group>
+		</item_modifier>
+    <item_modifier name="modMeleeDegradationTier1" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier1"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="100"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modMeleeDegradationTier2" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier2"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="200"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modMeleeDegradationTier3" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier3"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="300"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modMeleeDegradationTier4" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier4"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="400"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modMeleeDegradationTier5" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier5"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="500"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modMeleeDegradationTier6" installable_tags="melee" modifier_tags="modMeleeDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="MeleeDegradationModTier6"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="600"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier1" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier1"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="100"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier2" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier2"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="200"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier3" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier3"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="300"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier4" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier4"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="400"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier5" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier5"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="500"/>
+					</effect_group>
+				</item_modifier>
+    <item_modifier name="modRangedDegradationTier6" installable_tags="ranged" modifier_tags="modRangedDegradation" blocked_tags="noMods" type="attachment">
+					<property name="Extends" value="modGeneralMaster"/>
+					<property name="CustomIcon" value="RangedDegradationModTier6"/>
+
+					<effect_group tiered="false">
+						<passive_effect name="DegradationMax" operation="base_add" value="600"/>
+					</effect_group>
+				</item_modifier>
+  </append>
+</configs>

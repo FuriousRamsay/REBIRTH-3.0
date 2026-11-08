@@ -1,0 +1,12 @@
+<configs>
+  <append xpath="/entity_classes">
+    <entity_class name="FuriousRamsayNoEarthDamage" extends="zombieTemplateMale">
+      <property name="Tags" value="entity,nosleeper,skip" />
+      <property class="Explosion">
+        <property class="DamageBonus">
+          <property name="earth" value="0" />
+        </property>
+      </property>
+    </entity_class>
+  </append>
+</configs>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+  <!-- 2.6 propane refill controls, in the current REBIRTH panel colours. -->
+  <append xpath="/windows">
+    <window name="windowRebirthPropaneFiller" width="420" height="280" anchor="CenterCenter" pos="-915,285" depth="40" cursor_area="true" controller="RebirthPropanePanel, RebirthUtils">
+      <sprite depth="0" width="420" height="280" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
+      <sprite depth="1" width="420" height="280" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,230" />
+      <rect name="topBar" width="420" height="44">
+        <sprite depth="1" pos="2,-2" width="416" height="42" sprite="menu_empty" color="7,7,9,252" />
+        <label depth="2" pos="14,-9" width="390" height="30" font_size="24" upper_case="true" color="181,140,255,255" text_key="xuiRebirthPropaneTitle" />
+      </rect>
+      <sprite name="iconTank" depth="3" pos="14,-56" width="72" height="72" atlas="ItemIconAtlas" sprite="FR_SM_Propane_icon" />
+      <label depth="2" pos="104,-56" width="302" height="72" font_size="18" color="235,235,240,255" text_key="xuiRebirthPropaneHelp" />
+      <label name="lblStation" depth="2" pos="14,-140" width="392" height="24" font_size="20" color="235,235,240,255" />
+      <sprite depth="2" pos="14,-166" width="392" height="10" sprite="menu_empty" color="40,40,46,255" />
+      <sprite name="barStation" depth="3" pos="14,-166" width="392" height="10" sprite="menu_empty" type="filled" fill_direction="Horizontal" color="181,140,255,255" />
+      <label name="lblTank" depth="2" pos="14,-182" width="392" height="24" font_size="20" color="235,235,240,255" />
+      <sprite depth="2" pos="14,-208" width="392" height="10" sprite="menu_empty" color="40,40,46,255" />
+      <sprite name="barTank" depth="3" pos="14,-208" width="392" height="10" sprite="menu_empty" type="filled" fill_direction="Horizontal" color="201,198,105,255" />
+      <simplebutton name="btnFill" depth="4" pos="14,-230" width="392" height="38" font_size="20" caption_key="xuiRebirthPropaneStart" />
+    </window>
+  </append>
+</configs>

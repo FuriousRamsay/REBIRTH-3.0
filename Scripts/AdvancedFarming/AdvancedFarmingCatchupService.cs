@@ -865,7 +865,7 @@ public static class AdvancedFarmingCatchupService
 
         int gained = 0;
         int firstCycleIndex = (int)((previousWorldTime / cycleWorldTimeUnits) & 0x7FFFFFFFUL);
-        for (int i = 0; i < iterations && te.waterCount + gained < max; i++)
+        for (int i = 0; i < iterations && (te.waterCount + gained + 1) * 100d + te.WaterRemainderMl <= max * 100d; i++)
         {
             int roll = AdvancedFarmingRuleResolver.DeterministicRollPercent(pos, firstCycleIndex + i, 27183);
             if (roll <= chance)

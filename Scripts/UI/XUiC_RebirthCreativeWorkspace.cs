@@ -191,6 +191,8 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
     private const float NativeRefreshSeconds = .5f;
     private int childFlushPasses;
     private uint presentationVersion = 1, publishedVersion;
+    // Item (type and paint/meta) whose background texture is applied; -1 = none yet.
+    private int texturedItem = -1;
     private float wakeUntil, nextNativeRefresh;
     private ItemValue sampledItem;
     private int sampledCount, sampledMeta, sampledQuality;
@@ -379,10 +381,12 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
 #endif
             if (mode == RebirthCreativeSlotUpdateMode.Native)
             {
-                // Pooled catalogue values may be assigned before native Init
-                // resolves backgroundTexture. Reapply native material rendering
-                // after initialization, including when the stack is unchanged.
-                if(invalidated||due)updateBackgroundTexture();
+                // Pooled catalogue values may be assigned before native Init resolves backgroundTexture,
+                // so apply it once the texture view exists. Only re-apply when the item (type or paint)
+                // changes: updateBackgroundTexture ends in ForceTextureUpdate, and calling it on every
+                // safety refresh made textured slots (the Dev Paint Brush) flicker.
+                int textureKey = ItemStack == null || ItemStack.IsEmpty() ? 0 : ItemStack.itemValue.type * 256 + ItemStack.itemValue.Meta;
+                if (backgroundTexture != null && textureKey != texturedItem) { updateBackgroundTexture(); texturedItem = textureKey; }
                 uint publishingVersion = presentationVersion;
 #if REBIRTH_UI_DIAGNOSTICS
                 RebirthCreativePerformance.CountWake(reasons, dirtyAtEntry);

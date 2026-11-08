@@ -146,7 +146,7 @@
           <sprite depth="0" height="393" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
           <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
           <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
-          <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
+          <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" /><sprite name="camperInspectIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="camperInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" depth="12" color="255,255,255,255" />
           <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="255,255,255,255" support_bb_code="true" depth="12" />
           <rect name="camperDescriptionReader" pos="124,-152" width="380" height="220" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Owner capability is authoritative cached character data; never a nearby aura,
+// Owner capability is authoritative cached character data; never a nearby group effect,
 // source installer/viewer identity, client CVar or second fuel/battery multiplier.
 internal static class RebirthCamperEnergyEfficiency
 {

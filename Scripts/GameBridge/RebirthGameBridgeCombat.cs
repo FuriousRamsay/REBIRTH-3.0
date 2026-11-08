@@ -2773,7 +2773,8 @@ public static class RebirthGameBridgeCombat
         var rot = new Vector3(0f, yaw + 180f, 0f);
 
         Entity e = EntityFactory.CreateEntity(classId, pos, rot);
-        if (req.QueryBool("lootDrop", true)) e.lootDropProb = 1000f;     // the real chance is LootDropProb ~4 % x LootBagChance; tests want the bag every time
+        // Real loot bag chance by default (horde night, herds and bosses, as in 2.6); lootDrop=1 forces a bag for a test.
+        if (req.QueryBool("lootDrop", false)) e.lootDropProb = 1000f;
         p.world.SpawnEntityInWorld(e);
         if (req.QueryBool("sleeper", false)) { try { EntityAlive sl = e as EntityAlive; sl.SetSleeper(); sl.TriggerSleeperPose(0, false); } catch (Exception ex) { Log.Warning("[REBIRTH GameBridge] sleeper: " + ex.Message); } }
         req.Complete(new JObject

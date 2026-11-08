@@ -70,7 +70,7 @@ internal static class RebirthNativeInventoryPointerDrop
                 " locked="+slot.IsLocked+" stackLock="+slot.StackLock+" userLock="+slot.UserLockedSlot+
                 " simple="+slot.SimpleClick);
         }
-        if(state.Release!=Time.frameCount||state.Claimed||!Matches(ui,state,player,held))return;
+        if(!RebirthDragRelease.DropOnRelease||state.Release!=Time.frameCount||state.Claimed||!Matches(ui,state,player,held))return;
         var view=slot.ViewComponent;var collider=view?.UiTransform?.GetComponent<BoxCollider>();
         // NGUI retains hover on the pressed source for a real drag. The collider
         // raycast below identifies the destination even when native hover is stale.

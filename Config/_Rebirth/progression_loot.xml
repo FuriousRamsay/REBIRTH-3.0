@@ -3,10 +3,8 @@
   <insertBefore xpath="/lootcontainers/lootgroup[1]">
     <lootgroup name="rebirthLearning_bows" count="1">
       <item name="rebirthFieldNotesArchery" count="1"/>
-      <item name="rebirthPatternBowmaking" count="1"/>
       <item name="rebirthSchematicArcherySpecialtyAmmo" count="1"/>
       <item name="rebirthSchematicBowMods" count="1"/>
-      <item name="rebirthSchematicCrossbowsCompound" count="1"/>
       <item name="rebirthTheoryArcheryPrimer" count="1"/>
     </lootgroup>
     <lootgroup name="rebirthLearning_spears" count="1">
@@ -654,7 +652,6 @@
       <item name="rebirthPatternAssassinArmor" count="1"/>
       <item name="rebirthPatternAthleticArmor" count="1"/>
       <item name="rebirthPatternBikerArmor" count="1"/>
-      <item name="rebirthPatternBowmaking" count="1"/>
       <item name="rebirthPatternCommandoArmor" count="1"/>
       <item name="rebirthPatternEnforcerArmor" count="1"/>
       <item name="rebirthPatternFarmerArmor" count="1"/>
@@ -697,7 +694,6 @@
       <item name="rebirthSchematicBowMods" count="1"/>
       <item name="rebirthSchematicChemistryStation" count="1"/>
       <item name="rebirthSchematicClubMods" count="1"/>
-      <item name="rebirthSchematicCrossbowsCompound" count="1"/>
       <item name="rebirthSchematicElectricFencePost" count="1"/>
       <item name="rebirthSchematicElectricalFuse" count="1"/>
       <item name="rebirthSchematicElectricalSwitch" count="1"/>
@@ -726,6 +722,8 @@
       <item name="rebirthSchematicVehicleWheels" count="1"/>
       <item name="rebirthSchematicWireRelay" count="1"/>
       <item name="rebirthSchematicWiringHarness" count="1"/>
+      <item name="rebirthSchematicAmmoMachine" count="1"/>
+      <item name="rebirthSchematicAlchemyTable" count="1"/>
       <item name="rebirthSchematicWoodBurningStove" count="1"/>
     </lootgroup>
     <lootgroup name="rebirthCropSeeds" count="1">

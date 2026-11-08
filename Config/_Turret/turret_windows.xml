@@ -51,7 +51,7 @@
           <sprite width="841" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
           <label pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text="SELECTED ITEM" upper_case="true" depth="5" />
           <sprite pos="0,-38" width="841" height="2" sprite="menu_empty" color="181,140,255,255" depth="3" />
-          <sprite name="rebirthTurretSelectedIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" depth="6" visible="false" />
+          <sprite name="rebirthTurretSelectedIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" depth="6" visible="false" /><sprite name="rebirthTurretSelectedIconBonus" depth="12" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="rebirthTurretSelectedName" pos="139,-54" width="685" height="40" font_size="34" color="255,255,255,255" depth="5" />
           <label name="rebirthTurretSelectedDescription" pos="139,-92" width="368" height="165" font_size="20" color="235,235,239,255" depth="5" />
           <rect name="rebirthTurretSelectedActions" pos="14,-248" width="826" height="76" controller="RebirthItemActionList, RebirthUtils">
@@ -180,6 +180,7 @@
               <sprite depth="1" color="[mediumGrey]" type="sliced" width="449" height="44" />
               <button depth="4" name="statButton" style="icon30px, press" pos="22,-22" sprite="ui_game_symbol_ping" pivot="center" tooltip="Stats" tooltip_key="lblStats" sound="[paging_click]" selected="true" />
               <button depth="4" name="descriptionButton" style="icon30px, press" pos="65,-22" sprite="ui_game_symbol_book" pivot="center" tooltip="Description" tooltip_key="lblDescription" sound="[paging_click]" />
+              <button depth="4" name="rbBonusTab" style="icon30px, press" pos="108,-22" sprite="ui_game_symbol_star" defaultcolor="181,140,255" pivot="center" tooltip="Bonuses" tooltip_key="xuiRebirthBonusesTab" sound="[paging_click]" visible="{showbonusoption}" />
             </rect>
             <rect depth="1" pos="153,0" name="description" width="447" height="271" visible="{showonlydescription}">
               <sprite depth="1" color="[darkGrey]" type="sliced" />

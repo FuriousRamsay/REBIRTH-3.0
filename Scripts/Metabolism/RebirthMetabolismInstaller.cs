@@ -220,6 +220,8 @@ public static class RebirthMetabolismStaminaRegenPatch
             _originalValue: __instance.Stamina.RegenerationAmount,
             _entity: __instance.m_entity,
             tags: __instance.m_entity.CurrentMovementTag | __instance.m_entity.CurrentStanceTag);
+        if (resolved < 0f)
+            resolved *= RebirthArmorBonusSpecials.StaminaDrainFactor(__instance.m_entity);
 
         // Intentionally omit vanilla GetWaterPercent() multiplication. REBIRTH routes
         // Hydration/Nutrition through the Energy reserve, and Energy alone gates this

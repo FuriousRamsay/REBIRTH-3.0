@@ -1,0 +1,28 @@
+<configs>
+  <!-- 2.6 Mind Control Brew effect: 300 seconds; scythe primary attacks deal +200% damage. -->
+  <append xpath="/buffs">
+    <buff name="FuriousRamsaySetMindControl" tooltip_key="FuriousRamsaySetMindControlTooltip" name_key="FuriousRamsaySetMindControlName" description_key="FuriousRamsaySetMindControlDesc" icon="ui_game_symbol_FR_MindControl_icon">
+      <stack_type value="replace" />
+      <duration value="350" />
+      <update_rate value="10" />
+      <display_value value="$FuriousRamsaySetMindControlDisplay" />
+      <display_value_format value="time" />
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$FuriousRamsaySetMindControlDisplay" operation="set" value="300" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar="$FuriousRamsaySetMindControlDisplay" operation="add" value="-10" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="2.00">
+          <requirement name="IsPrimaryAttack" />
+          <requirement name="ItemHasTags" tags="scythe" />
+        </passive_effect>
+      </effect_group>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$varFuriousRamsayMindControlActive" operation="set" value="1" />
+        <triggered_effect trigger="onSelfBuffRemove" action="ModifyCVar" cvar="$FuriousRamsaySetMindControlDisplay" operation="set" value="0" />
+        <triggered_effect trigger="onSelfBuffRemove" action="ModifyCVar" cvar="$varFuriousRamsayMindControlActive" operation="set" value="0" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="RemoveBuff" buff="FuriousRamsaySetMindControl">
+          <requirement name="CVarCompare" cvar="$FuriousRamsaySetMindControlDisplay" operation="LTE" value="0" />
+        </triggered_effect>
+      </effect_group>
+    </buff>
+  </append>
+</configs>

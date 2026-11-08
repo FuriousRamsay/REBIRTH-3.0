@@ -139,6 +139,7 @@ public sealed class XUiC_RebirthTurretBackpack:XUiC_Backpack
                 inspectedIcon.SetColorImmediately(item.ItemClass.GetIconTint(item));
             }
         }
+        RebirthWeaponBonusSelectedIcon.Show(windowGroup?.Controller, "rebirthTurretSelectedIcon", valid ? stack.itemValue : null);
         inspectedName?.SetTextImmediately(valid?stack.itemValue.ItemClass.GetLocalizedItemName():string.Empty);
         inspectedDescription?.SetTextImmediately(valid?XUiC_RebirthCraftingItemContext.ResolveDescription(stack,xui):string.Empty);
         details?.Render(source,stack);

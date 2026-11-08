@@ -1,0 +1,720 @@
+<configs>
+  <!-- Approved boss crate lists, Rebirth progression only. No weapon parts or Legendary Parts. -->
+  <insertBefore xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT1']">
+    <lootgroup name="rebirthBossAmmoT5">
+      <item name="ammoBundle9mmBulletAP" />
+      <item name="ammoBundle44MagnumBulletAP" />
+      <item name="ammoBundle762mmBulletAP" />
+      <item name="ammoBundleShotgunBreachingSlug" />
+      <item name="ammoBundleShotgunSlug" />
+    </lootgroup>
+    <lootgroup name="rebirthBossWeaponT5">
+      <item name="gunMGT3M60" quality="4,6" />
+      <item name="gunRifleT3SniperRifle" quality="4,6" />
+      <item name="gunShotgunT3AutoShotgun" quality="4,6" />
+      <item name="gunExplosivesT3RocketLauncher" quality="4,6" />
+      <item name="meleeWpnBatonT2StunBaton" quality="4,6" />
+      <item name="meleeWpnSledgeT3SteelSledgehammer" quality="4,6" />
+      <item name="gunHandgunT3DesertVulture" quality="4,6" />
+    </lootgroup>
+    <lootgroup name="rebirthBossOtherT5">
+      <item name="armorAthleticHelmet" quality="4,6" />
+      <item name="armorAthleticOutfit" quality="4,6" />
+      <item name="armorAthleticGloves" quality="4,6" />
+      <item name="armorAthleticBoots" quality="4,6" />
+      <item name="armorEnforcerHelmet" quality="4,6" />
+      <item name="armorEnforcerOutfit" quality="4,6" />
+      <item name="armorEnforcerGloves" quality="4,6" />
+      <item name="armorEnforcerBoots" quality="4,6" />
+      <item name="armorLumberjackHelmet" quality="4,6" />
+      <item name="armorLumberjackOutfit" quality="4,6" />
+      <item name="armorLumberjackGloves" quality="4,6" />
+      <item name="armorLumberjackBoots" quality="4,6" />
+      <item name="armorPreacherHelmet" quality="4,6" />
+      <item name="armorPreacherOutfit" quality="4,6" />
+      <item name="armorPreacherGloves" quality="4,6" />
+      <item name="armorPreacherBoots" quality="4,6" />
+      <item name="armorPrimitiveHelmet" quality="4,6" />
+      <item name="armorPrimitiveOutfit" quality="4,6" />
+      <item name="armorPrimitiveGloves" quality="4,6" />
+      <item name="armorPrimitiveBoots" quality="4,6" />
+      <item name="armorRogueHelmet" quality="4,6" />
+      <item name="armorRogueOutfit" quality="4,6" />
+      <item name="armorRogueGloves" quality="4,6" />
+      <item name="armorRogueBoots" quality="4,6" />
+      <item name="armorAssassinHelmet" quality="4,6" />
+      <item name="armorAssassinOutfit" quality="4,6" />
+      <item name="armorAssassinGloves" quality="4,6" />
+      <item name="armorAssassinBoots" quality="4,6" />
+      <item name="armorBikerHelmet" quality="4,6" />
+      <item name="armorBikerOutfit" quality="4,6" />
+      <item name="armorBikerGloves" quality="4,6" />
+      <item name="armorBikerBoots" quality="4,6" />
+      <item name="armorCommandoHelmet" quality="4,6" />
+      <item name="armorCommandoOutfit" quality="4,6" />
+      <item name="armorCommandoGloves" quality="4,6" />
+      <item name="armorCommandoBoots" quality="4,6" />
+      <item name="armorFarmerHelmet" quality="4,6" />
+      <item name="armorFarmerOutfit" quality="4,6" />
+      <item name="armorFarmerGloves" quality="4,6" />
+      <item name="armorFarmerBoots" quality="4,6" />
+      <item name="armorRangerHelmet" quality="4,6" />
+      <item name="armorRangerOutfit" quality="4,6" />
+      <item name="armorRangerGloves" quality="4,6" />
+      <item name="armorRangerBoots" quality="4,6" />
+      <item name="armorScavengerHelmet" quality="4,6" />
+      <item name="armorScavengerOutfit" quality="4,6" />
+      <item name="armorScavengerGloves" quality="4,6" />
+      <item name="armorScavengerBoots" quality="4,6" />
+      <item name="armorMinerHelmet" quality="4,6" />
+      <item name="armorMinerOutfit" quality="4,6" />
+      <item name="armorMinerGloves" quality="4,6" />
+      <item name="armorMinerBoots" quality="4,6" />
+      <item name="armorNerdHelmet" quality="4,6" />
+      <item name="armorNerdOutfit" quality="4,6" />
+      <item name="armorNerdGloves" quality="4,6" />
+      <item name="armorNerdBoots" quality="4,6" />
+      <item name="armorNomadHelmet" quality="4,6" />
+      <item name="armorNomadOutfit" quality="4,6" />
+      <item name="armorNomadGloves" quality="4,6" />
+      <item name="armorNomadBoots" quality="4,6" />
+      <item name="armorRaiderHelmet" quality="4,6" />
+      <item name="armorRaiderOutfit" quality="4,6" />
+      <item name="armorRaiderGloves" quality="4,6" />
+      <item name="armorRaiderBoots" quality="4,6" />
+      <item name="armorSamuraiHelmet" quality="4,6" />
+      <item name="armorSamuraiOutfit" quality="4,6" />
+      <item name="armorSamuraiGloves" quality="4,6" />
+      <item name="armorSamuraiBoots" quality="4,6" />
+      <item name="modArmorQuadStoragePocketSchematic" />
+      <item name="modRoboticDroneMoraleBoosterModSchematic" />
+      <item name="modRoboticDroneArmorPlatingModSchematic" />
+      <item name="modRoboticDroneMedicModSchematic" />
+    </lootgroup>
+    <lootgroup name="rebirthBossPrizeT5">
+      <item group="rebirthBossWeaponT5" />
+      <item group="rebirthBossOtherT5" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSuppliesT5">
+      <item name="drugAntibiotics" count="1,3" />
+      <item name="medicalFirstAidKit" count="1,3" />
+      <item name="drugSteroids" count="1,3" />
+      <item name="drugOhShitzDrops" count="1,3" />
+      <item name="thrownTimedCharge" count="1,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossMaterialsT5">
+      <item name="resourceForgedSteel" count="25,50" />
+      <item name="resourceRocketCasing" count="25,50" />
+      <item name="resourceRocketTip" count="25,50" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSurpriseT5">
+      <item name="partV8Engine_FR" />
+      <item name="partCarTransmission_FR" />
+      <item name="partTruckRadiator_FR" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item group="rebirthBossPrizeT5" />
+    </lootgroup>
+    <lootgroup name="rebirthBossAmmoT4">
+      <item name="ammoBundle9mmBulletHP" />
+      <item name="ammoBundle44MagnumBulletHP" />
+      <item name="ammoBundle762mmBulletHP" />
+      <item name="ammoBundle9mmBulletAP" />
+      <item name="ammoBundle44MagnumBulletAP" />
+      <item name="ammoBundle762mmBulletAP" />
+      <item name="ammoBundleShotgunSlug" />
+      <item name="ammoBundleShotgunBreachingSlug" />
+    </lootgroup>
+    <lootgroup name="rebirthBossWeaponT4">
+      <item name="gunHandgunT3SMG5" quality="4,5" />
+      <item name="gunHandgunT3DesertVulture" quality="4,5" />
+      <item name="gunMGT3M60" quality="4,5" />
+      <item name="gunRifleT3SniperRifle" quality="4,5" />
+      <item name="gunShotgunT3AutoShotgun" quality="4,5" />
+      <item name="meleeWpnClubT3SteelClub" quality="4,5" />
+      <item name="meleeWpnBladeT3Machete" quality="4,5" />
+      <item name="meleeWpnSledgeT3SteelSledgehammer" quality="4,5" />
+      <item name="meleeWpnSpearT3SteelSpear" quality="4,5" />
+      <item name="meleeWpnKnucklesT3SteelKnuckles" quality="4,5" />
+    </lootgroup>
+    <lootgroup name="rebirthBossOtherT4">
+      <item name="armorAthleticHelmet" quality="4,5" />
+      <item name="armorAthleticOutfit" quality="4,5" />
+      <item name="armorAthleticGloves" quality="4,5" />
+      <item name="armorAthleticBoots" quality="4,5" />
+      <item name="armorEnforcerHelmet" quality="4,5" />
+      <item name="armorEnforcerOutfit" quality="4,5" />
+      <item name="armorEnforcerGloves" quality="4,5" />
+      <item name="armorEnforcerBoots" quality="4,5" />
+      <item name="armorLumberjackHelmet" quality="4,5" />
+      <item name="armorLumberjackOutfit" quality="4,5" />
+      <item name="armorLumberjackGloves" quality="4,5" />
+      <item name="armorLumberjackBoots" quality="4,5" />
+      <item name="armorPreacherHelmet" quality="4,5" />
+      <item name="armorPreacherOutfit" quality="4,5" />
+      <item name="armorPreacherGloves" quality="4,5" />
+      <item name="armorPreacherBoots" quality="4,5" />
+      <item name="armorPrimitiveHelmet" quality="4,5" />
+      <item name="armorPrimitiveOutfit" quality="4,5" />
+      <item name="armorPrimitiveGloves" quality="4,5" />
+      <item name="armorPrimitiveBoots" quality="4,5" />
+      <item name="armorRogueHelmet" quality="4,5" />
+      <item name="armorRogueOutfit" quality="4,5" />
+      <item name="armorRogueGloves" quality="4,5" />
+      <item name="armorRogueBoots" quality="4,5" />
+      <item name="armorAssassinHelmet" quality="4,5" />
+      <item name="armorAssassinOutfit" quality="4,5" />
+      <item name="armorAssassinGloves" quality="4,5" />
+      <item name="armorAssassinBoots" quality="4,5" />
+      <item name="armorBikerHelmet" quality="4,5" />
+      <item name="armorBikerOutfit" quality="4,5" />
+      <item name="armorBikerGloves" quality="4,5" />
+      <item name="armorBikerBoots" quality="4,5" />
+      <item name="armorCommandoHelmet" quality="4,5" />
+      <item name="armorCommandoOutfit" quality="4,5" />
+      <item name="armorCommandoGloves" quality="4,5" />
+      <item name="armorCommandoBoots" quality="4,5" />
+      <item name="armorFarmerHelmet" quality="4,5" />
+      <item name="armorFarmerOutfit" quality="4,5" />
+      <item name="armorFarmerGloves" quality="4,5" />
+      <item name="armorFarmerBoots" quality="4,5" />
+      <item name="armorRangerHelmet" quality="4,5" />
+      <item name="armorRangerOutfit" quality="4,5" />
+      <item name="armorRangerGloves" quality="4,5" />
+      <item name="armorRangerBoots" quality="4,5" />
+      <item name="armorScavengerHelmet" quality="4,5" />
+      <item name="armorScavengerOutfit" quality="4,5" />
+      <item name="armorScavengerGloves" quality="4,5" />
+      <item name="armorScavengerBoots" quality="4,5" />
+      <item name="armorMinerHelmet" quality="4,5" />
+      <item name="armorMinerOutfit" quality="4,5" />
+      <item name="armorMinerGloves" quality="4,5" />
+      <item name="armorMinerBoots" quality="4,5" />
+      <item name="armorNerdHelmet" quality="4,5" />
+      <item name="armorNerdOutfit" quality="4,5" />
+      <item name="armorNerdGloves" quality="4,5" />
+      <item name="armorNerdBoots" quality="4,5" />
+      <item name="armorNomadHelmet" quality="4,5" />
+      <item name="armorNomadOutfit" quality="4,5" />
+      <item name="armorNomadGloves" quality="4,5" />
+      <item name="armorNomadBoots" quality="4,5" />
+      <item name="armorRaiderHelmet" quality="4,5" />
+      <item name="armorRaiderOutfit" quality="4,5" />
+      <item name="armorRaiderGloves" quality="4,5" />
+      <item name="armorRaiderBoots" quality="4,5" />
+      <item name="armorSamuraiHelmet" quality="4,5" />
+      <item name="armorSamuraiOutfit" quality="4,5" />
+      <item name="armorSamuraiGloves" quality="4,5" />
+      <item name="armorSamuraiBoots" quality="4,5" />
+      <item name="modGunBipodSchematic" />
+      <item name="modGunSoundSuppressorSilencerSchematic" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="modRoboticDroneHeadlampModSchematic" />
+    </lootgroup>
+    <lootgroup name="rebirthBossPrizeT4">
+      <item group="rebirthBossWeaponT4" />
+      <item group="rebirthBossOtherT4" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSuppliesT4">
+      <item name="drugAntibiotics" count="1,3" />
+      <item name="medicalFirstAidKit" count="1,3" />
+      <item name="drugRecog" count="1,3" />
+      <item name="thrownGrenade" count="1,3" />
+      <item name="thrownAmmoPipeBomb" count="1,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossMaterialsT4">
+      <item name="resourceForgedSteel" count="20,40" />
+      <item name="resourceAcid" count="20,40" />
+      <item name="resourceElectricParts" count="20,40" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSurpriseT4">
+      <item name="partV8Engine_FR" />
+      <item name="partCarTransmission_FR" />
+      <item name="partTruckRadiator_FR" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item group="rebirthBossPrizeT5" />
+    </lootgroup>
+    <lootgroup name="rebirthBossAmmoT3">
+      <item name="ammoBundle9mmBulletHP" />
+      <item name="ammoBundle44MagnumBulletHP" />
+      <item name="ammoBundle762mmBulletHP" />
+      <item name="ammoBundle9mmBulletAP" />
+      <item name="ammoBundle44MagnumBulletAP" />
+      <item name="ammoBundle762mmBulletAP" />
+      <item name="ammoBundleShotgunSlug" />
+      <item name="ammoBundleShotgunBreachingSlug" />
+    </lootgroup>
+    <lootgroup name="rebirthBossWeaponT3">
+      <item name="gunHandgunT2Magnum44" quality="3,4" />
+      <item name="gunShotgunT2PumpShotgun" quality="3,4" />
+      <item name="gunRifleT2LeverActionRifle" quality="3,4" />
+      <item name="gunMGT2TacticalAR" quality="3,4" />
+      <item name="gunHandgunT3SMG5" quality="3,4" />
+      <item name="gunHandgunT3DesertVulture" quality="3,4" />
+      <item name="meleeWpnClubT3SteelClub" quality="3,4" />
+      <item name="meleeWpnBatonT2StunBaton" quality="3,4" />
+      <item name="meleeWpnBladeT3Machete" quality="3,4" />
+    </lootgroup>
+    <lootgroup name="rebirthBossOtherT3">
+      <item name="armorAthleticHelmet" quality="3,4" />
+      <item name="armorAthleticOutfit" quality="3,4" />
+      <item name="armorAthleticGloves" quality="3,4" />
+      <item name="armorAthleticBoots" quality="3,4" />
+      <item name="armorEnforcerHelmet" quality="3,4" />
+      <item name="armorEnforcerOutfit" quality="3,4" />
+      <item name="armorEnforcerGloves" quality="3,4" />
+      <item name="armorEnforcerBoots" quality="3,4" />
+      <item name="armorLumberjackHelmet" quality="3,4" />
+      <item name="armorLumberjackOutfit" quality="3,4" />
+      <item name="armorLumberjackGloves" quality="3,4" />
+      <item name="armorLumberjackBoots" quality="3,4" />
+      <item name="armorPreacherHelmet" quality="3,4" />
+      <item name="armorPreacherOutfit" quality="3,4" />
+      <item name="armorPreacherGloves" quality="3,4" />
+      <item name="armorPreacherBoots" quality="3,4" />
+      <item name="armorPrimitiveHelmet" quality="3,4" />
+      <item name="armorPrimitiveOutfit" quality="3,4" />
+      <item name="armorPrimitiveGloves" quality="3,4" />
+      <item name="armorPrimitiveBoots" quality="3,4" />
+      <item name="armorRogueHelmet" quality="3,4" />
+      <item name="armorRogueOutfit" quality="3,4" />
+      <item name="armorRogueGloves" quality="3,4" />
+      <item name="armorRogueBoots" quality="3,4" />
+      <item name="armorAssassinHelmet" quality="3,4" />
+      <item name="armorAssassinOutfit" quality="3,4" />
+      <item name="armorAssassinGloves" quality="3,4" />
+      <item name="armorAssassinBoots" quality="3,4" />
+      <item name="armorBikerHelmet" quality="3,4" />
+      <item name="armorBikerOutfit" quality="3,4" />
+      <item name="armorBikerGloves" quality="3,4" />
+      <item name="armorBikerBoots" quality="3,4" />
+      <item name="armorCommandoHelmet" quality="3,4" />
+      <item name="armorCommandoOutfit" quality="3,4" />
+      <item name="armorCommandoGloves" quality="3,4" />
+      <item name="armorCommandoBoots" quality="3,4" />
+      <item name="armorFarmerHelmet" quality="3,4" />
+      <item name="armorFarmerOutfit" quality="3,4" />
+      <item name="armorFarmerGloves" quality="3,4" />
+      <item name="armorFarmerBoots" quality="3,4" />
+      <item name="armorRangerHelmet" quality="3,4" />
+      <item name="armorRangerOutfit" quality="3,4" />
+      <item name="armorRangerGloves" quality="3,4" />
+      <item name="armorRangerBoots" quality="3,4" />
+      <item name="armorScavengerHelmet" quality="3,4" />
+      <item name="armorScavengerOutfit" quality="3,4" />
+      <item name="armorScavengerGloves" quality="3,4" />
+      <item name="armorScavengerBoots" quality="3,4" />
+      <item name="rebirthAudioSpearsPrimerCassette" />
+      <item name="rebirthAudioClubsPrimerCassette" />
+      <item name="rebirthAudioSwordsPrimerCassette" />
+      <item name="rebirthAudioAxesPrimerCassette" />
+      <item name="rebirthAudioBatonsPrimerCassette" />
+      <item name="rebirthAudioHammersPrimerCassette" />
+      <item name="rebirthAudioKnivesPrimerCassette" />
+      <item name="rebirthAudioScythesPrimerCassette" />
+      <item name="rebirthAudioKnucklesPrimerCassette" />
+      <item name="rebirthAudioUnarmedPrimerCassette" />
+      <item name="rebirthAudioArcheryPrimerCassette" />
+      <item name="rebirthAudioPistolsPrimerCassette" />
+      <item name="rebirthAudioRevolversPrimerCassette" />
+      <item name="rebirthAudioHeavyHandgunsPrimerCassette" />
+      <item name="rebirthAudioShotgunsPrimerCassette" />
+      <item name="rebirthAudioAssaultRiflesPrimerCassette" />
+      <item name="rebirthAudioTacticalRiflesPrimerCassette" />
+      <item name="rebirthAudioLongRangeRiflesPrimerCassette" />
+      <item name="rebirthAudioExplosivesPrimerCassette" />
+      <item name="rebirthAudioDeployableTurretsPrimerCassette" />
+      <item name="rebirthAudioDroneOperationsPrimerCassette" />
+      <item name="rebirthAudioMiningPrimerCassette" />
+      <item name="rebirthAudioLoggingPrimerCassette" />
+      <item name="rebirthAudioSalvagePrimerCassette" />
+      <item name="rebirthAudioFarmingPrimerCassette" />
+      <item name="rebirthAudioAnimalProcessingPrimerCassette" />
+      <item name="rebirthAudioTrackingPrimerCassette" />
+      <item name="rebirthAudioMechanicsPrimerCassette" />
+      <item name="rebirthAudioMedicinePrimerCassette" />
+      <item name="rebirthAudioCookingPrimerCassette" />
+      <item name="rebirthAudioMaintenancePrimerCassette" />
+      <item name="rebirthAudioConstructionPrimerCassette" />
+      <item name="rebirthAudioElectricalPrimerCassette" />
+      <item name="rebirthAudioMetalworkingPrimerCassette" />
+      <item name="rebirthAudioGunsmithingPrimerCassette" />
+      <item name="rebirthAudioChemistryPrimerCassette" />
+      <item name="rebirthAudioLockpickingPrimerCassette" />
+      <item name="rebirthAudioStealthPrimerCassette" />
+      <item name="rebirthAudioAthleticsPrimerCassette" />
+      <item name="rebirthAudioArmorProficiencyPrimerCassette" />
+      <item name="rebirthAudioBarteringPrimerCassette" />
+      <item name="rebirthAudioTailoringPrimerCassette" />
+      <item name="modGunBipodSchematic" />
+      <item name="modGunSoundSuppressorSilencerSchematic" />
+    </lootgroup>
+    <lootgroup name="rebirthBossPrizeT3">
+      <item group="rebirthBossWeaponT3" />
+      <item group="rebirthBossOtherT3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSuppliesT3">
+      <item name="drugHerbalAntibiotics" count="1,3" />
+      <item name="medicalFirstAidKit" count="1,3" />
+      <item name="drugFortBites" count="1,3" />
+      <item name="drugRecog" count="1,3" />
+      <item name="thrownGrenade" count="1,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossMaterialsT3">
+      <item name="resourceForgedSteel" count="15,30" />
+      <item name="resourceElectricParts" count="15,30" />
+      <item name="resourceAcid" count="15,30" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSurpriseT3">
+      <item name="partV8Engine_FR" />
+      <item name="partCarTransmission_FR" />
+      <item name="partTruckRadiator_FR" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item group="rebirthBossPrizeT4" />
+    </lootgroup>
+    <lootgroup name="rebirthBossAmmoT2">
+      <item name="ammoBundle9mmBulletBall" />
+      <item name="ammoBundle44MagnumBulletBall" />
+      <item name="ammoBundle762mmBulletBall" />
+      <item name="ammoBundleShotgunShell" />
+      <item name="ammoBundle9mmBulletHP" />
+      <item name="ammoBundle44MagnumBulletHP" />
+      <item name="ammoBundle762mmBulletHP" />
+    </lootgroup>
+    <lootgroup name="rebirthBossWeaponT2">
+      <item name="gunHandgunT1Pistol" quality="3" />
+      <item name="gunRifleT1HuntingRifle" quality="3" />
+      <item name="gunMGT1AK47" quality="3" />
+      <item name="gunShotgunT1DoubleBarrel" quality="3" />
+      <item name="gunHandgunT2Magnum44" quality="3" />
+      <item name="gunShotgunT2PumpShotgun" quality="3" />
+      <item name="gunRifleT2LeverActionRifle" quality="3" />
+      <item name="gunMGT2TacticalAR" quality="3" />
+      <item name="meleeWpnBatonT2StunBaton" quality="3" />
+      <item name="meleeWpnClubT1BaseballBat" quality="3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossOtherT2">
+      <item name="armorAthleticHelmet" quality="3" />
+      <item name="armorAthleticOutfit" quality="3" />
+      <item name="armorAthleticGloves" quality="3" />
+      <item name="armorAthleticBoots" quality="3" />
+      <item name="armorEnforcerHelmet" quality="3" />
+      <item name="armorEnforcerOutfit" quality="3" />
+      <item name="armorEnforcerGloves" quality="3" />
+      <item name="armorEnforcerBoots" quality="3" />
+      <item name="armorLumberjackHelmet" quality="3" />
+      <item name="armorLumberjackOutfit" quality="3" />
+      <item name="armorLumberjackGloves" quality="3" />
+      <item name="armorLumberjackBoots" quality="3" />
+      <item name="armorPreacherHelmet" quality="3" />
+      <item name="armorPreacherOutfit" quality="3" />
+      <item name="armorPreacherGloves" quality="3" />
+      <item name="armorPreacherBoots" quality="3" />
+      <item name="armorPrimitiveHelmet" quality="3" />
+      <item name="armorPrimitiveOutfit" quality="3" />
+      <item name="armorPrimitiveGloves" quality="3" />
+      <item name="armorPrimitiveBoots" quality="3" />
+      <item name="armorRogueHelmet" quality="3" />
+      <item name="armorRogueOutfit" quality="3" />
+      <item name="armorRogueGloves" quality="3" />
+      <item name="armorRogueBoots" quality="3" />
+      <item name="rebirthFieldNotesSpears" />
+      <item name="rebirthFieldNotesClubs" />
+      <item name="rebirthFieldNotesSwords" />
+      <item name="rebirthFieldNotesAxes" />
+      <item name="rebirthFieldNotesBatons" />
+      <item name="rebirthFieldNotesHammers" />
+      <item name="rebirthFieldNotesKnives" />
+      <item name="rebirthFieldNotesScythes" />
+      <item name="rebirthFieldNotesKnuckles" />
+      <item name="rebirthFieldNotesUnarmed" />
+      <item name="rebirthFieldNotesArchery" />
+      <item name="rebirthFieldNotesPistols" />
+      <item name="rebirthFieldNotesRevolvers" />
+      <item name="rebirthFieldNotesHeavyHandguns" />
+      <item name="rebirthFieldNotesShotguns" />
+      <item name="rebirthFieldNotesAssaultRifles" />
+      <item name="rebirthFieldNotesTacticalRifles" />
+      <item name="rebirthFieldNotesLongRangeRifles" />
+      <item name="rebirthFieldNotesExplosives" />
+      <item name="rebirthFieldNotesDeployableTurrets" />
+      <item name="rebirthFieldNotesDroneOperations" />
+      <item name="rebirthFieldNotesMining" />
+      <item name="rebirthFieldNotesLogging" />
+      <item name="rebirthFieldNotesSalvage" />
+      <item name="rebirthFieldNotesFarming" />
+      <item name="rebirthFieldNotesAnimalProcessing" />
+      <item name="rebirthFieldNotesTracking" />
+      <item name="rebirthFieldNotesMechanics" />
+      <item name="rebirthFieldNotesMedicine" />
+      <item name="rebirthFieldNotesCooking" />
+      <item name="rebirthFieldNotesMaintenance" />
+      <item name="rebirthFieldNotesConstruction" />
+      <item name="rebirthFieldNotesElectrical" />
+      <item name="rebirthFieldNotesMetalworking" />
+      <item name="rebirthFieldNotesGunsmithing" />
+      <item name="rebirthFieldNotesChemistry" />
+      <item name="rebirthFieldNotesLockpicking" />
+      <item name="rebirthFieldNotesStealth" />
+      <item name="rebirthFieldNotesAthletics" />
+      <item name="rebirthFieldNotesArmorProficiency" />
+      <item name="rebirthFieldNotesBartering" />
+      <item name="rebirthFieldNotesTailoring" />
+      <item name="rebirthAudioSpearsPrimerCassette" />
+      <item name="rebirthAudioClubsPrimerCassette" />
+      <item name="rebirthAudioSwordsPrimerCassette" />
+      <item name="rebirthAudioAxesPrimerCassette" />
+      <item name="rebirthAudioBatonsPrimerCassette" />
+      <item name="rebirthAudioHammersPrimerCassette" />
+      <item name="rebirthAudioKnivesPrimerCassette" />
+      <item name="rebirthAudioScythesPrimerCassette" />
+      <item name="rebirthAudioKnucklesPrimerCassette" />
+      <item name="rebirthAudioUnarmedPrimerCassette" />
+      <item name="rebirthAudioArcheryPrimerCassette" />
+      <item name="rebirthAudioPistolsPrimerCassette" />
+      <item name="rebirthAudioRevolversPrimerCassette" />
+      <item name="rebirthAudioHeavyHandgunsPrimerCassette" />
+      <item name="rebirthAudioShotgunsPrimerCassette" />
+      <item name="rebirthAudioAssaultRiflesPrimerCassette" />
+      <item name="rebirthAudioTacticalRiflesPrimerCassette" />
+      <item name="rebirthAudioLongRangeRiflesPrimerCassette" />
+      <item name="rebirthAudioExplosivesPrimerCassette" />
+      <item name="rebirthAudioDeployableTurretsPrimerCassette" />
+      <item name="rebirthAudioDroneOperationsPrimerCassette" />
+      <item name="rebirthAudioMiningPrimerCassette" />
+      <item name="rebirthAudioLoggingPrimerCassette" />
+      <item name="rebirthAudioSalvagePrimerCassette" />
+      <item name="rebirthAudioFarmingPrimerCassette" />
+      <item name="rebirthAudioAnimalProcessingPrimerCassette" />
+      <item name="rebirthAudioTrackingPrimerCassette" />
+      <item name="rebirthAudioMechanicsPrimerCassette" />
+      <item name="rebirthAudioMedicinePrimerCassette" />
+      <item name="rebirthAudioCookingPrimerCassette" />
+      <item name="rebirthAudioMaintenancePrimerCassette" />
+      <item name="rebirthAudioConstructionPrimerCassette" />
+      <item name="rebirthAudioElectricalPrimerCassette" />
+      <item name="rebirthAudioMetalworkingPrimerCassette" />
+      <item name="rebirthAudioGunsmithingPrimerCassette" />
+      <item name="rebirthAudioChemistryPrimerCassette" />
+      <item name="rebirthAudioLockpickingPrimerCassette" />
+      <item name="rebirthAudioStealthPrimerCassette" />
+      <item name="rebirthAudioAthleticsPrimerCassette" />
+      <item name="rebirthAudioArmorProficiencyPrimerCassette" />
+      <item name="rebirthAudioBarteringPrimerCassette" />
+      <item name="rebirthAudioTailoringPrimerCassette" />
+    </lootgroup>
+    <lootgroup name="rebirthBossPrizeT2">
+      <item group="rebirthBossWeaponT2" />
+      <item group="rebirthBossOtherT2" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSuppliesT2">
+      <item name="drugHerbalAntibiotics" count="1,3" />
+      <item name="medicalFirstAidBandage" count="1,3" />
+      <item name="drugFortBites" count="1,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossMaterialsT2">
+      <item name="resourceMechanicalParts" count="10,20" />
+      <item name="resourceElectricParts" count="10,20" />
+      <item name="resourceForgedIron" count="10,20" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSurpriseT2">
+      <item name="partV8Engine_FR" />
+      <item name="partCarTransmission_FR" />
+      <item name="partTruckRadiator_FR" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item group="rebirthBossPrizeT3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossAmmoT1">
+      <item name="ammoBundle9mmBulletBall" />
+      <item name="ammoBundle44MagnumBulletBall" />
+      <item name="ammoBundle762mmBulletBall" />
+      <item name="ammoBundleShotgunShell" />
+    </lootgroup>
+    <lootgroup name="rebirthBossWeaponT1">
+      <item name="gunHandgunT1Pistol" quality="2,3" />
+      <item name="gunRifleT1HuntingRifle" quality="2,3" />
+      <item name="gunMGT1AK47" quality="2,3" />
+      <item name="gunShotgunT1DoubleBarrel" quality="2,3" />
+      <item name="gunBowT1WoodenBow" quality="2,3" />
+      <item name="meleeWpnClubT1BaseballBat" quality="2,3" />
+      <item name="meleeWpnBladeT1HuntingKnife" quality="2,3" />
+      <item name="meleeWpnSpearT1IronSpear" quality="2,3" />
+      <item name="meleeWpnSledgeT1IronSledgehammer" quality="2,3" />
+      <item name="meleeWpnKnucklesT1IronKnuckles" quality="2,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossOtherT1">
+      <item name="armorAthleticHelmet" quality="2,3" />
+      <item name="armorAthleticOutfit" quality="2,3" />
+      <item name="armorAthleticGloves" quality="2,3" />
+      <item name="armorAthleticBoots" quality="2,3" />
+      <item name="armorEnforcerHelmet" quality="2,3" />
+      <item name="armorEnforcerOutfit" quality="2,3" />
+      <item name="armorEnforcerGloves" quality="2,3" />
+      <item name="armorEnforcerBoots" quality="2,3" />
+      <item name="armorLumberjackHelmet" quality="2,3" />
+      <item name="armorLumberjackOutfit" quality="2,3" />
+      <item name="armorLumberjackGloves" quality="2,3" />
+      <item name="armorLumberjackBoots" quality="2,3" />
+      <item name="armorPreacherHelmet" quality="2,3" />
+      <item name="armorPreacherOutfit" quality="2,3" />
+      <item name="armorPreacherGloves" quality="2,3" />
+      <item name="armorPreacherBoots" quality="2,3" />
+      <item name="armorPrimitiveHelmet" quality="2,3" />
+      <item name="armorPrimitiveOutfit" quality="2,3" />
+      <item name="armorPrimitiveGloves" quality="2,3" />
+      <item name="armorPrimitiveBoots" quality="2,3" />
+      <item name="armorRogueHelmet" quality="2,3" />
+      <item name="armorRogueOutfit" quality="2,3" />
+      <item name="armorRogueGloves" quality="2,3" />
+      <item name="armorRogueBoots" quality="2,3" />
+      <item name="rebirthFieldNotesSpears" />
+      <item name="rebirthFieldNotesClubs" />
+      <item name="rebirthFieldNotesSwords" />
+      <item name="rebirthFieldNotesAxes" />
+      <item name="rebirthFieldNotesBatons" />
+      <item name="rebirthFieldNotesHammers" />
+      <item name="rebirthFieldNotesKnives" />
+      <item name="rebirthFieldNotesScythes" />
+      <item name="rebirthFieldNotesKnuckles" />
+      <item name="rebirthFieldNotesUnarmed" />
+      <item name="rebirthFieldNotesArchery" />
+      <item name="rebirthFieldNotesPistols" />
+      <item name="rebirthFieldNotesRevolvers" />
+      <item name="rebirthFieldNotesHeavyHandguns" />
+      <item name="rebirthFieldNotesShotguns" />
+      <item name="rebirthFieldNotesAssaultRifles" />
+      <item name="rebirthFieldNotesTacticalRifles" />
+      <item name="rebirthFieldNotesLongRangeRifles" />
+      <item name="rebirthFieldNotesExplosives" />
+      <item name="rebirthFieldNotesDeployableTurrets" />
+      <item name="rebirthFieldNotesDroneOperations" />
+      <item name="rebirthFieldNotesMining" />
+      <item name="rebirthFieldNotesLogging" />
+      <item name="rebirthFieldNotesSalvage" />
+      <item name="rebirthFieldNotesFarming" />
+      <item name="rebirthFieldNotesAnimalProcessing" />
+      <item name="rebirthFieldNotesTracking" />
+      <item name="rebirthFieldNotesMechanics" />
+      <item name="rebirthFieldNotesMedicine" />
+      <item name="rebirthFieldNotesCooking" />
+      <item name="rebirthFieldNotesMaintenance" />
+      <item name="rebirthFieldNotesConstruction" />
+      <item name="rebirthFieldNotesElectrical" />
+      <item name="rebirthFieldNotesMetalworking" />
+      <item name="rebirthFieldNotesGunsmithing" />
+      <item name="rebirthFieldNotesChemistry" />
+      <item name="rebirthFieldNotesLockpicking" />
+      <item name="rebirthFieldNotesStealth" />
+      <item name="rebirthFieldNotesAthletics" />
+      <item name="rebirthFieldNotesArmorProficiency" />
+      <item name="rebirthFieldNotesBartering" />
+      <item name="rebirthFieldNotesTailoring" />
+      <item name="rebirthCookbookCampfireBasics" />
+      <item name="rebirthCookbookBaking" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+    </lootgroup>
+    <lootgroup name="rebirthBossPrizeT1">
+      <item group="rebirthBossWeaponT1" />
+      <item group="rebirthBossOtherT1" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSuppliesT1">
+      <item name="medicalBandage" count="1,3" />
+      <item name="drugVitamins" count="1,3" />
+      <item name="foodHoney" count="1,3" />
+    </lootgroup>
+    <lootgroup name="rebirthBossMaterialsT1">
+      <item name="resourceDuctTape" count="5,10" />
+      <item name="resourceSpring" count="5,10" />
+      <item name="resourceMechanicalParts" count="5,10" />
+    </lootgroup>
+    <lootgroup name="rebirthBossSurpriseT1">
+      <item name="partV8Engine_FR" />
+      <item name="partCarTransmission_FR" />
+      <item name="partTruckRadiator_FR" />
+      <item name="modRoboticDroneCargoModSchematic" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item group="rebirthBossPrizeT2" />
+    </lootgroup>
+    <lootgroup name="rebirthBossCrateT1" count="all">
+      <item group="rebirthModPoolT1" count="1" prob="0.25" force_prob="true" />
+      <item group="rebirthBossAmmoT1" count="1" />
+      <item group="rebirthBossPrizeT1" count="1" />
+      <item group="rebirthBossSuppliesT1" count="1" />
+      <item group="rebirthBossMaterialsT1" count="1" />
+      <item group="rebirthBossSurpriseT1" count="1" prob="0.10" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="rebirthBossCrateT2" count="all">
+      <item group="rebirthModPoolT2" count="1" prob="0.30" force_prob="true" />
+      <item group="rebirthBossAmmoT2" count="1,2" />
+      <item group="rebirthBossPrizeT2" count="1" />
+      <item group="rebirthBossSuppliesT2" count="1" />
+      <item group="rebirthBossMaterialsT2" count="1" />
+      <item group="rebirthBossSurpriseT2" count="1" prob="0.15" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="rebirthBossCrateT3" count="all">
+      <item group="rebirthModPoolT3" count="1" prob="0.40" force_prob="true" />
+      <item group="rebirthBossAmmoT3" count="2" />
+      <item group="rebirthBossPrizeT3" count="1" />
+      <item group="rebirthBossSuppliesT3" count="1" />
+      <item group="rebirthBossMaterialsT3" count="1" />
+      <item group="rebirthBossSurpriseT3" count="1" prob="0.25" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="rebirthBossCrateT4" count="all">
+      <item group="rebirthModPoolT4" count="1" prob="0.50" force_prob="true" />
+      <item group="rebirthBossAmmoT4" count="2,3" />
+      <item group="rebirthBossPrizeT4" count="1" />
+      <item group="rebirthBossSuppliesT4" count="1" />
+      <item group="rebirthBossMaterialsT4" count="1" />
+      <item group="rebirthBossSurpriseT4" count="1" prob="0.35" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="rebirthBossCrateT5" count="all">
+      <item group="rebirthModPoolT5" count="1" prob="0.65" force_prob="true" />
+      <item group="rebirthBossAmmoT5" count="3" />
+      <item group="rebirthBossPrizeT5" count="1" />
+      <item group="rebirthBossSuppliesT5" count="1" />
+      <item group="rebirthBossMaterialsT5" count="1" />
+      <item group="rebirthBossSurpriseT5" count="1" prob="0.50" force_prob="true" />
+      <item name="ammoRocketHE" count="2,4" prob="0.25" force_prob="true" />
+      <item name="ammoRocketFrag" count="2,4" prob="0.25" force_prob="true" />
+    </lootgroup>
+  </insertBefore>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT1']/item" />
+  <setattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT1']" name="count">1</setattribute>
+  <removeattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT1']/@loot_quality_template" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT1']">
+    <item group="rebirthBossCrateT1" />
+  </append>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT2']/item" />
+  <setattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT2']" name="count">1</setattribute>
+  <removeattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT2']/@loot_quality_template" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT2']">
+    <item group="rebirthBossCrateT2" />
+  </append>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT3']/item" />
+  <setattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT3']" name="count">1</setattribute>
+  <removeattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT3']/@loot_quality_template" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT3']">
+    <item group="rebirthBossCrateT3" />
+  </append>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT4']/item" />
+  <setattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT4']" name="count">1</setattribute>
+  <removeattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT4']/@loot_quality_template" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT4']">
+    <item group="rebirthBossCrateT4" />
+  </append>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT5']/item" />
+  <setattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT5']" name="count">1</setattribute>
+  <removeattribute xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT5']/@loot_quality_template" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthBossRewardT5']">
+    <item group="rebirthBossCrateT5" />
+  </append>
+</configs>

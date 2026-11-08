@@ -155,5 +155,10 @@
   <remove xpath="/items/item//triggered_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
   <remove xpath="/items/item//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
   <remove xpath="/items/item//triggered_effect[contains(@buff,'SetBonus')]" />
+  <include filename="_ArmorBonuses/items.xml"/>
+  <include filename="_Workstations/ported_station_items.xml"/>
+  <include filename="_Workstations/mind_control_items.xml"/>
+  <include filename="_WeaponBonuses/items.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/no_weapon_parts_items.xml"/></if></conditional>
 </configs>
 

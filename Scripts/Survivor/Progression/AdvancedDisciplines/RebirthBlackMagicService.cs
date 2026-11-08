@@ -229,6 +229,15 @@ public static class RebirthBlackMagicService
         record.Touch("witch-doctor-attunement");RebirthWorldCharacterRepository.SaveIfDirty(identity,"witch-doctor-attunement");RebirthSurvivorNetworkService.SendOwnerState(player,0L,true,"witch-doctor-attunement");reason="Occult attunement "+record.Progression.WitchDoctorInitiationAttunements+"/"+initiationAttunements+" completed.";return true;
     }
 
+    // Mind control ammunition: reaches farther than the touch interaction but follows the same rules.
+    public static bool TryDominateFromAmmo(World world,EntityPlayer player,EntityAlive target,out string reason)
+    {
+        reason=string.Empty;if(world==null||world.IsRemote()||player==null||target==null||target.IsDead()||!RebirthWorldCharacterRepository.IsServerAuthority)return false;Ensure();
+        if(!HasWitchDoctor(player)){reason="Mind control needs the Witch Doctor discipline.";return false;}
+        lock(Gate)if(Active.ContainsKey(target.entityId))return false;
+        return TryDominate(world,player,target,out reason);
+    }
+
     public static bool TrySpecialPantherDominate(World world,EntityPlayer player,EntityAlive target,out string reason)
     {
         reason=string.Empty;if(world==null||world.IsRemote()||player==null||target==null||!RebirthWorldCharacterRepository.IsServerAuthority){reason="server authority required";return false;}Ensure();if(!HasWitchDoctor(player)){reason="Witch Doctor discipline required";return false;}DominationState existing;lock(Gate)Active.TryGetValue(target.entityId,out existing);if(existing!=null){reason=existing.OwnerEntityId==player.entityId?"target already dominated by owner":"target already dominated";return false;}return TryDominate(world,player,target,out reason);

@@ -91,7 +91,7 @@ internal static partial class RebirthCamperRelayWiring
                     if(linkedTile!=null&&Matches(linkedTile,connectedLink,frame.Vehicle))
                     {linkedTile.chunk.ChunkCustomData.Remove(StampKey(linkedTile));linkedTile.chunk.isModified=true;}
                 }
-                Save(vehicle,disconnectedFrame);Log.Out("[REBIRTH EnergyFlow] relay-disconnect vehicle="+vehicle.entityId+" relay="+relay+" remaining="+disconnectedFrame.Links.Count);
+                Save(vehicle,disconnectedFrame);RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] relay-disconnect vehicle="+vehicle.entityId+" relay="+relay+" remaining="+disconnectedFrame.Links.Count);
                 accepted=true;status="xuiCamperWireDisconnected";return;
             }
             if(action==0)
@@ -134,7 +134,7 @@ internal static partial class RebirthCamperRelayWiring
                 if(corner<0&&!CanAdmitExternalLink(vehicle,position))
                 {
                     status="xuiCamperWireDenied";
-                    Log.Out("[REBIRTH EnergyFlow] relay-refused vehicle="+vehicle.entityId+" relay="+selection.Relay+
+                    RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] relay-refused vehicle="+vehicle.entityId+" relay="+selection.Relay+
                         " device=block:"+position+" reason=outside-camper-bounds distance="+
                         RebirthCamperEnergyBounds.Distance(RebirthCamperEnergyBounds.CurrentCenter(vehicle),position.ToVector3Center())+
                         " radius="+RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle));
@@ -145,7 +145,7 @@ internal static partial class RebirthCamperRelayWiring
                 next.Links.Add(new Link{Relay=selection.Relay,Corner=corner,Position=position,Block=tile?.blockValue.type??0,Stamp=stamp,Length=selection.Length});
                 status="xuiCamperWireConnected";
             }
-            Save(vehicle,next);Log.Out("[REBIRTH EnergyFlow] relay-edit vehicle="+vehicle.entityId+" relay="+selection.Relay+
+            Save(vehicle,next);RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] relay-edit vehicle="+vehicle.entityId+" relay="+selection.Relay+
                 " device="+(corner>=0?"mounted:"+corner:"block:"+position)+" connected="+(existing==null)+" links="+next.Links.Count);
             accepted=true;
         }

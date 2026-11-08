@@ -2600,7 +2600,10 @@ public static class RebirthVehicleRuntimePerformance
         Vector3 horizontal = rb.velocity;
         horizontal.y = 0f;
         float forwardSpeed = Vector3.Dot(rb.velocity, forward);
-        bool braking = entity.brakeTorque > 0.01f || entity.movementInput.jump ||
+        // Only the player's own braking (handbrake, or input against the direction of travel). The camper's coast
+        // brake keeps a small wheel brake torque whenever the throttle is released; counting it here applied the full
+        // upgraded brake assist every time the camper coasted (owner 2026-11-08: camper stopped far too fast).
+        bool braking = entity.movementInput.jump ||
             (input > 0.01f && forwardSpeed < -0.5f) || (input < -0.01f && forwardSpeed > 0.5f);
         if (braking && horizontal.sqrMagnitude > 0.25f && state.BrakeMultiplier > 1f)
             rb.AddForce(-horizontal.normalized * DirectBrake(state.BrakeMultiplier), ForceMode.Acceleration);

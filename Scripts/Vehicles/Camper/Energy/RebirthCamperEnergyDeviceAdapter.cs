@@ -302,7 +302,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         float now=UnityEngine.Time.realtimeSinceStartup;
         if(s.LastWitnessOperation==s.Operation&&s.LastWitnessStage==stage&&now<s.NextWitnessLog)return;
         s.LastWitnessOperation=s.Operation;s.LastWitnessStage=stage;s.NextWitnessLog=now+10f;
-        Log.Out("[REBIRTH EnergyFlow] device-lease stage="+stage+" vehicle="+s.Vehicle.entityId+
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] device-lease stage="+stage+" vehicle="+s.Vehicle.entityId+
             " operation="+s.Operation+" poiOn="+s.PoiOn+" baselines="+s.Baselines.Count+(detail==null?"":" reason="+detail));
     }
     private static void AdvanceDeviceSaves(ref ModEvents.SGameUpdateData data)
@@ -362,7 +362,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         // A temporarily empty but enabled bank may be recharged. Keep the
         // player's ON choice until they turn it off or disable every bank.
         if(s.PoiOn&&!poiSourceEnabled)
-        {s.PoiOn=false;s.Dirty=true;Log.Out("[REBIRTH EnergyFlow] poi-auto-off vehicle="+vehicle.entityId+" reason=all-dispatchable-sources-off");}
+        {s.PoiOn=false;s.Dirty=true;RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-auto-off vehicle="+vehicle.entityId+" reason=all-dispatchable-sources-off");}
         float range=RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle);
         var selectedPoi=NearestPoi(vehicle);
         string selectedTarget=PoiTarget(selectedPoi);
@@ -390,7 +390,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             {
                 double seconds=observation.ProspectiveRuntimeSeconds;
                 if(s.LastPoiRuntime>300&&seconds<=300||s.LastPoiRuntime>60&&seconds<=60)
-                    Log.Out("[REBIRTH EnergyFlow] poi-runtime-warning vehicle="+vehicle.entityId+" remaining="+seconds.ToString("0"));
+                    RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-runtime-warning vehicle="+vehicle.entityId+" remaining="+seconds.ToString("0"));
                 s.LastPoiRuntime=seconds;
             }
             else s.LastPoiRuntime=-1;
@@ -449,7 +449,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         if(reclaimedPoi>0&&UnityEngine.Time.realtimeSinceStartup>=s.NextPoiOffReclaimLog)
         {
             s.NextPoiOffReclaimLog=UnityEngine.Time.realtimeSinceStartup+10f;
-            Log.Out("[REBIRTH EnergyFlow] bank-poi-off-reclaim vehicle="+vehicle.entityId+" count="+reclaimedPoi+" requestedOn="+s.PoiOn);
+            RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] bank-poi-off-reclaim vehicle="+vehicle.entityId+" count="+reclaimedPoi+" requestedOn="+s.PoiOn);
         }
         foreach(var pair in s.Nodes.ToArray())if(!currentPositions.Contains(pair.Key))Restore(s,pair.Value);
         var plainPositions=new HashSet<Vector3i>();
@@ -489,7 +489,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         foreach(var pair in s.PlainNodes.ToArray())if(!plainPositions.Contains(pair.Key))RestorePlain(s,pair.Value);
         if(changed)
         {
-            if(s.PoiControl)Log.Out("[REBIRTH EnergyFlow] poi-lease-candidates vehicle="+vehicle.entityId+
+            if(s.PoiControl)RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-lease-candidates vehicle="+vehicle.entityId+
                 " poi="+s.PoiName+" requestedOn="+s.PoiOn+" supported="+s.PoiSupported+
                 " candidates="+candidates.Count+" baselines="+s.Baselines.Count+" excluded="+s.Excluded.Count);
             s.ProposedImage=Encode(s);s.Operation=Guid.NewGuid();RebirthCamperEnergyRuntime.For(vehicle).Hold(s.Operation,false);
@@ -936,20 +936,20 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             (player.position-vehicle.position).sqrMagnitude>64f||
             (player is EntityPlayerLocal local&&!vehicle.AllowActivationCommand("service",local))||
             RebirthCamperEnergyRuntime.For(vehicle).Snapshot().Mode!=RebirthCamperEnergyMode.Camp)
-        {Log.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle?.entityId+" on="+on+" reason=actor-or-camp-admission");return false;}
+        {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle?.entityId+" on="+on+" reason=actor-or-camp-admission");return false;}
         var owner=vehicle.GetOwner();var data=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId);
         if(owner==null||data==null||!owner.Equals(data.PrimaryId)&&!owner.Equals(data.NativeId))
-        {Log.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle.entityId+" on="+on+" reason=owner-admission");return false;}
+        {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle.entityId+" on="+on+" reason=owner-admission");return false;}
         var snapshot=ObservePoi(vehicle);
         if(on&&(!snapshot.InRange||snapshot.SupportedLights==0||
             !CanSupplyPoiLights(RebirthCamperEnergyRuntime.For(vehicle).Snapshot(),snapshot,out _)))
-        {Log.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle.entityId+" on=true reason=target-or-dispatchable-source inRange="+snapshot.InRange+
+        {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-refused vehicle="+vehicle.entityId+" on=true reason=target-or-dispatchable-source inRange="+snapshot.InRange+
             " supported="+snapshot.SupportedLights+" requiredWatts="+snapshot.RequiredWatts);return false;}
         var s=For(vehicle);if(!s.PoiControl||s.PoiOn!=on||s.PoiName!=snapshot.PoiName)s.Dirty=true;
         foreach(var position in s.ResetPlain)s.Excluded.Remove(position);s.ResetPlain.Clear();
         s.PoiOn=on;s.PoiControl=true;s.Poi=NearestPoi(vehicle);s.PoiName=snapshot.PoiName;s.PoiEligible=snapshot.InRange;
         s.PoiTargetIdentity=PoiTarget(s.Poi);
-        Log.Out("[REBIRTH EnergyFlow] poi-switch vehicle="+vehicle.entityId+" on="+on+" target="+snapshot.PoiName+
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-switch vehicle="+vehicle.entityId+" on="+on+" target="+snapshot.PoiName+
             " supported="+snapshot.SupportedLights+" requiredWatts="+snapshot.RequiredWatts+" dirty="+s.Dirty);
         return true;
     }
@@ -963,7 +963,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         bool priorOn=s.PoiOn;
         if(s.PoiOn){s.PoiOn=false;s.Dirty=true;}
         poiPowerGates.Remove(vehicle);
-        Log.Out("[REBIRTH EnergyFlow] bank-poi-off-accepted vehicle="+vehicle.entityId+" priorOn="+priorOn+
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] bank-poi-off-accepted vehicle="+vehicle.entityId+" priorOn="+priorOn+
             " requestedOn="+s.PoiOn+" ownedPowered="+s.Nodes.Count+" ownedPlain="+s.PlainNodes.Count+" dirty="+s.Dirty);
     }
     public static bool SetPoiLimit(EntityPlayer player,EntityVehicle vehicle,int count)
@@ -981,10 +981,10 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         var proposal=ObservePoi(vehicle,count);
         if(session.PoiOn&&count>current.SelectedLights&&
             !CanSupplyPoiLights(RebirthCamperEnergyRuntime.For(vehicle).Snapshot(),proposal,out _))
-        {Log.Out("[REBIRTH EnergyFlow] poi-selection-refused vehicle="+vehicle.entityId+" count="+count+
+        {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-selection-refused vehicle="+vehicle.entityId+" count="+count+
             " runtime="+proposal.ProspectiveRuntimeSeconds.ToString("0.0"));return false;}
         session.PoiLimit=count;session.Dirty=true;
-        Log.Out("[REBIRTH EnergyFlow] poi-selection vehicle="+vehicle.entityId+" count="+count+
+        RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] poi-selection vehicle="+vehicle.entityId+" count="+count+
             " total="+current.SupportedLights+" runtime="+proposal.ProspectiveRuntimeSeconds.ToString("0.0"));
         return true;
     }

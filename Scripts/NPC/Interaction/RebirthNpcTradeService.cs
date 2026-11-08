@@ -70,9 +70,10 @@ public static class RebirthNpcTradeOfferRegistry
 
     // Rebirth progression has no use for Legendary Parts. The list is built once per launch,
     // but progression belongs to the world, so the check happens at lookup.
+    private static readonly HashSet<string> WeaponPartItems=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"gunBotRoboticsParts","gunBowT1WoodenBowParts","gunExplosivesT3RocketLauncherParts","gunHandgunT1PistolParts","gunMGT1AK47Parts","gunRifleT1HuntingRifleParts","gunShotgunT1DoubleBarrelParts","meleeToolAllSteelParts","meleeToolAxeT3ChainsawParts","meleeWpnBatonT2StunBatonParts","meleeWpnBladeT3MacheteParts","meleeWpnClubT3SteelClubParts","meleeWpnKnucklesT3SteelKnucklesParts","meleeWpnSledgeT3SteelSledgehammerParts","meleeWpnSpearT3SteelSpearParts"};
     internal static bool HiddenInThisWorld(string itemKey)
     {
-        return string.Equals(itemKey,"resourceLegendaryParts",StringComparison.OrdinalIgnoreCase)
+        return (string.Equals(itemKey,"resourceLegendaryParts",StringComparison.OrdinalIgnoreCase)||WeaponPartItems.Contains(itemKey))
             && RebirthXmlOptionConditionResolver.IsCharacterProgression("Rebirth");
     }
 

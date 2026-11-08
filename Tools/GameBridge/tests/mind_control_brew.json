@@ -1,0 +1,25 @@
+{
+  "name": "Mind Control Brew: Witch Doctor drinks it, scythe power attack turns a zombie",
+  "stopOnFailure": false,
+  "steps": [
+    { "cleararea": { "radius": 60 } },
+    { "restore": {} },
+    { "console": "rbtestgrant witchdoctor" },
+    { "console": "rbtestgrant skill skill.black_magic 30" },
+    { "give": { "item": "FuriousRamsayMindControlDrink", "toolbelt": 3 } },
+    { "select": { "slot": 3 } },
+    { "wait": 2 },
+    { "press": { "action": "Primary", "seconds": 0.3 } },
+    { "wait": 3 },
+    { "expectBuff": "FuriousRamsaySetMindControl" },
+    { "give": { "item": "ItemsWeaponsScythe004_FR", "quality": 1, "toolbelt": 4 } },
+    { "select": { "slot": 4 } },
+    { "wait": 1 },
+    { "spawn": { "entity": "zombieMoe", "distance": 3 } },
+    { "wait": 1 },
+    { "action": { "command": "fight", "args": { "contains": "zombie", "power": 1, "maxSeconds": 20 } } },
+    { "expectLog": { "contains": "turned Dominated", "min": 1 } },
+    { "cleararea": { "radius": 60 } },
+    { "expectNoErrors": true }
+  ]
+}

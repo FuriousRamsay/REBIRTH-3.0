@@ -1,0 +1,83 @@
+<configs>
+  <insertBefore xpath="/lootcontainers/lootgroup[@name='groupMoPower']">
+    <lootgroup name="groupEnchantKitsT1">
+			<item name="kitSurvivorUpgrade"      count="1" prob="0.360"/>
+			<item name="kitBreakdown"            count="1" prob="0.120"/>
+			<item name="kitAdjustment"           count="1" prob="0.260"/>
+			<item name="kitRetuning"             count="1" prob="0.180"/>
+			<item name="kitEliteReinforcement"   count="1" prob="0.060"/>
+			<item name="kitComprehensiveUpgrade" count="1" prob="0.020"/>
+		</lootgroup>
+    <lootgroup name="groupEnchantKitsT2">
+			<item name="kitSurvivorUpgrade"      count="1" prob="0.270"/>
+			<item name="kitBreakdown"            count="1" prob="0.120"/>
+			<item name="kitAdjustment"           count="1" prob="0.220"/>
+			<item name="kitRetuning"             count="1" prob="0.220"/>
+			<item name="kitEliteReinforcement"   count="1" prob="0.110"/>
+			<item name="kitComprehensiveUpgrade" count="1" prob="0.060"/>
+		</lootgroup>
+    <lootgroup name="groupEnchantKitsT3">
+			<item name="kitSurvivorUpgrade"      count="1" prob="0.180"/>
+			<item name="kitBreakdown"            count="1" prob="0.120"/>
+			<item name="kitAdjustment"           count="1" prob="0.250"/>
+			<item name="kitRetuning"             count="1" prob="0.250"/>
+			<item name="kitEliteReinforcement"   count="1" prob="0.120"/>
+			<item name="kitComprehensiveUpgrade" count="1" prob="0.080"/>
+		</lootgroup>
+    <lootgroup name="groupEnchantKitsT4">
+			<item name="kitSurvivorUpgrade"      count="1" prob="0.150"/>
+			<item name="kitBreakdown"            count="1" prob="0.100"/>
+			<item name="kitAdjustment"           count="1" prob="0.170"/>
+			<item name="kitRetuning"             count="1" prob="0.250"/>
+			<item name="kitEliteReinforcement"   count="1" prob="0.230"/>
+			<item name="kitComprehensiveUpgrade" count="1" prob="0.100"/>
+		</lootgroup>
+    <lootgroup name="groupEnchantKitsT5">
+			<item name="kitSurvivorUpgrade"      count="1" prob="0.110"/>
+			<item name="kitBreakdown"            count="1" prob="0.090"/>
+			<item name="kitAdjustment"           count="1" prob="0.140"/>
+			<item name="kitRetuning"             count="1" prob="0.240"/>
+			<item name="kitEliteReinforcement"   count="1" prob="0.220"/>
+			<item name="kitComprehensiveUpgrade" count="1" prob="0.200"/>
+		</lootgroup>
+    <lootgroup name="groupMoPowerParts">
+			<item name="partRetrofitHousing" loot_prob_template="high" />
+			<item name="partTuningBoard" loot_prob_template="high" />
+			<item name="partFieldMechanismPack" loot_prob_template="high" />
+			<item name="partRegulatorPack" loot_prob_template="high" />
+			<item name="partPurgeCanister" loot_prob_template="high" />
+			<item name="partRetuningCartridge" loot_prob_template="high" />
+
+			<item name="partServiceHousing" loot_prob_template="medHigh" />
+			<item name="partStabilityClampSet" loot_prob_template="medHigh" />
+			<item name="partServiceHousing" loot_prob_template="medHigh" />
+			<item name="partStabilityClampSet" loot_prob_template="medHigh" />
+			<item name="partAdjustmentMatrix" loot_prob_template="medHigh" />
+			<item name="partControlShunt" loot_prob_template="medHigh" />
+
+			<item name="partReinforcedHousing" loot_prob_template="med" />
+			<item name="partReinforcementCore" loot_prob_template="med" />
+			<item name="partStabilityFrame" loot_prob_template="med" />
+			<item name="partControlLattice" loot_prob_template="med" />
+			<item name="partRegulatorAssembly" loot_prob_template="med" />
+
+			<item name="partReinforcedHousing" loot_prob_template="medLow" />
+			<item name="partReinforcementCore" loot_prob_template="medLow" />
+			<item name="partStabilityFrame" loot_prob_template="medLow" />
+			<item name="partControlLattice" loot_prob_template="medLow" />
+			<item name="partRegulatorAssembly" loot_prob_template="medLow" />
+		</lootgroup>
+  </insertBefore>
+  <append xpath="/lootcontainers/lootgroup[@name='groupReinforcedChestT1']">
+    <item group="groupEnchantKitsT1" count="1" />
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupReinforcedChestT2']">
+    <item group="groupEnchantKitsT2" count="1" />
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupReinforcedChestT3']">
+    <item group="groupEnchantKitsT3" count="2" />
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupMoPower']">
+    <item group="groupMoPowerParts" count="6,10" />
+  </append>
+</configs>

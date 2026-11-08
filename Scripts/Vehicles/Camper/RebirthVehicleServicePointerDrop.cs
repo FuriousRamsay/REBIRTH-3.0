@@ -188,7 +188,7 @@ internal static class RebirthVehicleServicePointerDrop
     }
     private static bool TryNativeInventoryDrop(XUiC_ItemStack[] cells,Ray ray,Gesture state)
     {
-        if(cells==null)return false;
+        if(cells==null||!RebirthDragRelease.DropOnRelease)return false;
         foreach(var cell in cells)
         {
             if(cell==null||cell.IsLocked||cell.StackLock||cell.UserLockedSlot||!Hit(cell,ray))continue;
@@ -230,6 +230,7 @@ internal static class RebirthVehicleServicePointerDrop
             slot.UserLockedSlot||slot.AssembleLock||slot.SimpleClick||InputUtils.ShiftKeyPressed||RebirthConsoleInputGuardRuntime.BlocksGameplayInput()||
             !CursorMatches(owner,state,owner.xui.DragAndDropWindow?.CurrentStack)||
             !CurrentScope(owner,state)||!slot.CanSwap(state.Cursor)||!CurrentScope(owner,state))return;
+        if(!RebirthDragRelease.DropOnRelease)return;
         // A prior native drag with an occupied held cursor is mandatory. A normal
         // click that fills the cursor on this same mouse-up cannot acquire this gate.
         state.Claimed=true;

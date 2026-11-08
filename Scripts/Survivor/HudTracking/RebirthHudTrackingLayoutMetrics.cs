@@ -29,6 +29,17 @@ public static class RebirthHudTrackingLayoutMetrics
 
     private static float purgeCardReserve;
     public static float PurgeCardReserve { get { lock(Sync)return purgeCardReserve; } }
+    // The biome card sits one row above the stage row, so with both shown the lower stack is two rows tall.
+    public static void SetLowerCardsVisible(bool purge, bool stages)
+    {
+        float reserve=purge?60f:stages?33f:0f;
+        lock(Sync)
+        {
+            if(purgeCardReserve==reserve)return;
+            purgeCardReserve=reserve;measuredCapacity=-1;
+        }
+        Notify(TrackerEnvelopeChanged);Notify(TrackerFootprintChanged);Notify(TrackerLayoutChanged);
+    }
     public static void SetPurgeCardVisible(bool visible)
     {
         float reserve=visible?33f:0f;

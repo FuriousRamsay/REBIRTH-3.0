@@ -26,7 +26,6 @@
     <bonus id="entity_damage_hammers" rarity="Common" min="0.04" max="0.08" skills="skill.hammers" />
     <bonus id="entity_damage_knives" rarity="Common" min="0.04" max="0.08" skills="skill.knives" />
     <bonus id="entity_damage_knuckles" rarity="Common" min="0.04" max="0.08" skills="skill.knuckles" />
-    <bonus id="entity_damage_scythes" rarity="Common" min="0.04" max="0.08" skills="skill.scythes" />
     <bonus id="entity_damage_spears" rarity="Common" min="0.04" max="0.08" skills="skill.spears" />
     <bonus id="entity_damage_swords" rarity="Common" min="0.04" max="0.08" skills="skill.swords" />
     <bonus id="entity_damage_unarmed" rarity="Common" min="0.04" max="0.08" skills="skill.unarmed" />
@@ -38,7 +37,7 @@
     <bonus id="entity_damage_assault_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.assault_rifles" />
     <bonus id="entity_damage_tactical_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.tactical_rifles" />
     <bonus id="entity_damage_long_range_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.long_range_rifles" />
-    <bonus id="entity_damage_melee" rarity="Uncommon" min="0.09" max="0.12" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="entity_damage_melee" rarity="Uncommon" min="0.09" max="0.12" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
     <bonus id="entity_damage_ranged" rarity="Uncommon" min="0.09" max="0.12" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
     <bonus id="entity_damage_all" rarity="Rare" min="0.13" max="0.15" />
     <bonus id="entity_damage_all_greater" rarity="Legendary" min="0.16" max="0.18" />
@@ -99,16 +98,14 @@
     <bonus id="apm_knives_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.knives" />
     <bonus id="apm_knuckles_common" rarity="Common" min="0.04" max="0.08" skills="skill.knuckles" />
     <bonus id="apm_knuckles_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.knuckles" />
-    <bonus id="apm_scythes_common" rarity="Common" min="0.04" max="0.08" skills="skill.scythes" />
-    <bonus id="apm_scythes_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.scythes" />
     <bonus id="apm_spears_common" rarity="Common" min="0.04" max="0.08" skills="skill.spears" />
     <bonus id="apm_spears_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.spears" />
     <bonus id="apm_swords_common" rarity="Common" min="0.04" max="0.08" skills="skill.swords" />
     <bonus id="apm_swords_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.swords" />
     <bonus id="apm_unarmed_common" rarity="Common" min="0.04" max="0.08" skills="skill.unarmed" />
     <bonus id="apm_unarmed_uncommon" rarity="Uncommon" min="0.09" max="0.14" skills="skill.unarmed" />
-    <bonus id="apm_melee_rare" rarity="Rare" min="0.15" max="0.18" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
-    <bonus id="apm_melee_legendary" rarity="Legendary" min="0.19" max="0.26" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="apm_melee_rare" rarity="Rare" min="0.15" max="0.18" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="apm_melee_legendary" rarity="Legendary" min="0.19" max="0.26" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
   </family>
 
   <family id="EntityPenetration" slot="Hands" effect="EntityPenetrationCount" op="base" flat="true">
@@ -135,7 +132,6 @@
     <bonus id="target_armor_hammers" rarity="Common" min="-0.08" max="-0.05" skills="skill.hammers" />
     <bonus id="target_armor_knives" rarity="Common" min="-0.08" max="-0.05" skills="skill.knives" />
     <bonus id="target_armor_knuckles" rarity="Common" min="-0.08" max="-0.05" skills="skill.knuckles" />
-    <bonus id="target_armor_scythes" rarity="Common" min="-0.08" max="-0.05" skills="skill.scythes" />
     <bonus id="target_armor_spears" rarity="Common" min="-0.08" max="-0.05" skills="skill.spears" />
     <bonus id="target_armor_swords" rarity="Common" min="-0.08" max="-0.05" skills="skill.swords" />
     <bonus id="target_armor_unarmed" rarity="Common" min="-0.08" max="-0.05" skills="skill.unarmed" />
@@ -147,7 +143,7 @@
     <bonus id="target_armor_assault_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.assault_rifles" />
     <bonus id="target_armor_tactical_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.tactical_rifles" />
     <bonus id="target_armor_long_range_rifles" rarity="Common" min="-0.08" max="-0.05" skills="skill.long_range_rifles" />
-    <bonus id="target_armor_melee" rarity="Uncommon" min="-0.12" max="-0.09" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="target_armor_melee" rarity="Uncommon" min="-0.12" max="-0.09" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
     <bonus id="target_armor_ranged" rarity="Uncommon" min="-0.12" max="-0.09" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
     <bonus id="target_armor_rare" rarity="Rare" min="-0.16" max="-0.13" />
     <bonus id="target_armor_legendary" rarity="Legendary" min="-0.22" max="-0.17" />
@@ -160,7 +156,6 @@
     <bonus id="dismember_hammers" rarity="Common" min="0.03" max="0.05" skills="skill.hammers" />
     <bonus id="dismember_knives" rarity="Common" min="0.03" max="0.05" skills="skill.knives" />
     <bonus id="dismember_knuckles" rarity="Common" min="0.03" max="0.05" skills="skill.knuckles" />
-    <bonus id="dismember_scythes" rarity="Common" min="0.03" max="0.05" skills="skill.scythes" />
     <bonus id="dismember_spears" rarity="Common" min="0.03" max="0.05" skills="skill.spears" />
     <bonus id="dismember_swords" rarity="Common" min="0.03" max="0.05" skills="skill.swords" />
     <bonus id="dismember_unarmed" rarity="Common" min="0.03" max="0.05" skills="skill.unarmed" />
@@ -172,7 +167,7 @@
     <bonus id="dismember_assault_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.assault_rifles" />
     <bonus id="dismember_tactical_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.tactical_rifles" />
     <bonus id="dismember_long_range_rifles" rarity="Common" min="0.03" max="0.05" skills="skill.long_range_rifles" />
-    <bonus id="dismember_melee" rarity="Uncommon" min="0.06" max="0.08" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.scythes,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="dismember_melee" rarity="Uncommon" min="0.06" max="0.08" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
     <bonus id="dismember_ranged" rarity="Uncommon" min="0.06" max="0.08" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
     <bonus id="dismember_rare" rarity="Rare" min="0.09" max="0.11" />
     <bonus id="dismember_legendary" rarity="Legendary" min="0.12" max="0.15" />
@@ -181,31 +176,29 @@
   <family id="WildHarvest" slot="Hands" effect="HarvestCount" op="base" flat="true" context="wildCropsHarvest">
     <bonus id="harvest_knives_common" rarity="Common" min="1" max="1" skills="skill.knives" />
     <bonus id="harvest_knives_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.knives" />
-    <bonus id="harvest_scythes_common" rarity="Common" min="1" max="1" skills="skill.scythes" />
-    <bonus id="harvest_scythes_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.scythes" />
     <bonus id="harvest_axes_common" rarity="Common" min="1" max="1" skills="skill.axes" />
     <bonus id="harvest_axes_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.axes" />
     <bonus id="harvest_swords_common" rarity="Common" min="1" max="1" skills="skill.swords" />
     <bonus id="harvest_swords_uncommon" rarity="Uncommon" min="2" max="2" skills="skill.swords" />
-    <bonus id="harvest_bladed_rare" rarity="Rare" min="2" max="2" skills="skill.knives,skill.scythes,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="1" />
-    <bonus id="harvest_bladed_legendary" rarity="Legendary" min="2" max="2" skills="skill.knives,skill.scythes,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="2" />
+    <bonus id="harvest_bladed_rare" rarity="Rare" min="2" max="2" skills="skill.knives,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="1" />
+    <bonus id="harvest_bladed_legendary" rarity="Legendary" min="2" max="2" skills="skill.knives,skill.axes,skill.swords" alt_context="cropHarvest" alt_value="2" />
   </family>
 
-  <family id="BlockDamageMining" slot="Hands" effect="BlockDamage" tags="miningTool">
+  <family id="BlockDamageMining" roll_group="BlockDamage" slot="Hands" effect="BlockDamage" tags="miningTool">
     <bonus id="block_damage_mining_common" rarity="Common" min="0.05" max="0.08" />
     <bonus id="block_damage_mining_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
     <bonus id="block_damage_mining_rare" rarity="Rare" min="0.13" max="0.16" />
     <bonus id="block_damage_mining_legendary" rarity="Legendary" min="0.17" max="0.22" />
   </family>
 
-  <family id="BlockDamageLogging" slot="Hands" effect="BlockDamage" tags="axe,chainsaw">
+  <family id="BlockDamageLogging" roll_group="BlockDamage" slot="Hands" effect="BlockDamage" tags="axe,chainsaw">
     <bonus id="block_damage_logging_common" rarity="Common" min="0.05" max="0.08" />
     <bonus id="block_damage_logging_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
     <bonus id="block_damage_logging_rare" rarity="Rare" min="0.13" max="0.16" />
     <bonus id="block_damage_logging_legendary" rarity="Legendary" min="0.17" max="0.22" />
   </family>
 
-  <family id="BlockDamageSalvage" slot="Hands" effect="BlockDamage" tags="salvageTool">
+  <family id="BlockDamageSalvage" roll_group="BlockDamage" slot="Hands" effect="BlockDamage" tags="salvageTool">
     <bonus id="block_damage_salvage_common" rarity="Common" min="0.05" max="0.08" />
     <bonus id="block_damage_salvage_uncommon" rarity="Uncommon" min="0.09" max="0.12" />
     <bonus id="block_damage_salvage_rare" rarity="Rare" min="0.13" max="0.16" />
@@ -217,6 +210,12 @@
     <bonus id="trained_damage_legendary" rarity="Legendary" min="0.21" max="0.28" />
   </family>
 
+  <family id="SecureLootAutoUnlock" slot="Hands" effect="None" special="secure_unlock">
+    <bonus id="secure_unlock_common" rarity="Common" min="0.25" max="0.25" />
+    <bonus id="secure_unlock_uncommon" rarity="Uncommon" min="0.50" max="0.50" />
+    <bonus id="secure_unlock_rare" rarity="Rare" min="0.75" max="0.75" />
+    <bonus id="secure_unlock_legendary" rarity="Legendary" min="1.00" max="1.00" />
+  </family>
   <family id="ExplosionDamage" slot="Hands" effect="None" special="explosion">
     <bonus id="explosion_pipe_bombs" rarity="Common" min="0.15" max="0.25" items="thrownAmmoPipeBomb" />
     <bonus id="explosion_grenades" rarity="Common" min="0.15" max="0.25" items="thrownGrenade,thrownGrenadeContact" />
@@ -230,4 +229,375 @@
     <bonus id="explosion_all_legendary" rarity="Legendary" min="0.75" max="1.00" items="thrownAmmoPipeBomb,thrownGrenade,thrownGrenadeContact,thrownDynamite,thrownTimedCharge,ammoArrowExploding,ammoCrossbowBoltExploding,ammoRocketHE,ammoRocketFrag,gunExplosivesT3RocketLauncher" />
   </family>
 
+  <family id="HeadLootStage" slot="Head" effect="LootStage" op="base" flat="true">
+    <bonus id="head_loot_stage_common" rarity="Common" min="5" max="15" />
+    <bonus id="head_loot_stage_uncommon" rarity="Uncommon" min="16" max="30" />
+    <bonus id="head_loot_stage_rare" rarity="Rare" min="31" max="45" />
+    <bonus id="head_loot_stage_legendary" rarity="Legendary" min="46" max="65" />
+  </family>
+  <family id="HeadScavengingTime" slot="Head" effect="ScavengingTime" negative="true">
+    <bonus id="head_scavenging_common" rarity="Common" min="-0.15" max="-0.1" />
+    <bonus id="head_scavenging_uncommon" rarity="Uncommon" min="-0.25" max="-0.16" />
+    <bonus id="head_scavenging_rare" rarity="Rare" min="-0.35" max="-0.26" />
+    <bonus id="head_scavenging_legendary" rarity="Legendary" min="-0.5" max="-0.36" />
+  </family>
+  <family id="HeadBarteringBuying" slot="Head" effect="BarteringBuying" op="base">
+    <bonus id="head_buying_common" rarity="Common" min="0.03" max="0.06" />
+    <bonus id="head_buying_uncommon" rarity="Uncommon" min="0.07" max="0.12" />
+    <bonus id="head_buying_rare" rarity="Rare" min="0.13" max="0.18" />
+    <bonus id="head_buying_legendary" rarity="Legendary" min="0.19" max="0.25" />
+  </family>
+  <family id="HeadBarteringSelling" slot="Head" effect="BarteringSelling" op="base">
+    <bonus id="head_selling_common" rarity="Common" min="0.03" max="0.06" />
+    <bonus id="head_selling_uncommon" rarity="Uncommon" min="0.07" max="0.12" />
+    <bonus id="head_selling_rare" rarity="Rare" min="0.13" max="0.18" />
+    <bonus id="head_selling_legendary" rarity="Legendary" min="0.19" max="0.25" />
+  </family>
+  <family id="HeadCraftingTime" slot="Head" effect="CraftingTime" negative="true">
+    <bonus id="head_crafting_common" rarity="Common" min="-0.3" max="-0.16" />
+    <bonus id="head_crafting_uncommon" rarity="Uncommon" min="-0.45" max="-0.31" />
+    <bonus id="head_crafting_rare" rarity="Rare" min="-0.6" max="-0.46" />
+    <bonus id="head_crafting_legendary" rarity="Legendary" min="-0.75" max="-0.61" />
+  </family>
+  <family id="HeadHarvestOreWood" slot="Head" effect="HarvestCount" context="oreWoodHarvest">
+    <bonus id="head_harvest_orewood_common" rarity="Common" min="0.15" max="0.25" />
+    <bonus id="head_harvest_orewood_uncommon" rarity="Uncommon" min="0.3" max="0.45" />
+    <bonus id="head_harvest_orewood_rare" rarity="Rare" min="0.5" max="0.7" />
+    <bonus id="head_harvest_orewood_legendary" rarity="Legendary" min="0.75" max="1" />
+  </family>
+  <family id="HeadHarvestButcher" slot="Head" effect="HarvestCount" context="butcherHarvest">
+    <bonus id="head_harvest_butcher_common" rarity="Common" min="0.15" max="0.25" />
+    <bonus id="head_harvest_butcher_uncommon" rarity="Uncommon" min="0.3" max="0.45" />
+    <bonus id="head_harvest_butcher_rare" rarity="Rare" min="0.5" max="0.7" />
+    <bonus id="head_harvest_butcher_legendary" rarity="Legendary" min="0.75" max="1" />
+  </family>
+  <family id="HeadHarvestSalvage" slot="Head" effect="HarvestCount" context="salvageHarvest">
+    <bonus id="head_harvest_salvage_common" rarity="Common" min="0.15" max="0.25" />
+    <bonus id="head_harvest_salvage_uncommon" rarity="Uncommon" min="0.3" max="0.45" />
+    <bonus id="head_harvest_salvage_rare" rarity="Rare" min="0.5" max="0.7" />
+    <bonus id="head_harvest_salvage_legendary" rarity="Legendary" min="0.75" max="1" />
+  </family>
+  <family id="HeadSkillXp" slot="Head" effect="None" special="skill_xp">
+    <bonus id="head_skill_xp_common_animal_handling" rarity="Common" min="0.02" max="0.05" skills="skill.animal_handling" />
+    <bonus id="head_skill_xp_common_animal_processing" rarity="Common" min="0.02" max="0.05" skills="skill.animal_processing" />
+    <bonus id="head_skill_xp_common_archery" rarity="Common" min="0.02" max="0.05" skills="skill.archery" />
+    <bonus id="head_skill_xp_common_armor_proficiency" rarity="Common" min="0.02" max="0.05" skills="skill.armor_proficiency" />
+    <bonus id="head_skill_xp_common_assault_rifles" rarity="Common" min="0.02" max="0.05" skills="skill.assault_rifles" />
+    <bonus id="head_skill_xp_common_athletics" rarity="Common" min="0.02" max="0.05" skills="skill.athletics" />
+    <bonus id="head_skill_xp_common_axes" rarity="Common" min="0.02" max="0.05" skills="skill.axes" />
+    <bonus id="head_skill_xp_common_bartering" rarity="Common" min="0.02" max="0.05" skills="skill.bartering" />
+    <bonus id="head_skill_xp_common_batons" rarity="Common" min="0.02" max="0.05" skills="skill.batons" />
+    <bonus id="head_skill_xp_common_chemistry" rarity="Common" min="0.02" max="0.05" skills="skill.chemistry" />
+    <bonus id="head_skill_xp_common_clubs" rarity="Common" min="0.02" max="0.05" skills="skill.clubs" />
+    <bonus id="head_skill_xp_common_construction" rarity="Common" min="0.02" max="0.05" skills="skill.construction" />
+    <bonus id="head_skill_xp_common_cooking" rarity="Common" min="0.02" max="0.05" skills="skill.cooking" />
+    <bonus id="head_skill_xp_common_deployable_turrets" rarity="Common" min="0.02" max="0.05" skills="skill.deployable_turrets" />
+    <bonus id="head_skill_xp_common_drink_preparation" rarity="Common" min="0.02" max="0.05" skills="skill.drink_preparation" />
+    <bonus id="head_skill_xp_common_drone_operations" rarity="Common" min="0.02" max="0.05" skills="skill.drone_operations" />
+    <bonus id="head_skill_xp_common_electrical" rarity="Common" min="0.02" max="0.05" skills="skill.electrical" />
+    <bonus id="head_skill_xp_common_explosives" rarity="Common" min="0.02" max="0.05" skills="skill.explosives" />
+    <bonus id="head_skill_xp_common_farming" rarity="Common" min="0.02" max="0.05" skills="skill.farming" />
+    <bonus id="head_skill_xp_common_gunsmithing" rarity="Common" min="0.02" max="0.05" skills="skill.gunsmithing" />
+    <bonus id="head_skill_xp_common_hammers" rarity="Common" min="0.02" max="0.05" skills="skill.hammers" />
+    <bonus id="head_skill_xp_common_heavy_handguns" rarity="Common" min="0.02" max="0.05" skills="skill.heavy_handguns" />
+    <bonus id="head_skill_xp_common_knives" rarity="Common" min="0.02" max="0.05" skills="skill.knives" />
+    <bonus id="head_skill_xp_common_knuckles" rarity="Common" min="0.02" max="0.05" skills="skill.knuckles" />
+    <bonus id="head_skill_xp_common_leadership" rarity="Common" min="0.02" max="0.05" skills="skill.leadership" />
+    <bonus id="head_skill_xp_common_lockpicking" rarity="Common" min="0.02" max="0.05" skills="skill.lockpicking" />
+    <bonus id="head_skill_xp_common_logging" rarity="Common" min="0.02" max="0.05" skills="skill.logging" />
+    <bonus id="head_skill_xp_common_long_range_rifles" rarity="Common" min="0.02" max="0.05" skills="skill.long_range_rifles" />
+    <bonus id="head_skill_xp_common_maintenance" rarity="Common" min="0.02" max="0.05" skills="skill.maintenance" />
+    <bonus id="head_skill_xp_common_management" rarity="Common" min="0.02" max="0.05" skills="skill.management" />
+    <bonus id="head_skill_xp_common_mechanics" rarity="Common" min="0.02" max="0.05" skills="skill.mechanics" />
+    <bonus id="head_skill_xp_common_medicine" rarity="Common" min="0.02" max="0.05" skills="skill.medicine" />
+    <bonus id="head_skill_xp_common_metalworking" rarity="Common" min="0.02" max="0.05" skills="skill.metalworking" />
+    <bonus id="head_skill_xp_common_mining" rarity="Common" min="0.02" max="0.05" skills="skill.mining" />
+    <bonus id="head_skill_xp_common_pistols" rarity="Common" min="0.02" max="0.05" skills="skill.pistols" />
+    <bonus id="head_skill_xp_common_revolvers" rarity="Common" min="0.02" max="0.05" skills="skill.revolvers" />
+    <bonus id="head_skill_xp_common_salvage" rarity="Common" min="0.02" max="0.05" skills="skill.salvage" />
+    <bonus id="head_skill_xp_common_scythes" rarity="Common" min="0.02" max="0.05" skills="skill.scythes" />
+    <bonus id="head_skill_xp_common_shotguns" rarity="Common" min="0.02" max="0.05" skills="skill.shotguns" />
+    <bonus id="head_skill_xp_common_spears" rarity="Common" min="0.02" max="0.05" skills="skill.spears" />
+    <bonus id="head_skill_xp_common_stealth" rarity="Common" min="0.02" max="0.05" skills="skill.stealth" />
+    <bonus id="head_skill_xp_common_swords" rarity="Common" min="0.02" max="0.05" skills="skill.swords" />
+    <bonus id="head_skill_xp_common_tactical_rifles" rarity="Common" min="0.02" max="0.05" skills="skill.tactical_rifles" />
+    <bonus id="head_skill_xp_common_tailoring" rarity="Common" min="0.02" max="0.05" skills="skill.tailoring" />
+    <bonus id="head_skill_xp_common_teaching" rarity="Common" min="0.02" max="0.05" skills="skill.teaching" />
+    <bonus id="head_skill_xp_common_tracking" rarity="Common" min="0.02" max="0.05" skills="skill.tracking" />
+    <bonus id="head_skill_xp_common_trading" rarity="Common" min="0.02" max="0.05" skills="skill.trading" />
+    <bonus id="head_skill_xp_common_unarmed" rarity="Common" min="0.02" max="0.05" skills="skill.unarmed" />
+    <bonus id="head_skill_xp_uncommon_swords_knives" rarity="Uncommon" min="0.06" max="0.1" skills="skill.swords,skill.knives" />
+    <bonus id="head_skill_xp_uncommon_axes_scythes" rarity="Uncommon" min="0.06" max="0.1" skills="skill.axes,skill.scythes" />
+    <bonus id="head_skill_xp_uncommon_clubs_batons" rarity="Uncommon" min="0.06" max="0.1" skills="skill.clubs,skill.batons" />
+    <bonus id="head_skill_xp_uncommon_hammers_clubs" rarity="Uncommon" min="0.06" max="0.1" skills="skill.hammers,skill.clubs" />
+    <bonus id="head_skill_xp_uncommon_knuckles_unarmed" rarity="Uncommon" min="0.06" max="0.1" skills="skill.knuckles,skill.unarmed" />
+    <bonus id="head_skill_xp_uncommon_spears_archery" rarity="Uncommon" min="0.06" max="0.1" skills="skill.spears,skill.archery" />
+    <bonus id="head_skill_xp_uncommon_pistols_revolvers" rarity="Uncommon" min="0.06" max="0.1" skills="skill.pistols,skill.revolvers" />
+    <bonus id="head_skill_xp_uncommon_revolvers_heavy_handguns" rarity="Uncommon" min="0.06" max="0.1" skills="skill.revolvers,skill.heavy_handguns" />
+    <bonus id="head_skill_xp_uncommon_assault_rifles_tactical_rifles" rarity="Uncommon" min="0.06" max="0.1" skills="skill.assault_rifles,skill.tactical_rifles" />
+    <bonus id="head_skill_xp_uncommon_tactical_rifles_long_range_rifles" rarity="Uncommon" min="0.06" max="0.1" skills="skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="head_skill_xp_uncommon_shotguns_heavy_handguns" rarity="Uncommon" min="0.06" max="0.1" skills="skill.shotguns,skill.heavy_handguns" />
+    <bonus id="head_skill_xp_uncommon_explosives_deployable_turrets" rarity="Uncommon" min="0.06" max="0.1" skills="skill.explosives,skill.deployable_turrets" />
+    <bonus id="head_skill_xp_uncommon_deployable_turrets_drone_operations" rarity="Uncommon" min="0.06" max="0.1" skills="skill.deployable_turrets,skill.drone_operations" />
+    <bonus id="head_skill_xp_uncommon_mining_logging" rarity="Uncommon" min="0.06" max="0.1" skills="skill.mining,skill.logging" />
+    <bonus id="head_skill_xp_uncommon_salvage_mechanics" rarity="Uncommon" min="0.06" max="0.1" skills="skill.salvage,skill.mechanics" />
+    <bonus id="head_skill_xp_uncommon_farming_cooking" rarity="Uncommon" min="0.06" max="0.1" skills="skill.farming,skill.cooking" />
+    <bonus id="head_skill_xp_uncommon_animal_processing_tracking" rarity="Uncommon" min="0.06" max="0.1" skills="skill.animal_processing,skill.tracking" />
+    <bonus id="head_skill_xp_uncommon_animal_handling_tracking" rarity="Uncommon" min="0.06" max="0.1" skills="skill.animal_handling,skill.tracking" />
+    <bonus id="head_skill_xp_uncommon_medicine_chemistry" rarity="Uncommon" min="0.06" max="0.1" skills="skill.medicine,skill.chemistry" />
+    <bonus id="head_skill_xp_uncommon_cooking_drink_preparation" rarity="Uncommon" min="0.06" max="0.1" skills="skill.cooking,skill.drink_preparation" />
+    <bonus id="head_skill_xp_uncommon_maintenance_mechanics" rarity="Uncommon" min="0.06" max="0.1" skills="skill.maintenance,skill.mechanics" />
+    <bonus id="head_skill_xp_uncommon_construction_electrical" rarity="Uncommon" min="0.06" max="0.1" skills="skill.construction,skill.electrical" />
+    <bonus id="head_skill_xp_uncommon_metalworking_gunsmithing" rarity="Uncommon" min="0.06" max="0.1" skills="skill.metalworking,skill.gunsmithing" />
+    <bonus id="head_skill_xp_uncommon_lockpicking_stealth" rarity="Uncommon" min="0.06" max="0.1" skills="skill.lockpicking,skill.stealth" />
+    <bonus id="head_skill_xp_uncommon_athletics_armor_proficiency" rarity="Uncommon" min="0.06" max="0.1" skills="skill.athletics,skill.armor_proficiency" />
+    <bonus id="head_skill_xp_uncommon_bartering_trading" rarity="Uncommon" min="0.06" max="0.1" skills="skill.bartering,skill.trading" />
+    <bonus id="head_skill_xp_uncommon_teaching_leadership" rarity="Uncommon" min="0.06" max="0.1" skills="skill.teaching,skill.leadership" />
+    <bonus id="head_skill_xp_uncommon_leadership_management" rarity="Uncommon" min="0.06" max="0.1" skills="skill.leadership,skill.management" />
+    <bonus id="head_skill_xp_uncommon_tailoring_armor_proficiency" rarity="Uncommon" min="0.06" max="0.1" skills="skill.tailoring,skill.armor_proficiency" />
+    <bonus id="head_skill_xp_rare_swords_knives_scythes" rarity="Rare" min="0.11" max="0.15" skills="skill.swords,skill.knives,skill.scythes" />
+    <bonus id="head_skill_xp_rare_clubs_batons_hammers" rarity="Rare" min="0.11" max="0.15" skills="skill.clubs,skill.batons,skill.hammers" />
+    <bonus id="head_skill_xp_rare_axes_spears_knuckles" rarity="Rare" min="0.11" max="0.15" skills="skill.axes,skill.spears,skill.knuckles" />
+    <bonus id="head_skill_xp_rare_pistols_revolvers_heavy_handguns" rarity="Rare" min="0.11" max="0.15" skills="skill.pistols,skill.revolvers,skill.heavy_handguns" />
+    <bonus id="head_skill_xp_rare_assault_rifles_tactical_rifles_long_range_rifles" rarity="Rare" min="0.11" max="0.15" skills="skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <bonus id="head_skill_xp_rare_archery_shotguns_stealth" rarity="Rare" min="0.11" max="0.15" skills="skill.archery,skill.shotguns,skill.stealth" />
+    <bonus id="head_skill_xp_rare_explosives_deployable_turrets_drone_operations" rarity="Rare" min="0.11" max="0.15" skills="skill.explosives,skill.deployable_turrets,skill.drone_operations" />
+    <bonus id="head_skill_xp_rare_mining_logging_salvage" rarity="Rare" min="0.11" max="0.15" skills="skill.mining,skill.logging,skill.salvage" />
+    <bonus id="head_skill_xp_rare_farming_animal_processing_tracking" rarity="Rare" min="0.11" max="0.15" skills="skill.farming,skill.animal_processing,skill.tracking" />
+    <bonus id="head_skill_xp_rare_cooking_drink_preparation_medicine" rarity="Rare" min="0.11" max="0.15" skills="skill.cooking,skill.drink_preparation,skill.medicine" />
+    <bonus id="head_skill_xp_rare_construction_electrical_mechanics" rarity="Rare" min="0.11" max="0.15" skills="skill.construction,skill.electrical,skill.mechanics" />
+    <bonus id="head_skill_xp_rare_metalworking_gunsmithing_maintenance" rarity="Rare" min="0.11" max="0.15" skills="skill.metalworking,skill.gunsmithing,skill.maintenance" />
+    <bonus id="head_skill_xp_rare_chemistry_medicine_tailoring" rarity="Rare" min="0.11" max="0.15" skills="skill.chemistry,skill.medicine,skill.tailoring" />
+    <bonus id="head_skill_xp_rare_bartering_trading_leadership" rarity="Rare" min="0.11" max="0.15" skills="skill.bartering,skill.trading,skill.leadership" />
+    <bonus id="head_skill_xp_rare_teaching_leadership_management" rarity="Rare" min="0.11" max="0.15" skills="skill.teaching,skill.leadership,skill.management" />
+    <bonus id="head_skill_xp_rare_lockpicking_stealth_athletics" rarity="Rare" min="0.11" max="0.15" skills="skill.lockpicking,skill.stealth,skill.athletics" />
+    <bonus id="head_skill_xp_legendary_swords_knives_axes_scythes" rarity="Legendary" min="0.16" max="0.2" skills="skill.swords,skill.knives,skill.axes,skill.scythes" />
+    <bonus id="head_skill_xp_legendary_clubs_batons_hammers_knuckles" rarity="Legendary" min="0.16" max="0.2" skills="skill.clubs,skill.batons,skill.hammers,skill.knuckles" />
+    <bonus id="head_skill_xp_legendary_pistols_revolvers_heavy_handguns_shotguns" rarity="Legendary" min="0.16" max="0.2" skills="skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns" />
+    <bonus id="head_skill_xp_legendary_assault_rifles_tactical_rifles_long_range_rifles_archery" rarity="Legendary" min="0.16" max="0.2" skills="skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles,skill.archery" />
+    <bonus id="head_skill_xp_legendary_explosives_deployable_turrets_drone_operations_electrical" rarity="Legendary" min="0.16" max="0.2" skills="skill.explosives,skill.deployable_turrets,skill.drone_operations,skill.electrical" />
+    <bonus id="head_skill_xp_legendary_mining_logging_salvage_farming" rarity="Legendary" min="0.16" max="0.2" skills="skill.mining,skill.logging,skill.salvage,skill.farming" />
+    <bonus id="head_skill_xp_legendary_cooking_drink_preparation_medicine_chemistry" rarity="Legendary" min="0.16" max="0.2" skills="skill.cooking,skill.drink_preparation,skill.medicine,skill.chemistry" />
+    <bonus id="head_skill_xp_legendary_construction_mechanics_maintenance_metalworking" rarity="Legendary" min="0.16" max="0.2" skills="skill.construction,skill.mechanics,skill.maintenance,skill.metalworking" />
+    <bonus id="head_skill_xp_legendary_gunsmithing_tailoring_chemistry_metalworking" rarity="Legendary" min="0.16" max="0.2" skills="skill.gunsmithing,skill.tailoring,skill.chemistry,skill.metalworking" />
+    <bonus id="head_skill_xp_legendary_bartering_trading_teaching_management" rarity="Legendary" min="0.16" max="0.2" skills="skill.bartering,skill.trading,skill.teaching,skill.management" />
+    <bonus id="head_skill_xp_legendary_stealth_lockpicking_athletics_tracking" rarity="Legendary" min="0.16" max="0.2" skills="skill.stealth,skill.lockpicking,skill.athletics,skill.tracking" />
+  </family>
+  <family id="BodyHealthMax" slot="Chest" effect="HealthMax" op="base" flat="true">
+    <bonus id="body_health_common" rarity="Common" min="10" max="20" />
+    <bonus id="body_health_uncommon" rarity="Uncommon" min="25" max="40" />
+    <bonus id="body_health_rare" rarity="Rare" min="45" max="65" />
+    <bonus id="body_health_legendary" rarity="Legendary" min="70" max="100" />
+  </family>
+  <family id="BodyCarryCapacity" slot="Chest" effect="CarryCapacity" op="base" flat="true">
+    <bonus id="body_carry_common" rarity="Common" min="3" max="6" />
+    <bonus id="body_carry_uncommon" rarity="Uncommon" min="7" max="10" />
+    <bonus id="body_carry_rare" rarity="Rare" min="11" max="14" />
+    <bonus id="body_carry_legendary" rarity="Legendary" min="15" max="18" />
+  </family>
+  <family id="FeetMovementSpeed" slot="Feet" effect="WalkSpeed" also_effects="RunSpeed,CrouchSpeed">
+    <bonus id="feet_speed_common" rarity="Common" min="0.03" max="0.05" />
+    <bonus id="feet_speed_uncommon" rarity="Uncommon" min="0.06" max="0.09" />
+    <bonus id="feet_speed_rare" rarity="Rare" min="0.1" max="0.13" />
+    <bonus id="feet_speed_legendary" rarity="Legendary" min="0.14" max="0.18" />
+  </family>
+  <family id="FeetFallDamageReduction" slot="Feet" effect="FallDamageReduction" negative="true">
+    <bonus id="feet_fall_common" rarity="Common" min="-0.1" max="-0.06" />
+    <bonus id="feet_fall_uncommon" rarity="Uncommon" min="-0.15" max="-0.11" />
+    <bonus id="feet_fall_rare" rarity="Rare" min="-0.2" max="-0.16" />
+    <bonus id="feet_fall_legendary" rarity="Legendary" min="-0.25" max="-0.21" />
+  </family>
+  <family id="FeetMovingDamageResist" slot="Feet" effect="GeneralDamageResist" op="base" context="walking,running">
+    <bonus id="feet_moving_resist_common" rarity="Common" min="0.05" max="0.09" />
+    <bonus id="feet_moving_resist_uncommon" rarity="Uncommon" min="0.1" max="0.15" />
+    <bonus id="feet_moving_resist_rare" rarity="Rare" min="0.16" max="0.2" />
+    <bonus id="feet_moving_resist_legendary" rarity="Legendary" min="0.21" max="0.25" />
+  </family>
+  <family id="FeetJumpStamina" slot="Feet" effect="StaminaLoss" negative="true" context="jumping">
+    <bonus id="feet_jump_common" rarity="Common" min="-0.18" max="-0.1" />
+    <bonus id="feet_jump_uncommon" rarity="Uncommon" min="-0.3" max="-0.2" />
+    <bonus id="feet_jump_rare" rarity="Rare" min="-0.4" max="-0.31" />
+    <bonus id="feet_jump_legendary" rarity="Legendary" min="-0.5" max="-0.45" />
+  </family>
+  <family id="HeadLootQuantity" slot="Head" effect="LootQuantity">
+    <bonus id="head_loot_qty_common_dukes" rarity="Common" min="0.15" max="0.3" context="dukes" />
+    <bonus id="head_loot_qty_common_ammo" rarity="Common" min="0.15" max="0.3" context="ammo" />
+    <bonus id="head_loot_qty_common_brass" rarity="Common" min="0.15" max="0.3" context="brass" />
+    <bonus id="head_loot_qty_common_food" rarity="Common" min="0.15" max="0.3" context="food" />
+    <bonus id="head_loot_qty_common_medical" rarity="Common" min="0.15" max="0.3" context="medical" />
+    <bonus id="head_loot_qty_uncommon_dukes_ammo" rarity="Uncommon" min="0.35" max="0.5" context="dukes,ammo" />
+    <bonus id="head_loot_qty_uncommon_dukes_brass" rarity="Uncommon" min="0.35" max="0.5" context="dukes,brass" />
+    <bonus id="head_loot_qty_uncommon_dukes_food" rarity="Uncommon" min="0.35" max="0.5" context="dukes,food" />
+    <bonus id="head_loot_qty_uncommon_dukes_medical" rarity="Uncommon" min="0.35" max="0.5" context="dukes,medical" />
+    <bonus id="head_loot_qty_uncommon_ammo_brass" rarity="Uncommon" min="0.35" max="0.5" context="ammo,brass" />
+    <bonus id="head_loot_qty_uncommon_ammo_food" rarity="Uncommon" min="0.35" max="0.5" context="ammo,food" />
+    <bonus id="head_loot_qty_uncommon_ammo_medical" rarity="Uncommon" min="0.35" max="0.5" context="ammo,medical" />
+    <bonus id="head_loot_qty_uncommon_brass_food" rarity="Uncommon" min="0.35" max="0.5" context="brass,food" />
+    <bonus id="head_loot_qty_uncommon_brass_medical" rarity="Uncommon" min="0.35" max="0.5" context="brass,medical" />
+    <bonus id="head_loot_qty_uncommon_food_medical" rarity="Uncommon" min="0.35" max="0.5" context="food,medical" />
+    <bonus id="head_loot_qty_rare_dukes_ammo_brass" rarity="Rare" min="0.55" max="0.75" context="dukes,ammo,brass" />
+    <bonus id="head_loot_qty_rare_dukes_ammo_food" rarity="Rare" min="0.55" max="0.75" context="dukes,ammo,food" />
+    <bonus id="head_loot_qty_rare_dukes_ammo_medical" rarity="Rare" min="0.55" max="0.75" context="dukes,ammo,medical" />
+    <bonus id="head_loot_qty_rare_dukes_brass_food" rarity="Rare" min="0.55" max="0.75" context="dukes,brass,food" />
+    <bonus id="head_loot_qty_rare_dukes_brass_medical" rarity="Rare" min="0.55" max="0.75" context="dukes,brass,medical" />
+    <bonus id="head_loot_qty_rare_dukes_food_medical" rarity="Rare" min="0.55" max="0.75" context="dukes,food,medical" />
+    <bonus id="head_loot_qty_rare_ammo_brass_food" rarity="Rare" min="0.55" max="0.75" context="ammo,brass,food" />
+    <bonus id="head_loot_qty_rare_ammo_brass_medical" rarity="Rare" min="0.55" max="0.75" context="ammo,brass,medical" />
+    <bonus id="head_loot_qty_rare_ammo_food_medical" rarity="Rare" min="0.55" max="0.75" context="ammo,food,medical" />
+    <bonus id="head_loot_qty_rare_brass_food_medical" rarity="Rare" min="0.55" max="0.75" context="brass,food,medical" />
+    <bonus id="head_loot_qty_legendary_dukes_ammo_brass_food" rarity="Legendary" min="0.8" max="1" context="dukes,ammo,brass,food" />
+    <bonus id="head_loot_qty_legendary_dukes_ammo_brass_medical" rarity="Legendary" min="0.8" max="1" context="dukes,ammo,brass,medical" />
+    <bonus id="head_loot_qty_legendary_dukes_ammo_food_medical" rarity="Legendary" min="0.8" max="1" context="dukes,ammo,food,medical" />
+    <bonus id="head_loot_qty_legendary_dukes_brass_food_medical" rarity="Legendary" min="0.8" max="1" context="dukes,brass,food,medical" />
+    <bonus id="head_loot_qty_legendary_ammo_brass_food_medical" rarity="Legendary" min="0.8" max="1" context="ammo,brass,food,medical" />
+  </family>
+  <family id="BodyBuffResistance" slot="Chest" effect="BuffResistance" op="base">
+    <bonus id="body_resist_common_fatigue" rarity="Common" min="0.05" max="0.1" context="buffFatiguedTrigger" />
+    <bonus id="body_resist_common_sprains" rarity="Common" min="0.05" max="0.1" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger" />
+    <bonus id="body_resist_common_abrasion" rarity="Common" min="0.05" max="0.1" context="buffAbrasionCatch" />
+    <bonus id="body_resist_common_laceration" rarity="Common" min="0.05" max="0.1" context="buffLaceration" />
+    <bonus id="body_resist_common_infection" rarity="Common" min="0.05" max="0.1" context="buffInfectionCatch" />
+    <bonus id="body_resist_common_stun" rarity="Common" min="0.05" max="0.1" context="buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_common_concussion" rarity="Common" min="0.05" max="0.1" context="buffInjuryConcussion" />
+    <bonus id="body_resist_common_bleeding" rarity="Common" min="0.05" max="0.1" context="buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_fatigue_sprains" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger" />
+    <bonus id="body_resist_uncommon_fatigue_abrasion" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffAbrasionCatch" />
+    <bonus id="body_resist_uncommon_fatigue_laceration" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffLaceration" />
+    <bonus id="body_resist_uncommon_fatigue_infection" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffInfectionCatch" />
+    <bonus id="body_resist_uncommon_fatigue_stun" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_uncommon_fatigue_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_fatigue_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffFatiguedTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_sprains_abrasion" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch" />
+    <bonus id="body_resist_uncommon_sprains_laceration" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration" />
+    <bonus id="body_resist_uncommon_sprains_infection" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInfectionCatch" />
+    <bonus id="body_resist_uncommon_sprains_stun" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_uncommon_sprains_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_sprains_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_abrasion_laceration" rarity="Uncommon" min="0.11" max="0.2" context="buffAbrasionCatch,buffLaceration" />
+    <bonus id="body_resist_uncommon_abrasion_infection" rarity="Uncommon" min="0.11" max="0.2" context="buffAbrasionCatch,buffInfectionCatch" />
+    <bonus id="body_resist_uncommon_abrasion_stun" rarity="Uncommon" min="0.11" max="0.2" context="buffAbrasionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_uncommon_abrasion_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffAbrasionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_abrasion_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffAbrasionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_laceration_infection" rarity="Uncommon" min="0.11" max="0.2" context="buffLaceration,buffInfectionCatch" />
+    <bonus id="body_resist_uncommon_laceration_stun" rarity="Uncommon" min="0.11" max="0.2" context="buffLaceration,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_uncommon_laceration_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffLaceration,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_laceration_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffLaceration,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_infection_stun" rarity="Uncommon" min="0.11" max="0.2" context="buffInfectionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_uncommon_infection_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffInfectionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_infection_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffInfectionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_stun_concussion" rarity="Uncommon" min="0.11" max="0.2" context="buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_uncommon_stun_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_uncommon_concussion_bleeding" rarity="Uncommon" min="0.11" max="0.2" context="buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_sprains_abrasion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch" />
+    <bonus id="body_resist_rare_fatigue_sprains_laceration" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration" />
+    <bonus id="body_resist_rare_fatigue_sprains_infection" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInfectionCatch" />
+    <bonus id="body_resist_rare_fatigue_sprains_stun" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_fatigue_sprains_concussion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_fatigue_sprains_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_abrasion_laceration" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffAbrasionCatch,buffLaceration" />
+    <bonus id="body_resist_rare_fatigue_abrasion_infection" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffAbrasionCatch,buffInfectionCatch" />
+    <bonus id="body_resist_rare_fatigue_abrasion_stun" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffAbrasionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_fatigue_abrasion_concussion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffAbrasionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_fatigue_abrasion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffAbrasionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_laceration_infection" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffLaceration,buffInfectionCatch" />
+    <bonus id="body_resist_rare_fatigue_laceration_stun" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffLaceration,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_fatigue_laceration_concussion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffLaceration,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_fatigue_laceration_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffLaceration,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_infection_stun" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInfectionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_fatigue_infection_concussion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInfectionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_fatigue_infection_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInfectionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_stun_concussion" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_fatigue_stun_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_fatigue_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffFatiguedTrigger,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_sprains_abrasion_laceration" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffLaceration" />
+    <bonus id="body_resist_rare_sprains_abrasion_infection" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffInfectionCatch" />
+    <bonus id="body_resist_rare_sprains_abrasion_stun" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_sprains_abrasion_concussion" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_sprains_abrasion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_sprains_laceration_infection" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration,buffInfectionCatch" />
+    <bonus id="body_resist_rare_sprains_laceration_stun" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_sprains_laceration_concussion" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_sprains_laceration_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_sprains_infection_stun" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInfectionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_sprains_infection_concussion" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInfectionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_sprains_infection_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInfectionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_sprains_stun_concussion" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_sprains_stun_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_sprains_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_abrasion_laceration_infection" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffLaceration,buffInfectionCatch" />
+    <bonus id="body_resist_rare_abrasion_laceration_stun" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffLaceration,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_abrasion_laceration_concussion" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffLaceration,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_abrasion_laceration_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffLaceration,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_abrasion_infection_stun" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInfectionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_abrasion_infection_concussion" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInfectionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_abrasion_infection_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInfectionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_abrasion_stun_concussion" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_abrasion_stun_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_abrasion_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffAbrasionCatch,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_laceration_infection_stun" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInfectionCatch,buffInjuryStunned01CHTrigger" />
+    <bonus id="body_resist_rare_laceration_infection_concussion" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInfectionCatch,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_laceration_infection_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInfectionCatch,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_laceration_stun_concussion" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_laceration_stun_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_laceration_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffLaceration,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_infection_stun_concussion" rarity="Rare" min="0.21" max="0.3" context="buffInfectionCatch,buffInjuryStunned01CHTrigger,buffInjuryConcussion" />
+    <bonus id="body_resist_rare_infection_stun_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffInfectionCatch,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_infection_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffInfectionCatch,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_rare_stun_concussion_bleeding" rarity="Rare" min="0.21" max="0.3" context="buffInjuryStunned01CHTrigger,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+    <bonus id="body_resist_legendary_all" rarity="Legendary" min="0.31" max="0.4" context="buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffAbrasionCatch,buffLaceration,buffInfectionCatch,buffInjuryStunned01CHTrigger,buffInjuryConcussion,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire" />
+  </family>
+  <family id="BodyHealthChangeOT" slot="Chest" effect="HealthChangeOT" op="base" display="seconds">
+    <bonus id="body_health_regen_common" rarity="Common" min="0.0167" max="0.0250" />
+    <bonus id="body_health_regen_uncommon" rarity="Uncommon" min="0.0278" max="0.0357" />
+    <bonus id="body_health_regen_rare" rarity="Rare" min="0.0417" max="0.0625" />
+    <bonus id="body_health_regen_legendary" rarity="Legendary" min="0.0714" max="0.1000" />
+  </family>
+  <family id="BodyStaminaRecoveryEfficiency" slot="Chest" effect="None" special="stamina_efficiency">
+    <bonus id="body_stamina_efficiency_common" rarity="Common" min="0.05" max="0.1" />
+    <bonus id="body_stamina_efficiency_uncommon" rarity="Uncommon" min="0.11" max="0.15" />
+    <bonus id="body_stamina_efficiency_rare" rarity="Rare" min="0.16" max="0.2" />
+    <bonus id="body_stamina_efficiency_legendary" rarity="Legendary" min="0.21" max="0.25" />
+  </family>
+  <family id="FeetMovementStamina" slot="Feet" effect="None" special="movement_stamina">
+    <bonus id="feet_movement_stamina_common" rarity="Common" min="0.1" max="0.18" />
+    <bonus id="feet_movement_stamina_uncommon" rarity="Uncommon" min="0.2" max="0.3" />
+    <bonus id="feet_movement_stamina_rare" rarity="Rare" min="0.35" max="0.45" />
+    <bonus id="feet_movement_stamina_legendary" rarity="Legendary" min="0.5" max="0.6" />
+  </family>
+  <family id="FeetSneakSprintStamina" slot="Feet" effect="None" special="sneak_sprint" flat="true">
+    <bonus id="feet_sneak_sprint_uncommon" rarity="Uncommon" min="1" max="1" />
+  </family>
+  <family id="FeetShadowBlend" slot="Feet" effect="LightMultiplier" negative="true" context="crouching" special="low_light">
+    <bonus id="feet_shadow_blend_common" rarity="Common" min="-0.22" max="-0.1" />
+    <bonus id="feet_shadow_blend_uncommon" rarity="Uncommon" min="-0.35" max="-0.25" />
+    <bonus id="feet_shadow_blend_rare" rarity="Rare" min="-0.52" max="-0.4" />
+    <bonus id="feet_shadow_blend_legendary" rarity="Legendary" min="-0.65" max="-0.58" />
+  </family>
+  <family id="FeetSneakDamage" slot="Feet" effect="None" special="sneak_damage">
+    <bonus id="feet_sneak_damage_common" rarity="Common" min="0.1" max="0.15" />
+    <bonus id="feet_sneak_damage_uncommon" rarity="Uncommon" min="0.18" max="0.25" />
+    <bonus id="feet_sneak_damage_rare" rarity="Rare" min="0.28" max="0.35" />
+    <bonus id="feet_sneak_damage_legendary" rarity="Legendary" min="0.4" max="0.5" />
+  </family>
+  <family id="FeetSleeperKnockdown" slot="Feet" effect="None" special="sleeper_knockdown">
+    <bonus id="feet_sleeper_knockdown_rare" rarity="Rare" min="0.5" max="0.5" />
+  </family>
+  <family id="FeetCrouchNoise" slot="Feet" effect="NoiseMultiplier" negative="true" context="crouching">
+    <bonus id="feet_noise_common" rarity="Common" min="-0.18" max="-0.1" />
+    <bonus id="feet_noise_uncommon" rarity="Uncommon" min="-0.3" max="-0.2" />
+    <bonus id="feet_noise_rare" rarity="Rare" min="-0.45" max="-0.35" />
+    <bonus id="feet_noise_legendary" rarity="Legendary" min="-0.5" max="-0.5" />
+  </family>
+  <family id="FeetEnemySearchDuration" slot="Feet" effect="EnemySearchDuration">
+    <bonus id="feet_search_common" rarity="Common" min="0.2" max="0.4" />
+    <bonus id="feet_search_uncommon" rarity="Uncommon" min="0.5" max="0.8" />
+    <bonus id="feet_search_rare" rarity="Rare" min="1" max="1.4" />
+    <bonus id="feet_search_legendary" rarity="Legendary" min="1.6" max="2" />
+  </family>
+  <family id="FeetLandMineImmunity" slot="Feet" effect="LandMineImmunity" op="base" flat="true">
+    <bonus id="feet_mine_immunity" rarity="Rare" min="1" max="1" />
+  </family>
+  <family id="FeetTrashSilence" slot="Feet" effect="SilenceBlockSteps" op="base" flat="true" context="trashPile">
+    <bonus id="feet_trash_silence" rarity="Uncommon" min="1" max="1" />
+  </family>
 </armor_bonuses>

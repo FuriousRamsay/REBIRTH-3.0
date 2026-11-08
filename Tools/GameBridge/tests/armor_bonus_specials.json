@@ -1,0 +1,23 @@
+{
+  "name": "Armor bonuses with their own code: sneak damage, sleeper knockdown, crouch sprint",
+  "stopOnFailure": false,
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "console": "rbtestgrant crouchlock 1" },
+    { "console": "rbtestgrant equipbonus feet_fall_common" },
+    { "spawn": { "entity": "zombieArlene", "distance": 12 } },
+    { "wait": 1 },
+    { "console": "rbtestgrant sneakhit" },
+    { "console": "rbtestgrant equipbonus feet_sneak_damage_legendary" },
+    { "console": "rbtestgrant sneakhit" },
+    { "console": "rbtestgrant equipbonus feet_sleeper_knockdown_rare" },
+    { "console": "rbtestgrant sneakhit" },
+    { "cleararea": { "radius": 40 } },
+    { "console": "rbtestgrant equipbonus feet_sneak_sprint_uncommon" },
+    { "move": { "forward": 1, "seconds": 3, "run": 1 } },
+    { "expectStat": { "name": "stamina", "op": ">", "value": 95 } },
+    { "console": "rbtestgrant crouchlock 0" },
+    { "expectNoErrors": true }
+  ]
+}

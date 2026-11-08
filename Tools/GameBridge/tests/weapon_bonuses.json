@@ -1,0 +1,21 @@
+{
+  "name": "Weapon bonuses: boss crate guarantee, real hits and armor roll rules",
+  "stopOnFailure": false,
+  "steps": [
+    { "cleararea": { "radius": 60 } },
+    { "restore": {} },
+    { "console": "rbtestgrant bonusloot rebirthBossRewardT3 100" },
+    { "console": "rbtestgrant rollstats Hands 3 6" },
+    { "give": { "item": "meleeWpnClubT1BaseballBat", "quality": 3, "toolbelt": 1 } },
+    { "select": { "slot": 1 } },
+    { "wait": 1 },
+    { "console": "rbweaponbonus force on" },
+    { "console": "rbweaponbonus RangedBleed 5" },
+    { "spawn": { "entity": "zombieArlene", "distance": 5 } },
+    { "fight": { "contains": "zombie" } },
+    { "expectLog": { "contains": "[REBIRTH WeaponBonus] RangedBleed", "min": 1 } },
+    { "console": "rbweaponbonus force off" },
+    { "cleararea": { "radius": 60 } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1048,6 +1048,30 @@
         <property name="Delay" value="0.1" />
       </property>
     </item>
+    <item name="rebirthSchematicAmmoMachine">
+      <property name="RebirthInstantRecipe" value="true" />
+      <property name="Extends" value="resourcePaper" />
+      <property name="CustomIcon" value="FR_LearnAmmoMachine_icon" />
+      <property name="Tags" value="book,rebirthLiterature" />
+      <property name="Stacknumber" value="5" />
+      <property name="EconomicValue" value="110" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionStudyLiteratureRebirth, RebirthUtils" />
+        <property name="Delay" value="0.1" />
+      </property>
+    </item>
+    <item name="rebirthSchematicAlchemyTable">
+      <property name="RebirthInstantRecipe" value="true" />
+      <property name="Extends" value="resourcePaper" />
+      <property name="CustomIcon" value="FR_AlchemyTable001Schematic_FR_icon" />
+      <property name="Tags" value="book,rebirthLiterature" />
+      <property name="Stacknumber" value="5" />
+      <property name="EconomicValue" value="110" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionStudyLiteratureRebirth, RebirthUtils" />
+        <property name="Delay" value="0.1" />
+      </property>
+    </item>
     <item name="rebirthSchematicWoodBurningStove">
       <property name="RebirthInstantRecipe" value="true" />
       <property name="Extends" value="resourcePaper" />
@@ -5104,6 +5128,20 @@
       <property name="Tags" value="medical,rebirthRageCapsule" />
       <property name="Stacknumber" value="10" />
       <property name="EconomicValue" value="500" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionUseRageCapsuleRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_painkillers" />
+      </property>
+    </item>
+    <!-- 2.6 FuriousRamsayRageCapsuleOther: anyone can take it (Page Down or eat) for the shared 60 s rage. -->
+    <item name="rebirthRageCapsuleOther">
+      <property name="CustomIcon" value="FR_RageCapsuleOther_icon"/>
+      <property name="Extends" value="drugRecog" />
+      <property name="Tags" value="medical,rebirthRageCapsule" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="300" />
+      <property name="SellableToTrader" value="true" />
       <property class="Action0">
         <property name="Class" value="ItemActionUseRageCapsuleRebirth, RebirthUtils" />
         <property name="Delay" value="1.0" />

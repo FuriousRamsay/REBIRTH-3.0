@@ -37,6 +37,9 @@ internal static class RebirthPurgeSupplyTargets
                 if(crate==null||!RebirthPurgeSupplyCrateSerialization.TryReadAuthoritative(crate,id,out stamp)||stamp.Player!=player)continue;
                 position=crate.position;
                 string name=RebirthPurgeDiscoveryNotification.CleanDisplayName(crate.spawnByName);
+                // Crates stamped before the display-name fix: use the owner's current display name.
+                if(string.IsNullOrEmpty(name)||name==Localization.Get("xuiRebirthPurgeSupplyOwner"))
+                    name=RebirthPurgeDiscoveryNotification.CleanDisplayName(GameManager.Instance?.persistentPlayers?.GetPlayerDataFromEntityID(crate.spawnById)?.PlayerName?.DisplayName);
                 RebirthPurgeSupplyMarkerLabels.Capture(crate,string.IsNullOrEmpty(name)?Localization.Get("xuiRebirthPurgeSupplyOwner"):name);
             }
             else

@@ -12,22 +12,26 @@
   <append xpath="/entity_classes/entity_class[@name='zombieMutated']/property[@name='Tags']/@value">,noheadshot</append>
   <append xpath="/entity_classes/entity_class[@name='zombieMutatedFeral']/property[@name='Tags']/@value">,noheadshot</append>
   <append xpath="/entity_classes/entity_class[@name='zombieMutatedRadiated']/property[@name='Tags']/@value">,noheadshot</append>
+  <!-- Regular mutated variants spawn minions with their spit (2.6, MinEventActionRebirthMutatedSpitImpact checks canSpawn); the NoMinion variants below do not. -->
+  <append xpath="/entity_classes/entity_class[@name='zombieMutated']/property[@name='Tags']/@value">,canSpawn</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedFeral']/property[@name='Tags']/@value">,canSpawn</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedRadiated']/property[@name='Tags']/@value">,canSpawn</append>
   <append xpath="/entity_classes/entity_class[@name='zombieMutatedCharged']/property[@name='Tags']/@value">,noheadshot</append>
   <append xpath="/entity_classes/entity_class[@name='zombieMutatedInfernal']/property[@name='Tags']/@value">,noheadshot</append>
   <!-- No-minion variants preserve the 2.6 spawn-composition identities while inheriting valid 3.0 AI and combat definitions. -->
   <append xpath="/entity_classes">
     <entity_class name="zombieMutatedNoMinion" extends="zombieMutated">
-      <property name="Tags" value="entity,zombie,walker,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="Tags" value="entity,zombie,walker,zombieMutated,noheadshot,noRebirth,perkAT04,perkAT05"/>
       <property name="MoveSpeedAggro" value=".2, 1.1"/>
     </entity_class>
     <entity_class name="zombieMutatedFeralNoMinion" extends="zombieMutatedFeral">
-      <property name="Tags" value="entity,zombie,walker,feral,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="Tags" value="entity,zombie,walker,feral,zombieMutated,noheadshot,noRebirth,perkAT04,perkAT05"/>
       <property name="GamestageStart" value="40"/>
       <property name="GamestageEnd" value="100"/>
       <property name="HordeNightChance" value="10"/>
     </entity_class>
     <entity_class name="zombieMutatedRadiatedNoMinion" extends="zombieMutatedRadiated">
-      <property name="Tags" value="entity,zombie,walker,feral,radiated,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="Tags" value="entity,zombie,walker,feral,radiated,zombieMutated,noheadshot,noRebirth,perkAT04,perkAT05"/>
       <property name="GamestageStart" value="60"/>
       <property name="GamestageEnd" value="0"/>
       <property name="HordeNightChance" value="10"/>
@@ -154,6 +158,7 @@
   <include filename="_EntityStudio/farmer_diagnostic_entityclasses.xml"/>
   <include filename="_Vehicles/standard_entityclasses.xml"/>
   <include filename="_Seeker/entityclasses.xml"/>
+  <include filename="_WeaponBonuses/entityclasses.xml"/>
   <set xpath="/entity_classes/entity_class[@name='animalZombieBear' or @name='animalZombieBoar' or @name='animalDireWolf']/property[@name='LootDropProb']/@value">0</set>
 </configs>
 

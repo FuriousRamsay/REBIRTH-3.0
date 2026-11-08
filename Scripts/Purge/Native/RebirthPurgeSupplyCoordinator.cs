@@ -19,7 +19,10 @@ internal static class RebirthPurgeSupplyCoordinator
         internal bool Current()=>NativePurge(Controller)&&ReferenceEquals(Controller.activeAirDrop,Flight)&&Flight!=null;
         internal void ProjectOwner(EntitySupplyCrate crate)
         {
-            crate.spawnById=Player?.entityId??-1;crate.spawnByName=Player?.EntityName??Localization.Get("xuiRebirthPurgeSupplyOwner");crate.spawnByAllowShare=false;
+            // The owner label shows the player's visible name (EntityName is not a player's display name).
+            string ownerName=(Player as EntityPlayer)?.PlayerDisplayName;
+            if(string.IsNullOrWhiteSpace(ownerName))ownerName=Player?.EntityName;
+            crate.spawnById=Player?.entityId??-1;crate.spawnByName=string.IsNullOrWhiteSpace(ownerName)?Localization.Get("xuiRebirthPurgeSupplyOwner"):ownerName;crate.spawnByAllowShare=false;
         }
     }
     private static World world;

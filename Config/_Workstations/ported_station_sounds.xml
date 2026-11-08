@@ -1,0 +1,123 @@
+<configs>
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayAmmoMachineOpen">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayAmmoMachineOpen"/>
+			<Noise ID="5" noise="10" time="4"/>
+			<LowestPitch name="1"/>
+			<HighestPitch name="1"/>
+			<LocalCrouchVolumeScale value="1"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="3"/>
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+    <SoundDataNode name="FuriousRamsayAlchemyTableOpen">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayAlchemyTableOpen"/>
+			<Noise ID="5" noise="10" time="4"/>
+			<LowestPitch name="1"/>
+			<HighestPitch name="1"/>
+			<LocalCrouchVolumeScale value="1"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="3"/>
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+    <SoundDataNode name="FuriousRamsayAlchemyCraft">
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/>
+			<Noise ID="1" noise="7" time="3" muffled_when_crouched="1"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayAlchemyCraft"/>
+			<LocalCrouchVolumeScale value="1.0"/>
+			<CrouchNoiseScale value="1"/>
+			<NoiseScale value="1"/>
+			<MaxVoices value="10"/>
+			<MaxRepeatRate value="1.111"/>
+		</SoundDataNode>
+    <!-- 2.6 station opening sounds (owner 2026-11-08) -->
+    <SoundDataNode name="FuriousRamsayMortarPestle" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayMortarPestle" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayToolbox" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayToolbox" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayCircularSaw" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayCircularSaw" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayGasStove" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayGasStove" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayIronOven" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayIronOven" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayDistiller" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayDistiller" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayShredder" muffled_when_crouched="1">
+    <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+    <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayShredder" />
+    <Noise ID="5" noise="10" time="4" />
+    <LowestPitch name="1" />
+    <HighestPitch name="1" />
+    <LocalCrouchVolumeScale value="1" />
+    <CrouchNoiseScale value="1" />
+    <NoiseScale value="1" />
+    <MaxVoices value="3" />
+    <MaxRepeatRate value="0.01" />
+  </SoundDataNode>
+  </append>
+</configs>

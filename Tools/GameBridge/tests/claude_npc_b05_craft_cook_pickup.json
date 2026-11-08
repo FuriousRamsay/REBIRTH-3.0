@@ -8,7 +8,7 @@
     { "action": { "command": "restore", "args": { } } },
     { "console": "settime 1 9 0" },
     { "waitForGuardIdle": { "timeout": 45 } },
-    { "_note": "OWNED-HUMAN PREAMBLE (manifest section Fixtures, recipe F1; real game interaction, no admin bypass): spawn an unowned survivor, open the real activation radial and Talk (activateNearestEntity default command talk), pay the real Hire price with casinoCoin. Price source: Scripts/NPC/Interaction/RebirthSurvivorHirePayment.cs Price(): HireCost 500 (Config/_NPC/entityclasses.xml) + 500 x $FR_NPC_Level, discounted by perkBetterBarter / trade aura; so 3000 coins cover any fresh survivor. The hired entity class is npcRebirthPersistentSurvivorManSDCS (RebirthHiredEntityClass)." },
+    { "_note": "OWNED-HUMAN PREAMBLE (manifest section Fixtures, recipe F1; real game interaction, no admin bypass): spawn an unowned survivor, open the real activation radial and Talk (activateNearestEntity default command talk), pay the real Hire price with casinoCoin. Price source: Scripts/NPC/Interaction/RebirthSurvivorHirePayment.cs Price(): HireCost 500 (Config/_NPC/entityclasses.xml) + 500 x $FR_NPC_Level, discounted by perkBetterBarter; so 3000 coins cover any fresh survivor. The hired entity class is npcRebirthPersistentSurvivorManSDCS (RebirthHiredEntityClass)." },
     { "action": { "command": "give", "args": { "item": "casinoCoin", "count": 3000 } } },
     { "wait": 0.5 },
     { "markItem": "casinoCoin" },

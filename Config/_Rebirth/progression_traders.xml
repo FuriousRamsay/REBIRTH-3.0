@@ -3,10 +3,8 @@
   <insertBefore xpath="/traders/trader_item_groups/trader_item_group[1]">
     <trader_item_group name="rebirthLearning_bows" count="1">
       <item name="rebirthFieldNotesArchery" count="1"/>
-      <item name="rebirthPatternBowmaking" count="1"/>
       <item name="rebirthSchematicArcherySpecialtyAmmo" count="1"/>
       <item name="rebirthSchematicBowMods" count="1"/>
-      <item name="rebirthSchematicCrossbowsCompound" count="1"/>
       <item name="rebirthTheoryArcheryPrimer" count="1"/>
     </trader_item_group>
     <trader_item_group name="rebirthLearning_spears" count="1">

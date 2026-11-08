@@ -322,16 +322,6 @@
       <stack_type value="ignore"/><duration value="10"/><effect_group/>
     </buff>
 
-    <buff name="FuriousRamsayResistFire" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire"/></effect_group></buff>
-    <buff name="FuriousRamsayResistShock" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical"/><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffShocked"/></effect_group></buff>
-    <buff name="FuriousRamsayResistSmoke" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="heat"/></effect_group></buff>
-    <buff name="FuriousRamsayResistFireShock" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire,buffShocked"/><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical"/></effect_group></buff>
-    <buff name="FuriousRamsayResistFireShockSmoke" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire,buffShocked"/><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical,heat"/></effect_group></buff>
-    <buff name="FuriousRamsayAddFireBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
-    <buff name="FuriousRamsayAddShockBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
-    <buff name="FuriousRamsayAddSmokeBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
-    <buff name="FuriousRamsayAddFireShockBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
-    <buff name="FuriousRamsayAddFireShockSmokeBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
   </append>
 
 
@@ -507,4 +497,6 @@
   <remove xpath="/buffs/buff//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
   <remove xpath="/buffs/buff//triggered_effect[contains(@buff,'SetBonus')]" />
   <remove xpath="/buffs/buff[contains(@name,'SetBonus')]" />
+  <include filename="_WeaponBonuses/buffs.xml"/>
+  <include filename="_Workstations/mind_control_buffs.xml"/>
 </configs>

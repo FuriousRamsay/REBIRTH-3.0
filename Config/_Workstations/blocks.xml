@@ -24,7 +24,7 @@
         <property name="ToolNames" value="1,2,3" />
       </property>
       <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
-      <property name="OpenSound" value="open_workbench" />
+      <property name="OpenSound" value="FuriousRamsayToolbox" />
       <property name="CloseSound" value="" />
       <property name="CraftSound" value="" />
       <property name="CraftCompleteSound" value="" />
@@ -46,7 +46,7 @@
     <block name="ModifierStation">
       <property name="Class" value="Workstation" />
       <property class="Workstation">
-        <property name="Modules" value="output" />
+        <property name="Modules" value="input,tools,output" />
         <property name="CraftingAreaRecipes" value="ModifierStation" />
       </property>
       <property name="DescriptionKey" value="ModifierStationDesc" />
@@ -122,9 +122,9 @@
       <property name="FuelType" value="ammoGasCan" />
       <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
       <property name="TakeDelay" value="2.5" />
-      <property name="OpenSound" value="open_workbench" />
+      <property name="OpenSound" value="FuriousRamsayCircularSaw" />
       <property name="CloseSound" value="" />
-      <property name="CraftSound" value="" />
+      <property name="CraftSound" value="FuriousRamsayCircularSaw" />
       <property name="CraftCompleteSound" value="" />
       <property class="RepairItems">
         <property name="resourceScrapIron" value="10" />
@@ -166,7 +166,7 @@
         <property name="CraftingAreaRecipes" value="WorkbenchDistiller001_FR" />
       </property>
       <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
-      <property name="OpenSound" value="open_workbench" />
+      <property name="OpenSound" value="FuriousRamsayDistiller" />
       <property name="CloseSound" value="" />
       <property name="CraftSound" value="" />
       <property name="CraftCompleteSound" value="" />
@@ -211,7 +211,7 @@
         <property name="CraftingAreaRecipes" value="WorkbenchShredder001_FR" />
       </property>
       <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
-      <property name="OpenSound" value="open_workbench" />
+      <property name="OpenSound" value="FuriousRamsayShredder" />
       <property name="CloseSound" value="" />
       <property name="CraftSound" value="" />
       <property name="CraftCompleteSound" value="" />
@@ -500,4 +500,17 @@
   <!-- Recipe tools are real station modules, including legacy-compatible tool recipes. -->
   <set xpath="/blocks/block[@name='workbench' or @name='cementMixer' or @name='WorkbenchResearchTable001_FR' or @name='SonjaAmmoRecyclerStation' or @name='SonjaOutfitDesigner']/property[@class='Workstation']/property[@name='Modules']/@value">tools,output</set>
   <set xpath="/blocks/block[@name='chemistryStation']/property[@class='Workstation']/property[@name='Modules']/@value">tools,output,fuel,input</set>
+  <!-- 2.6 propane refill, kept on the native composite tank so saved tanks and its explosion still work. -->
+  <append xpath="/blocks/block[@name='tankPropaneWhite']/property[@class='CompositeFeatures']">
+    <property class="TEFeatureStorage">
+      <property name="LootList" value="rebirthPropaneTankSlot" />
+    </property>
+    <property class="TEFeatureRebirthPropaneFiller">
+      <property name="UnitsMax" value="1000000" />
+      <property name="UnitsInitMin" value="0.30" />
+      <property name="UnitsInitMax" value="0.65" />
+      <property name="UnitsPerSecond" value="200" />
+      <property name="AcceptItem" value="FuriousRamsayPropaneTank" />
+    </property>
+  </append>
 </configs>

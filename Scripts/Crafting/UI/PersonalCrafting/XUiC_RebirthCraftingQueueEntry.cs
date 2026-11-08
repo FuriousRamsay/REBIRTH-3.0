@@ -116,6 +116,27 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         }
     }
 
+    private float lastStationTime = -1f;
+    private void FollowStation(float dt)
+    {
+        var station = (windowGroup?.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity;
+        var queue = station?.Queue;
+        if (queue == null || queue.Length == 0) return;
+        for (int i = 0; i < queue.Length; i++)
+        {
+            var row = queue[i];
+            if (row == null || !ReferenceEquals(row.Recipe, recipe)) continue;
+            // The station updates its time every couple of seconds; count down locally in between so the timer and bar
+            // move smoothly, and take the station's value whenever it changes.
+            if (System.Math.Abs(row.CraftingTimeLeft - lastStationTime) > .001f) { lastStationTime = row.CraftingTimeLeft; craftingTimeLeft = row.CraftingTimeLeft; }
+            else if (IsCrafting && craftingTimeLeft > 0f) craftingTimeLeft = System.Math.Max(0f, craftingTimeLeft - dt);
+            // The timer label reads the total time left (native only updates it while crafting itself).
+            float total = craftingTimeLeft + System.Math.Max(0, GetRecipeCount() - 1) * GetOneItemCraftTime();
+            if (System.Math.Abs(totalCraftTimeLeft - total) > .001f) totalCraftTimeLeft = total;
+            return;
+        }
+    }
+
     public override void Update(float dt)
     {
         // The active native stack and a completed inventory-full retry need XUiC_RecipeStack.Update. Queued backing
@@ -127,6 +148,10 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             RebirthCookingHeat.TickUi(this,dt);
             RebirthCookingDiagnostics.Heat(profile);
         }
+        // Scrap rows are timed by the station: show its remaining time. The active flag stays with the native queue
+        // (front card): flipping it made the window re-sync the station every frame and reset its tick timer, which
+        // froze scrapping progress and made the cards flicker (owner 2026-11-08).
+        if (HasRecipeForPresentation && RebirthRecyclerRuntime.IsMarked(recipe)) FollowStation(dt);
         bool nativeTick = HasRecipeForPresentation && (IsCrafting || isInventoryFull) && !managed;
         if (nativeTick)
             base.Update(dt);
@@ -142,7 +167,9 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
 
         // Active base.Update already updates the view tree. Queued cards only need lightweight
         // hover/widget flushing; do not invoke native RecipeStack processing for them.
-        if (!nativeTick && HasRecipeForPresentation)
+        // Scrap rows: the native Update is skipped by the recycler (station-timed), which also skips the view-tree update,
+        // so the bar fill was set but never drawn (owner 2026-11-08). Update the views here for them too.
+        if ((!nativeTick || RebirthRecyclerRuntime.IsMarked(recipe)) && HasRecipeForPresentation)
             UpdatePresentationTree(dt);
     }
 
@@ -193,7 +220,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         int recipeIdentity = recipe != null ? recipe.GetHashCode() : 0;
         bool craftingNow = recipe != null && IsCrafting;
         bool identityChanged = force || recipeIdentity != lastRecipeIdentity;
-        bool craftingChanged = force || craftingNow != lastCrafting;
+        bool craftingChanged = force || craftingNow != lastCrafting || identityChanged;
 
         if (recipe == null)
         {
@@ -272,7 +299,9 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
 
         if (craftingChanged)
         {
-            SetLabelText(statusLabel, craftingNow
+            // Scrap rows: the active one says "Scrapping", the others "Queued" (owner 2026-11-08).
+            bool scrap = recipe.IsScrap;
+            SetLabelText(statusLabel, scrap && craftingNow ? RebirthCraftingQueueBridge.Localize("xuiRebirthQueueScrapping", "Scrapping") : craftingNow
                 ? RebirthCraftingQueueBridge.Localize("xuiRebirthQueueCrafting", "Crafting")
                 : RebirthCraftingQueueBridge.Localize("xuiRebirthQueueQueued", "Queued"));
             if (statusLabel != null)
@@ -285,9 +314,22 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             }
         }
 
-        SetProgress(craftingNow ? (millingQueue ? 1f-RebirthCookingHeat.Remaining(recipe)/Math.Max(1f,RebirthCookingHeat.Number(recipe,"duration")) : RebirthCraftingQueueBridge.GetCurrentItemProgress(this)) : 0f, craftingNow);
+        SetProgress(craftingNow ? (millingQueue ? 1f-RebirthCookingHeat.Remaining(recipe)/Math.Max(1f,RebirthCookingHeat.Number(recipe,"duration")) : recipe.IsScrap && RebirthRecyclerRuntime.IsMarked(recipe) ? ScrapUnitProgress(recipe) : RebirthCraftingQueueBridge.GetCurrentItemProgress(this)) : 0f, craftingNow);
         lastRecipeIdentity = recipeIdentity;
         lastCrafting = craftingNow;
+    }
+
+    /// <summary>Scrap jobs cover every scrapped unit; the bar fills once per unit, as crafting fills once per item
+    /// (owner 2026-11-08: a 10-unit job filled about 1% per second and looked frozen).</summary>
+    private float ScrapUnitProgress(Recipe recipe)
+    {
+        int units = 1;
+        try { var value = recipe.ingredients[0].itemValue.GetMetadata(RebirthRecyclerRuntime.Prefix + "units"); if (value != null) units = Math.Max(1, Convert.ToInt32(value)); } catch { units = 1; }
+        float perUnit = GetOneItemCraftTime() / units;
+        if (perUnit <= 0.0001f) return 0f;
+        float left = Mathf.Max(0f, GetRecipeCraftingTimeLeft());
+        float remainder = left - Mathf.Floor(Mathf.Max(0f, left - 0.0001f) / perUnit) * perUnit;
+        return Mathf.Clamp01(1f - remainder / perUnit);
     }
 
     private void SetProgress(float progress, bool crafting)

@@ -214,8 +214,11 @@ public sealed class RebirthPersonalCraftingLayoutService
             ApplyCenterInternalLayout(centerWidth, bodyHeight);
             ApplyRightInternalLayout(rightWidth, bodyHeight);
 
-            // Scrap stations have no recipes: drop the list and give its width to input, queue and output.
-            if (owner.GetChildByType<XUiC_RebirthRecyclerInputGrid>() != null && !string.Equals(owner.Workstation, "SonjaOutfitDesigner", StringComparison.OrdinalIgnoreCase))
+            // Recycler and Shredder only scrap (owner 2026-11-07): the queue takes the recipe column as "Scrap Queue".
+            if (RebirthScrapWindow.IsScrapOnly) PlaceScrapQueue(leftWidth, bodyHeight);
+            else RestoreQueue();
+            // The Modifier Station has no recipes: drop the list and give its width to input, queue and output.
+            if (RebirthScrapWindow.Active && !RebirthScrapWindow.IsScrapOnly)
             {
                 SetControllerActive(owner.GetChildById("rebirthCraftingLeftZone"), false);
                 int scrapWidth = Math.Max(1, bodyWidth - ZoneGap);
@@ -225,6 +228,8 @@ public sealed class RebirthPersonalCraftingLayoutService
                 SetZone("rebirthCraftingRightZone", "rebirthCraftingRightBackground", "rebirthCraftingRightFrame", centerWidth + ZoneGap, 0, rightWidth, bodyHeight);
                 ApplyCenterInternalLayout(centerWidth, bodyHeight);
                 ApplyRightInternalLayout(rightWidth, bodyHeight);
+                // Kits apply at once, so the Modifier Station has nothing to queue.
+                if (RebirthScrapWindow.IsModifier) SetControllerActive(owner.GetChildById("rebirthCraftingQueueRegion"), false);
             }
             ApplyDebugGeometry(bodyWidth, bodyHeight, leftWidth, centerWidth, rightWidth);
         }
@@ -233,6 +238,57 @@ public sealed class RebirthPersonalCraftingLayoutService
         owner.State.RecordLayout(screen, rootSize, rootPosition);
         LogLayoutDiagnostic(screen, rootPosition, rootSize, bottomReserve);
         return true;
+    }
+
+    private UnityEngine.Transform queueHome;
+
+    /// <summary>Moves the queue into the left (recipe) column and titles it Scrap Queue; the recipe list and
+    /// expected-outcome sections are hidden there.</summary>
+    private void PlaceScrapQueue(int width, int height)
+    {
+        var queue = owner.GetChildById("rebirthCraftingQueueRegion");
+        var left = owner.GetChildById("rebirthCraftingLeftZone");
+        var queueTransform = queue?.ViewComponent?.UiTransform;
+        var leftTransform = left?.ViewComponent?.UiTransform;
+        if (queueTransform == null || leftTransform == null) return;
+        SetControllerActive(owner.GetChildById("rebirthCraftingRecipesRegion"), false);
+        // No recipes to search at a scrap-only station (owner 2026-11-08).
+        SetControllerActive(owner.GetChildById("rebirthCraftingRecipeSearch"), false);
+        SetControllerActive(owner.GetChildById("rebirthCraftingRecipeSearchPlaceholder"), false);
+        SetControllerActive(owner.GetChildById("rebirthCraftingOutcomeRegion"), false);
+        if (queueTransform.parent != leftTransform)
+        {
+            if (queueHome == null) queueHome = queueTransform.parent;
+            queueTransform.SetParent(leftTransform, false);
+        }
+        SetRect(queue, 0, 0, width, height);
+        SetRect(owner.GetChildById("rebirthCraftingQueueRegionBg"), 0, 0, width, height);
+        SetRect(owner.GetChildById("rebirthCraftingQueueHeaderRule"), 0, -38, width, 2);
+        SetRect(owner.GetChildById("rebirthCraftingQueueController"), 0, 0, width, height);
+        SetQueueTitle("xuiRebirthScrapQueue");
+    }
+
+    private void RestoreQueue()
+    {
+        var queueTransform = owner.GetChildById("rebirthCraftingQueueRegion")?.ViewComponent?.UiTransform;
+        if (queueHome != null && queueTransform != null && queueTransform.parent != queueHome)
+        {
+            queueTransform.SetParent(queueHome, false);
+            SetControllerActive(owner.GetChildById("rebirthCraftingRecipesRegion"), true);
+            SetControllerActive(owner.GetChildById("rebirthCraftingOutcomeRegion"), true);
+            SetControllerActive(owner.GetChildById("rebirthCraftingRecipeSearch"), true);
+            SetControllerActive(owner.GetChildById("rebirthCraftingRecipeSearchPlaceholder"), true);
+        }
+        // Stations that both craft and scrap (the Munitions Workbench) show "Crafting/Scrap Queue".
+        SetQueueTitle(RebirthRecyclerRuntime.Supports(XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity)
+            ? "xuiRebirthCraftScrapQueue" : "xuiRebirthCraftingQueue");
+    }
+
+    private void SetQueueTitle(string key)
+    {
+        var title = owner.GetChildById("rebirthCraftingQueueTitle")?.ViewComponent as XUiV_Label;
+        string text = Localization.Get(key);
+        if (title != null && title.Text != text) title.Text = text;
     }
 
     private void LogLayoutDiagnostic(Vector2i screen, Vector2i rootPosition, Vector2i rootSize, int bottomReserve)
@@ -372,7 +428,7 @@ public sealed class RebirthPersonalCraftingLayoutService
     private void ApplyCenterInternalLayout(int width, int height)
     {
         const int headerHeight = 38;
-        SetControllerActive(owner.GetChildById("rebirthCraftingRequirementsRegion"), true);
+        SetControllerActive(owner.GetChildById("rebirthCraftingRequirementsRegion"), !RebirthScrapWindow.Active);
         // Chunk J: outer center geometry is state-invariant. Reserve enough height for the
         // Crafting Backpack header plus four complete minimum-size rows before distributing
         // the remaining space to Details and Requirements. The backpack uses a wide 11-column
@@ -526,15 +582,35 @@ public sealed class RebirthPersonalCraftingLayoutService
             if(input!=null)
             {
                 // Wide scrap layout: input and instructions sit beside the tools, leaving height for the queue.
-                bool scrapInput=input.GetChildByType<XUiC_RebirthRecyclerInputGrid>()!=null && !string.Equals(owner.Workstation,"SonjaOutfitDesigner",StringComparison.OrdinalIgnoreCase);
+                bool scrapInput=RebirthScrapWindow.Active;
                 if(scrapInput && width>=480)
                 {
                     int inputX=tools==null?8:244;
                     int inputWidth=width-inputX-8;
                     SetRect(input,inputX,-42,inputWidth,204);
-                    SetRect(input.GetChildById("recyclerYield"),82,-46,inputWidth-90,150);
-                    SetRect(input.GetChildById("recyclerGate"),3,-124,76,76);
+                    int textX=RebirthScrapWindow.IsModifier?162:82;
+                    SetRect(input.GetChildById("recyclerGate"),textX,-46,inputWidth-textX-8,RebirthScrapWindow.IsScrapOnly?75:26);
+                    SetRect(input.GetChildById("recyclerYield"),textX,-74,inputWidth-textX-8,126);
+                    foreach(var id in new[]{"recyclerGate","recyclerYield"}){var text=input.GetChildById(id)?.ViewComponent;bool want=!RebirthScrapWindow.IsScrapOnly||id=="recyclerGate";if(text!=null&&text.IsVisible!=want)text.IsVisible=want;}
+                    if(input.GetChildById("recyclerGate")?.ViewComponent is XUiV_Label wideHelp&&RebirthScrapWindow.IsScrapOnly)RebirthRecyclingHelpText.Style(wideHelp);
                     top=Math.Max(top,250);
+                }
+                else if(RebirthRecyclerRuntime.Supports(XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity))
+                {
+                    // Scrap stations in a narrow column (owner 2026-11-07): the recycling input sits top right beside
+                    // the visible tool slots and the panel ends below them, leaving the height to the queue.
+                    // Owner 2026-11-08: same place as the Recycler: title and slot right after the Tools panel, the slot under
+                    // the title and the 2.6 "shift-click or drag items" help beside it. Status goes to the tooltip/preview.
+                    int inputX=tools==null?8:16+(int)Math.Ceiling(228*accessoryScale);
+                    int inputWidth=Math.Max(90,width-inputX-8);
+                    int rowHeight=Math.Max(121,(int)(121*accessoryScale));
+                    SetRect(input,inputX,-42,inputWidth,rowHeight);
+                    SetRect(input.GetChildById("recyclerInput"),3,-46,75,75);
+                    SetRect(input.GetChildById("recyclerGate"),82,-46,Math.Max(1,inputWidth-90),75);
+                    var help=input.GetChildById("recyclerGate")?.ViewComponent;if(help!=null&&!help.IsVisible)help.IsVisible=true;
+                    if(help is XUiV_Label helpLabel)RebirthRecyclingHelpText.Style(helpLabel);
+                    var yieldView=input.GetChildById("recyclerYield")?.ViewComponent;if(yieldView!=null&&yieldView.IsVisible)yieldView.IsVisible=false;
+                    top=Math.Max(top,46+rowHeight);
                 }
                 else {SetRect(input,8,-top,228,204);top+=214;}
             }
@@ -546,7 +622,15 @@ public sealed class RebirthPersonalCraftingLayoutService
             int outputWidth = width - 16;
             float outputScale = Math.Min(1f, (outputWidth - 24) / (7f * 75));
             int outputHeight = 52 + (int)Math.Ceiling(4 * 75 * outputScale);
-            SetRect(output,8,-(height-outputHeight),outputWidth,outputHeight);
+            int outputTop = height - outputHeight;
+            // The Modifier Station has no queue (kits apply at once): the output fills the column under the station
+            // panel and its slots keep their normal size (owner 2026-11-07).
+            if (RebirthScrapWindow.IsModifier && height - top > outputHeight)
+            {
+                outputHeight = height - top; // slots keep their size; the space under them stays empty (owner 2026-11-08)
+                outputTop = top;
+            }
+            SetRect(output,8,-outputTop,outputWidth,outputHeight);
             if (output != null)
             {
                 SetRect(output.GetChildById("content"),0,-46,outputWidth,outputHeight-46);
@@ -563,6 +647,54 @@ public sealed class RebirthPersonalCraftingLayoutService
         SetRect(owner.GetChildById("rebirthCraftingQueueRegionBg"), 0, 0, width, height);
         SetRect(owner.GetChildById("rebirthCraftingQueueHeaderRule"), 0, -38, width, 2);
         SetRect(owner.GetChildById("rebirthCraftingQueueController"), 0, 0, width, height);
+        PlaceScrapPreview(width, top, height);
+    }
+
+    /// <summary>Recycler and Shredder (owner 2026-11-08): the 2.6 scrap output list gets its own panel in the space the
+    /// queue left under the station panel. The panel lives in the recycling input, so it is placed relative to it.</summary>
+    private static void CenterLabel(XUiController controller, UIWidget.Pivot pivot, int x, int width)
+    {
+        if (!(controller?.ViewComponent is XUiV_Label label)) return;
+        if (label.Pivot != pivot) label.Pivot = pivot;
+        var size = new Vector2i(width, 24); if (label.Size != size) label.Size = size;
+        var position = new Vector2i(x, -15); if (label.Position != position) label.Position = position;
+    }
+
+    private void PlaceScrapPreview(int width, int top, int height)
+    {
+        var input = owner.GetChildById("windowForgeInput");
+        var panel = input?.GetChildById("scrapPreviewPanel");
+        if (panel?.ViewComponent == null) return;
+        bool show = RebirthScrapWindow.IsScrapOnly && input.ViewComponent != null && height >= 120;
+        if (panel.ViewComponent.IsVisible != show) panel.ViewComponent.IsVisible = show;
+        if (!show) return;
+        var origin = input.ViewComponent.Position;
+        int panelWidth = width - 16;
+        SetRect(panel, 8 - origin.x, -(top - (-origin.y)), panelWidth, height);
+        SetRect(panel.GetChildById("scrapPreviewBg"), 0, 0, panelWidth, height);
+        SetRect(panel.GetChildById("scrapPreviewFrame"), 0, 0, panelWidth, height);
+        SetRect(panel.GetChildById("scrapPreviewRule"), 0, -38, panelWidth, 2);
+        SetRect(panel.GetChildById("scrapPreviewStatus"), 10, -44, panelWidth - 20, 20);
+        // Compact 2.6-style rows (icon, name, time, amount), two columns when the panel is wide enough.
+        int cols = panelWidth >= 400 ? 2 : 1;
+        int colWidth = (panelWidth - 16 - (cols - 1) * 6) / cols;
+        int perCol = Math.Max(1, (height - 68 - 4) / 32);
+        XUiC_RebirthRecyclerPreview.Capacity = Math.Min(XUiC_RebirthRecyclerPreview.PreviewRows, perCol * cols);
+        for (int i = 0; i < XUiC_RebirthRecyclerPreview.PreviewRows; i++)
+        {
+            var row = panel.GetChildById("scrapRow" + i);
+            if (row?.ViewComponent == null) continue;
+            if (i >= XUiC_RebirthRecyclerPreview.Capacity) { row.ViewComponent.IsVisible = false; continue; }
+            SetRect(row, 8 + (i % cols) * (colWidth + 6), -68 - (i / cols) * 32, colWidth, 30);
+            SetRect(row.GetChildById("scrapRowBg" + i), 0, 0, colWidth, 30);
+            SetRect(row.GetChildById("scrapRowFrame" + i), 0, 0, colWidth, 30);
+            SetRect(row.GetChildById("scrapRowIcon" + i), 4, -3, 24, 24);
+            // Owner 2026-11-08: no time column; the name uses that space, larger and vertically centred.
+            // Anchored at their middle and placed on the row's centre line, so the text is vertically centred.
+            CenterLabel(row.GetChildById("scrapRowName" + i), UIWidget.Pivot.Left, 32, Math.Max(40, colWidth - 86));
+            var timeView = row.GetChildById("scrapRowTime" + i)?.ViewComponent; if (timeView != null && timeView.IsVisible) timeView.IsVisible = false;
+            CenterLabel(row.GetChildById("scrapRowCount" + i), UIWidget.Pivot.Right, colWidth - 6, 44);
+        }
     }
 
     private void ApplyDebugInventoryGeometry(int bodyWidth, int bodyHeight, int centerX, int centerY, int centerWidth, int centerHeight)
@@ -630,5 +762,17 @@ public sealed class RebirthPersonalCraftingLayoutService
         if (value < min) return min;
         if (value > max) return max;
         return value;
+    }
+}
+
+/// <summary>The 2.6 help beside the recycling slot: plain white, readable size, wrapped instead of shrunk (owner
+/// 2026-11-08: shrunk outlined text read as grey).</summary>
+internal static class RebirthRecyclingHelpText
+{
+    internal static void Style(XUiV_Label label)
+    {
+        if (label.Color != UnityEngine.Color.white) label.Color = UnityEngine.Color.white;
+        if (label.FontSize != 16) label.FontSize = 16;
+        if (label.Overflow != UILabel.Overflow.ResizeHeight) label.Overflow = UILabel.Overflow.ResizeHeight;
     }
 }

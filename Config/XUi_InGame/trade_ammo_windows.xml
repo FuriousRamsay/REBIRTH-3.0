@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configs>
-  <!-- 2.6 Briston ammo exchange layout, in the current REBIRTH panel colours. -->
+  <!-- 2.6 Briston ammo exchange layout, in the current REBIRTH panel colours. Each amount has a slider
+       (the same track and fill as the camper POI lights slider): press or drag along it to set the amount,
+       or use the arrows beside it for steps of 1 (10 with Shift). -->
   <append xpath="/windows">
     <window name="windowRebirthTradeAmmo" width="620" height="720" anchor="CenterCenter" pos="-310,360" depth="10" cursor_area="true" controller="RebirthTradeAmmo, RebirthUtils">
       <sprite depth="0" width="620" height="720" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
@@ -16,39 +18,47 @@
       <sprite depth="2" pos="40,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
       <sprite depth="3" pos="40,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
       <sprite depth="6" pos="90,-312" width="90" height="90" pivot="center" atlas="ItemIconAtlas" sprite="ammo9mmBulletBall" foregroundlayer="true" />
-      <button depth="5" name="btn9mmDown" style="icon22px, press" pos="50,-381" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
-      <label depth="5" name="lbl9mmAmount" pos="68,-369" width="44" height="24" font_size="20" justify="center" color="245,245,247,255" text="0" />
-      <button depth="5" name="btn9mmUp" style="icon22px, press" pos="130,-381" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <label depth="5" name="lbl9mmAmount" pos="30,-366" width="120" height="22" font_size="20" justify="center" color="245,245,247,255" text="0" />
+      <button depth="5" name="btn9mmDown" style="icon22px, press" pos="38,-402" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+      <button depth="5" name="btn9mmUp" style="icon22px, press" pos="142,-402" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <sprite depth="5" name="sld9mm" pos="50,-390" width="80" height="24" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" on_press="true" on_drag="true" />
+      <filledsprite depth="6" name="sld9mmFill" pos="53,-393" width="74" height="18" type="filled" fill="1" color="150,101,215,255" on_press="false" on_hover="false" />
 
       <sprite depth="2" pos="180,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
       <sprite depth="3" pos="180,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
       <sprite depth="6" pos="230,-312" width="90" height="90" pivot="center" atlas="ItemIconAtlas" sprite="ammo44MagnumBulletBall" foregroundlayer="true" />
-      <button depth="5" name="btn44Down" style="icon22px, press" pos="190,-381" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
-      <label depth="5" name="lbl44Amount" pos="208,-369" width="44" height="24" font_size="20" justify="center" color="245,245,247,255" text="0" />
-      <button depth="5" name="btn44Up" style="icon22px, press" pos="270,-381" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <label depth="5" name="lbl44Amount" pos="170,-366" width="120" height="22" font_size="20" justify="center" color="245,245,247,255" text="0" />
+      <button depth="5" name="btn44Down" style="icon22px, press" pos="178,-402" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+      <button depth="5" name="btn44Up" style="icon22px, press" pos="282,-402" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <sprite depth="5" name="sld44" pos="190,-390" width="80" height="24" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" on_press="true" on_drag="true" />
+      <filledsprite depth="6" name="sld44Fill" pos="193,-393" width="74" height="18" type="filled" fill="1" color="150,101,215,255" on_press="false" on_hover="false" />
 
       <sprite depth="2" pos="320,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
       <sprite depth="3" pos="320,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
       <sprite depth="6" pos="370,-312" width="90" height="90" pivot="center" atlas="ItemIconAtlas" sprite="ammo762mmBulletBall" foregroundlayer="true" />
-      <button depth="5" name="btn762Down" style="icon22px, press" pos="330,-381" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
-      <label depth="5" name="lbl762Amount" pos="348,-369" width="44" height="24" font_size="20" justify="center" color="245,245,247,255" text="0" />
-      <button depth="5" name="btn762Up" style="icon22px, press" pos="410,-381" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <label depth="5" name="lbl762Amount" pos="310,-366" width="120" height="22" font_size="20" justify="center" color="245,245,247,255" text="0" />
+      <button depth="5" name="btn762Down" style="icon22px, press" pos="318,-402" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+      <button depth="5" name="btn762Up" style="icon22px, press" pos="422,-402" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <sprite depth="5" name="sld762" pos="330,-390" width="80" height="24" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" on_press="true" on_drag="true" />
+      <filledsprite depth="6" name="sld762Fill" pos="333,-393" width="74" height="18" type="filled" fill="1" color="150,101,215,255" on_press="false" on_hover="false" />
 
       <sprite depth="2" pos="460,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
       <sprite depth="3" pos="460,-262" width="100" height="100" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
       <sprite depth="6" pos="510,-312" width="90" height="90" pivot="center" atlas="ItemIconAtlas" sprite="ammoShotgunShell" foregroundlayer="true" />
-      <button depth="5" name="btnShellDown" style="icon22px, press" pos="470,-381" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
-      <label depth="5" name="lblShellAmount" pos="488,-369" width="44" height="24" font_size="20" justify="center" color="245,245,247,255" text="0" />
-      <button depth="5" name="btnShellUp" style="icon22px, press" pos="550,-381" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <label depth="5" name="lblShellAmount" pos="450,-366" width="120" height="22" font_size="20" justify="center" color="245,245,247,255" text="0" />
+      <button depth="5" name="btnShellDown" style="icon22px, press" pos="458,-402" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+      <button depth="5" name="btnShellUp" style="icon22px, press" pos="562,-402" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <sprite depth="5" name="sldShell" pos="470,-390" width="80" height="24" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" on_press="true" on_drag="true" />
+      <filledsprite depth="6" name="sldShellFill" pos="473,-393" width="74" height="18" type="filled" fill="1" color="150,101,215,255" on_press="false" on_hover="false" />
 
-      <label depth="2" pos="14,-416" width="592" height="30" font_size="22" color="181,140,255,255" text_key="xuiTradeAmmoPickAmmo" />
-      <button depth="5" name="btnTargetBack" style="icon22px, press" pos="26,-471" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
-      <label depth="5" name="lblTarget" pos="44,-458" width="96" height="26" font_size="22" justify="center" color="245,245,247,255" text="9mm" />
-      <button depth="5" name="btnTargetNext" style="icon22px, press" pos="158,-471" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
-      <sprite depth="3" name="AmmoImage" pos="220,-471" width="50" height="50" pivot="center" atlas="ItemIconAtlas" sprite="ammo9mmBulletBall" foregroundlayer="true" />
+      <label depth="2" pos="14,-432" width="592" height="30" font_size="22" color="181,140,255,255" text_key="xuiTradeAmmoPickAmmo" />
+      <button depth="5" name="btnTargetBack" style="icon22px, press" pos="26,-487" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+      <label depth="5" name="lblTarget" pos="44,-474" width="96" height="26" font_size="22" justify="center" color="245,245,247,255" text="9mm" />
+      <button depth="5" name="btnTargetNext" style="icon22px, press" pos="158,-487" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+      <sprite depth="3" name="AmmoImage" pos="220,-487" width="50" height="50" pivot="center" atlas="ItemIconAtlas" sprite="ammo9mmBulletBall" foregroundlayer="true" />
 
-      <label depth="2" pos="14,-516" width="592" height="30" font_size="22" color="181,140,255,255" text_key="xuiTradeAmmoYouGet" />
-      <label name="lblTotal" depth="2" pos="14,-552" width="200" height="40" font_size="32" color="235,235,240,255" text="0" />
+      <label depth="2" pos="14,-532" width="592" height="30" font_size="22" color="181,140,255,255" text_key="xuiTradeAmmoYouGet" />
+      <label name="lblTotal" depth="2" pos="14,-568" width="200" height="40" font_size="32" color="235,235,240,255" text="0" />
 
       <simplebutton name="btnCancel" depth="3" pos="14,-664" width="180" height="40" font_size="24" caption_key="xuiCancel" />
       <simplebutton name="btnConfirm" depth="3" pos="426,-664" width="180" height="40" font_size="24" caption_key="xuiAccept" />

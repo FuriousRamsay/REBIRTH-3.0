@@ -166,7 +166,8 @@
               <label depth="12" name="durabilityValue" pos="0,-98" width="145" height="32" text="{durabilitytext}" font_size="30" justify="{durabilityjustify}" effect="outline" />
             </rect>
             <label name="selectedName" pos="180,-58" width="410" height="64" font_size="29" color="245,245,247,255" text="{itemname}" />
-            <label name="selectedDescription" pos="180,-126" width="410" height="100" font_size="23" color="214,214,220,255" text="{itemdescription}" parse_actions="true" overflow="clampcontent" />
+            <label name="selectedDescription" pos="180,-126" width="410" height="100" font_size="23" color="214,214,220,255" text="{itemdescription}" parse_actions="true" overflow="shrinkcontent" />
+            <button depth="8" name="rbBonusTab" style="icon30px, press" pos="574,-110" sprite="ui_game_symbol_star" defaultcolor="181,140,255" pivot="center" tooltip="Bonuses" tooltip_key="xuiRebirthBonusesTab" sound="[paging_click]" visible="{showbonusoption}" />
             <rect name="traderStat1" pos="620,-62" width="446" height="32">
               <label name="traderStatTitle1" width="300" height="30" font_size="24" text="{itemstattitle1}" color="230,230,234,255" />
               <label pos="305,0" width="141" height="30" font_size="24" text="{itemstat1}" color="201,198,105,255" justify="right" />

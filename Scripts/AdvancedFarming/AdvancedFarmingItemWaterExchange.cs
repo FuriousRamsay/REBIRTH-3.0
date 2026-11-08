@@ -57,25 +57,27 @@ internal static class AdvancedFarmingItemWaterExchange
         return tank.waterMax > 0 ? tank.waterMax : 400;
     }
 
-    public static int GetWaterDelta(string itemName, int holdingCount, int currentWater, int maxWater)
+    public static int GetWaterDelta(string itemName, int holdingCount, int currentWater, int maxWater, bool legacy = false)
     {
+        int bucketUnits = legacy ? 200 : 100;
+        int jarUnits = legacy ? 1 : 5;
         if (itemName == "bucketRiverWater")
-            return holdingCount == 1 && maxWater - currentWater >= 200 ? 200 : 0;
+            return holdingCount == 1 && maxWater - currentWater >= bucketUnits ? bucketUnits : 0;
 
         if (itemName == "drinkJarRiverWater" || itemName == "drinkJarBoiledWater" || itemName == "drinkJarPureMineralWater")
         {
-            int count = System.Math.Max(1, holdingCount);
+            int count = checked(System.Math.Max(1, holdingCount) * jarUnits);
             return maxWater - currentWater >= count ? count : 0;
         }
 
         if (itemName == "drinkJarEmpty")
         {
-            int count = System.Math.Max(1, holdingCount);
+            int count = checked(System.Math.Max(1, holdingCount) * jarUnits);
             return currentWater >= count ? -count : 0;
         }
 
         if (itemName == "bucketEmpty")
-            return holdingCount == 1 && currentWater >= 200 ? -200 : 0;
+            return holdingCount == 1 && currentWater >= bucketUnits ? -bucketUnits : 0;
 
         return 0;
     }

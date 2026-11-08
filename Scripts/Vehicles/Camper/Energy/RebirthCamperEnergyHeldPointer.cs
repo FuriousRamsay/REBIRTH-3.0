@@ -22,7 +22,7 @@ internal sealed class RebirthCamperEnergyHeldPointer
     {
         held=false;
         var pointer=xui.playerUI.CursorController;
-        if(Consumed||InputUtils.ShiftKeyPressed||!canInteract||xui.DragAndDropWindow?.IsEmpty()!=false||xui.playerUI.camera==null)return;
+        if(!RebirthDragRelease.DropOnRelease||Consumed||InputUtils.ShiftKeyPressed||!canInteract||xui.DragAndDropWindow?.IsEmpty()!=false||xui.playerUI.camera==null)return;
         var ray=xui.playerUI.camera.ScreenPointToRay((Vector3)pointer.GetScreenPosition());
         foreach(var slot in sources)if(TryDrop(slot,ray,xui))return;
         foreach(var slot in components)if(TryDrop(slot,ray,xui))return;

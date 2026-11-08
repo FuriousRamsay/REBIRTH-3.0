@@ -1,0 +1,166 @@
+<configs>
+  <!-- 2.6 mods reach players through supply drops and boss crates. Supply weights are the 2.6 values held by the old empty entries. -->
+  <insertBefore xpath="/lootcontainers/lootgroup[@name='groupAirDrop']">
+    <lootgroup name="rebirthModPoolT1">
+      <item name="ModAttackSpeedIncreaseTier1" />
+      <item name="ModBlockDamageIncreaseTier1" />
+      <item name="ModDismemberIncreaseTier1" />
+      <item name="ModEntityDamageMeleeTier1" />
+      <item name="ModEntityDamageRangedTier1" />
+      <item name="ModFireRateIncreaseTier1" />
+      <item name="ModGamestageDecreaseTier1" />
+      <item name="ModHungerThirstReductionTier1" />
+      <item name="ModKnockdownResistanceTier1" />
+      <item name="ModLootStageIncreaseTier1" />
+      <item name="ModLootTimeDecreaseTier1" />
+      <item name="ModRampageIncreaseTier1" />
+      <item name="ModSneakEffectivenessIncreaseTier1" />
+      <item name="ModStaminaLossReductionTier1" />
+      <item name="ModStructuralIntegrity" />
+      <item name="ModStunResistanceTier1" />
+      <item name="modArmorDegradationTier1" />
+      <item name="modAttackSpeedTier1" />
+      <item name="modFireRateTier1" />
+      <item name="modMagazineSizeTier1" />
+      <item name="modMeleeDegradationTier1" />
+      <item name="modMeleeEntityDamageTier1" />
+      <item name="modRangedDegradationTier1" />
+      <item name="modRangedEntityDamageTier1" />
+      <item name="modReloadSpeedTier1" />
+    </lootgroup>
+    <lootgroup name="rebirthModPoolT2">
+      <item name="ModAttackSpeedIncreaseTier2" />
+      <item name="ModBlockDamageIncreaseTier2" />
+      <item name="ModDismemberIncreaseTier2" />
+      <item name="ModEntityDamageMeleeTier2" />
+      <item name="ModEntityDamageRangedTier2" />
+      <item name="ModFireRateIncreaseTier2" />
+      <item name="ModGamestageDecreaseTier2" />
+      <item name="ModHungerThirstReductionTier2" />
+      <item name="ModKnockdownResistanceTier2" />
+      <item name="ModLootStageIncreaseTier2" />
+      <item name="ModLootTimeDecreaseTier2" />
+      <item name="ModRampageIncreaseTier2" />
+      <item name="ModSneakEffectivenessIncreaseTier2" />
+      <item name="ModStaminaLossReductionTier2" />
+      <item name="ModStructuralIntegrity" />
+      <item name="ModStunResistanceTier2" />
+      <item name="modArmorDegradationTier2" />
+      <item name="modAttackSpeedTier2" />
+      <item name="modFireRateTier2" />
+      <item name="modMagazineSizeTier2" />
+      <item name="modMeleeDegradationTier2" />
+      <item name="modMeleeEntityDamageTier2" />
+      <item name="modRangedDegradationTier2" />
+      <item name="modRangedEntityDamageTier2" />
+      <item name="modReloadSpeedTier2" />
+    </lootgroup>
+    <lootgroup name="rebirthModPoolT3">
+      <item name="ModAttackSpeedIncreaseTier3" />
+      <item name="ModBlockDamageIncreaseTier3" />
+      <item name="ModDismemberIncreaseTier3" />
+      <item name="ModEntityDamageMeleeTier3" />
+      <item name="ModEntityDamageRangedTier3" />
+      <item name="ModFireRateIncreaseTier3" />
+      <item name="ModGamestageDecreaseTier3" />
+      <item name="ModHungerThirstReductionTier3" />
+      <item name="ModKnockdownResistanceTier3" />
+      <item name="ModLootStageIncreaseTier3" />
+      <item name="ModLootTimeDecreaseTier3" />
+      <item name="ModRampageIncreaseTier3" />
+      <item name="ModSneakEffectivenessIncreaseTier3" />
+      <item name="ModStaminaLossReductionTier3" />
+      <item name="ModStructuralIntegrity" />
+      <item name="ModStunResistanceTier3" />
+      <item name="modArmorDegradationTier3" />
+      <item name="modAttackSpeedTier3" />
+      <item name="modFireRateTier3" />
+      <item name="modMagazineSizeTier3" />
+      <item name="modMeleeDegradationTier3" />
+      <item name="modMeleeEntityDamageTier3" />
+      <item name="modRangedDegradationTier3" />
+      <item name="modRangedEntityDamageTier3" />
+      <item name="modReloadSpeedTier3" />
+    </lootgroup>
+    <lootgroup name="rebirthModPoolT4">
+      <item name="ModAttackSpeedIncreaseTier4" />
+      <item name="ModBlockDamageIncreaseTier4" />
+      <item name="ModDismemberIncreaseTier4" />
+      <item name="ModEntityDamageMeleeTier4" />
+      <item name="ModEntityDamageRangedTier4" />
+      <item name="ModFireRateIncreaseTier4" />
+      <item name="ModGamestageDecreaseTier4" />
+      <item name="ModHungerThirstReductionTier4" />
+      <item name="ModKnockdownResistanceTier4" />
+      <item name="ModLootStageIncreaseTier4" />
+      <item name="ModLootTimeDecreaseTier4" />
+      <item name="ModRampageIncreaseTier4" />
+      <item name="ModSneakEffectivenessIncreaseTier4" />
+      <item name="ModStaminaLossReductionTier4" />
+      <item name="ModStructuralIntegrity" />
+      <item name="ModStunResistanceTier4" />
+      <item name="modArmorDegradationTier4" />
+      <item name="modAttackSpeedTier4" />
+      <item name="modFireRateTier4" />
+      <item name="modMagazineSizeTier4" />
+      <item name="modMeleeDegradationTier4" />
+      <item name="modMeleeEntityDamageTier4" />
+      <item name="modRangedDegradationTier4" />
+      <item name="modRangedEntityDamageTier4" />
+      <item name="modReloadSpeedTier4" />
+    </lootgroup>
+    <lootgroup name="rebirthModPoolT5">
+      <item name="ModAttackSpeedIncreaseTier5" />
+      <item name="ModBlockDamageIncreaseTier5" />
+      <item name="ModDismemberIncreaseTier5" />
+      <item name="ModEntityDamageMeleeTier5" />
+      <item name="ModEntityDamageRangedTier5" />
+      <item name="ModFireRateIncreaseTier5" />
+      <item name="ModGamestageDecreaseTier5" />
+      <item name="ModHungerThirstReductionTier5" />
+      <item name="ModKnockdownResistanceTier5" />
+      <item name="ModLootStageIncreaseTier5" />
+      <item name="ModLootTimeDecreaseTier5" />
+      <item name="ModRampageIncreaseTier5" />
+      <item name="ModSneakEffectivenessIncreaseTier5" />
+      <item name="ModStaminaLossReductionTier5" />
+      <item name="ModStructuralIntegrity" />
+      <item name="ModStunResistanceTier5" />
+      <item name="modArmorDegradationTier5" />
+      <item name="modAttackSpeedTier5" />
+      <item name="modAttackSpeedTier6" />
+      <item name="modFireRateTier5" />
+      <item name="modFireRateTier6" />
+      <item name="modMagazineSizeTier5" />
+      <item name="modMeleeDegradationTier5" />
+      <item name="modMeleeDegradationTier6" />
+      <item name="modMeleeEntityDamageTier5" />
+      <item name="modMeleeEntityDamageTier6" />
+      <item name="modRangedDegradationTier5" />
+      <item name="modRangedDegradationTier6" />
+      <item name="modRangedEntityDamageTier5" />
+      <item name="modRangedEntityDamageTier6" />
+      <item name="modReloadSpeedTier5" />
+      <item name="modReloadSpeedTier6" />
+    </lootgroup>
+    <lootgroup name="rebirthNativeSupplyMods" count="1">
+      <item group="rebirthModPoolT1" count="1" loot_prob_template="rebirthPurgeModProbability1" />
+      <item group="rebirthModPoolT2" count="1" loot_prob_template="rebirthPurgeModProbability2" />
+      <item group="rebirthModPoolT3" count="1" loot_prob_template="rebirthPurgeModProbability3" />
+      <item group="rebirthModPoolT4" count="1" loot_prob_template="rebirthPurgeModProbability4" />
+      <item group="rebirthModPoolT5" count="1" loot_prob_template="rebirthPurgeModProbability5" />
+    </lootgroup>
+  </insertBefore>
+  <!-- Non-Purge supply crates roll the native list; give them the same mod tiers, without Purge-only mods. -->
+  <append xpath="/lootcontainers/lootgroup[@name='groupAirDrop']"><item group="rebirthNativeSupplyMods" count="1,2" /></append>
+  <remove xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier1']/item[@group='empty']" />
+  <append xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier1']"><item group="rebirthModPoolT1" prob="17.45" /></append>
+  <remove xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier2']/item[@group='empty']" />
+  <append xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier2']"><item group="rebirthModPoolT2" prob="17.45" /></append>
+  <remove xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier3']/item[@group='empty']" />
+  <append xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier3']"><item group="rebirthModPoolT3" prob="17.45" /></append>
+  <remove xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier4']/item[@group='empty']" />
+  <append xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier4']"><item group="rebirthModPoolT4" prob="16.95" /></append>
+  <remove xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier5']/item[@group='empty']" />
+  <append xpath="/lootcontainers/lootgroup[@name='rebirthPurgeSupplyModifierTier5']"><item group="rebirthModPoolT5" prob="16.95" /></append>
+</configs>

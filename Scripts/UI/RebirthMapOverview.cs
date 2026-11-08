@@ -319,7 +319,7 @@ internal static class RebirthMapResponsiveWheel
     }
     private static bool HasHoverPopup(XUiC_RebirthMapArea map)
     {
-        if(!map.isOpen||!map.bMapInitialized||map.ZoomSlider?.BlocksMapInput==true)return false;
+        if(!map.isOpen||!map.bMapInitialized||map.ZoomSlider?.BlocksMapInput==true||XUiC_RebirthMapTargetCycler.AnyBlocksMapInput)return false;
         var popup=map.GetChildByType<XUiC_RebirthPurgePoiPopup>();
         bool card=popup?.ViewComponent?.IsVisible==true;
         bool native=map.bMapCursorSet&&!string.IsNullOrEmpty(map.xui?.ToolTipWindow?.ToolTip);

@@ -1,0 +1,55 @@
+<configs>
+  <!-- 2.6 Witch Doctor skeletons. Stats and art from 2.6; progression and limits come from advanced_disciplines.xml. -->
+  <append xpath="/entity_classes">
+  <entity_class name="FuriousRamsaySkeleton1NoHireCore" extends="zombieTemplateMale">
+    <property name="UserSpawnType" value="Menu" />
+    <property name="Tags" value="entity,zombie,walker,melee,skeletonCompanion,FuriousRamsaySkeleton1NoHireCore" />
+    <property name="Mesh" value="#@modfolder:Resources/FR_Skeletons.unity3d?Skeleton3_FR" />
+    <property name="HandItem" value="FuriousRamsaySkeleton1Machete" />
+    <property name="ExperienceGain" value="0" />
+    <effect_group name="Summoned skeleton">
+      <passive_effect name="HealthMax" operation="base_set" value="200" />
+    </effect_group>
+  </entity_class>
+  <entity_class name="FuriousRamsaySkeleton2NoHireCore" extends="zombieTemplateMale">
+    <property name="UserSpawnType" value="Menu" />
+    <property name="Tags" value="entity,zombie,walker,melee,skeletonCompanion,FuriousRamsaySkeleton2NoHireCore" />
+    <property name="Mesh" value="#@modfolder:Resources/FR_Skeletons.unity3d?Skeleton1_FR" />
+    <property name="HandItem" value="FuriousRamsaySkeleton2Spear" />
+    <property name="ExperienceGain" value="0" />
+    <effect_group name="Summoned skeleton">
+      <passive_effect name="HealthMax" operation="base_set" value="300" />
+    </effect_group>
+  </entity_class>
+  <entity_class name="FuriousRamsaySkeleton3NoHireCore" extends="zombieTemplateMale">
+    <property name="UserSpawnType" value="Menu" />
+    <property name="Tags" value="entity,zombie,walker,melee,skeletonCompanion,FuriousRamsaySkeleton3NoHireCore" />
+    <property name="Mesh" value="#@modfolder:Resources/FR_Skeletons.unity3d?Skeleton2_FR" />
+    <property name="HandItem" value="FuriousRamsaySkeleton3Machete" />
+    <property name="ExperienceGain" value="0" />
+    <effect_group name="Summoned skeleton">
+      <passive_effect name="HealthMax" operation="base_set" value="400" />
+    </effect_group>
+  </entity_class>
+  <entity_class name="FuriousRamsaySkeleton4NoHireCore" extends="zombieTemplateMale">
+    <property name="UserSpawnType" value="Menu" />
+    <property name="Tags" value="entity,zombie,walker,melee,skeletonCompanion,FuriousRamsaySkeleton4NoHireCore" />
+    <property name="Mesh" value="#@modfolder:Resources/FR_Skeletons.unity3d?Skeleton4_FR" />
+    <property name="HandItem" value="FuriousRamsaySkeleton4Spear" />
+    <property name="ExperienceGain" value="0" />
+    <effect_group name="Summoned skeleton">
+      <passive_effect name="HealthMax" operation="base_set" value="500" />
+    </effect_group>
+  </entity_class>
+  <entity_class name="FuriousRamsaySkeleton5NoHireCore" extends="zombieTemplateMale">
+    <property name="UserSpawnType" value="Menu" />
+    <property name="Tags" value="entity,zombie,walker,melee,skeletonCompanion,FuriousRamsaySkeleton5NoHireCore" />
+    <property name="Mesh" value="#@modfolder:Resources/FR_Skeletons.unity3d?Skeleton5_FR" />
+    <property name="HandItem" value="FuriousRamsaySkeleton5Axe" />
+    <property name="ExperienceGain" value="0" />
+    <effect_group name="Summoned skeleton">
+      <passive_effect name="HealthMax" operation="base_set" value="600" />
+    </effect_group>
+  </entity_class>
+  </append>
+</configs>

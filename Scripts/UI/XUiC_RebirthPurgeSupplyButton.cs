@@ -40,7 +40,7 @@ public sealed class XUiC_RebirthPurgeSupplyButton:XUiController
     private List<RebirthPurgeSupplyTarget> targets=new List<RebirthPurgeSupplyTarget>();
     public override void Init(){base.Init();button=GetChildById("supplyCycleButton");icon=GetChildById("supplyCycleIcon")?.ViewComponent as XUiV_Sprite;counter=GetChildById("supplyCycleCounter")?.ViewComponent as XUiV_Label;border=GetChildById("supplyCycleBorder")?.ViewComponent as XUiV_Sprite;tooltip=GetChildById("supplyCycleTooltip");if(button!=null)button.OnPress+=Pressed;}
     public override void OnOpen(){base.OnOpen();Clear();receiver=this;map=GetParentByType<XUiC_RebirthMapArea>();}
-    public override void OnClose(){if(ReferenceEquals(receiver,this))receiver=null;Clear();map=null;base.OnClose();}
+    public override void OnClose(){if(ReferenceEquals(receiver,this))receiver=null;Clear();RebirthMapCyclerStack.SetVisible(0,false);map=null;base.OnClose();}
     private void Clear(){if(selectedRing!=null)UnityEngine.Object.Destroy(selectedRing.gameObject);selectedRing=null;if(ViewComponent!=null)ViewComponent.IsVisible=false;scope=null;owner=saveName=gameWorld=null;request=Guid.Empty;nativeId=Guid.Empty;targets.Clear();previous=0;next=validUntil=0;advance=false;releasedFrame=-2;if(tooltip?.ViewComponent!=null)tooltip.ViewComponent.IsVisible=false;if(counter!=null)counter.Text="";}
     private bool Context()
     {
@@ -53,13 +53,14 @@ public sealed class XUiC_RebirthPurgeSupplyButton:XUiController
     }
     public override void Update(float dt)
     {
-        base.Update(dt);if(!Context()){if(ViewComponent!=null)ViewComponent.IsVisible=false;return;}
+        base.Update(dt);if(!Context()){if(ViewComponent!=null)ViewComponent.IsVisible=false;RebirthMapCyclerStack.SetVisible(0,false);return;}
         bool laidOut=Layout();
         if(request!=Guid.Empty&&Time.realtimeSinceStartup-requestedAt>3f){request=Guid.Empty;advance=false;targets.Clear();}
         if(Time.realtimeSinceStartup>=next&&request==Guid.Empty){next=Time.realtimeSinceStartup+1f;Refresh(false);}
         bool hasDrops=targets.Count>0&&Time.realtimeSinceStartup<=validUntil;
         if(!hasDrops&&selectedRing!=null)selectedRing.gameObject.SetActive(false);
         if(ViewComponent!=null)ViewComponent.IsVisible=laidOut&&hasDrops;
+        RebirthMapCyclerStack.SetVisible(0,laidOut&&hasDrops);
         bool enabled=hasDrops&&request==Guid.Empty;
         if(button?.ViewComponent!=null)button.ViewComponent.Enabled=enabled;
         bool hovered=laidOut&&hasDrops&&ContainsPointer();

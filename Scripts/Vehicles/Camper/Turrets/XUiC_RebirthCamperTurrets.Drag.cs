@@ -175,7 +175,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
     }
     private bool TryNativeDrop(XUiC_ItemStack slot)
     {
-        if(slot==null)return false;
+        if(slot==null||!RebirthDragRelease.DropOnRelease)return false;
         // Consume even a refused/hidden destination; never reinterpret it as a
         // ground drop or another target after acknowledgement/layout changes.
         var view=slot.ViewComponent;

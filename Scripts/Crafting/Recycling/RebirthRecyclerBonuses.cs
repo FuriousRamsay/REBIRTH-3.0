@@ -156,7 +156,27 @@ public static class RebirthRecyclerBonuses
         // One 50% roll per grouped input, including stacked inputs, as in 2.6.
         // Frozen hidden custody makes retries/reload/cancel unable to reroll.
         if (roll[0] < 128) result.Add(new ItemStack(ItemClass.GetItem("armorParts", true).Clone(), 1));
+        AddBonusParts(source, roll, result);
         return true;
+    }
+    private static readonly string[] BonusPartsOne = { "partRetrofitHousing", "partTuningBoard", "partFieldMechanismPack", "partRegulatorPack", "partServiceHousing", "partStabilityClampSet", "partPurgeCanister", "partRetuningCartridge" };
+    private static readonly string[] BonusPartsTwo = { "partServiceHousing", "partStabilityClampSet", "partAdjustmentMatrix", "partControlShunt", "partRetuningCartridge", "partProfileBridge" };
+    private static readonly string[] BonusPartsMore = { "partReinforcedHousing", "partReinforcementCore", "partStabilityFrame", "partControlLattice", "partRegulatorAssembly", "partMasterHousing", "partComprehensiveCore", "partControlArray", "partMasterRegulator", "partFieldArray" };
+
+    // 2.6: armor with bonuses also gives one or two different kit parts; more bonuses, better pool.
+    // Rolls come from the operation hash, so retries and reloads give the same reward.
+    private static void AddBonusParts(ItemValue source, byte[] roll, List<ItemStack> result)
+    {
+        int bonuses = RebirthArmorBonusStorage.Read(source).Length;
+        if (bonuses <= 0) return;
+        var pool = new List<string>(bonuses == 1 ? BonusPartsOne : bonuses == 2 ? BonusPartsTwo : BonusPartsMore);
+        int drops = 1 + roll[1] % 2;
+        for (int i = 0; i < drops && pool.Count > 0; i++)
+        {
+            int pick = roll[2 + i] % pool.Count;
+            result.Add(new ItemStack(ItemClass.GetItem(pool[pick], true).Clone(), 1));
+            pool.RemoveAt(pick);
+        }
     }
     public static IReadOnlyList<ItemStack> FreezeBonus(ItemValue source, Guid group)
     {

@@ -20,11 +20,12 @@
        definitions must live in the active Config/loot.xml category. -->
   <append xpath="/lootcontainers">
     <lootcontainer name="rebirthMilitaryAmmoPalletLarge" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" open_time="1">
-      <item group="groupAmmoLarge" count="1" />
+      <!-- Owner 2026-11-07: army pallets hold loot only about a third of the time. -->
+      <item group="groupAmmoLarge" count="1" prob=".33" force_prob="true" />
     </lootcontainer>
 
     <lootcontainer name="rebirthMilitaryAmmoPalletLarger" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" open_time="1">
-      <item group="groupAmmoLarge" count="1,3" />
+      <item group="groupAmmoLarge" count="1,3" prob=".33" force_prob="true" />
     </lootcontainer>
   </append>
 
@@ -123,6 +124,7 @@
 <include filename="_Survivor/container_junk_balance.xml"/>
 <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
   <include filename="_Workstations/birdnest_loot.xml"/>
+  <include filename="_Rage/loot.xml"/>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_loot.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_loot.xml"/></if></conditional>
   <!-- Apply after included loot definitions: murky water is a full cooking
@@ -154,28 +156,6 @@
   </append>
   <append xpath="/lootcontainers/lootgroup[@name='modArmorT2']">
     <item name="ModStructuralIntegrity" loot_prob_template="veryLow"/>
-    <item name="ModStrength" loot_prob_template="veryLow"/>
-    <item name="ModStrengthMeleeDamage" loot_prob_template="veryLow"/>
-    <item name="ModDexterity" loot_prob_template="veryLow"/>
-    <item name="ModDexterityDodge" loot_prob_template="veryLow"/>
-    <item name="ModStrengthTRex" loot_prob_template="veryLow"/>
-    <item name="ModStrengthMiner69er" loot_prob_template="veryLow"/>
-    <item name="ModStrengthMotherLode" loot_prob_template="veryLow"/>
-    <item name="ModDexterityParkour" loot_prob_template="veryLow"/>
-    <item name="ModDexterityRuleOneCardio" loot_prob_template="veryLow"/>
-    <item name="ModConstitution" loot_prob_template="veryLow"/>
-    <item name="ModConstitutionHealingFactor" loot_prob_template="veryLow"/>
-    <item name="ModConstitutionPackMule" loot_prob_template="veryLow"/>
-    <item name="ModConstitutionSlowMetabolism" loot_prob_template="veryLow"/>
-    <item name="ModIntelligence" loot_prob_template="veryLow"/>
-    <item name="ModIntelligenceDeepCuts" loot_prob_template="veryLow"/>
-    <item name="ModIntelligencePhysician" loot_prob_template="veryLow"/>
-    <item name="ModIntelligenceLuckyLooter" loot_prob_template="veryLow"/>
-    <item name="ModIntelligenceTreasureHunter" loot_prob_template="veryLow"/>
-    <item name="ModCharisma" loot_prob_template="veryLow"/>
-    <item name="ModCharismaBetterBarter" loot_prob_template="veryLow"/>
-    <item name="ModCharismaCharismaticNature" loot_prob_template="veryLow"/>
-    <item name="ModCharismaDaringAdventurer" loot_prob_template="veryLow"/>
   </append>
   </if></conditional>
   <include filename="_Survivor/loot_sizes_26.xml"/>
@@ -186,4 +166,10 @@
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/loot_skill_tag_cleanup.xml"/></if></conditional>
   <!-- Rebirth progression has no use for Legendary Parts. -->
   <conditional><if cond="character_progression('Rebirth')"><remove xpath="/lootcontainers/lootgroup/item[@name='resourceLegendaryParts']"/></if></conditional>
+  <include filename="_ArmorBonuses/loot.xml"/>
+  <include filename="_Workstations/ported_station_loot.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/mod_pools.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/boss_crates.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/no_weapon_parts_loot.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/primitive_weapons_loot.xml"/></if></conditional>
 </configs>

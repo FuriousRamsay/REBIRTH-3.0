@@ -1,0 +1,13 @@
+<configs>
+  <!-- 2.6: the Ammo Machine itself can come from desert and snow Purge airdrops. -->
+  <append xpath="/lootcontainers/lootgroup[@name='groupAirDropPurge_desert']">
+    <item name="FuriousRamsayAmmoMachine" count="1" loot_prob_template="low" force_prob="true" />
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupAirDropPurge_snow']">
+    <item name="FuriousRamsayAmmoMachine" count="1" loot_prob_template="medLow" force_prob="true" />
+  </append>
+  <!-- The propane station's tank slot: one slot, never filled by loot. -->
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthPropaneTankSlot" count="0" size="1,1" sound_open="UseActions/open_shopping_basket" sound_close="UseActions/close_shopping_basket" />
+  </append>
+</configs>

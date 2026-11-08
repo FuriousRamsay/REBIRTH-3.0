@@ -1,0 +1,20 @@
+{
+  "name": "2.6 mods: measured with a real target, worn gear and real loot lists",
+  "stopOnFailure": false,
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "spawn": { "entity": "zombieArlene", "distance": 14 } },
+    { "give": { "item": "meleeWpnClubT1BaseballBat", "toolbelt": 1 } },
+    { "select": { "slot": 1 } },
+    { "wait": 1 },
+    { "console": "rbtestgrant modreal ModEntityDamageMeleeTier1" },
+    { "console": "rbtestgrant wearmod ModHungerThirstReductionTier5" },
+    { "console": "rbtestgrant wearmod none" },
+    { "console": "rbtestgrant lootroll airDrop 100 100" },
+    { "console": "rbtestgrant lootroll airDropPurge_pine_forest 100 100" },
+    { "console": "rbtestgrant lootroll rebirthBossRewardT3 100 100" },
+    { "cleararea": { "radius": 40 } },
+    { "expectNoErrors": true }
+  ]
+}

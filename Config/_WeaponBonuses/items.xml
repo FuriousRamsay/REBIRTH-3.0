@@ -1,0 +1,19 @@
+<configs>
+  <append xpath="/items">
+    <item name="weaponBonusExplosion">
+			<property name="Extends" value="thrownGrenadeContact" param1="ExplodeOnHit"/>
+			<property name="CustomIconTint" value="59,62,55"/>
+			<property name="TintColor" value="59,62,55"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Grenade/GrenadePrefab.prefab"/>
+			<property name="DisplayType" value="ammoGrenade"/>
+			<property name="FuseTime" value="3"/>
+			<property name="StickPercent" value=".3"/>
+			<property class="Action1">
+				<property name="Class" value="Activate"/>
+				<property name="Delay" value="1"/>
+				<property name="Sound_start" value="grenade_pullpin"/>
+				<requirement name="CVarCompare" cvar="_underwater" operation="LT" value="1"/>
+			</property>
+		</item>
+  </append>
+</configs>

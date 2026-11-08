@@ -50,6 +50,18 @@ public sealed class XUiC_RebirthRecyclerInputGrid : XUiC_WorkstationInputGrid
         var actor=xui.playerUI.entityPlayer;
         if(!RebirthRecyclerRuntime.CanQueue(actor,station,0,input[0].count,out var reason)) { GateReason=reason;return; }
         GateReason=null;
+        // Placed stations on the host queue the 2.6 way: the item is taken and its rows join the station's queue at once.
+        if(!(station is RebirthCamperStationState) && actor is EntityPlayerLocal local && local.world?.IsRemote()==false
+            && windowGroup?.Controller is XUiC_WorkstationWindowGroup group)
+        {
+            if(RebirthRecyclerRuntime.TryQueueInWindow(local,group,station,0,input[0].count,out var taken,out reason))
+            {
+                SetSlots(taken);
+                // The grids and queue were refreshed by TryQueueInWindow; a whole-window dirty made every card and recipe row flicker.
+            }
+            else GateReason=reason;
+            return;
+        }
         if(RebirthRecyclerRuntime.TryQueue(actor,station,0,input[0].count,Guid.NewGuid(),
             ()=>windowGroup?.isShowing==true && ReferenceEquals(WorkstationData?.TileEntity,station),out reason))
         {
@@ -102,12 +114,47 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
             else why=reason; // Preserve unavailable-reference versus no matching rule.
         }
         string translated=string.IsNullOrEmpty(why)?Localization.Get("xuiRebirthRecyclingDrop"):Localization.Get(why);
+        string status=!string.IsNullOrEmpty(why)?translated:next.Length==0?Localization.Get("xuiRebirthScrapOutputEmpty"):string.Empty;
+        if(next!=yields || status!=shownStatus)RenderRows(stack,station,status,next.Length>0);
         if(next!=yields || translated!=gate){yields=next;gate=translated;RefreshBindings();}
+    }
+
+    internal const int PreviewRows=10;
+    internal static int Capacity=PreviewRows;
+    private string shownStatus;
+    private static string FormatSeconds(float s)
+    {
+        if(s<60f)return s.ToString("0.#")+"s";
+        int whole=(int)Math.Round(s);
+        return (whole/60)+":"+(whole%60).ToString("00");
+    }
+
+    /// <summary>2.6 scrap list (XUiC_ScrapList / XUiC_ScrapEntry): one row per output with its icon, name, time and
+    /// amount, in its own Scrap Output panel (owner 2026-11-08).</summary>
+    private void RenderRows(ItemStack stack,TileEntityWorkstation station,string status,bool hasOutputs)
+    {
+        shownStatus=status;
+        if(GetChildById("scrapPreviewStatus")?.ViewComponent is XUiV_Label statusLabel)statusLabel.Text=status;
+        var outputs=new System.Collections.Generic.List<RebirthRecyclerOutput>();
+        if(hasOutputs && RebirthRecyclerRules.TryResolve(stack.itemValue.type,station.block.GetBlockName(),out var rule,out _))outputs.AddRange(rule.Outputs);
+        for(int i=0;i<PreviewRows;i++)
+        {
+            var row=GetChildById("scrapRow"+i)?.ViewComponent;if(row==null)continue;
+            bool show=i<outputs.Count && i<Capacity;
+            if(row.IsVisible!=show)row.IsVisible=show;
+            if(!show)continue;
+            var item=outputs[i].Stack.itemValue.ItemClass;
+            if(GetChildById("scrapRowIcon"+i)?.ViewComponent is XUiV_Sprite icon){icon.SpriteName=item.GetIconName();icon.Color=item.GetIconTint();}
+            if(GetChildById("scrapRowName"+i)?.ViewComponent is XUiV_Label name)name.Text=Localization.Get(item.GetItemName());
+            if(GetChildById("scrapRowCount"+i)?.ViewComponent is XUiV_Label count)count.Text=((long)outputs[i].Stack.count*stack.count).ToString();
+            if(GetChildById("scrapRowTime"+i)?.ViewComponent is XUiV_Label time)time.Text=FormatSeconds(outputs[i].TimeSeconds*stack.count);
+        }
     }
     public override bool GetBindingValueInternal(ref string value,string bindingName)
     {
         if(bindingName=="recycler_yield"){value=yields;return true;}
-        if(bindingName=="recycler_gate"){value=gate;return true;}
+        // 2.6 help beside the slot (owner 2026-11-08); the status/reason is shown in the Scrap Output Preview panel.
+        if(bindingName=="recycler_gate"){value=Localization.Get("xuiRebirthRecyclingHelp");return true;}
         return base.GetBindingValueInternal(ref value,bindingName);
     }
 }
@@ -134,10 +181,10 @@ internal static class RebirthRecyclerToolPresentation
         string names;
         switch(station.block.GetBlockName())
         {
-            case "SonjaRecyclerStation":names="carBattery,FuriousRamsayHammerPliers,FuriousRamsayScrewdriver";break;
+            case "SonjaRecyclerStation":names="carBattery";break;
             case "SonjaAmmoRecyclerStation":names="FuriousRamsayPliers";break;
             case "WorkbenchShredder001_FR":names="FuriousRamsayPropaneTank";break;
-            default:names="FuriousRamsayArmorCrafting,FuriousRamsayScrewdriver";break;
+            default:names="FuriousRamsayArmorCrafting,FuriousRamsayHammerPliers,FuriousRamsayScrewdriver";break;
         }
         grid.requiredTools=names;
         var tools=names.Split(',');var cells=grid.GetItemStackControllers();
@@ -145,6 +192,8 @@ internal static class RebirthRecyclerToolPresentation
         {
             if(i<tools.Length && ItemClass.GetItemClass(tools[i]) is ItemClass item)cell.SetAllowedItemClassSingle(item);
             else cell.ClearAllowedItemClasses();
+            cell.TakeOnly=i>=tools.Length;
+            RebirthUnusedToolCells.Mark(cell,i>=tools.Length);
             cell.RequiredType=XUiC_RequiredItemStack.RequiredTypes.ItemClass;cell.RequiredItemOnly=true;cell.IsDirty=true;
         }
         new RebirthPersonalCraftingLayoutService(__instance.Presentation).Apply(true);
@@ -166,6 +215,39 @@ public sealed class RebirthRecyclerContextAction : BaseItemActionEntry
     public override void RefreshEnabled(){Enabled=grid.Accepts(source.ItemStack,out _);}
     public override void OnActivated(){if(grid.Accepts(source.ItemStack,out _))source.HandleMoveToPreferredLocation();}
     public override void OnDisabledActivate(){if(!grid.Accepts(source.ItemStack,out var reason))GameManager.ShowTooltip(source.xui.playerUI.entityPlayer,Localization.Get(reason));}
+}
+
+/// <summary>2.6 tool slots: one Hammer and Pliers at the Modifier Station; that and a Beaker at the Alchemy Table.</summary>
+[HarmonyLib.HarmonyPatch(typeof(XUiC_RebirthStationWorkspace), nameof(XUiC_RebirthStationWorkspace.OnOpen))]
+internal static class RebirthRequiredToolStations
+{
+    private static void Postfix(XUiC_RebirthStationWorkspace __instance)
+    {
+        string names;
+        switch (__instance.WorkstationData?.TileEntity?.block?.GetBlockName())
+        {
+            case "ModifierStation": names = "FuriousRamsayHammerPliers"; break;
+            case "AlchemyTable001_FR": names = "FuriousRamsayHammerPliers,toolBeaker"; break;
+            default: return;
+        }
+        var grid = __instance.GetChildByType<XUiC_WorkstationToolGrid>();
+        if (grid == null) return;
+        grid.requiredTools = names;
+        var tools = names.Split(',');
+        var cells = grid.GetItemStackControllers();
+        for (int i = 0; i < cells.Length; i++)
+        {
+            var cell = cells[i] as XUiC_RequiredItemStack;
+            if (cell == null) continue;
+            if (i < tools.Length && ItemClass.GetItemClass(tools[i]) is ItemClass item) cell.SetAllowedItemClassSingle(item);
+            else cell.ClearAllowedItemClasses();
+            cell.TakeOnly = i >= tools.Length;
+            RebirthUnusedToolCells.Mark(cell, i >= tools.Length);
+            cell.RequiredType = XUiC_RequiredItemStack.RequiredTypes.ItemClass;
+            cell.RequiredItemOnly = true;
+            cell.IsDirty = true;
+        }
+    }
 }
 
 [HarmonyLib.HarmonyPatch(typeof(XUiC_ItemActionList), nameof(XUiC_ItemActionList.SetCraftingActionList))]
@@ -214,30 +296,71 @@ internal static class RebirthRecyclerPreferredRouting
 }
 
 
-/// <summary>2.6: scrappable items show a purple background while a scrap station is open.</summary>
-[HarmonyLib.HarmonyPatch(typeof(XUiC_ItemStack), "bindingBackgroundColor")]
-internal static class RebirthRecyclerScrappableHighlight
+/// <summary>
+/// Only the Modifier Station drops the recipe list. Every 2.6 scrap station (Munitions Workbench, Recycling Station,
+/// Shredder, Outfit Designer) showed its crafting list beside the scrap input, so they keep it.
+/// Scrappable items are highlighted purple on all of them.
+/// </summary>
+internal static class RebirthScrapWindow
 {
-    private static readonly Color Purple = new Color32(107, 77, 110, 255);
+    // Scrap-only stations: no recipe list or recipe details. The Modifier Station (kits), and the Recycler and
+    // Shredder, which only scrap (owner 2026-11-07). The Munitions Workbench also crafts, so it keeps its recipes.
+    internal static bool Active => IsModifier || IsScrapOnly;
 
-    private static void Postfix(XUiC_ItemStack __instance, ref Color __result)
+    internal static bool IsScrapOnly
     {
-        var workspace = XUiC_RebirthStationWorkspace.ActiveInstance;
-        var station = workspace?.WorkstationData?.TileEntity;
-        if (station == null || !RebirthRecyclerRuntime.Supports(station)) return;
-        var location = __instance.StackLocation;
-        if (location != XUiC_ItemStack.StackLocationTypes.Backpack && location != XUiC_ItemStack.StackLocationTypes.ToolBelt) return;
-        var stack = __instance.ItemStack;
-        if (stack == null || stack.IsEmpty()) return;
-        if (RebirthRecyclerRules.TryResolve(stack.itemValue.type, station.block.GetBlockName(), out _)) __result = Purple;
+        get
+        {
+            string name = XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity?.block?.GetBlockName();
+            return name == "SonjaRecyclerStation" || name == "WorkbenchShredder001_FR";
+        }
+    }
+
+    internal static bool IsModifier => XUiC_RebirthStationWorkspace.ActiveInstance?.GetChildByType<XUiC_RebirthKitInputGrid>() != null;
+
+    internal static bool IsScrappable(ItemStack stack)
+    {
+        var station = XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity;
+        return station != null && stack != null && !stack.IsEmpty() && RebirthRecyclerRuntime.Supports(station)
+            && RebirthRecyclerRules.TryResolve(stack.itemValue.type, station.block.GetBlockName(), out _);
     }
 }
 
-[Preserve]
-public sealed class RebirthRecyclerHighlightModApi : IModApi
+/// <summary>Tool cells a station does not use stay hidden, as in 2.6 where those windows had fewer slots.</summary>
+[HarmonyLib.HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.Update))]
+internal static class RebirthUnusedToolCells
 {
-    public void InitMod(Mod modInstance)
+    private static readonly System.Collections.Generic.HashSet<XUiController> Hidden = new System.Collections.Generic.HashSet<XUiController>();
+
+    internal static void Mark(XUiC_RequiredItemStack cell, bool unused)
     {
-        RebirthHarmonyBootstrap.PatchClassOnce(new HarmonyLib.Harmony("rebirth.recycler.highlight"), typeof(RebirthRecyclerScrappableHighlight));
+        if (unused) Hidden.Add(cell); else Hidden.Remove(cell);
+        if (cell.ViewComponent != null && cell.ViewComponent.IsVisible == unused) cell.ViewComponent.IsVisible = !unused;
+    }
+
+    private static void Postfix(XUiC_ItemStack __instance)
+    {
+        if (Hidden.Count == 0 || !(__instance is XUiC_RequiredItemStack) || !Hidden.Contains(__instance)) return;
+        if (__instance.ViewComponent != null && __instance.ViewComponent.IsVisible) __instance.ViewComponent.IsVisible = false;
+    }
+}
+
+/// <summary>
+/// A craft at a station whose input grid is a scrap or kit slot is paid from the backpack, as in 2.6, where that
+/// slot was not a workstation input grid. The native craft checks the backpack for the ingredients but then removes
+/// them from the station's input grid; without this, crafting at a scrap station took nothing.
+/// Remote-resource payment (an earlier prefix on the same call) still wins when it has already handled the call.
+/// </summary>
+[HarmonyLib.HarmonyPatch(typeof(XUiC_WorkstationInputGrid), nameof(XUiC_WorkstationInputGrid.RemoveItems))]
+internal static class RebirthScrapStationCraftCost
+{
+    [HarmonyLib.HarmonyPriority(HarmonyLib.Priority.Low)]
+    private static bool Prefix(XUiC_WorkstationInputGrid __instance, System.Collections.Generic.IList<ItemStack> _itemStacks, int _multiplier,
+        System.Collections.Generic.IList<ItemStack> _removedItems, bool __runOriginal)
+    {
+        if (!__runOriginal) return false;
+        if (!(__instance is XUiC_RebirthRecyclerInputGrid) && !(__instance is XUiC_RebirthKitInputGrid)) return true;
+        __instance.xui?.PlayerInventory?.RemoveItems(_itemStacks, _multiplier, _removedItems);
+        return false;
     }
 }

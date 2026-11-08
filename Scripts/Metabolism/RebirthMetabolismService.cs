@@ -914,7 +914,8 @@ public static partial class RebirthMetabolismService
         float requested = RebirthMetabolismConfig.EnergyRecoveryPerRealMinute * GetLowEnergyRecoveryMultiplier(state.Energy) * recoveryFactor * hydrationRecoveryMultiplier
             * Mathf.Max(0f, mods.EnergyRecovery) * preparedEfficiency * deltaRealMinutes;
         requested = Mathf.Min(requested, Mathf.Max(0f, ceilingBeforeWork - state.Energy));
-        float foodCostPerEnergy = Mathf.Max(0f, RebirthMetabolismConfig.FoodUnitsPerEnergyRecovered) / Mathf.Max(1f, preparedEfficiency);
+        float foodCostPerEnergy = Mathf.Max(0f, RebirthMetabolismConfig.FoodUnitsPerEnergyRecovered) / Mathf.Max(1f, preparedEfficiency)
+            * (1f - RebirthArmorBonusSpecials.Best(player, EquipmentSlots.Chest, "stamina_efficiency"));
         if (foodCostPerEnergy > 0f)
         {
             float availableFood = Mathf.Max(0f, player.Stats.Food.Value - foodFloor);
@@ -2518,7 +2519,24 @@ public static class RebirthMetabolismModifierResolver
             m.DigestiveBaselineOffset += condition.DigestiveBaselineOffset;
             m.DigestiveRecovery = Mathf.Clamp(m.DigestiveRecovery * condition.DigestiveRecoveryMultiplier, 0.60f, 1.50f);
         }
+        m.TotalHydrationDemand *= WornPercent(player, PassiveEffects.WaterLossPerStaminaPointGained);
+        m.TotalNutritionDemand *= WornPercent(player, PassiveEffects.FoodLossPerStaminaPointGained);
         return m;
+    }
+
+    // The player class sets these native stats to zero because this service owns the drain, so
+    // worn mods that change them are read here and applied to the real demand.
+    private static float WornPercent(EntityPlayer player, PassiveEffects passive)
+    {
+        if (player.equipment == null) return 1f;
+        float value = 1f, percent = 1f;
+        for (int i = 0; i < player.equipment.GetSlotCount(); i++)
+        {
+            ItemValue worn = player.equipment.GetSlotItem(i);
+            if (worn == null || worn.IsEmpty()) continue;
+            worn.ModifyValue(player, null, passive, ref value, ref percent, FastTags<TagGroup.Global>.none);
+        }
+        return Mathf.Clamp(percent, 0.5f, 1.5f);
     }
 
     private static float CVarMultiplier(EntityPlayer player, string name)

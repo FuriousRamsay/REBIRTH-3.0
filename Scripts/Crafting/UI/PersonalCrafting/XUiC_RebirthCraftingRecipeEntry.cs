@@ -205,7 +205,9 @@ public sealed class XUiC_RebirthCraftingRecipeEntry : XUiC_RecipeEntry
         base.Update(dt);
         // Native row rebinding/hover can restore the neutral presentation after
         // the catalogue auto-selects its first search/category result.
-        if(rebirthSelected&&HasData)ApplySelectedVisual(true);
+        // The native row paints its background grey on hover and whenever its recipe is set; keep the REBIRTH row look
+        // (change-aware, so this costs nothing when nothing changed) (owner 2026-11-08: rows alternated grey/dark).
+        if(HasData)ApplySelectedVisual(rebirthSelected);
     }
 
     private void ApplySelectedVisual(bool selected)

@@ -1,0 +1,229 @@
+<configs>
+  <append xpath="/items">
+    <item name="FuriousRamsayMindControlArrowStone">
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowStone"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlArrowStone"/>
+			<property name="Tags" value="ammo,ranged,attAgility,perkArchery,perkPenetrator"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/arrow_stonePrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".25"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value="1"/>
+			<property name="Material" value="Mwood"/>
+			<property name="Stacknumber" value="1500"/>
+			<property name="EconomicValue" value="12"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="Group" value="Ammo/Weapons,Basics"/>
+			<property class="Action1">
+				<property name="Class" value="Projectile"/>
+				<property class="Explosion"><property name="ParticleIndex" value="0"/></property>
+				<property name="FlyTime" value="0"/>
+				<property name="Gravity" value="-4"/>
+				<property name="LifeTime" value="14"/>
+			</property>
+			<effect_group name="ammoArrowStone" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="35" tags="perkArchery"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="1" tags="perkArchery"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="45" tags="perkArchery"/>
+				<passive_effect name="ProjectileStickChance" operation="perc_set" value="1"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="0"/>
+				<display_value name="dMindControlSteel" value="0"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+    <item name="FuriousRamsayMindControlArrowIron">
+			<property name="Extends" value="FuriousRamsayMindControlArrowStone"/>
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowIron"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlArrowIron"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/arrow_ironPrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="Material" value="Mmetal"/>
+			<property name="EconomicValue" value="25"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".25"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value="1"/>
+			<property name="Group" value="Ammo/Weapons"/>
+			<property class="Action1">
+				<property name="Gravity" value="-3.5"/>
+			</property>
+			<effect_group name="ammoArrowIron" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="38" tags="perkArchery"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="3" tags="perkArchery"/>
+				<passive_effect name="TargetArmor" operation="perc_add" value="-.2"/>
+				<display_value name="dTargetArmor" value="-.2"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="50" tags="perkArchery"/>
+				<passive_effect name="ProjectileStickChance" operation="perc_set" value="1"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="1"/>
+				<display_value name="dMindControlSteel" value="0"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+    <item name="FuriousRamsayMindControlArrowSteel">
+			<property name="Extends" value="FuriousRamsayMindControlArrowIron"/>
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowSteel"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlArrowSteelAP"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/arrow_steelPrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="EconomicValue" value="57"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".25"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value="1"/>
+			<effect_group name="ammoArrowSteelAP" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="42" tags="perkArchery"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="5" tags="perkArchery"/>
+				<passive_effect name="TargetArmor" operation="perc_add" value="-.5"/>
+				<display_value name="dTargetArmor" value="-.5"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="55" tags="perkArchery"/>
+				<passive_effect name="ProjectileStickChance" operation="perc_set" value="1"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="1"/>
+				<display_value name="dMindControlSteel" value="1"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+    <item name="FuriousRamsayMindControlBoltStone">
+			<property name="Tags" value="ammo,ranged,attAgility,perkArchery,perkPenetrator"/>
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowStone"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlBoltStone"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/bolt_stonePrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="Material" value="Mwood"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".12"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value=".75"/>
+			<property name="Stacknumber" value="1500"/>
+			<property name="EconomicValue" value="12"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="Group" value="Ammo/Weapons"/>
+			<property class="Action1">
+				<property name="Class" value="Projectile"/>
+				<property class="Explosion"><property name="ParticleIndex" value="0"/></property>
+				<property name="Gravity" value="-3"/>
+				<property name="FlyTime" value="0"/>
+				<property name="LifeTime" value="14"/>
+			</property>
+			<effect_group name="FuriousRamsayMindControlBoltStone" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="50" tags="perkArchery"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="1" tags="perkArchery"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="67.5" tags="perkArchery"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="0"/>
+				<display_value name="dMindControlSteel" value="0"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+    <item name="FuriousRamsayMindControlBoltIron">
+			<property name="Tags" value="ammo,ranged,attAgility,perkArchery,perkPenetrator"/>
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowIron"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlBoltIron"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/bolt_ironPrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="Material" value="Mmetal"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".13"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value=".75"/>
+			<property name="Stacknumber" value="1500"/>
+			<property name="EconomicValue" value="25"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="Group" value="Ammo/Weapons"/>
+			<property class="Action1">
+				<property name="Class" value="Projectile"/>
+				<property class="Explosion"><property name="ParticleIndex" value="0"/></property>
+				<property name="Gravity" value="-2.5"/>
+				<property name="FlyTime" value="0"/>
+				<property name="LifeTime" value="14"/>
+			</property>
+			<property class="Attributes">
+				<property name="GetQualityFromWeapon" value="true"/>
+			</property>
+			<effect_group name="FuriousRamsayMindControlBoltIron" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="59" tags="perkArchery"/>
+				<passive_effect name="TargetArmor" operation="perc_add" value="-.2"/>
+				<display_value name="dTargetArmor" value="-.2"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="6" tags="perkArchery"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="DamageModifier" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="75" tags="perkArchery"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="1"/>
+				<display_value name="dMindControlSteel" value="0"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+    <item name="FuriousRamsayMindControlBoltSteel">
+			<property name="Extends" value="ammoCrossbowBoltIron"/>
+			<property name="DisplayType" value="FuriousRamsayMindControlArrowSteel"/>
+			<property name="CustomIcon" value="FuriousRamsayMindControlBoltSteelAP"/>
+			<property name="Meshfile" value="@:Other/Items/Weapons/Ranged/Bows/Arrows/bolt_steelPrefab.prefab"/>
+			<property name="HoldType" value="45"/>
+			<property name="HandMeshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="EconomicValue" value="57"/>
+			<property name="EconomicBundleSize" value="5"/>
+			<property name="IsSticky" value="true"/>
+			<property name="StickyOffset" value=".13"/>
+			<property name="StickyColliderUp" value="2"/>
+			<property name="StickyColliderRadius" value=".05"/>
+			<property name="StickyColliderLength" value=".75"/>
+			<effect_group name="FuriousRamsayMindControlBoltSteelAP" tiered="false">
+				<passive_effect name="EntityDamage" operation="base_set" value="63" tags="perkArchery"/>
+				<passive_effect name="BlockDamage" operation="base_set" value="6" tags="perkArchery"/>
+				<passive_effect name="TargetArmor" operation="perc_add" value="-.5"/>
+				<display_value name="dTargetArmor" value="-.5"/>
+				<passive_effect name="BlockDamage" operation="perc_set" value=".1" tags="wood"/>
+				<passive_effect name="BlockDamage" operation="perc_set" value="0" tags="earth,metal,cloth"/>
+				<passive_effect name="ProjectileVelocity" operation="base_set" value="82.5" tags="perkArchery"/>
+				<display_value name="dMindControlStone" value="1"/>
+				<display_value name="dMindControlIron" value="1"/>
+				<display_value name="dMindControlSteel" value="1"/>
+			</effect_group>
+			<effect_group tiered="false" name="RebirthMindControlHit">
+				<triggered_effect trigger="onSelfDamagedOther" action="RebirthMindControlHit, RebirthUtils" target="other"/>
+			</effect_group>
+		</item>
+  </append>
+  <append xpath="/items/item/property[@class='Action0']/property[@name='Magazine_items' and contains(@value,'ammoArrowStone')]/@value">,FuriousRamsayMindControlArrowStone,FuriousRamsayMindControlArrowIron,FuriousRamsayMindControlArrowSteel</append>
+  <append xpath="/items/item/property[@class='Action0']/property[@name='Magazine_items' and contains(@value,'ammoCrossbowBoltStone')]/@value">,FuriousRamsayMindControlBoltStone,FuriousRamsayMindControlBoltIron,FuriousRamsayMindControlBoltSteel</append>
+</configs>

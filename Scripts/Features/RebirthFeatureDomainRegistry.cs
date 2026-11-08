@@ -157,7 +157,7 @@ public static class RebirthFeatureDomainRegistry
             DomainId = "zombie.ai.special",
             DisplayName = "Zombie AI Special Behaviors",
             DomainKind = RebirthFeatureDomainKind.ZombieAi,
-            Current2_6Surfaces = "vehicle attack AI, block jump anticipation, fat zombie aura, spider climbing, crawl/repositioning, decoy aggro",
+            Current2_6Surfaces = "vehicle attack AI, block jump anticipation, fat zombie area effect, spider climbing, crawl/repositioning, decoy aggro",
             XmlSurfaces = "entityclasses, entitygroups, buffs, items/hand items, spawning",
             FutureOwnerModule = "ai.zombie",
             ScenarioDependency = "common; hive/purge spawn contexts possible",

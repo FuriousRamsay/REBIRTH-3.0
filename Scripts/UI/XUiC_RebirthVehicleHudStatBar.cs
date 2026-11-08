@@ -25,11 +25,18 @@ public sealed class XUiC_RebirthVehicleHudStatBar : XUiC_HUDStatBar
         }
         mode=observedMode;transition=observedTransition;return energyObserved;
     }
+    // Runs on every HUD refresh; enum names are slow and allocate, so build each key once.
+    private static readonly System.Collections.Generic.Dictionary<RebirthCamperEnergyMode,string> EnergyHudKeys=new System.Collections.Generic.Dictionary<RebirthCamperEnergyMode,string>();
+    private static string EnergyHudKey(RebirthCamperEnergyMode energyMode)
+    {
+        if(!EnergyHudKeys.TryGetValue(energyMode,out string key)){key="xuiRebirthEnergyHud"+energyMode;EnergyHudKeys[energyMode]=key;}
+        return key;
+    }
     private static string FuelCaption(EntityVehicle selected)
     {
         string title=Localization.Get("xuiRebirthVehicleHudFuel");
         if(!TryObserveEnergy(selected,out var energyMode,out float transition))return title;
-        string mode=Localization.Get("xuiRebirthEnergyHud"+energyMode);
+        string mode=Localization.Get(EnergyHudKey(energyMode));
         if(energyMode==RebirthCamperEnergyMode.Deploying||energyMode==RebirthCamperEnergyMode.Packing)
             mode=string.Format(CultureInfo.InvariantCulture,mode,Mathf.CeilToInt(transition));
         return title+" · "+mode;

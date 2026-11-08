@@ -72,6 +72,8 @@
   <item id="rebirthRecipeBlueberryCrumble" kind="discovery" knowledge="recipe.rebirthFoodBlueberryCrumble" study_seconds="45" />
   <item id="rebirthRecipeMushroomPotPie" kind="discovery" knowledge="recipe.rebirthFoodMushroomPotPie" study_seconds="45" />
   <item id="rebirthSchematicElectricFencePost" kind="discovery" knowledge="recipe.electricfencepost" study_seconds="75" />
+  <item id="rebirthSchematicAmmoMachine" kind="discovery" knowledge="recipe.FuriousRamsayAmmoMachine" study_seconds="75" />
+  <item id="rebirthSchematicAlchemyTable" kind="discovery" knowledge="recipe.AlchemyTable001_FR" study_seconds="75" />
   <item id="rebirthSchematicWoodBurningStove" kind="discovery" knowledge="recipe.cntWoodBurningStove" study_seconds="75" />
   <item id="rebirthSchematicHeatDetectionModule" kind="discovery" knowledge="recipe.ModHeatMapDetection" study_seconds="100" />
   <item id="rebirthManualGarmentRepair" kind="discovery" knowledge="procedure.tailoring.basic_repair" study_seconds="60" />

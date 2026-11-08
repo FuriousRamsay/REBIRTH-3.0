@@ -36,12 +36,12 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             bool supplied=Available&&suppliedWatts>=Watts&&Session.Operation==Guid.Empty;
             if(!supplied)
             {
-                if(lastSupplied)Log.Out("[REBIRTH EnergyTrace] circuit-power-off vehicle="+vehicle.entityId+
+                if(lastSupplied)RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] circuit-power-off vehicle="+vehicle.entityId+
                     " root="+Root.Position+" requested="+Watts+" supplied="+suppliedWatts+
                     " available="+Available+" lease="+Session.Operation);
                 Clear();return;
             }
-            if(!lastSupplied)Log.Out("[REBIRTH EnergyTrace] circuit-power-on vehicle="+vehicle.entityId+
+            if(!lastSupplied)RebirthCamperEnergyLog.Out("[REBIRTH EnergyTrace] circuit-power-on vehicle="+vehicle.entityId+
                 " root="+Root.Position+" requested="+Watts+" supplied="+suppliedWatts);
             lastSupplied=true;
             // Clear only branches behind a closed native switch/trigger. Do
@@ -130,7 +130,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             {
                 if(root.IsPowered&&root.RequiredPower>0)continue; // Do not take over another live supplier.
                 existing=new NativeCircuit{Session=session,Root=root,Nodes=nodes,Children=children};circuits.Add(root,existing);
-                Log.Out("[REBIRTH EnergyFlow] circuit-admitted vehicle="+session.Vehicle.entityId+
+                RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] circuit-admitted vehicle="+session.Vehicle.entityId+
                     " root="+root.Position+" nodes="+nodes.Length+" available="+available);
             }
             int native=0,watts=0;

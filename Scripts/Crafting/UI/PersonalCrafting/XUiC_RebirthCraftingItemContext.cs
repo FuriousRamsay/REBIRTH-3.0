@@ -20,6 +20,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
     private const int ContextHeight = 232;
     private const int CombatPanelHeight = 206;
     private const int CombatPanelGap = 16;
+    private int stripLift;
     private int combatVisibleDataRows;
 
     private RebirthCraftingPresentation owner;
@@ -32,6 +33,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
     private readonly XUiV_Label[] actionNames = new XUiV_Label[MaxVisibleActions];
     private XUiController closeButton;
     private XUiV_Sprite itemIcon;
+    private XUiV_Sprite bonusIcon; // 2.6: the weapon bonus symbol on the selected item's icon.
     private XUiV_Label itemName;
     private XUiV_Label itemSummary;
     private XUiV_Label itemDescription;
@@ -68,7 +70,16 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
             actionNames[i] = actionControllers[i]?.GetChildById("name")?.ViewComponent as XUiV_Label;
         }
         closeButton = GetChildById("btnRebirthCraftingItemContextClose");
+        // 2.6 star tab: toggles between the bonus list and the description (owner 2026-11-08).
+        var bonusTabButton = GetChildById(RebirthArmorBonusInfoTab.ButtonId);
+        if (bonusTabButton != null) bonusTabButton.OnPress += (sender, mouse) =>
+        {
+            var tab = RebirthArmorBonusInfoTab.For(this);
+            tab.ShowBonuses = !tab.ShowBonuses;
+            if (selectedSlot?.ItemStack != null && itemDescription != null) itemDescription.Text = ResolveDescription(selectedSlot.ItemStack, xui, this);
+        };
         itemIcon = GetView<XUiV_Sprite>("rebirthCraftingItemContextIcon");
+        bonusIcon = GetView<XUiV_Sprite>("rebirthCraftingItemContextBonusIcon");
         itemName = GetView<XUiV_Label>("rebirthCraftingItemContextName");
         itemSummary = GetView<XUiV_Label>("rebirthCraftingItemContextSummary");
         itemDescription = GetView<XUiV_Label>("rebirthCraftingItemContextDescription");
@@ -252,7 +263,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         {
             if (selectedSlot == null || selectedSlot.ItemStack == null || selectedSlot.ItemStack.IsEmpty())
                 return string.Empty;
-            string description = ResolveDescription(selectedSlot.ItemStack, xui);
+            string description = ResolveDescription(selectedSlot.ItemStack, xui, this);
             string summary = BuildSummary(selectedSlot.ItemStack);
             StringBuilder sb = new StringBuilder(selectedSlot.ItemNameText ?? string.Empty);
             if (!string.IsNullOrEmpty(summary)) sb.Append("\n").Append(summary);
@@ -614,6 +625,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         }
 
         LastInspected = selectedSlot.ItemStack;
+        if (RebirthScrapWindow.Active && GetChildById("rebirthCraftingActionsStrip")?.ViewComponent != null) GetChildById("rebirthCraftingActionsStrip").ViewComponent.IsVisible = true;
         ItemStack stack = selectedSlot.ItemStack;
         ItemValue value = stack.itemValue;
         ItemClass itemClass = value != null ? value.ItemClassOrMissing : null;
@@ -627,10 +639,19 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
                 itemIcon.Color = itemClass.GetIconTint(value);
             }
         }
+        if (bonusIcon != null)
+        {
+            string bonusKey;
+            bonusIcon.IsVisible = RebirthWeaponBonuses.TryIcon(stack, out bonusKey);
+            if (bonusIcon.IsVisible) bonusIcon.SpriteName = "ui_game_symbol_" + bonusKey;
+        }
 
         if (itemName != null) itemName.Text = selectedSlot.ItemNameText ?? string.Empty;
         if (itemSummary != null) itemSummary.Text = BuildSummary(stack);
-        if (itemDescription != null) itemDescription.Text = ResolveDescription(stack, xui);
+        if (itemDescription != null) itemDescription.Text = ResolveDescription(stack, xui, this);
+        var bonusTab = GetChildById(RebirthArmorBonusInfoTab.ButtonId)?.ViewComponent;
+        if (bonusTab != null) bonusTab.IsVisible = RebirthArmorBonusInfoTab.HasBonuses(stack);
+        PlaceBonusTab();
         RenderItemStats();
         RenderCombatData(stack);
         RenderRepairMaterials(stack);
@@ -756,6 +777,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         SetControllerVisible(closeButton, false);
         SetControllerVisible(actionList, false);
         if (itemIcon != null) itemIcon.IsVisible = false;
+        if (bonusIcon != null) bonusIcon.IsVisible = false;
         if (itemName != null) itemName.Text = string.Empty;
         if (itemSummary != null) itemSummary.Text = string.Empty;
         if (itemDescription != null) itemDescription.Text = string.Empty;
@@ -787,15 +809,41 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         int height = owner != null && owner.IsInventoryOnlyMode
             ? parentSize.y
             : Math.Max(ContextHeight, parentSize.y + CombatPanelGap + requirementsHeight);
-        int lowerPanelHeight = Math.Max(0, height - parentSize.y - CombatPanelGap);
+        // The stats and repair section start right under the action strip (owner 2026-11-08: at stations the detail
+        // area is taller than its content, which left a gap above and clipped the stats at the bottom).
+        XUiController stripForLower = owner != null ? owner.GetChildById("rebirthCraftingActionsStrip") : null;
+        int lowerTop = parentSize.y + CombatPanelGap;
+        if (stripForLower?.ViewComponent != null)
+        {
+            int stripBottom = -stripForLower.ViewComponent.Position.y + Math.Max(34, stripForLower.ViewComponent.Size.y);
+            if (stripBottom > 0 && stripBottom < parentSize.y) lowerTop = stripBottom + CombatPanelGap;
+        }
+        // Owner 2026-11-08: everything must end above the backpack. Cap the panel at the backpack top and, when the
+        // combat/repair rows would not fit, move the action strip and those rows up together.
+        var inventoryView = owner != null ? owner.GetChildById("rebirthCraftingInventoryRegion")?.ViewComponent : null;
+        if (inventoryView != null && inventoryView.Position.y < 0) height = Math.Min(height, -inventoryView.Position.y - 4);
+        int lowerNeed = 0;
+        if (GetChildById("rebirthCraftingCombatPanel")?.ViewComponent?.IsVisible == true)
+        {
+            int gainY = combatVisibleDataRows <= 0 ? 78 : combatVisibleDataRows == 1 ? 108 : combatVisibleDataRows == 2 ? 134 : combatVisibleDataRows == 3 ? 160 : 186;
+            lowerNeed = gainY + 26 + 8;
+        }
+        if (repairMaterialsVisible) lowerNeed = Math.Max(lowerNeed, 46 + 3 * 26);
+        stripLift = 0;
+        if (lowerNeed > 0 && lowerTop + lowerNeed > height)
+        {
+            stripLift = Math.Min(lowerTop + lowerNeed - height, Math.Max(0, lowerTop - 150));
+            lowerTop -= stripLift;
+        }
+        int lowerPanelHeight = Math.Max(0, height - lowerTop);
 
         SetRect(this, 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextBg"), 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextFrame"), 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextHeaderRule"), 0, -38, width, 2);
         int combatWidth = repairMaterialsVisible ? Math.Max(320, width - 300) : width;
-        SetRect(GetChildById("rebirthRepairMaterials"), combatWidth + 12, -(parentSize.y + CombatPanelGap), width - combatWidth - 12, lowerPanelHeight);
-        SetRect(GetChildById("rebirthCraftingCombatPanel"), 0, -(parentSize.y + CombatPanelGap), combatWidth, lowerPanelHeight);
+        SetRect(GetChildById("rebirthRepairMaterials"), combatWidth + 12, -lowerTop, width - combatWidth - 12, lowerPanelHeight);
+        SetRect(GetChildById("rebirthCraftingCombatPanel"), 0, -lowerTop, combatWidth, lowerPanelHeight);
         SetRect(GetChildById("rebirthCraftingCombatPanelBg"), 0, 0, combatWidth, lowerPanelHeight);
         SetRect(GetChildById("rebirthCraftingCombatHeaderRule"), 0, -38, combatWidth, 2);
         SetRect(GetChildById("rebirthCraftingCombatTitle"), 14, -8, Math.Max(180, combatWidth - 28), 28);
@@ -806,12 +854,14 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
 
         SetRect(GetChildById("rebirthCraftingItemContextIconFrame"), 14, -46, 96, 96);
         SetRect(GetChildById("rebirthCraftingItemContextIcon"), 20, -52, 84, 84);
+        SetRect(GetChildById("rebirthCraftingItemContextBonusIcon"), 22, -54, 26, 26);
         int statsWidth = width / 3;
         int statsX = width - statsWidth - 14;
         int descriptionWidth = System.Math.Max(120, statsX - 140);
         SetRect(GetChildById("craftingItemStats"), statsX, -46, statsWidth, 180);
         ApplyStatRowGeometry();
         SetRect(GetChildById("rebirthCraftingItemContextName"), 124, -46, descriptionWidth, 30);
+        PlaceBonusTab();
         SetRect(GetChildById("rebirthCraftingItemContextSummary"), 124, -76, descriptionWidth, 28);
         SetRect(GetChildById("rebirthCraftingItemContextDescription"), 124, -86, descriptionWidth, 128);
 
@@ -831,7 +881,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         int listX = recipeActionPos.x;
         int listWidth = Math.Max(360, recipeActionSize.x);
         int listHeight = Math.Max(34, recipeActionSize.y);
-        SetRect(list, listX, recipeActionPos.y, listWidth, listHeight);
+        SetRect(list, listX, recipeActionPos.y + stripLift, listWidth, listHeight);
 
         // ItemActionList owns action identity/input. Geometry is stable and only changes when
         // the number of resolved native actions or the strip size changes.
@@ -972,7 +1022,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
 
     private void SetRequirementsVisible(bool visible)
     {
-        SetControllerActive(requirementsRegion, visible);
+        SetControllerActive(requirementsRegion, visible && !RebirthScrapWindow.Active);
     }
 
     private static void SetControllerActive(XUiController controller, bool visible)
@@ -1005,11 +1055,37 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         sb.Append(value);
     }
 
+    /// <summary>With a tab owner: the 2.6 star tab decides between the bonus list and the description.</summary>
+    /// <summary>The star tab sits just right of the item name (owner 2026-11-08).</summary>
+    private void PlaceBonusTab()
+    {
+        var tab = GetChildById(RebirthArmorBonusInfoTab.ButtonId)?.ViewComponent;
+        if (tab == null || itemName == null) return;
+        itemName.label?.ProcessText();
+        int textWidth = itemName.label != null ? UnityEngine.Mathf.CeilToInt(itemName.label.printedSize.x) : 0;
+        int x = itemName.Position.x + System.Math.Min(textWidth, itemName.Size.x) + 18;
+        var position = new Vector2i(x, itemName.Position.y - 15);
+        if (tab.Position != position) tab.Position = position;
+    }
+
+    public static string ResolveDescription(ItemStack stack, XUi ui, XUiController tabOwner)
+    {
+        if (tabOwner == null) return ResolveDescription(stack, ui);
+        var state = RebirthArmorBonusInfoTab.For(tabOwner);
+        RebirthArmorBonusInfoTab.Track(state, stack);
+        if (RebirthArmorBonusInfoTab.HasBonuses(stack) && state.ShowBonuses) return RebirthArmorBonusInfoTab.BonusText(stack);
+        return RebirthArmorBonusInfoTab.WithWeapon(ResolveBaseDescription(stack, ui), stack);
+    }
+
     public static string ResolveDescription(ItemStack stack, XUi ui = null)
     {
         string description = ResolveBaseDescription(stack, ui);
-        string bonuses = stack != null && !stack.IsEmpty() ? RebirthArmorBonusText.DescribeAll(stack.itemValue) : string.Empty;
-        return bonuses.Length > 0 ? bonuses + "\n\n" + description : description;
+        if (stack == null || stack.IsEmpty()) return description;
+        // Armor bonuses above the description; the weapon bonus and its chance below it, as in 2.6.
+        string armor = RebirthArmorBonusText.DescribeArmor(stack.itemValue), weapon = RebirthWeaponBonuses.Describe(stack.itemValue);
+        if (armor.Length > 0) description = description.Length > 0 ? armor + "\n\n" + description : armor;
+        if (weapon.Length > 0) description = description.Length > 0 ? description + "\n\n" + weapon : weapon;
+        return description;
     }
 
     public static string ResolveBaseDescription(ItemStack stack, XUi ui = null)

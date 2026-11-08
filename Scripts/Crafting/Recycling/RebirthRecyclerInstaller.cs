@@ -11,7 +11,7 @@ internal static class RebirthRecyclerInstaller
 
         var harmony = new Harmony("rebirth.recycler.ui");
         RebirthRecyclerPlacedSettlement.InstallAuthorityController(harmony);
-        foreach (var type in new[] { typeof(RebirthRecyclerShiftAdmission), typeof(RebirthRecyclerToolPresentation),
+        foreach (var type in new[] { typeof(RebirthRecyclerShiftAdmission), typeof(RebirthRecyclerToolPresentation), typeof(RebirthRequiredToolStations), typeof(RebirthUnusedToolCells), typeof(RebirthScrapStationCraftCost),
             typeof(RebirthRecyclerContextActions), typeof(RebirthRecyclerPreferredRouting) })
             RebirthHarmonyBootstrap.PatchClassOnce(harmony, type);
     }

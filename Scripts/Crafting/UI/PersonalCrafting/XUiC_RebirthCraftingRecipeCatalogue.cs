@@ -252,6 +252,16 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         CloseControllerTree();
     }
 
+    private string lastToolSignature;
+    private string StationToolSignature()
+    {
+        var stacks = (owner?.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.GetToolStacks();
+        if (stacks == null) return string.Empty;
+        var sb = new System.Text.StringBuilder();
+        foreach (var stack in stacks) sb.Append(stack == null || stack.IsEmpty() ? 0 : stack.itemValue.type).Append(',');
+        return sb.ToString();
+    }
+
     public override void Update(float dt)
     {
         if (!RebirthSurvivorMode.IsEnabledForCurrentWorld())
@@ -290,7 +300,16 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
             RefreshCategoryButtons();
         }
         bool stationDatasetChanged = !string.IsNullOrEmpty(owner?.Workstation) && resortRecipes && pageChanged;
-        if (stationDatasetChanged) { filterDirty = true; category = string.Empty; }
+        // At a station the recipe set only changes with the station (handled above). The native list raises these flags on every
+        // tool or fuel change (WorkStation_OnToolsOrFuelChanged), which rebuilt the list and reset its category while the
+        // station burned fuel (owner 2026-11-08: recipe list flickering). Refresh availability only.
+        if (stationDatasetChanged)
+        {
+            resortRecipes = false; pageChanged = false;
+            // Burning fuel raises this every few seconds; only a change of the tools in the slots can change availability.
+            string tools = StationToolSignature();
+            if (tools != lastToolSignature) { lastToolSignature = tools; availabilityDirty = true; }
+        }
         bool externalDatasetChanged = !stationDatasetChanged && resortRecipes && pageChanged;
         if (externalDatasetChanged)
         {
@@ -977,7 +996,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         {
             string placeholder = ingredientFilter != null ? "Recipes using " + ingredientFilterName : defaultSearchPlaceholder;
             if (searchPlaceholder.Text != placeholder) searchPlaceholder.SetTextImmediately(placeholder);
-            searchPlaceholder.IsVisible = !searching;
+            searchPlaceholder.IsVisible = !searching && !RebirthScrapWindow.IsScrapOnly; // no recipe search at scrap-only stations (owner 2026-11-08)
         }
 
         if (favoriteFilterBackground != null)

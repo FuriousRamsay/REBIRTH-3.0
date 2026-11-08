@@ -65,4 +65,7 @@
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_recipes.xml"/></if></conditional>
   <!-- Rebirth progression has no use for Legendary Parts. -->
   <conditional><if cond="character_progression('Rebirth')"><remove xpath="/recipes/recipe/ingredient[@name='resourceLegendaryParts']"/></if></conditional>
+  <include filename="_ArmorBonuses/recipes.xml"/>
+  <include filename="_Workstations/ported_station_recipes.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/no_weapon_parts_recipes.xml"/></if></conditional>
 </configs>

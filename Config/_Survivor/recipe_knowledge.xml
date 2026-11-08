@@ -29,6 +29,8 @@
   <recipe name="rebirthFoodPumpkinVegetableSoup" knowledge="recipe.rebirthFoodPumpkinVegetableSoup" legacy_knowledge="knowledge.cooking.basic" category="cooking" literature_item="rebirthRecipePumpkinVegetableSoup" />
   <recipe name="rebirthFoodBlueberryCrumble" knowledge="recipe.rebirthFoodBlueberryCrumble" legacy_knowledge="knowledge.cooking.basic" category="cooking" literature_item="rebirthRecipeBlueberryCrumble" />
   <recipe name="rebirthFoodMushroomPotPie" knowledge="recipe.rebirthFoodMushroomPotPie" legacy_knowledge="knowledge.cooking.basic" category="cooking" literature_item="rebirthRecipeMushroomPotPie" />
+  <recipe name="FuriousRamsayAmmoMachine" knowledge="recipe.FuriousRamsayAmmoMachine" category="construction" literature_item="rebirthSchematicAmmoMachine" />
+  <recipe name="AlchemyTable001_FR" knowledge="recipe.AlchemyTable001_FR" category="construction" literature_item="rebirthSchematicAlchemyTable" />
   <recipe name="cntWoodBurningStove" knowledge="recipe.cntWoodBurningStove" category="construction" literature_item="rebirthSchematicWoodBurningStove" />
   <recipe name="ModHeatMapDetection" knowledge="recipe.ModHeatMapDetection" category="technical" literature_item="rebirthSchematicHeatDetectionModule" />
   <recipe name="armorRogueHelmet" knowledge="pattern.tailoring.rogue_armor" category="tailoring" literature_item="rebirthPatternRogueArmor" />

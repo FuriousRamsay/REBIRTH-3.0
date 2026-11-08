@@ -1384,7 +1384,7 @@
           <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
         <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
-          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" /><sprite name="cookingItemIconBonus" depth="22" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
           <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
           <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
@@ -2942,7 +2942,7 @@
           <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
         <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
-          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" /><sprite name="cookingItemIconBonus" depth="22" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
           <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
           <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
@@ -4500,7 +4500,7 @@
           <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
         <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
-          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" /><sprite name="cookingItemIconBonus" depth="22" width="26" height="26" foregroundlayer="true" visible="false" />
           <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
           <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
           <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">

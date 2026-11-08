@@ -1,0 +1,12 @@
+{
+  "name": "Armor bonuses, kits and looted armor: measured self test",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "console", "args": { "cmd": "rbarmorbonus test" } } },
+    { "wait": 6 },
+    { "expectLog": { "contains": ", 0 failed,", "min": 1 } },
+    { "console": "rbtestgrant scraprewards 2" },
+    { "console": "rbtestgrant patchcheck" },
+    { "expectNoErrors": true }
+  ]
+}

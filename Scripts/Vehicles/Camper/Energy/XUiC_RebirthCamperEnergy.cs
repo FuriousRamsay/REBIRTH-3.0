@@ -200,13 +200,13 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         if((action==RebirthCamperEnergyCommand.Remove||action==RebirthCamperEnergyCommand.Refuel||action==RebirthCamperEnergyCommand.Enabled)&&selected==Guid.Empty)return;
         if(action==RebirthCamperEnergyCommand.PoiLights&&(snapshot?.Mode!=RebirthCamperEnergyMode.Camp||
             (on?!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out _):poi?.IsOn!=true)))
-        {Log.Out("[REBIRTH EnergyFlow] ui-poi-refused on="+on+" mode="+snapshot?.Mode+" busy="+busy+" revision="+Revision);return;}
+        {RebirthCamperEnergyLog.Out("[REBIRTH EnergyFlow] ui-poi-refused on="+on+" mode="+snapshot?.Mode+" busy="+busy+" revision="+Revision);return;}
         int destination=action==RebirthCamperEnergyCommand.Remove&&InputUtils.ShiftKeyPressed?EmptyBackpackSlot():-1;
         if(action==RebirthCamperEnergyCommand.Remove&&InputUtils.ShiftKeyPressed&&destination<0)return;
         command(action,selected,-1,on,destination);
     }
     private void PowerTrace(string stage,string detail)
-    {if(powerTraceCount>=12)return;powerTraceCount++;Log.Out("[REBIRTH EnergyPowerUI] stage="+stage+" "+detail);}
+    {if(powerTraceCount>=12||!RebirthCamperEnergyLog.Enabled)return;powerTraceCount++;Log.Out("[REBIRTH EnergyPowerUI] stage="+stage+" "+detail);}
     private void ObservePowerRequest()
     {
         if(powerObservedSource==Guid.Empty)return;

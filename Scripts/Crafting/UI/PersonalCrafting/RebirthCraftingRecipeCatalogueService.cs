@@ -54,6 +54,25 @@ public sealed class RebirthCraftingRecipeCatalogueService
         return raw.Split(',').Select(area=>area.Trim()=="player"?string.Empty:area.Trim()).ToArray();
     }
 
+    private struct ArmorTier { internal string Name, Icon, Label, Tag; }
+    private static readonly ArmorTier[] ArmorTiers =
+    {
+        new ArmorTier { Name = "rbArmorTierAll", Icon = "ui_game_symbol_shirt", Label = "xuiRebirthArmorTierAll", Tag = null },
+        new ArmorTier { Name = "rbArmorTierLight", Icon = "ui_game_symbol_light_armor", Label = "xuiRebirthArmorTierLight", Tag = "lightArmor" },
+        new ArmorTier { Name = "rbArmorTierMedium", Icon = "ui_game_symbol_armor_leather", Label = "xuiRebirthArmorTierMedium", Tag = "mediumArmor" },
+        new ArmorTier { Name = "rbArmorTierHeavy", Icon = "ui_game_symbol_armor_iron", Label = "xuiRebirthArmorTierHeavy", Tag = "heavyArmor" },
+    };
+    private static bool TryArmorTier(string category, out string tag)
+    {
+        foreach (var tier in ArmorTiers) if (tier.Name == category) { tag = tier.Tag; return true; }
+        tag = null; return false;
+    }
+    private static bool RecipeHasTag(Recipe recipe, string tag)
+    {
+        var item = recipe == null ? null : ItemClass.GetForId(recipe.itemValueType);
+        return item != null && item.ItemTags.Test_AnySet(FastTags<TagGroup.Global>.Parse(tag));
+    }
+
     public void RefreshCategories()
     {
         categories.Clear();
@@ -64,6 +83,16 @@ public sealed class RebirthCraftingRecipeCatalogueService
             ? manager.GetCraftingCategoryDisplayList(owner?.Workstation ?? string.Empty)
             : null;
 
+        // 2.6 Outfit Designer: icons above the recipe search filter armor by tier (owner 2026-11-08).
+        if (string.Equals(owner?.Workstation, "SonjaOutfitDesigner", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var tier in ArmorTiers)
+            {
+                categories.Add(new Category { Name = tier.Name, Icon = tier.Icon, DisplayName = Localization.Get(tier.Label) });
+                categoryDisplayByName[tier.Name] = Localization.Get(tier.Label);
+            }
+            return;
+        }
         if (source == null)
             return;
 
@@ -130,6 +159,8 @@ public sealed class RebirthCraftingRecipeCatalogueService
             filtered = allRecipes.ToList();
             if (favoritesOnly)
                 CraftingManager.GetFavoriteRecipesFromList(ref filtered);
+            else if (TryArmorTier(category, out string tierTag))
+            { if (tierTag != null) filtered.RemoveAll(recipe => !RecipeHasTag(recipe, tierTag)); }
             else if (!string.IsNullOrEmpty(category))
                 XUiM_Recipes.FilterRecipesByCategory(category, ref filtered);
         }
