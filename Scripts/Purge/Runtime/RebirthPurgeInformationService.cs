@@ -59,7 +59,7 @@ internal static class RebirthPurgeInformationService
            (!request.AtReveal&&now<request.NotBefore+10f)||
            (lastBlockedReason==reason&&now<nextBlockedTrace))return;
         lastBlockedReason=reason;nextBlockedTrace=now+30f;
-        Log.Out("[REBIRTH Purge Information] queued="+request.Id+" blocked="+reason);
+        RebirthDebug.Log("purge", "[REBIRTH Purge Information] queued="+request.Id+" blocked="+reason);
     }
     internal static void RestoreReadingOnly(EntityPlayerLocal player,string id)
     {
@@ -120,7 +120,7 @@ internal static class RebirthPurgeInformationService
         foreach(var request in queued)if(ReferenceEquals(request.Player,player)&&request.Id=="PurgeIntro"&&!request.Manual)
         {request.AtReveal=true;request.NotBefore=Time.realtimeSinceStartup;request.ExpiresAt=request.NotBefore+60f;pending.Enqueue(request);}
         foreach(var request in queued)if(!(ReferenceEquals(request.Player,player)&&request.Id=="PurgeIntro"&&!request.Manual))pending.Enqueue(request);
-        if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] reveal entity="+player?.entityId+" queued="+pending.Count);
+        if(RebirthPurgeIntroDiagnostics.Enabled)RebirthDebug.Log("purge", "[REBIRTH Purge Intro] reveal entity="+player?.entityId+" queued="+pending.Count);
         next=0;Pulse();
     }
     internal static void Pulse()
@@ -220,7 +220,7 @@ internal static class RebirthPurgeInformationService
         if(request.RequestedAt>0)
         {
             if(now-request.RequestedAt<2f)return;
-            if(request.Attempts>=3){pending.Dequeue();Log.Out("[REBIRTH Purge Information] open never acknowledged id="+request.Id+"; offered again on next load");return;}
+            if(request.Attempts>=3){pending.Dequeue();RebirthDebug.Log("purge", "[REBIRTH Purge Information] open never acknowledged id="+request.Id+"; offered again on next load");return;}
         }
         if(now<request.NotBefore)return;
         var player=request.Player;
@@ -318,7 +318,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
         base.OnOpen();
         openedAt=Time.realtimeSinceStartup;playerClosed=false;
         if(entry!=null)RebirthPurgeInformationService.Acknowledge(entry.Id);
-        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] opened entity="+xui?.playerUI?.entityPlayer?.entityId+" frame="+Time.frameCount);
+        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)RebirthDebug.Log("purge", "[REBIRTH Purge Intro] opened entity="+xui?.playerUI?.entityPlayer?.entityId+" frame="+Time.frameCount);
         if(title!=null)title.Text=entry?.Title??string.Empty;
         if(body!=null)body.Text=entry?.Body??string.Empty;
         if(art!=null)art.SpriteName=sprite??"ThePurgeTitle";
@@ -326,7 +326,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     }
     public override void OnClose()
     {
-        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)Log.Out("[REBIRTH Purge Intro] closed explicit="+playerClosed+" visibleSeconds="+(Time.realtimeSinceStartup-openedAt));
+        if(entry?.Id=="PurgeIntro")if(RebirthPurgeIntroDiagnostics.Enabled)RebirthDebug.Log("purge", "[REBIRTH Purge Intro] closed explicit="+playerClosed+" visibleSeconds="+(Time.realtimeSinceStartup-openedAt));
         // Dismissal is an explicit player action; see below.
         var player=xui?.playerUI?.entityPlayer;
         if(entry?.Authored==true&&player!=null&&

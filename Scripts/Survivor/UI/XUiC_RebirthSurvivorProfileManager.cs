@@ -811,7 +811,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
         traitOffset = Mathf.Clamp(traitOffset, 0, Math.Max(0, selectedTraitDisplayCount - TraitVisibleRows));
         if (RebirthSurvivorDebug.Enabled)
         {
-            Log.Out("[REBIRTH Survivor][ProfileManager][TraitScroll] render-sync total=" + selectedTraitDisplayCount +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][TraitScroll] render-sync total=" + selectedTraitDisplayCount +
                 " visible=" + TraitVisibleRows + " offset=" + traitOffset +
                 " initialFrames=" + traitNativeInitialSyncFrames);
             StringBuilder traitTrace = new StringBuilder();
@@ -820,7 +820,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
                 if (traceIndex > 0) traitTrace.Append(",");
                 traitTrace.Append(profile.TraitIds[traceIndex]);
             }
-            Log.Out("[REBIRTH Survivor][ProfileManager][Traits] profile='" + (profile != null ? profile.ProfileId : "<none>") +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][Traits] profile='" + (profile != null ? profile.ProfileId : "<none>") +
                 "' stored=" + (profile != null && profile.TraitIds != null ? profile.TraitIds.Count : 0) + " resolved=" + selectedTraitDisplayCount +
                 " offset=" + traitOffset + " ids=" + traitTrace);
         }
@@ -1369,7 +1369,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
         else if (delta < 0f) progressionOffset++;
         progressionOffset = Mathf.Clamp(progressionOffset, 0, Math.Max(0, selectedProgressionDisplayCount - ProgressionVisibleRows));
         if (RebirthSurvivorDebug.Enabled)
-            Log.Out("[REBIRTH Survivor][ProfileManager][ProgressionScroll] wheel delta=" + delta +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][ProgressionScroll] wheel delta=" + delta +
                 " total=" + selectedProgressionDisplayCount + " visible=" + ProgressionVisibleRows +
                 " old=" + oldOffset + " new=" + progressionOffset);
         if (progressionOffset != oldOffset) Render();
@@ -1383,7 +1383,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
         else if (delta < 0f) traitOffset++;
         traitOffset = Mathf.Clamp(traitOffset, 0, Math.Max(0, selectedTraitDisplayCount - TraitVisibleRows));
         if (RebirthSurvivorDebug.Enabled)
-            Log.Out("[REBIRTH Survivor][ProfileManager][TraitScroll] wheel delta=" + delta +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][TraitScroll] wheel delta=" + delta +
                 " total=" + selectedTraitDisplayCount + " visible=" + TraitVisibleRows +
                 " old=" + oldOffset + " new=" + traitOffset);
         if (traitOffset != oldOffset) Render();
@@ -1456,7 +1456,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
         int oldOffset = progressionOffset;
         progressionOffset = requested;
         if (RebirthSurvivorDebug.Enabled)
-            Log.Out("[REBIRTH Survivor][ProfileManager][ProgressionScroll] native normalized=" + normalized +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][ProgressionScroll] native normalized=" + normalized +
                 " total=" + selectedProgressionDisplayCount + " old=" + oldOffset + " new=" + progressionOffset);
         Render();
     }
@@ -1496,7 +1496,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
         int oldOffset = traitOffset;
         traitOffset = requested;
         if (RebirthSurvivorDebug.Enabled)
-            Log.Out("[REBIRTH Survivor][ProfileManager][TraitScroll] native normalized=" + normalized +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProfileManager][TraitScroll] native normalized=" + normalized +
                 " total=" + selectedTraitDisplayCount + " old=" + oldOffset + " new=" + traitOffset);
         Render();
     }

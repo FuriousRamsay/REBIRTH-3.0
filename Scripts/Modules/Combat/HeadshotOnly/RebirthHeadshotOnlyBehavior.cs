@@ -221,7 +221,7 @@ public static class RebirthHeadshotOnlyBehaviorInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(s_harmony, typeof(RebirthHeadshotOnlyDamageResponsePatch));
 
         s_installed = true;
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[Rebirth][HeadshotOnly] Native Headshots Only behavior exceptions installed."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("modules", "[Rebirth][HeadshotOnly] Native Headshots Only behavior exceptions installed."); }
     }
 }
 

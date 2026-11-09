@@ -53,7 +53,7 @@ public static class RebirthHarmonyBootstrap
 
             initialized = true;
             lastError = string.Empty;
-            if (RebirthLogSettings.HarmonyPatchLoggingEnabled) Log.Out("[REBIRTH Harmony] Targeted installer mode active; assembly-wide PatchAll is disabled.");
+            if (RebirthLogSettings.HarmonyPatchLoggingEnabled) RebirthDebug.Log("patching", "[REBIRTH Harmony] Targeted installer mode active; assembly-wide PatchAll is disabled.");
         }
     }
 

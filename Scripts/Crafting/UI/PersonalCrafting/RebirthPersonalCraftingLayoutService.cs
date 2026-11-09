@@ -221,13 +221,29 @@ public sealed class RebirthPersonalCraftingLayoutService
             if (RebirthScrapWindow.Active && !RebirthScrapWindow.IsScrapOnly)
             {
                 SetControllerActive(owner.GetChildById("rebirthCraftingLeftZone"), false);
-                int scrapWidth = Math.Max(1, bodyWidth - ZoneGap);
-                rightWidth = Math.Max(560, (int)Math.Round(scrapWidth * 0.46f));
+                // Modifier Station (armor bonus focus, spec 7.1): the kit's rows take a column on the left.
+                int workspaceWidth = RebirthScrapWindow.IsModifier ? Math.Max(360, Math.Min(440, (int)Math.Round(bodyWidth * 0.26f))) : 0;
+                int workspaceSpace = workspaceWidth > 0 ? workspaceWidth + ZoneGap : 0;
+                int scrapWidth = Math.Max(1, bodyWidth - ZoneGap - workspaceSpace);
+                rightWidth = RebirthScrapWindow.IsModifier ? Math.Max(500, (int)Math.Round(scrapWidth * 0.44f)) : Math.Max(560, (int)Math.Round(scrapWidth * 0.46f));
                 centerWidth = Math.Max(420, scrapWidth - rightWidth);
-                SetZone("rebirthCraftingCenterZone", "rebirthCraftingCenterBackground", "rebirthCraftingCenterFrame", 0, 0, centerWidth, bodyHeight);
-                SetZone("rebirthCraftingRightZone", "rebirthCraftingRightBackground", "rebirthCraftingRightFrame", centerWidth + ZoneGap, 0, rightWidth, bodyHeight);
+                var workspace = owner.GetChildById("rbBonusWorkspace");
+                if (workspace != null)
+                {
+                    SetRect(workspace, 0, 0, workspaceWidth, bodyHeight);
+                    (workspace as XUiC_RebirthBonusWorkspace)?.Place(workspaceWidth, bodyHeight);
+                }
+                SetZone("rebirthCraftingCenterZone", "rebirthCraftingCenterBackground", "rebirthCraftingCenterFrame", workspaceSpace, 0, centerWidth, bodyHeight);
+                SetZone("rebirthCraftingRightZone", "rebirthCraftingRightBackground", "rebirthCraftingRightFrame", workspaceSpace + centerWidth + ZoneGap, 0, rightWidth, bodyHeight);
                 ApplyCenterInternalLayout(centerWidth, bodyHeight);
                 ApplyRightInternalLayout(rightWidth, bodyHeight);
+                // Modifier centre visual (owner 2026-11-08): over the centre panel, from under its header to the backpack.
+                var centre = owner.GetChildById("rbBonusCentre") as XUiC_RebirthBonusCentre;
+                if (centre != null)
+                {
+                    int inventoryTop = owner.GetChildById("rebirthCraftingInventoryRegion")?.ViewComponent?.Position.y ?? -(bodyHeight / 2);
+                    centre.Place(workspaceSpace + 12, -50, centerWidth - 24, Math.Max(220, -inventoryTop - 62));
+                }
                 // Kits apply at once, so the Modifier Station has nothing to queue.
                 if (RebirthScrapWindow.IsModifier) SetControllerActive(owner.GetChildById("rebirthCraftingQueueRegion"), false);
             }
@@ -306,7 +322,7 @@ public sealed class RebirthPersonalCraftingLayoutService
             return;
 
         lastLayoutDiagnosticKey = key;
-        Log.Out("[REBIRTH Crafting Layout] anchor=Center screen=" + screen.x + "x" + screen.y
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting Layout] anchor=Center screen=" + screen.x + "x" + screen.y
             + " rootPos=" + rootPosition.x + "," + rootPosition.y
             + " rootSize=" + rootSize.x + "x" + rootSize.y
             + " edges=" + left + "," + top + ".." + right + "," + bottom
@@ -585,13 +601,14 @@ public sealed class RebirthPersonalCraftingLayoutService
                 bool scrapInput=RebirthScrapWindow.Active;
                 if(scrapInput && width>=480)
                 {
-                    int inputX=tools==null?8:244;
+                    // The Modifier input sits a little further right of the tools (owner 2026-11-08).
+                    int inputX=tools==null?8:(RebirthScrapWindow.IsModifier?284:244);
                     int inputWidth=width-inputX-8;
                     SetRect(input,inputX,-42,inputWidth,204);
                     int textX=RebirthScrapWindow.IsModifier?162:82;
                     SetRect(input.GetChildById("recyclerGate"),textX,-46,inputWidth-textX-8,RebirthScrapWindow.IsScrapOnly?75:26);
                     SetRect(input.GetChildById("recyclerYield"),textX,-74,inputWidth-textX-8,126);
-                    foreach(var id in new[]{"recyclerGate","recyclerYield"}){var text=input.GetChildById(id)?.ViewComponent;bool want=!RebirthScrapWindow.IsScrapOnly||id=="recyclerGate";if(text!=null&&text.IsVisible!=want)text.IsVisible=want;}
+                    foreach(var id in new[]{"recyclerGate","recyclerYield"}){var text=input.GetChildById(id)?.ViewComponent;bool want=!RebirthScrapWindow.IsModifier&&(!RebirthScrapWindow.IsScrapOnly||id=="recyclerGate"); /* Modifier: bonuses and messages show in the workspace */ if(text!=null&&text.IsVisible!=want)text.IsVisible=want;}
                     if(input.GetChildById("recyclerGate")?.ViewComponent is XUiV_Label wideHelp&&RebirthScrapWindow.IsScrapOnly)RebirthRecyclingHelpText.Style(wideHelp);
                     top=Math.Max(top,250);
                 }
@@ -652,12 +669,17 @@ public sealed class RebirthPersonalCraftingLayoutService
 
     /// <summary>Recycler and Shredder (owner 2026-11-08): the 2.6 scrap output list gets its own panel in the space the
     /// queue left under the station panel. The panel lives in the recycling input, so it is placed relative to it.</summary>
-    private static void CenterLabel(XUiController controller, UIWidget.Pivot pivot, int x, int width)
+    // Owner 2026-11-08: names and counts vertically centred, counts right aligned. The label keeps its top-left pivot
+    // (changing the pivot moved the text box off the card) and aligns its text inside the box; the text top sits so
+    // the capitals are centred in the row: half the row minus about 0.45 of the font size.
+    private static void CenterLabel(XUiController controller, NGUIText.Alignment alignment, int left, int width, int rowHeight)
     {
         if (!(controller?.ViewComponent is XUiV_Label label)) return;
-        if (label.Pivot != pivot) label.Pivot = pivot;
-        var size = new Vector2i(width, 24); if (label.Size != size) label.Size = size;
-        var position = new Vector2i(x, -15); if (label.Position != position) label.Position = position;
+        if (label.Pivot != UIWidget.Pivot.TopLeft) label.Pivot = UIWidget.Pivot.TopLeft;
+        if (label.label != null && label.label.alignment != alignment) label.label.alignment = alignment;
+        int font = label.FontSize > 0 ? label.FontSize : 18;
+        var size = new Vector2i(Math.Max(1, width), font + 6); if (label.Size != size) label.Size = size;
+        var position = new Vector2i(left, -(int)Math.Round(rowHeight / 2f - font * 0.45f)); if (label.Position != position) label.Position = position;
     }
 
     private void PlaceScrapPreview(int width, int top, int height)
@@ -691,9 +713,9 @@ public sealed class RebirthPersonalCraftingLayoutService
             SetRect(row.GetChildById("scrapRowIcon" + i), 4, -3, 24, 24);
             // Owner 2026-11-08: no time column; the name uses that space, larger and vertically centred.
             // Anchored at their middle and placed on the row's centre line, so the text is vertically centred.
-            CenterLabel(row.GetChildById("scrapRowName" + i), UIWidget.Pivot.Left, 32, Math.Max(40, colWidth - 86));
+            CenterLabel(row.GetChildById("scrapRowName" + i), NGUIText.Alignment.Left, 32, Math.Max(40, colWidth - 32 - 60), 30);
             var timeView = row.GetChildById("scrapRowTime" + i)?.ViewComponent; if (timeView != null && timeView.IsVisible) timeView.IsVisible = false;
-            CenterLabel(row.GetChildById("scrapRowCount" + i), UIWidget.Pivot.Right, colWidth - 6, 44);
+            CenterLabel(row.GetChildById("scrapRowCount" + i), NGUIText.Alignment.Right, colWidth - 6 - 54, 54, 30);
         }
     }
 

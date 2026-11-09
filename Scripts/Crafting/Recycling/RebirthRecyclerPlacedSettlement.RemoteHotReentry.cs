@@ -16,9 +16,14 @@ internal static partial class RebirthRecyclerPlacedSettlement
             Station=loaded.Station;PendingReentry=loaded;ColdPhase=OwnerCheckpoint?.Phase??0;ColdCompleted=OwnerCheckpoint?.Completed??0;return true;
         }
     }
+    // Per frame: no closure or arrays without remote originals (profiler 2026-11-08).
     private static void RecoverRemoteRecyclerHot(World world)
     {
-        if(world?.IsRemote()!=false)return;
+        if(world?.IsRemote()!=false||remoteRecyclerOriginals.Count==0)return;
+        RecoverRemoteRecyclerHotCore(world);
+    }
+    private static void RecoverRemoteRecyclerHotCore(World world)
+    {
         LoadedStation[] candidates;lock(coldStationGate)candidates=loadedRecyclerStations.Where(value=>!value.Adopted&&value.SameWorld(world)).ToArray();
         foreach(var source in remoteRecyclerOriginals.Values.ToArray())
         {

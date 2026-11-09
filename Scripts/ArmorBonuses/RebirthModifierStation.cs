@@ -104,9 +104,7 @@ internal static class RebirthKitGridAdmission
 public sealed class XUiC_RebirthModifierPanel : XUiController
 {
     private XUiC_RebirthKitInputGrid grid;
-    private XUiV_Label status, bonuses;
     private string message = string.Empty;
-    private float nextPoll;
     private readonly Random random = new Random();
     internal static XUiC_RebirthModifierPanel Current { get; private set; }
 
@@ -114,8 +112,6 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
     {
         base.Init();
         grid = GetChildByType<XUiC_RebirthKitInputGrid>();
-        status = GetChildById("recyclerGate")?.ViewComponent as XUiV_Label;
-        bonuses = GetChildById("recyclerYield")?.ViewComponent as XUiV_Label;
         var apply = GetChildById("btnEnchant") as XUiC_SimpleButton;
         if (apply != null) apply.OnPressed += delegate { Apply(); };
     }
@@ -133,24 +129,19 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
         base.OnClose();
     }
 
-    public override void Update(float dt)
-    {
-        base.Update(dt);
-        if (windowGroup?.isShowing != true || Time.unscaledTime < nextPoll) return;
-        nextPoll = Time.unscaledTime + 0.25f;
-        var slots = grid?.GetSlots();
-        ItemValue item = null;
-        if (slots != null)
-            foreach (var slot in slots)
-                if (slot != null && !slot.IsEmpty() && !RebirthArmorBonusKits.IsKit(slot.itemValue)) { item = slot.itemValue; break; }
-        if (bonuses != null) bonuses.Text = item != null ? RebirthArmorBonusText.DescribeAll(item) : string.Empty;
-        if (status != null) status.Text = message.Length > 0 ? message : Localization.Get("xuiEnchantSlotHint");
-    }
+    // The bonus list, hint and messages show in the workspace column (XUiC_RebirthBonusWorkspace).
 
-    private void Apply()
+    private void Apply() => Apply(windowGroup?.Controller?.GetChildByType<XUiC_RebirthBonusWorkspace>()?.BuildRequest());
+
+    /// <summary>The last refusal, shown by the workspace (empty after a successful apply or on open).</summary>
+    internal string Message => message;
+    internal void ClearMessage() => message = string.Empty;
+
+    /// <summary>Applies the kit with the player's choices (null = no focus). The console test command calls this too.</summary>
+    internal void Apply(RebirthArmorBonusKitRequest request)
     {
         var station = (windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity;
-        var slots = grid?.GetSlots();
+        var slots = grid?.GetItemStackControllers()?.Select(c => c?.ItemStack ?? ItemStack.Empty.Clone()).ToArray(); // what the slots show, not the cached array
         if (station == null || slots == null || slots.Length < 2) { Fail("xuiEnchantSlotsUnavailable"); return; }
         grid.UpdateBackend(slots);
 
@@ -158,16 +149,25 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
         if (GameManager.Instance.World.IsRemote())
         {
             var player = xui.playerUI.entityPlayer;
-            SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthModifierApply>().Setup(player.entityId, station.ToWorldPos()));
+            SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthModifierApply>().Setup(player.entityId, station.ToWorldPos(), request));
             return;
         }
-        string failKey;
-        if (!RebirthModifierStationService.TryApply(station, random, out failKey)) { Fail(failKey); return; }
-        Show(station.Input, station.Output);
+        string failKey, before, after;
+        if (!RebirthModifierStationService.TryApply(station, request, xui.playerUI.entityPlayer, random, out failKey, out before, out after)) { Fail(failKey); return; }
+        Show(station.Input, station.Output, before, after);
     }
 
-    internal void Show(ItemStack[] input, ItemStack[] output)
+    /// <summary>Bonuses before and after the last applied kit (raw rbArmorBonus text), for the result card.</summary>
+    internal string LastBefore = string.Empty, LastAfter = string.Empty;
+    /// <summary>Counts successful applies, so the workspace shows each result card once.</summary>
+    internal int ResultVersion;
+
+    internal void Show(ItemStack[] input, ItemStack[] output, string before, string after)
     {
+        LastBefore = before ?? string.Empty;
+        LastAfter = after ?? string.Empty;
+        ResultVersion++;
+        RebirthDebug.Log("armorbonuses", "[REBIRTH Modifier] applied: before [" + LastBefore + "] after [" + LastAfter + "]");
         grid.SetSlots(input);
         windowGroup.Controller.GetChildByType<XUiC_WorkstationOutputGrid>()?.SetSlots(output);
         message = string.Empty;
@@ -183,6 +183,7 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
     internal void Fail(string key)
     {
         message = Localization.Get(key);
+        RebirthDebug.Log("armorbonuses", "[REBIRTH Modifier] refused: " + key);
         GameManager.ShowTooltip(xui.playerUI.entityPlayer, message, string.Empty, "ui_denied");
     }
 }
@@ -193,8 +194,16 @@ public static class RebirthModifierStationService
     private const string RequiredTool = "FuriousRamsayHammerPliers";
 
     public static bool TryApply(TileEntityWorkstation station, Random random, out string failKey)
+        => TryApply(station, null, null, random, out failKey, out _, out _);
+
+    /// <summary>The player's effective Tailoring, which gates focus depth (spec 3.1). 0 when unknown.</summary>
+    public static float TailoringOf(EntityPlayer player) =>
+        player != null && RebirthSkillOutcomeValueService.TryGetEffective(player, "skill.tailoring", out float value) ? value : 0f;
+
+    public static bool TryApply(TileEntityWorkstation station, RebirthArmorBonusKitRequest request, EntityPlayer player, Random random, out string failKey, out string before, out string after)
     {
         failKey = null;
+        before = after = string.Empty;
         var slots = station.Input;
         if (slots == null || slots.Length < 2) { failKey = "xuiEnchantSlotsUnavailable"; return false; }
 
@@ -210,7 +219,9 @@ public static class RebirthModifierStationService
         if (free < 0) { failKey = "xuiEnchantOutputFull"; return false; }
 
         ItemValue result;
-        if (!RebirthArmorBonusKits.TryApply(slots[kitIndex].itemValue, slots[itemIndex].itemValue, random, out result, out failKey)) return false;
+        if (!RebirthArmorBonusKits.TryApply(slots[kitIndex].itemValue, slots[itemIndex].itemValue, request, TailoringOf(player), random, out result, out failKey)) return false;
+        before = RebirthArmorBonusKitRequest.BonusText(slots[itemIndex].itemValue);
+        after = RebirthArmorBonusKitRequest.BonusText(result);
 
         // Nothing is consumed unless the kit applied.
         outputs[free] = new ItemStack(result, 1);
@@ -231,13 +242,16 @@ public sealed class NetPackageRebirthModifierApply : NetPackage
     private static readonly Random random = new Random();
     private int playerEntityId;
     private Vector3i position;
+    private RebirthArmorBonusKitRequest request;
+    private bool malformed;
 
     public override NetPackageDirection PackageDirection => NetPackageDirection.ToServer;
 
-    public NetPackageRebirthModifierApply Setup(int playerId, Vector3i stationPosition)
+    public NetPackageRebirthModifierApply Setup(int playerId, Vector3i stationPosition, RebirthArmorBonusKitRequest kitRequest = null)
     {
         playerEntityId = playerId;
         position = stationPosition;
+        request = kitRequest;
         return this;
     }
 
@@ -246,6 +260,13 @@ public sealed class NetPackageRebirthModifierApply : NetPackage
         var b = (System.IO.BinaryReader)reader;
         playerEntityId = b.ReadInt32();
         position = StreamUtils.ReadVector3i(b);
+        malformed = false;
+        request = null;
+        if (b.ReadBoolean())
+        {
+            try { request = RebirthArmorBonusKitRequest.Read(b); } catch (Exception) { request = null; }
+            malformed = request == null;
+        }
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -254,6 +275,8 @@ public sealed class NetPackageRebirthModifierApply : NetPackage
         var b = (System.IO.BinaryWriter)writer;
         b.Write(playerEntityId);
         StreamUtils.Write(b, position);
+        b.Write(request != null);
+        request?.Write(b);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
@@ -263,12 +286,14 @@ public sealed class NetPackageRebirthModifierApply : NetPackage
         var station = world.GetTileEntity(position) as TileEntityWorkstation;
         if (player == null || station == null || station.block?.GetBlockName() != "ModifierStation") return;
         if ((player.position - position.ToVector3()).sqrMagnitude > MaximumDistance * MaximumDistance) return;
-        string failKey;
-        bool applied = RebirthModifierStationService.TryApply(station, random, out failKey);
-        Sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthModifierResult>().Setup(position, applied, failKey, station.Input, station.Output));
+        string failKey, before = string.Empty, after = string.Empty;
+        bool applied;
+        if (malformed) { applied = false; failKey = "xuiEnchantRequestInvalid"; }
+        else applied = RebirthModifierStationService.TryApply(station, request, player, random, out failKey, out before, out after);
+        Sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthModifierResult>().Setup(position, applied, failKey, station.Input, station.Output, before, after));
     }
 
-    public int GetLength() => 20;
+    public int GetLength() => 1024;
 }
 
 [Preserve]
@@ -278,11 +303,14 @@ public sealed class NetPackageRebirthModifierResult : NetPackage
     private bool applied;
     private string failKey;
     private ItemStack[] input, output;
+    private string before = string.Empty, after = string.Empty;
 
     public override NetPackageDirection PackageDirection => NetPackageDirection.ToClient;
 
-    public NetPackageRebirthModifierResult Setup(Vector3i stationPosition, bool wasApplied, string failure, ItemStack[] inputStacks, ItemStack[] outputStacks)
+    public NetPackageRebirthModifierResult Setup(Vector3i stationPosition, bool wasApplied, string failure, ItemStack[] inputStacks, ItemStack[] outputStacks, string bonusesBefore = null, string bonusesAfter = null)
     {
+        before = bonusesBefore ?? string.Empty;
+        after = bonusesAfter ?? string.Empty;
         position = stationPosition;
         applied = wasApplied;
         failKey = failure ?? string.Empty;
@@ -299,6 +327,8 @@ public sealed class NetPackageRebirthModifierResult : NetPackage
         failKey = b.ReadString();
         input = GameUtils.ReadItemStack(reader);
         output = GameUtils.ReadItemStack(reader);
+        before = b.ReadString();
+        after = b.ReadString();
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -310,6 +340,8 @@ public sealed class NetPackageRebirthModifierResult : NetPackage
         b.Write(failKey);
         GameUtils.WriteItemStack(writer, input);
         GameUtils.WriteItemStack(writer, output);
+        b.Write(before);
+        b.Write(after);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
@@ -320,12 +352,12 @@ public sealed class NetPackageRebirthModifierResult : NetPackage
         {
             var station = world?.GetTileEntity(position) as TileEntityWorkstation;
             if (station != null) { station.Input = input; station.Output = output; }
-            panel.Show(input, output);
+            panel.Show(input, output, before, after);
         }
         else panel.Fail(failKey);
     }
 
-    public int GetLength() => 256;
+    public int GetLength() => 1024;
 }
 
 [Preserve]
@@ -396,14 +428,24 @@ public sealed class XUiC_RebirthModifierSlot : XUiC_RequiredItemStack
 {
     private RebirthSlotPalette palette;
     public override void Init() { base.Init(); palette = new RebirthSlotPalette(this); }
+
+    // In the native slot template "highlightOverlay" is the filled background and takes {backgroundcolor}; "backgroundMain"
+    // is only the frame. So the 2.6 rarity colour goes into {backgroundcolor} and the frame stays normal (owner 2026-11-08:
+    // the frame was coloured and the background stayed grey).
     public override bool GetBindingValueInternal(ref string value, string name)
     {
-        if (name == "backgroundcolor") { value = RebirthSlotPalette.Normal; return true; }
+        if (name == "backgroundcolor")
+        {
+            var rarity = RebirthArmorRarityVisuals.Fill(this);
+            value = rarity.HasValue ? rarity.Value.r + "," + rarity.Value.g + "," + rarity.Value.b + "," + rarity.Value.a : RebirthSlotPalette.Normal;
+            return true;
+        }
         return base.GetBindingValueInternal(ref value, name);
     }
+
     public override void Update(float dt)
     {
         base.Update(dt);
-        palette?.Apply(false);
+        palette?.Apply(false); // frame dark, fill = rarity colour or the normal slot colour
     }
 }

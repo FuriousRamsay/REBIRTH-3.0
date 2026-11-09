@@ -552,7 +552,7 @@ public class NetPackageRequestCropGrowthDiagnosticRebirth : NetPackage
             durationSeconds,
             intervalSeconds,
             cropPositions);
-        Log.Out(result);
+        RebirthDebug.Log("advancedfarming", result);
         SendAck(AdvancedFarmingCropGrowthDiagnosticService.AdmissionRevision!=priorAdmission&&AdvancedFarmingCropGrowthDiagnosticService.IsActive(sessionId,"SERVER",playerEntityId),cropPositions != null ? cropPositions.Length : 0,result);
     }
 
@@ -609,7 +609,7 @@ public class NetPackageCropGrowthDiagnosticAckRebirth : NetPackage
 
     public override void ProcessPackage(World _world, GameManager _callbacks)
     {
-        Log.Out("[AdvancedFarming GrowthTest] SERVER_ACK"
+        RebirthDebug.Log("advancedfarming", "[AdvancedFarming GrowthTest] SERVER_ACK"
             + " session=" + sessionId
             + " accepted=" + accepted
             + " cropCount=" + cropCount

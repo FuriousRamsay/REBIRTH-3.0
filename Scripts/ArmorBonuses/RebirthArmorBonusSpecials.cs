@@ -54,8 +54,11 @@ internal static class RebirthArmorBonusSpecials
     // Applied to movement drain only, so resting recovery stays as it is.
     internal static float StaminaDrainFactor(EntityAlive entity)
     {
-        if (entity.IsCrouching && entity.CurrentMovementTag.Test_AnySet(Running) && Best(entity, EquipmentSlots.Feet, "sneak_sprint") > 0f) return 0f;
-        return Mathf.Clamp01(1f - Best(entity, EquipmentSlots.Feet, "movement_stamina"));
+        float drain = Mathf.Clamp01(1f - Best(entity, EquipmentSlots.Feet, "movement_stamina"));
+        // Sneak sprinting removes its share of the drain while crouch-sprinting (owner 2026-11-08: levels; 1 = no drain).
+        if (entity.IsCrouching && entity.CurrentMovementTag.Test_AnySet(Running))
+            drain *= Mathf.Clamp01(1f - Best(entity, EquipmentSlots.Feet, "sneak_sprint"));
+        return drain;
     }
 
     internal static bool IsSneakHit(EntityAlive target, EntityPlayer attacker)

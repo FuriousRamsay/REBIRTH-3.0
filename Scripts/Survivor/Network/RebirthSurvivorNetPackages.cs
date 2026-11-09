@@ -159,6 +159,9 @@ public sealed class NetPackageRebirthSurvivorStateRequest : NetPackage
     private bool force;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToServer; } }
 
+    internal const int PreSpawnEntityId = -1;
+    private static readonly System.Collections.Generic.HashSet<int> LoggedPreSpawn = new System.Collections.Generic.HashSet<int>();
+
     public NetPackageRebirthSurvivorStateRequest Setup(int entityId, long revision, bool forceRefresh)
     {
         protocolVersion = RebirthSurvivorNetworkProtocol.Version;
@@ -194,6 +197,17 @@ public sealed class NetPackageRebirthSurvivorStateRequest : NetPackage
         {
             Log.Warning("[REBIRTH Survivor] rejected owner-state request protocol mismatch entity=" + playerEntityId
                 + " client=" + protocolVersion + " server=" + RebirthSurvivorNetworkProtocol.Version);
+            return;
+        }
+        // Owner 2026-11-09: a joining client asks before it has a player entity (entity -1); answer that
+        // connection directly so the Survivor chooser can show on the spawn screen.
+        if (playerEntityId == PreSpawnEntityId)
+        {
+            if (Sender == null) return;
+            bool sent = RebirthSurvivorNetworkService.SendOwnerState(Sender, 0L, true, "client-pre-spawn-request");
+            if (LoggedPreSpawn.Add(Sender.entityId))
+                RebirthDebug.Log("survivor", "[REBIRTH Survivor] pre-spawn character state request entity=" + Sender.entityId + " answered=" + sent
+                    + " serverAuthority=" + RebirthWorldCharacterRepository.IsServerAuthority + " mode=" + RebirthSurvivorMode.ConfiguredMode);
             return;
         }
         if (!ValidEntityIdForSender(playerEntityId)) return;

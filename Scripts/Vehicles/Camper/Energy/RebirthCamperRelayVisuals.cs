@@ -109,7 +109,7 @@ internal static class RebirthCamperRelayVisuals
         }
         // Appearance owns this group's activation and the same station opacity.
         binding.Group=group;binding.Reason=null;
-        Log.Out("[Camper relays] vehicle "+vehicle.entityId+" mounted both native relay endpoints; station fade and deployed Camp interaction");
+        RebirthDebug.Log("vehicles", "[Camper relays] vehicle "+vehicle.entityId+" mounted both native relay endpoints; station fade and deployed Camp interaction");
     }
 }
 

@@ -138,6 +138,9 @@ internal static partial class RebirthRecyclerPlacedSettlement
                 (string)retired.Attribute("original")==RebirthStationPublicationRecord.Digest(Encoding.UTF8.GetBytes(original.ToString(SaveOptions.DisableFormatting)));
         }
     }
+    // Per frame: no closure or array when empty (profiler 2026-11-08).
     private static void SweepJoinedRecyclerOwners(World world)
+    {if(joinedRecyclerOwners.Count==0)return;SweepJoinedRecyclerOwnersCore(world);}
+    private static void SweepJoinedRecyclerOwnersCore(World world)
     {foreach(var source in joinedRecyclerOwners.Where(value=>!ReferenceEquals(value.World,world)||value.Connection.IsDisconnected()).ToArray())source.Dispose();}
 }

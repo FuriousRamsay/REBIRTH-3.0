@@ -86,7 +86,7 @@ internal static class RebirthCamperEnergyAccess
             {
                 var snapshot=RebirthCamperEnergyRuntime.Observe(session.Vehicle);
                 long afterRuntime=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
-                var poi=RebirthCamperEnergyDeviceAdapter.ObservePoi(session.Vehicle);
+                var poi=RebirthCamperEnergyDeviceAdapter.ObservePoiForWindow(session.Vehicle);
                 long afterPoi=measure?System.Diagnostics.Stopwatch.GetTimestamp():0;
                 bool busy=Busy(session.Vehicle);
                 bool bounds=CanShowBounds(session.Vehicle,session.Player);
@@ -101,7 +101,7 @@ internal static class RebirthCamperEnergyAccess
                     runtimeMs=(afterRuntime-started)*ms;poiMs=(afterPoi-afterRuntime)*ms;
                     statusMs=(afterStatus-afterPoi)*ms;presentMs=(end-afterStatus)*ms;
                     if((end-started)*ms>=12)
-                        Log.Out("[REBIRTH EnergyPerf] refresh frame="+UnityEngine.Time.frameCount+
+                        RebirthDebug.Log("vehicles", "[REBIRTH EnergyPerf] refresh frame="+UnityEngine.Time.frameCount+
                             " totalMs="+((end-started)*ms).ToString("F2")+
                             " runtimeMs="+((afterRuntime-started)*ms).ToString("F2")+
                             " poiMs="+((afterPoi-afterRuntime)*ms).ToString("F2")+
@@ -321,7 +321,7 @@ internal static class RebirthCamperEnergyAccess
         if(!Current(s))return;
         bool canShow=CanShowBounds(s.Vehicle,s.Player);if(!canShow)s.BoundsShown=false;
         s.Sender.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCamperEnergySnapshot>().Setup(s.Token,s.Vehicle.entityId,
-            RebirthCamperEnergySnapshotWire.Write(RebirthCamperEnergyRuntime.Observe(s.Vehicle),RebirthCamperEnergyDeviceAdapter.ObservePoi(s.Vehicle),s.Wait!=null||Busy(s.Vehicle),s.Status,canShow,s.BoundsShown,RebirthCamperEnergyCapacity.ForActor(s.Player))));
+            RebirthCamperEnergySnapshotWire.Write(RebirthCamperEnergyRuntime.Observe(s.Vehicle),RebirthCamperEnergyDeviceAdapter.ObservePoiForWindow(s.Vehicle),s.Wait!=null||Busy(s.Vehicle),s.Status,canShow,s.BoundsShown,RebirthCamperEnergyCapacity.ForActor(s.Player))));
     }
     internal static void Present(Guid token,int entity,byte[] bytes)
     {

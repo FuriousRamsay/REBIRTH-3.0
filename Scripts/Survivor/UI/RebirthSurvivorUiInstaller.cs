@@ -51,7 +51,7 @@ public static class RebirthSurvivorUiInstaller
         contextReady &= PatchOptionalContext(typeof(RebirthContextHiddenTransferPatch));
         RebirthContextNavigationService.IntegrationReady = contextReady;
         if (RebirthSurvivorDebug.Enabled)
-            Log.Out("[REBIRTH Container UI] integrationReady=" + contextReady + " layout=approved-11x11-v19");
+            RebirthDebug.Log("survivor", "[REBIRTH Container UI] integrationReady=" + contextReady + " layout=approved-11x11-v19");
         installed = true;
         return "survivor profile/creator/character/backpack UI integration installed + integrated native spawn-profile browser + native ESC ownership + staged-commit patch";
     }

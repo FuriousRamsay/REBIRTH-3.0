@@ -1112,7 +1112,7 @@ public static partial class RebirthDogLifecycleService
         RebirthNpcAggregatePersistenceStore.Save();
         RebirthDogChunkObserverService.Release(id);
         RebirthDogCapacitySyncService.NotifyOwner(capacityOwner);
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] non-terminal death entity=" + dog.entityId + " stableId=" + id +
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] non-terminal death entity=" + dog.entityId + " stableId=" + id +
                 " reason=" + (reason ?? string.Empty) + " awaitingRespawn=true"); }
         return true;
     }
@@ -1187,7 +1187,7 @@ public static partial class RebirthDogLifecycleService
             if (r.Dog != null) r.Dog.RespawnFallback = parkPosition;
         });
         RebirthNpcAggregatePersistenceStore.Save();
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] parked awaiting-respawn entity=" + dog.entityId + " stableId=" + stableId +
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] parked awaiting-respawn entity=" + dog.entityId + " stableId=" + stableId +
                 " source=" + parkSource + " pos=" + parkPosition); }
     }
 
@@ -1386,7 +1386,7 @@ public static partial class RebirthDogLifecycleService
         RebirthDogChunkObserverService.Release(stableId);
         RebirthDogCapacitySyncService.NotifyOwner(player);
         reason = "restored to AwaitingRespawn; use Report for Duty from the Companions window";
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] recovered legacy killall record stableId=" + stableId + " owner=" + ownerId); }
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] recovered legacy killall record stableId=" + stableId + " owner=" + ownerId); }
         return true;
     }
 
@@ -1499,7 +1499,7 @@ public static partial class RebirthDogLifecycleService
         RebirthDogChunkObserverService.Release(stableId);
         RebirthDogCapacitySyncService.NotifyOwner(player);
         reason = Localization.Get("xuiRebirthDogDismissSuccess");
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] dismissed missing dog stableId=" + stableId + " formerOwner=" + ownerId); }
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] dismissed missing dog stableId=" + stableId + " formerOwner=" + ownerId); }
         return true;
     }
 
@@ -2040,7 +2040,7 @@ public static partial class RebirthDogLifecycleService
         if (repaired.Succeeded)
         {
             dog.SetSpawnerSource(EnumSpawnerSource.StaticSpawner);
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] restored live owner projection from persistent record entity=" + dog.entityId +
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] restored live owner projection from persistent record entity=" + dog.entityId +
                 " stableId=" + state.StableId + " owner=" + durableOwner); }
         }
         else
@@ -2284,7 +2284,7 @@ public static partial class RebirthDogLifecycleService
         {
             RebirthNpcAggregatePersistenceStore.Save();
             RebirthNpcStableIdentityStore.Save();
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] ghost repair completed owner=" + ownerId +
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] ghost repair completed owner=" + ownerId +
                 " repaired=" + repaired + " trigger=" + (trigger ?? string.Empty)); }
         }
         return repaired;
@@ -2504,7 +2504,7 @@ public static partial class RebirthDogLifecycleService
             reason = "repaired";
             RebirthCompanionRecallDebug.TraceGhostReconstruction(stableId, previousEmbodimentGeneration,
                 unchecked(previousEmbodimentGeneration + 1U), persistedHealth, created, trigger);
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] reconstructed missing Active dog stableId=" + stableId +
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] reconstructed missing Active dog stableId=" + stableId +
                 " entity=" + created.entityId + " breed=" + dogRecord.BreedId +
                 " order=" + order + " pos=" + created.position +
                 " trigger=" + (trigger ?? string.Empty)); }
@@ -2716,7 +2716,7 @@ public static partial class RebirthDogLifecycleService
         {
             RebirthNpcAggregatePersistenceStore.Save();
             RebirthDogCapacitySyncService.NotifyOwner(player);
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Dog] v285 repaired v284 false reconstruction deaths owner=" + ownerId +
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH Dog] v285 repaired v284 false reconstruction deaths owner=" + ownerId +
                 " recovered=" + recovered); }
         }
         return recovered;

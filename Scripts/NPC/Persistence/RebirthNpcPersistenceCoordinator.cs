@@ -120,7 +120,7 @@ public static partial class RebirthNpcPersistenceTimelineService
                 newestCheckpoint = 0UL;
                 restoredCheckpoint = 0UL;
                 lastDetail = "legacy/untracked sidecars; first v237 checkpoint not written yet";
-                { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC Timeline] " + lastDetail + " worldTime=" + currentWorldTime.ToString(CultureInfo.InvariantCulture)); }
+                { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH NPC Timeline] " + lastDetail + " worldTime=" + currentWorldTime.ToString(CultureInfo.InvariantCulture)); }
                 return;
             }
 

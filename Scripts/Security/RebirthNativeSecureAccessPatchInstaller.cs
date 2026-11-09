@@ -27,7 +27,7 @@ public static class RebirthNativeSecureAccessPatchInstaller
             RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthSecureAccessDronePatch));
             RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthSecureAccessVendingMachinePatch));
             installed = true;
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH SecureAccess] Extended four explicit 3.1 native lock implementations."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("security", "[REBIRTH SecureAccess] Extended four explicit 3.1 native lock implementations."); }
         }
         catch
         {

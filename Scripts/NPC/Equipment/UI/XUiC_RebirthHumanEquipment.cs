@@ -46,7 +46,7 @@ public sealed class XUiC_RebirthHumanEquipment:XUiController
         if(summaryDone||summaryFrame==0||Time.frameCount<summaryFrame||npc==null)return;
         summaryDone=true;summaryFrame=0;
         float now=Time.realtimeSinceStartup;
-        Log.Out("[REBIRTH NPC Equipment] model ms: snapshot="+(snapshotAt<0f||openAt<0f?-1:(int)((snapshotAt-openAt)*1000f))+
+        RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] model ms: snapshot="+(snapshotAt<0f||openAt<0f?-1:(int)((snapshotAt-openAt)*1000f))+
             " prepare="+(modelBinder?.LastPrepareMs??0)+" finish="+(modelBinder?.LastFinishMs??0)+" bind="+summaryBindMs+
             " firstPaint="+(openAt<0f?-1:(int)((now-openAt)*1000f))+" mode="+summaryMode+" entity="+npc.entityId);
     }
@@ -226,7 +226,7 @@ public sealed class XUiC_RebirthHumanEquipment:XUiController
         {
             if(failedToken!=token){failedToken=token;modelAttempts=0;}
             // One log line per NPC+token; at most 3 attempts, then the placeholder stays until the gear token changes.
-            if(modelAttempts++==0)Log.Out("[REBIRTH NPC Equipment UI] model preview ms="+totalMs+" ok=False entity="+npc.entityId);
+            if(modelAttempts++==0)RebirthDebug.Log("npc", "[REBIRTH NPC Equipment UI] model preview ms="+totalMs+" ok=False entity="+npc.entityId);
         }
     }
     // dispose=false (tab hide / mode change): Suspend keeps the finished image for a cheap reopen of the same NPC and gear.

@@ -69,7 +69,7 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
     {
         var owner=ActiveInstance;
         string prefix="[REBIRTH Minimap Diagnostic PC226] ";
-        System.Action<string> report=message=>{SdtdConsole.Instance.Output(prefix+message);Log.Out(prefix+message);};
+        System.Action<string> report=message=>{SdtdConsole.Instance.Output(prefix+message);RebirthDebug.Log("ui", prefix+message);};
         if(owner==null){report("No active minimap controller.");return;}
         report("phase="+phase+" ready="+owner.ready+" visible="+owner.ViewComponent.IsVisible+" subscribed="+owner.subscribed+" requestedOpacity="+TerrainOpacity);
         var widget=owner.xuiTexture?.UiTransform?.GetComponent<UITexture>();
@@ -181,7 +181,7 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
             {
                 SaveZoom();
                 RefreshTerrain(p);
-                { if (RebirthLogSettings.UiRouteLoggingEnabled) Log.Out("[REBIRTH Minimap Zoom] zoomScale="+userZoom.ToString("0.000000",System.Globalization.CultureInfo.InvariantCulture)); }
+                { if (RebirthLogSettings.UiRouteLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH Minimap Zoom] zoomScale="+userZoom.ToString("0.000000",System.Globalization.CultureInfo.InvariantCulture)); }
             }
             zoomScale=targetZoomScale=userZoom;
         }

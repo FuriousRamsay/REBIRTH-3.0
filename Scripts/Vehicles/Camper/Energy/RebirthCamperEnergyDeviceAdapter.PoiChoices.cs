@@ -5,13 +5,27 @@ using UnityEngine;
 
 public static partial class RebirthCamperEnergyDeviceAdapter
 {
+    // Profiler 2026-11-08 (owner: a POI can hold hundreds of lights): without a session every observation asked the
+    // world for land-claim ownership once per light, up to three times per light. Claims change rarely; answers are
+    // reused for one second per world/player, matching the session path (PlainAuthorized), main thread only.
+    private static readonly Dictionary<Vector3i,EnumLandClaimOwner> claimCache=new Dictionary<Vector3i,EnumLandClaimOwner>();
+    private static WorldBase claimWorld;private static PersistentPlayerData claimPlayer;private static float claimUntil;
+    internal static EnumLandClaimOwner CachedClaim(World world,Vector3i position,PersistentPlayerData player)
+    {
+        if(!ThreadManager.IsMainThread())return world.GetLandClaimOwner(position,player);
+        float now=Time.realtimeSinceStartup;
+        if(now>=claimUntil||!ReferenceEquals(world,claimWorld)||!ReferenceEquals(player,claimPlayer))
+        {claimCache.Clear();claimWorld=world;claimPlayer=player;claimUntil=now+1f;}
+        if(claimCache.TryGetValue(position,out var claim))return claim;
+        return claimCache[position]=world.GetLandClaimOwner(position,player);
+    }
     private static bool PoiPositionAuthorized(EntityVehicle vehicle,Vector3i position)
     {
         if(vehicle?.world==null||vehicle.world.IsWithinTraderArea(position))return false;
         var owner=vehicle.GetOwner();
         var player=owner==null?null:GameManager.Instance.GetPersistentPlayerList()?.GetPlayerData(owner);
         if(owner!=null&&player==null)return false;
-        var claim=vehicle.world.GetLandClaimOwner(position,player);
+        var claim=CachedClaim(vehicle.world,position,player);
         return claim==EnumLandClaimOwner.None||claim==EnumLandClaimOwner.Self;
     }
     private static void PreparePoiLights(EntityVehicle vehicle,PrefabInstance poi)
@@ -63,7 +77,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         if(player==null)return false;
         var claim=world.GetLandClaimOwner(position,player);
         if(claim!=EnumLandClaimOwner.None&&claim!=EnumLandClaimOwner.Self)return false;
-        float best=float.MaxValue;
+        float best=float.MaxValue;bool bestOn=false;
         foreach(var entity in world.Entities.list)
         {
             if(!(entity is EntityVehicle candidate)||candidate.IsDead()||!RebirthCamperRadial.IsCamper(candidate)||
@@ -89,8 +103,13 @@ public static partial class RebirthCamperEnergyDeviceAdapter
                 }
                 else if(!(tile is TileEntityLight))continue;
             }
+            // Owner 2026-11-08: with several owned campers at one POI, the camper whose
+            // POI lighting is ON is the one that can switch the light. Prefer it over a
+            // nearer camper whose POI switch is off (that one would leave the light
+            // uncontrollable). Same rule on server and client, so Receive still matches.
+            bool on=TryObservePoiOn(candidate,out bool poiOn)&&poiOn;
             float distance=(candidate.position-position.ToVector3Center()).sqrMagnitude;
-            if(distance<best){best=distance;vehicle=candidate;}
+            if(on&&!bestOn||on==bestOn&&distance<best){best=distance;bestOn=on;vehicle=candidate;}
         }
         return vehicle!=null;
     }
@@ -119,34 +138,53 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         ushort expectedBlock,byte expectedRotation,uint expectedStamp,out string status)
     {
         status="xuiCamperWireDenied";
-        if(!Authority(vehicle)||!TryPoiLightInteraction(actor,position,out var admitted)||!ReferenceEquals(admitted,vehicle))return false;
+        bool Refuse(string reason)
+        {
+            RebirthDebug.Log("vehicles","[REBIRTH PoiLight] manual-refused vehicle="+vehicle?.entityId+" actor="+actor?.entityId+
+                " pos="+position+" on="+on+" reason="+reason);
+            return false;
+        }
+        if(!Authority(vehicle))return Refuse("not-authority");
+        if(!TryPoiLightInteraction(actor,position,out var admitted)||!ReferenceEquals(admitted,vehicle))return Refuse("interaction-admission");
         // Manual input may change a light only while the POI bank is already ON.
         // Reject stale remote requests before choice/session/power mutations.
-        if(!TryObservePoiOn(vehicle,out bool poiOn)||!poiOn)return false;
+        if(!TryObservePoiOn(vehicle,out bool poiOn)||!poiOn)return Refuse("poi-lighting-off");
         var world=vehicle.world;var value=world.GetBlock(position);
-        if(value.type!=expectedBlock||value.rotation!=expectedRotation)return false;
+        if(value.type!=expectedBlock||value.rotation!=expectedRotation)return Refuse("block-changed");
         // Recheck the actual native surface on the server. No client-supplied
         // placement identity, activation result or desired power is authority.
         var eye=actor.position+Vector3.up*actor.GetEyeHeight();var delta=position.ToVector3Center()-eye;
-        if(!ManualPoiLightVisible(actor,world,position,eye,delta))return false;
+        if(!ManualPoiLightVisible(actor,world,position,eye,delta))return Refuse("not-visible");
         var poi=NearestPoi(vehicle);PreparePoiLights(vehicle,poi);
+        if(poi==null)return Refuse("no-poi");
         var tile=world.GetTileEntity(position);uint stamp=RebirthCamperWorldLighting.Stamp(tile);
-        if(stamp==0||expectedStamp!=0&&expectedStamp!=stamp)return false;
+        if(stamp==0)return Refuse("no-provenance");
+        if(expectedStamp!=0&&expectedStamp!=stamp)return Refuse("stale-request");
         var session=For(vehicle);
-        if(session.Operation!=Guid.Empty||RebirthCamperEnergyAccess.Busy(vehicle))
-        {status="xuiRebirthCamperEnergyOwnerWaiting";return false;}
+        // Owner 2026-11-08: a camper-powered POI light must always be switchable. The
+        // manual choice is a durable chunk record shared by every camper; it does not
+        // touch the vehicle lease image or any pending save/transfer. Consumers already
+        // waits for a pending lease witness (or other camper transaction) before it
+        // re-encodes Dirty sessions and applies power, exactly like SetPoiLights and
+        // SetPoiLimit, which never refused while busy. So a pending operation on this
+        // camper or on any other camper at the same POI only defers the physical
+        // change; it is no longer a refusal ("This light cannot be controlled right now").
         var affected=sessions.Values.Where(s=>Current(s)&&ReferenceEquals(s.World,world)&&
             NearestPoi(s.Vehicle) is PrefabInstance p&&Inside(p,position)).ToArray();
-        if(affected.Any(s=>s.Operation!=Guid.Empty||RebirthCamperEnergyAccess.Busy(s.Vehicle)))
-        {status="xuiRebirthCamperEnergyOwnerWaiting";return false;}
+        bool deferred=session.Operation!=Guid.Empty||RebirthCamperEnergyAccess.Busy(vehicle)||
+            affected.Any(s=>s.Operation!=Guid.Empty||RebirthCamperEnergyAccess.Busy(s.Vehicle));
         string target=PoiTarget(poi);
-        bool wasOn=session.PoiOn&&(session.Poi==null||ReferenceEquals(session.Poi,poi))&&
+        // Same identity rule as TryObservePoiOn (target string), not PrefabInstance
+        // reference equality, which can differ for the same POI.
+        bool wasOn=session.PoiOn&&(session.Poi==null||ReferenceEquals(session.Poi,poi)||PoiTarget(session.Poi)==target)&&
             (string.IsNullOrEmpty(session.PoiTargetIdentity)||session.PoiTargetIdentity==target)&&
             (session.PoiName==null||session.PoiName==poi.prefab.PrefabName);
-        if(!wasOn)return false;
+        if(!wasOn)return Refuse("session-poi-not-on");
         var previous=new Dictionary<Session,RebirthCamperPoiLightChoices.Plan>();
         foreach(var s in affected)previous[s]=SelectPoiLights(s.Vehicle,NearestPoi(s.Vehicle),s.PoiLimit);
-        if(!RebirthCamperPoiLightChoices.Set(world,tile,on))return false;
+        if(!RebirthCamperPoiLightChoices.Set(world,tile,on))return Refuse("choice-record-failed");
+        if(deferred)RebirthDebug.Log("vehicles","[REBIRTH PoiLight] manual-deferred vehicle="+vehicle.entityId+" pos="+position+
+            " on="+on+" reason=pending-camper-transaction");
         foreach(var s in affected)
         {
             var prior=previous[s];

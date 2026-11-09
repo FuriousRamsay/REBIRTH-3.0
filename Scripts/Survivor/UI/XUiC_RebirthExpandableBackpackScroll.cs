@@ -105,7 +105,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         DisableBlockingBackpackScrollSurfaceInput();
         RefreshGeometry(true);
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] INIT "+BuildDebugReport()+" "+BuildNativeDebugReport());
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] INIT "+BuildDebugReport()+" "+BuildNativeDebugReport());
     }
 
     public override void OnOpen()
@@ -128,10 +128,10 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         diagnosticHierarchyDumped=false;
         diagnosticBottomSnapshotLogged=false;
         diagnosticLastBottomPixel=-9999f;
-        if (diagnosticLogging) Log.Out("[REBIRTH BackpackScroll] INPUT_READY "+BuildSlotInputForwardingReport());
+        if (diagnosticLogging) RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] INPUT_READY "+BuildSlotInputForwardingReport());
         if(diagnosticLogging)
         {
-            Log.Out("[REBIRTH BackpackScroll] ON_OPEN "+BuildDebugReport()+" "+BuildNativeDebugReport());
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] ON_OPEN "+BuildDebugReport()+" "+BuildNativeDebugReport());
             DumpNativeHierarchy();
         }
         RebirthScrollbarPagingNativeAdapter.RegisterCustomAuthority(nativeScrollHost);
@@ -189,7 +189,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             }
 
             if(diagnosticLogging)
-                Log.Out("[REBIRTH BackpackScroll] OPEN_SETTLE remaining="+openSettleFrames
+                RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] OPEN_SETTLE remaining="+openSettleFrames
                     +" gridPos="+inventory.ViewComponent.Position);
         }
 
@@ -199,7 +199,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             if(Time.realtimeSinceStartup>=nextDiagnosticHeartbeatTime)
             {
                 nextDiagnosticHeartbeatTime=Time.realtimeSinceStartup+0.5f;
-                Log.Out("[REBIRTH BackpackScroll] HEARTBEAT "+BuildDebugReport()+" "+BuildNativeDebugReport()
+                RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] HEARTBEAT "+BuildDebugReport()+" "+BuildNativeDebugReport()
                     +" hovered="+DescribeHoveredObject()
                     +" mouseWheel="+Input.GetAxis("Mouse ScrollWheel").ToString("0.###",System.Globalization.CultureInfo.InvariantCulture));
             }
@@ -208,7 +208,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(diagnosticLogging && !diagnosticUpdateProofLogged)
         {
             diagnosticUpdateProofLogged=true;
-            Log.Out("[REBIRTH BackpackScroll] UPDATE_ACTIVE "+BuildDebugReport());
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] UPDATE_ACTIVE "+BuildDebugReport());
         }
         if(!diagnosticLogging)diagnosticUpdateProofLogged=false;
         PollMouseWheelFallback();
@@ -238,9 +238,9 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             activeInstance.diagnosticPendingPressCheckFrame=-1;
             activeInstance.diagnosticPendingPressCandidate=string.Empty;
         }
-        Log.Out("[REBIRTH BackpackScroll] diagnosticLogging="+enabled);
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] diagnosticLogging="+enabled);
         if(enabled&&activeInstance!=null)
-            Log.Out(activeInstance.BuildDebugReport());
+            RebirthDebug.Log("survivor", activeInstance.BuildDebugReport());
     }
 
     public static void ResetDiagnosticsForWorldChange()
@@ -333,7 +333,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         {
             diagnosticLastBottomPixel=pixelOffset;
             diagnosticBottomSnapshotLogged=true;
-            Log.Out("[REBIRTH BackpackScroll] BOTTOM_GEOMETRY "+BuildBottomGeometryReport());
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] BOTTOM_GEOMETRY "+BuildBottomGeometryReport());
         }
     }
 
@@ -497,7 +497,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             UpdateScrollbar();
             WriteRowOffsetToNativeScrollbar();
             if(diagnosticLogging)
-                Log.Out("[REBIRTH BackpackScroll] GEOMETRY oldRows="+oldRows+" rows="+rows
+                RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] GEOMETRY oldRows="+oldRows+" rows="+rows
                     +" physical="+physical+" offset="+rowOffset+" maxOffset="+MaxOffset
                     +" report="+BuildDebugReport());
         }
@@ -545,7 +545,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(!blockingBackgroundColliderLogged)
         {
             blockingBackgroundColliderLogged=true;
-            if (diagnosticLogging) Log.Out("[REBIRTH BackpackScroll] INPUT_BLOCKER_DISABLED"
+            if (diagnosticLogging) RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] INPUT_BLOCKER_DISABLED"
                 +" path="+BuildTransformPath(background!=null?background:collider.transform)
                 +" collider="+collider.GetType().Name
                 +" wasEnabled="+blockingBackgroundColliderWasEnabled);
@@ -583,7 +583,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(!blockingScrollSurfaceColliderLogged)
         {
             blockingScrollSurfaceColliderLogged=true;
-            if (diagnosticLogging) Log.Out("[REBIRTH BackpackScroll] INPUT_SCROLL_SURFACE_DISABLED"
+            if (diagnosticLogging) RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] INPUT_SCROLL_SURFACE_DISABLED"
                 +" path="+BuildTransformPath(ViewComponent.UiTransform)
                 +" collider="+collider.GetType().Name
                 +" wasEnabled="+blockingScrollSurfaceColliderWasEnabled);
@@ -689,7 +689,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(slot!=null)interactionDiagnosticSlotIndices.TryGetValue(slot,out index);
         diagnosticSlotPressCount++;
         if(!diagnosticLogging)return;
-        Log.Out("[REBIRTH BackpackScroll] SLOT_PRESS count="+diagnosticSlotPressCount
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] SLOT_PRESS count="+diagnosticSlotPressCount
             +" slot="+index+" button="+mouseButton
             +" hovered="+DescribeHoveredObject()
             +" candidate="+DescribeBackpackHitCandidate()
@@ -704,7 +704,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(slot!=null)interactionDiagnosticSlotIndices.TryGetValue(slot,out index);
         diagnosticSlotDragCount++;
         if(!diagnosticLogging)return;
-        Log.Out("[REBIRTH BackpackScroll] SLOT_DRAG count="+diagnosticSlotDragCount
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] SLOT_DRAG count="+diagnosticSlotDragCount
             +" slot="+index+" dragType="+dragType
             +" delta="+mousePositionDelta
             +" hovered="+DescribeHoveredObject());
@@ -718,7 +718,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(controller.ViewComponent!=null)controller.ViewComponent.EventOnScroll=true;
         controller.OnScroll+=HandleScroll;
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] wired "+DescribeController(controller)+" total="+scrollWiredControllers.Count);
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] wired "+DescribeController(controller)+" total="+scrollWiredControllers.Count);
     }
 
     private void HandleScroll(XUiController sender,float delta)
@@ -732,14 +732,14 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             lastWheelDelta=delta;
         }
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] WHEEL sender="+lastWheelSender
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] WHEEL sender="+lastWheelSender
                 +" delta="+delta.ToString("0.###",System.Globalization.CultureInfo.InvariantCulture)
                 +" beforeOffset="+rowOffset+" maxOffset="+MaxOffset);
         if(RebirthScrollbarPagingPolicy.Enabled) SetPixelOffset(RebirthScrollbarPagingPolicy.Step(pixelOffset, MaxPixelOffset, VisibleRows * CellHeight, delta > 0f ? -1 : 1));
         else if(delta>0f)SetPixelOffset(pixelOffset-30f);
         else if(delta<0f)SetPixelOffset(pixelOffset+30f);
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] WHEEL result offset="+rowOffset+" gridPos="
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] WHEEL result offset="+rowOffset+" gridPos="
                 +(inventory!=null&&inventory.ViewComponent!=null?inventory.ViewComponent.Position.ToString():"<none>"));
     }
 
@@ -761,7 +761,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(!IsMouseOverBackpackArea())return;
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] RAW_WHEEL delta="
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] RAW_WHEEL delta="
                 +delta.ToString("0.###",System.Globalization.CultureInfo.InvariantCulture)
                 +" hover="+DescribeHoveredObject()
                 +" hostVisible=True beforeOffset="+rowOffset+" maxOffset="+MaxOffset);
@@ -895,7 +895,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         {
             if(diagnosticSlotPressCount==diagnosticPendingPressSnapshot)
             {
-                Log.Out("[REBIRTH BackpackScroll] INTERACTION_MISS candidate="+diagnosticPendingPressCandidate
+                RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] INTERACTION_MISS candidate="+diagnosticPendingPressCandidate
                     +" hoveredNow="+DescribeHoveredObjectDetailed()
                     +" pressForwarding="+BuildSlotInputForwardingReport()
                     +" note=no XUiC_ItemStack.OnPress observed within two frames of mouse-down");
@@ -911,7 +911,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         diagnosticPendingPressCandidate=DescribeBackpackHitCandidate();
         diagnosticPendingPressCheckFrame=Time.frameCount+2;
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] BACKPACK_MOUSE_DOWN hovered="+DescribeHoveredObject()
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] BACKPACK_MOUSE_DOWN hovered="+DescribeHoveredObject()
                 +" candidate="+diagnosticPendingPressCandidate
                 +" root="+DescribeController(this)
                 +" inventory="+DescribeController(inventory)
@@ -972,7 +972,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             ||scrollTrack.ViewComponent==null||scrollTrack.ViewComponent.UiTransform==null)return;
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] TRACK_CLICK_ACCEPTED button="+mouseButton
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] TRACK_CLICK_ACCEPTED button="+mouseButton
                 +" hovered="+DescribeHoveredObject()
                 +" rowOffsetBefore="+rowOffset+" max="+MaxOffset);
 
@@ -1010,7 +1010,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         float requested=Mathf.Clamp(normalized*MaxPixelOffset,0f,MaxPixelOffset);
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] TRACK_CLICK mouseY="
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] TRACK_CLICK mouseY="
                 +mouse.y.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)
                 +" top="+top.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)
                 +" bottom="+bottom.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)
@@ -1027,7 +1027,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         diagnosticTrackPressCount++;
         diagnosticLastTrackEvent="OnPress button="+mouseButton+" sender="+DescribeController(sender);
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] TRACK_EVENT OnPress count="+diagnosticTrackPressCount
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] TRACK_EVENT OnPress count="+diagnosticTrackPressCount
                 +" button="+mouseButton
                 +" hovered="+DescribeHoveredObject()
                 +" sender="+DescribeController(sender)
@@ -1040,7 +1040,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         diagnosticThumbPressCount++;
         diagnosticLastTrackEvent="ThumbOnPress button="+mouseButton+" sender="+DescribeController(sender);
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] THUMB_EVENT OnPress count="+diagnosticThumbPressCount
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] THUMB_EVENT OnPress count="+diagnosticThumbPressCount
                 +" button="+mouseButton
                 +" hovered="+DescribeHoveredObject()
                 +" sender="+DescribeController(sender)
@@ -1054,7 +1054,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         if(Time.realtimeSinceStartup>=nextTrackDiagnosticHeartbeat)
         {
             nextTrackDiagnosticHeartbeat=Time.realtimeSinceStartup+0.5f;
-            Log.Out("[REBIRTH BackpackScroll] TRACK_HEARTBEAT "
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] TRACK_HEARTBEAT "
                 +BuildTrackHitDebugReport()
                 +" hovered="+DescribeHoveredObject()
                 +" mouseDown="+Input.GetMouseButton(0)
@@ -1068,7 +1068,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         bool insideTrack=IsMouseInsideControllerCollider(scrollTrack);
         bool insideThumb=IsMouseInsideControllerCollider(scrollThumb);
 
-        Log.Out("[REBIRTH BackpackScroll] RAW_MOUSE_DOWN count="+diagnosticRawTrackMouseDownCount
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] RAW_MOUSE_DOWN count="+diagnosticRawTrackMouseDownCount
             +" insideTrack="+insideTrack
             +" insideThumb="+insideThumb
             +" hovered="+DescribeHoveredObject()
@@ -1177,7 +1177,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         WriteRowOffsetToNativeScrollbar();
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] PIXEL_OFFSET requested="
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] PIXEL_OFFSET requested="
                 +requested.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)
                 +" applied="+pixelOffset.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)
                 +" rowFloor="+rowOffset
@@ -1256,7 +1256,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         WriteRowOffsetToNativeScrollbar();
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] OPEN_TOP offset=0 gridPos="
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] OPEN_TOP offset=0 gridPos="
                 +(inventory!=null&&inventory.ViewComponent!=null?inventory.ViewComponent.Position.ToString():"<none>"));
     }
 
@@ -1308,7 +1308,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         object raw=ReadMember(bar,"value");
         if(raw==null)
         {
-            if(diagnosticLogging)Log.Out("[REBIRTH BackpackScroll] NATIVE_READ value-member=<missing> component="+BuildComponentPath(bar));
+            if(diagnosticLogging)RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] NATIVE_READ value-member=<missing> component="+BuildComponentPath(bar));
             return false;
         }
 
@@ -1319,7 +1319,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         }
         catch(Exception ex)
         {
-            if(diagnosticLogging)Log.Out("[REBIRTH BackpackScroll] NATIVE_READ conversion-failed rawType="+raw.GetType().FullName+" ex="+ex.GetType().Name);
+            if(diagnosticLogging)RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] NATIVE_READ conversion-failed rawType="+raw.GetType().FullName+" ex="+ex.GetType().Name);
             return false;
         }
     }
@@ -1346,7 +1346,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         }
 
         if(diagnosticLogging)
-            Log.Out("[REBIRTH BackpackScroll] NATIVE_WRITE value-member=<missing> component="+BuildComponentPath(bar));
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] NATIVE_WRITE value-member=<missing> component="+BuildComponentPath(bar));
         return false;
     }
 
@@ -1430,12 +1430,12 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         diagnosticHierarchyDumped=true;
         if(nativeScrollHost==null||nativeScrollHost.ViewComponent==null||nativeScrollHost.ViewComponent.UiTransform==null)
         {
-            Log.Out("[REBIRTH BackpackScroll] HIERARCHY nativeScrollHost=<unavailable>");
+            RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] HIERARCHY nativeScrollHost=<unavailable>");
             return;
         }
 
         Transform root=nativeScrollHost.ViewComponent.UiTransform;
-        Log.Out("[REBIRTH BackpackScroll] HIERARCHY root="+BuildTransformPath(root));
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] HIERARCHY root="+BuildTransformPath(root));
         DumpTransformRecursive(root,0);
     }
 
@@ -1454,7 +1454,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
         }
 
         Collider collider=transform.GetComponent<Collider>();
-        Log.Out("[REBIRTH BackpackScroll] HIERARCHY depth="+depth
+        RebirthDebug.Log("survivor", "[REBIRTH BackpackScroll] HIERARCHY depth="+depth
             +" path="+BuildTransformPath(transform)
             +" active="+transform.gameObject.activeInHierarchy
             +" collider="+(collider!=null?collider.GetType().Name:"<none>")

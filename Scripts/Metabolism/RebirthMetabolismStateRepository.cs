@@ -114,7 +114,7 @@ public static partial class RebirthMetabolismStateRepository
         lock (Sync)
             States[id] = fresh;
 
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Metabolism] reset persisted state for fresh character id=" + id
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] reset persisted state for fresh character id=" + id
             + " reason=" + (reason ?? "fresh-spawn")); }
         return fresh;
     }
@@ -259,7 +259,7 @@ public static partial class RebirthMetabolismStateRepository
             }
         }
 
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Metabolism] persistence saved players=" + playerCount + " reason=" + (reason ?? "unspecified")); }
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] persistence saved players=" + playerCount + " reason=" + (reason ?? "unspecified")); }
         return true;
     }
 
@@ -303,7 +303,7 @@ public static partial class RebirthMetabolismStateRepository
                     States[pair.Key] = pair.Value;
                 loaded = true;
             }
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Metabolism] persistence loaded players=" + candidate.Count); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] persistence loaded players=" + candidate.Count); }
             return true;
         }
         catch (Exception ex)
@@ -642,7 +642,8 @@ public static partial class RebirthMetabolismStateRepository
             string root = GameIO.GetSaveGameDir();
             if (string.IsNullOrEmpty(root)) return string.Empty;
             var cached = System.Threading.Volatile.Read(ref pathNameCache);
-            if (cached != null && ReferenceEquals(cached.Item1, root)) return cached.Item2;
+            // Value compare: GetSaveGameDir builds a new string per call, so a reference compare never hit (profiler 2026-11-08).
+            if (cached != null && string.Equals(cached.Item1, root, StringComparison.Ordinal)) return cached.Item2;
             string path = Path.Combine(root, "RebirthData", "Metabolism", "players.xml");
             System.Threading.Volatile.Write(ref pathNameCache, Tuple.Create(root, path));
             return path;

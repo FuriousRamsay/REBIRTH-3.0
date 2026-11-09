@@ -67,18 +67,18 @@ internal static partial class RebirthHydrationProposalServer
                 var item=state.HydrationSlotItem;int count=item==null||item.IsEmpty()?0:item.count;
                 var hydration=new RebirthGearInventoryPlan.Stack{Count=count,ItemData=count==0?string.Empty:RebirthNativeItemCodec.Encode(item.itemValue)};
                 int free=0;for(int i=0;i<snapshot.Bag.Length;i++)if(snapshot.Bag[i].Count==0&&(lockedBag==null||!lockedBag[i]))free++;
-                Log.Out($"[REBIRTH HydrationTransfer] server-admission action={(returning?"return":"equip")} actor={player.entityId} source={(sourceIsBag?"bag":"belt")} index={sourceIndex} slot={(count==0?"empty":item.itemValue?.ItemClass?.GetItemName()??"unknown")} count={count} bag={snapshot.Bag.Length} freeUnlocked={free} stateRevision={state.Revision}");
+                RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] server-admission action={(returning?"return":"equip")} actor={player.entityId} source={(sourceIsBag?"bag":"belt")} index={sourceIndex} slot={(count==0?"empty":item.itemValue?.ItemClass?.GetItemName()??"unknown")} count={count} bag={snapshot.Bag.Length} freeUnlocked={free} stateRevision={state.Revision}");
                 if(!RebirthHydrationTransferPlan.TryCreate(snapshot.Bag,snapshot.Belt,lockedBag,owned,hydration,sourceIsBag,returning?-1:sourceIndex,out var plan))
-                {Log.Out("[REBIRTH HydrationTransfer] server-refused reason=plan-refused");return false;}
+                {RebirthDebug.Log("metabolism", "[REBIRTH HydrationTransfer] server-refused reason=plan-refused");return false;}
                 if(!RebirthHydrationTransferOriginal.TryCreate(operation,world,owner,creation,player.Died,state.Revision,owned,lockedBag,plan,out var original))
-                {Log.Out("[REBIRTH HydrationTransfer] server-refused reason=original-invalid");return false;}
+                {RebirthDebug.Log("metabolism", "[REBIRTH HydrationTransfer] server-refused reason=original-invalid");return false;}
                 var body=RebirthHydrationOriginalTransport.Create(original);
                 if(!ReferenceEquals(peer.latestPlayerData,uploaded)||!Scope(player,peer,operation,out var finalWorld,out var finalOwner,out var finalCreation)||
                     !original.Matches(finalWorld,finalOwner,finalCreation,player.Died)||
                     !RebirthMetabolismStateRepository.TryGet(player,out var latest)||!ReferenceEquals(latest,state)||latest.Revision!=original.Revision)return false;
                 var next=new Proposal(player,peer,original,sourceIsBag,sourceIndex,returning,body);proposals.Add(operation,next);
                 if(!RebirthHydrationServerSourceHold.Lease.TryAcquire(player,original,out next.lease)||!next.Current())return false;
-                proposal=next;Log.Out($"[REBIRTH HydrationTransfer] server-result action={(returning?"return":"equip")} actor={player.entityId} prepared=true");return true;
+                proposal=next;RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] server-result action={(returning?"return":"equip")} actor={player.entityId} prepared=true");return true;
             }
             catch{return false;}
         }

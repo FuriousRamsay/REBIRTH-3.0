@@ -385,7 +385,7 @@ internal static class RebirthNpcB14NativeStrike
             if (IsOwnCallDrop(world, item, center, npc.entityId)) { AddWitness(o, item.itemStack, item.position, item.entityId); attributed++; }
             else rejected++;
         }
-        Log.Out("[RBNPC] b14 strike drops block=" + block.GetBlockName() + " pos=" + o.Position + " inCall=" + spawnedInCall.Count +
+        RebirthDebug.Log("npc", "[RBNPC] b14 strike drops block=" + block.GetBlockName() + " pos=" + o.Position + " inCall=" + spawnedInCall.Count +
             " attributed=" + attributed + " leftInWorld=" + rejected + " calculated=" + emitted.Count);
         // Actor receipt: our own DamageBlock call returned exactly the predicted result. Persist it (HasPostImage)
         // so recovery needs no inference from the block. If this save fails the next save carries it; a crash in

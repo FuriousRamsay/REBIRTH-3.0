@@ -62,9 +62,6 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     private const int GeneralModuleMaxWidth = 260;
     private const float ResponsiveLayoutRefreshSeconds = 0.20f;
 
-    private static readonly PropertyInfo PrintedSizeProperty = typeof(UILabel).GetProperty(
-        "printedSize",
-        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
     private XUiView shellView;
     private XUiView purgeScannerView;
@@ -249,6 +246,20 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
                 int elevation = Mathf.RoundToInt(player.GetPosition().y - WeatherManager.SeaLevel());
                 value = elevation.ToString("+0;-#;0", CultureInfo.InvariantCulture);
                 return true;
+
+            // The native compass refreshes bindings every frame and these three ran a NoTimeDisplay effect lookup
+            // each time (garbage per frame). Same rule as native, using the cached effect check.
+            case "showtime":
+            case "showtimecompass":
+            case "showtimenocompass":
+            {
+                bool show = player == null || (IsTimeDisplayVisible(player) &&
+                    global::SandboxOptions.SandboxOptionManager.GetBool(global::SandboxOptions.SandboxOptions.ShowDayTime));
+                if (player != null && bindingName == "showtimecompass") show &= ShowCompass;
+                else if (player != null && bindingName == "showtimenocompass") show &= !ShowCompass;
+                value = show ? "True" : "False";
+                return true;
+            }
 
             case "daycolor":
             {
@@ -714,27 +725,14 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
             return fallback;
 
         int measured = 0;
-        UILabel label = null;
-        Transform labelTransform = labelView.UiTransform;
-        if ((UnityEngine.Object)labelTransform != (UnityEngine.Object)null)
-            label = labelTransform.GetComponent<UILabel>();
+        // The view's own UILabel; direct printedSize instead of GetComponent + reflection (which boxed every call).
+        UILabel label = labelView.label;
 
         if ((UnityEngine.Object)label != (UnityEngine.Object)null)
         {
-            if (PrintedSizeProperty != null)
-            {
-                try
-                {
-                    object raw = PrintedSizeProperty.GetValue(label, null);
-                    if (raw is Vector2 printed && !float.IsNaN(printed.x) && !float.IsInfinity(printed.x))
-                        measured = Mathf.Max(measured, Mathf.CeilToInt(printed.x));
-                }
-                catch
-                {
-                    // Runtime font measurement is an optimization. The string-based path below is
-                    // deliberately sufficient on builds where NGUI hides/renames printedSize.
-                }
-            }
+            Vector2 printed = label.printedSize;
+            if (!float.IsNaN(printed.x) && !float.IsInfinity(printed.x))
+                measured = Mathf.Max(measured, Mathf.CeilToInt(printed.x));
 
             // printedSize is authoritative when NGUI exposes it. Only estimate when the runtime
             // does not provide a usable printed width; taking the max of both made short labels

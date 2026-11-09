@@ -126,7 +126,7 @@ public static class RebirthFireSleeperActivation
                     Reason = reason
                 });
                 VolumesQueued++;
-                Log.Out("[REBIRTH Fire Sleeper] queued reason=" + reason + " pos=" + position
+                RebirthDebug.Log("fire", "[REBIRTH Fire Sleeper] queued reason=" + reason + " pos=" + position
                     + " boxMin=" + volume.BoxMin + " boxMax=" + volume.BoxMax
                     + " pending=" + Pending.Count);
             }
@@ -188,7 +188,7 @@ public static class RebirthFireSleeperActivation
                 ActivatedVolumes.Add(pending.Key);
                 VolumesActivated++;
                 started++;
-                Log.Out("[REBIRTH Fire Sleeper] spawn queued reason=" + pending.Reason
+                RebirthDebug.Log("fire", "[REBIRTH Fire Sleeper] spawn queued reason=" + pending.Reason
                     + " source=" + pending.SourcePosition + " boxMin=" + volume.BoxMin
                     + " boxMax=" + volume.BoxMax + " player="
                     + (pending.Player != null ? pending.Player.entityId.ToString() : "<none>"));

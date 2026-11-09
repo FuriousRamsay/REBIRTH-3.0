@@ -279,7 +279,7 @@ public static partial class RebirthNpcExecutionPersistenceStore
             pendingRevision++;
         }
         restored++;
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC] Restored execution lease=" + lease.LeaseId +
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH NPC] Restored execution lease=" + lease.LeaseId +
             " entity=" + npc.entityId + " order=" + lease.Order + "."); }
     }
 

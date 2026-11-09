@@ -67,7 +67,13 @@ internal static partial class RebirthRecyclerPlacedSettlement
         source.Entering=false;source.File.entering=false;
         if(!source.Returned)remoteLoadedRecyclerOwners.Remove(source);
     }
+    // Per frame: no closure when empty (profiler 2026-11-08).
     private static void SweepRemoteLoadedRecyclerOwners(World world)
+    {
+        if(remoteLoadedRecyclerOwners.Count==0)return;
+        SweepRemoteLoadedRecyclerOwnersCore(world);
+    }
+    private static void SweepRemoteLoadedRecyclerOwnersCore(World world)
     {
         remoteLoadedRecyclerOwners.RemoveAll(value=>value.File.closed||!ReferenceEquals(value.File.world,world));
     }

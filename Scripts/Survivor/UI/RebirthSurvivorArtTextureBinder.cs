@@ -95,7 +95,7 @@ public sealed class RebirthSurvivorArtTextureBinder
         if (!thumbnailPreloadReported)
         {
             thumbnailPreloadReported = true;
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor UI] Background thumbnail cache ready loaded=" + loaded + "/" + bundle.Backgrounds.Count + "."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor UI] Background thumbnail cache ready loaded=" + loaded + "/" + bundle.Backgrounds.Count + "."); }
         }
         return loaded;
     }

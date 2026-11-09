@@ -111,7 +111,7 @@ public static class RebirthSurvivorSupportUiFeedback
     public static void Receive(bool success,string message)
     {
         if(string.IsNullOrEmpty(message)) return;
-        Log.Out("[REBIRTH Survivor] support action result="+(success?"OK":"FAIL")+" message="+message);
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor] support action result="+(success?"OK":"FAIL")+" message="+message);
         try
         {
             EntityPlayerLocal player=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetPrimaryPlayer():null;

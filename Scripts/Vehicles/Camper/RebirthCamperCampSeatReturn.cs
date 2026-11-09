@@ -49,7 +49,7 @@ internal static class RebirthCamperCampSeatReturn
     private static void Trace(EntityPlayerLocal player, string stage, string detail)
     {
         if (player?.Buffs != null && player.Buffs.GetCustomVar("$rebirthCamperSeatReturnDebug") > 0)
-            Log.Out("[REBIRTH Camper Seat Return] player=" + player.entityId + " stage=" + stage + " " + detail);
+            RebirthDebug.Log("vehicles", "[REBIRTH Camper Seat Return] player=" + player.entityId + " stage=" + stage + " " + detail);
     }
     private static int CollisionMask(CharacterController controller)
     {

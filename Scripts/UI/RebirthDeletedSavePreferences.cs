@@ -63,7 +63,7 @@ internal static class RebirthDeletedSavePreferences
                 RebirthJournalGuideService.RetireDeletedWorld(key);
             }, out int files);
             Diagnostic = deleted ? "confirmed cleanup complete; files=" + files : "native save still present; local data retained";
-            Log.Out("[REBIRTH save deletion] " + Diagnostic);
+            RebirthDebug.Log("ui", "[REBIRTH save deletion] " + Diagnostic);
         }
         catch (Exception e) { Diagnostic = "cleanup failed: " + e.Message; Log.Warning("[REBIRTH save deletion] " + Diagnostic); }
     }

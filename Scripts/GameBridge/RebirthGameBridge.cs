@@ -67,6 +67,13 @@ public static partial class RebirthGameBridge
         if (started) return;
         started = true;
 
+        // Owner 2026-11-09: the launcher passes -GameName/-GameWorld/-SkipSpawnButton, and the game saved them into
+        // the player's own settings on exit. Later normal sessions then started with the bridge test save as "last
+        // game" and Skip Spawn on. A bridge session uses these values but never stores them.
+        GamePrefs.SetPersistent(EnumGamePrefs.GameName, false);
+        GamePrefs.SetPersistent(EnumGamePrefs.GameWorld, false);
+        GamePrefs.SetPersistent(EnumGamePrefs.SkipSpawnButton, false);
+
         // Tests that top up food, water and health themselves start with the eating/drinking/crafting chores OFF, so nothing is wasted at
         // every launch (set REBIRTH_BRIDGE_NOCHORES=1 in the launching environment; the game inherits it).
         // Human-play recording: no automation of any kind (no guard instincts, no reflexes, no chores); only the probe watches.

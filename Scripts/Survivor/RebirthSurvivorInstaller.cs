@@ -33,7 +33,7 @@ public static class RebirthSurvivorInstaller
             try
             {
                 string configRoot = RebirthSurvivorDefinitionLoader.ResolveConfigRoot();
-                if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor] loading definitions from '" + configRoot + "'.");
+                if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor] loading definitions from '" + configRoot + "'.");
                 bundle = RebirthSurvivorDefinitionLoader.Load(configRoot);
                 string hash = RebirthSurvivorDefinitionVersion.ComputeSemanticHash(bundle);
                 string version = RebirthSurvivorDefinitionVersion.BuildVersionLabel(hash);
@@ -63,7 +63,7 @@ public static class RebirthSurvivorInstaller
                 // cannot be used to configure automatic diagnostics. Load the mod-local read-only
                 // logging gates as soon as the authoritative config root is known.
                 RebirthLogSettings.LoadFromConfigRoot(bundle.ConfigRoot);
-                if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor] definition registry installed backgrounds=" + bundle.Backgrounds.Count
+                if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor] definition registry installed backgrounds=" + bundle.Backgrounds.Count
                     + " traits=" + bundle.Traits.Count + " diets=" + bundle.Diets.Count
                     + " root='" + bundle.ConfigRoot + "'.");
             }

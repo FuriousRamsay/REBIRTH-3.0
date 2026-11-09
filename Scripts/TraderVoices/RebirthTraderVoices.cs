@@ -29,7 +29,7 @@ public static class RebirthTraderVoices
         if (!Diagnostics) return;
         if (Events.Count >= 64) Events.Dequeue();
         Events.Enqueue(value);
-        Log.Out("[REBIRTH TraderVoices] " + value);
+        RebirthDebug.Log("tradervoices", "[REBIRTH TraderVoices] " + value);
     }
     private static void Load()
     {

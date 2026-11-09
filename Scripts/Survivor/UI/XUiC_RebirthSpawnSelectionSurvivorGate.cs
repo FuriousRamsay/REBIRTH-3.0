@@ -288,10 +288,25 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
             WireScroll(detailRows[i], TraitListScroll);
     }
 
+    // Owner 2026-11-09 (dedicated server): Spawn was usable before the server's character state arrived, so a new
+    // player spawned into the creation hold with no chooser. On a server join Spawn waits for that state (20 s max).
+    private const float OwnerWaitSeconds = 20f;
+    private float ownerWaitUntil, nextOwnerRequest;
+    private static bool AwaitingServerOwner(float until)
+    {
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection == null || connection.IsServer || !connection.IsConnected) return false;
+        if (RebirthSurvivorClientState.GetOwnerStateSnapshot() != null) return false;
+        return Time.realtimeSinceStartup < until;
+    }
+
     public override void OnOpen()
     {
         base.OnOpen();
         activeInstance = this;
+        ownerWaitUntil = Time.realtimeSinceStartup + OwnerWaitSeconds;
+        nextOwnerRequest = 0f;
+        if (AwaitingServerOwner(ownerWaitUntil)) { nextOwnerRequest = Time.realtimeSinceStartup + 2f; RebirthSurvivorNetworkService.RequestOwnerStatePreSpawn(); }
         standaloneRedirectPending = false;
         standaloneRedirectExhausted = false;
         standaloneRedirectAttempts = 0;
@@ -323,6 +338,11 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
         {
             ApplyNativeSpawnLock(true, "OnOpen");
             RequestStandaloneSpawnSelector("OnOpen");
+        }
+        else if (AwaitingServerOwner(ownerWaitUntil))
+        {
+            ApplyNativeSpawnLock(true, "OnOpen-awaiting-server-owner");
+            RebirthSpawnInputTrace.Note("spawn-screen-awaiting-server-owner");
         }
         else
         {
@@ -394,7 +414,13 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
         lastVisible = false;
         if (!required)
         {
-            ApplyNativeSpawnLock(false, reason);
+            bool waiting = AwaitingServerOwner(ownerWaitUntil);
+            if (waiting && Time.realtimeSinceStartup >= nextOwnerRequest)
+            {
+                nextOwnerRequest = Time.realtimeSinceStartup + 2f;
+                RebirthSurvivorNetworkService.RequestOwnerStatePreSpawn();
+            }
+            ApplyNativeSpawnLock(waiting, waiting ? reason + "-awaiting-server-owner" : reason);
             return;
         }
 

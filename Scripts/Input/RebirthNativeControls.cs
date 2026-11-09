@@ -43,7 +43,7 @@ public static class RebirthNativeControls
         // manager on normal startup. Register against the already-created native manager now.
         EnsureRegisteredFromNativePlatform("mod-install");
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Controls] Native action registration, Controls UI integration, and gameplay dispatchers installed."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("input", "[REBIRTH Controls] Native action registration, Controls UI integration, and gameplay dispatchers installed."); }
     }
 
     private static bool EnsureRegisteredFromNativePlatform(string reason)
@@ -105,7 +105,7 @@ public static class RebirthNativeControls
             Log.Warning("[REBIRTH Controls] Could not restore saved REBIRTH bindings during " + reason + ": " + ex.Message);
         }
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Controls] Registered native action set '" + PlayerActionsRebirth.ActionSetName +
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("input", "[REBIRTH Controls] Registered native action set '" + PlayerActionsRebirth.ActionSetName +
                 "' during " + reason + " actions=" + actions.Actions.Count + "."); }
         return true;
     }
@@ -134,7 +134,7 @@ public static class RebirthNativeControls
             action.UnbindBindingsOfType(false);
             action.AddBinding(new KeyBindingSource(new Key[] { Key.Shift, Key.L }));
             SdPlayerPrefs.SetString(ActionSetSaveKey, actions.Save());
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Controls] Migrated Toggle Companion Card Style default binding Shift+C -> Shift+L."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("input", "[REBIRTH Controls] Migrated Toggle Companion Card Style default binding Shift+C -> Shift+L."); }
         }
         catch (Exception ex)
         {
@@ -277,7 +277,7 @@ public static class RebirthNativeControls
             rows[i].Action = i < count ? actions[i] : null;
 
         options.IsDirty = true;
-        { if (RebirthLogSettings.UiRouteLoggingEnabled) Log.Out("[REBIRTH Controls] Populated " + screenName + " REBIRTH tab index=" + tabIndex +
+        { if (RebirthLogSettings.UiRouteLoggingEnabled) RebirthDebug.Log("input", "[REBIRTH Controls] Populated " + screenName + " REBIRTH tab index=" + tabIndex +
                 " rows=" + rows.Length + " entries=" + count + "."); }
         return count;
     }

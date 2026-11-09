@@ -10,10 +10,19 @@
 
   <!--
     Restore military ammunition pallet tile variants as persistent loot containers.
-    The base pallet is not lootable. These source blocks are
+    Owner 2026-11-08: the base and cap pallets are lootable too, as in 2.6. These source blocks are
     intentionally not destroy-on-close, so after looting and emptying them they
     can be recovered as secure player storage by the general pickup resolver.
   -->
+  <append xpath="/blocks/block[@name='palletCartonMilitaryBase' or @name='palletCartonMilitaryCap']">
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarge"/>
+      </property>
+    </property>
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPreserveAfterLoot" value="true"/>
+  </append>
   <append xpath="/blocks/block[@name='palletCartonMilitaryTile' or @name='palletCartonMilitaryTileCovered']">
     <property class="CompositeFeatures">
       <property class="TEFeatureStorage">
@@ -239,6 +248,13 @@
     <property name="RebirthPickup" value="Allow"/>
     <property name="ReplacementBlockName" value="partMilitaryTruckWheel_FR"/>
     <property name="isReplacementItem" value="true"/>
+  </append>
+  <!-- Tipped (45 degree) POI water barrel recovers as the upright REBIRTH water tank
+       (FuriousRamsayWaterTank: same barrelPlasticPrefab model, BlockWaterTankRebirth).
+       Storage pickup rules still require the barrel to be emptied first. -->
+  <append xpath="/blocks/block[@name='cntBarrelPlasticSingle45']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="FuriousRamsayWaterTank"/>
   </append>
   <include filename="snack_storage_26.xml"/>
   <include filename="legacy_broken_vending_bath_storage_26.xml"/>

@@ -227,7 +227,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
             return;
 
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting QueueScroll] wheel before=" + before.ToString("0.0")
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting QueueScroll] wheel before=" + before.ToString("0.0")
                 + " target=" + scrollTargetPixels.ToString("0.0")
                 + " current=" + scrollPixels.ToString("0.0")
                 + " max=" + MaxPixelOffset.ToString("0.0"));
@@ -391,7 +391,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
                     Vector3 actual = entry.ViewComponent.UiTransform != null
                         ? entry.ViewComponent.UiTransform.localPosition
                         : Vector3.zero;
-                    Log.Out("[REBIRTH Crafting QueuePlacement] reveal nativeIndex=" + nativeIndex
+                    RebirthDebug.Log("crafting", "[REBIRTH Crafting QueuePlacement] reveal nativeIndex=" + nativeIndex
                         + " display=" + displayOrder
                         + " desired=" + desiredPosition.x + "," + desiredPosition.y
                         + " actual=" + actual.x.ToString("0") + "," + actual.y.ToString("0")
@@ -631,7 +631,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
                 visible++;
         }
 
-        Log.Out("[REBIRTH Crafting QueueTrace] reason=" + (reason ?? "unknown")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting QueueTrace] reason=" + (reason ?? "unknown")
             + " active=" + ActiveCount + "/" + RuntimeCapacity
             + " discovered=" + entries.Length
             + " runtime=" + RuntimeCapacity

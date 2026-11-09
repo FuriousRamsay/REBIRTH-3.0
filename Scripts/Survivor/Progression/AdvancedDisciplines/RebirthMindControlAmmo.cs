@@ -38,7 +38,7 @@ internal static class RebirthMindControlAmmo
         }
         string reason;
         bool dominated = RebirthBlackMagicService.TryDominateFromAmmo(world, player, target, out reason);
-        Log.Out("[REBIRTH MindControl] " + target.EntityClass?.entityClassName + " " + target.entityId + ": " + (dominated ? "turned" : "refused") + " " + reason);
+        RebirthDebug.Log("survivor", "[REBIRTH MindControl] " + target.EntityClass?.entityClassName + " " + target.entityId + ": " + (dominated ? "turned" : "refused") + " " + reason);
         if (!string.IsNullOrEmpty(reason)) GameManager.ShowTooltipMP(player, reason, dominated ? "ui_success" : "ui_denied");
     }
 }
@@ -99,7 +99,7 @@ public class MinEventActionRebirthMindControlArea : MinEventActionBase
         // A landed potion reports no thrower, so the nearest player is taken as the one who threw it.
         var world = GameManager.Instance?.World;
         var player = _params.Self as EntityPlayer ?? world?.GetClosestPlayer(_params.Position, 60f, false);
-        Log.Out("[REBIRTH MindControl] potion impact at " + _params.Position + " by " + (player != null ? player.entityId.ToString() : "nobody"));
+        RebirthDebug.Log("survivor", "[REBIRTH MindControl] potion impact at " + _params.Position + " by " + (player != null ? player.entityId.ToString() : "nobody"));
         if (player == null || player.world == null) return;
         var found = new System.Collections.Generic.List<Entity>();
         player.world.GetEntitiesInBounds(typeof(EntityEnemy), new Bounds(_params.Position, Vector3.one * radius * 2f), found);

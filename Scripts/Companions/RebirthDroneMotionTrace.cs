@@ -80,7 +80,7 @@ public static class RebirthDroneMotionTrace
         lock (Sync)
             Sessions[drone.entityId] = session;
 
-        Log.Out("[RebirthDroneTrace] START Entity=" + drone.entityId +
+        RebirthDebug.Log("companions", "[RebirthDroneTrace] START Entity=" + drone.entityId +
                 " Duration=" + seconds.ToString("0.0", CultureInfo.InvariantCulture) + "s" +
                 " Rate=" + hz + "Hz " + RebirthDroneQualitySpeed.GetDiagnosticReport(drone));
     }
@@ -223,7 +223,7 @@ public static class RebirthDroneMotionTrace
         session.MinTargetDistance = Mathf.Min(session.MinTargetDistance, targetDistance);
         session.MaxTargetDistance = Mathf.Max(session.MaxTargetDistance, targetDistance);
 
-        Log.Out("[RebirthDroneTrace]" +
+        RebirthDebug.Log("companions", "[RebirthDroneTrace]" +
                 " t=" + (now - session.StartTime).ToString("0.000", CultureInfo.InvariantCulture) +
                 " id=" + drone.entityId +
                 " q=" + RebirthDroneQualitySpeed.GetQuality(drone) +
@@ -303,7 +303,7 @@ public static class RebirthDroneMotionTrace
         float averageFollowSpeed = session.FollowSpeedSamples > 0 ? session.SumFollowMeasuredSpeed / session.FollowSpeedSamples : 0f;
         float averageDistance = session.Samples > 0 ? session.SumTargetDistance / session.Samples : 0f;
         float minDistance = session.MinTargetDistance == float.MaxValue ? 0f : session.MinTargetDistance;
-        Log.Out("[RebirthDroneTrace] STOP Entity=" + session.EntityId +
+        RebirthDebug.Log("companions", "[RebirthDroneTrace] STOP Entity=" + session.EntityId +
                 " Reason=" + reason +
                 " Samples=" + session.Samples +
                 " SpeedSamples=" + session.SpeedSamples +

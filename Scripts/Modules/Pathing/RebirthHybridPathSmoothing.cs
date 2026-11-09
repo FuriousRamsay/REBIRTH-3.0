@@ -492,7 +492,7 @@ public static class RebirthHybridPathSmoothing
 
         if (DebugLogging)
         {
-            Log.Out("[RebirthHybridPath] direct entity=" + entity.entityId
+            RebirthDebug.Log("modules", "[RebirthHybridPath] direct entity=" + entity.entityId
                 + " target=" + target.entityId
                 + " distance=" + (directTarget - entity.position).magnitude.ToString("0.00")
                 + " speed=" + speed.ToString("0.00"));
@@ -606,7 +606,7 @@ public static class RebirthHybridPathSmoothing
             return;
 
         if (Time.realtimeSinceStartup >= captureEndRealtime)
-            Log.Out(StopCapture("durationExpired"));
+            RebirthDebug.Log("modules", StopCapture("durationExpired"));
     }
 
     public static string GetCaptureStatus()
@@ -752,7 +752,7 @@ public static class RebirthHybridPathSmoothing
         float now = Time.realtimeSinceStartup;
         if (now >= captureEndRealtime)
         {
-            Log.Out(StopCapture("durationExpired"));
+            RebirthDebug.Log("modules", StopCapture("durationExpired"));
             return;
         }
 
@@ -803,7 +803,7 @@ public static class RebirthHybridPathSmoothing
             ? (target.position - entity.position).magnitude
             : -1f;
 
-        Log.Out("[RebirthHybridCapture]"
+        RebirthDebug.Log("modules", "[RebirthHybridCapture]"
             + " phase=" + phase
             + " tick=" + tick
             + " decision=" + (string.IsNullOrEmpty(decision) ? "<none>" : decision)
@@ -1311,7 +1311,7 @@ public static class RebirthHybridPathSmoothing
         if (!DebugLogging || entity == null)
             return;
 
-        Log.Out("[RebirthHybridPath] fallback entity=" + entity.entityId
+        RebirthDebug.Log("modules", "[RebirthHybridPath] fallback entity=" + entity.entityId
             + " reason=" + reason
             + " cooldownTicks=" + NoDirectCooldownTicks);
     }
@@ -1444,7 +1444,7 @@ public static class RebirthHybridPathSmoothingInstaller
             RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.hybrid-path-smoothing.3.1"), typeof(RebirthHybridPathSmoothingPatch));
 
             installed = true;
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[RebirthHybridPath] Installed direct-target hybrid path smoothing."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("modules", "[RebirthHybridPath] Installed direct-target hybrid path smoothing."); }
         }
         catch (Exception ex)
         {

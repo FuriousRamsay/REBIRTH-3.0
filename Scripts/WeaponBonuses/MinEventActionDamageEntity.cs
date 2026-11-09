@@ -11,7 +11,7 @@ public class MinEventActionDamageEntity : MinEventActionTargetedBase
     private static void D(string msg)
     {
         if (DEBUG_DAMAGEENTITY)
-            Log.Out("[MinEventActionDamageEntity] " + msg);
+            RebirthDebug.Log("weaponbonuses", "[MinEventActionDamageEntity] " + msg);
     }
 
     // XML: damage="0.1" (percent) or damage="12" (flat)

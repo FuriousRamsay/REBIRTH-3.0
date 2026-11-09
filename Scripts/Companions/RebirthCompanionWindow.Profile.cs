@@ -276,14 +276,14 @@ public sealed partial class XUiC_RebirthCompanions
         long totalMs = portraitStageMs; portraitStageMs = 0;
         if (ok)
         {
-            Log.Out("[REBIRTH Companion Overview] portrait ms=" + totalMs + " (staged over 2 frames) ok=True entity=" + npc.entityId);
+            RebirthDebug.Log("companions", "[REBIRTH Companion Overview] portrait ms=" + totalMs + " (staged over 2 frames) ok=True entity=" + npc.entityId);
             portraitToken = token; portraitFailedToken = null; portraitAttempts = 0;
             ShowPortrait(true);
         }
         else
         {
             if (portraitFailedToken != token) { portraitFailedToken = token; portraitAttempts = 0; }
-            if (portraitAttempts++ == 0) Log.Out("[REBIRTH Companion Overview] portrait ms=" + totalMs + " ok=False entity=" + npc.entityId);
+            if (portraitAttempts++ == 0) RebirthDebug.Log("companions", "[REBIRTH Companion Overview] portrait ms=" + totalMs + " ok=False entity=" + npc.entityId);
         }
     }
 

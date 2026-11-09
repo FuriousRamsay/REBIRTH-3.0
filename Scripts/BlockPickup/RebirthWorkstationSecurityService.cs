@@ -1102,7 +1102,7 @@ public static class RebirthWorkstationSecurityService
             dirty = false;
             foreach (var pair in loaded) if (pair.Value.PasswordResetRequired) { dirty = true; break; }
         }
-        { if (RebirthLogSettings.BlockPickupLoggingEnabled) Log.Out("[REBIRTH BlockPickup] Loaded " + loaded.Count +
+        { if (RebirthLogSettings.BlockPickupLoggingEnabled) RebirthDebug.Log("blockpickup", "[REBIRTH BlockPickup] Loaded " + loaded.Count +
             " secured workstation records."); }
     }
 

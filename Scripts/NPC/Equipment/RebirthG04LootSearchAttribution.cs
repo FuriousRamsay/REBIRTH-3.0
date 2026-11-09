@@ -85,7 +85,7 @@ internal static class RebirthG04LootSearchAttribution
         try
         {
             var d = Describe(npc, owner, list, ownerStage);
-            Log.Out("[REBIRTH G04 loot attribution] npc=" + npc?.RebirthRuntimeState?.StableId + " effectiveStage=" + effectiveStage +
+            RebirthDebug.Log("npc", "[REBIRTH G04 loot attribution] npc=" + npc?.RebirthRuntimeState?.StableId + " effectiveStage=" + effectiveStage +
                 " ownerStage=" + ownerStage + " " + d.ToString(Newtonsoft.Json.Formatting.None));
         }
         catch(Exception) { }

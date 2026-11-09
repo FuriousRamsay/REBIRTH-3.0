@@ -656,7 +656,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             if(hasSession)authorized=PlainAuthorized(session,position);
             else
             {
-                var claim=vehicle.world.GetLandClaimOwner(position,player);
+                var claim=CachedClaim(vehicle.world,position,player);
                 authorized=claim==EnumLandClaimOwner.None||claim==EnumLandClaimOwner.Self;
             }
             if(authorized)positions.Add(position);
@@ -673,7 +673,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         {
             long end=System.Diagnostics.Stopwatch.GetTimestamp();double ms=1000.0/System.Diagnostics.Stopwatch.Frequency;
             if((end-started)*ms>=2)
-                Log.Out("[REBIRTH RankPerf] frame="+UnityEngine.Time.frameCount+
+                RebirthDebug.Log("vehicles", "[REBIRTH RankPerf] frame="+UnityEngine.Time.frameCount+
                     " totalMs="+((end-started)*ms).ToString("F2")+
                     " nodesMs="+((afterNodes-started)*ms).ToString("F2")+
                     " worldLightsMs="+((afterWorldLights-afterNodes)*ms).ToString("F2")+
@@ -729,6 +729,27 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         return ranked.ToArray();
     }
     // END PURE POI SPREAD
+    // Profiler 2026-11-08 (owner: POIs can hold hundreds of lights): the Energy window queries 4x per second and
+    // every query re-ran the full POI light scan. The window may reuse a scan for half a second while the POI
+    // switch, limit, target, mode, POI and light discovery are unchanged; any of those changing rescans at once.
+    private sealed class PoiWindowCache{internal float At=-100f;internal RebirthCamperEnergyPoiSnapshot Snapshot;internal bool On;internal int Limit,Generation;internal string Target;internal PrefabInstance Poi;internal RebirthCamperEnergyMode Mode;}
+    private static readonly ConditionalWeakTable<EntityVehicle,PoiWindowCache> poiWindowCache=new ConditionalWeakTable<EntityVehicle,PoiWindowCache>();
+    public static RebirthCamperEnergyPoiSnapshot ObservePoiForWindow(EntityVehicle vehicle)
+    {
+        if(vehicle==null||!ThreadManager.IsMainThread())return ObservePoi(vehicle);
+        var cache=poiWindowCache.GetValue(vehicle,_=>new PoiWindowCache());
+        sessions.TryGetValue(vehicle,out var s);
+        bool on=s!=null&&s.PoiOn;int limit=s?.PoiLimit??int.MaxValue;string target=s?.PoiTargetIdentity;
+        var poi=Authority(vehicle)?NearestPoi(vehicle):null;
+        RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _);
+        int generation=RebirthCamperWorldLighting.DiscoveryGeneration;
+        float now=Time.realtimeSinceStartup;
+        if(cache.Snapshot!=null&&now-cache.At<.5f&&now>=cache.At&&cache.On==on&&cache.Limit==limit&&cache.Target==target&&
+            ReferenceEquals(cache.Poi,poi)&&cache.Mode==mode&&cache.Generation==generation)return cache.Snapshot;
+        var snapshot=ObservePoi(vehicle);
+        cache.Snapshot=snapshot;cache.At=now;cache.On=on;cache.Limit=limit;cache.Target=target;cache.Poi=poi;cache.Mode=mode;cache.Generation=generation;
+        return snapshot;
+    }
     public static RebirthCamperEnergyPoiSnapshot ObservePoi(EntityVehicle vehicle,int? requestedLimit=null)
         =>ObservePoi(vehicle,requestedLimit,RebirthCamperEnergyEfficiency.OwnerSaving(vehicle));
     private static RebirthCamperEnergyPoiSnapshot ObservePoi(EntityVehicle vehicle,int? requestedLimit,float ownerSaving)
@@ -773,7 +794,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             if(s!=null){if(!PlainAuthorized(s,position))continue;}
             else
             {
-                if(plainOwnerPlayer==null)continue;var claim=vehicle.world.GetLandClaimOwner(position,plainOwnerPlayer);
+                if(plainOwnerPlayer==null)continue;var claim=CachedClaim(vehicle.world,position,plainOwnerPlayer);
                 if(claim!=EnumLandClaimOwner.None&&claim!=EnumLandClaimOwner.Self)continue;
             }
             result.SupportedLights++;
@@ -793,7 +814,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             long end=System.Diagnostics.Stopwatch.GetTimestamp();
             double ms=1000.0/System.Diagnostics.Stopwatch.Frequency;
             if((end-started)*ms>=2)
-                Log.Out("[REBIRTH PoiPerf] frame="+UnityEngine.Time.frameCount+
+                RebirthDebug.Log("vehicles", "[REBIRTH PoiPerf] frame="+UnityEngine.Time.frameCount+
                     " totalMs="+((end-started)*ms).ToString("F2")+
                     " migrationMs="+((afterMigration-started)*ms).ToString("F2")+
                     " rankMs="+((afterRank-afterMigration)*ms).ToString("F2")+

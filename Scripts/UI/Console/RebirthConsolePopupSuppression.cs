@@ -70,7 +70,7 @@ public static class RebirthConsoleInputGuardRuntime
             player.AimingGun = false;
         }
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH ConsoleInput] PC127 opened; native console owns input frame=" + Time.frameCount);
+            RebirthDebug.Log("ui", "[REBIRTH ConsoleInput] PC127 opened; native console owns input frame=" + Time.frameCount);
     }
 
     public static void ClearGameplayMovement(EntityPlayerLocal player)
@@ -99,7 +99,7 @@ public static class RebirthConsoleInputGuardRuntime
         LocalPlayerUI ui = LocalPlayerUI.GetUIForPrimaryPlayer();
         ClearGameplayMovement(ui != null ? ui.entityPlayer : null);
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH ConsoleInput] PC127 closed; close-frame edge consumed, no timed hold frame=" + Time.frameCount);
+            RebirthDebug.Log("ui", "[REBIRTH ConsoleInput] PC127 closed; close-frame edge consumed, no timed hold frame=" + Time.frameCount);
     }
 }
 
@@ -121,7 +121,7 @@ public static class RebirthConsolePopupInstaller
         harmony.CreateClassProcessor(typeof(RebirthConsoleItemActionListGuardPatch)).Patch();
         s_installed = true;
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH ConsoleInput] PC127 installed exact OnOpen/OnClose hooks openMethods=1 closeMethods=1; live-window input guard active.");
+            RebirthDebug.Log("ui", "[REBIRTH ConsoleInput] PC127 installed exact OnOpen/OnClose hooks openMethods=1 closeMethods=1; live-window input guard active.");
     }
 }
 

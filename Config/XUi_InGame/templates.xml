@@ -1168,5 +1168,9 @@
 <include filename="../_Vehicles/camper_station_navigation.xml" />
 <conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/><include filename="../_Recycling/controls.xml"/></if></conditional>
 <include filename="../_WeaponUi/hover_rows.xml" />
+<!-- Owner 2026-11-08: count alignment via rebirthcountcenter (native rule, except drinks stay right) so rebinds never jump the number. -->
+<setattribute xpath="/templates/item_stack//label[@name='stackValue']" name="justify">{#rebirthcountcenter ? 'Center' : 'Right'}</setattribute>
+<setattribute xpath="/templates/dewcollector_stack//label[@name='stackValue']" name="justify">{#rebirthcountcenter ? 'Center' : 'Right'}</setattribute>
+<setattribute xpath="/templates/rebirth_item_stack_toolbar//label[@name='stackValue']" name="justify">{#rebirthcountcenter ? 'Center' : 'Right'}</setattribute>
 </configs>
 

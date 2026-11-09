@@ -75,7 +75,7 @@ public static class RebirthTraderPlacementExceptionsInstaller
 
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.trader-placement-exceptions.3.1"), typeof(RebirthTraderPlacementPatch));
         s_installed = true;
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH] Trader placement exceptions installed."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("traderprotection", "[REBIRTH] Trader placement exceptions installed."); }
     }
 }
 

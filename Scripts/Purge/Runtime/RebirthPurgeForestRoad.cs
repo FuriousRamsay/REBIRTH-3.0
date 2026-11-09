@@ -41,50 +41,67 @@ internal static class RebirthPurgeForestRoad
         roads=(provider as ChunkProviderGenerateWorldFromRaw)?.poiFromImage?.m_Poi;
         if(biomes==null||terrain==null||roads==null||biomes.worldSize<512){Log.Warning("[PurgeTruckStart] step=road.providers waiting biome="+(biomes!=null)+" terrain="+(terrain!=null)+" roads="+(roads!=null));cachedWorld=null;return false;}
         var timer=System.Diagnostics.Stopwatch.StartNew();int forest=0,road=0,settlement=0,run=0,slope=0,width=0;
-        Log.Out("[PurgeTruckStart] step=road.search.begin size="+biomes.worldSize+" provider="+provider.GetType().Name);
-        var buildings=exclusions;buildings.Clear();
+        RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.search.begin size="+biomes.worldSize+" provider="+provider.GetType().Name);
+        // Owner 2026-11-09 (Pregen06k01, dedicated server): one 200 m rule per 5 s retry left joining players on
+        // "building environment" for minutes. One search now tries every clearance, then an off-road forest
+        // spot, then any level spot, so a start position always exists.
+        var random=new System.Random();
         var decorator=GameManager.Instance.GetDynamicPrefabDecorator();
-        if(decorator?.allPrefabs!=null)foreach(var prefab in decorator.allPrefabs)
+        long budgetEnd=0;
+        bool skipForest=false;
+        foreach(var tier in RoadTiers)
         {
-            var size=prefab.boundingBoxSize;if(size.x<8||size.z<8||size.y<5)continue;
-            var at=prefab.boundingBoxPosition;buildings.Add(new Rect(at.x-200,at.z-200,size.x+400,size.z+400));
-        }
-        int margin=192,half=biomes.worldSizeHalf;var random=new System.Random();
-        for(int attempt=0;attempt<500000;attempt++)
-        {
-            int x=random.Next(-half+margin,half-margin),z=random.Next(-half+margin,half-margin);
-            if((attempt&255)==0&&timer.ElapsedMilliseconds>3000)break;
-            if(Rejected(new Vector2(x,z))||!Forest(biomes,x,z))continue;forest++;
-            if(!Road(biomes,x,z))continue;road++;
-            if(InsideExclusion(buildings,new Vector2(x,z))){settlement++;continue;}
-            for(int angle=0;angle<8;angle++)
+            bool forestRoad=tier.forest;int clearance=tier.clearance;
+            if(forestRoad&&skipForest)continue;
+            BuildExclusions(decorator,clearance);budgetEnd=timer.ElapsedMilliseconds+700;
+            var buildings=exclusions;
+            int margin=192,half=biomes.worldSizeHalf;
+            for(int attempt=0;attempt<500000;attempt++)
             {
-                float radians=angle*Mathf.PI/8;var forward=new Vector2(Mathf.Sin(radians),Mathf.Cos(radians));var side=new Vector2(forward.y,-forward.x);
-                if(!RoadRun(biomes,new Vector2(x,z),forward,30))continue;run++;
-                float left=Width(biomes,new Vector2(x,z),-side),right=Width(biomes,new Vector2(x,z),side);
-                if(left+right<3||left+right>20){width++;continue;}
-                var centre=new Vector2(x,z)+side*(right-left)*.5f;
-                if(InsideExclusion(buildings,centre)||Rejected(centre))continue;
-                bool clear=true;float low=float.MaxValue,high=float.MinValue;
-                for(int along=-6;along<=6;along+=3)for(int across=-2;across<=2;across+=2)
+                int x=random.Next(-half+margin,half-margin),z=random.Next(-half+margin,half-margin);
+                if((attempt&255)==0&&timer.ElapsedMilliseconds>budgetEnd)break;
+                if(Rejected(new Vector2(x,z))||!Ground(biomes,x,z,forestRoad))continue;forest++;
+                if(!Road(biomes,x,z))continue;road++;
+                if(InsideExclusion(buildings,new Vector2(x,z))){settlement++;continue;}
+                for(int angle=0;angle<8;angle++)
                 {
-                    var at=centre+forward*along+side*(across*.6f);int px=Mathf.RoundToInt(at.x),pz=Mathf.RoundToInt(at.y);
-                    if(!Road(biomes,px,pz)||!Forest(biomes,px,pz)){clear=false;break;}
-                    float height=terrain.GetTerrainHeightAt(px,pz);low=Mathf.Min(low,height);high=Mathf.Max(high,height);
+                    float radians=angle*Mathf.PI/8;var forward=new Vector2(Mathf.Sin(radians),Mathf.Cos(radians));var side=new Vector2(forward.y,-forward.x);
+                    if(!RoadRun(biomes,new Vector2(x,z),forward,30))continue;run++;
+                    float left=Width(biomes,new Vector2(x,z),-side),right=Width(biomes,new Vector2(x,z),side);
+                    if(left+right<3||left+right>20){width++;continue;}
+                    var centre=new Vector2(x,z)+side*(right-left)*.5f;
+                    if(InsideExclusion(buildings,centre)||Rejected(centre))continue;
+                    bool clear=true;float low=float.MaxValue,high=float.MinValue;
+                    for(int along=-6;along<=6;along+=3)for(int across=-2;across<=2;across+=2)
+                    {
+                        var at=centre+forward*along+side*(across*.6f);int px=Mathf.RoundToInt(at.x),pz=Mathf.RoundToInt(at.y);
+                        if(!Road(biomes,px,pz)||!Ground(biomes,px,pz,forestRoad)){clear=false;break;}
+                        float height=terrain.GetTerrainHeightAt(px,pz);low=Mathf.Min(low,height);high=Mathf.Max(high,height);
+                    }
+                    if(!clear||high-low>.45f){slope++;continue;}
+                    // Surroundings must remain forest beyond both ends and road shoulders.
+                    if(forestRoad)foreach(var offset in new[]{forward*50,-forward*50,side*25,-side*25})
+                        if(!Forest(biomes,Mathf.RoundToInt(centre.x+offset.x),Mathf.RoundToInt(centre.y+offset.y)))clear=false;
+                    if(!clear)continue;
+                    float y=terrain.GetTerrainHeightAt(Mathf.RoundToInt(centre.x),Mathf.RoundToInt(centre.y));
+                    var candidate=new SpawnPosition(new Vector3(centre.x,y+.5f,centre.y),angle*22.5f);
+                    if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
+                    cached=candidate;found=true;position=cached;
+                    RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.search.qualified-candidate "+(forestRoad?"forest road":"any road")+" clearance="+clearance+"m position="+cached.position+" heading="+cached.heading+" elapsedMs="+timer.ElapsedMilliseconds+" attempts="+(attempt+1));return true;
                 }
-                if(!clear||high-low>.45f){slope++;continue;}
-                // Surroundings must remain forest beyond both ends and road shoulders.
-                foreach(var offset in new[]{forward*50,-forward*50,side*25,-side*25})
-                    if(!Forest(biomes,Mathf.RoundToInt(centre.x+offset.x),Mathf.RoundToInt(centre.y+offset.y)))clear=false;
-                if(!clear)continue;
-                float y=terrain.GetTerrainHeightAt(Mathf.RoundToInt(centre.x),Mathf.RoundToInt(centre.y));
-                var candidate=new SpawnPosition(new Vector3(centre.x,y+.5f,centre.y),angle*22.5f);
-                if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
-                cached=candidate;found=true;position=cached;
-                Log.Out("[PurgeTruckStart] step=road.search.qualified-candidate position="+cached.position+" heading="+cached.heading+" elapsedMs="+timer.ElapsedMilliseconds+" attempts="+(attempt+1));return true;
             }
+            RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.search.failed "+(forestRoad?"forest road":"any road")+" clearance="+clearance+"m ground="+forest+" road="+road+" settlementRejected="+settlement+" straightRuns="+run+" widthRejected="+width+" footprintRejected="+slope);
+            // Owner 2026-11-09: some worlds have few roads. No forest-road point at all means relaxing the building
+            // clearance cannot help, so go straight to the off-road spot instead of spending the other passes.
+            // Some maps are a large city or have few roads: no road point at all means relaxing clearance cannot help.
+            if(road==0&&forestRoad){skipForest=true;RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.no-forest-roads (trying any road)");}
+            else if(road==0){RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.none-found (using an off-road spot)");break;}
+            forest=road=settlement=run=slope=width=0;
         }
-        Log.Error("[PurgeTruckStart] step=road.search.failed elapsedMs="+timer.ElapsedMilliseconds+" forest="+forest+" road="+road+" settlementRejected="+settlement+" straightRuns="+run+" widthRejected="+width+" footprintRejected="+slope);return false;
+        BuildExclusions(decorator,ClearanceSteps[ClearanceSteps.Length-1]);
+        if(OffRoad(world,provider,biomes,terrain,random,true,timer,out position)||OffRoad(world,provider,biomes,terrain,random,false,timer,out position))
+        {cached=position;found=true;return true;}
+        Log.Error("[PurgeTruckStart] step=site.search.failed elapsedMs="+timer.ElapsedMilliseconds+" (no road, forest or level spot qualified)");return false;
     }
     internal static bool Nearby(World world,Vector3 origin,float heading,float offset,out SpawnPosition candidate)
     {
@@ -158,6 +175,48 @@ internal static class RebirthPurgeForestRoad
         if(high-low>.45f)return false;
         point.y=provider.m_TerrainGenerator.GetTerrainHeightAt(Mathf.RoundToInt(point.x),Mathf.RoundToInt(point.z))+.5f;
         player=new SpawnPosition(point,truck.heading);return true;
+    }
+    private static readonly int[] ClearanceSteps={200,150,100,60,30};
+    // Forest roads first (clear of buildings), then any non-radiated road (city maps: roads run beside buildings;
+    // the footprint check still keeps blocks out of the truck space).
+    private static readonly (bool forest,int clearance)[] RoadTiers={(true,200),(true,150),(true,100),(true,60),(true,30),(false,30),(false,10),(false,0)};
+    private static bool Ground(WorldBiomeProviderFromImage map,int x,int z,bool forest)=>forest?Forest(map,x,z):map.GetRadiationAt(x,z)<=0;
+    private static void BuildExclusions(DynamicPrefabDecorator decorator,int clearance)
+    {
+        exclusions.Clear();
+        if(decorator?.allPrefabs==null)return;
+        foreach(var prefab in decorator.allPrefabs)
+        {
+            var size=prefab.boundingBoxSize;if(size.x<8||size.z<8||size.y<5)continue;
+            var at=prefab.boundingBoxPosition;exclusions.Add(new Rect(at.x-clearance,at.z-clearance,size.x+2*clearance,size.z+2*clearance));
+        }
+    }
+    /// <summary>Owner fallback: a level spot clear of buildings, in pine forest first, then any biome.</summary>
+    private static bool OffRoad(World world,ChunkProviderGenerateWorld provider,WorldBiomeProviderFromImage biomes,ITerrainGenerator terrain,
+        System.Random random,bool forestOnly,System.Diagnostics.Stopwatch timer,out SpawnPosition position)
+    {
+        position=SpawnPosition.Undef;
+        int margin=192,half=biomes.worldSizeHalf;long end=timer.ElapsedMilliseconds+1500;
+        for(int attempt=0;attempt<200000;attempt++)
+        {
+            if((attempt&255)==0&&timer.ElapsedMilliseconds>end)break;
+            int x=random.Next(-half+margin,half-margin),z=random.Next(-half+margin,half-margin);
+            if(Rejected(new Vector2(x,z))||biomes.GetRadiationAt(x,z)>0||forestOnly&&!Forest(biomes,x,z)||InsideExclusion(exclusions,new Vector2(x,z)))continue;
+            float heading=random.Next(8)*45f;var forward=Quaternion.Euler(0,heading,0)*Vector3.forward;var side=new Vector3(forward.z,0,-forward.x);
+            float low=float.MaxValue,high=float.MinValue;
+            for(int along=-7;along<=7;along+=7)for(int across=-2;across<=2;across+=2)
+            {
+                var at=new Vector3(x,0,z)+forward*along+side*across;
+                float h=terrain.GetTerrainHeightAt(Mathf.RoundToInt(at.x),Mathf.RoundToInt(at.z));low=Mathf.Min(low,h);high=Mathf.Max(high,h);
+            }
+            if(high-low>.6f)continue;
+            var candidate=new SpawnPosition(new Vector3(x,terrain.GetTerrainHeightAt(x,z)+.5f,z),heading);
+            if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
+            position=candidate;
+            RebirthDebug.Log("purge", "[PurgeTruckStart] step=site.fallback "+(forestOnly?"off-road forest":"any biome")+" position="+candidate.position+" heading="+heading+" attempts="+(attempt+1)+" (no qualifying forest road)");
+            return true;
+        }
+        return false;
     }
     private static bool InsideExclusion(List<Rect> buildings,Vector2 point)
     {

@@ -496,6 +496,8 @@ function Invoke-TestFile([string] $file) {
     $executable = @($test.steps | Where-Object { -not ($_.PSObject.Properties.Name.StartsWith('_')) })
     if ($executable.Count -eq 0) { Fail 'scenario contains only comments' }
     $startSeq = (Invoke-Bridge 'GET' '/ping').Json.lastLogSeq
+    # Debug logging is off until "rbdebug on" (owner 2026-11-08); scenarios read automatic log lines, so turn it on.
+    try { $null = Invoke-Bridge 'POST' '/console' @{} 'rbdebug on' 10 } catch { Write-Host "note: rbdebug on failed: $_" }
     $results = @(); $failed = 0; $i = 0; $skillMarks = @{}; $itemMarks = @{}; $fenceMarks = @{}
     $evidenceDir = Join-Path $OutDir ('tests/' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '_' + [IO.Path]::GetFileNameWithoutExtension($file))
     New-Item -ItemType Directory -Path $evidenceDir -Force | Out-Null

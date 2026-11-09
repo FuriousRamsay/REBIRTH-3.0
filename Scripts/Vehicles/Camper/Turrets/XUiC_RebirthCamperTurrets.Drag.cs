@@ -21,7 +21,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
 #if DEBUG
         if(!DebugDragLog||dragTraceBudget<=0)return;
         dragTraceBudget--;
-        try{Log.Out("[REBIRTH TurretDrag] frame="+Time.frameCount+" stage="+stage+" "+(detail??"").Replace('\r',' ').Replace('\n',' ')+
+        try{RebirthDebug.Log("vehicles", "[REBIRTH TurretDrag] frame="+Time.frameCount+" stage="+stage+" "+(detail??"").Replace('\r',' ').Replace('\n',' ')+
             " waiting="+waiting+" outgoing="+outgoingDrag+" queued="+queuedDrop+
             " cursor="+RebirthCamperEnergyGestureTrace.Stack(xui.DragAndDropWindow?.CurrentStack));}catch{}
 #endif

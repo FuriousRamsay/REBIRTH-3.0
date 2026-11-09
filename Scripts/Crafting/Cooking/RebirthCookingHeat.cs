@@ -98,7 +98,7 @@ public static class RebirthCookingHeat
         Advance(stack.recipe,dt,heated);stack.craftingTimeLeft=Remaining(stack.recipe);
         if(!wasReady&&Ready(stack.recipe))
         {
-            if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.CraftingUiLoggingEnabled)) Log.Out(IsDrink(stack.recipe)
+            if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.CraftingUiLoggingEnabled)) RebirthDebug.Log("crafting", IsDrink(stack.recipe)
                 ?"[REBIRTH Cooking] Drink ready; evaporation at "+RebirthCookingHeatRules.Grace+"s, empty at "+RebirthCookingHeatRules.BurnAfter(Text(stack.recipe,"method"))+"s after completion."
                 :"[REBIRTH Cooking] Food ready; overcooking at "+RebirthCookingHeatRules.Grace+"s, burnt at "+RebirthCookingHeatRules.BurnAfter(Text(stack.recipe,"method"))+"s after completion.");
             

@@ -36,7 +36,7 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
     public override void Execute(MinEventParams _params)
     {
         var entityAlive = _params.Self as EntityAlive;
-        //Log.Out($"MinEventActionMadmanExplosion::Execute - this Entity: {entityAlive}, other: {_params.Other}, others: {_params.Others}");
+        //RebirthDebug.Log("weaponbonuses", $"MinEventActionMadmanExplosion::Execute - this Entity: {entityAlive}, other: {_params.Other}, others: {_params.Others}");
 
         if (entityAlive == null) return;
 
@@ -93,29 +93,29 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
             itemExplosion = ItemClass.GetItem("weaponBonusExplosion2", false);
         }
 
-        //Log.Out("MinEventActionMadmanExplosion-Execute instigatorId: " + _params.Buff.instigatorId);
-        //Log.Out("MinEventActionMadmanExplosion-Execute instigatorPos: " + _params.Buff.instigatorPos);
+        //RebirthDebug.Log("weaponbonuses", "MinEventActionMadmanExplosion-Execute instigatorId: " + _params.Buff.instigatorId);
+        //RebirthDebug.Log("weaponbonuses", "MinEventActionMadmanExplosion-Execute instigatorPos: " + _params.Buff.instigatorPos);
 
         if (_params.Buff.instigatorId != -1)
         {
-            //Log.Out("MinEventActionMadmanExplosion-Execute 1");
+            //RebirthDebug.Log("weaponbonuses", "MinEventActionMadmanExplosion-Execute 1");
             TargetPos = _params.Buff.instigatorPos;
         }
         else if (_params.Other != null)
         {
-            //Log.Out("MinEventActionMadmanExplosion-Execute 2");
+            //RebirthDebug.Log("weaponbonuses", "MinEventActionMadmanExplosion-Execute 2");
             TargetPos = _params.Other.position;
         }
         else
         {
-            //Log.Out("MinEventActionMadmanExplosion-Execute 2");
+            //RebirthDebug.Log("weaponbonuses", "MinEventActionMadmanExplosion-Execute 2");
             TargetPos = _params.Self.position;
         }
 
         if (blastPower == 201)
         {
             RebirthWeaponBonusParticles.Play(particleName, impactPosition, soundName, _params.Self, TargetPos);
-            //Log.Out($"InstantiateParticleEffect: {particleName}, impactPosition: {impactPosition}, TargetPos: {TargetPos}");
+            //RebirthDebug.Log("weaponbonuses", $"InstantiateParticleEffect: {particleName}, impactPosition: {impactPosition}, TargetPos: {TargetPos}");
         }
 
         Explode(itemExplosion);
@@ -199,7 +199,7 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
 
     public void Explode(ItemValue _itemValueExplosionSource)
     {
-        //Log.Out($"MadmanExplosion::AttackEntities - _entityThatCausedExplosion: {SourceEntityID}, _itemValueExplosionSource: {_itemValueExplosionSource}, damageType: {damageType}");
+        //RebirthDebug.Log("weaponbonuses", $"MadmanExplosion::AttackEntities - _entityThatCausedExplosion: {SourceEntityID}, _itemValueExplosionSource: {_itemValueExplosionSource}, damageType: {damageType}");
 
         FastTags<TagGroup.Global> tags = explosionTag;
 
@@ -215,7 +215,7 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
         int prevLayer = SourceEntity.GetModelLayer();
         SourceEntity.SetModelLayer(2, true);
         Collider[] allColliders = Physics.OverlapSphere(TargetPos - Origin.position, value2, layerMask);// -538480645);
-        //Log.Out($"Found allColliders: {allColliders.Length}, layerMask: {layerMask}");
+        //RebirthDebug.Log("weaponbonuses", $"Found allColliders: {allColliders.Length}, layerMask: {layerMask}");
         SourceEntity.SetModelLayer(prevLayer, true);
         bool flag = false;
 
@@ -345,7 +345,7 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
                 }
             }
 
-            //Log.Out($"entity: {entity}, hitEntity.Value.damage: {hitEntity.Value.damage}, bCrit: {bCrit}, dmgDone: {dmgDone}, dmg source entity id: {SourceEntityID}, {SourceEntity}");
+            //RebirthDebug.Log("weaponbonuses", $"entity: {entity}, hitEntity.Value.damage: {hitEntity.Value.damage}, bCrit: {bCrit}, dmgDone: {dmgDone}, dmg source entity id: {SourceEntityID}, {SourceEntity}");
 
             if (SourceEntity != null)
             {
@@ -432,7 +432,7 @@ public static FastTags<TagGroup.Global> explosionTag = TAG_EXPLOSION;
         int yStr = UnityEngine.Random.Range(_heightMultiplier.x, _heightMultiplier.y);
         int zStr = UnityEngine.Random.Range(_XZMultiplier.x, _XZMultiplier.y) * zSign;
         Vector3 force = new Vector3(_initialForceStrength * xStr, _initialForceStrength * yStr, _initialForceStrength * zStr);
-        //Log.Out($"force: {force}");
+        //RebirthDebug.Log("weaponbonuses", $"force: {force}");
         return force;
     }
 

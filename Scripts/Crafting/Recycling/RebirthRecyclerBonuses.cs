@@ -143,12 +143,20 @@ public static class RebirthRecyclerBonuses
         return unavailable.AsReadOnly();
     }
     public static bool TryFreezeBonus(ItemValue source, Guid group, out IReadOnlyList<ItemStack> rewards, out IReadOnlyList<string> unavailable)
+        => TryFreezeBonus(source, group, 1, 1, out rewards, out unavailable);
+
+    public static bool TryFreezeBonus(ItemValue source, Guid group, int units, int crafterLevel, out IReadOnlyList<ItemStack> rewards, out IReadOnlyList<string> unavailable)
     {
         var result = new List<ItemStack>(); rewards = result.AsReadOnly(); unavailable = UnavailableLegacyFeatures(source);
         if (source == null || source.IsEmpty() || group == Guid.Empty) return false;
         // Unported mastery is reported independently; never manufacture old CVars.
         foreach (string issue in unavailable) if (issue != "legacy-armor-mastery-progression") return false;
         string name = source.ItemClass?.GetItemName() ?? string.Empty;
+        if (name.StartsWith("controlPanel", StringComparison.OrdinalIgnoreCase))
+        {
+            AddPanelParts(group, Math.Max(1, units), crafterLevel, result);
+            return true;
+        }
         if (!name.StartsWith("armor", StringComparison.OrdinalIgnoreCase)
             || string.Equals(RebirthVariables.customScenario, "hive", StringComparison.OrdinalIgnoreCase)) return true;
         byte[] roll;
@@ -178,15 +186,59 @@ public static class RebirthRecyclerBonuses
             pool.RemoveAt(pick);
         }
     }
-    public static IReadOnlyList<ItemStack> FreezeBonus(ItemValue source, Guid group)
+    // 2.6 ControlPanelPartRewards (Recycler, ScrapBonusPartDropper): each control panel scrapped gives 0-3 different kit
+    // parts. The player's level sets the odds (1-20, 21-50, 51+); parts are picked by weight without repeats.
+    // Rolls come from the operation hash per unit, so retries and reloads give the same reward.
+    private static readonly int[] PanelPartWeights = { 100, 100, 100, 100, 100, 40, 40, 40, 40, 40, 40, 12, 12, 12, 12, 12, 3, 3, 3, 3, 3 };
+    private static readonly float[] PanelNone = { 0.35f, 0.2f, 0.05f }, PanelOne = { 0.6f, 0.45f, 0.3f }, PanelTwo = { 0.85f, 0.8f, 0.75f };
+
+    private static void AddPanelParts(Guid group, int units, int crafterLevel, List<ItemStack> result)
     {
-        if (TryFreezeBonus(source, group, out var rewards, out var unavailable)) return rewards;
+        int tier = crafterLevel >= 51 ? 2 : crafterLevel >= 21 ? 1 : 0;
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        using (var hash = SHA256.Create())
+            for (int unit = 0; unit < units; unit++)
+            {
+                byte[] roll = hash.ComputeHash(Encoding.UTF8.GetBytes("rebirth.recycler.panel.parts.v1|" + group.ToString("N") + "|" + unit));
+                double chance = BitConverter.ToUInt32(roll, 0) / (double)uint.MaxValue;
+                int parts = chance < PanelNone[tier] ? 0 : chance < PanelOne[tier] ? 1 : chance < PanelTwo[tier] ? 2 : 3;
+                var picked = new bool[LegacyPanelParts.Length];
+                for (int drop = 0; drop < parts; drop++)
+                {
+                    int total = 0;
+                    for (int i = 0; i < PanelPartWeights.Length; i++) if (!picked[i]) total += PanelPartWeights[i];
+                    if (total <= 0) break;
+                    int pick = (int)(BitConverter.ToUInt32(roll, 4 + 4 * drop) % (uint)total);
+                    for (int i = 0; i < PanelPartWeights.Length; i++)
+                    {
+                        if (picked[i]) continue;
+                        if (pick < PanelPartWeights[i])
+                        {
+                            picked[i] = true;
+                            counts[LegacyPanelParts[i]] = (counts.TryGetValue(LegacyPanelParts[i], out int n) ? n : 0) + 1;
+                            break;
+                        }
+                        pick -= PanelPartWeights[i];
+                    }
+                }
+            }
+        foreach (var part in counts) result.Add(new ItemStack(ItemClass.GetItem(part.Key, true).Clone(), part.Value));
+    }
+
+    public static IReadOnlyList<ItemStack> FreezeBonus(ItemValue source, Guid group) => FreezeBonus(source, group, 1, 1);
+
+    public static IReadOnlyList<ItemStack> FreezeBonus(ItemValue source, Guid group, int units, int crafterLevel)
+    {
+        if (TryFreezeBonus(source, group, units, crafterLevel, out var rewards, out var unavailable)) return rewards;
         throw new InvalidOperationException("Recycler bonus dependency unavailable: " + string.Join(",", unavailable));
     }
-    public static List<ItemStack> CompletionRewards(ItemValue source, Guid group)
+    public static List<ItemStack> CompletionRewards(ItemValue source, Guid group) => CompletionRewards(source, group, 1, 1);
+
+    /// <summary>Completion bonuses for a scrap job: units = items scrapped, crafterLevel = level of the player who queued it.</summary>
+    public static List<ItemStack> CompletionRewards(ItemValue source, Guid group, int units, int crafterLevel)
     {
         var result = new List<ItemStack>();
-        foreach (var stack in FreezeBonus(source, group)) result.Add(stack.Clone());
+        foreach (var stack in FreezeBonus(source, group, units, crafterLevel)) result.Add(stack.Clone());
         return result;
     }
 }

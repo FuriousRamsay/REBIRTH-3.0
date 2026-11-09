@@ -44,7 +44,7 @@ public static class AdvancedFarmingRuntimePolicy
         AdvancedFarmingDynamicLightOpacityService.ClearPendingSunlightRefreshes();
         AdvancedFarmingDoorVisualRefreshService.ClearPendingVisualRefreshes();
 
-        Log.Out("[AdvancedFarming] DiagnosticHardDisableAll=" + s_diagnosticHardDisableAll + " reason=" + (reason ?? string.Empty));
+        RebirthDebug.Log("advancedfarming", "[AdvancedFarming] DiagnosticHardDisableAll=" + s_diagnosticHardDisableAll + " reason=" + (reason ?? string.Empty));
     }
 
     public static void SetEnabled(bool enabled)

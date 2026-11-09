@@ -431,7 +431,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         else if (delta < 0f)
             SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, 1) : targetPixelOffset + effectivePitch);
         if (RebirthLogSettings.CraftingUiLoggingEnabled && Math.Abs(before - targetPixelOffset) > 0.01f)
-            Log.Out("[REBIRTH Crafting InventoryTrace] scroll source=" + ControllerId(sender)
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] scroll source=" + ControllerId(sender)
                 + " delta=" + delta.ToString("0.###")
                 + " current=" + pixelOffset.ToString("0.0")
                 + " target=" + targetPixelOffset.ToString("0.0")
@@ -451,7 +451,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         else
             SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, 1) : targetPixelOffset + effectivePitch);
         if (RebirthLogSettings.CraftingUiLoggingEnabled && Math.Abs(before - targetPixelOffset) > 0.01f)
-            Log.Out("[REBIRTH Crafting InventoryTrace] scroll source=poll delta=" + delta.ToString("0.###")
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] scroll source=poll delta=" + delta.ToString("0.###")
                 + " current=" + pixelOffset.ToString("0.0")
                 + " target=" + targetPixelOffset.ToString("0.0")
                 + " max=" + MaxPixelOffset.ToString("0.0"));
@@ -508,7 +508,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
                 lastColumnRight = lastColumn.UiTransform.localPosition.x +
                     lastColumn.Size.x * lastColumn.UiTransform.localScale.x;
         }
-        Log.Out("[REBIRTH Crafting InventoryTrace] geometry reason=" + (reason ?? "unknown")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] geometry reason=" + (reason ?? "unknown")
             + " columns=" + Columns
             + " authored=" + RebirthCraftingInventoryBridge.AuthoredSlotCount
             + " physical=" + lastPhysical
@@ -558,7 +558,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
 
         if (hoveredSlot < 0 || slots == null || hoveredSlot >= slots.Length || slots[hoveredSlot] == null || slots[hoveredSlot].ViewComponent == null)
         {
-            Log.Out("[REBIRTH Crafting InventoryHover] slot=<none> hovered=" + (hovered != null ? hovered.name : "<null>"));
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryHover] slot=<none> hovered=" + (hovered != null ? hovered.name : "<null>"));
             return;
         }
 
@@ -571,7 +571,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
             : 0;
         int actualW = Mathf.RoundToInt(slotSize.x * localScale.x);
         int actualH = Mathf.RoundToInt(slotSize.y * localScale.y);
-        Log.Out("[REBIRTH Crafting InventoryHover] slot=" + hoveredSlot
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryHover] slot=" + hoveredSlot
             + " physical=" + lastPhysical
             + " unencumbered=" + RebirthCraftingInventoryBridge.GetUnencumberedSlotCount(xui)
             + " pos=" + pos.x + "," + pos.y

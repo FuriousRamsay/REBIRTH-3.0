@@ -43,7 +43,7 @@ public static class RebirthCamperTrace
             entry["cargoSlots"]=vehicle.bag?.ItemGrid?.items.Length??-1;
         }
         events.Enqueue(entry);while(events.Count>256)events.Dequeue();
-        Log.Out("[CamperTrace] "+entry.ToString(Newtonsoft.Json.Formatting.None));
+        RebirthDebug.Log("vehicles", "[CamperTrace] "+entry.ToString(Newtonsoft.Json.Formatting.None));
     }
     public static JObject Snapshot(EntityVehicle vehicle)
     {

@@ -20,7 +20,7 @@ internal static class RebirthGearBagBackingGuard
         bool allowed=!blocked || (_resize && RebirthGearNativeWritePermit.TryConsume(
             RebirthGearNativeWritePermit.Kind.BagBacking,__instance,-1,_slots,_slots?.Length ?? -1));
         if(blocked && !allowed && XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen==true)
-            Log.Out("[REBIRTH CreativeTransfer] bag.SetSlots.blocked vehicle="+
+            RebirthDebug.Log("survivor", "[REBIRTH CreativeTransfer] bag.SetSlots.blocked vehicle="+
                 RebirthVehicleOwnerCustody.BlocksInventory(__instance,true)+" hydration="+
                 RebirthHydrationOwnerHold.BlocksInventory(__instance,true)+" resize="+_resize);
         return allowed;
@@ -36,7 +36,7 @@ internal static class RebirthGearBeltSlotGuard
         bool allowed=!blocked || RebirthGearNativeWritePermit.TryConsume(
             RebirthGearNativeWritePermit.Kind.BeltSlot,__instance,_idx,_itemValue,_count);
         if(blocked && !allowed && XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen==true)
-            Log.Out("[REBIRTH CreativeTransfer] belt.SetItem.blocked vehicle="+
+            RebirthDebug.Log("survivor", "[REBIRTH CreativeTransfer] belt.SetItem.blocked vehicle="+
                 RebirthVehicleOwnerCustody.BlocksInventory(__instance,false)+" slot="+_idx);
         return allowed;
     }

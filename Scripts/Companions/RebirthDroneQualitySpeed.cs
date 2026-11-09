@@ -80,7 +80,7 @@ public static class RebirthDroneQualitySpeed
             telemetryDeadline = Time.realtimeSinceStartup + Mathf.Clamp(seconds, 1f, 60f);
             nextTelemetryPrune = 0f;
         }
-        Log.Out("[RebirthDroneSpeed] movement telemetry enabled for at most 60 seconds; movement policy unchanged.");
+        RebirthDebug.Log("companions", "[RebirthDroneSpeed] movement telemetry enabled for at most 60 seconds; movement policy unchanged.");
     }
     public static void StopTelemetry()
     {

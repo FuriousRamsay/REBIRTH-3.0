@@ -108,7 +108,7 @@ internal static class RebirthHydrationLocalTransfer
     private static Result Refuse(EntityPlayerLocal player,bool returning,bool sourceIsBag,int sourceIndex,string reason)
     {Trace(player,returning,sourceIsBag,sourceIndex,"refused",reason);return Result.Refused;}
     private static void Trace(EntityPlayerLocal player,bool returning,bool sourceIsBag,int sourceIndex,string phase,string detail)
-    {Log.Out($"[REBIRTH HydrationTransfer] {phase} action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(sourceIsBag?"bag":"belt")} index={sourceIndex} {detail}");}
+    {RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] {phase} action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(sourceIsBag?"bag":"belt")} index={sourceIndex} {detail}");}
     private static string SafeName(ItemStack stack)=>stack==null||stack.IsEmpty()?"empty":stack.itemValue?.ItemClass?.GetItemName()??"unknown";
     private static int FreeUnlocked(EntityPlayerLocal player,ItemStack[] bag)
     {if(bag==null)return -1;var locks=player?.bag?.LockedSlots;int free=0;for(int i=0;i<bag.Length;i++)if((bag[i]==null||bag[i].IsEmpty())&&(locks==null||i>=locks.Length||!locks[i]))free++;return free;}

@@ -241,7 +241,7 @@ public static class RebirthMetabolismConfig
             PrebioticRealSeconds = F(supplements, "prebioticRealSeconds", PrebioticRealSeconds, 0f, 172800f);
 
             loaded = true;
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Metabolism] Config loaded. hydration/60real=" + BaseFluidNeedMlPerReal60Minutes.ToString("0", CultureInfo.InvariantCulture)
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Config loaded. hydration/60real=" + BaseFluidNeedMlPerReal60Minutes.ToString("0", CultureInfo.InvariantCulture)
                 + "mL nutrition/60real=" + BaseFoodNeedUnitsPerReal60Minutes.ToString("0.#", CultureInfo.InvariantCulture)
                 + " energyRecovery/min=" + EnergyRecoveryPerRealMinute.ToString("0.##", CultureInfo.InvariantCulture)
                 + " stomach=" + BaseStomachCapacityMl.ToString("0", CultureInfo.InvariantCulture) + "mL"

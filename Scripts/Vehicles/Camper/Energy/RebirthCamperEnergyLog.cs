@@ -4,5 +4,5 @@
 internal static class RebirthCamperEnergyLog
 {
     internal static bool Enabled => RebirthLogSettings.AutomaticLoggingDefault;
-    internal static void Out(string message) { if (Enabled) Log.Out(message); }
+    internal static void Out(string message) { if (Enabled) RebirthDebug.Log("vehicles", message); }
 }

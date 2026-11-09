@@ -21,6 +21,11 @@ internal static class RebirthStationPaidCompletionCallsite
     private const string NativeImage34b9="086755F825EEE6ABD4A13789F2F428D9043D36C8C54EBB3B38A9518B4A5146FC";
     private const string NativeMvid34b10="0dfd4a8c-e2eb-4a72-8af4-f69f7c5b1480";
     private const string NativeImage34b10="CB54022CCC862AA673E0EE55DAFE67D842B364C80DF6916958D171E959656C58";
+    // 3.4 dedicated server (b10 server build, MVID 843f5381): every guarded method was compared to the reviewed b10 client
+    // with operands resolved by name (2026-11-09, scratchpad ilcmp): all identical; only metadata tokens differ.
+    private const string NativeMvid34Server="843f5381-6019-44cb-9180-0b5e2888de8b";
+    private const string NativeImage34Server="1383D5B6414B3DE6106FA6F03DBD9EBBC739B41179F591A45241C8C1A6FD4A47";
+    private const string NativeBody34Server="6D475DD4DD8E7E3EF292450BEC0DAEC5661C8E383ACFD62FF86CC5B0D5BA973D";
     private sealed class Fault { }
     private sealed class PendingCompletion
     {
@@ -143,6 +148,7 @@ internal static class RebirthStationPaidCompletionCallsite
         else if(mvid==NativeMvid34){expectedImage=NativeImage34;expectedBody=NativeBody34;}
         else if(mvid==NativeMvid34b9){expectedImage=NativeImage34b9;expectedBody=NativeBody34;}
         else if(mvid==NativeMvid34b10){expectedImage=NativeImage34b10;expectedBody=NativeBody34;}
+        else if(mvid==NativeMvid34Server){expectedImage=NativeImage34Server;expectedBody=NativeBody34Server;}
         else throw new InvalidOperationException("Unsupported native station version.");
         // Qualify one reviewed module/image/body tuple, never an independent cross-product.
         using(var sha=SHA256.Create())

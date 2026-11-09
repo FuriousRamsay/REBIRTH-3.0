@@ -173,7 +173,7 @@ public static class RebirthSurvivorCreationService
         FinalizeFreshOnlineState(player, committed, metabolism);
         RebirthBackgroundStarterItems.Offer(player);
         RebirthCharacterCreationHoldService.OnCharacterCommitted(player, identity);
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] character created key=" + identity.StorageKey
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] character created key=" + identity.StorageKey
             + " creationId=" + creationId
             + " revision=" + committed.Revision
             + " background=" + committed.Origin.BackgroundId

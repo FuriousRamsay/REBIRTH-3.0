@@ -31,6 +31,6 @@ public sealed class RebirthVehicleRespawnModApi : IModApi
             report.MissingTargetBlocks > 0 || report.WrongAfterBinding > 0)
             Log.Warning("[REBIRTH Vehicle Respawn] runtime helper binding " + report);
         else if (RebirthLogSettings.RuntimeInstallLoggingEnabled)
-            Log.Out("[REBIRTH Vehicle Respawn] runtime helper binding " + report);
+            RebirthDebug.Log("vehicles", "[REBIRTH Vehicle Respawn] runtime helper binding " + report);
     }
 }

@@ -67,7 +67,7 @@ public static class RebirthWorkmanshipSignatureService
         if(activeEmptyHandInspections==null)activeEmptyHandInspections=new HashSet<string>(StringComparer.Ordinal);
         if(!activeEmptyHandInspections.Add(key))return;
         __state=key;
-        Log.Out("[REBIRTH Block Inspect] block="+__instance.GetBlockName()+" position="+pos);
+        RebirthDebug.Log("survivor", "[REBIRTH Block Inspect] block="+__instance.GetBlockName()+" position="+pos);
     }
 
     public static void EmptyHandBlockInspectPostfix(string __state)

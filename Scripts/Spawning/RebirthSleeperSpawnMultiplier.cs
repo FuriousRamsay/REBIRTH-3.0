@@ -151,7 +151,7 @@ public sealed class RebirthSleeperSpawnMultiplierModApi : IModApi
         try
         {
             RebirthSleeperSpawnMultiplierInstaller.Install();
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Sleeper Multipliers] Runtime patch installed."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", "[REBIRTH Sleeper Multipliers] Runtime patch installed."); }
         }
         catch (Exception ex)
         {

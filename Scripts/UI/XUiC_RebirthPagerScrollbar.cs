@@ -340,7 +340,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
             if (craftingRectFailureLogBudget > 0)
             {
                 craftingRectFailureLogBudget--;
-                if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH RecipeScroll] TRACK_READY rect=<unresolved>"
+                if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] TRACK_READY rect=<unresolved>"
                     + " viewSize=" + (ViewComponent != null ? ViewComponent.Size.ToString() : "<null>")
                     + " root=" + (ViewComponent != null ? ViewComponent.ID : "<null>"));
             }
@@ -350,7 +350,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
         if (!craftingReadyLogged)
         {
             craftingReadyLogged = true;
-            if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH RecipeScroll] TRACK_READY"
+            if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] TRACK_READY"
                 + " root=" + (ViewComponent != null ? ViewComponent.ID : "<null>")
                 + " rect=[" + left.ToString("0.0")
                 + "," + bottom.ToString("0.0")
@@ -404,7 +404,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
         if (craftingRawInputLogBudget > 0 && (reason != "drag" || requested != before))
         {
             craftingRawInputLogBudget--;
-            if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH RecipeScroll] TRACK_INPUT reason=" + reason
+            if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] TRACK_INPUT reason=" + reason
                 + " before=" + before
                 + " requested=" + requested
                 + " after=" + after
@@ -468,7 +468,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
 
         if (craftingRawInputLogBudget > 0)
         {
-            if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH RecipeScroll] NATIVE_NAV reason=" + reason
+            if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] NATIVE_NAV reason=" + reason
                 + " start=" + start
                 + " requested=" + requested
                 + " final=" + pager.GetPage()
@@ -586,7 +586,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
 
         if (IsCraftingBridge && rangeChanged)
         {
-            if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH RecipeScroll] RANGE oldMaxPage=" + previousMaxPage
+            if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] RANGE oldMaxPage=" + previousMaxPage
                 + " newMaxPage=" + maxPage
                 + " page=" + pager.GetPage()
                 + " viewportHeight=" + viewportHeight);
@@ -632,7 +632,7 @@ public sealed class XUiC_RebirthPagerScrollbar : XUiController
             if(IsCraftingBridge&&rangeChanged)
             {
                 float nativeValue,nativeBarSize;bool haveValue=RebirthNativeScrollbarUtil.TryGetValue(scrollView,out nativeValue);bool haveBarSize=RebirthNativeScrollbarUtil.TryGetBarSize(scrollView,out nativeBarSize);
-                if(RebirthLogSettings.CraftingUiLoggingEnabled)Log.Out("[REBIRTH RecipeScroll] RANGE_APPLIED maxPage="+maxPage+" current="+current+" nativeValue="+(haveValue?nativeValue.ToString("0.###"):"<unavailable>")+" nativeBarSize="+(haveBarSize?nativeBarSize.ToString("0.###"):"<unavailable>"));
+                if(RebirthLogSettings.CraftingUiLoggingEnabled)RebirthDebug.Log("ui", "[REBIRTH RecipeScroll] RANGE_APPLIED maxPage="+maxPage+" current="+current+" nativeValue="+(haveValue?nativeValue.ToString("0.###"):"<unavailable>")+" nativeBarSize="+(haveBarSize?nativeBarSize.ToString("0.###"):"<unavailable>"));
             }
         }
         finally{syncing=false;}

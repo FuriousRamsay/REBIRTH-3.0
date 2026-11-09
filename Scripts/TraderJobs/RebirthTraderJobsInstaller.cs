@@ -83,6 +83,6 @@ public static class RebirthTraderJobsInstaller
         RebirthSpecialOfferDiagnostics.Install(harmony);
         #endif
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH] Trader jobs installed: expanded per-tier listings, repeat-POI policy, concurrent/daily acceptance limits, guaranteed progression credit, multi-fetch routing/identity, infested presentation, class-level Jobs click/direct-accept bindings, random refresh, completion history, 2.6-hard listing composition caps, silent cancel/shared notifications, death/disconnect-only five-minute recovery with death-time deadlines."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("traderjobs", "[REBIRTH] Trader jobs installed: expanded per-tier listings, repeat-POI policy, concurrent/daily acceptance limits, guaranteed progression credit, multi-fetch routing/identity, infested presentation, class-level Jobs click/direct-accept bindings, random refresh, completion history, 2.6-hard listing composition caps, silent cancel/shared notifications, death/disconnect-only five-minute recovery with death-time deadlines."); }
     }
 }

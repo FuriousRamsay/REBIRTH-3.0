@@ -1,0 +1,20 @@
+{
+  "name": "Armor bonus focus: category tree, focused rolls and every kit rule (rbbonus selftest)",
+  "stopOnFailure": false,
+  "steps": [
+    { "console": "rbbonus tree" },
+    { "wait": 2 },
+    { "expectLog": { "contains": "Problems: 0", "min": 1 } },
+    { "console": "rbbonus selftest" },
+    { "wait": 8 },
+    { "expectLog": { "contains": "rbbonus selftest:", "min": 1 } },
+    { "expectLog": { "contains": " passed, 0 failed", "min": 1 } },
+    { "console": "rbbonus roll Hands cat:hands_melee 2 4 1000" },
+    { "wait": 3 },
+    { "expectLog": { "contains": "outside pool/range 0, empty 0", "min": 1 } },
+    { "console": "rbbonus reroll reload_speed_shotguns 2 6 1000" },
+    { "wait": 3 },
+    { "expectLog": { "contains": "key changed 0", "min": 1 } },
+    { "expectNoErrors": true }
+  ]
+}

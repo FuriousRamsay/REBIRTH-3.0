@@ -12,6 +12,7 @@ internal sealed class RebirthPoiNativeEvidence
     private const int MaximumCandidates=4096,MaximumActorsPerPoi=8192;
     private readonly Func<RebirthPoiWorldStore> resolveStore;
     private readonly Func<double> clock;
+    private const double CombatJournalSeconds=2.0;
     private readonly Dictionary<PrefabInstance,Candidate> candidates=new Dictionary<PrefabInstance,Candidate>();
     private readonly Queue<Candidate> dirty=new Queue<Candidate>();
     private readonly Queue<DeathWitness> pendingDeaths=new Queue<DeathWitness>();
@@ -34,6 +35,7 @@ internal sealed class RebirthPoiNativeEvidence
         public EntityPlayer Touched;
         public readonly Dictionary<SleeperVolume,Dictionary<int,Actor>> Actors=new Dictionary<SleeperVolume,Dictionary<int,Actor>>();
         public bool Queued,Fault,ResetObserved,JournalDirty;
+        public double NextCombatJournal; // see CombatJournalSeconds
         public long RespawnGateRevision=-1; public double RespawnGateUntil; public bool RespawnGateValid;
         public long? Epoch;
         public Guid BoundReset;
@@ -899,6 +901,13 @@ internal sealed class RebirthPoiNativeEvidence
             if(observations==null){c.Fault=true;return;}
             if(record.Observations==null || record.Observations.Canonical!=observations.Canonical)
             {
+                // Profiler 2026-11-08: each publication is two flushed files plus manifest re-reads on the main
+                // thread (20-57 ms), queued after every spawn/kill. While required combatants are alive, publish
+                // at most every CombatJournalSeconds; the last kill (live 0), resets and shutdown drains
+                // (journalOnly) still publish at once, so a clear is never proven from an unpersisted journal.
+                double journalNow=clock();
+                if(!journalOnly && live>0 && journalNow<c.NextCombatJournal){Dirty(c);return;}
+                c.NextCombatJournal=journalNow+CombatJournalSeconds;
                 var publication=store.TryObservePartial(snapshot,c.Identity,record.Epoch,observations);
                 if(publication!=RebirthPoiStoreResult.Published && publication!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}
                 snapshot=store.Published;

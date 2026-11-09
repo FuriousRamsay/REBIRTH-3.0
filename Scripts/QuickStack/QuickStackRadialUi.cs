@@ -53,7 +53,7 @@ public static class QuickStackRadialUiService
 public static class QuickStackUiDiagnostics
 {
     public static bool Enabled;
-    public static void Write(string text) { if (Enabled) Log.Out("[QuickStackUI] " + text); }
+    public static void Write(string text) { if (Enabled) RebirthDebug.Log("quickstack", "[QuickStackUI] " + text); }
 }
 
 [Preserve]
@@ -717,29 +717,29 @@ public sealed class XUiC_RebirthLogistics : XUiController
                 : null;
             if (player == null || player.PlayerUI == null || player.PlayerUI.xui == null)
             {
-                Log.Out("[QuickStackUI] dump: no local player/XUi");
+                RebirthDebug.Log("quickstack", "[QuickStackUI] dump: no local player/XUi");
                 return;
             }
 
             XUi xui = player.PlayerUI.xui;
             XUiController group = xui.FindWindowGroupByName(QuickStackRadialUiService.WindowGroupName);
             XUiC_RebirthLogistics controller = group != null ? group.GetChildByType<XUiC_RebirthLogistics>() : null;
-            Log.Out("[QuickStackUI] dump windowOpen=" +
+            RebirthDebug.Log("quickstack", "[QuickStackUI] dump windowOpen=" +
                 player.PlayerUI.windowManager.IsWindowOpen(QuickStackRadialUiService.WindowGroupName) +
                 " group=" + (group != null) + " controller=" + (controller != null));
             if (controller == null) return;
 
             CursorControllerAbs cursor = player.PlayerUI.CursorController;
-            Log.Out("[QuickStackUI] dump action=" + controller.action +
+            RebirthDebug.Log("quickstack", "[QuickStackUI] dump action=" + controller.action +
                 " selectedTarget='" + controller.selectedTargetId + "' itemOffset=" + controller.itemScrollIndex +
                 " targetOffset=" + controller.targetScrollIndex +
                 " itemTotal=" + (controller.previewData != null && controller.previewData.ItemRows != null ? controller.previewData.ItemRows.Count : 0) +
                 " targetTotal=" + (controller.previewData != null && controller.previewData.TargetRows != null ? controller.previewData.TargetRows.Count : 0));
-            Log.Out("[QuickStackUI] dump cursor hidden=" + (cursor != null && cursor.GetCursorHidden()) +
+            RebirthDebug.Log("quickstack", "[QuickStackUI] dump cursor hidden=" + (cursor != null && cursor.GetCursorHidden()) +
                 " locked=" + (cursor != null && cursor.Locked) +
                 " hover=" + DescribeView(cursor != null ? cursor.HoverTarget : null) +
                 " current=" + DescribeView(cursor != null ? cursor.CurrentTarget : null));
-            Log.Out("[QuickStackUI] dump scrollbars itemTrack=" +
+            RebirthDebug.Log("quickstack", "[QuickStackUI] dump scrollbars itemTrack=" +
                 (controller.itemScrollTrackInput != null && controller.itemScrollTrackInput.ViewComponent != null && controller.itemScrollTrackInput.ViewComponent.IsVisible) +
                 " itemThumb=" + (controller.itemScrollThumb != null && controller.itemScrollThumb.IsVisible) +
                 " targetTrack=" + (controller.targetScrollTrackInput != null && controller.targetScrollTrackInput.ViewComponent != null && controller.targetScrollTrackInput.ViewComponent.IsVisible) +
@@ -751,7 +751,7 @@ public sealed class XUiC_RebirthLogistics : XUiController
                 if (row == null) continue;
                 int dataIndex = controller.GetItemDataIndex(slot);
                 XUiController clickable = row.Include != null ? row.Include.GetChildById("clickable") : null;
-                Log.Out("[QuickStackUI] item slot=" + slot + " dataIndex=" + dataIndex +
+                RebirthDebug.Log("quickstack", "[QuickStackUI] item slot=" + slot + " dataIndex=" + dataIndex +
                     " rootVisible=" + (row.Root != null && row.Root.ViewComponent != null && row.Root.ViewComponent.IsVisible) +
                     " include=" + (row.Include != null) +
                     " includeVisible=" + (row.Include != null && row.Include.ViewComponent != null && row.Include.ViewComponent.IsVisible) +
@@ -771,7 +771,7 @@ public sealed class XUiC_RebirthLogistics : XUiController
                 if (row == null) continue;
                 int dataIndex = controller.GetTargetDataIndex(slot);
                 XUiV_Button button = row.Select != null ? row.Select.ViewComponent as XUiV_Button : null;
-                Log.Out("[QuickStackUI] target slot=" + slot + " dataIndex=" + dataIndex +
+                RebirthDebug.Log("quickstack", "[QuickStackUI] target slot=" + slot + " dataIndex=" + dataIndex +
                     " rootVisible=" + (row.Root != null && row.Root.ViewComponent != null && row.Root.ViewComponent.IsVisible) +
                     " button=" + (button != null) +
                     " buttonVisible=" + (button != null && button.IsVisible) +

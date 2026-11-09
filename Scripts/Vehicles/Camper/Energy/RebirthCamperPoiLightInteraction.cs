@@ -55,15 +55,29 @@ internal static class RebirthCamperPoiLightInteraction
         for(int i=0;i<commands.Length;i++)
             if(commands[i].text=="light"&&commands[i].enabled!=active){var command=commands[i];command.enabled=active;commands[i]=command;}
     }
+    // Profiler 2026-11-08: the prompt is asked every frame while a light is under the crosshair, and Managed walks
+    // every world entity with land-claim and POI checks (38 ms in one dip). Reuse the answer for the same light,
+    // block and actor for a quarter of a second; a switch or pickup changes the block or is refreshed within that.
+    private const float PromptCacheSeconds=.25f;
+    private static Vector3i promptPosition;private static int promptType=-1,promptRotation=-1,promptActor=-1;
+    private static float promptUntil;private static bool promptManaged;private static string promptText;
     internal static void Prompt(WorldBase world,BlockValue value,Vector3i position,EntityAlive actor,ref string text)
     {
-        if(!Managed(world,position,value,actor as EntityPlayer,out _))return;
+        if(!ThreadManager.IsMainThread())return; // Managed() refuses off the main thread; never cache that answer.
+        float now=UnityEngine.Time.realtimeSinceStartup;
+        int actorId=actor!=null?actor.entityId:-1;
+        if(now<promptUntil&&position==promptPosition&&value.type==promptType&&value.rotation==promptRotation&&actorId==promptActor)
+        {if(promptManaged)text=promptText;return;}
+        promptPosition=position;promptType=value.type;promptRotation=value.rotation;promptActor=actorId;promptUntil=now+PromptCacheSeconds;
+        promptManaged=Managed(world,position,value,actor as EntityPlayer,out _);
+        if(!promptManaged)return;
         text=string.Empty;
         var commands=value.Block.GetBlockActivationCommands(world,value,position,actor);
-        if(commands==null)return;
-        foreach(var command in commands)
-            if(command.enabled&&command.text=="take")
-            {text=string.Format(Localization.Get("pickupPrompt"),value.Block.GetLocalizedBlockName());return;}
+        if(commands!=null)
+            foreach(var command in commands)
+                if(command.enabled&&command.text=="take")
+                {text=string.Format(Localization.Get("pickupPrompt"),value.Block.GetLocalizedBlockName());break;}
+        promptText=text;
     }
     internal static void Radial(XUiC_Radial radial,ref XUiC_Radial.CommandHandlerDelegate handler,
         XUiC_Radial.RadialContextAbs context,ref bool special)

@@ -200,7 +200,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
         RefreshGeneratedStorageNames(blocks, lookup);
         if (added > 0 || legacyCompatibilityCount > 0)
         {
-            { if (RebirthLogSettings.BlockPickupLoggingEnabled) Log.Out("[REBIRTH BlockPickup] Generated " + added
+            { if (RebirthLogSettings.BlockPickupLoggingEnabled) RebirthDebug.Log("blockpickup", "[REBIRTH BlockPickup] Generated " + added
                 + " source-specific secure player-storage block definitions ("
                 + emptyVisualCount + " using Empty downgrade visuals, "
                 + explicitSizeCount + " with explicit size overrides) and "
@@ -323,7 +323,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
 
         if (removed > 0)
         {
-            { if (RebirthLogSettings.BlockPickupLoggingEnabled) Log.Out("[REBIRTH BlockPickup] Converted " + converted
+            { if (RebirthLogSettings.BlockPickupLoggingEnabled) RebirthDebug.Log("blockpickup", "[REBIRTH BlockPickup] Converted " + converted
                 + " vanilla CanPickup definitions to inherited REBIRTH hold-E metadata and removed "
                 + removed + " vanilla prompt properties."); }
         }

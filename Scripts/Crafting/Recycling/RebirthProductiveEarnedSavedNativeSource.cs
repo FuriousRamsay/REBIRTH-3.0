@@ -80,6 +80,9 @@ internal static partial class RebirthProductiveEarnedSavedNativeSource
         {
             ResetCompletedNativeLoads();
             foreach(var request in cachedLoadRequests)request.Custody.Dispose();cachedLoadRequests.Clear();
+            // Owner 2026-11-09: on a joining client GameStarting still sees the LAST LOCAL game's save folder. This
+            // server recovery scan must never read another save; clients have no recovery originals.
+            if(!data.AsServer)return;
             try
             {
                 string save=System.IO.Path.GetFullPath(GameIO.GetSaveGameDir()),root=System.IO.Path.Combine(save,"RebirthProductiveEarned");

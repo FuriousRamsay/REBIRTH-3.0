@@ -107,7 +107,7 @@ public static class RebirthSpawnCompositionService
                 s_history.Clear();
                 s_historyWorld = null;
                 s_status = "compiled generation=" + s_definitionGeneration + " entities=" + compiled.Entities.Count + " categories=" + compiled.Categories.Count + " themes=" + compiled.Themes.Count + " prefabs=" + compiled.Prefabs.Count + " preserved=" + compiled.VanillaPreservedEntities.Count + " validation=" + compiled.Validation.Count;
-                { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[RebirthSpawn] " + s_status); }
+                { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", "[RebirthSpawn] " + s_status); }
                 for (int i = 0; i < compiled.Validation.Count; i++) Log.Warning("[RebirthSpawn] " + compiled.Validation[i]);
             }
             catch (Exception ex)

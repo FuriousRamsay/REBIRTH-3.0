@@ -12,12 +12,11 @@
     </property>
   </append>
 
-  <!-- Existing saves can contain base/cap storage from the former conversion.
-       Retain its native schema to read/write those exact saved contents. The
-       compatibility class creates no new storage and denies pickup; fresh base
-       and cap blocks remain non-lootable. Tile variants keep their own class. -->
-  <append xpath="/blocks/block[@name='palletCartonMilitaryBase']">
-    <property name="Class" value="RebirthLegacyMilitaryPalletBase, RebirthUtils" />
+  <!-- Owner 2026-11-08: every military pallet is lootable, as in 2.6 (base, cap and both tiles). The native composite
+       class creates the storage on model activation, so pallets already placed in generated POIs become lootable too;
+       saved storage from the former conversion is read as before. Only about a third hold loot (loot.xml, prob .33). -->
+  <append xpath="/blocks/block[@name='palletCartonMilitaryBase' or @name='palletCartonMilitaryCap']">
+    <property name="Class" value="CompositeTileEntity" />
     <property class="CompositeFeatures">
       <property class="TEFeatureStorage">
         <property name="LootList" value="rebirthMilitaryAmmoPalletLarge" />
@@ -25,7 +24,7 @@
     </property>
   </append>
 
-  <!-- Military pallet tile variants only. The base is not a loot container. -->
+  <!-- Military pallet tile variants. -->
   <append xpath="/blocks/block[@name='palletCartonMilitaryTile']">
     <property name="Class" value="CompositeTileEntity" />
     <property class="CompositeFeatures">

@@ -72,7 +72,7 @@ public static partial class RebirthRecyclerRuntime
         var local = world.GetPrimaryPlayer() as EntityPlayerLocal;
         var ui = local != null ? LocalPlayerUI.GetUIForPlayer(local) : null;
         if (ui?.xui == null) return null;
-        foreach (var window in ui.xui.GetChildrenByType<XUiC_WorkstationWindowGroup>())
+        foreach (var window in RebirthWorkstationWindowIndex.For(ui.xui))
             if (window.windowGroup?.isShowing == true && ReferenceEquals(window.WorkstationData?.TileEntity, station)) return window;
         return null;
     }
@@ -80,7 +80,7 @@ public static partial class RebirthRecyclerRuntime
     internal static void PullWindowQueue(TileEntityWorkstation station)
     {
         var window = OpenPlacedWindow(station);
-        var cards = window?.GetChildByType<XUiC_CraftingQueue>()?.GetRecipesToCraft();
+        var cards = RebirthWorkstationQueueIndex.For(window)?.GetRecipesToCraft();
         var current = station?.Queue;
         if (cards == null || current == null || cards.Length != current.Length) return;
         var rows = new RecipeQueueItem[cards.Length];
@@ -114,7 +114,7 @@ public static partial class RebirthRecyclerRuntime
 
     internal static void ProjectWindowQueue(XUiC_WorkstationWindowGroup window, TileEntityWorkstation station)
     {
-        var cards = window?.GetChildByType<XUiC_CraftingQueue>()?.GetRecipesToCraft();
+        var cards = RebirthWorkstationQueueIndex.For(window)?.GetRecipesToCraft();
         var queue = station?.Queue;
         if (cards == null || queue == null || cards.Length != queue.Length || station is RebirthCamperStationState) return;
         for (int i = 0; i < queue.Length; i++)

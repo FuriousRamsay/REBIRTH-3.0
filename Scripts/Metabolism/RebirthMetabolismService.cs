@@ -277,7 +277,7 @@ public static partial class RebirthMetabolismService
         }
 
         if (DebugEnabled)
-            Log.Out("[REBIRTH Metabolism] tick " + FormatSnapshot(snapshot, GetEnergyReserveCeiling(player)));
+            RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] tick " + FormatSnapshot(snapshot, GetEnergyReserveCeiling(player)));
         if (DebugEnabled || traceActive)
         {
             LogDetailedTickTrace(player, state, snapshot, deltaRealSeconds,
@@ -305,7 +305,7 @@ public static partial class RebirthMetabolismService
         bool decliningWithReserves=state.Energy<before-0.01f&&hasReserves;
         if(!lost&&(!(lowWithReserves||decliningWithReserves)||nextLowEnergyDiagnostic.TryGetValue(player.entityId,out var due)&&now<due))return;
         nextLowEnergyDiagnostic[player.entityId]=now+30f;
-        Log.Out("[REBIRTH EnergyAudit] entity="+player.entityId
+        RebirthDebug.Log("metabolism", "[REBIRTH EnergyAudit] entity="+player.entityId
             +" reason="+(lost?"drop":decliningWithReserves?"declining-with-reserves":"low-with-reserves")
             +" dt="+seconds.ToString("0.00",CultureInfo.InvariantCulture)
             +" movement="+DescribeMovement(player)
@@ -335,7 +335,7 @@ public static partial class RebirthMetabolismService
         float now = Time.realtimeSinceStartup;
         digestionDiagnosticUntil[player.entityId] = now + 180f;
         nextDigestionDiagnostic[player.entityId] = now + 15f;
-        Log.Out("[REBIRTH DigestionAudit] admit entity=" + player.entityId
+        RebirthDebug.Log("metabolism", "[REBIRTH DigestionAudit] admit entity=" + player.entityId
             + " entry=" + entry.EntryId + " item=" + entry.SourceItemName
             + " kind=" + entry.Kind
             + " stomachLiquidMl=" + entry.RemainingFluidVolumeMl.ToString("0.0", CultureInfo.InvariantCulture)
@@ -356,7 +356,7 @@ public static partial class RebirthMetabolismService
         {
             digestionDiagnosticUntil.Remove(player.entityId);
             nextDigestionDiagnostic.Remove(player.entityId);
-            Log.Out("[REBIRTH DigestionAudit] end entity=" + player.entityId + " reason=timeout");
+            RebirthDebug.Log("metabolism", "[REBIRTH DigestionAudit] end entity=" + player.entityId + " reason=timeout");
             return;
         }
         if (nextDigestionDiagnostic.TryGetValue(player.entityId, out float due) && now < due) return;
@@ -366,7 +366,7 @@ public static partial class RebirthMetabolismService
         string energyGate = state.Energy >= ceiling - 0.001f ? "cap" :
             player.Stats.Food.Value <= foodFloor ? "nutrition-floor" :
             GetEnergyRecoveryFactor(state.SmoothedActivity) <= 0f ? "activity" : "available";
-        Log.Out("[REBIRTH DigestionAudit] sample entity=" + player.entityId
+        RebirthDebug.Log("metabolism", "[REBIRTH DigestionAudit] sample entity=" + player.entityId
             + " entries=" + state.IngestionEntries.Count
             + " stomachLiquidMl=" + GetFluidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
             + " stomachSolidMl=" + GetSolidMl(state).ToString("0.0", CultureInfo.InvariantCulture)
@@ -422,7 +422,7 @@ public static partial class RebirthMetabolismService
         }
 
         if (changed && DebugEnabled)
-            Log.Out("[REBIRTH Metabolism] liquid state normalized for entity=" + player.entityId);
+            RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] liquid state normalized for entity=" + player.entityId);
     }
 
     private static bool SynchronizeLiquidVisualState(EntityPlayer player, RebirthMetabolismSourceKind sourceKind, int sourceSlot, ItemStack source)
@@ -1163,7 +1163,7 @@ public static partial class RebirthMetabolismService
             GameManager.ShowTooltipMP(player, Localization.Get("xuiRebirthDysenteryVomit"), "");
             if (!TryPlaySound(player, "FuriousRamsayVomit"))
                 TryPlaySound(player, "player#vomit");
-            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) Log.Out("[REBIRTH Metabolism] Dysentery episode=vomit stomachLost="
+            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=vomit stomachLost="
                 + (stomachFluidBefore - GetFluidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-liquid/"
                 + (stomachSolidBefore - GetSolidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-solids"
                 + " directFluidLoss=" + directFluidLossMl.ToString("0", CultureInfo.InvariantCulture) + "mL"); }
@@ -1180,7 +1180,7 @@ public static partial class RebirthMetabolismService
             CleanupEntries(state);
             TryPlaySound(player, "FuriousRamsayDiarrhea");
             GameManager.ShowTooltipMP(player, Localization.Get("xuiRebirthDysenteryDiarrhea"), "");
-            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) Log.Out("[REBIRTH Metabolism] Dysentery episode=diarrhea intestineLost="
+            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=diarrhea intestineLost="
                 + (gutFluidBefore - GetIntestinalFluidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-liquid/"
                 + (gutSolidBefore - GetIntestinalSolidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-chyme/"
                 + (gutNutritionBefore - GetIntestinalNutritionUnits(state)).ToString("0.00", CultureInfo.InvariantCulture) + " nutrition"
@@ -2306,7 +2306,7 @@ public static partial class RebirthMetabolismService
             return;
         seconds = Mathf.Clamp(seconds, 10f, 600f);
         debugTraceUntilRealTime[player.entityId] = Time.realtimeSinceStartup + seconds;
-        Log.Out("[REBIRTH Metabolism Trace] BEGIN entity=" + player.entityId
+        RebirthDebug.Log("metabolism", "[REBIRTH Metabolism Trace] BEGIN entity=" + player.entityId
             + " duration=" + seconds.ToString("0", CultureInfo.InvariantCulture) + "s"
             + " update=" + RebirthMetabolismConfig.UpdateRealSeconds.ToString("0.##", CultureInfo.InvariantCulture) + "s"
             + " | Run normally, drink/eat, then send the output_log. Trace auto-stops.");
@@ -2317,9 +2317,9 @@ public static partial class RebirthMetabolismService
         if (player == null)
             return;
         if (debugTraceUntilRealTime.Remove(player.entityId))
-            Log.Out("[REBIRTH Metabolism Trace] END entity=" + player.entityId + " reason=manual");
+            RebirthDebug.Log("metabolism", "[REBIRTH Metabolism Trace] END entity=" + player.entityId + " reason=manual");
         else
-            Log.Out("[REBIRTH Metabolism Trace] entity=" + player.entityId + " was not tracing.");
+            RebirthDebug.Log("metabolism", "[REBIRTH Metabolism Trace] entity=" + player.entityId + " was not tracing.");
     }
 
     private static bool IsDebugTraceActive(EntityPlayer player)
@@ -2332,7 +2332,7 @@ public static partial class RebirthMetabolismService
         if (Time.realtimeSinceStartup <= until)
             return true;
         debugTraceUntilRealTime.Remove(player.entityId);
-        Log.Out("[REBIRTH Metabolism Trace] END entity=" + player.entityId + " reason=timeout");
+        RebirthDebug.Log("metabolism", "[REBIRTH Metabolism Trace] END entity=" + player.entityId + " reason=timeout");
         return false;
     }
 
@@ -2372,7 +2372,7 @@ public static partial class RebirthMetabolismService
         float hydrationLossMlPerMinute = snapshot.HydrationLossMlPerReal60Minutes / 60f;
         float nutritionUsePerMinute = snapshot.FoodUsePerReal60Minutes / 60f;
 
-        Log.Out("[REBIRTH Metabolism Trace] entity=" + player.entityId
+        RebirthDebug.Log("metabolism", "[REBIRTH Metabolism Trace] entity=" + player.entityId
             + " dt=" + deltaRealSeconds.ToString("0.00", CultureInfo.InvariantCulture) + "s"
             + " move=" + DescribeMovement(player)
             + " activity=" + state.SmoothedActivity.ToString("0.00", CultureInfo.InvariantCulture)

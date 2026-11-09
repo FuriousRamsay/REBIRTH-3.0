@@ -51,7 +51,7 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
             actionData.invData.holdingEntity is EntityPlayer player && !animationStartTimes.ContainsKey(player.entityId))
         {
             animationStartTimes[player.entityId] = Time.realtimeSinceStartup;
-            Log.Out("[REBIRTH ConsumeAnimation] start entity=" + player.entityId
+            RebirthDebug.Log("metabolism", "[REBIRTH ConsumeAnimation] start entity=" + player.entityId
                 + " item=" + actionData.invData.itemStack.itemValue.ItemClass?.Name);
         }
         if (PercentDone(actionData) >= 1f) CompleteConsumption(actionData, "time-fallback");
@@ -72,7 +72,7 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
             float began;
             bool timed = animationStartTimes.TryGetValue(animationPlayer.entityId, out began);
             animationStartTimes.Remove(animationPlayer.entityId);
-            Log.Out("[REBIRTH ConsumeAnimation] complete entity=" + animationPlayer.entityId
+            RebirthDebug.Log("metabolism", "[REBIRTH ConsumeAnimation] complete entity=" + animationPlayer.entityId
                 + " item=" + actionData.invData.itemStack?.itemValue?.ItemClass?.Name
                 + " source=" + completionSource
                 + " elapsed=" + (timed ? (Time.realtimeSinceStartup - began).ToString("0.00", CultureInfo.InvariantCulture) : "unknown")
@@ -87,7 +87,7 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
     {
         if (data?.invData?.holdingEntity is EntityPlayer player && animationStartTimes.TryGetValue(player.entityId, out float began))
         {
-            Log.Out("[REBIRTH ConsumeAnimation] stopped entity=" + player.entityId
+            RebirthDebug.Log("metabolism", "[REBIRTH ConsumeAnimation] stopped entity=" + player.entityId
                 + " item=" + data.invData.itemStack?.itemValue?.ItemClass?.Name
                 + " elapsed=" + (Time.realtimeSinceStartup - began).ToString("0.00", CultureInfo.InvariantCulture) + "s"
                 + " pending=" + ((data as ItemActionEat.MyInventoryData)?.bEatingStarted == true));

@@ -158,6 +158,11 @@ internal static partial class RebirthRecyclerPlacedSettlement
     {
         SweepRemoteLoadedRecyclerOwners(world);
         SweepJoinedRecyclerOwners(world);
+        if(loadedOwners.Count==0)return; // per frame: no closure or array when empty (profiler 2026-11-08)
+        DisposeStaleLoadedOwners(world);
+    }
+    private static void DisposeStaleLoadedOwners(World world)
+    {
         foreach(var source in loadedOwners.Where(value=>!ReferenceEquals(value.world,world)||value.registered&&
             (!ReferenceEquals(world?.GetPrimaryPlayer(),value.actor)||!ReferenceEquals(world?.GetEntity(value.actor.entityId),value.actor))).ToArray())source.Dispose();
     }

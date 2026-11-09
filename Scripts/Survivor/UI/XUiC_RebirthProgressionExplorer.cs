@@ -167,7 +167,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         base.OnOpen();
         if(windowGroup!=null)windowGroup.isEscClosable=false;
         postOpenRefreshFrames=2;hasLiveOwnerHeader=false;lastGraphSemanticHash=RebirthProgressionGraphRegistry.SemanticHash??string.Empty;
-        if(RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][UI] OPEN focus="+preparedFocusId+" pinnedBackground="+backgroundBrowserPinned+" postOpenRefresh=2");
+        if(RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][UI] OPEN focus="+preparedFocusId+" pinnedBackground="+backgroundBrowserPinned+" postOpenRefresh=2");
         Render();
         RebirthScrollbarPagingNativeAdapter.RegisterCustomAuthority(incomingNativeScrollHost);
         RebirthScrollbarPagingNativeAdapter.RegisterCustomAuthority(outgoingNativeScrollHost);
@@ -194,7 +194,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         if(postOpenRefreshFrames>0)
         {
             postOpenRefreshFrames--;
-            if(RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][UI] post-open refresh remaining="+postOpenRefreshFrames+" focus="+preparedFocusId);
+            if(RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][UI] post-open refresh remaining="+postOpenRefreshFrames+" focus="+preparedFocusId);
             needsRender=true;
         }
         if(needsRender)Render();
@@ -217,7 +217,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         if(xui!=null&&xui.playerUI!=null&&xui.playerUI.playerInput!=null &&
             (xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased || xui.playerUI.playerInput.GUIActions.Cancel.WasReleased))
         {
-            { if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) Log.Out("[REBIRTH Progression Explorer][Input] ESC action=return caller="+(returnContext!=null?returnContext.CallerWindowGroupId:"<none>")); }
+            { if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Input] ESC action=return caller="+(returnContext!=null?returnContext.CallerWindowGroupId:"<none>")); }
             ReturnOrClose();
         }
     }
@@ -434,7 +434,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
     private static void DebugScroll(string action,bool incoming,string detail)
     {
         if(!RebirthSurvivorDebug.Enabled)return;
-        Log.Out("[REBIRTH Progression Explorer][Scroll] side="+(incoming?"incoming":"outgoing")+" action="+action+" "+detail);
+        RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Scroll] side="+(incoming?"incoming":"outgoing")+" action="+action+" "+detail);
     }
 
     private void RenderFocusTrackingAction()
@@ -492,7 +492,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
             else p.Add(resolved.Type,resolved.StableId);
         },out error);
         if(!ok&&RebirthSurvivorDebug.Enabled)Log.Warning("[REBIRTH Progression Explorer][HUD Tracking] focus toggle failed id="+resolved.Key+" error="+(error??string.Empty));
-        else if(ok&&RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][HUD Tracking] focus toggled id="+resolved.Key);
+        else if(ok&&RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][HUD Tracking] focus toggled id="+resolved.Key);
         RenderFocusTrackingAction();
     }
 
@@ -531,13 +531,13 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
                 incomingOffset=Mathf.Clamp(selectedIndex-(VisibleSideRows/2),0,maxOffset);
             }
             ResetBreadcrumbPath(preparedFocusId);
-            if(RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][Search] selected background="+preparedFocusId+" browserPinned=true listIndex="+selectedIndex+" offset="+incomingOffset);
+            if(RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Search] selected background="+preparedFocusId+" browserPinned=true listIndex="+selectedIndex+" offset="+incomingOffset);
         }
         else
         {
             backgroundBrowserPinned=false;incomingOffset=0;
             ResetSearchBreadcrumbPath(preparedFocusId);
-            if(RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][Search] selected="+preparedFocusId+" browserPinned=false breadcrumbMode=neutral-root");
+            if(RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Search] selected="+preparedFocusId+" browserPinned=false breadcrumbMode=neutral-root");
         }
 
         RenderSearch(false);Render();
@@ -559,16 +559,16 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
     private void ReturnOrClose()
     {
         if(xui==null||xui.playerUI==null||xui.playerUI.windowManager==null)return;var manager=xui.playerUI.windowManager;
-        { if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) Log.Out("[REBIRTH Progression Explorer][Return] BEGIN caller="+(returnContext!=null?returnContext.CallerWindowGroupId:"<none>")+" callerOpenBefore="+(returnContext!=null&&returnContext.HasCaller&&manager.IsWindowOpen(returnContext.CallerWindowGroupId))); }
+        { if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Return] BEGIN caller="+(returnContext!=null?returnContext.CallerWindowGroupId:"<none>")+" callerOpenBefore="+(returnContext!=null&&returnContext.HasCaller&&manager.IsWindowOpen(returnContext.CallerWindowGroupId))); }
         manager.Close(WindowGroupId);
         if(returnContext!=null&&RebirthProgressionExplorerReturnRegistry.TryHandle(xui,returnContext))return;
         if(returnContext!=null&&returnContext.HasCaller)
         {
             // Main Menu and other callers may deliberately remain open underneath the Explorer.
             // Never close/recreate an already-open caller just to return to it.
-            if(manager.IsWindowOpen(returnContext.CallerWindowGroupId)){{ if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) Log.Out("[REBIRTH Progression Explorer][Return] caller already open: "+returnContext.CallerWindowGroupId); }return;}
+            if(manager.IsWindowOpen(returnContext.CallerWindowGroupId)){{ if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Return] caller already open: "+returnContext.CallerWindowGroupId); }return;}
             XUiController caller=xui.FindWindowGroupByName(returnContext.CallerWindowGroupId);
-            if(caller!=null&&caller.windowGroup!=null){manager.Open((GUIWindow)caller.windowGroup,true);{ if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) Log.Out("[REBIRTH Progression Explorer][Return] reopened caller="+returnContext.CallerWindowGroupId+" openAfter="+manager.IsWindowOpen(returnContext.CallerWindowGroupId)); }}
+            if(caller!=null&&caller.windowGroup!=null){manager.Open((GUIWindow)caller.windowGroup,true);{ if (RebirthLogSettings.ProgressionExplorerLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][Return] reopened caller="+returnContext.CallerWindowGroupId+" openAfter="+manager.IsWindowOpen(returnContext.CallerWindowGroupId)); }}
             else Log.Error("[REBIRTH Progression Explorer][Return] caller window group not found: "+returnContext.CallerWindowGroupId);
         }
     }
@@ -658,7 +658,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
                 preparedFocusId=id;
                 int pathIndex=breadcrumbPath.FindIndex(delegate(string x){return string.Equals(x,id,StringComparison.OrdinalIgnoreCase);});
                 if(pathIndex>=0&&pathIndex+1<breadcrumbPath.Count)breadcrumbPath.RemoveRange(pathIndex+1,breadcrumbPath.Count-pathIndex-1);
-                if(RebirthSurvivorDebug.Enabled)Log.Out("[REBIRTH Progression Explorer][BackgroundBrowser] breadcrumb id="+id+" isBackground="+isBackground+" pinned="+backgroundBrowserPinned);
+                if(RebirthSurvivorDebug.Enabled)RebirthDebug.Log("survivor", "[REBIRTH Progression Explorer][BackgroundBrowser] breadcrumb id="+id+" isBackground="+isBackground+" pinned="+backgroundBrowserPinned);
             }
             incomingOffset=0;outgoingOffset=0;Render();return;
         }

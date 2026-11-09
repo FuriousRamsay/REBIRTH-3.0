@@ -239,7 +239,7 @@ public static class RebirthWeaponBonuses
         if (attacker.Buffs.HasBuff("FuriousRamsayRampage")) chance *= 3f;
         if (random.Next(0, 100) >= chance) return;
         Triggers++;
-        if (forced) Log.Out("[REBIRTH WeaponBonus] " + bonus.Key + " level " + level + " fired on " + target.EntityClass?.entityClassName);
+        if (forced) RebirthDebug.Log("weaponbonuses", "[REBIRTH WeaponBonus] " + bonus.Key + " level " + level + " fired on " + target.EntityClass?.entityClassName);
 
         if (bonus.PlayerBuff != null) attacker.Buffs.AddBuff(bonus.PlayerBuffHasLevels ? bonus.PlayerBuff + level : bonus.PlayerBuff);
         if (bonus.TargetBuff != null) target.Buffs.AddBuff(bonus.TargetBuff + level, attacker.entityId);

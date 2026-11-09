@@ -206,7 +206,7 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         command(action,selected,-1,on,destination);
     }
     private void PowerTrace(string stage,string detail)
-    {if(powerTraceCount>=12||!RebirthCamperEnergyLog.Enabled)return;powerTraceCount++;Log.Out("[REBIRTH EnergyPowerUI] stage="+stage+" "+detail);}
+    {if(powerTraceCount>=12||!RebirthCamperEnergyLog.Enabled)return;powerTraceCount++;RebirthDebug.Log("vehicles", "[REBIRTH EnergyPowerUI] stage="+stage+" "+detail);}
     private void ObservePowerRequest()
     {
         if(powerObservedSource==Guid.Empty)return;

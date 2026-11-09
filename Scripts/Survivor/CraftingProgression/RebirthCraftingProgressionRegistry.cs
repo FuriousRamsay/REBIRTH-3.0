@@ -121,7 +121,7 @@ public static class RebirthCraftingProgressionRegistry
         {
             if(ExternalDiagnostics.Count>=ExternalDiagnosticLimit || !ExternalDiagnostics.Add(id))return;
         }
-        { if (RebirthLogSettings.CraftingUiLoggingEnabled) Log.Out("[REBIRTH CraftingProgression] external compatibility recipe='"+id+"' context="+(context??string.Empty)+" policy=native-allowed"); }
+        { if (RebirthLogSettings.CraftingUiLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH CraftingProgression] external compatibility recipe='"+id+"' context="+(context??string.Empty)+" policy=native-allowed"); }
     }
 
     public static string BuildSummary()

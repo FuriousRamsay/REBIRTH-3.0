@@ -459,7 +459,7 @@ public static class RebirthDamageAdapterInstaller
 
         RebirthHarmonyBootstrap.PatchClassOnce(s_harmony, typeof(RebirthDamageResponsePatch));
         s_installed = true;
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[RebirthDamage] Installed the shared ProcessDamageResponseLocal scalar dispatcher."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("modules", "[RebirthDamage] Installed the shared ProcessDamageResponseLocal scalar dispatcher."); }
     }
 }
 

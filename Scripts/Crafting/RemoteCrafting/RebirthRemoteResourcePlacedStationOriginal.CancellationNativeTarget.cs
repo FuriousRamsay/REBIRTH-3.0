@@ -31,7 +31,11 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
                 : module==new Guid("b181c006-3dca-4211-80fe-9efc360eeb10")
                     ? "086755F825EEE6ABD4A13789F2F428D9043D36C8C54EBB3B38A9518B4A5146FC"
                     : module==new Guid("0dfd4a8c-e2eb-4a72-8af4-f69f7c5b1480")
-                        ? "CB54022CCC862AA673E0EE55DAFE67D842B364C80DF6916958D171E959656C58" : null;
+                        ? "CB54022CCC862AA673E0EE55DAFE67D842B364C80DF6916958D171E959656C58"
+                        // 3.4 dedicated server (b10 server build, MVID 843f5381): every guarded method was compared to the reviewed b10 client
+        // with operands resolved by name (2026-11-09, scratchpad ilcmp): all identical; only metadata tokens differ.
+                        : module==new Guid("843f5381-6019-44cb-9180-0b5e2888de8b")
+                            ? "1383D5B6414B3DE6106FA6F03DBD9EBBC739B41179F591A45241C8C1A6FD4A47" : null;
         if(expectedImage==null)
             throw new NotSupportedException("Unqualified placed cancellation native lifecycle module.");
         using(var input=File.OpenRead(assembly.Location))using(var sha=SHA256.Create())

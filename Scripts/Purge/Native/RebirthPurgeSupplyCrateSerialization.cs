@@ -100,9 +100,22 @@ internal static class RebirthPurgeSupplyCrateSerialization
         Guid native; if(entry.EntityId!=crate.entityId||entry.Born!=crate.WorldTimeBorn||!Guid.TryParseExact((crate.world as World)?.worldState?.Guid,"N",out native)||native!=world)return false;
         stamp=entry.Stamp;return true;
     }
+    // The Bridge feedback audit only exists in qualification (Debug) builds; Release builds never audit.
+    private static bool AuditAllowed
+    {
+        get
+        {
+#if PURGE_QUALIFICATION
+            return RebirthPurgeFeedbackTrace.Allowed;
+#else
+            return false;
+#endif
+        }
+    }
+
     internal static void AfterWrite(EntitySupplyCrate __instance,PooledBinaryWriter _bw,StreamModeWrite _eStreamMode,bool __runOriginal)
     {
-        Audit audit=null;if(!ReferenceEquals(__instance,null)&&RebirthPurgeFeedbackTrace.Allowed){audit=audits.GetOrCreateValue(__instance);audit.Writes++;audit.WriteMode=_eStreamMode.ToString();audit.WriteDecision="gated";}
+        Audit audit=null;if(!ReferenceEquals(__instance,null)&&AuditAllowed){audit=audits.GetOrCreateValue(__instance);audit.Writes++;audit.WriteMode=_eStreamMode.ToString();audit.WriteDecision="gated";}
         try {
         if(!__runOriginal||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||_bw==null||_eStreamMode==StreamModeWrite.ToServer)return;
         if(audit!=null)audit.WriteDecision="entry-or-identity-refused";
@@ -120,7 +133,7 @@ internal static class RebirthPurgeSupplyCrateSerialization
     internal static void AfterRead(EntitySupplyCrate __instance,PooledBinaryReader _br,StreamModeRead _eStreamMode,bool __runOriginal)
     {
         if(!__runOriginal||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||__instance==null||_br==null||_eStreamMode==StreamModeRead.FromClient)return;
-        Audit audit=RebirthPurgeFeedbackTrace.Allowed?audits.GetOrCreateValue(__instance):null;
+        Audit audit=AuditAllowed?audits.GetOrCreateValue(__instance):null;
         if(audit!=null){audit.Reads++;audit.ReadMode=_eStreamMode.ToString();audit.ExistingAtRead=entries.TryGetValue(__instance,out var prior);audit.ReadBefore=_br.BaseStream.CanSeek?_br.BaseStream.Position:-1;}
         RebirthPurgeSupplyCrateStamp stamp;bool parsed=RebirthPurgeSupplyCrateStamp.TryRead(_br,out stamp);
         if(audit!=null){audit.Parsed=parsed;audit.ReadAfter=_br.BaseStream.CanSeek?_br.BaseStream.Position:-1;}if(!parsed)return;

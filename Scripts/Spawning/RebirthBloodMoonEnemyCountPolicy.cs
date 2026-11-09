@@ -55,7 +55,7 @@ public static class RebirthBloodMoonEnemyCountInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthBloodMoonTickSettingsPatch));
 
         s_installed = true;
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Blood Moon Count] Settings-driven active enemy limit installed."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", "[REBIRTH Blood Moon Count] Settings-driven active enemy limit installed."); }
     }
 }
 

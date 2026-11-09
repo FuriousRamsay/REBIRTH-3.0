@@ -103,7 +103,7 @@ public static class RebirthAlwaysStaggerPolicy
     public static void Trace(EntityAlive target, DamageResponse response, RebirthAlwaysStaggerDecisionReason reason, string phase)
     {
         if (!DebugEnabled) return;
-        Log.Out("[Rebirth][AlwaysStagger] phase=" + phase + " mode=" + RebirthAlwaysStaggerRuntimePolicy.Mode +
+        RebirthDebug.Log("modules", "[Rebirth][AlwaysStagger] phase=" + phase + " mode=" + RebirthAlwaysStaggerRuntimePolicy.Mode +
                 " reason=" + reason + " entity=" + (target == null ? "null" : target.EntityName) +
                 " strength=" + response.Strength + " fatal=" + response.Fatal +
                 " painHit=" + response.PainHit + " bodyPart=" + response.HitBodyPart);

@@ -706,7 +706,7 @@ public static class RebirthBlockPickupService
         RebirthBlockPickupDecision decision = RebirthBlockPickupClassifier.Evaluate(block);
         RebirthBlockPickupTargetDecision targetDecision =
             RebirthBlockPickupTargetResolver.Resolve(block);
-        Log.Out("[REBIRTH BlockPickup] empty-hand hit block=" + block.GetBlockName()
+        RebirthDebug.Log("blockpickup", "[REBIRTH BlockPickup] empty-hand hit block=" + block.GetBlockName()
             + " id=" + block.blockID
             + " pos=" + pos
             + " damage=" + blockValue.damage

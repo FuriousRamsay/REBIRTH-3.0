@@ -264,7 +264,13 @@ internal static partial class RebirthRecyclerPlacedSettlement
         // Metadata may refuse unknown custody, never restore or authorize it.
         return station.GetChunk()?.ChunkCustomData?.dict?.Keys.Any(key=>key.StartsWith(prefix,StringComparison.Ordinal))==true;
     }
+    // Per frame: no closure or array when there is nothing loaded (profiler 2026-11-08).
     private static void SweepLoadedRecyclerStations(World world)
+    {
+        if(loadedRecyclerStations.Count==0)return;
+        SweepLoadedRecyclerStationsCore(world);
+    }
+    private static void SweepLoadedRecyclerStationsCore(World world)
     {
         lock(coldStationGate)foreach(var source in loadedRecyclerStations.Where(value=>!value.SameWorld(world)).ToArray())source.Dispose();
     }

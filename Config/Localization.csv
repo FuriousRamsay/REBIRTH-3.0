@@ -12149,26 +12149,43 @@ armorScavengerHelmetDesc,Medium Armor\nYou're bound to learn something from taki
 armorScavengerOutfitDesc,Medium Armor\nDeep pockets help bring the goods home. Reduces encumbrance.
 xuiRebirthArmorBonusHeading,BONUSES
 aeBonusFmt_entity_damage_axes,+{0} damage with axes
+aeBonusFmt_entity_damage_axes_uncommon,+{0} damage with axes
 aeBonusFmt_entity_damage_batons,+{0} damage with batons
+aeBonusFmt_entity_damage_batons_uncommon,+{0} damage with batons
 aeBonusFmt_entity_damage_clubs,+{0} damage with clubs
+aeBonusFmt_entity_damage_clubs_uncommon,+{0} damage with clubs
 aeBonusFmt_entity_damage_hammers,+{0} damage with hammers
+aeBonusFmt_entity_damage_hammers_uncommon,+{0} damage with hammers
 aeBonusFmt_entity_damage_knives,+{0} damage with knives
+aeBonusFmt_entity_damage_knives_uncommon,+{0} damage with knives
 aeBonusFmt_entity_damage_knuckles,+{0} damage with knuckles
+aeBonusFmt_entity_damage_knuckles_uncommon,+{0} damage with knuckles
 aeBonusFmt_entity_damage_spears,+{0} damage with spears
+aeBonusFmt_entity_damage_spears_uncommon,+{0} damage with spears
 aeBonusFmt_entity_damage_swords,+{0} damage with swords
+aeBonusFmt_entity_damage_swords_uncommon,+{0} damage with swords
 aeBonusFmt_entity_damage_unarmed,+{0} damage with bare hands
+aeBonusFmt_entity_damage_unarmed_uncommon,+{0} damage with bare hands
 aeBonusFmt_entity_damage_bows,+{0} damage with bows
+aeBonusFmt_entity_damage_bows_uncommon,+{0} damage with bows
 aeBonusFmt_entity_damage_pistols,+{0} damage with pistols
+aeBonusFmt_entity_damage_pistols_uncommon,+{0} damage with pistols
 aeBonusFmt_entity_damage_revolvers,+{0} damage with revolvers
+aeBonusFmt_entity_damage_revolvers_uncommon,+{0} damage with revolvers
 aeBonusFmt_entity_damage_heavy_handguns,+{0} damage with heavy handguns
+aeBonusFmt_entity_damage_heavy_handguns_uncommon,+{0} damage with heavy handguns
 aeBonusFmt_entity_damage_shotguns,+{0} damage with shotguns
+aeBonusFmt_entity_damage_shotguns_uncommon,+{0} damage with shotguns
 aeBonusFmt_entity_damage_assault_rifles,+{0} damage with assault rifles
+aeBonusFmt_entity_damage_assault_rifles_uncommon,+{0} damage with assault rifles
 aeBonusFmt_entity_damage_tactical_rifles,+{0} damage with tactical rifles
+aeBonusFmt_entity_damage_tactical_rifles_uncommon,+{0} damage with tactical rifles
 aeBonusFmt_entity_damage_long_range_rifles,+{0} damage with long-range rifles
+aeBonusFmt_entity_damage_long_range_rifles_uncommon,+{0} damage with long-range rifles
 aeBonusFmt_entity_damage_melee,+{0} damage with all melee weapons
 aeBonusFmt_entity_damage_ranged,+{0} damage with all ranged weapons
 aeBonusFmt_entity_damage_all,+{0} damage with all weapons
-aeBonusFmt_entity_damage_all_greater,+{0} damage with all weapons
+aeBonusFmt_entity_damage_all_greater,"+{0} damage with every weapon"
 aeBonusFmt_reload_speed_bows_common,+{0} reload speed with bows
 aeBonusFmt_reload_speed_bows_uncommon,+{0} reload speed with bows
 aeBonusFmt_reload_speed_pistols_common,+{0} reload speed with pistols
@@ -12301,8 +12318,8 @@ aeBonusFmt_block_damage_salvage_common,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_uncommon,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_rare,+{0} salvage speed with salvage tools
 aeBonusFmt_block_damage_salvage_legendary,+{0} salvage speed with salvage tools
-aeBonusFmt_trained_damage_rare,+{0} damage, higher with weapon skill
-aeBonusFmt_trained_damage_legendary,+{0} damage, higher with weapon skill
+aeBonusFmt_trained_damage_rare,"+{0} damage with every weapon"
+aeBonusFmt_trained_damage_legendary,"+{0} damage with every weapon"
 aeBonusFmt_explosion_pipe_bombs,+{0} explosive damage with pipe bombs
 aeBonusFmt_explosion_grenades,+{0} explosive damage with grenades
 aeBonusFmt_explosion_dynamite,+{0} explosive damage with dynamite
@@ -12333,12 +12350,12 @@ kitRetuning,"Retuning Kit"
 kitComprehensiveUpgrade,"Comprehensive Upgrade Kit"
 kitEliteReinforcement,"Elite Reinforcement Kit"
 kitBreakdown,"Breakdown Kit"
-kitSurvivorUpgradeDesc,"Upgrades an item by rolling one bonus. Use on an item with no bonuses."
-kitAdjustmentDesc,"Adds a second bonus to an item that currently has exactly one bonus."
-kitRetuningDesc,"Rerolls an item by removing its current bonuses and rolling new bonuses. Limited to items with one or two bonuses."
-kitComprehensiveUpgradeDesc,"Adds up to four bonuses to an item that currently has no bonuses."
-kitEliteReinforcementDesc,"Upgrades a two-bonus item to add a third bonus. Small chance to also add a fourth one."
-kitBreakdownDesc,"Removes all bonuses from an item and returns it to normal."
+kitSurvivorUpgradeDesc,"Adds the first bonus to armor with no bonuses. With Tailoring 10 you can choose its category, with Tailoring 25 the exact bonus; otherwise it is random. Rarity is rolled."
+kitAdjustmentDesc,"Adds a second bonus to armor with exactly one bonus. With Tailoring 10 you can choose its category, with Tailoring 25 the exact bonus; otherwise it is random. Rarity is rolled."
+kitRetuningDesc,"Changes armor with one or two bonuses. For each bonus choose Keep, Reroll (same bonus, new rarity and value) or Replace (a new bonus, which you can choose with enough Tailoring)."
+kitComprehensiveUpgradeDesc,"Adds three bonuses to armor with no bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose each of the three; the fourth is always random. Rarity is rolled."
+kitEliteReinforcementDesc,"Adds a third bonus to armor with exactly two bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose the third; the fourth is always random. Rarity is rolled."
+kitBreakdownDesc,"Removes the bonuses you choose from armor, or all of them. The bonuses you keep stay exactly as they are."
 aeEnchantInvalidKit,"Invalid modification kit."
 aeEnchantMissingKit,"Modification kit is missing."
 aeEnchantItemOnly,"Only modifiable items can be enhanced."
@@ -12412,6 +12429,213 @@ xuiRebirthModifierInstructions,"Place armor and a kit in the slots, then press A
 xuiEnchantToolRequired,Install the required tool first.
 xuiEnchantOutputFull,The output is full.
 xuiEnchantSlotHint,Armor and kit go here.
+xuiEnchantRequestStale,"The item or kit changed. Check your choices and try again."
+xuiEnchantRequestInvalid,"Those choices do not fit this kit."
+xuiEnchantFocusWrongSlot,"That bonus cannot appear on this armor."
+xuiEnchantFocusNeedsTailoring10,"Picking a category needs Tailoring 10."
+xuiEnchantFocusNeedsTailoring25,"Picking an exact bonus needs Tailoring 25."
+xuiEnchantFocusFamilyTaken,"That bonus is already on this item or chosen for another row."
+xuiEnchantRetuneNothing,"Choose at least one bonus to reroll or replace."
+xuiEnchantBreakdownNothing,"Choose at least one bonus to remove."
+aeCatHeadLoot,"Loot and scavenging"
+aeCatHeadTradeCraft,"Trade, crafting speed and harvesting"
+aeCatHeadSurvivalXp,"Survival and social skill XP"
+aeCatHeadCombatXp,"Combat skill XP"
+aeCatHeadCraftingXp,"Crafting and technical skill XP"
+aeCatChestVitality,"Vitality"
+aeCatChestTrauma,"Trauma resistance"
+aeCatChestWound,"Wound resistance"
+aeCatHandsMelee,"Melee"
+aeCatHandsRangedDamage,"Ranged damage"
+aeCatHandsRangedHandling,"Weapon handling"
+aeCatHandsTools,"Tools and utility"
+aeCatFeetMobility,"Mobility and protection"
+aeCatFeetStealth,"Stealth"
+aeFamily_EntityDamage,"Damage"
+aeFamily_ReloadSpeed,"Reload speed"
+aeFamily_RoundsPerMinute,"Fire rate"
+aeFamily_AttacksPerMinute,"Attack speed"
+aeFamily_EntityPenetration,"Penetration"
+aeFamily_TargetArmor,"Target armor"
+aeFamily_DismemberChance,"Dismember chance"
+aeFamily_WildHarvest,"Wild harvest"
+aeFamily_BlockDamage,"Block damage"
+aeFamily_TrainedDamage,"Damage with every weapon"
+aeFamily_SecureLootAutoUnlock,"Instant lockpicking"
+aeFamily_ExplosionDamage,"Explosive damage"
+aeFamily_HeadLootStage,"Loot stage"
+aeFamily_HeadScavengingTime,"Search speed"
+aeFamily_HeadBarteringBuying,"Buying prices"
+aeFamily_HeadBarteringSelling,"Selling prices"
+aeFamily_HeadCraftingTime,"Crafting speed"
+aeFamily_HeadHarvestOreWood,"Resource gathering"
+aeFamily_HeadHarvestButcher,"Butchering"
+aeFamily_HeadHarvestSalvage,"Salvaging"
+aeFamily_HeadSkillXp,"Skill experience"
+aeFamily_HeadLootQuantity,"Loot quantity"
+aeFamily_BodyHealthMax,"Maximum health"
+aeFamily_BodyCarryCapacity,"Carry capacity"
+aeFamily_BodyBuffResistance,"Ailment resistance"
+aeFamily_BodyHealthChangeOT,"Health regeneration"
+aeFamily_BodyStaminaRecoveryEfficiency,"Stamina recovery"
+aeFamily_FeetMovementSpeed,"Movement speed"
+aeFamily_FeetFallDamageReduction,"Fall damage"
+aeFamily_FeetMovingDamageResist,"Damage while moving"
+aeFamily_FeetJumpStamina,"Jump stamina"
+aeFamily_FeetMovementStamina,"Movement stamina"
+aeFamily_FeetSneakSprintStamina,"Sneak sprinting"
+aeFamily_FeetShadowBlend,"Shadow blend"
+aeFamily_FeetSneakDamage,"Sneak damage"
+aeFamily_FeetSleeperKnockdown,"Sleeper knockdown"
+aeFamily_FeetCrouchNoise,"Crouch noise"
+aeFamily_FeetEnemySearchDuration,"Enemy search time"
+aeFamily_FeetLandMineImmunity,"Land mine immunity"
+aeFamily_FeetTrashSilence,"Silent on trash"
+xuiRebirthBonusWsEmpty,"Place armor and a kit in the slots. The kit decides what you can do."
+xuiRebirthBonusWsNeedTool,"Put a Hammer and Pliers in the Tools slot to see what this kit can do."
+xuiRebirthBonusWsNeedKit,"Now add a kit. The kit decides what you can do to this armor."
+xuiRebirthBonusWsNeedArmor,"Now add an armor piece (head, chest, gloves or boots)."
+xuiRebirthBonusWsCurrent,"Current bonuses"
+xuiRebirthBonusWsNone,"None yet."
+xuiRebirthBonusWsNewOne,"New bonus"
+xuiRebirthBonusWsNewMany,"New bonuses"
+xuiRebirthBonusWsOnItem,"Bonuses on {0}"
+xuiRebirthBonusWsBonusN,"Bonus {0}"
+xuiRebirthBonusWsNewSub,"New bonus"
+xuiRebirthBonusWsAny,"Any bonus"
+xuiRebirthBonusWsLocked10,"Tailoring 10"
+xuiRebirthBonusWsKept,"Kept"
+xuiRebirthBonusWsExtra,"25% chance of one more"
+xuiRebirthBonusWsExtraRandom,"Always random"
+xuiRebirthBonusWsKeep,"Keep"
+xuiRebirthBonusWsReroll,"Reroll"
+xuiRebirthBonusWsReplace,"Replace"
+xuiRebirthBonusWsRemove,"Remove"
+xuiRebirthBonusWsRemoveAll,"Remove all"
+xuiRebirthBonusWsKeepAll,"Keep all"
+xuiRebirthBonusWsWillRemove,"Will be removed"
+xuiRebirthBonusWsVerbAdd,"Add bonus"
+xuiRebirthBonusWsVerbAddMany,"Add bonuses"
+xuiRebirthBonusWsVerbRetune,"Retune"
+xuiRebirthBonusWsVerbRemove,"Remove bonus"
+xuiRebirthBonusWsVerbRemoveMany,"Remove bonuses"
+xuiRebirthRarityCommon,"Common"
+xuiRebirthRarityUncommon,"Uncommon"
+xuiRebirthRarityRare,"Rare"
+xuiRebirthRarityLegendary,"Legendary"
+xuiRebirthBonusWsSearch,"Search bonuses"
+xuiRebirthBonusWsBrowse,"Browse"
+xuiRebirthBonusWsFavourites,"Favourites"
+xuiRebirthBonusWsFocusTitle,"Bonus focus"
+xuiRebirthBonusWsBackLink,"Back"
+xuiRebirthBonusWsCount,"{0} bonuses"
+xuiRebirthBonusWsSetRandom,"Set back to Random"
+xuiRebirthBonusWsCountOne,"1 bonus"
+xuiRebirthBonusWsAnyIn,"Any bonus in {0}"
+xuiRebirthBonusWsAnyOf,"Any {0} bonus"
+xuiRebirthBonusWsNeeds10,"Tailoring 10"
+xuiRebirthBonusWsNeeds25,"Tailoring 25"
+xuiRebirthBonusWsTaken,"Already on this item"
+xuiRebirthBonusWsUsedBy,"Used by {0}"
+xuiRebirthBonusWsUsedByReplacement,"Used by another replacement"
+xuiRebirthBonusWsSelected,"Selected"
+xuiRebirthBonusWsPreviewNote,"Every bonus this category can give. Exact picks need Tailoring 25."
+xuiRebirthBonusWsResults,"{0} results"
+xuiRebirthBonusWsNoFav,"No favourites yet. Star a bonus or a category to add it here."
+xuiRebirthBonusWsMore,"Scroll for more ({0}-{1} of {2})"
+xuiRebirthBonusWsTailoring,"Tailoring {0}"
+xuiRebirthBonusWsAllUnlocked,"all focus levels unlocked"
+xuiRebirthBonusWsMoreToCat,"{0} more to category focus"
+xuiRebirthBonusWsMoreToExact,"{0} more to exact focus"
+xuiRebirthBonusWsMark10,"10 category"
+xuiRebirthBonusWsMark25,"25 exact"
+xuiRebirthBonusWsGainNote,"Craft armor: about +1.0 each. Scrap armor: about +0.5 each."
+xuiRebirthBonusWsOdds,"Rarity odds: kit level {0}, quality {1}"
+xuiRebirthBonusWsResultLine,"Result: {0}"
+xuiRebirthBonusWsResultOne,"1 bonus"
+xuiRebirthBonusWsResultN,"{0} bonuses"
+xuiRebirthBonusWsResultExtra,"{0}, or {1} on a 25% roll"
+xuiRebirthBonusWsResultKept,"{0} kept"
+xuiRebirthBonusWsResultNone,"No bonuses"
+xuiRebirthBonusWsResultTitle,"Result"
+xuiRebirthBonusWsBefore,"Before"
+xuiRebirthBonusWsAfter,"After"
+xuiRebirthBonusWsNew,"New"
+xuiRebirthBonusWsDone,"Done, moved to Output"
+xuiRebirthBonusWsCategoryFav,"{0}"
+xuiRebirthBonusWsNoResults,"No bonus matches that search."
+xuiRebirthMcTailoringTo10,"Tailoring {0}: reach 10 to choose a bonus category"
+xuiRebirthMcTailoringTo25,"Tailoring {0}: reach 25 to choose an exact bonus"
+xuiRebirthMcTailoringAll,"Tailoring {0}: you can choose any bonus"
+xuiRebirthMcOddsTitle,"Rarity odds: {0} on quality {1} armor"
+xuiRebirthMcBefore,"Before"
+xuiRebirthMcNextTag,"NEXT"
+xuiRebirthMcNextTool,"Put a Hammer and Pliers in the Tools slot (top right)."
+xuiRebirthMcNextArmor,"Put an armor piece in the Item slot (top right)."
+xuiRebirthMcNextKit,"Put a kit in the Kit slot (top right). The cards above show what each kit does."
+xuiRebirthMcNextWrongKit,"Swap the kit for one that fits this armor. The cards above show what each kit needs."
+xuiRebirthMcNextOutput,"Output is full. Take an item out of Output to make room."
+xuiRebirthMcNextRandomOnly,"Press {0} (under the slots) to add a random bonus. Choosing the bonus unlocks at Tailoring 10."
+xuiRebirthMcNextChooseOrRandom,"Press Choose in the left panel to pick the bonus, or press {0} (under the slots) for a random one."
+xuiRebirthMcNextApply,"Press {0} (under the slots) to apply."
+xuiRebirthMcNextRetuneSet,"In the left panel, set each bonus to Keep, Reroll or Replace."
+xuiRebirthMcNextBreakdownMark,"In the left panel, click the bonuses you want to remove."
+xuiRebirthMcNextAgain,"Take the armor from Output, or put in another armor piece and kit."
+xuiRebirthMcAfter,"After"
+xuiRebirthMcResult,"Result"
+xuiRebirthMcDone,"Done"
+xuiRebirthMcPlus,"+{0} bonus"
+xuiRebirthMcPlusChance,"+{0} (25%: +{1})"
+xuiRebirthMcRetune,"Retune"
+xuiRebirthMcRemove,"Remove {0}"
+xuiRebirthMcRandom,"Random"
+xuiRebirthMcCategory,"Category"
+xuiRebirthMcExact,"Exact bonus"
+xuiRebirthMcAnyOf,"Any of {0}"
+xuiRebirthMcNeeds,"Tailoring {0}"
+xuiRebirthMcPressChoose,"Press Choose (left)"
+xuiRebirthMcPress,"Then press {0}."
+xuiRebirthMcStepTools,"Tools"
+xuiRebirthMcStepArmor,"Armor"
+xuiRebirthMcStepKit,"Kit"
+xuiRebirthMcStepChoose,"Choose (left)"
+xuiRebirthMcLegend,"[cca738]Gold ?[-] new bonus     [8c8c96]Grey ?[-] 25% chance     [d26464]Red[-] removed"
+xuiRebirthMcLegendRemoved,"Removed"
+xuiRebirthMcLegendChance,"25% chance"
+xuiRebirthMcLegendNew,"New bonus"
+xuiRebirthBonusWsChooseButton,"Choose"
+xuiRebirthBonusWsBrowseButton,"Browse"
+xuiRebirthBonusWsRandom,"Random bonus"
+xuiRebirthBonusWsRandomLocked,"Random bonus"
+xuiRebirthBonusWsStarAdd,"Add to Favourites: keep this choice one click away in the Favourites tab."
+xuiRebirthBonusWsStarRemove,"Remove from Favourites"
+xuiRebirthBonusWsKitSurvivor,"Adds 1 bonus. Press Choose to pick it, or leave it random."
+xuiRebirthBonusWsKitAdjustment,"Adds a 2nd bonus. Press Choose to pick what it will be, or leave it random."
+xuiRebirthBonusWsKitComprehensive,"Adds 3 bonuses (25% chance of a 4th). Press Choose on each row, or leave them random."
+xuiRebirthBonusWsKitElite,"Adds a 3rd bonus (25% chance of a 4th). Press Choose to pick it, or leave it random."
+xuiRebirthBonusWsKitSurvivorRandom,"Adds 1 random bonus."
+xuiRebirthBonusWsKitAdjustmentRandom,"Adds a 2nd random bonus."
+xuiRebirthBonusWsKitComprehensiveRandom,"Adds 3 random bonuses (25% chance of a 4th)."
+xuiRebirthBonusWsKitEliteRandom,"Adds a 3rd random bonus (25% chance of a 4th)."
+xuiRebirthBonusWsKitRetuning,"For each bonus, pick Keep, Reroll or Replace."
+xuiRebirthBonusWsKitBreakdown,"Click a bonus to switch it between Keep and Remove."
+xuiRebirthBonusWsKitBreakdownOne,"This bonus will be removed."
+xuiRebirthBonusWsExplorerNote,"Choosing {0}. Click a row to use it. Greyed rows are locked or already on the item."
+xuiRebirthBonusWsTheReplacement,"the replacement bonus"
+xuiRebirthGuideEmpty,"HOW TO USE THE MODIFIER STATION\n\n1. Put a Hammer and Pliers in the Tools slot.\n2. Put an armor piece in the Item slot (head, chest, gloves or boots).\n3. Put a kit in the Kit slot. The kit decides what happens:\n     Survivor's Upgrade: adds the first bonus.\n     Adjustment: adds a 2nd bonus.\n     Elite Reinforcement: adds a 3rd (25% chance of a 4th).\n     Comprehensive Upgrade: adds 3 to an item with none (25% chance of a 4th).\n     Retuning: rerolls or replaces 1 or 2 bonuses.\n     Breakdown: removes the bonuses you pick.\n4. Make your choices in the left panel, then press the button under the slots. The armor goes to Output."
+xuiRebirthGuideAdd,"{0}\n\nWHAT TO DO\n1. In the left panel, each new bonus has a Choose button.\n2. Leave it on Random bonus and the bonus is picked at random.\n3. Or press Choose and pick what you want:\n     Tailoring 10: a category, for example Melee. The bonus comes from that group.\n     Tailoring 25: an exact bonus, for example reload speed with shotguns.\n     Rarity and value are always rolled, with the odds shown at the bottom left.\n4. Press {1}. The armor goes to Output.\n\nYOUR TAILORING: {2}. {3}"
+xuiRebirthGuideRetune,"RETUNING\n\nChange the bonuses already on this armor. For each bonus in the left panel pick:\n     Keep: it stays exactly as it is.\n     Reroll: the same bonus, with a new rarity and value.\n     Replace: a different bonus. Press Choose under it to pick what, or leave it random.\nAt least one bonus must be Reroll or Replace.\n\nPress Retune when ready. The armor goes to Output.\n\nYOUR TAILORING: {0}. {1}"
+xuiRebirthGuideBreakdown,"BREAKDOWN\n\nRemove bonuses from this armor. In the left panel, click a bonus to switch it between Keep and Remove, or use Remove all. Kept bonuses stay exactly as they are.\n\nTo change an item with 3 or 4 bonuses: remove the ones you don't want here, then add new ones with Adjustment or Elite Reinforcement.\n\nPress the button under the slots when ready. The armor goes to Output."
+xuiRebirthGuideBlocked,"THIS KIT CAN'T BE USED ON THIS ARMOR\n\n{0}\n\nWhich kit fits:\n     No bonuses: Survivor's Upgrade or Comprehensive Upgrade.\n     1 bonus: Adjustment, Retuning or Breakdown.\n     2 bonuses: Elite Reinforcement, Retuning or Breakdown.\n     3 or 4 bonuses: Breakdown."
+xuiRebirthGuideExplorer,"CHOOSING {0}\n\n     Random bonus: picked at random.\n     A category (Tailoring 10): the bonus comes from that group.\n     An effect or exact bonus (Tailoring 25): pick precisely.\n     The letters on the right are the rarities a bonus can roll.\n     Greyed rows show the Tailoring they need, or that this type of bonus is already on the item (one of each type per item).\n     Click the star to add a choice to Favourites.\n     Use the search box to find a bonus by name.\n\nClick Back to return without changing anything."
+xuiRebirthGuideResult,"DONE\n\nThe armor is in Output with its new bonuses, shown in the left panel. Put in another armor piece and kit to continue."
+xuiRebirthGuideUnlock0,"Choosing a category unlocks at Tailoring 10. Crafting armor gives about 1.0 Tailoring each, scrapping armor about 0.5."
+xuiRebirthGuideUnlock10,"Choosing an exact bonus unlocks at Tailoring 25."
+xuiRebirthGuideUnlock25,"Every choice is unlocked."
+xuiRebirthSlotHead,"Head"
+xuiRebirthSlotChest,"Chest"
+xuiRebirthSlotHands,"Gloves"
+xuiRebirthSlotFeet,"Boots"
 xuiRebirthPropaneTitle,Propane Refill
 xuiRebirthPropaneHelp,"Drag a propane tank into the slot, then start filling. Filling continues if you close the window."
 xuiRebirthPropaneStation,Station
@@ -12694,7 +12918,13 @@ aeBonusFmt_feet_movement_stamina_common,"{0}% less stamina drain while walking o
 aeBonusFmt_feet_movement_stamina_uncommon,"{0}% less stamina drain while walking or running"
 aeBonusFmt_feet_movement_stamina_rare,"{0}% less stamina drain while walking or running"
 aeBonusFmt_feet_movement_stamina_legendary,"{0}% less stamina drain while walking or running"
-aeBonusFmt_feet_sneak_sprint_uncommon,"No stamina drain while crouched and sprinting"
+aeBonusFmt_feet_sneak_sprint_uncommon,"{0}% less stamina drain while crouched and sprinting"
+aeBonusFmt_feet_sleeper_knockdown_legendary,"{0}% chance to knock down sleepers you hit while crouched"
+aeBonusFmt_feet_sleeper_knockdown_uncommon,"{0}% chance to knock down sleepers you hit while crouched"
+aeBonusFmt_feet_sleeper_knockdown_common,"{0}% chance to knock down sleepers you hit while crouched"
+aeBonusFmt_feet_sneak_sprint_legendary,"{0}% less stamina drain while crouched and sprinting"
+aeBonusFmt_feet_sneak_sprint_rare,"{0}% less stamina drain while crouched and sprinting"
+aeBonusFmt_feet_sneak_sprint_common,"{0}% less stamina drain while crouched and sprinting"
 aeBonusFmt_feet_shadow_blend_common,"{0}% less light exposure while crouched in low light"
 aeBonusFmt_feet_shadow_blend_uncommon,"{0}% less light exposure while crouched in low light"
 aeBonusFmt_feet_shadow_blend_rare,"{0}% less light exposure while crouched in low light"

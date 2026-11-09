@@ -7,14 +7,14 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
     {
         RebirthWeaponBonusParticles.Play(particleName, impactPosition, soundName, _params.Self, _params.Position);
 
-        /*Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute START");
+        /*RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute START");
 
         if (particleName == "")
         {
             return;
         }
 
-        Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute particleName: " + particleName);
+        RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute particleName: " + particleName);
 
         bool isPositionAoE = false;
 
@@ -23,12 +23,12 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
             isPositionAoE = true;
         }
 
-        Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute isPositionAoE: " + isPositionAoE);
+        RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute isPositionAoE: " + isPositionAoE);
 
         var entityAlive = _params.Self as EntityAlive;
         if (entityAlive == null && !isPositionAoE)
         {
-            Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute 1");
+            RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute 1");
             return;
         }
 
@@ -37,16 +37,16 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
 
         if (entityAlive != null && !isPositionAoE)
         {
-            Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute 2");
+            RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute 2");
             position = entityAlive.position;
         }
         else if (isPositionAoE)
         {
-            Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute 3");
+            RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute 3");
             position = _params.Position;
         }
 
-        Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute position: " + position);
+        RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute position: " + position);
 
         lightBrightness = entityAlive.world.GetLightBrightness(new Vector3i(position.x, position.y, position.z));
 
@@ -54,7 +54,7 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
 
         if (!isAvailable)
         {
-            Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute 4");
+            RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute 4");
             ParticleEffect.LoadAsset(particleName);
         }
 
@@ -64,18 +64,18 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
 
         if (soundName != "")
         {
-            Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute soundName: " + soundName);
+            RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute soundName: " + soundName);
             Manager.BroadcastPlayByLocalPlayer(position, soundName);
         }
 
-        Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute particleName: " + particleName + " / id: " + particleName.GetHashCode());
-        Log.Out("MinEventActionInstantiateParticleEffectRebirth-Execute _params.Self.entityId: " + _params.Self.entityId);
+        RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute particleName: " + particleName + " / id: " + particleName.GetHashCode());
+        RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-Execute _params.Self.entityId: " + _params.Self.entityId);
         entityAlive.world.GetGameManager().SpawnParticleEffectServer(particleEffect, _params.Self.entityId, false, true);*/
     }
 
     public override bool ParseXmlAttribute(XAttribute _attribute)
     {
-        //Log.Out("MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute START");
+        //RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute START");
         bool flag = base.ParseXmlAttribute(_attribute);
         if (!flag)
         {
@@ -83,25 +83,25 @@ public class MinEventActionInstantiateParticleEffectRebirth : MinEventActionTarg
             if (localName == "particleName")
             {
                 particleName = _attribute.Value;
-                //Log.Out("MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute particleName: " + particleName);
+                //RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute particleName: " + particleName);
                 return true;
             }
             if (localName == "soundName")
             {
                 soundName = _attribute.Value;
-                //Log.Out("MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
+                //RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
                 return true;
             }
             if (localName == "impactPosition")
             {
                 impactPosition = _attribute.Value;
-                //Log.Out("MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
+                //RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
                 return true;
             }
             if (localName == "buffName")
             {
                 buffName = _attribute.Value;
-                //Log.Out("MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
+                //RebirthDebug.Log("weaponbonuses", "MinEventActionInstantiateParticleEffectRebirth-ParseXmlAttribute soundName: " + soundName);
                 return true;
             }
         }

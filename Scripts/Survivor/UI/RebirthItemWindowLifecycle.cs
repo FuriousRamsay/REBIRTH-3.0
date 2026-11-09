@@ -22,7 +22,7 @@ public static class RebirthItemWindowLifecycle
     internal static void Trace(string message)
     {
 #if REBIRTH_UI_DIAGNOSTICS
-        if (RebirthSurvivorDebug.Enabled) Log.Out(message);
+        if (RebirthSurvivorDebug.Enabled) RebirthDebug.Log("survivor", message);
 #endif
     }
 

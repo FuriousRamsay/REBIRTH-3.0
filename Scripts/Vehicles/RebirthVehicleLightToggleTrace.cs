@@ -27,7 +27,7 @@ internal static class RebirthVehicleLightToggleTrace
         line.Append("[VehicleLightToggle] vehicle=").Append(__instance.vehicle.GetName())
             .Append(" entity=").Append(entity.entityId)
             .Append(" on=true lights=").Append(lights.Length);
-        Log.Out(line.ToString());
+        RebirthDebug.Log("vehicles", line.ToString());
         foreach (var light in lights)
         {
             if (light == null) continue;
@@ -43,7 +43,7 @@ internal static class RebirthVehicleLightToggleTrace
                 .Append(" cullingMask=").Append(light.cullingMask)
                 .Append(" localPosition=").Append(root.InverseTransformPoint(light.transform.position).ToString("F3"))
                 .Append(" localForward=").Append(root.InverseTransformDirection(light.transform.forward).ToString("F3"));
-            Log.Out(line.ToString());
+            RebirthDebug.Log("vehicles", line.ToString());
         }
     }
 

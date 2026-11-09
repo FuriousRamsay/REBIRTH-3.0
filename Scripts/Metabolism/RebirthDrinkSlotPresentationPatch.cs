@@ -49,3 +49,24 @@ internal static class RebirthDrinkSlotPresentationPatch
         RebirthSelectedDurability.RenderDragCursor(__instance);
     }
 }
+
+/// <summary>
+/// Owner 2026-11-08: a drink's count is right-aligned by the Update postfix above, but the item templates centre the
+/// count whenever a bar shows ({#hasdurability ? 'Center' : 'Right'}). Any rebind outside Update (backpack refresh after
+/// a drag, drop, move or station output) centred it for a frame: the number visibly jumped. Templates now read
+/// rebirthcountcenter, which is the native rule except for drinks, so every rebind already places it right.
+/// </summary>
+[HarmonyPatch(typeof(XUiC_ItemStack),nameof(XUiC_ItemStack.GetBindingValueInternal))]
+internal static class RebirthDrinkCountAlignmentBinding
+{
+    [HarmonyPostfix]
+    private static void Postfix(XUiC_ItemStack __instance,ref string _value,string _bindingName,ref bool __result)
+    {
+        if(_bindingName!="rebirthcountcenter")return;
+        bool center=__instance!=null&&__instance.ShowDurability;
+        var stack=__instance?.ItemStack;
+        if(center&&stack!=null&&!stack.IsEmpty()&&RebirthSurvivorMode.IsEnabledForCurrentWorld()&&
+            RebirthConsumableResolver.TryResolve(stack.itemValue.ItemClass,out var definition)&&definition.IsDrink)center=false;
+        _value=center?"true":"false";__result=true;
+    }
+}

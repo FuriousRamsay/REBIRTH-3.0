@@ -17,6 +17,8 @@ public static partial class RebirthRecyclerRuntime
         internal Guid Id; internal ItemValue Original; internal int Units,Outputs;
         internal string Owner,Creation,Rule; internal int Index;
     }
+    /// <summary>Level of the player who queued the scrap job (2.6 control panel parts use it); 1 when unknown.</summary>
+    internal static int CrafterLevel(World world,int entityId)=>Math.Max(1,(world?.GetEntity(entityId) as EntityPlayer)?.Progression?.Level??1);
     private sealed class Processing {internal bool Active;internal int NativeOwnerFrame=-1;}
     private static readonly ConditionalWeakTable<TileEntityWorkstation,Processing> processing=new ConditionalWeakTable<TileEntityWorkstation,Processing>();
     private static readonly MethodInfo syncUiFromTe=AccessTools.Method(typeof(XUiC_WorkstationWindowGroup),"syncUIfromTE");
@@ -357,7 +359,7 @@ public static partial class RebirthRecyclerRuntime
                 }
                 queue[queue.Length-1]=new RecipeQueueItem {StartingEntityId=-1};
                 bool final=!queue.Any(sibling=>TryGroup(sibling?.Recipe,out var id)&&id==group.Id);
-                var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id):new List<ItemStack>();
+                var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id,group.Units,CrafterLevel(world,row.StartingEntityId)):new List<ItemStack>();
                 if(bonuses.Count>0&&!world.IsRemote()&&!(station is RebirthCamperStationState))
                 {
                     // 2.6 (ScrapBonusPartDropper): bonus parts go into the station output; what does not fit is dropped at the station.
@@ -424,7 +426,7 @@ public static partial class RebirthRecyclerRuntime
         if(station==null)return;
         if(!(actor is EntityPlayerLocal local))return;
         var ui=LocalPlayerUI.GetUIForPlayer(local);if(ui==null)return;
-        foreach(var window in ui.xui.GetChildrenByType<XUiC_WorkstationWindowGroup>())
+        foreach(var window in RebirthWorkstationWindowIndex.For(ui.xui))
             if(window.windowGroup?.isShowing==true&&ReferenceEquals(window.WorkstationData?.TileEntity,station))
             {
                 if(station is RebirthCamperStationState mobile)

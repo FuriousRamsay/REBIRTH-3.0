@@ -28,6 +28,11 @@ public sealed class RebirthArmorBonusDefinition
     public FastTags<TagGroup.Global> Context, AltContext;
     public float AltValue;
     public string Special;
+    /// <summary>What the bonus applies to, from its skills, context, items or tags (null when it applies to everything).
+    /// A bonus whose tokens include another bonus's tokens is a bigger version of it (armor bonus focus subjects).</summary>
+    public string[] TokenNames;
+    /// <summary>Kept so items that already have it keep it, but never rolled again (owner 2026-11-08).</summary>
+    public bool Retired;
 
     // One rule for play and for tests: does this bonus apply to that weapon?
     public bool AppliesToWeapon(ItemValue weapon)
@@ -116,6 +121,13 @@ public static class RebirthArmorBonusCatalog
         };
     }
 
+    private static string[] Tokens(string list)
+    {
+        if (string.IsNullOrEmpty(list)) return null;
+        var parts = list.Split(new[] { (char)44 }, StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).Where(p => p.Length > 0).ToArray();
+        return parts.Length == 0 ? null : parts;
+    }
+
     private static void EnsureLoaded()
     {
         if (loaded) return;
@@ -175,7 +187,9 @@ public static class RebirthArmorBonusCatalog
                         HasAltContext = !string.IsNullOrEmpty(altContext),
                         AltContext = string.IsNullOrEmpty(altContext) ? default(FastTags<TagGroup.Global>) : FastTags<TagGroup.Global>.Parse(altContext),
                         AltValue = bonus.Attribute("alt_value") != null ? float.Parse((string)bonus.Attribute("alt_value"), CultureInfo.InvariantCulture) : 0f,
-                        Special = (string)family.Attribute("special")
+                        Special = (string)family.Attribute("special"),
+                        TokenNames = Tokens(skills ?? (string)bonus.Attribute("context") ?? (string)family.Attribute("context") ?? items ?? tags),
+                        Retired = (string)bonus.Attribute("retired") == "true" || (string)family.Attribute("retired") == "true"
                     };
                     ById.Add(definition.Id, definition);
                     All.Add(definition);
@@ -250,6 +264,19 @@ public static class RebirthArmorBonusRoller
     }
 
     public static List<RebirthArmorRolledBonus> Roll(EquipmentSlots slot, IEnumerable<RebirthArmorRolledBonus> existing, int targetCount, int level, int quality, Random random, IEnumerable<string> excludedIds = null)
+        => Roll(slot, existing, targetCount, level, quality, random, excludedIds, null);
+
+    /// <summary>
+    /// Focused roll (spec section 5): the focus only narrows the candidates; the draw itself is unchanged.
+    /// A chosen (focused) bonus only has to differ from the bonuses already rolled; it may share their family
+    /// (owner 2026-11-08: Construction XP and Batons XP are different bonuses). Random rows keep the 2.6 family rule.
+    /// </summary>
+    public static List<RebirthArmorRolledBonus> Roll(EquipmentSlots slot, IEnumerable<RebirthArmorRolledBonus> existing, int targetCount, int level, int quality, Random random, RebirthArmorBonusFocus focus, IEnumerable<string> excludedIds = null)
+        => focus.Depth == RebirthArmorBonusFocusDepth.Any
+            ? Roll(slot, existing, targetCount, level, quality, random, excludedIds, null)
+            : Roll(slot, existing, targetCount, level, quality, random, excludedIds, RebirthArmorBonusTree.Pool(slot, focus), true);
+
+    private static List<RebirthArmorRolledBonus> Roll(EquipmentSlots slot, IEnumerable<RebirthArmorRolledBonus> existing, int targetCount, int level, int quality, Random random, IEnumerable<string> excludedIds, HashSet<string> allowed, bool sameBonusOnly = false)
     {
         var excluded = excludedIds != null ? new HashSet<string>(excludedIds, StringComparer.Ordinal) : null;
         var result = new List<RebirthArmorRolledBonus>(existing);
@@ -259,7 +286,10 @@ public static class RebirthArmorBonusRoller
         while (result.Count < targetCount)
         {
             var families = RebirthArmorBonusCatalog.Definitions
-                .Where(d => d.Slot == slot && (excluded == null || !excluded.Contains(d.Id)) && !result.Any(r => r.Definition.FamilyId == d.FamilyId))
+                .Where(d => d.Slot == slot && !d.Retired && (allowed == null || allowed.Contains(d.Id)) && (excluded == null || !excluded.Contains(d.Id))
+                    && (sameBonusOnly
+                        ? !result.Any(r => RebirthArmorBonusTree.ExactKey(r.Definition.Id) == RebirthArmorBonusTree.ExactKey(d.Id))
+                        : !result.Any(r => r.Definition.FamilyId == d.FamilyId)))
                 .GroupBy(d => d.FamilyId).ToList();
             if (families.Count == 0) break;
             var family = families[random.Next(families.Count)].ToList();
@@ -270,6 +300,18 @@ public static class RebirthArmorBonusRoller
             result.Add(new RebirthArmorRolledBonus { Definition = chosen, Value = value });
         }
         return result;
+    }
+
+    /// <summary>Retuning "Reroll": the same exact bonus, its rarity rolled again among the rarities that bonus has
+    /// (kit level and quality weights), then a new value in that row's range.</summary>
+    public static RebirthArmorRolledBonus RerollSame(RebirthArmorRolledBonus bonus, int level, int quality, Random random)
+    {
+        if (bonus.Definition == null || !RebirthArmorBonusTree.TryGetExact(RebirthArmorBonusTree.ExactKey(bonus.Definition.Id), out var exact) || exact.Rows.Count == 0)
+            return bonus;
+        var rarity = RollRarity(exact.Rows, RebirthArmorBonusCatalog.GetRarityWeights(level, quality), random);
+        var options = exact.Rows.Where(d => d.Rarity == rarity).ToList();
+        var chosen = options[random.Next(options.Count)];
+        return new RebirthArmorRolledBonus { Definition = chosen, Value = chosen.Min + (float)random.NextDouble() * (chosen.Max - chosen.Min) };
     }
 
     private static RebirthArmorBonusRarity RollRarity(List<RebirthArmorBonusDefinition> pool, int[] weights, Random random)
@@ -297,24 +339,31 @@ public static class RebirthArmorBonusText
     private static string Amount(RebirthArmorRolledBonus bonus)
     {
         float value = System.Math.Abs(bonus.Value);
-        // Weapon-skill bonuses give half their value at skill 0 and all of it at skill 100: show that range.
-        if (bonus.Definition.ScaleWithWeaponSkill && !bonus.Definition.Flat && !bonus.Definition.ShowAsSeconds)
-            return (value * 50f).ToString("0.#", CultureInfo.InvariantCulture) + "-" + (value * 100f).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+        // Every bonus shows the single value rolled when it was made (owner 2026-11-08: no weapon-skill range).
         if (bonus.Definition.ShowAsSeconds) return (1f / value).ToString("0", CultureInfo.InvariantCulture);
         return bonus.Definition.Flat ? value.ToString("0", CultureInfo.InvariantCulture) : (value * 100f).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+    }
+
+    /// <summary>The bonus text with its value. Some texts are written "{0}% more ..." while percentages already carry
+    /// their "%", so a "%" right after {0} is dropped (owner 2026-11-08: "2.6%% more axes skill experience").</summary>
+    private static string Format(RebirthArmorRolledBonus bonus, string amount)
+    {
+        string format = Localization.Get("aeBonusFmt_" + bonus.Definition.Id);
+        if (amount.EndsWith("%", StringComparison.Ordinal)) format = format.Replace("{0}%", "{0}");
+        return format.Replace("{0}", amount);
     }
 
     public static string Describe(RebirthArmorRolledBonus bonus)
     {
         string format = Localization.Get("aeBonusFmt_" + bonus.Definition.Id);
         string amount = Amount(bonus);
-        return "[" + Colors[(int)bonus.Definition.Rarity] + "]" + format.Replace("{0}", amount) + "[-]";
+        return "[" + Colors[(int)bonus.Definition.Rarity] + "]" + Format(bonus, amount) + "[-]";
     }
 
     public static string Plain(RebirthArmorRolledBonus bonus)
     {
         string amount = Amount(bonus);
-        return Localization.Get("aeBonusFmt_" + bonus.Definition.Id).Replace("{0}", amount);
+        return Format(bonus, amount);
     }
 
     public static string DescribeArmor(ItemValue item) => string.Join("\n", RebirthArmorBonusStorage.Read(item).Select(Describe));
@@ -352,7 +401,7 @@ internal static class RebirthArmorBonusEffectPatch
                 value = definition.AltValue;
             }
             if (definition.Special == "low_light" && _entity.GetCVar("_lightlevel") > RebirthArmorBonusSpecials.LowLightLevel) continue;
-            if (definition.ScaleWithWeaponSkill) value *= RebirthArmorBonusWeaponSkills.Scale(_entity, weapon);
+            // No weapon-skill scaling: the rolled value applies as it is, as in 2.6 (owner 2026-11-08).
             if (definition.AddsToBase) _originalValue += value;
             else _perc_value += value;
         }

@@ -312,12 +312,20 @@ public static class RebirthSurvivorFirstEntryUiService
         RestoreInitialSpawnPreference();
         bool editMode = RebirthCharacterCreationHoldService.IsEditModeActive();
         bool? existingSurvivor = editMode ? null : CurrentSaveHasSurvivorCharacter();
-        if(!editMode&&!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth
-            && existingSurvivor == false)
+        bool skipSpawnBefore = GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton);
+        // Owner 2026-11-08 (dedicated server): a joining client does not know the server's progression mode yet at
+        // GameStarting, so the native auto-spawn skipped spawnselection (where the Survivor chooser lives); the server
+        // then held the new player with no chooser and no control. Joining a remote world without a local Survivor
+        // record always shows spawnselection; the integrated gate decides once owner state arrives.
+        // A local save can share the server's world and game name (owner trace 2026-11-09: existingSurvivor=True from
+        // the local test save while the server had no character), so the local probe is ignored for every remote join.
+        bool remoteJoin=!data.AsServer;
+        if(!editMode&&!GameManager.IsDedicatedServer&&
+            (RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth&&existingSurvivor==false||remoteJoin))
         {
             initialSkipSpawnPreference=GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton);
             GamePrefs.Set(EnumGamePrefs.SkipSpawnButton,false);
-            Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-gate enabled skipSpawnWas="+initialSkipSpawnPreference.Value);
+            RebirthDebug.Log("survivor", "[PurgeTruckStart] step=survivor.pre-spawn-gate enabled skipSpawnWas="+initialSkipSpawnPreference.Value);
         }
         else if(!editMode&&!GameManager.IsDedicatedServer)
         {
@@ -326,10 +334,11 @@ public static class RebirthSurvivorFirstEntryUiService
             // for that returning save instead of preserving our stale override.
             if (RebirthSurvivorMode.ConfiguredMode == RebirthPlayerProgressionMode.Rebirth && existingSurvivor == true)
                 GamePrefs.Set(EnumGamePrefs.SkipSpawnButton, true);
-            Log.Out("[REBIRTH Survivor][PreSpawnTrace] existingSurvivor="+
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][PreSpawnTrace] existingSurvivor="+
                 (existingSurvivor.HasValue ? existingSurvivor.Value.ToString() : "unknown")+
                 " native SkipSpawnButton="+GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton));
         }
+        RebirthSpawnInputTrace.GameStarting(data.AsServer, editMode, existingSurvivor, skipSpawnBefore);
         int abandonedUiCount = ClearAbandonedPendingPlayerUiAssignments();
         ResetSessionState();
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("GameStarting asServer=" + data.AsServer
@@ -364,8 +373,9 @@ public static class RebirthSurvivorFirstEntryUiService
     {
         if (!data.IsLocalPlayer) return;
         RestoreInitialSpawnPreference();
+        RebirthSpawnInputTrace.PlayerSpawned();
         if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
-        Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-selection consumed staged="+stagedSelectionReady);
+        RebirthDebug.Log("survivor", "[PurgeTruckStart] step=survivor.pre-spawn-selection consumed staged="+stagedSelectionReady);
 
         EntityPlayerLocal player = GetLocalPlayer();
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("PlayerSpawned local=True entity="
@@ -434,6 +444,7 @@ public static class RebirthSurvivorFirstEntryUiService
             pendingSelectorManager = null;
             if (hadPendingCreationUi) CloseCreationWindowsAndRestoreControl();
             Log.Warning("[REBIRTH Survivor] ignored post-spawn creation prompt from owner state");
+            RebirthSpawnInputTrace.Note("ignored-post-spawn-creation-prompt creation=" + snapshot.CreationState + " hasCharacter=" + snapshot.HasCharacter);
             return;
         }
         creationUiRequired = required;
@@ -580,6 +591,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        RebirthSpawnInputTrace.Pump();
         if (RebirthCharacterCreationHoldService.IsEditModeActive()) return;
         TickCore("ModEvents.GameUpdate");
     }
@@ -928,7 +940,7 @@ public static class RebirthSurvivorFirstEntryUiService
         if (!RebirthSurvivorProfileStore.TryCreate(vm.ProfileName.Trim(), vm.BuildSelection(), vm.GetCreationChoicesSnapshot(), out created, out error))
             Log.Warning("[REBIRTH Survivor UI] world character created but reusable profile save failed: " + error);
         else
-            Log.Out("[REBIRTH Survivor UI] reusable profile saved after staged world creation id=" + created.ProfileId);
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor UI] reusable profile saved after staged world creation id=" + created.ProfileId);
     }
 
     public static void ReturnToSelector()

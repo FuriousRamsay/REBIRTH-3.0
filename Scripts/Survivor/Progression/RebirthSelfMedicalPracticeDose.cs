@@ -167,10 +167,13 @@ internal static class RebirthSelfMedicalPracticeDose
                 var body = method.GetMethodBody();
                 byte[] il = body?.GetILAsByteArray();
                 if (il == null || il.Length != (consume ? 464 : 522) || body.ExceptionHandlingClauses.Count != 0) return false;
+                // 3.4 dedicated server (b10 server build, MVID 843f5381): every guarded method was compared to the reviewed b10 client
+                // with operands resolved by name (2026-11-09, scratchpad ilcmp): all identical; only metadata tokens differ.
+                bool server = mvid == "843f5381-6019-44cb-9180-0b5e2888de8b";
                 using (var hash = SHA256.Create())
                     if (BitConverter.ToString(hash.ComputeHash(il)).Replace("-", "") !=
-                        (consume ? "C417DB13AC2DBE440FA64EF97DD1E0C007A8DB0FDABECD36C9B978E6451D7AC2" :
-                        "B5CD857448E5263CDAB6019882D73432B5C07337D5CE5C12BA2EBB4E07242A79")) return false;
+                        (consume ? (server ? "2CE439CE36A55060709C1FE5E1379E6C0EE4B1D03D2CD9F9C4AF26672C3048FB" : "C417DB13AC2DBE440FA64EF97DD1E0C007A8DB0FDABECD36C9B978E6451D7AC2") :
+                        (server ? "206A31FB51A64AD076EABCB39EE69A03B82CCF712FD8FF03A60FDECB90B79C28" : "B5CD857448E5263CDAB6019882D73432B5C07337D5CE5C12BA2EBB4E07242A79"))) return false;
                 return true;
             }
             using (var stream = File.OpenRead(method.Module.Assembly.Location))
@@ -186,7 +189,7 @@ internal static class RebirthSelfMedicalPracticeDose
         if(method!="consume" && method!="ExecuteInstantAction")return;
         diagnosticCounts.TryGetValue(method,out int count);if(count>=4)return;diagnosticCounts[method]=count+1;
         string message="[REBIRTH MedicinePractice][Startup] target=ItemActionEat."+method+" doseTranspiler="+(applied?"APPLIED":"REFUSED")+" reason="+reason;
-        if(applied)Log.Out(message);else Log.Warning(message);
+        if(applied)RebirthDebug.Log("survivor", message);else Log.Warning(message);
     }
     internal static IEnumerable<CodeInstruction> Transpile(IEnumerable<CodeInstruction> instructions,MethodBase method){
         var incoming=new List<CodeInstruction>(instructions);

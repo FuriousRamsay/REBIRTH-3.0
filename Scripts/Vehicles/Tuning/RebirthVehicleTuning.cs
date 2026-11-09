@@ -162,7 +162,7 @@ internal sealed partial class RebirthVehicleTuningSession
             foreach(var field in assembly.Performance.GetType().GetFields(BindingFlags.Public|BindingFlags.Instance))report.Append("RESTORATION ").Append(field.Name).Append(" = ").Append(Format(field.GetValue(assembly.Performance))).AppendLine();
         if(Entity.wheels!=null)for(int i=0;i<Entity.wheels.Length;i++){var w=Entity.wheels[i];if(w?.wheelC==null)continue;report.Append("WHEEL ").Append(i).Append(" radius=").Append(F(w.wheelC.radius)).Append(" motorScale=").Append(F(w.motorTorqueScale)).Append(" brakeScale=").Append(F(w.brakeTorqueScale)).Append(" damping=").Append(F(w.wheelC.wheelDampingRate)).Append(" sideStiffness=").Append(F(w.wheelC.sidewaysFriction.stiffness)).AppendLine();}
         if(string.Equals(Entity.vehicle.GetName(),"rebirthCamper80s",StringComparison.OrdinalIgnoreCase))report.AppendLine("CAMPER_NORMALIZATION torque/brake=originalScale*radius/.63; damping=.7; sideways stiffness front=1.8 rear=1.7.");
-        report.AppendLine("Live values are baselines/runtime settings, not final effective physics. Restoration, native effects, perks and direct assists still apply. SOURCE proposals are NOT applied live or saved. Integrate source explicitly.").Append("[REBIRTH VehicleTuning] END");Log.Out(report.ToString());
+        report.AppendLine("Live values are baselines/runtime settings, not final effective physics. Restoration, native effects, perks and direct assists still apply. SOURCE proposals are NOT applied live or saved. Integrate source explicitly.").Append("[REBIRTH VehicleTuning] END");RebirthDebug.Log("vehicles", report.ToString());
     }
 }
 

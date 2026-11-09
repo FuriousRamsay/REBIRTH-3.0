@@ -111,7 +111,7 @@ public static class RebirthNpcLifecycle
         }
 
         RebirthNpcLifecycleQualificationService.RecordBootstrap(GetSnapshot(), false);
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH NPC Lifecycle] registered generation=" + bootstrapGeneration +
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("npc", "[REBIRTH NPC Lifecycle] registered generation=" + bootstrapGeneration +
             " packages=" + Packages.Count + " services=" + Services.Count); }
     }
 

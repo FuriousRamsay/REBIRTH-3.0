@@ -503,7 +503,7 @@ public static class RebirthMetabolismUiFeedback
         if (string.IsNullOrEmpty(result.Message))
             return;
 
-        Log.Out("[REBIRTH Metabolism] " + result.Message);
+        RebirthDebug.Log("network", "[REBIRTH Metabolism] " + result.Message);
 
         // Manual intake feedback should be visible without opening the detailed metabolism
         // window. Auto-sip does not call this feedback path, so this does not create periodic

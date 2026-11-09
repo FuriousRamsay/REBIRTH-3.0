@@ -30,7 +30,11 @@ public sealed class XUiC_RebirthRecyclerInputGrid : XUiC_WorkstationInputGrid
         var merged=ItemStack.CreateArray(original.Length);
         for(int i=0;i<original.Length;i++)merged[i]=original[i].Clone();
         if(stacks.Length>0 && merged.Length>0)merged[0]=stacks[0].Clone();
-        base.UpdateBackend(merged);
+        // Native XUiC_WorkstationInputGrid.UpdateBackend = SetInputStacks + whole-window SetAllChildrenDirty; that
+        // redrew every backpack slot when an item went into the scrap input (owner 2026-11-08, traced). Scrap input
+        // does not change recipe availability, so only this input panel is redrawn.
+        WorkstationData.SetInputStacks(merged);
+        (Parent??this).SetAllChildrenDirty();
     }
     public override void OnOpen()
     {
@@ -316,7 +320,8 @@ internal static class RebirthScrapWindow
         }
     }
 
-    internal static bool IsModifier => XUiC_RebirthStationWorkspace.ActiveInstance?.GetChildByType<XUiC_RebirthKitInputGrid>() != null;
+    // By block name, like IsScrapOnly (profiler 2026-11-08: the old window-tree search ran several times per frame).
+    internal static bool IsModifier => XUiC_RebirthStationWorkspace.ActiveInstance?.WorkstationData?.TileEntity?.block?.GetBlockName() == "ModifierStation";
 
     internal static bool IsScrappable(ItemStack stack)
     {

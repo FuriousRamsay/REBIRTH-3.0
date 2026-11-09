@@ -871,7 +871,7 @@ public static class RebirthPoiSenseRuntimeIntegration
             installed = true;
             lastRuntimeError = string.Empty;
             string result = "[RebirthPoiSense] Installed authoritative EntityPlayer.CheckSleeperTriggers activation";
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(result); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", result); }
             return result;
         }
         catch (Exception ex)

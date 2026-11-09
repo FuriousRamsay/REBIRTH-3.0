@@ -26,7 +26,7 @@ internal static class RebirthHumanProgression
         if(!b13ProtectionInstalled && b13Attempts < 5 && Time.unscaledTime >= b13NextAttempt && ThreadManager.IsMainThread())
         {
             b13NextAttempt = Time.unscaledTime + 10f; b13Attempts++;
-            try { RebirthB13OwnerWorkAwards.EnsureReceiptProtection(); b13ProtectionInstalled = true; Log.Out("[REBIRTH B13] receipt protection installed"); }
+            try { RebirthB13OwnerWorkAwards.EnsureReceiptProtection(); b13ProtectionInstalled = true; RebirthDebug.Log("npc", "[REBIRTH B13] receipt protection installed"); }
             catch(Exception error) { if(b13Attempts >= 5) Log.Warning("[REBIRTH B13] receipt protection not installed, giving up: " + error.Message); }
         }
         var world = GameManager.Instance?.World;

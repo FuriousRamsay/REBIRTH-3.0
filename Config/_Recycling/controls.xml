@@ -2,7 +2,7 @@
  <append xpath="/templates">
  <rebirth_modifier_input>
   <rect name="windowForgeInput" controller="RebirthModifierPanel, RebirthUtils" width="228" height="204" cursor_area="true">
-   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_armor"/><label depth="10" style="header.name.shrink" text_key="xuiEnchantInput" font_size="22" /></rect>
+   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_armor_iron"/><label depth="10" style="header.name.shrink" text_key="xuiEnchantInput" font_size="22" /></rect>
    <grid name="modifierInput" pos="3,-46" rows="1" cols="2" cell_width="75" cell_height="75" controller="RebirthKitInputGrid, RebirthUtils" repeat_content="true"><item_stack controller="RebirthModifierSlot, RebirthUtils" name="0" /></grid>
    <label depth="10" pos="3,-122" width="75" height="20" font_size="16" justify="center" color="201,198,105,255" text_key="xuiEnchantItemSlot" />
    <label depth="10" pos="78,-122" width="75" height="20" font_size="16" justify="center" color="201,198,105,255" text_key="xuiEnchantKitSlot" />
@@ -11,6 +11,677 @@
    <label depth="10" name="recyclerYield" pos="162,-74" width="60" height="126" font_size="18" justify="left" />
   </rect>
  </rebirth_modifier_input>
+ <rebirth_modifier_workspace>
+  <!-- Armor bonus focus workspace (spec 6 and 7): kit rows, focus explorer, Tailoring strip, rarity odds and result card.
+       Every child is placed by XUiC_RebirthBonusWorkspace (Scripts/ArmorBonuses). -->
+  <rect name="rbBonusWorkspace" controller="RebirthBonusWorkspace, RebirthUtils" pos="0,0" width="400" height="682" visible="false" cursor_area="true" on_scroll="true">
+   <sprite name="wsBg" depth="1" width="400" height="682" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
+   <sprite name="wsFrame" depth="2" width="400" height="682" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="wsIcon" depth="5" pos="10,-8" width="26" height="26" sprite="ui_game_symbol_armor_iron" />
+   <label name="wsTitle" depth="5" pos="42,-8" width="340" height="28" font_size="22" justify="left" color="181,140,255,255" text_key="xuiEnchantInput" />
+   <label name="wsBack" depth="6" width="10" height="20" font_size="18"  color="181,140,255,255" justify="right" visible="false" />
+   <button name="wsBackBtn" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   <sprite name="wsRule" depth="3" pos="0,-38" width="400" height="2" sprite="menu_empty" color="181,140,255,220" />
+   <label name="wsNote" depth="5" width="10" font_size="18" justify="left" color="185,182,198,255" height="80" />
+   <textfield name="wsSearch" justify="left" vjustify="middle" depth="20" pos="10,-48" width="380" height="34" font_size="17" character_limit="48" search_field="true" clear_button="true" virtual_keyboard_prompt="vkPromptSearchTerm" bordercolor="72,72,82,255" vk_propagates_events="false" visible="false" />
+   <label name="wsSearchHint" depth="21" width="10" height="20" font_size="16" justify="left" color="130,130,140,255" text_key="xuiRebirthBonusWsSearch" visible="false" />
+   <sprite name="wsTabBg0" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+   <sprite name="wsTabFrame0" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+   <label name="wsTabText0" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+   <button name="wsTabBtn0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   <sprite name="wsTabBg1" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+   <sprite name="wsTabFrame1" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+   <label name="wsTabText1" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+   <button name="wsTabBtn1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   <label name="wsCrumb" depth="5" width="10" height="20" font_size="17" justify="left" color="185,182,198,255" overflow="shrinkcontent" visible="false" />
+   <button name="wsCrumbBtn" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" visible="false" />
+   <label name="wsMore" depth="5" width="10" height="20" font_size="15"  color="185,182,198,255" justify="center" visible="false" />
+   <sprite name="wsMsgBg" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="210,100,100,30" visible="false" />
+   <sprite name="wsMsgFrame" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="210,100,100,255" fillcenter="false" visible="false" />
+   <label name="wsMsg" depth="6" width="10" font_size="18" justify="left" color="235,235,240,255" height="48" visible="false" />
+   <sprite name="wsSumRule" depth="3" width="10" height="2" sprite="menu_empty" color="64,64,72,255" visible="false" />
+   <label name="wsTailorText" depth="5" width="10" height="20" font_size="16" justify="left" color="170,149,199,255" overflow="shrinkcontent" visible="false" />
+   <sprite name="wsTrackBar" depth="4" width="10" height="6" sprite="menu_empty" color="35,35,43,255" visible="false" />
+   <sprite name="wsTrackFill" depth="5" width="10" height="6" sprite="menu_empty" color="181,140,255,255" visible="false" />
+   <sprite name="wsMark10" depth="6" width="2" height="16" sprite="menu_empty" color="64,64,72,255" visible="false" />
+   <sprite name="wsMark25" depth="6" width="2" height="16" sprite="menu_empty" color="64,64,72,255" visible="false" />
+   <label name="wsMark10Text" depth="6" width="10" height="20" font_size="15"  color="185,182,198,255" justify="center" visible="false" />
+   <label name="wsMark25Text" depth="6" width="10" height="20" font_size="15"  color="185,182,198,255" justify="center" visible="false" />
+   <label name="wsTailorNote" depth="5" width="10" height="20" font_size="15" justify="left" color="185,182,198,255" overflow="shrinkcontent" visible="false" />
+   <label name="wsOddsText" depth="5" width="10" height="20" font_size="16" justify="left" color="170,149,199,255" overflow="shrinkcontent" visible="false" />
+   <sprite name="wsOdds0" depth="5" width="10" height="8" sprite="menu_empty" color="200,200,200,255" visible="false" />
+   <sprite name="wsOdds1" depth="5" width="10" height="8" sprite="menu_empty" color="136,170,255,255" visible="false" />
+   <sprite name="wsOdds2" depth="5" width="10" height="8" sprite="menu_empty" color="255,170,85,255" visible="false" />
+   <sprite name="wsOdds3" depth="5" width="10" height="8" sprite="menu_empty" color="204,136,255,255" visible="false" />
+   <label name="wsOddsPct" depth="5" width="10" height="20" font_size="15" justify="left" color="185,182,198,255" overflow="shrinkcontent" visible="false" />
+   <label name="wsResult" depth="5" width="10" height="20" font_size="17" justify="left" color="235,235,240,255" overflow="shrinkcontent" visible="false" />
+   <rect name="wsRow0" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg0" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame0" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText0" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText0" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight0" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar0" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress0" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn0" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg0_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame0_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText0_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn0_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg0_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame0_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText0_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn0_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg0_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame0_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText0_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn0_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow1" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg1" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame1" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText1" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText1" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight1" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar1" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress1" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn1" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg1_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame1_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText1_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn1_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg1_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame1_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText1_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn1_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg1_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame1_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText1_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn1_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow2" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg2" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame2" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText2" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText2" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight2" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar2" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress2" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn2" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg2_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame2_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText2_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn2_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg2_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame2_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText2_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn2_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg2_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame2_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText2_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn2_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow3" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg3" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame3" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg3" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText3" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText3" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight3" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar3" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress3" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn3" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg3_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame3_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText3_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn3_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg3_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame3_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText3_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn3_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg3_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame3_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText3_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn3_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow4" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg4" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame4" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg4" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText4" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText4" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight4" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar4" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress4" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn4" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg4_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame4_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText4_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn4_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg4_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame4_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText4_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn4_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg4_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame4_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText4_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn4_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow5" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg5" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame5" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg5" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText5" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText5" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight5" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar5" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress5" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn5" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg5_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame5_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText5_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn5_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg5_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame5_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText5_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn5_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg5_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame5_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText5_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn5_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow6" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg6" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame6" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg6" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText6" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText6" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight6" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar6" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress6" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn6" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg6_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame6_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText6_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn6_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg6_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame6_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText6_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn6_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg6_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame6_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText6_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn6_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow7" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg7" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame7" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg7" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText7" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText7" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight7" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar7" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress7" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn7" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg7_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame7_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText7_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn7_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg7_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame7_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText7_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn7_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg7_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame7_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText7_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn7_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow8" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg8" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame8" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg8" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText8" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText8" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight8" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar8" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress8" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn8" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg8_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame8_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText8_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn8_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg8_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame8_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText8_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn8_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg8_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame8_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText8_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn8_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow9" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg9" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame9" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg9" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText9" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText9" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight9" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar9" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress9" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn9" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg9_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame9_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText9_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn9_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg9_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame9_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText9_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn9_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg9_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame9_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText9_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn9_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow10" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg10" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame10" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg10" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText10" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText10" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight10" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar10" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress10" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn10" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg10_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame10_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText10_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn10_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg10_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame10_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText10_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn10_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg10_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame10_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText10_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn10_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow11" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg11" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame11" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg11" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText11" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText11" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight11" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar11" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress11" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn11" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg11_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame11_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText11_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn11_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg11_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame11_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText11_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn11_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg11_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame11_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText11_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn11_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow12" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg12" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame12" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg12" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText12" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText12" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight12" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar12" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress12" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn12" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg12_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame12_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText12_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn12_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg12_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame12_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText12_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn12_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg12_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame12_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText12_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn12_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow13" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg13" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame13" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg13" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText13" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText13" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight13" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar13" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress13" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn13" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg13_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame13_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText13_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn13_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg13_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame13_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText13_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn13_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg13_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame13_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText13_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn13_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow14" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg14" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame14" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg14" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText14" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText14" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight14" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar14" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress14" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn14" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg14_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame14_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText14_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn14_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg14_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame14_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText14_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn14_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg14_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame14_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText14_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn14_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+   <rect name="wsRow15" pos="10,-50" width="380" height="36" visible="false" on_scroll="true">
+    <sprite name="wsRowBg15" depth="3" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+    <sprite name="wsRowFrame15" depth="4" width="10" height="10" sprite="menu_empty2px" type="sliced" color="52,52,60,255" fillcenter="false" />
+    <sprite name="wsChipBg15" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="200,200,200,255" />
+    <label name="wsChipText15" depth="6" width="10" height="20" font_size="15"  color="12,12,15,255" justify="center" />
+    <label name="wsRowText15" depth="6" width="10" height="20" font_size="18" justify="left" color="235,235,240,255" overflow="shrinkcontent" />
+    <label name="wsRowRight15" depth="6" width="10" height="20" font_size="16"  color="185,182,198,255" justify="right" overflow="shrinkcontent" />
+    <sprite name="wsStar15" depth="7" width="20" height="20" sprite="ui_game_symbol_star" color="90,90,100,255" visible="false" />
+    <button name="wsRowPress15" depth="8" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" />
+    <button name="wsStarBtn15" depth="10" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg15_0" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame15_0" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText15_0" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn15_0" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg15_1" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame15_1" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText15_1" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn15_1" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+    <sprite name="wsSegBg15_2" depth="5" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" visible="false" />
+    <sprite name="wsSegFrame15_2" depth="6" width="10" height="10" sprite="menu_empty2px" type="sliced" color="64,64,72,255" fillcenter="false" visible="false" />
+    <label name="wsSegText15_2" depth="7" width="10" height="20" font_size="16"  color="185,182,198,255" justify="center" visible="false" />
+    <button name="wsSegBtn15_2" depth="9" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" sound="[paging_click]" on_scroll="true" visible="false" />
+   </rect>
+  </rect>
+ </rebirth_modifier_workspace>
+ <rebirth_modifier_centre>
+  <!-- Modifier Station centre visual (armor bonus focus, owner 2026-11-08): ready = before/after diamonds, the three ways
+       to decide a bonus, Tailoring track, rarity odds and result; not ready = step track and the six-kit sheet.
+       Shown over the centre panel when no item is selected; placed and drawn by XUiC_RebirthBonusCentre. -->
+  <rect name="rbBonusCentre" controller="RebirthBonusCentre, RebirthUtils" pos="0,0" width="600" height="480" visible="false">
+   <sprite name="mcCardBeforeBg" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcCardBeforeFrame" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcCardBeforeIcon" depth="34" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcCardBeforeCaption" depth="35" width="10" height="20" font_size="16" justify="center" color="185,182,198,255" />
+   <sprite name="mcPipBefore0" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextBefore0" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipBefore1" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextBefore1" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipBefore2" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextBefore2" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipBefore3" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextBefore3" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcCardAfterBg" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcCardAfterFrame" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcCardAfterIcon" depth="34" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcCardAfterCaption" depth="35" width="10" height="20" font_size="16" justify="center" color="185,182,198,255" />
+   <sprite name="mcPipAfter0" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextAfter0" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipAfter1" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextAfter1" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipAfter2" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextAfter2" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcPipAfter3" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcPipTextAfter3" depth="36" width="10" height="20" font_size="15" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitIcon" depth="34" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <sprite name="mcArrowLine" depth="33" width="10" height="6" sprite="menu_empty" color="181,140,255,255" />
+   <sprite name="mcArrowHead" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcArrowText" depth="35" width="10" height="20" font_size="17" color="235,235,240,255" justify="center" />
+   <sprite name="mcTileBg0" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcTileFrame0" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcTileIcon0" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcTileGlyph0" depth="35" width="10" height="20" font_size="30" color="235,235,240,255" justify="center" />
+   <label name="mcTileTitle0" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" />
+   <label name="mcTileSub0" depth="35" width="10" height="20" font_size="15" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcTileLock0" depth="36" width="10" height="10" sprite="ui_game_symbol_lock" color="185,182,198,255" />
+   <sprite name="mcTileBg1" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcTileFrame1" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcTileIcon1" depth="34" width="10" height="10" sprite="ui_game_symbol_quickstack_categories" color="185,182,198,255" />
+   <label name="mcTileGlyph1" depth="35" width="10" height="20" font_size="30" color="235,235,240,255" justify="center" />
+   <label name="mcTileTitle1" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" />
+   <label name="mcTileSub1" depth="35" width="10" height="20" font_size="15" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcTileLock1" depth="36" width="10" height="10" sprite="ui_game_symbol_lock" color="185,182,198,255" />
+   <sprite name="mcTileBg2" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcTileFrame2" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcTileIcon2" depth="34" width="10" height="10" sprite="ui_game_symbol_sight" color="185,182,198,255" />
+   <label name="mcTileGlyph2" depth="35" width="10" height="20" font_size="30" color="235,235,240,255" justify="center" />
+   <label name="mcTileTitle2" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" />
+   <label name="mcTileSub2" depth="35" width="10" height="20" font_size="15" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcTileLock2" depth="36" width="10" height="10" sprite="ui_game_symbol_lock" color="185,182,198,255" />
+   <sprite name="mcInfoBg" depth="30" width="10" height="10" sprite="menu_empty2px" type="sliced" color="17,17,21,245" />
+   <sprite name="mcInfoFrame" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <label name="mcTrackTitle" depth="35" width="10" height="20" font_size="15" color="170,149,199,255" />
+   <sprite name="mcTrackBar" depth="33" width="10" height="6" sprite="menu_empty" color="35,35,43,255" />
+   <sprite name="mcTrackFill" depth="34" width="10" height="6" sprite="menu_empty" color="181,140,255,255" />
+   <sprite name="mcTrackMark10" depth="35" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <sprite name="mcTrackMark25" depth="35" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <label name="mcTrackText10" depth="35" width="10" height="20" font_size="14" justify="center" color="185,182,198,255" />
+   <label name="mcTrackText25" depth="35" width="10" height="20" font_size="14" justify="center" color="185,182,198,255" />
+   <label name="mcTrackYou" depth="35" width="10" height="20" font_size="14" color="235,235,240,255" justify="center" />
+   <label name="mcOddsTitle" depth="35" width="10" height="20" font_size="15" color="170,149,199,255" />
+   <sprite name="mcOdds0" depth="34" width="10" height="6" sprite="menu_empty" color="200,200,200,255" />
+   <sprite name="mcOdds1" depth="34" width="10" height="6" sprite="menu_empty" color="136,170,255,255" />
+   <sprite name="mcOdds2" depth="34" width="10" height="6" sprite="menu_empty" color="255,170,85,255" />
+   <sprite name="mcOdds3" depth="34" width="10" height="6" sprite="menu_empty" color="204,136,255,255" />
+   <label name="mcOddsLegend" depth="35" width="10" height="20" font_size="15" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcOddsKey0" depth="35" width="10" height="6" sprite="menu_empty" color="200,200,200,255" />
+   <label name="mcOddsKeyText0" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcOddsKey1" depth="35" width="10" height="6" sprite="menu_empty" color="136,170,255,255" />
+   <label name="mcOddsKeyText1" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcOddsKey2" depth="35" width="10" height="6" sprite="menu_empty" color="255,170,85,255" />
+   <label name="mcOddsKeyText2" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcOddsKey3" depth="35" width="10" height="6" sprite="menu_empty" color="204,136,255,255" />
+   <label name="mcOddsKeyText3" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <label name="mcResult" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcNextBg" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="48,42,24,255" />
+   <sprite name="mcNextFrame" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="204,167,56,255" />
+   <label name="mcNextTag" depth="35" width="10" height="20" font_size="16" color="204,167,56,255" />
+   <label name="mcNext" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcStepBg0" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
+   <sprite name="mcStepFrame0" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcStepIcon0" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcStepText0" depth="35" width="10" height="20" font_size="15" justify="center" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcStepJoin0" depth="31" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <sprite name="mcStepBg1" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
+   <sprite name="mcStepFrame1" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcStepIcon1" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcStepText1" depth="35" width="10" height="20" font_size="15" justify="center" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcStepJoin1" depth="31" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <sprite name="mcStepBg2" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
+   <sprite name="mcStepFrame2" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcStepIcon2" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcStepText2" depth="35" width="10" height="20" font_size="15" justify="center" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcStepJoin2" depth="31" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <sprite name="mcStepBg3" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
+   <sprite name="mcStepFrame3" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcStepIcon3" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcStepText3" depth="35" width="10" height="20" font_size="15" justify="center" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcStepJoin3" depth="31" width="10" height="6" sprite="menu_empty" color="64,64,72,255" />
+   <sprite name="mcStepBg4" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="20,20,24,255" />
+   <sprite name="mcStepFrame4" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcStepIcon4" depth="34" width="10" height="10" sprite="menu_empty" color="185,182,198,255" />
+   <label name="mcStepText4" depth="35" width="10" height="20" font_size="15" justify="center" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg0" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame0" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon0" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName0" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip0_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip0_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText0_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow0" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote0" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg1" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame1" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon1" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName1" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip1_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip1_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText1_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow1" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote1" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg2" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame2" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon2" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName2" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip2_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip2_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText2_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow2" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote2" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg3" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame3" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon3" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName3" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip3_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip3_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText3_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow3" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote3" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg4" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame4" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon4" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName4" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip4_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip4_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText4_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow4" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote4" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <sprite name="mcKitBg5" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="27,27,31,255" />
+   <sprite name="mcKitFrame5" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+   <sprite name="mcKitCardIcon5" depth="33" width="10" height="10" atlas="ItemIconAtlas" sprite="" foregroundlayer="true" />
+   <label name="mcKitName5" depth="34" width="10" height="20" font_size="16" color="235,235,240,255" overflow="shrinkcontent" />
+   <sprite name="mcKitPip5_0" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_0" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_1" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_1" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_2" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_2" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_3" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_3" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_4" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_4" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_5" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_5" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_6" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_6" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitPip5_7" depth="34" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcKitPipText5_7" depth="35" width="10" height="20" font_size="11" justify="center" color="17,17,21,255" />
+   <sprite name="mcKitArrow5" depth="34" width="10" height="10" sprite="ui_game_symbol_arrow_right" color="181,140,255,255" />
+   <label name="mcKitNote5" depth="34" width="10" height="20" font_size="13" color="185,182,198,255" overflow="shrinkcontent" />
+   <label name="mcLegend" depth="35" width="10" height="20" font_size="14" color="185,182,198,255" overflow="shrinkcontent" />
+   <button name="mcKitHit0" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <button name="mcKitHit1" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <button name="mcKitHit2" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <button name="mcKitHit3" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <button name="mcKitHit4" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <button name="mcKitHit5" depth="38" pos="0,0" width="10" height="10" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="204,167,56,24" disabledcolor="0,0,0,1" hoverscale="1.0" />
+   <sprite name="mcLegKey0" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcLegText0" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcLegKey1" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcLegText1" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcLegKey2" depth="35" width="10" height="10" sprite="ui_game_symbol_star" color="185,182,198,255" />
+   <label name="mcLegText2" depth="35" width="10" height="20" font_size="16" color="235,235,240,255" />
+   <sprite name="mcReasonBg" depth="31" width="10" height="10" sprite="menu_empty2px" type="sliced" color="210,100,100,30" />
+   <sprite name="mcReasonFrame" depth="32" width="10" height="10" sprite="menu_empty2px" type="sliced" fillcenter="false" color="210,100,100,255" />
+   <label name="mcReason" depth="35" width="10" height="20" font_size="18" color="235,235,240,255" overflow="shrinkcontent" />
+  </rect>
+ </rebirth_modifier_centre>
  <rebirth_recycler_input>
   <rect name="windowForgeInput" controller="RebirthRecyclerPreview, RebirthUtils" width="228" height="204" cursor_area="true">
    <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_scrap"/><label depth="10" style="header.name.shrink" text_key="xuiRebirthRecycling" font_size="22" /></rect>

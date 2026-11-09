@@ -827,7 +827,7 @@ public static class RebirthNpcFoundationService
 
         initialized = true;
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH NPC] Foundation initialized. profiles=" +
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("npc", "[REBIRTH NPC] Foundation initialized. profiles=" +
                 RebirthNpcProfileRegistry.GetSnapshot().Length +
                 " schema=" + RebirthNpcRuntimeState.CurrentSchemaVersion +
                 " authoringValidation=deferred"); }
@@ -873,11 +873,11 @@ public static class RebirthNpcFoundationService
         else if (dogValidation.WarningCount > 0)
             Log.Warning(dogValidation.ToReport());
         else
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(dogValidation.ToReport()); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("npc", dogValidation.ToReport()); }
 
         authoringValidatedForCurrentGame = true;
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH NPC] Authoring validation completed after GameStartDone. authoredClasses=" +
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("npc", "[REBIRTH NPC] Authoring validation completed after GameStartDone. authoredClasses=" +
                 validation.CheckedClassCount +
                 " dogBreeds=" + dogValidation.ResolvedBreedCount + "/" + dogValidation.ExpectedBreedCount); }
     }

@@ -128,7 +128,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         {
             lastSelectedSlotVisible = selectedVisible;
             if (RebirthLogSettings.CraftingUiLoggingEnabled)
-                Log.Out("[REBIRTH Crafting ItemContext] selectedSlot=" + selectedSlot.SlotNumber
+                RebirthDebug.Log("crafting", "[REBIRTH Crafting ItemContext] selectedSlot=" + selectedSlot.SlotNumber
                     + " visibleInInventory=" + selectedVisible
                     + " contextPreserved=true");
         }
@@ -154,7 +154,8 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
 
     public void SelectSlot(XUiC_ItemStack slot)
     {
-        if (slot == null || slot.ItemStack == null || slot.ItemStack.IsEmpty())
+        // Modifier Station (owner 2026-11-08): no Selected Item panel, so the modification info in the centre stays visible.
+        if (RebirthScrapWindow.IsModifier || slot == null || slot.ItemStack == null || slot.ItemStack.IsEmpty())
         {
             HideContext(true, true);
             return;
@@ -1063,8 +1064,13 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
         if (tab == null || itemName == null) return;
         itemName.label?.ProcessText();
         int textWidth = itemName.label != null ? UnityEngine.Mathf.CeilToInt(itemName.label.printedSize.x) : 0;
-        int x = itemName.Position.x + System.Math.Min(textWidth, itemName.Size.x) + 18;
-        var position = new Vector2i(x, itemName.Position.y - 15);
+        // A smaller star level with the name (owner 2026-11-08): 20 px, centred on the capitals of the name.
+        const int starSize = 20;
+        var size = new Vector2i(starSize, starSize);
+        if (tab.Size != size) tab.Size = size;
+        int font = itemName.FontSize > 0 ? itemName.FontSize : 22;
+        int x = itemName.Position.x + System.Math.Min(textWidth, itemName.Size.x) + 6 + starSize / 2;
+        var position = new Vector2i(x, itemName.Position.y - (int)System.Math.Round(font * 0.5f) - 1);
         if (tab.Position != position) tab.Position = position;
     }
 

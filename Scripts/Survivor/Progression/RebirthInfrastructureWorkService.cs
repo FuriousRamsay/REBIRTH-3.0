@@ -162,7 +162,7 @@ public static partial class RebirthInfrastructureWorkService
         if(TryLoadFile(path,out staged,out error)||TryLoadFile(path+".bak",out staged,out error))
         {
             foreach(KeyValuePair<string,RebirthElectricalServiceRecord> kv in staged)records[kv.Key]=kv.Value;
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor Infrastructure] loaded electrical service records="+records.Count); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor Infrastructure] loaded electrical service records="+records.Count); }
             return;
         }
         if(File.Exists(path)||File.Exists(path+".bak"))
@@ -770,7 +770,7 @@ public static class RebirthElectricalServiceUiFeedback
     public static void Receive(bool success,string message)
     {
         if(string.IsNullOrEmpty(message))return;
-        Log.Out("[REBIRTH Survivor Electrical] result="+(success?"OK":"FAIL")+" "+message);
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor Electrical] result="+(success?"OK":"FAIL")+" "+message);
         try
         {
             EntityPlayerLocal p=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetPrimaryPlayer():null;
@@ -852,7 +852,7 @@ public static class RebirthConstructionDamageBlockCommitPatch
             worldArg=w;clrArg=c;positionArg=pos;blockRefArg=bref;blockValueArg=bv;damageArg=dmg;entityArg=ent;attackHitArg=hit;
         }
         if(best!=null)
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor Construction] resolved Block.OnBlockDamaged target="+best); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor Construction] resolved Block.OnBlockDamaged target="+best); }
         else
             Log.Error("[REBIRTH Survivor Construction] no compatible Block.OnBlockDamaged target was found; Construction repair/upgrade LBD hook is unavailable on this build.");
         return best;

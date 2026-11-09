@@ -24,7 +24,7 @@ public sealed class XUiC_RebirthItemEditorHeader : XUiC_WindowNonPagingHeader
         ActiveInstance = this;
         base.OnOpen();
         Update(0);
-        Log.Out("[REBIRTH ItemEditor] opened editor; returnCaptured=" + RebirthItemWindowLifecycle.HasReturn(xui));
+        RebirthDebug.Log("survivor", "[REBIRTH ItemEditor] opened editor; returnCaptured=" + RebirthItemWindowLifecycle.HasReturn(xui));
     }
     public override void OnClose()
     {

@@ -6,10 +6,19 @@ public static partial class RebirthMetabolismStateRepository
 {
     private static World scopeWorld;
     private static string scopePath;
+    // Profiler 2026-11-08: Path.GetFullPath ran on every scope check (~24 KB/s). PathName now returns the same
+    // string while the save folder is unchanged, so its full path is reused for that exact string.
+    private static string fullPathSource,fullPathValue;
+    private static string FullPathName()
+    {
+        string path=PathName;
+        if(!ReferenceEquals(path,fullPathSource)){fullPathValue=Path.GetFullPath(path);fullPathSource=path;}
+        return fullPathValue;
+    }
     private static bool ScopeCurrentLocked()
     {
         try{return ReferenceEquals(scopeWorld,GameManager.Instance?.World)&&scopeWorld!=null&&
-            string.Equals(scopePath,Path.GetFullPath(PathName),Environment.OSVersion.Platform==PlatformID.Win32NT?StringComparison.OrdinalIgnoreCase:StringComparison.Ordinal);}
+            string.Equals(scopePath,FullPathName(),Environment.OSVersion.Platform==PlatformID.Win32NT?StringComparison.OrdinalIgnoreCase:StringComparison.Ordinal);}
         catch{return false;}
     }
     private static bool BindScopeLocked()

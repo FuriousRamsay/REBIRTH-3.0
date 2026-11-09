@@ -193,7 +193,7 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
             companionsButton.ViewComponent.IsVisible = true;
 
         if (RebirthLogSettings.CraftingUiLoggingEnabled && force)
-            Log.Out("[REBIRTH Crafting InventoryTrace] header physical=" + physical
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] header physical=" + physical
                 + " used=" + used
                 + " unencumbered=" + unencumbered
                 + " encumberedUsed=" + encumberedUsed

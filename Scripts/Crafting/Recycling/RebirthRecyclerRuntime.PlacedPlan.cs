@@ -79,7 +79,7 @@ public static partial class RebirthRecyclerRuntime
         if(ItemStack.AddToItemStackArray(output,new ItemStack(new ItemValue(row.Recipe.itemValueType,false),row.Recipe.count))==-1)return false;
         var queue=(RecipeQueueItem[])station.Queue.Clone();queue[queue.Length-1]=new RecipeQueueItem{StartingEntityId=-1};
         if(queue.Any(sibling=>TryGroup(sibling?.Recipe,out var id)&&id==group.Id))return false;
-        var returns=RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id);
+        var returns=RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id,group.Units,CrafterLevel(GameManager.Instance?.World,row.StartingEntityId));
         if(returns.Count==0)return false; // Station-only output belongs to its native processing source.
         plan=new PlacedActionPlan{Actor=recipient,Viewer=viewer,RecipientOwner=group.Owner,RecipientCreation=group.Creation,Station=station,Operation=CompletionOperation(group.Id),Purpose="complete",Input=ItemStack.Clone(station.Input),
             Queue=queue,Output=output,Tools=RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds),Returns=returns.ToArray(),Cycle=true};return true;

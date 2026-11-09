@@ -1149,7 +1149,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             if(reviewVisualContent!=null&&reviewVisualContent.ViewComponent!=null)reviewVisualContent.ViewComponent.Position=progressionExplorerDetailContentPosition;
             PrepareCursor();
             if(progressionExplorerReturnFocus!=null&&progressionExplorerReturnFocus.ViewComponent!=null&&xui!=null&&xui.playerUI!=null&&xui.playerUI.CursorController!=null)xui.playerUI.CursorController.SetNavigationTargetLater(progressionExplorerReturnFocus.ViewComponent);
-            progressionExplorerReturnFocus=null;Log.Out("[REBIRTH Survivor][ProgressionExplorer] CREATOR-RETURN step="+(model!=null?model.Step.ToString():"<null>"));return;
+            progressionExplorerReturnFocus=null;RebirthDebug.Log("survivor", "[REBIRTH Survivor][ProgressionExplorer] CREATOR-RETURN step="+(model!=null?model.Step.ToString():"<null>"));return;
         }
         if (resumeFromNativeChildEditorPending)
         {
@@ -1679,7 +1679,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         RenderAll();
 #if REBIRTH_DEBUG
         if (step == RebirthSurvivorCreatorStep.Traits && RebirthSurvivorDebug.TraitUiLoggingEnabled)
-            Log.Out(RebirthSurvivorTraitUiDebug.BuildReport(model));
+            RebirthDebug.Log("survivor", RebirthSurvivorTraitUiDebug.BuildReport(model));
 #endif
         SelectFirstForStep();
     }
@@ -3362,9 +3362,9 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         nativeEditorDecision = 0;
         nativeProfileCreatePhase = NativeProfileCreatePhase.EditingTemp;
         nativeProfileCreateStageDeadline = 0f;
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor opened profile='" +
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP editor opened profile='" +
             nativeTemporaryProfileName + "' owner=survivor-creator-suspended");
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] BEGIN temp='" + nativeTemporaryProfileName +
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] BEGIN temp='" + nativeTemporaryProfileName +
             "' original='" + nativeOriginalProfileName + "' phase=EditingTemp create=ProfileSDF-direct");
     }
 
@@ -3399,7 +3399,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
                 nativeEditorDecision = 0;
                 nativeProfileCreatePhase = NativeProfileCreatePhase.EditingTemp;
                 nativeProfileCreateStageDeadline = 0f;
-                Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor opened profile='" +
+                RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP editor opened profile='" +
                     nativeTemporaryProfileName + "'");
                 break;
 
@@ -3425,7 +3425,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
                 if (newPlayerProfileNameInput != null && newPlayerProfileNameInput.ViewComponent != null &&
                     xui.playerUI.CursorController != null)
                     xui.playerUI.CursorController.SetNavigationTargetLater(newPlayerProfileNameInput.ViewComponent);
-                Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor applied; awaiting save decision.");
+                RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP editor applied; awaiting save decision.");
                 break;
 
             case NativeProfileCreatePhase.AwaitSaveName:
@@ -3635,7 +3635,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         nativeProfileCreatePhase = NativeProfileCreatePhase.AwaitSaveName;
         lastOwnedApply++;
         nativeProfileCreateStageDeadline = 0f;
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor decision=APPLY appearance=True save=ProfileSDF-direct return=survivor-creator");
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP editor decision=APPLY appearance=True save=ProfileSDF-direct return=survivor-creator");
         ResumeCreatorAfterNativeChildEditor("temp-create-apply");
     }
 
@@ -3657,7 +3657,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         if (xui != null && xui.playerUI != null && xui.playerUI.windowManager != null &&
             xui.playerUI.windowManager.IsWindowOpen("customCharacterSystem"))
             xui.playerUI.windowManager.Close("customCharacterSystem");
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor decision=BACK synchronous-cancel=True return=survivor-creator");
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP editor decision=BACK synchronous-cancel=True return=survivor-creator");
         FinishTemporaryProfileCreate(false, string.Empty);
         ResumeCreatorAfterNativeChildEditor("temp-create-back");
     }
@@ -3696,7 +3696,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
 
         nativeFinalProfileName = name;
         SetVisible(playerProfileSaveOverlay, false);
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] SAVE requested final='" + nativeFinalProfileName + "'");
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] SAVE requested final='" + nativeFinalProfileName + "'");
 
         string createError = string.Empty;
         if (nativeTemporaryAppearance == null ||
@@ -3711,7 +3711,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             return;
         }
 
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] FINAL saved profile='" +
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] FINAL saved profile='" +
             nativeFinalProfileName + "' via=ProfileSDF-direct");
         FinishTemporaryProfileCreate(true, string.Empty);
     }
@@ -3763,7 +3763,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
 
         if (!tempDeleted && string.IsNullOrEmpty(failure)) failure = deleteError;
         transientStatus = string.IsNullOrEmpty(failure) ? string.Empty : "[CC6B64]" + failure + "[-]";
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] END keepFinal=" + keepFinal +
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] END keepFinal=" + keepFinal +
             " final='" + nativeFinalProfileName + "' tempDeleted=" + tempDeleted +
             (string.IsNullOrEmpty(failure) ? string.Empty : " error='" + failure + "'"));
 
@@ -3814,7 +3814,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             string restoreError;
             RebirthNativePlayerProfileBridge.TrySelectEmbeddedPlayerProfileByName(this, nativeGlobalProfileNameAtOpen, out restoreError);
         }
-        Log.Out("[REBIRTH Survivor][PlayerProfileCreate] purged verified owned temporary Player Profiles on creator open.");
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] purged verified owned temporary Player Profiles on creator open.");
     }
 
     private void NativeProfileEditObserved_OnPressed(XUiController sender, int mouseButton)
@@ -4028,7 +4028,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
                 RebirthNativePlayerProfileBridge.TrySelectEmbeddedPlayerProfileByName(this, draft, out selectError);
             }
             UpdateNativeProfileModifyButtons(true);
-            Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP-CLEANUP complete profile='" + tempName + "' restored='" + draft + "'.");
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][PlayerProfileCreate] TEMP-CLEANUP complete profile='" + tempName + "' restored='" + draft + "'.");
             return;
         }
 
@@ -4231,7 +4231,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         }
 #if REBIRTH_DEBUG
         if (RebirthSurvivorDebug.TraitUiLoggingEnabled)
-            Log.Out("[REBIRTH Survivor][TraitUI] click side=" + side + " row=" + row + " mouseButton=" + mouseButton +
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][TraitUI] click side=" + side + " row=" + row + " mouseButton=" + mouseButton +
                 " pageLength=" + (page != null ? page.Length : 0) +
                 " offset=" + (side == "negative" ? model.NegativeTraitOffset : model.PositiveTraitOffset));
 #endif
@@ -4246,7 +4246,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         focusedTraitId = page[row].Definition.Id;
 #if REBIRTH_DEBUG
         if (RebirthSurvivorDebug.TraitUiLoggingEnabled)
-            Log.Out("[REBIRTH Survivor][TraitUI] click resolved trait=" + focusedTraitId + " selectedBefore=" + page[row].IsSelected + " canToggle=" + page[row].CanToggle);
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][TraitUI] click resolved trait=" + focusedTraitId + " selectedBefore=" + page[row].IsSelected + " canToggle=" + page[row].CanToggle);
 #endif
         if (!model.IsReadOnly)
         {
@@ -4386,7 +4386,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         model.PositiveTraitOffset = offset;
 #if REBIRTH_DEBUG
         if (RebirthSurvivorDebug.TraitUiLoggingEnabled && before != offset)
-            Log.Out("[REBIRTH Survivor][TraitUI] positive-thumb offset=" + before + "->" + offset + " dy=" + dy.ToString(CultureInfo.InvariantCulture));
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][TraitUI] positive-thumb offset=" + before + "->" + offset + " dy=" + dy.ToString(CultureInfo.InvariantCulture));
 #endif
         RenderTraits();
     }
@@ -4402,7 +4402,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         model.NegativeTraitOffset = offset;
 #if REBIRTH_DEBUG
         if (RebirthSurvivorDebug.TraitUiLoggingEnabled && before != offset)
-            Log.Out("[REBIRTH Survivor][TraitUI] negative-thumb offset=" + before + "->" + offset + " dy=" + dy.ToString(CultureInfo.InvariantCulture));
+            RebirthDebug.Log("survivor", "[REBIRTH Survivor][TraitUI] negative-thumb offset=" + before + "->" + offset + " dy=" + dy.ToString(CultureInfo.InvariantCulture));
 #endif
         RenderTraits();
     }
@@ -4742,7 +4742,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     private static void DebugCreatorScroll(string action, string detail)
     {
         if (!RebirthSurvivorDebug.Enabled) return;
-        Log.Out("[REBIRTH Survivor Creator][Scroll] action=" + action + " " + detail);
+        RebirthDebug.Log("survivor", "[REBIRTH Survivor Creator][Scroll] action=" + action + " " + detail);
     }
 
     private static int ScrollOffset(int offset, float delta, int total, int visible)

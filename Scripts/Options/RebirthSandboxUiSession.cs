@@ -264,7 +264,7 @@ public static class RebirthSandboxUiSession
             return data;
         }
 
-        { if (RebirthLogSettings.UiRouteLoggingEnabled) Log.Out("[RebirthSandbox] Refreshed new-world preset '" + preset.Name
+        { if (RebirthLogSettings.UiRouteLoggingEnabled) RebirthDebug.Log("options", "[RebirthSandbox] Refreshed new-world preset '" + preset.Name
             + "' from its current saved definition instead of a stale last-used option code."); }
 
         return new RebirthSandboxSaveData

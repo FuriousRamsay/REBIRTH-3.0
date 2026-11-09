@@ -223,6 +223,9 @@ internal static partial class RebirthWorkstationCompletionPipeline
     private static void ReadCachedCustodies(ref ModEvents.SGameStartingData data)
     {
         foreach(var value in cachedCustodies.Values){value.Frame?.CachedReentry?.Dispose();value.Dispose();}cachedCustodies.Clear();
+        // Owner 2026-11-09: a joining client still sees the LAST LOCAL game's save folder at GameStarting; server
+        // completion records are never read from it.
+        if(!data.AsServer)return;
         try
         {
             string save=System.IO.Path.GetFullPath(GameIO.GetSaveGameDir()),folder=System.IO.Path.Combine(RebirthWorkstationCompletionOutbox.Root("server"),"intents");

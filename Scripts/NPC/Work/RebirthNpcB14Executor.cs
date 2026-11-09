@@ -308,7 +308,7 @@ internal static class RebirthNpcB14HarvestExecutor
         if (DebugHaltTripped) return true;
         if (!string.Equals(phase.ToString(), DebugHaltAfterPhase, StringComparison.OrdinalIgnoreCase)) return false;
         DebugHaltTripped = true;
-        Log.Out("[RBNPC] b14 halted phase=" + phase);
+        RebirthDebug.Log("npc", "[RBNPC] b14 halted phase=" + phase);
         DebugSetPlayerVar("rbnpc_b14_halted", 1f);
         return true;
     }

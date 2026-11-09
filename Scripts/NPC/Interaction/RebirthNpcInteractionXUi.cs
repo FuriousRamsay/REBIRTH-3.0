@@ -46,7 +46,7 @@ public static class RebirthNpcInteractionUiService
         ulong navigation=RebirthNpcWindowInput.OpenRevision;
         RebirthNpcInteractionNetworkClient.RequestOpen(npc.entityId,delegate(RebirthNpcInteractionProjection projection,RebirthNpcInteractionCommandResponse ignored,string networkError)
         {
-            if(projection==null){Log.Out("[REBIRTH NPC] "+networkError);return;}
+            if(projection==null){RebirthDebug.Log("npc", "[REBIRTH NPC] "+networkError);return;}
             if(navigation!=RebirthNpcWindowInput.OpenRevision||npc.IsDead())
             {RebirthNpcInteractionNetworkClient.RequestClose(projection.SessionKey);return;}
             if((projection.Permissions&RebirthNpcInteractionPermissions.Dismiss)!=0)

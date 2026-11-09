@@ -75,6 +75,8 @@ console "settime 1 9 0" "buff buffDrugPainkillers"   # any console command; outp
 `smoke`, `cooking_campfire`, `combat_melee`, `combat_ranged` and `berserker_rage`; the step format is in
 `Tools/GameBridge/tests/README.md`. Add a scenario for every feature you change.
 
+**Debug logging:** automatic info logs go through `RebirthDebug.Log("<area>", ...)`. Release builds remove them; Debug builds stay silent until `rbdebug on` (or `rbdebug on <area>`, the top folder under Scripts). `test` scenarios turn it on automatically; use `console "rbdebug on"` before reading logs by hand. New logs: use `RebirthDebug.Log`, never a bare `Log.Out`, except in console command replies.
+
 ### How to play well (learned the hard way)
 - **Windows:** Esc is `key name=Escape` (the game's `permanent.Cancel`). Tab opens the inventory/crafting
   screen. Gameplay keys (attack, toolbelt) are ignored while a window is open, so close it first.

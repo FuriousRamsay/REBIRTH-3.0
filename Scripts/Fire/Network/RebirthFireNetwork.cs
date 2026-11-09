@@ -241,7 +241,7 @@ public static class RebirthFireNetwork
         RebirthFireDiagnostics.NetworkAuthoritativeCalls++;
         #endif
         if (cause == RebirthFireIgnitionCause.Debug)
-            Log.Out("[RBFireTest][Authority] request operation=" + operation + " positions=" + (positions != null ? positions.Count : 0)
+            RebirthDebug.Log("fire", "[RBFireTest][Authority] request operation=" + operation + " positions=" + (positions != null ? positions.Count : 0)
                 + " source=" + sourceEntityId + " runtimePolicy=" + RebirthFireRuntimePolicy.Enabled);
         if (world == null)
             return;
@@ -336,7 +336,7 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
             #if DEBUG
             RebirthFireDiagnostics.NetworkRejectedSender++;
             #endif
-            if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request rejected reason=sender-or-world");
+            if (cause == RebirthFireIgnitionCause.Debug) RebirthDebug.Log("fire", "[RBFireTest][Server] request rejected reason=sender-or-world");
             return;
         }
         if (!RebirthFireRuntimePolicy.Enabled && operation == RebirthFireRequestOperation.Ignite)
@@ -344,7 +344,7 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
             #if DEBUG
             RebirthFireDiagnostics.NetworkRejectedDisabled++;
             #endif
-            if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request rejected reason=runtime-disabled");
+            if (cause == RebirthFireIgnitionCause.Debug) RebirthDebug.Log("fire", "[RBFireTest][Server] request rejected reason=runtime-disabled");
             return;
         }
         if (!Enum.IsDefined(typeof(RebirthFireRequestOperation), operation) ||
@@ -353,7 +353,7 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
             #if DEBUG
             RebirthFireDiagnostics.NetworkRejectedEnum++;
             #endif
-            if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request rejected reason=invalid-enum");
+            if (cause == RebirthFireIgnitionCause.Debug) RebirthDebug.Log("fire", "[RBFireTest][Server] request rejected reason=invalid-enum");
             return;
         }
 
@@ -381,7 +381,7 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
             RebirthFireDiagnostics.NetworkRejectedMissingSource++;
             #endif
             if (cause == RebirthFireIgnitionCause.Debug)
-                Log.Out("[RBFireTest][Server] request rejected reason=no-authoritative-action-witness");
+                RebirthDebug.Log("fire", "[RBFireTest][Server] request rejected reason=no-authoritative-action-witness");
             return;
         }
 

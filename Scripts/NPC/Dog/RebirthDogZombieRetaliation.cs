@@ -811,14 +811,14 @@ public static class RebirthDogCombatDebugService
                 EntityRebirthDogCompanion dog = world.GetEntity(dogId) as EntityRebirthDogCompanion;
                 EntityZombie zombie = world.GetEntity(zombieId) as EntityZombie;
                 samples++;
-                Log.Out(BuildTargetingSample(samples, player, dog, zombie, dogId, zombieId));
+                RebirthDebug.Log("npc", BuildTargetingSample(samples, player, dog, zombie, dogId, zombieId));
                 yield return new WaitForSeconds(TraceSampleSeconds);
             }
         }
         finally
         {
             traceRunning = false;
-            Log.Out("[REBIRTH Dog Targeting] COMPLETE dog=" + dogId + " zombie=" + zombieId + " samples=" + samples);
+            RebirthDebug.Log("npc", "[REBIRTH Dog Targeting] COMPLETE dog=" + dogId + " zombie=" + zombieId + " samples=" + samples);
         }
     }
 
@@ -923,14 +923,14 @@ public static class RebirthDogCombatDebugService
                 EntityRebirthDogCompanion dog = world.GetEntity(dogId) as EntityRebirthDogCompanion;
                 EntityZombie zombie = world.GetEntity(zombieId) as EntityZombie;
                 samples++;
-                Log.Out(BuildSample(samples, player, dog, zombie, dogId, zombieId));
+                RebirthDebug.Log("npc", BuildSample(samples, player, dog, zombie, dogId, zombieId));
                 yield return new WaitForSeconds(TraceSampleSeconds);
             }
         }
         finally
         {
             traceRunning = false;
-            Log.Out("[REBIRTH Dog Combat] COMPLETE dog=" + dogId + " zombie=" + zombieId + " samples=" + samples);
+            RebirthDebug.Log("npc", "[REBIRTH Dog Combat] COMPLETE dog=" + dogId + " zombie=" + zombieId + " samples=" + samples);
         }
     }
 

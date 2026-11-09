@@ -122,7 +122,7 @@ internal static class RebirthTraderStationPlacer
         }
         world.SetBlockRPC(pos, value);
         Settled.Add(key);
-        Log.Out("[REBIRTH TraderStations] Placed " + where);
+        RebirthDebug.Log("trader", "[REBIRTH TraderStations] Placed " + where);
     }
 
     // What the 2.6 traders replaced at these spots: vegetation, busted or collapsed stations, loose yard clutter.

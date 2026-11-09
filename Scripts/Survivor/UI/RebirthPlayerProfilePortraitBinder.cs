@@ -158,7 +158,7 @@ public sealed class RebirthPlayerProfilePortraitBinder
             }
             ReplaceMemory(profileName, snapshot, signature);
             snapshot = null;
-            Log.Out(LogPrefix + " native preview captured profile='" + profileName +
+            RebirthDebug.Log("survivor", LogPrefix + " native preview captured profile='" + profileName +
                 "' source=" + source.width + "x" + source.height + " cacheVersion=" + CacheVersion);
             return true;
         }

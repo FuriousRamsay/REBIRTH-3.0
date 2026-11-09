@@ -71,6 +71,9 @@ public static class RebirthSurvivorNetworkService
         }
         RebirthStablePlayerIdentity.Remember(data.ClientInfo);
         bool sent = SendOwnerState(data.ClientInfo, 0L, true, "player-joined-pre-spawn");
+        // Owner 2026-11-09: a failed pre-spawn send (identity not resolved yet) was never retried, so a new player
+        // reached Spawn without the chooser. Retry until it is sent, the client leaves, or a minute passes.
+        if (!sent) { lock (PendingJoinSends) PendingJoinSends[data.ClientInfo] = UnityEngine.Time.realtimeSinceStartup + 60f; }
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("PlayerJoinedGame entity=" + data.ClientInfo.entityId + " ownerSnapshotSent=" + sent); } }
     }
 
@@ -88,8 +91,30 @@ public static class RebirthSurvivorNetworkService
         SendOwnerState(data.ClientInfo, 0L, true, "player-spawned");
     }
 
+    private static readonly Dictionary<ClientInfo, float> PendingJoinSends = new Dictionary<ClientInfo, float>();
+    private static float nextJoinRetry;
+    private static void RetryPendingJoinSends()
+    {
+        if (PendingJoinSends.Count == 0) return;
+        float now = UnityEngine.Time.realtimeSinceStartup;
+        if (now < nextJoinRetry) return;
+        nextJoinRetry = now + 0.5f;
+        List<ClientInfo> clients;
+        lock (PendingJoinSends) clients = new List<ClientInfo>(PendingJoinSends.Keys);
+        foreach (var client in clients)
+        {
+            float until;
+            lock (PendingJoinSends) if (!PendingJoinSends.TryGetValue(client, out until)) continue;
+            bool gone = client == null || client.disconnecting || now > until;
+            bool sent = !gone && SendOwnerState(client, 0L, true, "player-joined-pre-spawn-retry");
+            if (gone || sent) lock (PendingJoinSends) PendingJoinSends.Remove(client);
+            if (sent) RebirthDebug.Log("survivor", "[REBIRTH Survivor] pre-spawn character state sent on retry entity=" + client.entityId);
+        }
+    }
+
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        RetryPendingJoinSends();
         RebirthBackgroundStarterItems.Tick();
         RebirthMusicTransferClient.Tick();
         RebirthGearDeferredInitialDispatcher.Tick();
@@ -245,6 +270,16 @@ public static class RebirthSurvivorNetworkService
             connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthSurvivorCreationRequest>().Setup(request));
         }
         return request.RequestId;
+    }
+
+    /// <summary>Joining client, spawn screen open, no player entity yet: ask the server for this connection's state.</summary>
+    public static void RequestOwnerStatePreSpawn()
+    {
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection == null || connection.IsServer || !connection.IsConnected) return;
+        connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthSurvivorStateRequest>()
+            .Setup(NetPackageRebirthSurvivorStateRequest.PreSpawnEntityId, 0L, true));
+        RebirthSpawnInputTrace.Note("pre-spawn-owner-state-requested");
     }
 
     public static void RequestOwnerState(EntityPlayerLocal player, bool force)

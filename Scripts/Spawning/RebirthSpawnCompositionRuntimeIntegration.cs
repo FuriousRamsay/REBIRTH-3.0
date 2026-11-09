@@ -55,7 +55,7 @@ public static class RebirthSpawnCompositionRuntimeIntegration
         s_installedCount = installed;
         s_installed = installed > 0;
         string result = "[RebirthSpawn] Runtime integration patches=" + installed + " failures=" + failures;
-        if (failures > 0) Log.Warning(result); else { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(result); }
+        if (failures > 0) Log.Warning(result); else { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", result); }
         return result;
     }
 
@@ -373,7 +373,7 @@ public static class RebirthSpawnEntityGroupResolverPatch
                 (!animalSleeper||!IsNonZombieAnimal(EntityClass.GetEntityClass(replacementTrace.EntityClassId)))&&
                 !RebirthSpawnCompositionService.IsForbiddenRestrictedSpawnEntity(replacementTrace.EntityClassId))
             {
-                if(animalSleeper)Log.Out("[RebirthSpawn] sleeper animal replaced group="+_sEntityGroupName+" original="+selectedClass.entityClassName+" replacement="+replacementTrace.EntityName+" prefab="+active.PrefabName);
+                if(animalSleeper)RebirthDebug.Log("spawning", "[RebirthSpawn] sleeper animal replaced group="+_sEntityGroupName+" original="+selectedClass.entityClassName+" replacement="+replacementTrace.EntityName+" prefab="+active.PrefabName);
                 __result = replacementTrace.EntityClassId;
                 lastClassId = replacementTrace.EntityClassId;
                 return;

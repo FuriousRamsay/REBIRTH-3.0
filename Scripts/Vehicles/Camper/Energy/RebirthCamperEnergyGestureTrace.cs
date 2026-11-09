@@ -15,7 +15,7 @@ internal static class RebirthCamperEnergyGestureTrace
         try
         {
             string clean=(detail??string.Empty).Replace('\r',' ').Replace('\n',' ');if(clean.Length>700)clean=clean.Substring(0,700);
-            if(RebirthCamperEnergyLog.Enabled)Log.Out("[REBIRTH EnergyGesture] frame="+UnityEngine.Time.frameCount+" stage="+stage+" "+clean);
+            if(RebirthCamperEnergyLog.Enabled)RebirthDebug.Log("vehicles", "[REBIRTH EnergyGesture] frame="+UnityEngine.Time.frameCount+" stage="+stage+" "+clean);
         }
         catch{} // Diagnostics cannot change gesture admission.
     }

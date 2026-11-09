@@ -83,6 +83,8 @@
             <rebirth_station_shared_10 />
             <rebirth_modifier_input />
           </rect>
+          <rebirth_modifier_workspace />
+          <rebirth_modifier_centre />
         </rect>
         <rebirth_station_shared_3 />
         <rebirth_item_stats_popup />

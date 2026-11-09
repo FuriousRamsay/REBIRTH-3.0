@@ -168,7 +168,7 @@ public static class RebirthCamperSavedVehicle
         float now=UnityEngine.Time.realtimeSinceStartup;
         if(expected.LastDiagnostic==reason&&now-expected.LastDiagnosticAt<10f)return;
         expected.LastDiagnostic=reason;expected.LastDiagnosticAt=now;
-        Log.Out("[REBIRTH VehicleSaveProof] entity="+expected.Id+" reason="+reason);
+        RebirthDebug.Log("vehicles", "[REBIRTH VehicleSaveProof] entity="+expected.Id+" reason="+reason);
     }
     // Budgeted read accepts the installed native v38 vehicle envelope only.
     // Preflight every variable allocation before EntityCreationData.read, and

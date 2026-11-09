@@ -104,7 +104,7 @@ public class BlockRespawnRebirth : BlockPlantGrowing
                 _damagePoints,
                 _recDepth);
 
-            Log.Out(
+            RebirthDebug.Log("vehicles", 
                 "[REBIRTH Vehicle Respawn][Debug] suppressed marker pass-through damage="
                 + _damagePoints
                 + " recDepth=" + _recDepth
@@ -164,7 +164,7 @@ public class BlockRespawnRebirth : BlockPlantGrowing
                     previousDowngrade,
                     repeatable);
 
-                Log.Out(
+                RebirthDebug.Log("vehicles", 
                     "[REBIRTH Vehicle Respawn][Debug] spawned=" + spawned.Block.blockName
                     + " class=" + spawned.Block.GetType().Name
                     + " previousDowngrade=" + previousDowngrade

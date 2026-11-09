@@ -82,11 +82,12 @@ public static class RebirthSandboxSyncService
             return;
 
         RebirthSandboxOptionManager manager = RebirthSandboxOptionManager.Current;
+        RebirthSandboxTrace.Server("sent to client entity=" + clientInfo.entityId + " reason=" + reason);
         clientInfo.SendPackage(
             NetPackageManager.GetPackage<NetPackageRebirthSandboxCode>()
                 .Setup(manager.CurrentCode, manager.Revision));
 
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandboxSync] Sent authoritative snapshot to client="
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("network", "[RebirthSandboxSync] Sent authoritative snapshot to client="
             + clientInfo.ClientNumber + " entity=" + clientInfo.entityId
             + " revision=" + manager.Revision + " reason=" + (reason ?? "unspecified")); }
     }
@@ -137,7 +138,13 @@ public static class RebirthSandboxSyncService
         bool applied = newTransport
             ? RebirthSandboxOptionManager.Current.LoadAuthoritativeSnapshot(receivedClientCode, receivedClientRevision, true)
             : RebirthSandboxOptionManager.Current.ApplyNetworkSnapshot(receivedClientCode, receivedClientRevision);
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandboxSync] Received authoritative server snapshot revision="
+        RebirthSandboxTrace.Client("client received server options applied=" + applied + " newConnection=" + newTransport);
+        // One line per server join showing which REBIRTH options arrived (rbdebug on survivor).
+        if (newTransport)
+            RebirthDebug.Log("survivor", "[RebirthSandboxSync] REBIRTH options received from server: code=" + receivedClientCode + " revision=" + receivedClientRevision
+                + " applied=" + applied + " progression=" + RebirthSandboxOptionManager.Current.PlayerProgression
+                + " theme=" + RebirthSandboxOptionManager.Current.Theme + " purge=" + RebirthSandboxOptionManager.Current.IsPurge);
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("network", "[RebirthSandboxSync] Received authoritative server snapshot revision="
             + receivedClientRevision + " applied=" + applied); }
     }
 
@@ -157,7 +164,7 @@ public static class RebirthSandboxSyncService
             receivedClientCode, receivedClientRevision, true);
         if (applied)
         {
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandboxSync] Applied retained authoritative snapshot revision="
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("network", "[RebirthSandboxSync] Applied retained authoritative snapshot revision="
                 + receivedClientRevision + " reason=" + (reason ?? "unspecified")); }
         }
         return applied;

@@ -123,7 +123,7 @@ public sealed class XUiC_RebirthVitalColorPicker : XUiController
     public void BtnApply_OnPressed(XUiController sender, int mouseButton)
     {
         RebirthVitalHudColors.Set(kind, selectedColor);
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH HUD] vital-fill-color selected stat=" + kind
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("ui", "[REBIRTH HUD] vital-fill-color selected stat=" + kind
             + " rgba=" + RebirthVitalHudColors.ToRgbaString(selectedColor)
             + " hex=" + RebirthVitalHudColors.ToHex(selectedColor)); }
 

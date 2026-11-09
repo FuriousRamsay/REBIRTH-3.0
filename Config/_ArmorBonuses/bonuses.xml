@@ -37,9 +37,29 @@
     <bonus id="entity_damage_assault_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.assault_rifles" />
     <bonus id="entity_damage_tactical_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.tactical_rifles" />
     <bonus id="entity_damage_long_range_rifles" rarity="Common" min="0.04" max="0.08" skills="skill.long_range_rifles" />
-    <bonus id="entity_damage_melee" rarity="Uncommon" min="0.09" max="0.12" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
-    <bonus id="entity_damage_ranged" rarity="Uncommon" min="0.09" max="0.12" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
-    <bonus id="entity_damage_all" rarity="Rare" min="0.13" max="0.15" />
+    <!-- Owner 2026-11-08: a weapon damage pick is that weapon at Common and Uncommon, all melee or all ranged weapons at
+         Rare, and every weapon at Legendary; the percentage grows with each rarity. -->
+    <bonus id="entity_damage_axes_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.axes" />
+    <bonus id="entity_damage_batons_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.batons" />
+    <bonus id="entity_damage_clubs_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.clubs" />
+    <bonus id="entity_damage_hammers_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.hammers" />
+    <bonus id="entity_damage_knives_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.knives" />
+    <bonus id="entity_damage_knuckles_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.knuckles" />
+    <bonus id="entity_damage_spears_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.spears" />
+    <bonus id="entity_damage_swords_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.swords" />
+    <bonus id="entity_damage_unarmed_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.unarmed" />
+    <bonus id="entity_damage_bows_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.archery" />
+    <bonus id="entity_damage_pistols_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.pistols" />
+    <bonus id="entity_damage_revolvers_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.revolvers" />
+    <bonus id="entity_damage_heavy_handguns_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.heavy_handguns" />
+    <bonus id="entity_damage_shotguns_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.shotguns" />
+    <bonus id="entity_damage_assault_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.assault_rifles" />
+    <bonus id="entity_damage_tactical_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.tactical_rifles" />
+    <bonus id="entity_damage_long_range_rifles_uncommon" rarity="Uncommon" min="0.09" max="0.12" skills="skill.long_range_rifles" />
+    <bonus id="entity_damage_melee" rarity="Rare" min="0.13" max="0.15" skills="skill.axes,skill.batons,skill.clubs,skill.hammers,skill.knives,skill.knuckles,skill.spears,skill.swords,skill.unarmed" />
+    <bonus id="entity_damage_ranged" rarity="Rare" min="0.13" max="0.15" skills="skill.archery,skill.pistols,skill.revolvers,skill.heavy_handguns,skill.shotguns,skill.assault_rifles,skill.tactical_rifles,skill.long_range_rifles" />
+    <!-- Replaced by the Rare melee/ranged versions (owner 2026-11-08); items that have it keep it. -->
+    <bonus id="entity_damage_all" rarity="Rare" min="0.13" max="0.15" retired="true" />
     <bonus id="entity_damage_all_greater" rarity="Legendary" min="0.16" max="0.18" />
   </family>
 
@@ -205,7 +225,8 @@
     <bonus id="block_damage_salvage_legendary" rarity="Legendary" min="0.17" max="0.22" />
   </family>
 
-  <family id="TrainedDamage" slot="Hands" effect="EntityDamage" scale_with_weapon_skill="true">
+  <!-- Retired 2026-11-08 (owner): duplicate of the Legendary every-weapon damage; items that have it keep it. -->
+  <family id="TrainedDamage" slot="Hands" effect="EntityDamage" retired="true">
     <bonus id="trained_damage_rare" rarity="Rare" min="0.15" max="0.20" />
     <bonus id="trained_damage_legendary" rarity="Legendary" min="0.21" max="0.28" />
   </family>
@@ -564,8 +585,13 @@
     <bonus id="feet_movement_stamina_rare" rarity="Rare" min="0.35" max="0.45" />
     <bonus id="feet_movement_stamina_legendary" rarity="Legendary" min="0.5" max="0.6" />
   </family>
-  <family id="FeetSneakSprintStamina" slot="Feet" effect="None" special="sneak_sprint" flat="true">
-    <bonus id="feet_sneak_sprint_uncommon" rarity="Uncommon" min="1" max="1" />
+  <!-- Owner 2026-11-08: levels at every rarity (share of stamina drain removed while crouch-sprinting); items rolled
+       before keep their value (1 = no drain). -->
+  <family id="FeetSneakSprintStamina" slot="Feet" effect="None" special="sneak_sprint">
+    <bonus id="feet_sneak_sprint_common" rarity="Common" min="0.2" max="0.3" />
+    <bonus id="feet_sneak_sprint_uncommon" rarity="Uncommon" min="0.4" max="0.55" />
+    <bonus id="feet_sneak_sprint_rare" rarity="Rare" min="0.65" max="0.8" />
+    <bonus id="feet_sneak_sprint_legendary" rarity="Legendary" min="1" max="1" />
   </family>
   <family id="FeetShadowBlend" slot="Feet" effect="LightMultiplier" negative="true" context="crouching" special="low_light">
     <bonus id="feet_shadow_blend_common" rarity="Common" min="-0.22" max="-0.1" />
@@ -580,7 +606,10 @@
     <bonus id="feet_sneak_damage_legendary" rarity="Legendary" min="0.4" max="0.5" />
   </family>
   <family id="FeetSleeperKnockdown" slot="Feet" effect="None" special="sleeper_knockdown">
+    <bonus id="feet_sleeper_knockdown_common" rarity="Common" min="0.15" max="0.25" />
+    <bonus id="feet_sleeper_knockdown_uncommon" rarity="Uncommon" min="0.3" max="0.4" />
     <bonus id="feet_sleeper_knockdown_rare" rarity="Rare" min="0.5" max="0.5" />
+    <bonus id="feet_sleeper_knockdown_legendary" rarity="Legendary" min="0.65" max="0.75" />
   </family>
   <family id="FeetCrouchNoise" slot="Feet" effect="NoiseMultiplier" negative="true" context="crouching">
     <bonus id="feet_noise_common" rarity="Common" min="-0.18" max="-0.1" />
@@ -595,9 +624,11 @@
     <bonus id="feet_search_legendary" rarity="Legendary" min="1.6" max="2" />
   </family>
   <family id="FeetLandMineImmunity" slot="Feet" effect="LandMineImmunity" op="base" flat="true">
-    <bonus id="feet_mine_immunity" rarity="Rare" min="1" max="1" />
+    <!-- On or off, so one rarity only (owner 2026-11-08). Common, so picking it never guarantees a higher rarity. -->
+    <bonus id="feet_mine_immunity" rarity="Common" min="1" max="1" />
   </family>
   <family id="FeetTrashSilence" slot="Feet" effect="SilenceBlockSteps" op="base" flat="true" context="trashPile">
-    <bonus id="feet_trash_silence" rarity="Uncommon" min="1" max="1" />
+    <!-- On or off, so one rarity only (owner 2026-11-08). Common, so picking it never guarantees a higher rarity. -->
+    <bonus id="feet_trash_silence" rarity="Common" min="1" max="1" />
   </family>
 </armor_bonuses>

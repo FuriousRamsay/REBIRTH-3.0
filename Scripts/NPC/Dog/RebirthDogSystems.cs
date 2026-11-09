@@ -2180,7 +2180,7 @@ public static partial class RebirthDogRuntimeService
             if (now >= trace.EndTicks)
             {
                 ActiveMovementTrace = null;
-                Log.Out("[REBIRTH Dog Movement] COMPLETE entity=" + dog.entityId +
+                RebirthDebug.Log("npc", "[REBIRTH Dog Movement] COMPLETE entity=" + dog.entityId +
                         " samples=" + trace.Samples + " finalPos=" + FormatMovementVector(dog.position) +
                         " finalYaw=" + FormatMovementFloat(dog.rotation.y));
                 return;
@@ -2240,7 +2240,7 @@ public static partial class RebirthDogRuntimeService
             ? TimeSpan.FromTicks(Math.Max(0L, now - runtimeCache.LastPathRequestTicks)).TotalMilliseconds
             : -1.0;
 
-        Log.Out("[REBIRTH Dog Movement] sample=" + trace.Samples +
+        RebirthDebug.Log("npc", "[REBIRTH Dog Movement] sample=" + trace.Samples +
                 " entity=" + dog.entityId +
                 " stableId=" + state.StableId +
                 " order=" + state.Order +

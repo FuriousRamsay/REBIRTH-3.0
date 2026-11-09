@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Armor bonus focus categories (spec: _Documentation/ArmorBonusFocus_Spec_20261108.md, section 10).
+  Read directly by RebirthArmorBonusTree, like bonuses.xml. Rules are checked in order per slot; the first match wins.
+  A rule matches on the bonus family (roll_group when set) and/or a regex on the bonus id with its rarity word removed
+  (for example "head_skill_xp_cooking", "reload_speed_shotguns"). Every bonus must match exactly one rule's category.
+-->
+<bonus_categories>
+
+  <slot id="Hands">
+    <category id="hands_tools" name_key="aeCatHandsTools">
+      <rule family="BlockDamage" />
+      <rule family="WildHarvest" />
+      <rule family="SecureLootAutoUnlock" />
+      <rule family="ExplosionDamage" />
+    </category>
+    <category id="hands_ranged_handling" name_key="aeCatHandsRangedHandling">
+      <rule family="ReloadSpeed" />
+      <rule family="RoundsPerMinute" />
+      <rule family="TrainedDamage" />
+      <rule match="_all(_greater)?$" />
+      <rule match="^(target_armor|dismember)$" />
+    </category>
+    <category id="hands_melee" name_key="aeCatHandsMelee">
+      <rule family="AttacksPerMinute" />
+      <rule match="_(axes|batons|clubs|hammers|knives|knuckles|spears|swords|unarmed|melee)$" />
+    </category>
+    <category id="hands_ranged_damage" name_key="aeCatHandsRangedDamage">
+      <rule match=".*" />
+    </category>
+  </slot>
+
+  <slot id="Head">
+    <category id="head_combat_xp" name_key="aeCatHeadCombatXp">
+      <rule family="HeadSkillXp" match="(archery|assault|axes|batons|clubs|hammers|heavy_handguns|knives|knuckles|long_range|pistols|revolvers|shotguns|spears|swords|tactical|unarmed|explosives|deployable|scythes|rage|black_magic)" />
+    </category>
+    <category id="head_crafting_xp" name_key="aeCatHeadCraftingXp">
+      <rule family="HeadSkillXp" match="(chemistry|construction|cooking|drink|electrical|gunsmithing|mechanics|metalworking|maintenance|medicine|tailoring|lockpicking|drone|salvage|mining|logging)" />
+    </category>
+    <category id="head_survival_xp" name_key="aeCatHeadSurvivalXp">
+      <rule family="HeadSkillXp" />
+    </category>
+    <category id="head_loot" name_key="aeCatHeadLoot">
+      <rule family="HeadLootStage" />
+      <rule family="HeadScavengingTime" />
+      <rule family="HeadLootQuantity" />
+    </category>
+    <category id="head_trade_craft" name_key="aeCatHeadTradeCraft">
+      <rule match=".*" />
+    </category>
+  </slot>
+
+  <slot id="Chest">
+    <category id="chest_wound" name_key="aeCatChestWound">
+      <rule family="BodyBuffResistance" match="^body_resist_(abrasion|laceration|infection|bleeding)" />
+    </category>
+    <category id="chest_trauma" name_key="aeCatChestTrauma">
+      <rule family="BodyBuffResistance" />
+    </category>
+    <category id="chest_vitality" name_key="aeCatChestVitality">
+      <rule match=".*" />
+    </category>
+  </slot>
+
+  <slot id="Feet">
+    <category id="feet_stealth" name_key="aeCatFeetStealth">
+      <rule family="FeetShadowBlend" />
+      <rule family="FeetSneakDamage" />
+      <rule family="FeetSneakSprintStamina" />
+      <rule family="FeetSleeperKnockdown" />
+      <rule family="FeetCrouchNoise" />
+      <rule family="FeetEnemySearchDuration" />
+      <rule family="FeetTrashSilence" />
+    </category>
+    <category id="feet_mobility" name_key="aeCatFeetMobility">
+      <rule match=".*" />
+    </category>
+  </slot>
+
+</bonus_categories>

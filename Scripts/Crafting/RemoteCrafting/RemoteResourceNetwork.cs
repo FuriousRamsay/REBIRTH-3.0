@@ -84,7 +84,7 @@ public static class RemoteResourceDiagnostics
     public static bool Enabled;
     public static void Write(string message)
     {
-        if (Enabled) Log.Out("[RemoteResources] " + message);
+        if (Enabled) RebirthDebug.Log("crafting", "[RemoteResources] " + message);
     }
 
     public static void WriteSource(EntityPlayer player, IRemoteResourceSource source, bool eligible, string reason, Dictionary<int, int> counts)
@@ -93,7 +93,7 @@ public static class RemoteResourceDiagnostics
         int total = 0;
         if (counts != null) foreach (KeyValuePair<int, int> pair in counts) total += pair.Value;
         float distance = player != null ? Vector3.Distance(player.position, source.Position) : -1f;
-        Log.Out("[RemoteResources] source=" + source.StableId +
+        RebirthDebug.Log("crafting", "[RemoteResources] source=" + source.StableId +
             " kind=" + source.Kind +
             " name='" + source.DisplayName + "'" +
             " distance=" + distance.ToString("0.0") + "m" +

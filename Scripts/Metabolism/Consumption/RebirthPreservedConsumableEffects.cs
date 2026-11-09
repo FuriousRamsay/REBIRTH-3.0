@@ -66,14 +66,14 @@ internal static class RebirthPreservedConsumableEffects
                 if (player.Stats.Food.Value > nutritionBeforeEvent)
                 {
                     if (debug)
-                        Log.Out("[REBIRTH Metabolism] blocked immediate pre-digestion Nutrition gain="
+                        RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] blocked immediate pre-digestion Nutrition gain="
                             + (player.Stats.Food.Value - nutritionBeforeEvent).ToString("0.000", CultureInfo.InvariantCulture));
                     player.Stats.Food.Value = nutritionBeforeEvent;
                 }
                 if (player.Stats.Water.Value > hydrationBeforeEvent)
                 {
                     if (debug)
-                        Log.Out("[REBIRTH Metabolism] blocked immediate pre-absorption Hydration gain="
+                        RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] blocked immediate pre-absorption Hydration gain="
                             + (player.Stats.Water.Value - hydrationBeforeEvent).ToString("0.000", CultureInfo.InvariantCulture));
                     player.Stats.Water.Value = hydrationBeforeEvent;
                 }

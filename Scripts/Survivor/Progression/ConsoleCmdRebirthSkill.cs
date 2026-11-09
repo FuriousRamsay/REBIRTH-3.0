@@ -28,7 +28,8 @@ public sealed class ConsoleCmdRebirthSkill : ConsoleCmdAbstract
         "  rbskill cooking         -> show one skill (aliases accepted)\n" +
         "  rbskill mark [skill]    -> save current value(s)\n" +
         "  rbskill diff [skill]    -> compare current value(s) to the last mark\n" +
-        "  rbskill audit           -> read-only local weapon/eligibility/profile/queued-award report";
+        "  rbskill audit           -> read-only local weapon/eligibility/profile/queued-award report\n" +
+        "  rbskill set tailoring 25 -> set a skill to a value for testing (aliases accepted; saved and synced)";
 
     public override void Execute(List<string> _params, CommandSenderInfo _senderInfo)
     {
@@ -36,6 +37,12 @@ public sealed class ConsoleCmdRebirthSkill : ConsoleCmdAbstract
         if (player == null)
         {
             SdtdConsole.Instance.Output("[REBIRTH Skill] No local player is available.");
+            return;
+        }
+
+        if (_params != null && _params.Count >= 3 && string.Equals(_params[0], "set", StringComparison.OrdinalIgnoreCase))
+        {
+            SetSkill(player, NormalizeSkillId(_params[1]), _params[2]);
             return;
         }
 
@@ -222,6 +229,35 @@ public sealed class ConsoleCmdRebirthSkill : ConsoleCmdAbstract
             snapshot[pair.Key] = new SkillMark { Value = pair.Value.Value, Progress = pair.Value.Progress };
         }
         return snapshot.Count > 0;
+    }
+
+    /// <summary>Test helper (owner 2026-11-08): sets one practical skill, same path as "rbtestgrant skill".</summary>
+    private static void SetSkill(EntityPlayer player, string skillId, string rawValue)
+    {
+        if (!float.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out float value) || value < 0f || value > 100f)
+        {
+            SdtdConsole.Instance.Output("[REBIRTH Skill] Value must be a number from 0 to 100.");
+            return;
+        }
+        if (!RebirthSkillAwardService.TryGetEligible(player, out var identity, out var record))
+        {
+            SdtdConsole.Instance.Output("[REBIRTH Skill] This character has no REBIRTH progression.");
+            return;
+        }
+        if (string.IsNullOrEmpty(skillId) || !record.Progression.Skills.TryGetValue(skillId, out var skill) || skill == null)
+        {
+            SdtdConsole.Instance.Output("[REBIRTH Skill] Unknown skill " + skillId + ". Known: " + string.Join(", ", record.Progression.Skills.Keys.OrderBy(k => k)));
+            return;
+        }
+        float before = skill.Value;
+        skill.Value = value;
+        record.Touch("rbskill-set");
+        RebirthWorldCharacterRepository.SaveIfDirty(identity, "rbskill-set");
+        RebirthSurvivorNetworkService.SendOwnerState(player, 0L, true, "rbskill-set");
+        RebirthSkillOutcomeValueService.TryGetEffective(player, skillId, out float effective);
+        SdtdConsole.Instance.Output("[REBIRTH Skill] " + skillId + ": " + before.ToString("0.##", CultureInfo.InvariantCulture) + " -> " + value.ToString("0.##", CultureInfo.InvariantCulture)
+            + " (effective with attribute: " + effective.ToString("0.##", CultureInfo.InvariantCulture) + ")");
+        Log.Out("[REBIRTH Skill] set " + skillId + " " + before.ToString("0.##", CultureInfo.InvariantCulture) + " -> " + value.ToString("0.##", CultureInfo.InvariantCulture));
     }
 
     private static string NormalizeSkillId(string raw)

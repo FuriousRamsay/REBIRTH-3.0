@@ -125,7 +125,7 @@ public static partial class RebirthNpcStableIdentityStore
         lock (Sync) UnresolvedByEntity.Remove(npc.entityId);
         restored++;
         embeddedDogMatches++;
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC] Restored dog stable identity entity=" + npc.entityId +
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH NPC] Restored dog stable identity entity=" + npc.entityId +
             " stableId=" + stableId + " match=embedded-save-id."); }
         return true;
     }
@@ -310,7 +310,7 @@ public static partial class RebirthNpcStableIdentityStore
         else if (selectedByDurableDogIdentity) durableDogMatches++;
         else positionalMatches++;
         string matchKind = selectedByExactEntity ? "entity-id" : (selectedByDurableDogIdentity ? "durable-owned-dog" : "position");
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC] Restored stable identity entity=" + npc.entityId + " stableId="
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH NPC] Restored stable identity entity=" + npc.entityId + " stableId="
             + selected.StableId + " match=" + matchKind + "."); }
     }
 

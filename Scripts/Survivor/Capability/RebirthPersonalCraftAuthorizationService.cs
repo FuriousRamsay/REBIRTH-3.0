@@ -610,7 +610,7 @@ public static class RebirthPersonalCraftCompletionService
 
     internal static void AfterOutput(XUiC_RecipeStack entry, Witness witness, bool success)
     {
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] AfterOutput witness=" + (witness != null) + " success=" + success + " sameWorld=" + (witness != null && ReferenceEquals(witness.Player.world, runtimeWorld)) + " recipe=" + (witness != null ? witness.Recipe.GetName() : "-") + " before=" + (witness != null ? witness.BeforeCount : -1) + " now=" + (witness != null ? Count(witness.Player, witness.Recipe.itemValueType) : -1) + " retry=" + (witness != null && witness.Retry));
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] AfterOutput witness=" + (witness != null) + " success=" + success + " sameWorld=" + (witness != null && ReferenceEquals(witness.Player.world, runtimeWorld)) + " recipe=" + (witness != null ? witness.Recipe.GetName() : "-") + " before=" + (witness != null ? witness.BeforeCount : -1) + " now=" + (witness != null ? Count(witness.Player, witness.Recipe.itemValueType) : -1) + " retry=" + (witness != null && witness.Retry));
         if (witness == null || !success || !ReferenceEquals(witness.Player.world, runtimeWorld)) return;
         // Retry Update may call the patched outputStack itself. Never credit both observers.
         if (witness.Retry && (outputSerial != witness.Serial || entry.isInventoryFull ||
@@ -773,7 +773,7 @@ public static class RebirthPersonalCraftCompletionService
         if (string.IsNullOrEmpty(skill)) return false;
         bool hadReceipt = record.Progression.SkillAwardReceipts.Contains(receipt);
         bool accepted = RebirthSkillAwardService.TryAwardCraft(player,skill,model,1,1f,"personal-craft:"+recipeName,receipt);
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] Credit recipe=" + recipeName + " skill=" + skill + " modelValid=" + model.Valid + " raw=" + model.Raw + " hadReceipt=" + hadReceipt + " accepted=" + accepted);
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] Credit recipe=" + recipeName + " skill=" + skill + " modelValid=" + model.Valid + " raw=" + model.Raw + " hadReceipt=" + hadReceipt + " accepted=" + accepted);
         if (accepted && !hadReceipt) RebirthStatisticsService.RecordItemsCrafted(player, recipeName, count);
         return accepted;
     }

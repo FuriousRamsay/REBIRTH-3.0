@@ -101,7 +101,7 @@ internal static class RebirthP2NpcEquipmentRestore
         npc.inventory.SetSelectedSlot(sel);
         npc.inventory.ReconcileHeldItem();
         RebirthHumanWeaponPassives.SyncNow(npc);
-        Log.Out("[REBIRTH NPC Equipment] restored selected toolbelt slot entity=" + npc.entityId + " sel=" + sel);
+        RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] restored selected toolbelt slot entity=" + npc.entityId + " sel=" + sel);
     }
 
     // Run once per NPC instance from the existing retry tick (budgeted by the caller) or from Apply. true = concluded.
@@ -119,8 +119,8 @@ internal static class RebirthP2NpcEquipmentRestore
     {
         // Once per change of reason, then a reminder every 30 s while the person stays held (a hold is never silent and never concludes).
         float now = UnityEngine.Time.unscaledTime;
-        if (state.Held != reason) { state.Held = reason; state.HeldLogAt = now; Log.Out("[REBIRTH NPC Equipment] restore held entity=" + npc.entityId + " reason=" + reason); }
-        else if (now - state.HeldLogAt >= 30f) { state.HeldLogAt = now; Log.Out("[REBIRTH NPC Equipment] restore still held entity=" + npc.entityId + " reason=" + reason); }
+        if (state.Held != reason) { state.Held = reason; state.HeldLogAt = now; RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] restore held entity=" + npc.entityId + " reason=" + reason); }
+        else if (now - state.HeldLogAt >= 30f) { state.HeldLogAt = now; RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] restore still held entity=" + npc.entityId + " reason=" + reason); }
         return false;
     }
 
@@ -228,7 +228,7 @@ internal static class RebirthP2NpcEquipmentRestore
                         // as-is (Equipment.cs 476-488); a saved frame is already post-normalization, so it reads back exactly.
                         RebirthHumanEquipment.Put(npc, slot, stack);
                         liveCount[frame] = have + 1;
-                        Log.Out("[REBIRTH NPC Equipment] restored saved frame entity=" + npc.entityId + " slot=" + slot + " item=" + rec.ItemKey + " count=" + rec.Count);
+                        RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] restored saved frame entity=" + npc.entityId + " slot=" + slot + " item=" + rec.ItemKey + " count=" + rec.Count);
                     }
                 }
                 catch
@@ -277,7 +277,7 @@ internal static class RebirthP2NpcEquipmentRestore
         if (state.Probed || !npc.RebirthStartingLoadoutRead) return;
         state.Probed = true;
         int Used(IEnumerable<ItemStack> items) { int n = 0; if (items != null) foreach (var s in items) if (s != null && !s.IsEmpty()) n++; return n; }
-        Log.Out("[REBIRTH NPC Equipment] reload-probe entity=" + npc.entityId + " inst=" + RuntimeHelpers.GetHashCode(npc) + " row=" + row +
+        RebirthDebug.Log("npc", "[REBIRTH NPC Equipment] reload-probe entity=" + npc.entityId + " inst=" + RuntimeHelpers.GetHashCode(npc) + " row=" + row +
             " liveToolbelt=" + Used(npc.inventory.ItemGrid.items) + " liveEquipment=" + Used(npc.equipment.ItemGrid.items) + " liveBag=" + Used(npc.bag.ItemGrid.items) + "/" + npc.bag.SlotCount +
             " selected=" + npc.inventory.SelectedSlot + " marker=" + npc.Buffs.GetCustomVar(MarkerCVar) + " tries=" + npc.Buffs.GetCustomVar(TriesCVar) +
             " nativeMode=" + npc.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode) + " savedBindings=" + (x?.Element("bindings")?.Elements("binding").Count() ?? 0) +

@@ -34,7 +34,7 @@ public static class RebirthGameSenseOptionPatch
         if (RebirthGameSenseOption.Enabled)
             return true;
         GameSenseManager.Instance = null;
-        Log.Out("[REBIRTH] SteelSeries GameSense integration is off (Sandbox Options > Misc, takes effect at game start).");
+        RebirthDebug.Log("options", "[REBIRTH] SteelSeries GameSense integration is off (Sandbox Options > Misc, takes effect at game start).");
         return false;
     }
 }

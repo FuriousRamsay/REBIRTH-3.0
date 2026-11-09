@@ -62,7 +62,7 @@ public static class RebirthSurvivorPersistenceLifecycle
             + " metabolismRepoAuthority=" + RebirthMetabolismStateRepository.IsServerAuthority
             + " metabolismServiceAuthority=" + RebirthMetabolismService.IsServerAuthority); }
         if (data.AsServer)
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] world persistence root=" + RebirthWorldCharacterRepository.RootDirectory); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] world persistence root=" + RebirthWorldCharacterRepository.RootDirectory); }
     }
 
     private static void OnPlayerSpawnedInWorld(ref ModEvents.SPlayerSpawnedInWorldData data)
@@ -91,7 +91,7 @@ public static class RebirthSurvivorPersistenceLifecycle
         int count = RebirthWorldCharacterRepository.SaveAllDirty(reason);
         RebirthMetabolismStateRepository.SaveIfDirty(reason);
         if (count > 0)
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] persistence flush saved=" + count + " reason=" + (reason ?? "unspecified")); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] persistence flush saved=" + count + " reason=" + (reason ?? "unspecified")); }
     }
 
     internal static void FlushClient(ClientInfo clientInfo, string reason)

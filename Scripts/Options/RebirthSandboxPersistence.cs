@@ -47,7 +47,11 @@ public static class RebirthSandboxPersistence
             string configuredSource;
             if (RebirthDedicatedServerSandboxConfig.TryLoadCode(out configuredCode, out configuredSource))
             {
+                string requestedCode = configuredCode;
                 if (hasCurrentWorld) configuredCode = PreservePurgeTheme(configuredCode, currentWorld.Code);
+                RebirthDebug.Log("survivor", "[REBIRTH OptionsTrace] server start source=" + configuredSource + " fileCode=" + requestedCode +
+                        " existingWorld=" + hasCurrentWorld + (hasCurrentWorld ? " worldCode=" + currentWorld.Code : "") +
+                        " appliedCode=" + configuredCode + (requestedCode != configuredCode ? " (existing world keeps its Purge theme)" : ""));
                 int revision = hasCurrentWorld ? Math.Max(0, currentWorld.Revision) : 0;
                 if (!hasCurrentWorld || !string.Equals(currentWorld.Code, configuredCode, StringComparison.Ordinal))
                     revision = IncrementRevision(revision);

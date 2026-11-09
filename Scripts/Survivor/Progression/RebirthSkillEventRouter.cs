@@ -47,7 +47,7 @@ public static class RebirthSkillEventRouter
             RebirthWeaponSustainedDpsService.TryGetCombatProfile(player,response.Source.AttackingItem,out profile) && profile!=null && profile.Valid && profile.SustainedDps>0f)
             amount=RebirthWeaponSustainedDpsService.CalculateCombatProgress(creditedDamage,profile.SustainedDps,state.Value+state.Progress);
         if (RebirthSkillEvalDiagnostics.On)
-            Log.Out("[REBIRTH SkillEval] combat event skill=" + skillId + " item=" + response.Source.AttackingItem.ItemClass.GetItemName() +
+            RebirthDebug.Log("survivor", "[REBIRTH SkillEval] combat event skill=" + skillId + " item=" + response.Source.AttackingItem.ItemClass.GetItemName() +
                 " target=" + target.entityId + " preHealth=" + preHitHealth + " healthLoss=" + actualHealthLoss +
                 " credited=" + creditedDamage + " dps=" + (profile != null ? profile.SustainedDps : 0f) + " raw=" + amount);
         if(amount>0f) RebirthWeaponSustainedDpsService.QueueCombatProgress(player,skillId,amount);
@@ -81,10 +81,10 @@ public static class RebirthSkillEventRouter
         // craftedCount is output units; a recipe making e.g. 100 arrows is ONE material transaction.
         int cycles=Math.Max(1,count/Math.Max(1,recipe.count));
         var model=RebirthCraftTrainingRules.BuildModel(player,recipe,skillId);
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] craft completed recipe=" + recipeName + " skill=" + skillId + " cycles=" + cycles + " modelValid=" + model.Valid + " raw=" + model.Raw + " prepMult=" + RebirthCookingBatch.SkillMultiplier(recipeName));
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] craft completed recipe=" + recipeName + " skill=" + skillId + " cycles=" + cycles + " modelValid=" + model.Valid + " raw=" + model.Raw + " prepMult=" + RebirthCookingBatch.SkillMultiplier(recipeName));
         bool craftAwarded=RebirthSkillAwardService.TryAwardCraft(player,skillId,model,cycles,RebirthCookingBatch.SkillMultiplier(recipeName),
             "craft:"+skillId+":"+(recipeName??string.Empty));
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] craft award result=" + craftAwarded);
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] craft award result=" + craftAwarded);
     }
 
     public static void OnEquipmentRepairCompleted(EntityPlayer player,string itemName,float restoredUseTimes,float maxUseTimes)

@@ -21,13 +21,57 @@ public static class RebirthDedicatedServerSandboxConfig
     public const string SectionName = "RebirthSettings";
     public const string PropertyName = "RebirthSandboxCode";
 
+    public const string CodeFileName = "RebirthSandboxCode.txt";
+
+    /// <summary>
+    /// serverconfig.xml section first, then the code file in the REBIRTH mod folder. Owner 2026-11-08: a hosted
+    /// server refused to start (no log at all) with the nested section, so the host's own panel/startup check
+    /// rejects it; the mod-folder file never touches serverconfig.xml.
+    /// </summary>
     public static bool TryLoadCode(out string code, out string source)
     {
         code = string.Empty;
         source = string.Empty;
-
         if (!GameManager.IsDedicatedServer)
             return false;
+        return TryLoadFromServerConfig(out code, out source) || TryLoadFromModFile(out code, out source);
+    }
+
+    /// <summary>Mods/zzz_REBIRTH__3_0/RebirthSandboxCode.txt: the first line that starts with the code prefix.</summary>
+    private static bool TryLoadFromModFile(out string code, out string source)
+    {
+        code = string.Empty;
+        source = string.Empty;
+        string root = ModManager.GetMod("zzz_REBIRTH__3_0")?.Path;
+        if (string.IsNullOrEmpty(root)) return false;
+        string path = Path.Combine(root, CodeFileName);
+        if (!File.Exists(path)) return false;
+        try
+        {
+            foreach (string raw in File.ReadAllLines(path))
+            {
+                string line = raw?.Trim();
+                if (string.IsNullOrEmpty(line) || !line.StartsWith(RebirthSandboxOptionManager.CodePrefix, StringComparison.Ordinal))
+                    continue;
+                if (!Validate(line, path, out code)) return false;
+                source = "dedicated-modfile:" + CodeFileName;
+                RebirthDebug.Log("survivor", "[RebirthSandbox] Using the REBIRTH options code from " + path);
+                return true;
+            }
+            Log.Warning("[RebirthSandbox] " + path + " has no line starting with '" + RebirthSandboxOptionManager.CodePrefix
+                + "'. The per-world REBIRTH snapshot will be used.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("[RebirthSandbox] Failed reading " + path + ": " + ex.GetType().Name + ": " + ex.Message);
+        }
+        return false;
+    }
+
+    private static bool TryLoadFromServerConfig(out string code, out string source)
+    {
+        code = string.Empty;
+        source = string.Empty;
 
         string configPath = ResolveServerConfigPath();
         if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))

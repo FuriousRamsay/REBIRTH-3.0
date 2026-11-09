@@ -435,12 +435,12 @@
             <trait id="trait.coordinated"/>
         </favored_traits>
         <starting_skills>
-            <skill id="skill.tailoring" value="35"/>
-            <skill id="skill.maintenance" value="10"/>
+            <skill id="skill.tailoring" value="20"/>
+            <skill id="skill.maintenance" value="20"/>
             <skill id="skill.hammers" value="-10"/>
             <skill id="skill.explosives" value="-5"/>
         </starting_skills>
-        <starting_skill_knowledge><skill id="skill.tailoring" value="45"/><skill id="skill.maintenance" value="20"/></starting_skill_knowledge><starting_knowledge>
+        <starting_skill_knowledge><skill id="skill.tailoring" value="30"/><skill id="skill.maintenance" value="20"/></starting_skill_knowledge><starting_knowledge>
             <knowledge id="knowledge.tailoring.basic" />
             <knowledge id="procedure.tailoring.basic_repair" />
             <knowledge id="procedure.tailoring.leather_repair" />

@@ -475,7 +475,7 @@ public static class RebirthCompanionOwnerTeleportService
 
         if (RebirthCompanionRecallDebug.TraceEnabled)
         {
-            Log.Out("[REBIRTH CompanionRecall] OWNER_TELEPORT_EXPLICIT playerEntity=" + player.entityId +
+            RebirthDebug.Log("companions", "[REBIRTH CompanionRecall] OWNER_TELEPORT_EXPLICIT playerEntity=" + player.entityId +
                 " pos=" + current);
         }
     }
@@ -524,7 +524,7 @@ public static class RebirthCompanionOwnerTeleportService
             state.SettleAt = Time.realtimeSinceStartup + SettleSeconds;
             if (RebirthCompanionRecallDebug.TraceEnabled)
             {
-                Log.Out("[REBIRTH CompanionRecall] OWNER_TELEPORT_DETECTED playerEntity=" + player.entityId +
+                RebirthDebug.Log("companions", "[REBIRTH CompanionRecall] OWNER_TELEPORT_DETECTED playerEntity=" + player.entityId +
                     " pos=" + current + " jumpDistance=" + Mathf.Sqrt(jumpSqr).ToString("0.0"));
             }
             return;
@@ -561,7 +561,7 @@ public static class RebirthCompanionOwnerTeleportService
 
         if (RebirthCompanionRecallDebug.TraceEnabled)
         {
-            Log.Out("[REBIRTH CompanionRecall] OWNER_TELEPORT_SETTLED playerEntity=" + player.entityId +
+            RebirthDebug.Log("companions", "[REBIRTH CompanionRecall] OWNER_TELEPORT_SETTLED playerEntity=" + player.entityId +
                 " pos=" + current + " autoRecall=FollowOnly");
         }
         RebirthCompanionService.RecallFollowingAfterOwnerTeleport(player);

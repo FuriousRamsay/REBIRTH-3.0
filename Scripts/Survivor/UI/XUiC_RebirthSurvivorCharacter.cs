@@ -880,7 +880,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         if (RebirthLogSettings.CharacterProgressionUiLoggingEnabled && lastOverviewTraceRevision != overviewSnapshot.SurvivorRevision)
         {
             lastOverviewTraceRevision = overviewSnapshot.SurvivorRevision;
-            Log.Out("[REBIRTH Character Overview] traits=" + overviewSnapshot.Traits.Count + " conditions=" + overviewSnapshot.Conditions.Count
+            RebirthDebug.Log("survivor", "[REBIRTH Character Overview] traits=" + overviewSnapshot.Traits.Count + " conditions=" + overviewSnapshot.Conditions.Count
                 + " rowsResolved=" + listsReady + " modelReady=" + modelReady + " opacity=" + RebirthPersonalCraftingPanelOpacity.Percent);
         }
 

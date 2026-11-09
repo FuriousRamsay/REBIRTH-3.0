@@ -13,7 +13,11 @@ public static class RebirthSandboxRuntimeService
             // before or just after this GameStarting callback. Preserve and re-apply an early
             // authoritative packet instead of overwriting it with the temporary client-safe state.
             if (RebirthSandboxSyncService.TryApplyReceivedClientSnapshot("game-starting"))
+            {
+                RebirthSandboxTrace.Client("client game-start: server options already received and applied");
                 return;
+            }
+            RebirthSandboxTrace.Client("client game-start: waiting for server options (temporary Base Game state)");
 
             // Until the authoritative server snapshot arrives, keep systems that can materially
             // alter world processing on their conservative/base path. Revision 0 from a new server
@@ -22,7 +26,7 @@ public static class RebirthSandboxRuntimeService
                 RebirthSandboxOptionManager.Encode(new RebirthSandboxState { PlayerProgression = RebirthPlayerProgressionMode.BaseGame, AdvancedFarming = false }),
                 0,
                 true);
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandbox] Client waiting for authoritative server option snapshot."); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("options", "[RebirthSandbox] Client waiting for authoritative server option snapshot."); }
             return;
         }
 
@@ -41,7 +45,7 @@ public static class RebirthSandboxRuntimeService
         // the correct tree and vehicle multipliers without forcing an unsafe reload.
         RebirthWorldDecorationDensityRuntimePolicy.BeginNativeDefinitionLoad(source);
 
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandbox] GameStarting source=" + source
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("options", "[RebirthSandbox] GameStarting source=" + source
             + " preset=" + data.PresetName
             + " tree=" + manager.TreeDensityMultiplier + "%"
             + " vehicle=" + manager.VehicleDensityMultiplier + "%"

@@ -189,7 +189,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             {
                 debugLogTimer = 1f;
                 float num2 = speedForward * speedForward + (speedStrafe >= 1234f ? 0f : speedStrafe) * (speedStrafe >= 1234f ? 0f : speedStrafe);
-                Log.Out($"[SdcsNpcAnim] id={entity.entityId}" +
+                RebirthDebug.Log("npc", $"[SdcsNpcAnim] id={entity.entityId}" +
                         $" isRemote={entity.isEntityRemote}" +
                         $" speedFwd={speedForward:F3}" +
                         $" fasterSpeed={fasterSpeed:F3}" +
@@ -218,7 +218,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
                     if (p.name == "MovementState") foundMovementState = true;
                 }
                 sb.Append($"| MovementStateParamExists={foundMovementState}");
-                Log.Out(sb.ToString());
+                RebirthDebug.Log("npc", sb.ToString());
             }
         }
 

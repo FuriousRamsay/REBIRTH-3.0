@@ -76,7 +76,7 @@ public static class RebirthSleeperRespawnInstaller
             throw new InvalidOperationException("No Sleeper Respawns patches were installed.");
 
         s_installed = true;
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Sleeper Respawns] Installed " + installedCount
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("spawning", "[REBIRTH Sleeper Respawns] Installed " + installedCount
             + "/2 runtime guards. enabled=" + RebirthSleeperRespawnRuntimePolicy.Enabled); }
     }
 }

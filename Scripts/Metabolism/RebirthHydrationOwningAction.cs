@@ -6,13 +6,13 @@ internal static class RebirthHydrationOwningAction
 {
     internal static bool Begin(EntityPlayerLocal player,bool bag,int index,bool returning)
     {
-        Log.Out($"[REBIRTH HydrationTransfer] client-request action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(bag?"bag":"belt")} index={index} remote={player?.world?.IsRemote().ToString()??"none"}");
+        RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] client-request action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(bag?"bag":"belt")} index={index} remote={player?.world?.IsRemote().ToString()??"none"}");
         if(player?.world?.IsRemote()!=true||!ThreadManager.IsMainThread())return false;
         if(!RebirthHydrationProposalClient.Intent.TryBegin(player,bag,index,returning,out var intent))
-        {Log.Out("[REBIRTH HydrationTransfer] client-request refused at intent admission");return false;}
+        {RebirthDebug.Log("metabolism", "[REBIRTH HydrationTransfer] client-request refused at intent admission");return false;}
         intent.Advance(System.Diagnostics.Stopwatch.GetTimestamp()/(double)System.Diagnostics.Stopwatch.Frequency);
         bool current=intent.Current();
-        Log.Out($"[REBIRTH HydrationTransfer] client-request result={(current?"pending":"scope-changed")}");
+        RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] client-request result={(current?"pending":"scope-changed")}");
         return current; // Accepted/pending, never a financial receipt.
     }
     internal static bool BeginMatching(EntityPlayerLocal player,ItemValue item,bool returning)

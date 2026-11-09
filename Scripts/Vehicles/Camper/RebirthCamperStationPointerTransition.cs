@@ -52,9 +52,9 @@ internal static class RebirthCamperStationPointerTransition
                 " windowManager="+(ui!=null&&ReferenceEquals(cursor.windowManager,ui.windowManager))+
                 " guiActions="+(cursor.guiActions!=null)+" guiEnabled="+(cursor.guiActions!=null&&cursor.guiActions.Enabled)+
                 " nativeLocked="+cursor.Locked;
-            Log.Out(line);
+            RebirthDebug.Log("vehicles", line);
         }
-        catch(Exception error){Log.Out("[CamperPointer VISIBILITY] g="+generation+" phase="+phase+" observer="+error.GetType().Name);}
+        catch(Exception error){RebirthDebug.Log("vehicles", "[CamperPointer VISIBILITY] g="+generation+" phase="+phase+" observer="+error.GetType().Name);}
     }
     internal static void SoftCursorDecision(SoftCursor cursor)
     {
@@ -94,9 +94,9 @@ internal static class RebirthCamperStationPointerTransition
             line+=" touch="+(UICamera.currentTouch==null?"none":UICamera.currentTouch.pos.ToString());
             if(stack&&!stackLogged)
             {stackLogged=true;string trace=new System.Diagnostics.StackTrace(1,false).ToString();line+=" caller="+trace.Substring(0,Math.Min(1200,trace.Length)).Replace('\n',' ').Replace('\r',' ');}
-            Log.Out(line);
+            RebirthDebug.Log("vehicles", line);
         }
-        catch(Exception error){Log.Out("[CamperPointer DEBUGLOG] stage="+stage+" observer="+error.GetType().Name);}
+        catch(Exception error){RebirthDebug.Log("vehicles", "[CamperPointer DEBUGLOG] stage="+stage+" observer="+error.GetType().Name);}
     }
     internal static void Native(CursorControllerAbs cursor,string stage,string detail,bool stack=false)
     {if(ReferenceEquals(cursor,debugCursor))Trace(stage,detail,stack);}

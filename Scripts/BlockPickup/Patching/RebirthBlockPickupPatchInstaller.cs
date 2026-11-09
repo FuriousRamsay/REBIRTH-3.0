@@ -45,9 +45,9 @@ public static class RebirthBlockPickupPatchInstaller
                 installed = false;
                 patchedMethods = 0;
                 failedMethods = 0;
-                Log.Out("[REBIRTH BlockPickup] One-shot lag comparison session active. "
+                RebirthDebug.Log("blockpickup", "[REBIRTH BlockPickup] One-shot lag comparison session active. "
                     + "The flag has already been consumed; restart after testing to restore Block Pickup automatically.");
-                Log.Out(Status());
+                RebirthDebug.Log("blockpickup", Status());
                 return Status();
             }
         }
@@ -143,7 +143,7 @@ public static class RebirthBlockPickupPatchInstaller
         }
 
         if (!installed) Log.Warning(Status());
-        else if (RebirthLogSettings.BlockPickupLoggingEnabled) Log.Out(Status());
+        else if (RebirthLogSettings.BlockPickupLoggingEnabled) RebirthDebug.Log("blockpickup", Status());
         return Status();
     }
 

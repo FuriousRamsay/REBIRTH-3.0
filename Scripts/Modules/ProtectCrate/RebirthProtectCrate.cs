@@ -525,7 +525,7 @@ public static class RebirthProtectCrateService
         RebirthProtectCratePersistence.RecordGenerated(state);
         RebirthProtectCratePersistence.TrySaveNow();
 
-        Log.Out("[REBIRTH ProtectCrate] crate=" + crate.entityId
+        RebirthDebug.Log("modules", "[REBIRTH ProtectCrate] crate=" + crate.entityId
             + " player=" + player.EntityName
             + " progression=" + progressionMode
             + " biome=" + biome

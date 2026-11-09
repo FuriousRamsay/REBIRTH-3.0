@@ -305,7 +305,7 @@ public static class RebirthAutoReplantTreeRegistry
         fallingTree.world.SetBlockRPC((BlockValueRef)blockPos, replacement);
 
 #if DEBUG && REBIRTH_DEBUG
-        Log.Out("[REBIRTH Auto Replant Trees][Debug] fall-complete reason="
+        RebirthDebug.Log("trees", "[REBIRTH Auto Replant Trees][Debug] fall-complete reason="
             + reason
             + " source=" + definition.SourceBlockName
             + " replacement=" + definition.ReplacementBlockName
@@ -465,7 +465,7 @@ public sealed class RebirthAutoReplantTreesModApi : IModApi
             report.WrongClass > 0 || report.DuplicateSource > 0 || report.WrongRuntimeState > 0)
             Log.Warning("[REBIRTH Auto Replant Trees] 2.6 target map with native fall completion " + report);
         else if (RebirthLogSettings.RuntimeInstallLoggingEnabled)
-            Log.Out("[REBIRTH Auto Replant Trees] 2.6 target map with native fall completion " + report);
+            RebirthDebug.Log("trees", "[REBIRTH Auto Replant Trees] 2.6 target map with native fall completion " + report);
     }
 }
 

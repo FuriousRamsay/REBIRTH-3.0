@@ -4,6 +4,8 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
 {
     private static readonly object protocolInstallGate=new object();
     private static bool reviewedSource4Producer;
+    /// <summary>The running game assembly is not one of the reviewed images; the placed protocol is never enabled.</summary>
+    internal static bool CancellationUnqualified { get; private set; }
     // This policy belongs only to the ordinary placed original. Mobile,
     // managed/grid admissions and other Survivor producers retain their own
     // protocols; it is not a global remote-resource mode switch.
@@ -35,6 +37,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
         lock(protocolInstallGate)
         {
             if(protocolActive)return;
+            if(CancellationUnqualified)return; // unreviewed game build: placed protocol stays inactive (warned at install)
             if(!ProtocolInfrastructureInstalled)
                 throw new InvalidOperationException("Placed protocol infrastructure is incomplete.");
             if(GameManager.Instance?.World!=null)

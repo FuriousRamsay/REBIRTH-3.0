@@ -47,6 +47,30 @@ internal static class RebirthStationScopedInputRedrawPatch
     }
 }
 
+// Owner 2026-11-08: scrap output arriving (and tool changes) redrew the whole station window, so every backpack
+// slot rebound and counts visibly jumped. Same scoped redraw as fuel/input.
+[HarmonyPatch(typeof(XUiC_WorkstationWindowGroup), nameof(XUiC_WorkstationWindowGroup.TileEntity_OutputChanged))]
+internal static class RebirthStationScopedOutputRedrawPatch
+{
+    private static bool Prefix(XUiC_WorkstationWindowGroup __instance)
+    {
+        if (!RebirthStationScopedRedraw.Applies(__instance) || __instance.WorkstationData == null) return true;
+        if (__instance.outputWindow != null) RebirthStationScopedRedraw.Refresh(__instance.outputWindow, __instance.WorkstationData.GetOutputStacks());
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(XUiC_WorkstationWindowGroup), nameof(XUiC_WorkstationWindowGroup.TileEntity_ToolChanged))]
+internal static class RebirthStationScopedToolRedrawPatch
+{
+    private static bool Prefix(XUiC_WorkstationWindowGroup __instance)
+    {
+        if (!RebirthStationScopedRedraw.Applies(__instance) || __instance.WorkstationData == null) return true;
+        if (__instance.toolWindow != null) RebirthStationScopedRedraw.Refresh(__instance.toolWindow, __instance.WorkstationData.GetToolStacks());
+        return false;
+    }
+}
+
 [Preserve]
 public sealed class RebirthStationScopedRedrawModApi : IModApi
 {
@@ -55,5 +79,7 @@ public sealed class RebirthStationScopedRedrawModApi : IModApi
         var harmony = new Harmony("rebirth.station-scoped-redraw");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthStationScopedFuelRedrawPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthStationScopedInputRedrawPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthStationScopedOutputRedrawPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthStationScopedToolRedrawPatch));
     }
 }

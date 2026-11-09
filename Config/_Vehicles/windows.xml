@@ -414,7 +414,7 @@
           <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="547,-410" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="editorBagSort" visible="false" />
           <button name="editorBagSort" pos="509,-410" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_sort" style="press, hover" tooltip_key="xuiRebirthCraftingInventorySortTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagFilter" nav_right="editorBagLock" pivot="center" />
           <button name="editorBagLock" pos="547,-410" width="28" height="28" depth="5" atlas="RebirthUiIcons" sprite="rb_backpack_lock" style="press, hover" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_left="editorBagSort" pivot="center" />
-          <sprite name="editorBagRule" depth="12" pos="0,-413" width="610" height="2" sprite="menu_empty" color="181,140,255,255" />
+          <sprite name="editorBagRule" depth="12" pos="0,-392" width="610" height="2" sprite="menu_empty" color="181,140,255,255" />
           <rect name="editorBagScroll" pos="17,-433" width="590" height="372" controller="RebirthCharacterOverviewList, RebirthUtils">
             <panel name="listViewport" width="568" height="372" clipping="SoftClip" depth="10" clippingsize="568,372" clippingcenter="284,-186">
               <rect name="listContent" width="568" height="1775">

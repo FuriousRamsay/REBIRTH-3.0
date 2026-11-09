@@ -194,7 +194,7 @@ public static class RebirthXmlOptionConditionResolver
         }
 
         bool result = state != null && state.PlayerProgression == expected;
-        if (RebirthLogSettings.CharacterProgressionUiLoggingEnabled) Log.Out("[RebirthXmlOptions][CharacterProgression] expected=" + (expectedValue ?? string.Empty)
+        if (RebirthLogSettings.CharacterProgressionUiLoggingEnabled) RebirthDebug.Log("options", "[RebirthXmlOptions][CharacterProgression] expected=" + (expectedValue ?? string.Empty)
             + " actual=" + (state != null ? state.PlayerProgression.ToString() : "unavailable")
             + " result=" + result);
         return result;
@@ -306,7 +306,7 @@ public sealed class RebirthXmlOptionConditionModApi : IModApi
         {
             RebirthHarmonyBootstrap.PatchClassOnce(XmlOptionHarmony, typeof(RebirthXmlPatchConditionEvaluatorPatch));
             installed = true;
-            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[RebirthXmlOptions] Installed typed isoption/not_isoption/character_progression conditional functions (no dynamic field/method lookup)."); }
+            { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("options", "[RebirthXmlOptions] Installed typed isoption/not_isoption/character_progression conditional functions (no dynamic field/method lookup)."); }
         }
         catch (Exception ex)
         {

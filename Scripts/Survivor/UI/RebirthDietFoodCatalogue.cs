@@ -114,7 +114,7 @@ public static class RebirthDietFoodCatalogue
             lastReport = "[REBIRTH Survivor Diet] authored food catalogue ready entries=" + Authored.Count;
         }
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(lastReport + " source='" + path + "'."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", lastReport + " source='" + path + "'."); }
         return lastReport;
     }
 

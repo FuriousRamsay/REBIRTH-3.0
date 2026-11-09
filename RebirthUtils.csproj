@@ -47,7 +47,8 @@
 	    <Private>False</Private>
 	  </Reference>
 	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+	<!-- Game-shipped Unity JSON module: the camper wrap reads its surface contract with JsonUtility in every build. -->
+	<ItemGroup>
 	  <Reference Include="UnityEngine.JSONSerializeModule">
 	    <HintPath>$(RebirthManagedRoot)\UnityEngine.JSONSerializeModule.dll</HintPath>
 	    <Private>False</Private>

@@ -2166,7 +2166,7 @@ public sealed class RebirthFireService
     private static void LogDebugIgnition(RebirthFireIgnitionCause cause, Vector3i position, string result)
     {
         if (cause == RebirthFireIgnitionCause.Debug)
-            Log.Out("[RBFireTest][Authority] ignition position=" + position + " result=" + result);
+            RebirthDebug.Log("fire", "[RBFireTest][Authority] ignition position=" + position + " result=" + result);
     }
 
     private static long GetChunkKey(Vector3i position)
@@ -2578,7 +2578,7 @@ public sealed class RebirthFireModApi : IModApi
         }
         RebirthFireVisualManager.Initialize();
 
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Fire] runtime ready enabled=" + RebirthFireRuntimePolicy.Enabled
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("fire", "[REBIRTH Fire] runtime ready enabled=" + RebirthFireRuntimePolicy.Enabled
             + " patches=" + RebirthFirePatchInstaller.IsInstalled
             + " active=" + RebirthFireService.Instance.ActiveCount); }
     }

@@ -248,6 +248,6 @@ public static class RebirthTraderLootPolicyInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderBlockHasCommandsPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderBlockGetCommandsPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderBlockActivationPatch));
-        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH] Trader loot policy installed at the 3.1 BlockCompositeTileEntity interaction layers."); }
+        { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("traderprotection", "[REBIRTH] Trader loot policy installed at the 3.1 BlockCompositeTileEntity interaction layers."); }
     }
 }

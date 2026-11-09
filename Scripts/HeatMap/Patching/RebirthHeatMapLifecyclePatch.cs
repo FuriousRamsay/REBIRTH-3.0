@@ -108,7 +108,7 @@ internal static class RebirthHeatMapCheckToSpawnPatch
         if (spawnCountAfter <= spawnCountBefore)
         {
             if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.HeatMapLoggingEnabled))
-            Log.Out("[REBIRTH HeatMap] scout roll passed but no scout was queued; heat retained at "
+            RebirthDebug.Log("heatmap", "[REBIRTH HeatMap] scout roll passed but no scout was queued; heat retained at "
                 + _chunkData.ActivityLevel.ToString("F3"));
             return false;
         }
@@ -120,7 +120,7 @@ internal static class RebirthHeatMapCheckToSpawnPatch
         _chunkData.SetLongDelay();
 
         if (RebirthDiagnosticPolicy.MayPrepare(RebirthLogSettings.HeatMapLoggingEnabled))
-        Log.Out("[REBIRTH HeatMap] scout queued; heat consumed and long cooldown started at "
+        RebirthDebug.Log("heatmap", "[REBIRTH HeatMap] scout queued; heat consumed and long cooldown started at "
             + bestEvent.Position);
 
         return false;

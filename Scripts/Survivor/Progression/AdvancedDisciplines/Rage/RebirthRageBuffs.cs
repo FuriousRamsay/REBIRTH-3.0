@@ -125,7 +125,7 @@ public static class RebirthRageBuffs
                 + "<triggered_effect trigger=\"onSelfBuffRemove\" action=\"ModifyScreenEffect\" intensity=\"0\" fade=\"1\" effect_name=\"Greyscale\"/>"
                 + "</effect_group></buff>");
             Registered = count;
-            Log.Out("[REBIRTH Rage] registered " + count + " rage buffs (one per rage, values from code)");
+            RebirthDebug.Log("survivor", "[REBIRTH Rage] registered " + count + " rage buffs (one per rage, values from code)");
         }
         catch (System.Exception e)
         {

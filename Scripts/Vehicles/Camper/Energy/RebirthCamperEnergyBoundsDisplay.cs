@@ -15,7 +15,7 @@ public static class RebirthCamperEnergyBoundsDisplay
     private static void Diagnose(EntityVehicle vehicle,EntityPlayerLocal player,string stage,string detail)
     {
         if(diagnostics>=24)return;diagnostics++;
-        Log.Out("[REBIRTH CamperEnergyBounds] stage="+stage+" vehicle="+(vehicle?.entityId??-1)
+        RebirthDebug.Log("vehicles", "[REBIRTH CamperEnergyBounds] stage="+stage+" vehicle="+(vehicle?.entityId??-1)
             +" player="+(player?.entityId??-1)+" "+detail);
     }
     private static string MaterialDetails(Material material)

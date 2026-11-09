@@ -41,29 +41,31 @@ public static class RebirthLogSettings
     private static bool heatMap;
     private static bool automaticLoggingDefault;
 
+    // Owner 2026-11-08: every gate follows the one debug switch (RebirthDebug): always false in Release builds (the code
+    // behind it is removed), and in Debug builds false until "rbdebug on". debug.xml no longer turns logging on.
     // Routine runtime/load/save success messages use this existing switch directly.
     // Explicit category attributes override the fallback for their own traces only.
     // Compiler DEBUG/TRACE symbols and the game's debug mode never enable these gates.
-    public static bool AutomaticLoggingDefault { get { EnsureLoaded(); return automaticLoggingDefault; } }
-    public static bool BlockPickupLoggingEnabled { get { EnsureLoaded(); return blockPickup; } }
-    public static bool HeatMapLoggingEnabled { get { EnsureLoaded(); return heatMap; } }
+    public static bool AutomaticLoggingDefault => RebirthDebug.On;
+    public static bool BlockPickupLoggingEnabled => RebirthDebug.On;
+    public static bool HeatMapLoggingEnabled => RebirthDebug.On;
     public static string ConfigPath { get { EnsureLoaded(); return configPath; } }
-    public static bool TraitUiLoggingEnabled { get { EnsureLoaded(); return traitUi; } }
-    public static bool TraitUiLoggingConfigured { get { EnsureLoaded(); return configuredTraitUi; } }
-    public static bool CharacterProgressionUiLoggingEnabled { get { EnsureLoaded(); return characterProgressionUi; } }
-    public static bool HarmonyPatchLoggingEnabled { get { EnsureLoaded(); return harmonyPatch; } }
-    public static bool RuntimeInstallLoggingEnabled { get { EnsureLoaded(); return runtimeInstall; } }
-    public static bool UiRouteLoggingEnabled { get { EnsureLoaded(); return uiRoute; } }
-    public static bool PlayerProfileBridgeLoggingEnabled { get { EnsureLoaded(); return playerProfileBridge; } }
-    public static bool PlayerProfilePortraitLoggingEnabled { get { EnsureLoaded(); return playerProfilePortrait; } }
-    public static bool ExitTraceLoggingEnabled { get { EnsureLoaded(); return exitTrace; } }
-    public static bool ProgressionExplorerLoggingEnabled { get { EnsureLoaded(); return progressionExplorer; } }
-    public static bool PreSpawnLoggingEnabled { get { EnsureLoaded(); return preSpawn; } }
-    public static bool SpawnFlowLoggingEnabled { get { EnsureLoaded(); return spawnFlow; } }
-    public static bool SkillKnowledgeLoggingEnabled { get { EnsureLoaded(); return skillKnowledge; } }
-    public static bool LiteratureLoggingEnabled { get { EnsureLoaded(); return literature; } }
-    public static bool CraftAdmissionLoggingEnabled { get { EnsureLoaded(); return craftAdmission; } }
-    public static bool CraftingUiLoggingEnabled { get { EnsureLoaded(); return craftingUi; } }
+    public static bool TraitUiLoggingEnabled => RebirthDebug.On;
+    public static bool TraitUiLoggingConfigured => RebirthDebug.On;
+    public static bool CharacterProgressionUiLoggingEnabled => RebirthDebug.On;
+    public static bool HarmonyPatchLoggingEnabled => RebirthDebug.On;
+    public static bool RuntimeInstallLoggingEnabled => RebirthDebug.On;
+    public static bool UiRouteLoggingEnabled => RebirthDebug.On;
+    public static bool PlayerProfileBridgeLoggingEnabled => RebirthDebug.On;
+    public static bool PlayerProfilePortraitLoggingEnabled => RebirthDebug.On;
+    public static bool ExitTraceLoggingEnabled => RebirthDebug.On;
+    public static bool ProgressionExplorerLoggingEnabled => RebirthDebug.On;
+    public static bool PreSpawnLoggingEnabled => RebirthDebug.On;
+    public static bool SpawnFlowLoggingEnabled => RebirthDebug.On;
+    public static bool SkillKnowledgeLoggingEnabled => RebirthDebug.On;
+    public static bool LiteratureLoggingEnabled => RebirthDebug.On;
+    public static bool CraftAdmissionLoggingEnabled => RebirthDebug.On;
+    public static bool CraftingUiLoggingEnabled => RebirthDebug.On;
 
     public static void LoadFromConfigRoot(string configRoot)
     {
@@ -75,7 +77,7 @@ public static class RebirthLogSettings
     {
         EnsureLoaded();
         traitUi = value;
-        Log.Out("[REBIRTH Survivor][TraitUI] logging=" + traitUi + " source=runtime-override");
+        RebirthDebug.Log("logging", "[REBIRTH Survivor][TraitUI] logging=" + traitUi + " source=runtime-override");
     }
 
     public static void RestoreConfiguredTraitUi()
@@ -188,31 +190,31 @@ public static class RebirthLogSettings
         if (nextTraitUi && !traitStartupAnnounced)
         {
             traitStartupAnnounced = true;
-            Log.Out("[REBIRTH Survivor][TraitUI] startup logging=" + nextTraitUi +
+            RebirthDebug.Log("logging", "[REBIRTH Survivor][TraitUI] startup logging=" + nextTraitUi +
                 " source=config path='" + (path ?? string.Empty) + "'");
         }
 
         if (nextCharacterProgressionUi && !characterProgressionStartupAnnounced)
         {
             characterProgressionStartupAnnounced = true;
-            Log.Out("[REBIRTH Options][CharacterProgressionUI] startup logging=True" +
+            RebirthDebug.Log("logging", "[REBIRTH Options][CharacterProgressionUI] startup logging=True" +
                 " source=config path='" + (path ?? string.Empty) + "'");
         }
 
         if (nextPreSpawn && !preSpawnStartupAnnounced)
         {
             preSpawnStartupAnnounced = true;
-            Log.Out("[REBIRTH Survivor][PreSpawnTrace] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
+            RebirthDebug.Log("logging", "[REBIRTH Survivor][PreSpawnTrace] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
         }
 
         if (nextSpawnFlow && !spawnFlowStartupAnnounced)
         {
             spawnFlowStartupAnnounced = true;
-            Log.Out("[REBIRTH Survivor][SpawnFlow] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
+            RebirthDebug.Log("logging", "[REBIRTH Survivor][SpawnFlow] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
         }
 
         if (nextCraftingUi)
-            Log.Out("[REBIRTH Crafting Trace] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
+            RebirthDebug.Log("logging", "[REBIRTH Crafting Trace] startup logging=True source=config path='" + (path ?? string.Empty) + "'");
     }
 
     private static bool ReadBool(XmlElement root, string attribute, bool fallback)

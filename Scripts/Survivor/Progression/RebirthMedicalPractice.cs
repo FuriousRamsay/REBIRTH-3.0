@@ -89,7 +89,7 @@ public static class RebirthMedicalPractice
     public static Evidence Begin(EntityPlayer healer,EntityAlive patient,string item)
     {
         actionDepth++;
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] medical Begin item=" + item + " depth=" + actionDepth + " hasTreatment=" + RebirthDifficultyPractice.HasTreatment(item) + " remote=" + (healer != null && healer.world != null && healer.world.IsRemote()));
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Begin item=" + item + " depth=" + actionDepth + " hasTreatment=" + RebirthDifficultyPractice.HasTreatment(item) + " remote=" + (healer != null && healer.world != null && healer.world.IsRemote()));
         if(actionDepth!=1 || healer?.world==null || patient==null || !ReferenceEquals(patient.world,healer.world) || healer.IsDead() || patient.IsDead() || !RebirthDifficultyPractice.HasTreatment(item))return null;
         if(!ReferenceEquals(healer.world.GetEntity(healer.entityId),healer)||
             !ReferenceEquals(healer.world.GetEntity(patient.entityId),patient))return null;
@@ -167,7 +167,7 @@ public static class RebirthMedicalPractice
     }
     public static void Complete(Evidence e)
     {
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] medical Complete evidence=" + (e != null));
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Complete evidence=" + (e != null));
         if(!IsCurrentTreatment(e) || e.Completed || (ReferenceEquals(e.Healer,e.Patient) && !e.DoseConfirmed))return;
         e.Completed=true;
         var p=e.Patient;
@@ -190,7 +190,7 @@ public static class RebirthMedicalPractice
             if(direct>0f)RebirthConstitutionTrainingService.OnHealthRestored(p,direct);
             Award(e,direct/unit);
             float reserve=Math.Max(0,C(p,"medicalRegHealthAmount")-e.Reserve);
-            if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] medical Complete unit=" + unit + " direct=" + direct + " reserveDelta=" + reserve + " pendingBefore=" + PendingUses.Count);
+            if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Complete unit=" + unit + " direct=" + direct + " reserveDelta=" + reserve + " pendingBefore=" + PendingUses.Count);
             if(e.Item=="drugPainkillers" && e.SelfScope!=null){
                 e.PainkillerAfter=p.Buffs.GetBuff("buffDrugPainkillers");
                 if(e.PainkillerBefore==null && e.PainkillerAfter!=null)AddPending(new Pending{Before=e,Health=p.Stats.Health.Value,Unit=unit,Remaining=unit-direct,CreatedAt=UnityEngine.Time.time});
@@ -242,7 +242,7 @@ public static class RebirthMedicalPractice
             return;
         }
         float level,progress;
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] medical Award fraction=" + fraction + " item=" + e.Item);
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Award fraction=" + fraction + " item=" + e.Item);
         if(!RebirthServiceCraftSkillService.TryGetPracticalSkillProgress(e.Healer,"skill.medicine",out level,out progress))return;
         float credited=Math.Min(1f,Math.Max(0f,fraction));
         float raw=RebirthDifficultyPractice.Treatment(e.Item,level+progress)*credited;
@@ -254,12 +254,12 @@ public static class RebirthMedicalPractice
         };
         RebirthSkillTrainingComputation computation;float gained,attribute;
         bool awarded=RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(e.Healer,evidence,out computation,out gained,out attribute);
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] medical award result=" + awarded + " raw=" + raw + " gained=" + gained + " attribute=" + attribute);
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical award result=" + awarded + " raw=" + raw + " gained=" + gained + " attribute=" + attribute);
     }
     public static void Observe(EntityAlive patient)
     {
         bool traceObservation=RebirthSkillEvalDiagnostics.On && PendingUses.Count > 0 && UnityEngine.Time.time - lastObserveLog > 1f;
-        if (traceObservation) { lastObserveLog = UnityEngine.Time.time; Log.Out("[REBIRTH SkillEval] medical Observe enter pending=" + PendingUses.Count + " patient=" + (patient != null ? patient.entityId : -1) + " sameWorld=" + (patient != null && ReferenceEquals(world, patient.world))); }
+        if (traceObservation) { lastObserveLog = UnityEngine.Time.time; RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Observe enter pending=" + PendingUses.Count + " patient=" + (patient != null ? patient.entityId : -1) + " sameWorld=" + (patient != null && ReferenceEquals(world, patient.world))); }
         if(PendingUses.Count==0 || patient?.world==null || ClinicalTransfers.Contains(patient))return;
         if(world!=patient.world){ClearPending();world=patient.world;return;}
         // Allocate a tick's useful change once, oldest treatment first, never once per stacked dose.
@@ -288,7 +288,7 @@ public static class RebirthMedicalPractice
                 if(healthBudget<0)healthBudget=reserve<use.Reserve?Math.Min(Math.Max(0,health-use.Health),(use.Reserve-reserve)*Math.Max(0,C(patient,"medRegHealthIncSpeed"))/2f):0;
                 amount=Math.Min(use.Remaining,healthBudget);healthBudget-=amount;use.Health=health;use.Reserve=reserve;
             }
-            if (RebirthSkillEvalDiagnostics.On && (amount>0f || traceObservation)) Log.Out("[REBIRTH SkillEval] medical Observe pending=" + PendingUses.Count + " amount=" + amount + " remaining=" + use.Remaining + " useReserve=" + use.Reserve + " saw=" + use.SawReserve + " reserveNow=" + C(patient,"medicalRegHealthAmount"));
+            if (RebirthSkillEvalDiagnostics.On && (amount>0f || traceObservation)) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] medical Observe pending=" + PendingUses.Count + " amount=" + amount + " remaining=" + use.Remaining + " useReserve=" + use.Reserve + " saw=" + use.SawReserve + " reserveNow=" + C(patient,"medicalRegHealthAmount"));
             if(amount>0){if(!use.InfectionTreatment)RebirthConstitutionTrainingService.OnHealthRestored(patient,amount);Award(e,amount/use.Unit);use.Remaining-=amount;}
             bool exhausted=use.InfectionTreatment?C(patient,"$infectionCureCounter")<=0 || C(patient,"infectionCounter")<=0:(C(patient,"medicalRegHealthAmount")<=0 && use.SawReserve) || (!use.SawReserve && UnityEngine.Time.time-use.CreatedAt>20f);
             if(use.Remaining<=.0001f || exhausted){FinishSelf(e);PendingUses.RemoveAt(i);}else i++;

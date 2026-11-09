@@ -59,7 +59,7 @@ public static class RebirthCharacterCreationHoldService
         {
             typeof(string), typeof(WorldBase), typeof(Vector3i), typeof(BlockValue), typeof(EntityPlayerLocal)
         });
-        if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor][RuntimeInstall][HoldTarget] Block.OnBlockActivated(string,WorldBase,Vector3i,BlockValue,EntityPlayerLocal) found=" + (blockActivationTarget != null));
+        if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor][RuntimeInstall][HoldTarget] Block.OnBlockActivated(string,WorldBase,Vector3i,BlockValue,EntityPlayerLocal) found=" + (blockActivationTarget != null));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCharacterCreationHoldBlockActivationPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCharacterCreationHoldAttackTargetPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCharacterCreationHoldNativeXpPatch));
@@ -143,7 +143,8 @@ public static class RebirthCharacterCreationHoldService
             local.ClearMovementInputs();
             local.SetControllable(true);
         }
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] creation hold RELEASE entity=" + player.entityId + " key=" + (identity != null ? identity.StorageKey : string.Empty)); }
+        RebirthSpawnInputTrace.Note("creation-hold-release entity=" + player.entityId);
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] creation hold RELEASE entity=" + player.entityId + " key=" + (identity != null ? identity.StorageKey : string.Empty)); }
         { if (RebirthLogSettings.SpawnFlowLoggingEnabled) RebirthLogSettings.TraceSpawnFlow("creation hold RELEASE entity=" + player.entityId
             + " local=" + (player is EntityPlayerLocal) + " key=" + (identity != null ? identity.StorageKey : string.Empty)); }
     }
@@ -263,7 +264,8 @@ public static class RebirthCharacterCreationHoldService
             local.ClearMovementInputs();
             local.SetControllable(false);
         }
-        { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] creation hold ENTER entity=" + player.entityId + " reason=" + reason + " key=" + entry.StableKey); }
+        RebirthSpawnInputTrace.Note("creation-hold-enter entity=" + player.entityId + " reason=" + reason);
+        { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] creation hold ENTER entity=" + player.entityId + " reason=" + reason + " key=" + entry.StableKey); }
         { if (RebirthLogSettings.SpawnFlowLoggingEnabled) RebirthLogSettings.TraceSpawnFlow("creation hold ENTER entity=" + player.entityId
             + " local=" + (player is EntityPlayerLocal) + " controllableForcedFalse=" + (local != null)
             + " reason=" + reason + " key=" + entry.StableKey); }
@@ -419,7 +421,7 @@ public static class RebirthCharacterCreationHoldNativeXpPatch
                 if (p > 0) signature += ",";
                 signature += parameters[p].ParameterType != null ? parameters[p].ParameterType.Name : "?";
             }
-            if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Survivor][RuntimeInstall][HoldTarget] Progression.AddLevelExp(" + signature + ") found=True");
+            if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("survivor", "[REBIRTH Survivor][RuntimeInstall][HoldTarget] Progression.AddLevelExp(" + signature + ") found=True");
         }
 
         if (targets.Count == 0)

@@ -351,7 +351,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         {
             data.Add(new RowData { Title = Localization.Get("xuiRebirthArmorBonusHeading"), Value = "", Heading = true, Height = 38 });
             for (int bonusIndex = 0; bonusIndex < armorBonuses.Length; bonusIndex++)
-                data.Add(new RowData { Title = RebirthArmorBonusText.Plain(armorBonuses[bonusIndex]), Value = "", FullWidth = true });
+                data.Add(new RowData { Title = RebirthArmorBonusText.Describe(armorBonuses[bonusIndex]), Value = "", FullWidth = true }); // rarity colour, as in 2.6 (owner 2026-11-08)
         }
         // Modifier kits show what they do, as in 2.6 (owner 2026-11-08).
         string kitName = stack.itemValue.ItemClass?.GetItemName();

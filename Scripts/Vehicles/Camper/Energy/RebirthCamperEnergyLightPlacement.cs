@@ -51,6 +51,6 @@ internal static class RebirthCamperEnergyLightPlacement
     private static void Trace(string stage,Vector3i position,string error)
     {
         if(diagnostics>=16)return;diagnostics++;
-        Log.Out("[REBIRTH CamperEnergyLightPlacement] stage="+stage+" position="+position+(error==null?"":" error="+error));
+        RebirthDebug.Log("vehicles", "[REBIRTH CamperEnergyLightPlacement] stage="+stage+" position="+position+(error==null?"":" error="+error));
     }
 }

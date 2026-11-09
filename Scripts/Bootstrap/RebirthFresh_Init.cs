@@ -28,6 +28,7 @@ namespace Rebirth.Bootstrap
             new Dictionary<string, RebirthBootstrapInstallState>(StringComparer.Ordinal);
         private static RebirthBootstrapInstallState overallState = RebirthBootstrapInstallState.NotStarted;
         private static string lastFailure = string.Empty;
+        private static readonly List<string> FailedSteps = new List<string>();
         private static readonly HarmonyLib.Harmony PerfHarmony =
             new HarmonyLib.Harmony("rebirth.performance.3.1");
         private static readonly HarmonyLib.Harmony DensityHarmony =
@@ -73,7 +74,7 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("vehicle-hud-slot-guard", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthHudStatBarSlotGuardPatch)); });
                 RunStepOnce("reflection-rate-at-speed", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthReflectionRateAtSpeedPatch)); });
                 RunStepOnce("gamesense-option", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthGameSenseOptionPatch)); });
-                RunStepOnce("gamesense-dedupe", delegate { Log.Out(RebirthGameSenseDedupePatch.Install(PerfHarmony)); });
+                RunStepOnce("gamesense-dedupe", delegate { RebirthDebug.Log("bootstrap", RebirthGameSenseDedupePatch.Install(PerfHarmony)); });
                 RunStepOnce("density-hooks", delegate
                 {
                     RebirthHarmonyBootstrap.PatchClassOnce(DensityHarmony, typeof(Rebirth.WorldDecorations.Density.AddDecoBlockPatch));
@@ -88,7 +89,7 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("survivor", delegate
                 {
                     string report = RebirthSurvivorInstaller.Install(_modInstance);
-                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report);
+                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report);
                     if (!RebirthSurvivorInstaller.IsInstalled) throw new InvalidOperationException(report);
                 });
                 RunStepOnce("camper-modules", delegate
@@ -98,7 +99,7 @@ namespace Rebirth.Bootstrap
                         RebirthCamperCharacterAccess.CurrentCreation,
                         _modInstance?.Path);
                 });
-                RunStepOnce("metabolism", delegate { string report = RebirthMetabolismInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("metabolism", delegate { string report = RebirthMetabolismInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
                 RunStepOnce("cooking", RebirthCookingBatch.Install);
                 RunStepOnce("recycling", RebirthRecyclerInstaller.Install);
                 RunStepOnce("player-consumption-originals",RebirthConsumptionDurableDelivery.EnableReviewedInventoryOriginals);
@@ -127,28 +128,28 @@ namespace Rebirth.Bootstrap
                 });
                 RunStepOnce("inventory-info-window-lookup", RebirthInventoryInfoWindowLookup.Install);
                 RunStepOnce("ui-input-style-subscriptions", RebirthInputStyleSubscriptions.Install);
-                RunStepOnce("toolbelt-capacity", delegate { string report = RebirthToolbeltCapacityInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
-                RunStepOnce("poi-sense", delegate { string report = RebirthPoiSenseRuntimeIntegration.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("toolbelt-capacity", delegate { string report = RebirthToolbeltCapacityInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
+                RunStepOnce("poi-sense", delegate { string report = RebirthPoiSenseRuntimeIntegration.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
                 RunStepOnce("spawn-composition-service", RebirthSpawnCompositionService.Initialize);
-                RunStepOnce("spawn-composition-runtime", delegate { string report = RebirthSpawnCompositionRuntimeIntegration.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("spawn-composition-runtime", delegate { string report = RebirthSpawnCompositionRuntimeIntegration.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
                 RunStepOnce("vehicle-restoration", RebirthVehicleRestorationInstaller.Install);
-                RunStepOnce("vehicle-respawn", delegate { string report = RebirthVehicleRespawnPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("vehicle-respawn", delegate { string report = RebirthVehicleRespawnPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
                 RunStepOnce("fire", delegate
                 {
                     string report=RebirthFirePatchInstaller.Install();
                     if(!RebirthFirePatchInstaller.IsInstalled)throw new InvalidOperationException(report);
-                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)Log.Out(report);
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)RebirthDebug.Log("bootstrap", report);
                 });
                 RunStepOnce("heat-map", delegate
                 {
                     string report=RebirthHeatMapLifecycleInstaller.Install();
                     if(!RebirthHeatMapLifecycleInstaller.IsInstalled)throw new InvalidOperationException(report);
-                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)Log.Out(report);
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)RebirthDebug.Log("bootstrap", report);
                 });
                 RunStepOnce("held-item-animator", delegate
                 {
                     string report = RebirthCustomHeldItemAnimatorPreserver.Install();
-                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report);
+                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report);
                     if (!RebirthCustomHeldItemAnimatorPreserver.IsInstalled) throw new InvalidOperationException(report);
                 });
                 RunStepOnce("tree-replant", RebirthAutoReplantTreesInstaller.Install);
@@ -163,15 +164,21 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("workstation-fuel", delegate
                 {
                     string report = RebirthWorkstationFuelPreservationInstaller.Install();
-                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report);
+                    if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report);
                     if (!RebirthWorkstationFuelPreservationInstaller.IsInstalled) throw new InvalidOperationException(report);
                 });
-                RunStepOnce("weather-fog", delegate { string report = RebirthWeatherFogPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
-                RunStepOnce("uniform-atmosphere", delegate { string report = RebirthUniformAtmospherePatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
-                RunStepOnce("pitch-black", delegate { string report = RebirthPitchBlackPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("weather-fog", delegate { string report = RebirthWeatherFogPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
+                RunStepOnce("uniform-atmosphere", delegate { string report = RebirthUniformAtmospherePatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
+                RunStepOnce("pitch-black", delegate { string report = RebirthPitchBlackPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", report); });
 
-                lock (Sync) overallState = RebirthBootstrapInstallState.Complete;
-                { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Fresh] Bootstrap initialized. modules="
+                lock (Sync)
+                {
+                    overallState = FailedSteps.Count == 0 ? RebirthBootstrapInstallState.Complete : RebirthBootstrapInstallState.Partial;
+                    if (FailedSteps.Count > 0) lastFailure = "failed steps: " + string.Join(", ", FailedSteps);
+                }
+                if (FailedSteps.Count > 0)
+                    Log.Error("[REBIRTH Fresh] bootstrap Partial: all other steps installed; failed steps: " + string.Join(", ", FailedSteps));
+                { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) RebirthDebug.Log("bootstrap", "[REBIRTH Fresh] Bootstrap initialized. modules="
                     + RebirthModuleRegistry.GetModulesSnapshot().Length
                     + " patchEntries=" + RebirthPatchRegistry.GetEntriesSnapshot().Length
                     + " harmonyMode=targeted-installers state=Complete"); }
@@ -202,9 +209,12 @@ namespace Rebirth.Bootstrap
             }
             catch (Exception error)
             {
-                lock (Sync) Steps[name] = RebirthBootstrapInstallState.Failed;
+                lock (Sync) { Steps[name] = RebirthBootstrapInstallState.Failed; FailedSteps.Add(name); }
                 Log.Error("[REBIRTH Fresh] bootstrap step '" + name + "' failed: " + error);
-                throw;
+                // Owner 2026-11-09: one failed step used to abort every later step, so a dedicated server ran without
+                // Survivor, metabolism, cooking, recycling... Only the core Harmony step is fatal; every other step
+                // is independent and checks its own preconditions, so the bootstrap continues and ends Partial.
+                if (name == "harmony-core") throw;
             }
         }
 

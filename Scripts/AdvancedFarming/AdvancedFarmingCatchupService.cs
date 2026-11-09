@@ -146,7 +146,7 @@ public static class AdvancedFarmingCatchupService
             return;
 
         s_catchupDebugSequence++;
-        Log.Out("[AdvancedFarming CatchupDebug] #" + s_catchupDebugSequence + " " + message);
+        RebirthDebug.Log("advancedfarming", "[AdvancedFarming CatchupDebug] #" + s_catchupDebugSequence + " " + message);
     }
 
     private static string SafeBlockName(BlockValue blockValue)
@@ -2333,7 +2333,7 @@ public static class AdvancedFarmingCatchupService
 
         string report = CompleteCatchupWatch(world, "areaProcess", false, anchorPos);
         if (!string.IsNullOrEmpty(report))
-            Log.Out(report);
+            RebirthDebug.Log("advancedfarming", report);
     }
 
     private static bool IsCatchupWatchCompletionDue(Vector3i anchorPos)

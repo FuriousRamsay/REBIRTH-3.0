@@ -90,11 +90,17 @@ public static class RebirthBlockPickupClassifier
         if (block == null)
             return RebirthBlockPickupDecision.DeniedUnknown;
 
+        // Profiler 2026-11-08: Evaluate itself allocated ~33 KB/s, so the cache array was being rebuilt instead of
+        // reused. Rebuild only for a real new block list; without one, answer uncached and allocate no array.
+        Block[] blocks = Block.list;
+        if (blocks == null)
+            return EvaluateUncached(block);
         RebirthBlockPickupDecision[] local = cache;
-        if (local == null || Block.list == null || local.Length != Block.list.Length)
+        if (local == null || local.Length != blocks.Length)
         {
-            local = new RebirthBlockPickupDecision[Block.list != null ? Block.list.Length : 0];
+            local = new RebirthBlockPickupDecision[blocks.Length];
             cache = local;
+            RebirthDebug.Log("BlockPickup", "[REBIRTH BlockPickup] classifier cache built for " + blocks.Length + " blocks");
         }
 
         int id = block.blockID;

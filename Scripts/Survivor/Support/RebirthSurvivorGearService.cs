@@ -323,7 +323,7 @@ public static class RebirthSurvivorGearService
         if (player.bag.ItemGrid.items == null || player.bag.ItemGrid.items.Length != desiredSlots) return false;
         PackedBoolArray locks = player.bag.LockedSlots;
         if (locks != null && locks.Length != desiredSlots) locks.Length = desiredSlots;
-        if (notify) { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor] physical backpack capacity entity=" + player.entityId + " slots=" + desiredSlots); }
+        if (notify) { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor] physical backpack capacity entity=" + player.entityId + " slots=" + desiredSlots); }
         return true;
     }
 

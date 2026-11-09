@@ -16,7 +16,15 @@ internal static class RebirthPlacedWorkmanshipIdentity
     internal static bool AcceptedUpgrade(WorldBase world,Vector3i position)=>active!=null&&active.Upgrade&&active.Accepted&&ReferenceEquals(active.World,world)&&active.Position==position;
     internal static bool AcceptedPlacement(WorldBase world,Vector3i position)=>active!=null&&!active.Upgrade&&active.Accepted&&ReferenceEquals(active.World,world)&&active.Position==position;
     internal static void Install(Harmony harmony){RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthPlacedWorkmanshipBlockCommit));}
-    private static string Key(Vector3i position)=>Prefix+(position.x&15)+":"+position.y+":"+(position.z&15);
+    // Cached per local chunk position (profiler 2026-11-08: a new string per call); out-of-range y builds one.
+    private static readonly string[] keyTable=new string[16*256*16];
+    private static string Key(Vector3i position)
+    {
+        int x=position.x&15,z=position.z&15,y=position.y;
+        if(y<0||y>255)return Prefix+x+":"+y+":"+z;
+        int index=(y<<8)|(z<<4)|x;
+        return keyTable[index]??(keyTable[index]=Prefix+x+":"+y+":"+z);
+    }
     private static Chunk ChunkAt(WorldBase world,Vector3i position)=>world?.GetChunkSync(World.toChunkXZ(position.x),World.toChunkXZ(position.z)) as Chunk;
     private static bool Current(WorldBase world,Chunk chunk)=>ThreadManager.IsMainThread()&&world!=null&&!world.IsRemote()&&ReferenceEquals(GameManager.Instance?.World,world)&&chunk!=null&&!chunk.InProgressUnloading;
     internal static string NativeKey(Vector3i position)=>Key(position);

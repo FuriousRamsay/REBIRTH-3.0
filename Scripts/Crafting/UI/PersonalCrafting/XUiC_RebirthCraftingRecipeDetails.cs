@@ -118,7 +118,9 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         ApplyGeometry(false);
 
         Recipe current = owner?.Coordinator?.SelectedRecipe ?? (catalogue != null ? catalogue.CurrentRecipe : null);
-        if (current != selectedRecipe)
+        // Compare with what was last requested, not selectedRecipe: scrap-only stations store null there, which re-ran
+        // ApplyRecipe every frame (profiler 2026-11-08, about 4 s of dips in 15 minutes).
+        if (current != lastRequestedRecipe)
             ApplyRecipe(current, true);
 
         // Preserve the zero state here: Math.Max(1, Count) hid the 1 -> 0 transition.
@@ -245,8 +247,11 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         Render();
     }
 
+    private Recipe lastRequestedRecipe;
+
     private void ApplyRecipe(Recipe recipe, bool resetCount)
     {
+        lastRequestedRecipe = recipe;
         bool changed = selectedRecipe != recipe;
         selectedRecipe = RebirthScrapWindow.Active ? null : recipe;
         if (changed) selectedCraftingTier = ResolveCraftingTier(recipe);
@@ -407,7 +412,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         if (emptyLabel != null)
         {
             emptyLabel.Text = RebirthScrapWindow.IsModifier
-                ? Localize("xuiRebirthModifierInstructions", "Place armor and a kit in the slots, then press Apply. The result goes to Output.")
+                ? ModifierText()
                 : RebirthScrapWindow.Active
                 ? Localize("xuiRebirthRecyclingInstructions", "Shift-click a purple item to scrap it, or drop it in the recycling slot. Click a purple item to see what it scraps into.")
                 : Localize("xuiRebirthSelectRecipePrompt", "Select a recipe to view its details.");
@@ -514,8 +519,31 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         XUiController actionStrip = GetChildById("rebirthCraftingActionsStrip");
         SetRect(actionStrip, 14, -actionY, Math.Max(260, width - 28), 34);
         actions?.ApplyGeometry(true);
-        SetRect(GetChildById("rebirthCraftingSelectedRecipeEmpty"), 16, -74, Math.Max(200, width - 32), 80);
+        // The Modifier Station guide is several lines (armor bonus focus, owner 2026-11-08).
+        SetRect(GetChildById("rebirthCraftingSelectedRecipeEmpty"), RebirthScrapWindow.IsModifier ? 24 : 16, -74, Math.Max(200, width - (RebirthScrapWindow.IsModifier ? 48 : 32)), RebirthScrapWindow.IsModifier ? Math.Max(80, height - 120) : 80);
     }
+
+    /// <summary>Step-by-step help for the Modifier Station, written by the bonus workspace for the kit in the slot.</summary>
+    internal static string ModifierGuide = string.Empty;
+
+    /// <summary>Shows the current Modifier guide when nothing is selected (the guide replaces the one-line prompt).</summary>
+    internal void RefreshModifierGuide()
+    {
+        if (emptyLabel == null || !RebirthScrapWindow.IsModifier || !emptyLabel.IsVisible) return;
+        if (emptyLabel.label != null && emptyLabel.label.alignment != NGUIText.Alignment.Left) emptyLabel.label.alignment = NGUIText.Alignment.Left;
+        string text = ModifierText();
+        if (emptyLabel.Text != text) emptyLabel.Text = text;
+    }
+
+    /// <summary>True while the centre visual (XUiC_RebirthBonusCentre) covers the empty prompt; the prompt is then blank.</summary>
+    internal static bool ModifierVisualActive;
+
+    /// <summary>Nothing is selected: the empty prompt is showing (the Modifier centre visual may cover it).</summary>
+    internal bool EmptyPromptVisible => emptyLabel != null && emptyLabel.IsVisible;
+
+    private string ModifierText() => ModifierVisualActive ? string.Empty : string.IsNullOrEmpty(ModifierGuide)
+        ? Localize("xuiRebirthModifierInstructions", "Place armor and a kit in the slots, then press Apply. The result goes to Output.")
+        : ModifierGuide;
 
     private int ResolveCraftingTier(Recipe recipe)
     {
@@ -531,7 +559,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         if (nextTier == selectedCraftingTier) return;
         selectedCraftingTier = nextTier;
         owner?.AdvanceCraftIntentEpoch();
-        Log.Out("[REBIRTH Crafting Quality] recipe=" + selectedRecipe.GetName() + " selected=" + selectedCraftingTier);
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting Quality] recipe=" + selectedRecipe.GetName() + " selected=" + selectedCraftingTier);
         RefreshNow();
     }
 

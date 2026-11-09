@@ -32,7 +32,7 @@ internal static class RebirthInventoryGestureTrace
         var player=slot.xui.playerUI.entityPlayer;
         var held=slot.xui.DragAndDropWindow?.CurrentStack;
         var item=slot.ItemStack;
-        Log.Out("[InventoryGesture] frame="+Time.frameCount+" phase="+phase+" nativeRan="+ran+
+        RebirthDebug.Log("ui", "[InventoryGesture] frame="+Time.frameCount+" phase="+phase+" nativeRan="+ran+
             " controller="+slot.GetType().Name+" slot="+slot.SlotNumber+" over="+slot.isOver+
             " visible="+slot.ViewComponent?.IsVisible+" press="+slot.ViewComponent?.EventOnPress+
             " item="+(item?.IsEmpty()==false?item.itemValue.ItemClass.GetItemName()+":"+item.count:"empty")+
@@ -92,7 +92,7 @@ internal static class RebirthCreativeTransferTrace
         if(slot?.StackLocation==XUiC_ItemStack.StackLocationTypes.Backpack && bag!=null && slot.SlotNumber>=0 && slot.SlotNumber<bag.Length)
             bagState+=" bagSlot="+(bag[slot.SlotNumber]?.IsEmpty()==false?bag[slot.SlotNumber].itemValue.ItemClass.GetItemName()+":"+bag[slot.SlotNumber].count:"empty");
         var mouse=UICamera.GetMouse?.Invoke(0);
-        Log.Out("[REBIRTH CreativeTransfer] frame="+Time.frameCount+" phase="+phase+
+        RebirthDebug.Log("ui", "[REBIRTH CreativeTransfer] frame="+Time.frameCount+" phase="+phase+
             " source="+(slot==null?"none":slot.GetType().Name+":"+slot.StackLocation+":"+slot.SlotNumber)+
             " item="+(item?.IsEmpty()==false?item.itemValue?.ItemClass?.GetItemName()+":"+item.count:"empty")+
             " cursor="+(held?.IsEmpty()==false?held.itemValue?.ItemClass?.GetItemName()+":"+held.count:"empty")+
@@ -130,7 +130,7 @@ internal static class RebirthInventoryGestureBoundaryTrace
         if(!__runOriginal&&described.Add(__originalMethod))
         {
             var patches=Harmony.GetPatchInfo(__originalMethod);
-            if(patches!=null)Log.Out("[InventoryGesture] suppressed="+__originalMethod.Name+" candidatePrefixes="+
+            if(patches!=null)RebirthDebug.Log("ui", "[InventoryGesture] suppressed="+__originalMethod.Name+" candidatePrefixes="+
                 string.Join(";",patches.Prefixes.Select(p=>p.owner+":"+p.PatchMethod.DeclaringType?.Name)));
         }
     }

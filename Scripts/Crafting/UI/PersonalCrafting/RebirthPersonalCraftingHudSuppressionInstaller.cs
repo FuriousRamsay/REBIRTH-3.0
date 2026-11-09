@@ -111,6 +111,11 @@ internal static class RebirthPersonalCraftingSetAllChildrenDirtyPatch
     [HarmonyPrefix]
     private static bool Prefix(XUiController __instance)
     {
+#if REBIRTH_DEBUG
+        // Owner 2026-11-08: picking up an item in a station redraws every backpack slot. Name the caller.
+        if(__instance is XUiC_RebirthStationWorkspace&&RebirthDebug.IsOn("Crafting"))
+            RebirthDebug.Log("Crafting","[REBIRTH StationRedraw] whole-window SetAllChildrenDirty frame="+UnityEngine.Time.frameCount+"\n"+System.Environment.StackTrace);
+#endif
         if(__instance is XUiC_RebirthCookingStation cooking)
         {
             cooking.GetChildByType<XUiC_RebirthCookingWorkspace>()?.RefreshStationState();

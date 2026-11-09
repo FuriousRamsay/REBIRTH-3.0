@@ -44,6 +44,16 @@ internal static class RebirthPurgeTruckStart
             ", attached="+(player.AttachedToEntity?.entityId??0);
     }
     private static string RecordPath=>Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PurgeRoadStart","initial-truck.json");
+    /// <summary>True on the authority while no starter truck has been placed in this world (no starter record).</summary>
+    internal static bool StarterUnclaimed=>!File.Exists(RecordPath);
+    private const float ClientWaitSeconds=90f;
+    private static float clientWaitSince;
+    private static bool clientWaitTimedOut;
+    // Owner 2026-11-09: an interrupted first entry (road search still running when the player quit) left the world
+    // with no starter truck, and every later join (JoinMultiplayer) was ignored, so that player never got one.
+    // A join is also a start spawn; the authority still creates a starter only while none has been claimed, and
+    // answers "no claim" at once for players who do not need one (client clientState 1 -> normal spawn).
+    internal static bool StartSpawn(RespawnType reason)=>reason==RespawnType.NewGame||reason==RespawnType.EnterMultiplayer||reason==RespawnType.JoinMultiplayer;
     private static string Owner(EntityPlayer player)=>GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId)?.PrimaryId?.CombinedString
         ??(player is EntityPlayerLocal?GameManager.Instance.getPersistentPlayerID(null)?.CombinedString:null);
     private static void PrepareStarterParts(EntityVehicle vehicle,World world)
@@ -82,9 +92,11 @@ internal static class RebirthPurgeTruckStart
         ModEvents.PlayerSpawnedInWorld.RegisterHandler(Spawned);ModEvents.GameUpdate.RegisterHandler(Update);
         ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);
     }
-    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data){Log.Out("[PurgeTruckStart] step=shutdown pending="+jobs.Count);jobs.Clear();finished.Clear();preparing.Clear();RebirthPurgeForestRoad.Reset();nativeSpawnObserved.Clear();nextPreparation.Clear();nextReply.Clear();localMove=null;clientSiteRevision=0;clientWorld=null;clientActor=clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
+    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data){RebirthDebug.Log("purge", "[PurgeTruckStart] step=shutdown pending="+jobs.Count);jobs.Clear();finished.Clear();preparing.Clear();RebirthPurgeForestRoad.Reset();nativeSpawnObserved.Clear();nextPreparation.Clear();nextReply.Clear();localMove=null;clientSiteRevision=0;clientWorld=null;clientActor=clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
     private static void Step(Job job,string step,EntityVehicle inspect=null)
-    {float now=Time.realtimeSinceStartup;if(job.Step==step&&now-job.LastLog<5)return;job.Step=step;job.LastLog=now;Log.Out("[PurgeTruckStart] step="+step+" player="+job.Player.entityId+" vehicle="+job.Record.Vehicle+" stage="+job.Record.Stage+" position="+job.Player.position);if(inspect!=null)Stable(inspect,true);}
+    {float now=Time.realtimeSinceStartup;if(job.Step==step&&now-job.LastLog<5)return;job.Step=step;job.LastLog=now;
+        string line="[PurgeTruckStart] step="+step+" player="+job.Player.entityId+" vehicle="+job.Record.Vehicle+" stage="+job.Record.Stage+" position="+job.Player.position;
+        RebirthDebug.Log("purge",line);if(inspect!=null)Stable(inspect,true);}
     internal static void PresentStart(EntityPlayerLocal player)
     {
         if(player==null)return;
@@ -147,12 +159,19 @@ internal static class RebirthPurgeTruckStart
     {
         var player=controller.entityPlayerLocal;var world=player?.world;
         if(!Enabled||world==null||player.IsSpawned()||
-            (controller.respawnReason!=RespawnType.NewGame&&controller.respawnReason!=RespawnType.EnterMultiplayer))return true;
+            !StartSpawn(controller.respawnReason))return true;
         localMove=controller;
         if(world.IsRemote())
         {
             if(!ReferenceEquals(clientWorld,world)||clientActor!=player.entityId)
-            {clientSiteRevision=0;clientWorld=world;clientActor=player.entityId;clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();}
+            {clientSiteRevision=0;clientWorld=world;clientActor=player.entityId;clientVehicle=0;clientState=0;clientNext=0;clientOwnsProgress=false;clientStability.Reset();clientWaitSince=Time.realtimeSinceStartup;clientWaitTimedOut=false;}
+            // Owner 2026-11-09: the client waited for the truck with no limit and players force-closed the game on
+            // "building environment". After ClientWaitSeconds the player spawns normally; the server start continues.
+            if(Time.realtimeSinceStartup-clientWaitSince>ClientWaitSeconds)
+            {
+                if(!clientWaitTimedOut){clientWaitTimedOut=true;Log.Warning("[PurgeTruckStart] client waited "+ClientWaitSeconds+"s for the starter truck (state="+clientState+" vehicle="+clientVehicle+"); spawning normally");}
+                return true;
+            }
             QueryClient(player);
             if(clientState==1)return true; // Authority confirms no starter claim for this player.
             var replica=world.GetEntity(clientVehicle) as EntityVehicle;
@@ -187,7 +206,7 @@ internal static class RebirthPurgeTruckStart
         if(job.Player is EntityPlayerLocal local&&localMove?.entityPlayerLocal==local)localMove.spawnPosition=anchor;
         job.Player.SetPosition(anchor.position,true);
         if(File.Exists(RecordPath))Write(job.Record);
-        Log.Out("[PurgeTruckStart] step=road.new-site revision="+job.SiteRevision+" from="+old+" to="+road.position+" minimumSeparation=256");
+        RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.new-site revision="+job.SiteRevision+" from="+old+" to="+road.position+" minimumSeparation=256");
         job.Next=now+.5f;return true;
     }
     private static void QueryClient(EntityPlayerLocal player)
@@ -245,7 +264,9 @@ internal static class RebirthPurgeTruckStart
     }
     private static void Spawned(ref ModEvents.SPlayerSpawnedInWorldData data)
     {
-        var world=GameManager.Instance?.World;if(!Enabled||world==null||world.IsRemote())return;
+        var world=GameManager.Instance?.World;
+        RebirthSandboxTrace.Server("purge-start on spawn entity="+data.EntityId+" enabled="+Enabled+" remoteWorld="+(world?.IsRemote()==true)+" respawn="+data.RespawnType+" recordExists="+(world!=null&&System.IO.File.Exists(RecordPath)));
+        if(!Enabled||world==null||world.IsRemote())return;
         var player=world.GetEntity(data.EntityId) as EntityPlayer;if(player==null)return;
         // Server remote EntityPlayer.IsSpawned is not a client-entry witness.
         // Only the native event opens the post-entry driver/commit phase.
@@ -273,7 +294,7 @@ internal static class RebirthPurgeTruckStart
             }
             else
             {
-                if(reason!=RespawnType.NewGame&&reason!=RespawnType.EnterMultiplayer)return;
+                if(!StartSpawn(reason))return;
                 if(!RebirthPurgeForestRoad.Find(world,out var road))
                 {RebirthPurgeForestRoad.RetryFailedSearch(world);return;}
                 record=new StartRecord{World=world.worldState.Guid,Owner=owner,X=road.position.x,Y=road.position.y,Z=road.position.z,Heading=road.heading};
@@ -321,7 +342,7 @@ internal static class RebirthPurgeTruckStart
                             bool alternateClear=Clear(job.World,probe,p,out clearing);
                             if(!alternateClear&&!clearing)continue;
                             record.X=probe.X;record.Y=probe.Y;record.Z=probe.Z;relocated=true;
-                            Log.Out("[PurgeTruckStart] step=road.obstacle-avoided offset="+(distance*sign)+" position="+record.Position);break;
+                            RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.obstacle-avoided offset="+(distance*sign)+" position="+record.Position);break;
                         }
                         if(!relocated){Step(job,"wait.clear-loaded-road-footprint");job.Next=now+2;continue;}
                         if(clearing){Step(job,"wait.road-decoration-cleanup");job.Next=now+.5f;continue;}
@@ -368,7 +389,7 @@ internal static class RebirthPurgeTruckStart
                 Step(job,"gameplay.enable");record.Stage=2;Write(record);VehicleManager.Instance.TriggerSave();Reveal(job);
                 finished[p.entityId]=record.Vehicle;preparing.Remove(p.entityId);jobs.Remove(pair.Key);
                 if(p is EntityPlayerLocal introPlayer)RebirthPurgeInformationService.RevealIntro(introPlayer);
-                Log.Out("[PurgeTruckStart] Initial truck ready on a rural pine-forest road; driver attached.");
+                RebirthDebug.Log("purge", "[PurgeTruckStart] Initial truck ready on a rural pine-forest road; driver attached.");
             }
             catch(Exception e){job.Failure=e.Message;Log.Error("[PurgeTruckStart] Handoff stopped under loading cover without creating another truck: "+e.Message);}
         }
@@ -376,7 +397,7 @@ internal static class RebirthPurgeTruckStart
     private static bool Stable(EntityVehicle vehicle,bool diagnostic=false)
     {
         if(vehicle==null||vehicle.world==null||vehicle.ModelTransform==null||vehicle.PhysicsTransform==null||vehicle.vehicleRB==null||vehicle.isEntityRemote)
-        {if(diagnostic)Log.Out("[PurgeTruckStart] step=grounding.detail vehicle="+vehicle?.entityId+" pending=bindings-or-physics-owner origin="+Origin.position);return false;}
+        {if(diagnostic)RebirthDebug.Log("purge", "[PurgeTruckStart] step=grounding.detail vehicle="+vehicle?.entityId+" pending=bindings-or-physics-owner origin="+Origin.position);return false;}
         var rigidbody=vehicle.vehicleRB;var world=vehicle.world;
         var position=rigidbody.position+Origin.position;
         var chunk=world.GetChunkFromWorldPos(new Vector3i(position)) as Chunk;
@@ -393,7 +414,7 @@ internal static class RebirthPurgeTruckStart
         if(terrain==null)return false;
         float height=terrain.GetTerrainHeightAt(Mathf.RoundToInt(position.x),Mathf.RoundToInt(position.z));
         float poseError=Mathf.Max((vehicle.ModelTransform.position+Origin.position-position).sqrMagnitude,(vehicle.position-position).sqrMagnitude);
-        if(diagnostic)Log.Out("[PurgeTruckStart] step=grounding.detail vehicle="+vehicle.entityId+" entity="+vehicle.position+" rigidbody="+position+
+        if(diagnostic)RebirthDebug.Log("purge", "[PurgeTruckStart] step=grounding.detail vehicle="+vehicle.entityId+" entity="+vehicle.position+" rigidbody="+position+
             " velocity="+rigidbody.velocity+" angular="+rigidbody.angularVelocity+" contacts="+grounded+" loaded="+loaded+" upright="+vehicle.PhysicsTransform.up.y+
             " poseErrorSquared="+poseError+" terrain="+height+" origin="+Origin.position+" kinematic="+rigidbody.isKinematic+" RBActive="+vehicle.RBActive);
         return RebirthPurgeStartStability.Accept(loaded,grounded,rigidbody.velocity.sqrMagnitude,rigidbody.angularVelocity.sqrMagnitude,
@@ -438,7 +459,7 @@ internal static class RebirthPurgeTruckStart
                 if(y<=Mathf.CeilToInt(terrain)&&block.Block.shape.IsTerrain())continue;
                 if(RebirthPurgeStartPlacementPolicy.Removable(block.Block.GetBlockName(),block.Block.IsTerrainDecoration,block.Block.Properties.GetString("Shape")))
                 {decorations[at]=block;continue;}
-                Log.Out("[PurgeTruckStart] step=road.obstruction block="+block.Block.GetBlockName()+" position="+new Vector3i(x,y,z));return false;
+                RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.obstruction block="+block.Block.GetBlockName()+" position="+new Vector3i(x,y,z));return false;
             }
         }
         if(decorations.Count>0)
@@ -447,7 +468,7 @@ internal static class RebirthPurgeTruckStart
             foreach(var decoration in decorations)
                 world.SetBlockRPC(new BlockChangeInfo((BlockValueRef)decoration.Key,BlockValue.Air,true,false));
             clearing=true;
-            Log.Out("[PurgeTruckStart] step=road.decorations-cleared count="+decorations.Count+" position="+record.Position);
+            RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.decorations-cleared count="+decorations.Count+" position="+record.Position);
             return false; // Let native collision rebuild, then repeat full clearance before creating a truck.
         }
         foreach(var entity in world.Entities.list)
@@ -473,10 +494,10 @@ internal static class RebirthPurgeRoadSpawnSelection
     private static bool Prefix(World _world,ref SpawnPosition __result)
     {
         if(!RebirthPurgeTruckStart.CanChoose(_world))return true;
-        Log.Out("[PurgeTruckStart] step=native.spawn-selection");
+        RebirthDebug.Log("purge", "[PurgeTruckStart] step=native.spawn-selection");
         if(!RebirthPurgeForestRoad.Find(_world,out var road))return true;
         if(!RebirthPurgeForestRoad.PlayerAnchor(_world,road,out var player))return true;
-        Log.Out("[PurgeTruckStart] step=player.staging-anchor truck="+road.position+" player="+player.position);
+        RebirthDebug.Log("purge", "[PurgeTruckStart] step=player.staging-anchor truck="+road.position+" player="+player.position);
         __result=player;return false;
     }
 }
@@ -487,7 +508,7 @@ internal static class RebirthPurgeFreshRemoteRequest
     {
         __state=RebirthPurgeTruckStart.FreshRemoteRequest;
         RebirthPurgeTruckStart.FreshRemoteRequest=RebirthPurgeTruckStart.Enabled&&_cInfo!=null
-            &&!PlayerDataFile.Exists(GameIO.GetPlayerDataDir(),__instance.getPersistentPlayerID(_cInfo).CombinedString);
+            &&(!PlayerDataFile.Exists(GameIO.GetPlayerDataDir(),__instance.getPersistentPlayerID(_cInfo).CombinedString)||RebirthPurgeTruckStart.StarterUnclaimed);
     }
     private static void Postfix(ClientInfo _cInfo)=>RebirthPurgeTruckStart.PrepareRemote(_cInfo);
     private static Exception Finalizer(Exception __exception,bool __state){RebirthPurgeTruckStart.FreshRemoteRequest=__state;return __exception;}
@@ -498,7 +519,7 @@ internal static class RebirthPurgeFreshRemoteRequest
 internal static class RebirthPurgeInitialWorldReadiness
 {
     private static void Postfix(PlayerMoveController __instance,ref bool __result)
-    {if(__result&&(__instance.respawnReason==RespawnType.NewGame||__instance.respawnReason==RespawnType.EnterMultiplayer))__result=RebirthPurgeTruckStart.BeforeWorldReady(__instance);}
+    {if(__result&&RebirthPurgeTruckStart.StartSpawn(__instance.respawnReason))__result=RebirthPurgeTruckStart.BeforeWorldReady(__instance);}
 }
 [HarmonyPatch]
 internal static class RebirthPurgeInitialRevive
@@ -526,6 +547,6 @@ internal static class RebirthPurgeNativeSpawnTrace
         var player=__instance.entityPlayerLocal;
         if(!RebirthPurgeTruckStart.Enabled||player==null||!RebirthPurgeTruckStart.StartHandoffActive(player)||player.IsSpawned()||Time.realtimeSinceStartup<next)return;
         next=Time.realtimeSinceStartup+5;
-        Log.Out("[PurgeTruckStart] step=wait.native-respawn player="+player.entityId+" reason="+__instance.respawnReason+" timer="+__instance.respawnTime+" position="+player.position+" uiReady="+player.PlayerUI.xui.IsReady);
+        RebirthDebug.Log("purge", "[PurgeTruckStart] step=wait.native-respawn player="+player.entityId+" reason="+__instance.respawnReason+" timer="+__instance.respawnTime+" position="+player.position+" uiReady="+player.PlayerUI.xui.IsReady);
     }
 }

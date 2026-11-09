@@ -197,7 +197,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         FinishRebuild(true, "item-recipes", true);
         ApplyRows();
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting] item-recipes ingredient=" + ingredientFilter.itemValue.type +
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting] item-recipes ingredient=" + ingredientFilter.itemValue.type +
                 " name=" + ingredientFilterName + " matches=" + recipeInfos.Count);
     }
 
@@ -412,7 +412,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         if (MaxPixelOffset <= 0.5f || Math.Abs(delta) < 0.0001f)
         {
             if (RebirthLogSettings.CraftingUiLoggingEnabled)
-                Log.Out("[REBIRTH Crafting RecipeScroll] wheelIgnored source=" + (source ?? "unknown")
+                RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] wheelIgnored source=" + (source ?? "unknown")
                     + " delta=" + delta.ToString("0.###")
                     + " count=" + (recipeInfos != null ? recipeInfos.Count : 0)
                     + " max=" + MaxPixelOffset.ToString("0.0"));
@@ -707,7 +707,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         resetScrollOnNextRebuild = userEdit;
         pendingRebuildReason = userEdit ? "search-change-user" : "search-change-code";
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting RecipeScroll] searchChanged fromCode=" + changeFromCode
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] searchChanged fromCode=" + changeFromCode
                 + " text='" + (text ?? string.Empty) + "' reset=" + resetScrollOnNextRebuild);
         RefreshFilterVisuals();
     }
@@ -738,7 +738,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         XUiC_RebirthCraftingRecipeCatalogue previous = activeInstance;
         activeInstance = this;
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting RecipeScroll] authorityClaim reason=" + (reason ?? "unknown")
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] authorityClaim reason=" + (reason ?? "unknown")
                 + " instance=" + GetHashCode()
                 + " previous=" + (previous != null ? previous.GetHashCode().ToString() : "<none>"));
     }
@@ -789,7 +789,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
 
         UpdateScrollbarGeometry();
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting RecipeScroll] rebuild reason=" + (reason ?? "refresh")
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] rebuild reason=" + (reason ?? "refresh")
                 + " reset=" + requestedReset
                 + " ensureSelection=" + ensureSelectionVisible
                 + " count=" + countAfter
@@ -1280,7 +1280,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         if ((!RebirthPersonalCraftingState.LayoutDebugEnabled && !RebirthLogSettings.CraftingUiLoggingEnabled) || Math.Abs(before - after) < 0.05f)
             return;
 
-        Log.Out("[REBIRTH Crafting RecipeScroll] inputOffsetPx=" + before.ToString("0.0")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] inputOffsetPx=" + before.ToString("0.0")
             + " refreshReason=" + (string.IsNullOrEmpty(reason) ? "unknown" : reason)
             + " resultingOffsetPx=" + after.ToString("0.0")
             + " maxOffsetPx=" + MaxPixelOffset.ToString("0.0")
@@ -1390,7 +1390,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         lastTraceTarget = targetScrollOffsetPixels;
         lastTraceFirst = firstVisibleIndex;
         lastTraceCount = count;
-        Log.Out("[REBIRTH Crafting RecipeScroll] snapshot instance=" + GetHashCode()
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting RecipeScroll] snapshot instance=" + GetHashCode()
             + " active=" + (activeInstance == this)
             + " reason=" + (reason ?? "unknown")
             + " current=" + scrollOffsetPixels.ToString("0.0")

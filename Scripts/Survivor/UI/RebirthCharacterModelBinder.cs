@@ -84,7 +84,7 @@ public sealed class RebirthCharacterModelBinder
         view.Texture = hit;
         view.IsVisible = true;
         LastPrepareMs = 0; LastFinishMs = 0;
-        if (logLabel != null && LogStages) Log.Out(logLabel + " model ms=0 stage=cache-hit entity=" + player.entityId);
+        if (logLabel != null && LogStages) RebirthDebug.Log("survivor", logLabel + " model ms=0 stage=cache-hit entity=" + player.entityId);
         return true;
     }
 
@@ -301,11 +301,11 @@ public sealed class RebirthCharacterModelBinder
                     light.color = new Color(1f, 0.93f, 0.86f, 1f);
                 }
                 if (RebirthLogSettings.CharacterProgressionUiLoggingEnabled)
-                    Log.Out(LogPrefix + " full-body bounds=" + bounds.size + " orthographicSize=" + camera.orthographicSize
+                    RebirthDebug.Log("survivor", LogPrefix + " full-body bounds=" + bounds.size + " orthographicSize=" + camera.orthographicSize
                         + " aspect=" + aspect + " texture=" + TextureWidth + "x" + TextureHeight);
                 PrepareMs = prepareTimer.ElapsedMilliseconds;
                 if (label != null && !Quiet)
-                    Log.Out(label + " model ms=" + PrepareMs + " stage=prepare(CreateVizUI+rig+camera) entity=" + entityId);
+                    RebirthDebug.Log("survivor", label + " model ms=" + PrepareMs + " stage=prepare(CreateVizUI+rig+camera) entity=" + entityId);
                 return true;
             }
             catch (Exception ex)
@@ -335,7 +335,7 @@ public sealed class RebirthCharacterModelBinder
                     Graphics.Blit(renderSystem.RenderTex, gpuImage);
                     FinishMs = timer.ElapsedMilliseconds;
                     if (label != null && !Quiet)
-                        Log.Out(label + " model ms=" + FinishMs + " stage=finish(render+gpu-copy) entity=" + entityId);
+                        RebirthDebug.Log("survivor", label + " model ms=" + FinishMs + " stage=finish(render+gpu-copy) entity=" + entityId);
                     return gpuImage;
                 }
                 RenderTexture previous = RenderTexture.active;

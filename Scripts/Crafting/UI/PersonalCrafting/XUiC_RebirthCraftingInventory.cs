@@ -369,7 +369,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
 
         itemControllers = discovered;
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting InventoryTrace] EnsureItemControllers recovered=" + itemControllers.Length
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] EnsureItemControllers recovered=" + itemControllers.Length
                 + " viewType=" + (ViewComponent != null ? ViewComponent.GetType().Name : "<null>"));
         for (int i = 0; i < itemControllers.Length; i++)
         {
@@ -440,7 +440,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
         }
 
         XUiV_Grid grid = ViewComponent as XUiV_Grid;
-        Log.Out("[REBIRTH Crafting InventoryTrace] reason=" + (reason ?? "unknown")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting InventoryTrace] reason=" + (reason ?? "unknown")
             + " bagPresent=" + (RebirthCraftingInventoryBridge.GetBag(xui) != null)
             + " sourceLen=" + sourceLength
             + " sourceNonEmpty=" + sourceNonEmpty

@@ -147,6 +147,7 @@ internal static class RebirthCamperOwnCollision
         state.HoodController=controller;state.HoodIgnored=ignore;
     }
 
+    private static readonly List<Transform> hoodNodes=new List<Transform>();
     private static void BindHoodSupports(State state)
     {
         // These native compound solids are siblings of the visual addon, so
@@ -155,14 +156,19 @@ internal static class RebirthCamperOwnCollision
         var rails=state.Body.transform.Find("Turret-facing guardrail collision");
         state.BodyGuardrails=rails!=null?rails.gameObject:null;
         state.CabHull=null;state.HoodSupports.Clear();state.BareHull.Clear();
-        foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
+        // Profiler 2026-11-08 (~10 KB/s per camper): reuse one node list and read each Unity name (a new string per
+        // read) once instead of three times.
+        hoodNodes.Clear();state.Root.GetComponentsInChildren<Transform>(true,hoodNodes);
+        foreach(var node in hoodNodes)
         {
-            if(node.name=="CabHull")state.CabHull=node.GetComponent<BoxCollider>();
-            if(node.name.StartsWith("REBIRTH bare pickup "))
+            string name=node.name;
+            if(name=="CabHull")state.CabHull=node.GetComponent<BoxCollider>();
+            else if(name.StartsWith("REBIRTH bare pickup ",System.StringComparison.Ordinal))
             {var part=node.GetComponent<BoxCollider>();if(part!=null)state.BareHull.Add(part);}
-            if(node.name.StartsWith("REBIRTH travel Camp "))
+            else if(name.StartsWith("REBIRTH travel Camp ",System.StringComparison.Ordinal))
             {var existing=node.GetComponent<MeshCollider>();if(existing!=null)state.HoodSupports.Add(existing);}
         }
+        hoodNodes.Clear();
         if(state.CabHull!=null&&state.BareHull.Count==0)
         {
             // The cab's main solid stops below its roof. A shallow roof plate

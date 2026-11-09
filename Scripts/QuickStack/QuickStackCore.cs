@@ -53,7 +53,7 @@ public static class QuickStackDiagnostics
     }
     public static void Write(string text)
     {
-        if (configuredEnabled || QuickStackHotkeyDiagnostics.ConsumeLine()) Log.Out("[QuickStack] " + text);
+        if (configuredEnabled || QuickStackHotkeyDiagnostics.ConsumeLine()) RebirthDebug.Log("quickstack", "[QuickStack] " + text);
     }
 }
 

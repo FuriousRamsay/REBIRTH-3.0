@@ -290,7 +290,7 @@ public static partial class RebirthNpcAggregatePersistenceStore
             promotedQuarantinedDogs++;
             InvalidateReadViewLocked(id);
             record = RebirthNpcAggregateRecordCopy.Copy(candidate);
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC Aggregate] promoted quarantined dog after current-save entity proof stableId=" +
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("npc", "[REBIRTH NPC Aggregate] promoted quarantined dog after current-save entity proof stableId=" +
                     id + " saveScope=" + ShortScope(loadedSaveScope) + "."); }
             return true;
         }

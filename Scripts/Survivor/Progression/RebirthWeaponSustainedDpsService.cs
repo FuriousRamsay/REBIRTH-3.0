@@ -267,7 +267,7 @@ public static class RebirthWeaponSustainedDpsService
             bool saved=RebirthSkillAwardService.TryAwardCombatDurable(player,award.Skill,award.Amount,"combat-batch:"+award.Skill,0f,award.Receipt,out skill,out attribute);
             if(saved)lock(Gate)if(batch.InFlight.Remove(award))SettledCounts.GetOrCreateValue(player).Settled++;
             if (RebirthSkillEvalDiagnostics.On)
-                Log.Out("[REBIRTH SkillEval] combat award skill=" + award.Skill + " raw=" + award.Amount + " applied=" + skill + " attribute=" + attribute+" settled="+saved);
+                RebirthDebug.Log("survivor", "[REBIRTH SkillEval] combat award skill=" + award.Skill + " raw=" + award.Amount + " applied=" + skill + " attribute=" + attribute+" settled="+saved);
         }
         lock(Gate)if(batch.New.Count==0&&batch.InFlight.Count==0)PendingCombat.Remove(key);
     }
@@ -414,7 +414,7 @@ public static class RebirthWeaponSustainedDpsService
             bool shouldLog;
             lock (Gate) shouldLog = ReloadProfileDebugKeys.Add(key);
             if (shouldLog)
-                Log.Out("[REBIRTH RELOAD TIMING] DISPLAY-CANONICAL item='" +
+                RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] DISPLAY-CANONICAL item='" +
                     (held.ItemClass != null ? (held.ItemClass.GetItemName() ?? string.Empty) : string.Empty) +
                     "' entity=" + player.entityId.ToString(CultureInfo.InvariantCulture) +
                     " heldMeta=" + held.Meta.ToString(CultureInfo.InvariantCulture) +
@@ -1364,7 +1364,7 @@ public static class RebirthWeaponSustainedDpsService
         }
         if (ReloadTimingDebug)
         {
-            Log.Out("[REBIRTH RELOAD TIMING] START item='" + (held.ItemClass.GetItemName() ?? string.Empty) +
+            RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] START item='" + (held.ItemClass.GetItemName() ?? string.Empty) +
                 "' entity=" + player.entityId.ToString(CultureInfo.InvariantCulture) +
                 " authored=" + ReadReloadSeconds(held.ItemClass, held.ItemClass.Actions != null && held.ItemClass.Actions.Length > 0 ? held.ItemClass.Actions[0] : null).ToString("0.###", CultureInfo.InvariantCulture) +
                 " effectiveMultiplier=" + effectiveMultiplier.ToString("0.###", CultureInfo.InvariantCulture));
@@ -1416,7 +1416,7 @@ public static class RebirthWeaponSustainedDpsService
         if (!accepted)
         {
             if (ReloadTimingDebug)
-                Log.Out("[REBIRTH RELOAD TIMING] REJECT item='" + start.ItemName + "' wall=" + elapsed.ToString("0.###", CultureInfo.InvariantCulture) +
+                RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] REJECT item='" + start.ItemName + "' wall=" + elapsed.ToString("0.###", CultureInfo.InvariantCulture) +
                     "s game=" + gameElapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s reason=invalid-or-divergent-clocks");
             return;
         }
@@ -1427,7 +1427,7 @@ public static class RebirthWeaponSustainedDpsService
             RecentHeld.Clear();
         }
         if (ReloadTimingDebug)
-            Log.Out("[REBIRTH RELOAD TIMING] COMPLETE item='" + start.ItemName +
+            RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] COMPLETE item='" + start.ItemName +
                 "' entity=" + player.entityId.ToString(CultureInfo.InvariantCulture) +
                 " measuredEffective=" + elapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s" +
                 " gameElapsed=" + gameElapsed.ToString("0.###", CultureInfo.InvariantCulture) + "s" +
@@ -1488,7 +1488,7 @@ public static class RebirthWeaponSustainedDpsService
         try { heldModel = heldData != null ? heldData.model : null; } catch { }
         try { heldTransform = player.inventory != null ? player.inventory.GetHoldingItemTransform() : null; } catch { }
 
-        Log.Out("[REBIRTH RELOAD TIMING] PROFILE item='" + itemName +
+        RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] PROFILE item='" + itemName +
             "' entity=" + player.entityId.ToString(CultureInfo.InvariantCulture) +
             " skill='" + (skillId ?? string.Empty) + "'" +
             " source=" + (source ?? string.Empty) +
@@ -1530,7 +1530,7 @@ public static class RebirthWeaponSustainedDpsService
             AddReloadDebugAnimators(heldTransform, seen, animators);
             AddReloadDebugAnimators(player.transform, seen, animators);
 
-            Log.Out("[REBIRTH RELOAD TIMING] ROOTS heldData=" + (heldData != null ? "yes" : "no") +
+            RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] ROOTS heldData=" + (heldData != null ? "yes" : "no") +
                 " heldModel=" + DescribeTransform(heldData != null ? heldData.model : null) +
                 " heldTransform=" + DescribeTransform(heldTransform) +
                 " playerRoot=" + DescribeTransform(player.transform) +
@@ -1545,7 +1545,7 @@ public static class RebirthWeaponSustainedDpsService
                 RuntimeAnimatorController controller = animator.runtimeAnimatorController;
                 AnimationClip[] clips = controller != null ? controller.animationClips : null;
                 int roleScore = GetReloadAnimatorRoleScore(animator);
-                Log.Out("[REBIRTH RELOAD TIMING] ANIMATOR name='" + (animator.name ?? string.Empty) +
+                RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] ANIMATOR name='" + (animator.name ?? string.Empty) +
                     "' controller='" + (controller != null ? (controller.name ?? string.Empty) : "<null>") +
                     "' id=" + animator.GetInstanceID().ToString(CultureInfo.InvariantCulture) +
                     " active=" + (animator.gameObject != null && animator.gameObject.activeInHierarchy ? "1" : "0") +
@@ -1565,7 +1565,7 @@ public static class RebirthWeaponSustainedDpsService
                     if (!reloadNamed && (!includeAllClips || allClipLogged >= 40)) continue;
                     if (reloadNamed) reloadNamedCount++;
                     else allClipLogged++;
-                    Log.Out("[REBIRTH RELOAD TIMING] CLIP animator='" + (animator.name ?? string.Empty) +
+                    RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] CLIP animator='" + (animator.name ?? string.Empty) +
                         "' controller='" + (controller != null ? (controller.name ?? string.Empty) : "<null>") +
                         "' clip='" + (clip.name ?? string.Empty) +
                         "' length=" + clip.length.ToString("0.###", CultureInfo.InvariantCulture) +
@@ -1582,7 +1582,7 @@ public static class RebirthWeaponSustainedDpsService
                         {
                             AnimationClip clip = current[ci].clip;
                             if (clip == null) continue;
-                            Log.Out("[REBIRTH RELOAD TIMING] CURRENT layer=" + layer.ToString(CultureInfo.InvariantCulture) +
+                            RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] CURRENT layer=" + layer.ToString(CultureInfo.InvariantCulture) +
                                 " animator='" + (animator.name ?? string.Empty) +
                                 "' clip='" + (clip.name ?? string.Empty) +
                                 "' length=" + clip.length.ToString("0.###", CultureInfo.InvariantCulture) +
@@ -1593,7 +1593,7 @@ public static class RebirthWeaponSustainedDpsService
                 catch { }
             }
             if (reloadNamedCount == 0)
-                Log.Out("[REBIRTH RELOAD TIMING] CLIP no reload-named clips found on the held model/player hierarchy; authored Reload_time fallback will be used until a runtime reload is measured.");
+                RebirthDebug.Log("survivor", "[REBIRTH RELOAD TIMING] CLIP no reload-named clips found on the held model/player hierarchy; authored Reload_time fallback will be used until a runtime reload is measured.");
         }
         catch (Exception ex)
         {

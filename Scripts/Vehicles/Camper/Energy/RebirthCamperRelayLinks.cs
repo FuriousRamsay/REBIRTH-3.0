@@ -105,7 +105,7 @@ internal static partial class RebirthCamperRelayWiring
             if(liveOwner)throw new InvalidOperationException("Device already has another camper cable.");
             // The old vehicle is absent from the loaded area containing this
             // device, so its moving cable cannot still be supplying it.
-            Log.Out("[CamperRelay] Reclaiming orphan cable target="+tile.ToWorldPos()+" old="+priorOwner+" new="+owner);
+            RebirthDebug.Log("vehicles", "[CamperRelay] Reclaiming orphan cable target="+tile.ToWorldPos()+" old="+priorOwner+" new="+owner);
             tile.chunk.ChunkCustomData.Remove(StampKey(tile));tile.chunk.isModified=true;
         }
         var stamp=Guid.NewGuid();bytes=stamp.ToByteArray().Concat(owner.ToByteArray()).ToArray();

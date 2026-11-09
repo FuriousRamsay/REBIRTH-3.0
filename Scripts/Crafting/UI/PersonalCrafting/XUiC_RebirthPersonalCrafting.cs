@@ -291,7 +291,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         }
         else if (forceLog || (RebirthPersonalCraftingState.LayoutDebugEnabled && lastLoggedAudit != logLine))
         {
-            Log.Out(logLine);
+            RebirthDebug.Log("crafting", logLine);
         }
         if (!string.IsNullOrEmpty(logLine)) lastLoggedAudit = logLine;
         lastAuditInventoryMode = IsInventoryOnlyMode;
@@ -485,7 +485,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
             return;
         ActionSetManager stack = xui.playerUI.ActionSetManager;
         string top = stack == null || stack.Empty ? "<empty>" : stack.Top.GetType().Name;
-        Log.Out("[REBIRTH Crafting InputTrace] PC127 reason=" + reason
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting InputTrace] PC127 reason=" + reason
             + " surface=" + surfaceMode + " top=" + top
             + " controlOverrideWrites=0 stackResets=0");
     }
@@ -621,7 +621,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         // The visible quest tracker is already captured above through windowQuestTracker; keep
         // the model in diagnostics only so the HUD suppression path remains type-correct.
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting HUDTrace] questModel resolved=" + (xui.QuestTracker != null)
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] questModel resolved=" + (xui.QuestTracker != null)
                 + " type=" + (xui.QuestTracker != null ? xui.QuestTracker.GetType().Name : "<null>"));
 
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
@@ -633,7 +633,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         if (controller == null || controller.ViewComponent == null)
         {
             if (RebirthLogSettings.CraftingUiLoggingEnabled)
-                Log.Out("[REBIRTH Crafting HUDTrace] capture source=" + (source ?? "<unknown>") + " resolved=false");
+                RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] capture source=" + (source ?? "<unknown>") + " resolved=false");
             return;
         }
         if (!hudVisibilityBeforeOpen.ContainsKey(controller))
@@ -650,7 +650,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         if (!hudDormantBeforeOpen.ContainsKey(controller) && TryGetControllerDormant(controller, out dormantBefore))
             hudDormantBeforeOpen.Add(controller, dormantBefore);
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting HUDTrace] capture source=" + (source ?? "<unknown>")
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] capture source=" + (source ?? "<unknown>")
                 + " id=" + ControllerId(controller)
                 + " type=" + controller.GetType().Name
                 + " beforeVisible=" + controller.ViewComponent.IsVisible
@@ -708,7 +708,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         if (RebirthLogSettings.CraftingUiLoggingEnabled && Time.realtimeSinceStartup >= nextHudTrace)
         {
             nextHudTrace = Time.realtimeSinceStartup + 1.0f;
-            Log.Out("[REBIRTH Crafting HUDTrace] maintain captured=" + hudVisibilityBeforeOpen.Count
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] maintain captured=" + hudVisibilityBeforeOpen.Count
                 + " visibleAgainThisFrame=" + visibleAgain
                 + " reappliedSinceLastTrace=" + hudReappearSinceTrace
                 + " totalReapplies=" + hudReapplyCount);
@@ -801,7 +801,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
     private void RestoreGameplayHudOverlays()
     {
         if (RebirthLogSettings.CraftingUiLoggingEnabled)
-            Log.Out("[REBIRTH Crafting HUDTrace] restore captured=" + hudVisibilityBeforeOpen.Count
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] restore captured=" + hudVisibilityBeforeOpen.Count
                 + " totalReapplies=" + hudReapplyCount);
         foreach (KeyValuePair<XUiController, bool> pair in hudVisibilityBeforeOpen)
         {
@@ -833,7 +833,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         if (!RebirthLogSettings.CraftingUiLoggingEnabled)
             return;
         XUiController toolbelt = xui != null ? xui.FindWindowGroupByName("toolbelt") : null;
-        Log.Out("[REBIRTH Crafting HUDTrace] snapshot reason=" + (reason ?? "unknown")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] snapshot reason=" + (reason ?? "unknown")
             + " toolbelt=" + (toolbelt != null)
             + " captured=" + hudVisibilityBeforeOpen.Count);
     }
@@ -845,7 +845,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
 
         if (controller.ViewComponent != null && controller.ViewComponent.IsVisible)
         {
-            Log.Out("[REBIRTH Crafting HUDTrace] visible path=" + path
+            RebirthDebug.Log("crafting", "[REBIRTH Crafting HUDTrace] visible path=" + path
                 + " id=" + ControllerId(controller)
                 + " type=" + controller.GetType().Name);
             emitted++;
@@ -879,7 +879,7 @@ public sealed class XUiC_RebirthPersonalCrafting : XUiC_CraftingWindowGroup
         XUiController outcomeResults = GetChildById("rebirthCraftingOutcomeResultsPanel");
         XUiController quick = GetChildById("btnRebirthCraftingInventoryQuickStack");
         XUiController companions = GetChildById("btnRebirthCraftingInventoryCompanions");
-        Log.Out("[REBIRTH Crafting LayoutTrace] reason=" + (reason ?? "unknown")
+        RebirthDebug.Log("crafting", "[REBIRTH Crafting LayoutTrace] reason=" + (reason ?? "unknown")
             + " tabIcon=" + RectText(icon)
             + " tabLabel=" + RectText(label)
             + " outcomeMetrics=" + RectText(outcomeMetrics)

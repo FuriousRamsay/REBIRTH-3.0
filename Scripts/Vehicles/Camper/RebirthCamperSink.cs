@@ -149,7 +149,7 @@ internal static partial class RebirthCamperSink
         if(lastInputFrame==Time.frameCount&&lastInputActor==player.entityId)return false;
         lastInputFrame=Time.frameCount;lastInputActor=player.entityId;
         bool admitted=Admitted(vehicle,player);
-        Log.Out("[CamperSink] release action="+action+" vehicle="+vehicle.entityId+" admitted="+admitted);
+        RebirthDebug.Log("vehicles", "[CamperSink] release action="+action+" vehicle="+vehicle.entityId+" admitted="+admitted);
         if(!admitted)return false;
         int slot=inventory.holdingItemIdx;var cells=inventory.ItemGrid.items;
         if(slot<0||slot>=RebirthToolbeltCapacity.GetOwnedSlotCount(player,cells.Length)||!TryCurrentConversion(cells[slot],out _,out _,out _))

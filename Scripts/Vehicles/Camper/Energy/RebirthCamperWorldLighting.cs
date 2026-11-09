@@ -40,7 +40,15 @@ internal static class RebirthCamperWorldLighting
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperAuthoredLightIndexChanged));
         ModEvents.GameUpdate.RegisterHandler(Update);ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);installed=true;
     }
-    private static string Key(Vector3i p)=>MarkerPrefix+p.x+":"+p.y+":"+p.z;
+    // Marker keys are looked up every frame. Local chunk positions are bounded (16 x 256 x 16), so each key string
+    // is built once and reused. Racing writers store equal immutable strings, which is harmless.
+    private static readonly string[] keyTable=new string[16*256*16];
+    private static string Key(Vector3i p)
+    {
+        if(p.x<0||p.x>15||p.z<0||p.z>15||p.y<0||p.y>255)return MarkerPrefix+p.x+":"+p.y+":"+p.z;
+        int index=(p.y<<8)|(p.z<<4)|p.x;
+        return keyTable[index]??(keyTable[index]=MarkerPrefix+p.x+":"+p.y+":"+p.z);
+    }
     private static bool Trader(WorldBase world,Vector3i position)=>Admission?.bTraderArea==true||world is World current&&current.IsWithinTraderArea(position);
     private static byte[] Image(BlockValue value,byte provenance)
     {var bytes=new byte[8];bytes[0]=(byte)value.type;bytes[1]=(byte)(value.type>>8);bytes[2]=(byte)value.rotation;bytes[3]=provenance;Array.Copy(Guid.NewGuid().ToByteArray(),0,bytes,4,4);bytes[4]|=1;return bytes;}
@@ -171,7 +179,7 @@ internal static class RebirthCamperWorldLighting
         {
             double elapsed=1000.0*(System.Diagnostics.Stopwatch.GetTimestamp()-started)/System.Diagnostics.Stopwatch.Frequency;
             if(elapsed>=15)
-                Log.Out("[REBIRTH LightMigrationPerf] frame="+UnityEngine.Time.frameCount+
+                RebirthDebug.Log("vehicles", "[REBIRTH LightMigrationPerf] frame="+UnityEngine.Time.frameCount+
                     " chunk="+chunk.X+":"+chunk.Z+" ms="+elapsed.ToString("F2")+
                     " overlappingPoi="+overlapping+" scanned="+scanned+" created="+created+
                     " pending="+pendingAuthoredData);

@@ -596,7 +596,7 @@ public sealed class XUiC_RebirthChooseSurvivor : XUiController
         if (!RebirthSurvivorProfileStore.TryCreate(vm.ProfileName.Trim(), vm.BuildSelection(), vm.GetCreationChoicesSnapshot(), out created, out error))
             Log.Warning("[REBIRTH Survivor UI] world character created but reusable profile save failed: " + error);
         else
-            { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH Survivor UI] reusable profile saved after world creation id=" + created.ProfileId); }
+            { if (RebirthLogSettings.AutomaticLoggingDefault) RebirthDebug.Log("survivor", "[REBIRTH Survivor UI] reusable profile saved after world creation id=" + created.ProfileId); }
     }
 
     private void Leave_OnPressed(XUiController sender, int mouseButton) { RebirthSurvivorFirstEntryUiService.LeaveWorld(); }

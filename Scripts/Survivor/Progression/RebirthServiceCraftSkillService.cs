@@ -486,6 +486,7 @@ public static class RebirthCraftTrainingRules
     private static readonly System.Collections.Generic.Dictionary<string, float> Recommendations =
         new System.Collections.Generic.Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
     private static float referenceEffort = 10f, maximumRaw = 0.6f, practiceFade = 20f;
+    internal const float ArmorTailoringMinimum = 1.0f;
     private static float economicDivisor = 20f, unknownWeight = 0.25f;
 
     public static void Load(string configRoot)
@@ -581,6 +582,10 @@ public static class RebirthCraftTrainingRules
         float baseRate;
         if (!SkillRates.TryGetValue(skillId, out baseRate)) baseRate = RebirthServiceCraftSkillService.GetCraftAward(skillId, 1);
         float raw = Math.Min(maximumRaw, baseRate * units / referenceEffort * complexity * (rule == null ? 1f : rule.Multiplier));
+        // Armor and clothing teach Tailoring at least ArmorTailoringMinimum per piece (owner 2026-11-08: 1.0; scrapping
+        // gives half). The practice fade past the recipe's difficulty still applies, so easy pieces stop teaching.
+        if (string.Equals(skillId, "skill.tailoring", StringComparison.OrdinalIgnoreCase) && ItemClass.GetForId(recipe.itemValueType) is ItemClassArmor)
+            raw = Math.Max(raw, ArmorTailoringMinimum);
         float difficulty = Mathf.Clamp(5f + units * 1.5f + Math.Max(0, types.Count - 1) * 8f + authoredSeconds / 10f, 5f, 100f);
         float recommended;
         if (Recommendations.TryGetValue(name + "|" + skillId, out recommended)) difficulty = Math.Max(difficulty, recommended);

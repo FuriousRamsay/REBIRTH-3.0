@@ -20,7 +20,7 @@ public static class RebirthStealthTrainingService
         // Capture awareness before damageEntityLocal mutates alert/revenge state. A target already
         // attacking/revenging this player is not undetected. Alerted awake targets are also rejected
         // conservatively; sleepers and genuinely unalerted targets can qualify.
-        if (RebirthSkillEvalDiagnostics.On) Log.Out("[REBIRTH SkillEval] stealth check target=" + target.EntityName + " sleeping=" + target.IsSleeping + " waking=" + target.sleepingOrWakingUp + " alertTicks=" + target.GetAlertTicks() + " attackTarget=" + (target.GetAttackTarget() == attacker) + " revenge=" + (target.GetRevengeTarget() == attacker) + " skill=" + underlying);
+        if (RebirthSkillEvalDiagnostics.On) RebirthDebug.Log("survivor", "[REBIRTH SkillEval] stealth check target=" + target.EntityName + " sleeping=" + target.IsSleeping + " waking=" + target.sleepingOrWakingUp + " alertTicks=" + target.GetAlertTicks() + " attackTarget=" + (target.GetAttackTarget() == attacker) + " revenge=" + (target.GetRevengeTarget() == attacker) + " skill=" + underlying);
         if (target.GetAttackTarget() == attacker || target.GetRevengeTarget() == attacker) return false;
         if (!target.IsSleeping && (target.sleepingOrWakingUp || target.GetAlertTicks() > 0)) return false;
         return true;

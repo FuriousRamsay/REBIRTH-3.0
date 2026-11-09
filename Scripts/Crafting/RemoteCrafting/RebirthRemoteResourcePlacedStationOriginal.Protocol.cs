@@ -21,7 +21,16 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
             RebirthProductiveEarnedUiDeferredTransport.InstallSelectedSendObserver(); // Sole actual native receive-dequeue lineage, including PlayerId.
             InstallAcceptedUpload();
             InstallCancellation();
-            InstallCancellationReentry();
+            // Owner 2026-11-09: a dedicated server runs a different game assembly than the reviewed clients, and this
+            // qualification threw out of the whole REBIRTH bootstrap (no Survivor, metabolism, cooking...). An
+            // unreviewed build only loses placed remote-crafting cancellation recovery; the protocol stays inactive.
+            try { InstallCancellationReentry(); }
+            catch (NotSupportedException ex)
+            {
+                CancellationUnqualified = true;
+                Log.Warning("[REBIRTH RemoteResources] placed remote crafting stays off on this game build (" + ex.Message
+                    + "); everything else continues.");
+            }
             ModEvents.GameUpdate.RegisterHandler(ClientUpdate);protocolInfrastructure=true;
             // Deliberately does NOT activate. Only the separate explicit
             // source-review decision may enable before world creation.

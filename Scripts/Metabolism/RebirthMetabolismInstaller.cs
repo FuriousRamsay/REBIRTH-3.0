@@ -68,6 +68,7 @@ public static class RebirthMetabolismInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemTooltipPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemInfoPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthDrinkSlotPresentationPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthDrinkCountAlignmentBinding));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSelectedInfoSourcePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSelectedInfoPresentationPatch));
 
@@ -101,7 +102,7 @@ public static class RebirthMetabolismFoodUpdatePatch
         if (__instance.Food.Value > nutritionBeforeNativeTick)
         {
             if (RebirthMetabolismService.DebugEnabled)
-                Log.Out("[REBIRTH Metabolism] blocked pre-digestion native Nutrition gain="
+                RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] blocked pre-digestion native Nutrition gain="
                     + (__instance.Food.Value - nutritionBeforeNativeTick).ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
             __instance.Food.Value = nutritionBeforeNativeTick;
         }
@@ -135,7 +136,7 @@ public static class RebirthMetabolismWaterUpdatePatch
         if (__instance.Water.Value > hydrationBeforeNativeTick)
         {
             if (RebirthMetabolismService.DebugEnabled)
-                Log.Out("[REBIRTH Metabolism] blocked pre-absorption native Hydration gain="
+                RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] blocked pre-absorption native Hydration gain="
                     + (__instance.Water.Value - hydrationBeforeNativeTick).ToString("0.000", System.Globalization.CultureInfo.InvariantCulture));
             __instance.Water.Value = hydrationBeforeNativeTick;
         }
@@ -277,7 +278,7 @@ public static class RebirthMetabolismSpawnPatch
             if (RebirthSurvivorMetabolismCreationGate.ShouldDefer(player))
             {
                 if (RebirthMetabolismService.DebugEnabled)
-                    Log.Out("[REBIRTH Metabolism] spawn initialization deferred pending Survivor origin entity="
+                    RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] spawn initialization deferred pending Survivor origin entity="
                         + player.entityId + " reason=" + _respawnReason.ToStringCached<RespawnType>());
                 return;
             }

@@ -8,7 +8,14 @@ internal enum RebirthCamperPoiLightChoice:byte {Automatic=0,On=1,Off=2}
 internal static class RebirthCamperPoiLightChoices
 {
     private const string Prefix="rebirth.poi.light.choice.v1:";
-    private static string Key(Vector3i p)=>Prefix+p.x+":"+p.y+":"+p.z;
+    // Cached per local chunk position (profiler 2026-11-08: a new string per call); out-of-range positions build one.
+    private static readonly string[] keyTable=new string[16*256*16];
+    private static string Key(Vector3i p)
+    {
+        if(p.x<0||p.x>15||p.z<0||p.z>15||p.y<0||p.y>255)return Prefix+p.x+":"+p.y+":"+p.z;
+        int index=(p.y<<8)|(p.z<<4)|p.x;
+        return keyTable[index]??(keyTable[index]=Prefix+p.x+":"+p.y+":"+p.z);
+    }
     private static bool Current(World world,TileEntity tile,out Chunk chunk,out BlockValue block,out uint stamp)
     {
         chunk=null;block=default(BlockValue);stamp=0;
