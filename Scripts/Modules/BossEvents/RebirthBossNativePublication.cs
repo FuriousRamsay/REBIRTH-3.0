@@ -15,6 +15,11 @@ internal static class RebirthBossNativePublication
     private static readonly Dictionary<Guid,Removing> removing=new Dictionary<Guid,Removing>();
     private static World scope;private static string directory;private static float nextUpdate;private static int reservedFloor;private static bool idsIndexed;
     private static bool retirementInstalled;
+    private static readonly string[] OriginalIdentityCVarNames =
+    {
+        "rebirthBossOriginal0", "rebirthBossOriginal1", "rebirthBossOriginal2", "rebirthBossOriginal3",
+        "rebirthBossOriginal4", "rebirthBossOriginal5", "rebirthBossOriginal6", "rebirthBossOriginal7"
+    };
     private static void StopWatch(Bound item){var capture=item.Capture;var watch=item.Watch;item.Capture=null;item.Watch=null;item.Chunk=null;if(capture!=null)capture.Dispose();else watch?.Dispose();}
     private static void StopWatch(Removing item){var capture=item.Capture;var watch=item.Watch;item.Capture=null;item.Watch=null;item.Chunk=null;if(capture!=null)capture.Dispose();else watch?.Dispose();}
     internal static void Install(Harmony harmony)
@@ -44,7 +49,7 @@ internal static class RebirthBossNativePublication
     private static bool AliveIdentity(EntityAlive entity,RebirthBossSpawnOriginal original,bool write)
     {
         if(entity?.Buffs==null)return false;byte[] bytes=original.Operation.ToByteArray();
-        for(int i=0;i<8;i++){string key="rebirthBossOriginal"+i;float expected=1+bytes[i*2]+256*bytes[i*2+1];if(write)entity.Buffs.SetCustomVar(key,expected);else if(entity.Buffs.GetCustomVar(key)!=expected)return false;}return true;
+        for(int i=0;i<OriginalIdentityCVarNames.Length;i++){string key=OriginalIdentityCVarNames[i];float expected=1+bytes[i*2]+256*bytes[i*2+1];if(write)entity.Buffs.SetCustomVar(key,expected);else if(entity.Buffs.GetCustomVar(key)!=expected)return false;}return true;
     }
     internal static bool ValidProof(string proof)=>proof!=null&&(proof.Length==0||proof.Length==64&&proof.All(value=>value>='0'&&value<='9'||value>='a'&&value<='f'));
     internal static void DestroyDetached(World world,Entity entity)
@@ -124,7 +129,7 @@ internal static class RebirthBossNativePublication
     {
         if(world==null||entity==null||!ReferenceEquals(entity.world,world)||entity.entityId!=original.EntityId||entity.entityClass!=original.EntityClass||entity.WorldTimeBorn!=original.WorldTimeBorn)return false;
         if(entity is EntityAlive alive&&AliveIdentity(alive,original,false))return true;
-        if(entity is EntityAlive unknown)for(int i=0;i<8;i++)if(unknown.Buffs==null||unknown.Buffs.GetCustomVar("rebirthBossOriginal"+i)!=0f)return false;
+        if(entity is EntityAlive unknown)for(int i=0;i<OriginalIdentityCVarNames.Length;i++)if(unknown.Buffs==null||unknown.Buffs.GetCustomVar(OriginalIdentityCVarNames[i])!=0f)return false;
         var chunk=entity.addedToChunk?world.GetChunkSync(entity.chunkPosAddedEntityTo.x,entity.chunkPosAddedEntityTo.z) as Chunk:world.GetChunkFromWorldPos((int)Math.Floor(entity.position.x),(int)Math.Floor(entity.position.z)) as Chunk;
         return chunk!=null&&chunk.ChunkCustomData.dict.TryGetValue(Key(original),out var marker)&&marker.data!=null&&marker.expiresInWorldTime==ulong.MaxValue&&!marker.isSavedToNetwork&&marker.TriggerWriteDataDelegate==null&&marker.data.SequenceEqual(Stamp(world,e,original));
     }
@@ -137,6 +142,8 @@ internal static class RebirthBossNativePublication
     internal static void Pump(World world)
     {
         if(world?.IsRemote()!=false||!RebirthBossEventPersistence.IsReady)return;Scope(world);if(UnityEngine.Time.realtimeSinceStartup<nextUpdate)return;nextUpdate=UnityEngine.Time.realtimeSinceStartup+1f;
+        // Outstanding native watches still need retirement after their event leaves the registry.
+        if(!RebirthBossEventRegistry.HasLiveEvents&&bound.Count==0&&removing.Count==0)return;
         AdoptLegacy(world);AdoptLegacyRewards(world);StageOwedSupportLoot(world);PumpRemovals(world);
         foreach(var e in RebirthBossEventRegistry.SnapshotEvents())foreach(var original in e.SpawnOriginals)
         {if(original.EntityId>=EntityFactory.nextEntityID&&original.EntityId<int.MaxValue)EntityFactory.nextEntityID=original.EntityId+1;}
@@ -263,7 +270,7 @@ internal static class RebirthBossNativePublication
             {
                 var state=pair.Value;if(state.EventId!=e.EventId)continue;var entity=world.GetEntity(pair.Key) as EntityAlive;
                 if(entity==null||entity.IsDead()||(EntityClass.list==null||EntityClass.GetEntityClass(entity.entityClass)==null)||!ReferenceEquals(entity.world,world)){unknown=true;break;}
-                for(int i=0;i<8;i++)if(entity.Buffs==null||entity.Buffs.GetCustomVar("rebirthBossOriginal"+i)!=0f)unknown=true;
+                for(int i=0;i<OriginalIdentityCVarNames.Length;i++)if(entity.Buffs==null||entity.Buffs.GetCustomVar(OriginalIdentityCVarNames[i])!=0f)unknown=true;
                 if(unknown)break;
                 selected.Add(Tuple.Create(entity,new RebirthBossSpawnOriginal{Operation=Guid.NewGuid(),EntityId=entity.entityId,EntityClass=entity.entityClass,Role=(int)state.Role,Position=entity.position,Phase=0,AdoptionVersion=1}));
             }

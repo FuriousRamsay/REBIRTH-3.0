@@ -1,0 +1,61 @@
+{
+  "name": "Purge automatic intro appears at first stable starter-truck driver reveal",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in isolated solo Purge and dedicated Purge with a genuinely new persistent player claim, no Journal marker or consumed-note intent. Finish Survivor creation normally. Start this check once the native first-entry gameplay can be observed. Keep the automatic intro open for the screenshot and do not dismount."
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "to do the work others left unfinished",
+        "id": "purgeInformationBody"
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,world"
+        }
+      }
+    },
+    {
+      "screenshot": "purge_intro_new_starter_driver"
+    },
+    {
+      "_note": "Confirm the captured frame is in the real driver's seat of the assigned stable starter truck, gameplay is revealed, and the loading overlay is closed. On dedicated compare the authority starter record and reciprocal driver's attachment using the prepared camper state observation."
+    },
+    {
+      "expectNoUi": {
+        "text": "Building environment"
+      }
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "_note": "The old native Duke's Note event waited five seconds before applying its envelope buff."
+    },
+    {
+      "wait": 6
+    },
+    {
+      "expectNoBuff": "buffDukeNote"
+    },
+    {
+      "expectNoItem": "noteDuke01"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

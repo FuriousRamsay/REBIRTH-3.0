@@ -44,9 +44,16 @@ internal static class RebirthCookingOutputDelivery
         =>player?.Buffs!=null&&player.IsSpawned()&&!player.IsDead()&&ReferenceEquals(player.world,GameManager.Instance?.World)&&
             ReferenceEquals(player.world?.GetPrimaryPlayer(),player)&&(player.Buffs.GetCustomVar(Held)==1f||
                 owners.TryGetValue(player,out var attempt)&&attempt.Awaiting&&ReferenceEquals(attempt.World,player.world)&&attempt.Deaths==player.Died);
-    internal static bool IsHeld(EntityPlayerLocal player)=>RebirthNpcTradeOwnerExchange.IsHeld(player)||RebirthCamperStationContentsDelivery.HoldsOwner(player)||RebirthConsumptionDurableDelivery.HoldsInventoryOwner(player)||RebirthRecyclerPlacedSettlement.HoldsOwner(player)||RebirthCookingMillingPublication.HoldsOwner(player)||HasOwnHold(player)||RebirthCookingOwnerDelta.IsHeld(player)||RebirthRemoteResourceOwnerAction.IsHeld(player);
-    internal static bool Blocks(ItemStackGrid grid)
-    {var player=GameManager.Instance?.World?.GetPrimaryPlayer();return IsHeld(player)&&(ReferenceEquals(grid,player.bag?.ItemGrid)||ReferenceEquals(grid,player.inventory?.ItemGrid));}
+    private static bool OtherOwnerHold(EntityPlayerLocal player)=>RebirthNpcTradeOwnerExchange.IsHeld(player)||RebirthCamperStationContentsDelivery.HoldsOwner(player)||RebirthConsumptionDurableDelivery.HoldsInventoryOwner(player)||RebirthRecyclerPlacedSettlement.HoldsOwner(player)||RebirthCookingMillingPublication.HoldsOwner(player)||HasOwnHold(player)||RebirthCookingOwnerDelta.IsHeld(player);
+    internal static bool IsHeld(EntityPlayerLocal player)=>OtherOwnerHold(player)||RebirthRemoteResourceOwnerAction.IsHeld(player);
+    internal static bool Blocks(ItemStackGrid grid,int slot=-1)
+    {
+        var player=GameManager.Instance?.World?.GetPrimaryPlayer();
+        return player!=null&&grid!=null&&(ReferenceEquals(grid,player.bag?.ItemGrid)||ReferenceEquals(grid,player.inventory?.ItemGrid))&&
+            (OtherOwnerHold(player)||RebirthRemoteResourceOwnerAction.BlocksNativeInventory(player,grid,slot));
+    }
+    internal static bool BlocksNativeGesture(EntityPlayerLocal player,ItemStackGrid grid=null,int slot=-1) =>
+        OtherOwnerHold(player)||RebirthRemoteResourceOwnerAction.BlocksNativeInventory(player,grid,slot);
     internal static bool BlocksUnrelatedPersonalQueue(XUiC_RecipeStack card)
     {
         if(card==null||card.GetParentByType<XUiC_WorkstationWindowGroup>()!=null)return false;
@@ -350,7 +357,7 @@ internal static class RebirthCookingDeliveryGridSlot
 {
     [HarmonyPriority(Priority.First)]
     private static bool Prefix(ItemStackGrid __instance,int _index,ItemStack _stack)
-        =>!RebirthCookingOutputDelivery.Blocks(__instance)||RebirthCookingOutputDelivery.Consume(__instance,_index,_stack);
+        =>!RebirthCookingOutputDelivery.Blocks(__instance,_index)||RebirthCookingOutputDelivery.Consume(__instance,_index,_stack);
     private static void Postfix(ItemStackGrid __instance,int _index,ItemStack _stack,bool __runOriginal)
         =>RebirthRecyclerPlacedSettlement.ObserveOwnerSlot(__instance,_index,_stack,__runOriginal);
 }
@@ -413,8 +420,26 @@ internal static class RebirthCookingDeliveryActions
             yield return AccessTools.DeclaredMethod(type,"OnActivated",Type.EmptyTypes)??throw new MissingMethodException(type.FullName,"OnActivated");
     }
     [HarmonyPriority(Priority.First)]
-    private static bool Prefix(BaseItemActionEntry __instance)=>RebirthRecyclerPlacedSettlement.CanUseNativeEntry(__instance)&&
-        (!RebirthCookingOutputDelivery.IsHeld(__instance?.ItemController?.xui?.playerUI?.entityPlayer)||RebirthRemoteResourceOwnerAction.AllowOriginalEntry(__instance));
+    private static bool Prefix(BaseItemActionEntry __instance)
+    {
+        if (!RebirthRecyclerPlacedSettlement.CanUseNativeEntry(__instance)) return false;
+        var player = __instance?.ItemController?.xui?.playerUI?.entityPlayer;
+        if (!RebirthCookingOutputDelivery.IsHeld(player) || RebirthRemoteResourceOwnerAction.AllowOriginalEntry(__instance))
+            return true;
+
+        if (__instance is ItemActionEntryUse use &&
+            use.consumeType is ItemActionEntryUse.ConsumeType.Eat or ItemActionEntryUse.ConsumeType.Drink or ItemActionEntryUse.ConsumeType.Heal &&
+            use.ItemController is XUiC_ItemStack controller && controller is not XUiC_Creative2Stack &&
+            RebirthConsumptionDurableDelivery.HoldsInventoryOwner(player))
+        {
+            var item = controller.ItemStack?.itemValue;
+            // Native Eat, Drink and Heal select the first non-null action.
+            if (item?.ItemClass?.Actions?.FirstOrDefault(action => action != null) is ItemActionConsumeMetabolismRebirth &&
+                RebirthConsumableResolver.TryResolve(item, out _))
+                RebirthMetabolismUiFeedback.Receive(RebirthMetabolismService.InventoryServingPending());
+        }
+        return false;
+    }
 }
 
 // Fence the gesture before its first cursor/native-slot side effect. Guarding only
@@ -429,14 +454,23 @@ internal static class RebirthCookingDeliverySlotGesture
     }
     [HarmonyPriority(Priority.First)]
     private static bool Prefix(XUiC_ItemStack __instance)
-        =>!RebirthCookingOutputDelivery.IsHeld(__instance?.xui?.playerUI?.entityPlayer);
+    {
+        var player=__instance?.xui?.playerUI?.entityPlayer;
+        var grid=__instance?.StackLocation switch
+        {
+            XUiC_ItemStack.StackLocationTypes.Backpack=>player?.bag?.ItemGrid,
+            XUiC_ItemStack.StackLocationTypes.ToolBelt=>player?.inventory?.ItemGrid,
+            _=>null
+        };
+        return !RebirthCookingOutputDelivery.BlocksNativeGesture(player,grid,__instance?.SlotNumber??-1);
+    }
 }
 [HarmonyPatch(typeof(XUiC_DragAndDropWindow),nameof(XUiC_DragAndDropWindow.SetCurrentStack))]
 internal static class RebirthCookingDeliveryCursorSet
 {
     [HarmonyPriority(Priority.First)]
     private static bool Prefix(XUiC_DragAndDropWindow __instance,ItemStack stack)
-        =>!RebirthCookingOutputDelivery.IsHeld(__instance?.xui?.playerUI?.entityPlayer)||RebirthCamperStationContentsDelivery.AllowOwnerCursor(__instance,stack)||RebirthCookingGridCustody.AllowCursor(__instance,stack);
+        =>!RebirthCookingOutputDelivery.BlocksNativeGesture(__instance?.xui?.playerUI?.entityPlayer)||RebirthCamperStationContentsDelivery.AllowOwnerCursor(__instance,stack)||RebirthCookingGridCustody.AllowCursor(__instance,stack);
 }
 [HarmonyPatch]
 internal static class RebirthCookingDeliveryCursorGesture
@@ -448,7 +482,7 @@ internal static class RebirthCookingDeliveryCursorGesture
     }
     [HarmonyPriority(Priority.First)]
     private static bool Prefix(XUiC_DragAndDropWindow __instance)
-        =>!RebirthCookingOutputDelivery.IsHeld(__instance?.xui?.playerUI?.entityPlayer);
+        =>!RebirthCookingOutputDelivery.BlocksNativeGesture(__instance?.xui?.playerUI?.entityPlayer);
 }
 
 // Native personal completion/cancellation must pause before it constructs an

@@ -56,6 +56,7 @@ public static class RebirthMetabolismInstaller
         RebirthConsumableResolver.ClearCache();
         RebirthMetabolismStateRepository.Reset(RebirthMetabolismService.IsServerAuthority);
 
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismSimulatedSourcePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismAnimatedCompletionPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCreativeConsumableUsePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismFoodUpdatePatch));
@@ -63,8 +64,14 @@ public static class RebirthMetabolismInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismHealthRegenPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismStaminaRegenPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismDeathPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthDeathBuffPolicy));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthRespawnInfectionPolicy));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismDisconnectPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismSpawnPatch));
+#if REBIRTH_DEBUG
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthInjuryRemovalTrace));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthInjuryLocalRespawnTrace));
+#endif
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemTooltipPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemInfoPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthDrinkSlotPresentationPatch));
@@ -267,6 +274,10 @@ public static class RebirthMetabolismSpawnPatch
         if (player == null)
             return;
 
+#if REBIRTH_DEBUG
+        if (_respawnReason == RespawnType.Died)
+            RebirthDeathInjuryDiagnostics.Trace(player, "server-spawn-notification");
+#endif
         bool engineFreshSpawn = _respawnReason == RespawnType.NewGame || _respawnReason == RespawnType.EnterMultiplayer;
 
         if (RebirthSurvivorMode.IsEnabledForCurrentWorld())
@@ -296,6 +307,8 @@ public static class RebirthMetabolismSpawnPatch
             // Fresh Survivor startup sanitization is performed exactly once by the creation service
             // after durable origin commit. Returning characters/respawns use non-fresh sanitation.
             RebirthToolbeltCapacity.SanitizePlayerStartup(player, survivorState, false);
+            if (_respawnReason == RespawnType.Died)
+                RebirthMetabolismService.RestoreRespawnNeeds(player, survivorState);
             RebirthMetabolismStateRepository.SaveIfDirty("survivor-player-spawn");
             return;
         }
@@ -321,6 +334,10 @@ public static class RebirthMetabolismDeathPatch
     public static void Prefix(EntityAlive __instance)
     {
         EntityPlayer player = __instance as EntityPlayer;
+#if REBIRTH_DEBUG
+        if (player != null)
+            RebirthDeathInjuryDiagnostics.Trace(player, "death");
+#endif
         if (player != null && RebirthMetabolismService.IsServerAuthority)
             RebirthMetabolismService.HandlePlayerDeath(player);
     }

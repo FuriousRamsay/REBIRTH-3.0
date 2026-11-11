@@ -1,0 +1,22 @@
+{
+  "name": "Live vehicle Shift-click and drag part removal",
+  "classification": "FIXTURE-DEPENDENT",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run on a disposable solo or dedicated Purge save. Start in the placed V8 truck's Service window with only the first headlight installed, no headlight carried, an empty cursor and unlocked empty toolbelt slot 2. The bridge drag trace should show the headlight held after release and the separate placement click should empty the cursor." },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "1 / 15" } },
+    { "markItem": "resourceHeadlight" },
+    { "action": { "command": "click", "args": { "id": "vehiclePart0", "shift": 1 } } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "0 / 15" } },
+    { "expectItemDelta": { "name": "resourceHeadlight", "op": "==", "value": 1 } },
+    { "action": { "command": "click", "args": { "item": "resourceHeadlight", "shift": 1 } } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "1 / 15" } },
+    { "expectItemDelta": { "name": "resourceHeadlight", "op": "==", "value": 0 } },
+    { "action": { "command": "drag", "args": { "from.id": "vehiclePart0", "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "trace": 1 } } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "0 / 15" } },
+    { "expectUiItem": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "item": "resourceHeadlight", "min": 1, "max": 1 } },
+    { "expectItemDelta": { "name": "resourceHeadlight", "op": "==", "value": 1 } },
+    { "expectNoErrors": true }
+  ]
+}

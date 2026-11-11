@@ -36,13 +36,15 @@ internal static class RebirthHumanGroupRoles
             var runtime = snapshot[(recoveryCursor + i) % snapshot.Length];
             if(runtime == null) continue;
             if(RebirthNpcRuntimeRegistry.TryGetEntityId(runtime.StableId,out var liveId) &&
-                world.GetEntity(liveId) is EntityRebirthHumanoidNPC live && live.IsFreshGroupBootstrapPending)
-                live.TryReleaseFreshGroupBootstrap();
+                world.GetEntity(liveId) is EntityRebirthHumanoidNPC live && live.IsFreshGroupBootstrapPending &&
+                !live.TryReleaseFreshGroupBootstrap() && resumed == 0 &&
+                RebirthNpcWorldIntegrationService.TryRecoverAlreadyLiveFreshGroup(world, live))
+                resumed++;
             if(!RebirthNpcAggregatePersistenceStore.TryGet(runtime.StableId, out var person)) continue;
             XElement node;
             try { node = Group(person); }
             catch(Exception error) when (error is InvalidDataException || error is System.Xml.XmlException) { continue; }
-            if(node == null && resumed < 1 && person.NativeReconstruction != null &&
+            if(node == null && resumed < 1 && RebirthP4NaturalGroupOccurrence.IsEnabled && person.NativeReconstruction != null &&
                 RebirthNpcRuntimeRegistry.TryGetEntityId(runtime.StableId,out var leaderEntityId) &&
                 world.GetEntity(leaderEntityId) is EntityRebirthHumanoidNPC leaderNpc &&
                 leaderNpc.IsFreshGroupBootstrapPending &&
@@ -136,8 +138,8 @@ internal static class RebirthHumanGroupRoles
         if(!RebirthNpcAggregatePersistenceStore.TryGet(id, out var person) || person.Identity == null ||
            (person.Identity.Category != "Survivor" && person.Identity.Category != "Bandit" &&
             person.Identity.Category != "SpecialHumanoid")) return false;
-        var runtime = RebirthNpcRuntimeRegistry.GetSnapshot().FirstOrDefault(row => row != null && row.StableId == id);
-        if(runtime == null || runtime.OwnershipKind != RebirthNpcOwnershipKind.None) return false;
+        if(!RebirthNpcRuntimeRegistry.TryGetProfileAndOwnership(id, out _, out var ownership) ||
+           ownership != RebirthNpcOwnershipKind.None) return false;
         XElement group;
         try { group = Group(person); }
         catch(Exception error) when (error is InvalidDataException || error is System.Xml.XmlException) { return false; }

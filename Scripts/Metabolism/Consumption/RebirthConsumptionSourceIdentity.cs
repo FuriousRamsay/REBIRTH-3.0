@@ -1,5 +1,15 @@
 internal static class RebirthConsumptionSourceIdentity
 {
+    internal static bool TryGetWorldKey(World world, out string key)
+    {
+        key = null;
+        if (world == null) return false;
+        string nativeKey = world.IsRemote() ? GamePrefs.GetString(EnumGamePrefs.GameGuidClient) : world.worldState?.Guid;
+        if (!System.Guid.TryParse(nativeKey, out var id) || id == System.Guid.Empty) return false;
+        key = id.ToString("N");
+        return true;
+    }
+
     internal static byte[] Fingerprint(ItemValue value)
     {
         if (value == null) throw new System.ArgumentNullException(nameof(value));

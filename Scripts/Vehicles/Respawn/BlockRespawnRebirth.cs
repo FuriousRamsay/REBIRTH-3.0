@@ -153,12 +153,12 @@ public class BlockRespawnRebirth : BlockPlantGrowing
             BlockValue spawned = _world.GetBlock(_blockPos);
             if (!spawned.isair && spawned.Block != null && spawned.type != blockID)
             {
+#if DEBUG && REBIRTH_DEBUG
                 string previousDowngrade;
                 bool repeatable = RebirthVehicleRespawnRuntimeRegistry.EnsureSpawnedBlockIsRepeatable(
                     spawned.Block,
                     out previousDowngrade);
 
-#if DEBUG && REBIRTH_DEBUG
                 RebirthVehicleRespawnDebugPolicy.RecordRespawnedBlock(
                     spawned.Block.blockName,
                     previousDowngrade,
@@ -169,6 +169,8 @@ public class BlockRespawnRebirth : BlockPlantGrowing
                     + " class=" + spawned.Block.GetType().Name
                     + " previousDowngrade=" + previousDowngrade
                     + " repeatable=" + repeatable);
+#else
+                RebirthVehicleRespawnRuntimeRegistry.EnsureSpawnedBlockIsRepeatable(spawned.Block);
 #endif
             }
         }

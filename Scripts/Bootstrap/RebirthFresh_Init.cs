@@ -50,6 +50,11 @@ namespace Rebirth.Bootstrap
             try
             {
                 RunStepOnce("harmony-core", delegate { RebirthHarmonyBootstrap.EnsurePatched(); });
+                if (GameManager.IsDedicatedServer)
+                    RunStepOnce("dedicated-xpath-condition-log", delegate
+                    {
+                        RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthXPathConditionLoggingPatch));
+                    });
                 // Install native load/account observers during mod discovery, before world
                 // providers, PlayerId and ToPlayer can run. This does not enable C traffic.
                 RunStepOnce("placed-protocol-infrastructure", RebirthRemoteResourcePlacedStationOriginal.InstallProtocolInfrastructure);
@@ -67,14 +72,22 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("server-only-xbl-cleanup", delegate
                 {
                     if (!RebirthUnusedServerOnlyXblCleanupInstaller.Install())
-                        Log.Warning("[REBIRTH][XBL Cleanup] Native cleanup retained: " +
-                            RebirthUnusedServerOnlyXblCleanupInstaller.LastRefusal);
+                    {
+                        string reason = RebirthUnusedServerOnlyXblCleanupInstaller.LastRefusal;
+                        string message = "[REBIRTH][XBL Cleanup] Native cleanup retained: " + reason;
+                        if (reason == "unreviewed_version_or_editor") RebirthDebug.Log("bootstrap", message);
+                        else Log.Warning(message);
+                    }
                 });
                 RunStepOnce("perf-fasttags", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthFastTagsUnionPatch)); });
                 RunStepOnce("vehicle-hud-slot-guard", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthHudStatBarSlotGuardPatch)); });
                 RunStepOnce("reflection-rate-at-speed", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthReflectionRateAtSpeedPatch)); });
                 RunStepOnce("gamesense-option", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthGameSenseOptionPatch)); });
-                RunStepOnce("gamesense-dedupe", delegate { RebirthDebug.Log("bootstrap", RebirthGameSenseDedupePatch.Install(PerfHarmony)); });
+                RunStepOnce("gamesense-dedupe", delegate
+                {
+                    string report = RebirthGameSenseDedupePatch.Install(PerfHarmony);
+                    RebirthDebug.Log("bootstrap", report);
+                });
                 RunStepOnce("density-hooks", delegate
                 {
                     RebirthHarmonyBootstrap.PatchClassOnce(DensityHarmony, typeof(Rebirth.WorldDecorations.Density.AddDecoBlockPatch));

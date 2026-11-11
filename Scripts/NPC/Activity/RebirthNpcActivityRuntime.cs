@@ -324,7 +324,7 @@ public static partial class RebirthNpcActivityRegistry
         if (now < nextWatchdogUtcTicks) return;
         nextWatchdogUtcTicks = now + TimeSpan.FromSeconds(1).Ticks;
 
-        List<RebirthNpcActivityRecord> timedOut = new List<RebirthNpcActivityRecord>();
+        List<RebirthNpcActivityRecord> timedOut = null;
         lock (Sync)
         {
             foreach (RebirthNpcActivityRecord record in ActiveByEntity.Values)
@@ -332,14 +332,11 @@ public static partial class RebirthNpcActivityRegistry
                 if(RebirthNpcWorkReleaseGate.Hold(record.Order))continue;
                 RebirthNpcExecutionLease lease;
                 if (!RebirthNpcExecutionLeaseRegistry.TryGetActive(record.TargetEntityId, out lease) ||
-                    lease.LeaseId != record.LeaseId)
-                {
-                    timedOut.Add(record);
-                    continue;
-                }
-                if (now > record.HeartbeatDeadlineUtcTicks) timedOut.Add(record);
+                    lease.LeaseId != record.LeaseId || now > record.HeartbeatDeadlineUtcTicks)
+                    (timedOut ??= new List<RebirthNpcActivityRecord>()).Add(record);
             }
 
+            if (timedOut == null) return;
             for (int i = 0; i < timedOut.Count; i++)
             {
                 RebirthNpcActivityRecord record = timedOut[i];

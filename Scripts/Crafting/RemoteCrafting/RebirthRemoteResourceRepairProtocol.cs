@@ -53,6 +53,7 @@ internal static class RebirthRemoteResourceRepairProtocol
     }
     internal static bool TryAttach(ItemActionEntryRepair entry)
     {
+        if(pending.Count==0)return false;
         try
         {
             var player=entry?.ItemController?.xui?.playerUI?.entityPlayer;
@@ -94,7 +95,7 @@ internal static class RebirthRemoteResourceRepairProtocol
         if(now>=scanAt)
         {
             scanAt=now+5f;
-            if(RebirthRemoteResourceClientOriginal.TryReadPending(out var originals))foreach(var original in originals)
+            if(RebirthRemoteResourceClientOriginal.TryReadPendingForRecovery(player,out var originals))foreach(var original in originals)
             {
                 if(original.Kind!=RemoteResourceClientOperation.ItemRepair||!RebirthRemoteResourceRepairAdoption.QueryScope(player,original)||pending.ContainsKey(original.Operation)||pending.Count>=32)continue;
                 // Cold originals only query their retained identity. No callback
@@ -618,7 +619,7 @@ public sealed class NetPackageRebirthRemoteRepairResult:NetPackage
     }
     public override void ProcessPackage(World world,GameManager callbacks)
     {
-        if(!RebirthRemoteResourceNetworkScope.Receive(this,world,callbacks,false,out var connection)||world.worldState.Guid!=nativeWorld||operation==Guid.Empty)return;
+        if(!RebirthRemoteResourceNetworkScope.Receive(this,world,callbacks,false,out var connection)||RebirthRemoteResourceNetworkScope.ProtocolWorld(world)!=nativeWorld||operation==Guid.Empty)return;
         var actor=world.GetPrimaryPlayer();if(actor==null||actor.IsDead()||creation!=RebirthCamperCharacterAccess.CurrentCreation(actor)||
             !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)||identity.CanonicalId!=owner)return;
         if(total>12*1024*1024||!RebirthRemoteResourceFragments.TryAdd("repair-result|"+nativeWorld+"|"+identity.StorageKey+"|"+creation+"|"+RebirthRemoteResourceNetworkScope.SessionKey(connection),operation,hash,total,count,index,fragment,Time.realtimeSinceStartup,out var complete)||complete==null)return;

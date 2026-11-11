@@ -1,0 +1,13 @@
+{
+  "name": "Pause-menu exit returns to the main menu after an NPC checkpoint",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Start in a disposable single-player Purge world after completing Survivor creation. Run from controllable gameplay with all windows closed."
+    },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "click": { "id": "btnExit" } },
+    { "waitForWindowOpen": { "window": "mainMenu", "timeout": 20 } },
+    { "expectNoErrors": true }
+  ]
+}

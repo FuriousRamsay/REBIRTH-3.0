@@ -1,8 +1,14 @@
 <configs>
+  <append xpath="/buffs/buff[@name='buffLegSprained' or @name='buffLegBroken' or @name='buffLegSplinted' or @name='buffLegCast' or @name='buffArmSprained' or @name='buffArmBroken' or @name='buffArmSplinted' or @name='buffArmCast' or @name='buffBrokenLimbStatus']">
+    <tags value="rebirth_limb_injury"/>
+  </append>
 
   <!-- REBIRTH Survivor legacy starter-item support. -->
     <conditional>
     <if cond="character_progression('Rebirth')">
+      <!-- Keep the native buff readable for old saves, without its retired HUD and prompt. -->
+      <setattribute xpath="/buffs/buff[@name='buffDukeNote']" name="hidden">true</setattribute>
+      <remove xpath="/buffs/buff/effect_group/triggered_effect[@action='PinToolbeltMessage' and @message_key='buffDukeNoteToolTip']"/>
       <include filename="_Rebirth/buffs.xml"/>
     </if>
     <else>
@@ -492,11 +498,7 @@
   <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@value">50</set>
   <include filename="_Seeker/buffs.xml"/>
   <!-- Full set bonuses are removed. -->
-  <remove xpath="/buffs/buff//effect_group[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/buffs/buff//triggered_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/buffs/buff//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/buffs/buff//triggered_effect[contains(@buff,'SetBonus')]" />
-  <remove xpath="/buffs/buff[contains(@name,'SetBonus')]" />
+  <remove xpath="/buffs/buff[contains(@name,'SetBonus')] | /buffs/buff//*[self::effect_group or self::triggered_effect or self::passive_effect][requirement[@name='HasBuff' and contains(@buff,'SetBonus')]] | /buffs/buff//triggered_effect[contains(@buff,'SetBonus')]" />
   <include filename="_WeaponBonuses/buffs.xml"/>
   <include filename="_Workstations/mind_control_buffs.xml"/>
 </configs>

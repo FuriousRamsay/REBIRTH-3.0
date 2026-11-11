@@ -143,6 +143,7 @@ internal static partial class RebirthProductiveEarnedUiDeferredTransport
             RebirthProductiveEarnedUiQueueOwner.ForgetRemoteNativeSetup(_package);
             if(_package is NetPackageTileEntity native&&selectedNativeSources.TryGetValue(native,out var source))
             {selectedNativeSources.Remove(native);source.Dispose();}
+            if(_package is NetPackagePlayerId playerId)RebirthNpcMetabolismCustody.ForgetClientNativePlayerPacket(playerId);
             ForgetReceivedConnection(_package);
             return true;
         }

@@ -1,0 +1,18 @@
+{
+  "name": "Purge Miner Ore Sense live block and marker control",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Requires a disposable Rebirth Purge Miner whose Ore Sense is initially off. Prepare a real nearby Iron ore block within native pickaxe reach and a slightly farther Lead ore block inside the view range. No other ore closer than Lead. The crosshair targets Iron, and a native pickaxe hit can break that last Iron block. Guard stays on. Repeat in solo and on a dedicated client."},
+    {"expectTarget": "oreIron"},
+    {"action": {"command": "press", "args": {"action": "rebirth.OreSense"}}},
+    {"waitForUi": {"window": "rebirthOreSenseHud", "text": "Iron", "timeout": 6}},
+    {"screenshot": "audit_ore_sense_iron"},
+    {"action": {"command": "press", "args": {"action": "Primary"}}},
+    {"waitForUi": {"window": "rebirthOreSenseHud", "text": "Lead", "timeout": 12}},
+    {"screenshot": "audit_ore_sense_lead"},
+    {"action": {"command": "press", "args": {"action": "rebirth.OreSense"}}},
+    {"expectNoUi": {"window": "rebirthOreSenseHud", "exactText": "ORE SENSE"}},
+    {"expectNoErrors": true},
+    {"_note": "Inspect both screenshots for world-position geometry and color. Repeat while walking toward Lead, across a scan-center change and after world rejoin, checking the normal distance opacity and no stale markers. A profiler capture can count remaining SetPositions calls while stationary."}
+  ]
+}

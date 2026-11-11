@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 
 // Native StashItems performs each inventory mutation synchronously. Coalesce only
@@ -113,46 +112,12 @@ internal static class RebirthBulkTransferRefresh
     }
 }
 
-// XUi.GetChild*ByType walks every controller in every window group. The window set is fixed
-// once a UI is built, so these two per-refresh native lookups keep their result.
-internal static class RebirthUiLookupCache
-{
-    private sealed class Entry
-    {
-        internal int Groups;
-        internal XUiC_ItemInfoWindow InfoWindow;
-        internal List<XUiC_InfoWindow> InfoWindows;
-    }
-    private static readonly ConditionalWeakTable<XUi, Entry> Entries = new ConditionalWeakTable<XUi, Entry>();
-    private static Entry For(XUi xui)
-    {
-        var entry = Entries.GetOrCreateValue(xui);
-        if (entry.Groups != xui.WindowGroups.Count)
-        {
-            entry.Groups = xui.WindowGroups.Count;
-            entry.InfoWindow = null;
-            entry.InfoWindows = null;
-        }
-        return entry;
-    }
-    internal static XUiC_ItemInfoWindow ItemInfoWindow(XUi xui)
-    {
-        var entry = For(xui);
-        return entry.InfoWindow ?? (entry.InfoWindow = xui.GetChildByType<XUiC_ItemInfoWindow>());
-    }
-    internal static List<XUiC_InfoWindow> InfoWindows(XUi xui)
-    {
-        var entry = For(xui);
-        return entry.InfoWindows ?? (entry.InfoWindows = xui.GetChildrenByType<XUiC_InfoWindow>());
-    }
-}
-
 [HarmonyPatch(typeof(XUiC_Backpack), "SetStacks")]
 internal static class RebirthBackpackInfoWindowLookup
 {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
-        var cached = AccessTools.Method(typeof(RebirthUiLookupCache), nameof(RebirthUiLookupCache.ItemInfoWindow));
+        var cached = AccessTools.Method(typeof(RebirthInventoryInfoWindowLookup), nameof(RebirthInventoryInfoWindowLookup.Find));
         foreach (var instruction in instructions)
         {
             if (instruction.operand is MethodInfo method && method.IsGenericMethod && method.Name == "GetChildByType" &&
@@ -188,7 +153,7 @@ internal static class RebirthInfoWindowVisibility
     {
         if (!_visibleInScene) return true;
         bool showing = __instance.windowGroup == null || __instance.windowGroup.isShowing;
-        var windows = RebirthUiLookupCache.InfoWindows(__instance.xui);
+        var windows = RebirthInventoryInfoWindowLookup.FindAll(__instance.xui);
         for (int i = 0; i < windows.Count; i++)
             if (windows[i] != __instance && (showing || !windows[i].windowGroup.isShowing))
                 windows[i].ViewComponent.IsVisible = false;

@@ -402,7 +402,8 @@ public static partial class RemoteResourceTransactions
         {
             IRemoteResourceSource source = sources[i];
             string reason;
-            if (RebirthRemoteResourceSourceCustody.BlocksSource(source)||!RemoteResourceEligibility.CanUse(source, player, true, false, out reason)) continue;
+            if (RebirthRemoteResourceSourceCustody.BlocksSource(source) ||
+                !RemoteResourceEligibility.CanUse(source, player, true, false, out reason)) continue;
             int revision = source.Revision;
             ItemStack[] slots = source.Slots;
             PackedBoolArray locks = source.SlotLocks;

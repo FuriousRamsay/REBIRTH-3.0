@@ -52,10 +52,6 @@ internal static class RebirthConsumptionSourceWriteback
 
         ItemStack value = replacement != null ? replacement.Clone() : ItemStack.Empty.Clone();
         ItemStack intended = value.Clone();
-        var expectedBag=RebirthVehicleInventoryWrite.Snapshot(player.bag?.ItemGrid?.items??System.Array.Empty<ItemStack>());
-        var expectedBelt=RebirthVehicleInventoryWrite.Snapshot(player.inventory?.ItemGrid?.items??System.Array.Empty<ItemStack>());
-        if(kind==RebirthMetabolismSourceKind.Backpack)expectedBag[slot]=intended.Clone();
-        if(kind==RebirthMetabolismSourceKind.HeldToolbelt)expectedBelt[slot]=intended.Clone();
         if(!Current())return false;
         switch (kind)
         {
@@ -75,9 +71,7 @@ internal static class RebirthConsumptionSourceWriteback
             case RebirthMetabolismSourceKind.HeldToolbelt:
                 var liveBelt=player.inventory?.ItemGrid?.items;if(liveBelt==null||slot<0||slot>=liveBelt.Length)return false;observed=liveBelt[slot];break;
         }
-        bool committed=Current()&&RebirthStationGridIngredients.IsSameStackSnapshot(observed,intended)&&
-            RebirthVehicleInventoryWrite.SameSlots(expectedBag,player.bag?.ItemGrid?.items??System.Array.Empty<ItemStack>())&&
-            RebirthVehicleInventoryWrite.SameSlots(expectedBelt,player.inventory?.ItemGrid?.items??System.Array.Empty<ItemStack>());
+        bool committed = Current() && RebirthStationGridIngredients.IsSameStackSnapshot(observed, intended);
         RebirthConsumptionTrace.Note("debit.observed",player,kind:kind,slot:slot,before:expected,after:observed,
             reason:committed?"exact-postimage":"setter-postimage-mismatch",success:committed);
         return committed;

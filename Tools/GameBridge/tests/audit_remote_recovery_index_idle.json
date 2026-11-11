@@ -1,0 +1,12 @@
+{
+  "name": "Purge remote resource cold index idle check",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Run against a disposable Purge world with the candidate Debug DLL. In the current client process enable rbdebug on Crafting before leaving and joining again. Record the log sequence before the actual join. After spawning, use gamebridge.ps1 log -Since <sequence> -Contains 'Remote resource recovery catalogue read' and require one positive scan for the new scope. Then run this scenario in that same authenticated session with no active user action. An earlier log and a quiet six-second recovery interval are both required."},
+    {"console": "rbdebug on Crafting"},
+    {"wait": 6},
+    {"expectNoLog": {"contains": "Remote resource recovery catalogue read"}},
+    {"expectNoErrors": true},
+    {"_note": "Repeat for solo and dedicated Purge. Repeat with legitimate retained item-repair, block-repair and personal-craft originals from disposable copies of actual interrupted operations, each under its exact authority. Record original IDs, exact native counts and terminal phase before/after; verify one new scan after a local Prepare/Advance/Archive, that no prior owner/world resurfaces, and that an ambiguous journal still fences. This idle scenario alone does not qualify native settlement or the malformed-file refusal."}
+  ]
+}

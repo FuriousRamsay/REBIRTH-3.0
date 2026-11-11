@@ -22,15 +22,17 @@ internal static class RebirthSeekerPolicy
     }
     internal static int Tier(int level, bool bloodMoon) => level < 30 ? 0 : Math.Min(7, 1 + (level - 30) / (bloodMoon ? 20 : 10));
     internal static int Count(int tier) => tier < 1 ? 0 : tier < 3 ? 1 : tier < 5 ? 2 : tier < 7 ? 3 : 4;
-    internal static bool RestrictionAllows(RebirthSeekerRestriction restriction, bool questing, bool outdoors)
+    internal static bool RestrictionAllows(RebirthSeekerRestriction restriction, bool questing, World world, Vector3 position)
     {
         switch (restriction)
         {
             case RebirthSeekerRestriction.Off: return false;
             case RebirthSeekerRestriction.OnlyQuesting: return questing;
             case RebirthSeekerRestriction.NotQuesting: return !questing;
-            case RebirthSeekerRestriction.OutdoorsOnly: return outdoors;
-            case RebirthSeekerRestriction.OutdoorsAndNotQuesting: return outdoors && !questing;
+            case RebirthSeekerRestriction.OutdoorsOnly:
+                return RebirthBossEventPlacement.IsOutdoors(world, position);
+            case RebirthSeekerRestriction.OutdoorsAndNotQuesting:
+                return !questing && RebirthBossEventPlacement.IsOutdoors(world, position);
             default: return true;
         }
     }
@@ -117,7 +119,7 @@ internal static class RebirthSeekerRuntime
         if (!moon &&
             ((!RebirthSandboxOptionManager.Current.SeekerHordeDay && RebirthBossEventEligibility.IsBloodMoonDay(world))
              || !RebirthSeekerPolicy.RestrictionAllows(RebirthSandboxOptionManager.Current.SeekerRestriction,
-                questing, RebirthBossEventPlacement.IsOutdoors(world, player.position)))) return false;
+                questing, world, player.position))) return false;
         // The legacy event producer excludes caves/underground POIs and mounted players.
         var poi = GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabAtPosition(player.position);
         if (poi?.prefab != null) return !poi.prefab.Tags.Test_AnySet(Underground);

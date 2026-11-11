@@ -373,9 +373,12 @@ public static class AdvancedFarmingDynamicLightOpacityService
 
     public static void ClearPendingSunlightRefreshes()
     {
-        s_pendingSunlightRefreshes.Clear();
-        s_evaluatedLoadedCropSubcells.Clear();
-        s_scheduledLoadedCropChunkBands.Clear();
+        if (s_pendingSunlightRefreshes.Count > 0)
+            s_pendingSunlightRefreshes.Clear();
+        if (s_evaluatedLoadedCropSubcells.Count > 0)
+            s_evaluatedLoadedCropSubcells.Clear();
+        if (s_scheduledLoadedCropChunkBands.Count > 0)
+            s_scheduledLoadedCropChunkBands.Clear();
     }
 
     public static void ProcessPendingSunlightRefreshes()

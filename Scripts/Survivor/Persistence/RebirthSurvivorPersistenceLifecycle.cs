@@ -11,7 +11,7 @@ public static class RebirthSurvivorPersistenceLifecycle
 {
     private static bool installed;
     private static readonly object InstallSync=new object();
-    private static bool startingRegistered,spawnRegistered,worldShutdownRegistered,gameShutdownRegistered;
+    private static bool startingRegistered,spawnRegistered,worldShutdownRegistered,gameShutdownRegistered,updateRegistered;
     public static bool IsInstalled{get{lock(InstallSync)return installed;}}
     private static readonly Harmony Harmony = new Harmony("rebirth.survivor.persistence.3.0");
 
@@ -24,10 +24,12 @@ public static class RebirthSurvivorPersistenceLifecycle
 
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSurvivorPersistenceSaveWorldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSurvivorPersistenceDisconnectPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthOrdinarySkillPractice.DisconnectPatch));
         RegisterStage(ref startingRegistered,()=>ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting)));
         RegisterStage(ref spawnRegistered,()=>ModEvents.PlayerSpawnedInWorld.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SPlayerSpawnedInWorldData>(OnPlayerSpawnedInWorld)));
         RegisterStage(ref worldShutdownRegistered,()=>ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown)));
         RegisterStage(ref gameShutdownRegistered,()=>ModEvents.GameShutdown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameShutdownData>(OnGameShutdown)));
+        RegisterStage(ref updateRegistered,()=>ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnGameUpdate)));
         installed=true;
         return "[REBIRTH Survivor] bounded persistence lifecycle installed.";
         }
@@ -35,6 +37,9 @@ public static class RebirthSurvivorPersistenceLifecycle
 
     private static void RegisterStage(ref bool complete,Action register)
     {if(complete)return;register();complete=true;}
+
+    private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
+        => RebirthWorldCharacterRepository.TickOrdinaryPracticeCheckpoints();
 
     private static void OnGameStarting(ref ModEvents.SGameStartingData data)
     {
@@ -101,7 +106,7 @@ public static class RebirthSurvivorPersistenceLifecycle
         RebirthStablePlayerIdentity identity;
         if (RebirthStablePlayerIdentity.TryFromClientInfo(clientInfo, out identity))
         {
-            RebirthWorldCharacterRepository.SaveIfDirty(identity, reason);
+            RebirthWorldCharacterRepository.TrySaveIfDirtyForLifecycle(identity, reason);
             RebirthSurvivorCreationTransactions.ForgetPlayer(identity.StorageKey);
         }
         RebirthMetabolismStateRepository.SaveIfDirty(reason);

@@ -1,0 +1,10 @@
+{
+  "name": "Trader has no authored Cement Mixer or Combine Station",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Use a disposable Solo or Dedicated Purge save. Stand inside an isolated stock trader with the whole compound loaded and no other compound or player workshop within 50 m. Run on both progression modes, using one fresh chunk and one saved chunk from before the fix. Give the saved chunk one existing five-second cleanup interval after arrival." },
+    { "expectNearbyBlockCount": { "name": "cementMixer", "radius": 50, "count": 0 } },
+    { "expectNearbyBlockCount": { "name": "combineStation", "radius": 50, "count": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

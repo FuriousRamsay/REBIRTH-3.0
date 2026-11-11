@@ -1,0 +1,1008 @@
+[
+  {
+    "id": 1,
+    "title": "80s truck part installation",
+    "mode": "remote",
+    "setup": "Place the creative-sourced 80s truck. Open Service with exactly one headlight and one battery in the backpack and both destination slots empty. Supply strict drag, returnCursor, shiftClick, firstSlot and secondSlot selectors.",
+    "review": true,
+    "domain": "restorationOriginal",
+    "steps": [
+      {
+        "markItem": "resourceHeadlight"
+      },
+      {
+        "action": {
+          "command": "drag",
+          "args": {
+            "fixture": "drag"
+          }
+        }
+      },
+      {
+        "wait": 5
+      },
+      {
+        "expectItemDelta": {
+          "name": "resourceHeadlight",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "expectUiItem": {
+          "fixture": "firstSlot"
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "returnCursor"
+          }
+        }
+      },
+      {
+        "markItem": "carBattery"
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "shiftClick"
+          }
+        }
+      },
+      {
+        "wait": 5
+      },
+      {
+        "expectItemDelta": {
+          "name": "carBattery",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "expectUiItem": {
+          "fixture": "secondSlot"
+        }
+      },
+      {
+        "screenshot": "truck_parts"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Fresh profile thumbnails",
+    "mode": "menu",
+    "setup": "Launch with FreshClientData, then open the first Survivor Profile Creator screen without selecting a profile row.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "screenshot": "portraits_before"
+      },
+      {
+        "wait": 2
+      },
+      {
+        "screenshot": "portraits_before_selection"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Character preview lighting",
+    "mode": "remote",
+    "setup": "Join a fresh isolated dedicated Purge world with fresh client data and complete a new Survivor profile. After the HUD is ready, open Crafting without previously opening Character. Supply the Character tab selector. Record the time and scene lighting. For a second lighting condition, change a visible equipment slot so the renderer builds a fresh snapshot rather than reusing its previous texture.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "character"
+          }
+        }
+      },
+      {
+        "screenshot": "character_preview_first"
+      },
+      {
+        "wait": 5
+      },
+      {
+        "screenshot": "character_preview_settled"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Drink transfer to sip slot",
+    "mode": "remote",
+    "setup": "Open Character with sip slot empty and a drink in a visible backpack slot. Supply item and native drag selectors.",
+    "review": false,
+    "domain": "hydrationOriginal",
+    "steps": [
+      {
+        "markItem": {
+          "fixture": "item"
+        }
+      },
+      {
+        "action": {
+          "command": "drag",
+          "args": {
+            "fixture": "drag"
+          }
+        }
+      },
+      {
+        "wait": 8
+      },
+      {
+        "screenshot": "sip_slot"
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "item"
+          },
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "expectNoUi": {
+          "id": "survivorOverviewDrinkSlotState",
+          "exactText": "EMPTY"
+        }
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "NPC after remote world transition",
+    "mode": "remote",
+    "setup": "Exit to menu and reconnect to the same disposable Purge server in the same client process. Record the player-spawn projection warning separately. If an existing REBIRTH Survivor is available on the authority, start outside its client streaming range and supply movement toward it and its class match. Record the authority and client entity IDs and review the exact incoming spawn exception. Leave the fixture unavailable if there is no existing Survivor.",
+    "review": true,
+    "domain": "npcRecovery",
+    "steps": [
+      {
+        "action": {
+          "command": "walkto",
+          "args": {
+            "fixture": "walk"
+          }
+        }
+      },
+      {
+        "wait": 8
+      },
+      {
+        "expectLivingEntities": {
+          "contains": {
+            "fixture": "entity"
+          },
+          "radius": 28,
+          "op": ">=",
+          "value": 1
+        }
+      },
+      {
+        "expectNoLog": {
+          "contains": "Exact original client projection group unavailable",
+          "level": "error"
+        }
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Dryer and duffle bag loot",
+    "mode": "remote",
+    "setup": "After a same-process exit to menu and reconnect, stage a loaded dryer and duffle bag with one known item each. Supply both activation and Take All selectors and item names. Also exercise a separate single-slot take.",
+    "review": false,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "markItem": {
+          "fixture": "dryerItem"
+        }
+      },
+      {
+        "action": {
+          "command": "activate",
+          "args": {
+            "fixture": "dryer"
+          }
+        }
+      },
+      {
+        "waitForWindowOpen": { "window": "rebirthContextNavigation", "timeout": 8 }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "takeAll"
+          }
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "dryerItem"
+          },
+          "op": "==",
+          "value": 1
+        }
+      },
+      {
+        "ui": { "action": "close", "window": "looting" }
+      },
+      {
+        "markItem": {
+          "fixture": "bagItem"
+        }
+      },
+      {
+        "action": {
+          "command": "activate",
+          "args": {
+            "fixture": "duffle"
+          }
+        }
+      },
+      {
+        "waitForWindowOpen": { "window": "rebirthContextNavigation", "timeout": 8 }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "takeAll"
+          }
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "bagItem"
+          },
+          "op": "==",
+          "value": 1
+        }
+      },
+      {
+        "expectNoLog": {
+          "contains": "typed projection retirement"
+        }
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Running stone pickups",
+    "mode": "remote",
+    "setup": "Locate five natural rocks in the current isolated save and verify each on the host. Aim low and confirm the exact rock coordinate in the client target before running and tapping native Activate. Include a rapid second tap on the same rock in at least one trial. Capture the HUD immediately after each input, and record the host block and client stone count before and after each attempt. A missed aim or missing block is not a pickup trial.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "markItem": "resourceRockSmall"
+      },
+      {
+        "fixture": "route"
+      },
+      {
+        "expectNoUi": {
+          "text": "The block changed before pickup completed."
+        }
+      },
+      {
+        "wait": 2
+      },
+      {
+        "expectItemDelta": {
+          "name": "resourceRockSmall",
+          "op": "==",
+          "value": 5
+        }
+      },
+      {
+        "expectNoLog": {
+          "contains": "The block changed before pickup completed."
+        }
+      },
+      {
+        "screenshot": "stone_pickup"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Upgrade kit directions",
+    "mode": "remote",
+    "setup": "Open Backpack with a Survivor's Upgrade Kit visible. Supply item click selector.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "kit"
+          }
+        }
+      },
+      {
+        "screenshot": "upgrade_kit"
+      },
+      {
+        "expectUi": {
+          "text": "Modifier Station"
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Remote crafting, drag and Deposit All",
+    "mode": "remote",
+    "setup": "Put all recipe inputs in nearby eligible storage, leave exactly one separate deposit marker in backpack, and open Crafting. Supply craftClick, recipe output, post-craft drag/slot, crate activate, Deposit All click and crate marker-slot expectation.",
+    "review": true,
+    "domain": "remoteResourceOriginals",
+    "steps": [
+      {
+        "markItem": {
+          "fixture": "output"
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "craftClick"
+          }
+        }
+      },
+      {
+        "wait": 8
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "output"
+          },
+          "op": "==",
+          "value": 1
+        }
+      },
+      {
+        "action": {
+          "command": "drag",
+          "args": {
+            "fixture": "drag"
+          }
+        }
+      },
+      {
+        "expectUiItem": {
+          "fixture": "dragSlot"
+        }
+      },
+      {
+        "markItem": {
+          "fixture": "marker"
+        }
+      },
+      {
+        "action": {
+          "command": "key",
+          "args": {
+            "name": "Escape"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "activate",
+          "args": {
+            "fixture": "crate"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "deposit"
+          }
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "marker"
+          },
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "expectUiItem": {
+          "fixture": "crateSlot"
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "deposit"
+          }
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "expectUiItem": {
+          "fixture": "crateSlot"
+        }
+      },
+      {
+        "screenshot": "remote_craft_deposit"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Cow Skull placement debit",
+    "mode": "remote",
+    "setup": "Pick up one Cow Skull from the world, place it in the active toolbelt slot, turn creative off, and aim at an empty valid placement. Supply the exact post-placement look/target.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "markItem": "decoCowSkull"
+      },
+      {
+        "expectItem": {
+          "name": "decoCowSkull",
+          "min": 1,
+          "max": 1
+        }
+      },
+      {
+        "press": {
+          "action": "Secondary",
+          "seconds": 0.2
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "screenshot": "cow_skull"
+      },
+      {
+        "expectItemDelta": {
+          "name": "decoCowSkull",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "action": {
+          "command": "lookat",
+          "args": {
+            "fixture": "placed"
+          }
+        }
+      },
+      {
+        "expectTarget": "decoCowSkull"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Held and inventory food/drink use",
+    "mode": "remote",
+    "setup": "Prepare chili in the specified belt slot and water in backpack, with stomach capacity. Supply belt, inventory-open action steps, water selector, and inventory Use button selector.",
+    "review": true,
+    "domain": "playerConsumption",
+    "steps": [
+      {
+        "markItem": "foodCanChili"
+      },
+      {
+        "select": {
+          "slot": {
+            "fixture": "belt"
+          }
+        }
+      },
+      {
+        "press": {
+          "action": "Primary",
+          "seconds": 0.2
+        }
+      },
+      {
+        "wait": 5
+      },
+      {
+        "action": {
+          "command": "state",
+          "args": {
+            "sections": "consumption,stats"
+          }
+        }
+      },
+      {
+        "expectItemDelta": {
+          "name": "foodCanChili",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "markItem": "drinkJarBoiledWater"
+      },
+      {
+        "fixture": "inventory"
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "water"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "use"
+          }
+        }
+      },
+      {
+        "wait": 6
+      },
+      {
+        "expectItemDelta": {
+          "name": "drinkJarBoiledWater",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "action": {
+          "command": "state",
+          "args": {
+            "sections": "consumption,stats"
+          }
+        }
+      },
+      {
+        "expectNoLog": {
+          "contains": "Selected consumption source is no longer current."
+        }
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Starvation damage",
+    "mode": "remote",
+    "setup": "Use a living player with zero food, at least 90 hydration, the starving buff, and no threat, healing effect or god mode. Supply starting health and an observation interval of at least 45 seconds.",
+    "review": false,
+    "domain": "stamina",
+    "steps": [
+      {
+        "expectBuff": "buffRebirthStarving"
+      },
+      {
+        "expectStat": { "name": "food", "op": "==", "value": 0 }
+      },
+      {
+        "expectStat": { "name": "water", "op": ">=", "value": 90 }
+      },
+      {
+        "expectNoBuff": "buffHealHealth"
+      },
+      {
+        "expectNoBuff": "god"
+      },
+      {
+        "expectStat": {
+          "name": "health",
+          "op": "==",
+          "value": {
+            "fixture": "health"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "state",
+          "args": {
+            "sections": "stats,buffs"
+          }
+        }
+      },
+      {
+        "wait": {
+          "fixture": "seconds"
+        }
+      },
+      {
+        "expectStat": { "name": "food", "op": "==", "value": 0 }
+      },
+      {
+        "expectStat": { "name": "water", "op": ">=", "value": 90 }
+      },
+      {
+        "expectNoBuff": "buffHealHealth"
+      },
+      {
+        "expectStat": {
+          "name": "health",
+          "op": "<",
+          "value": {
+            "fixture": "health"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "state",
+          "args": {
+            "sections": "stats,buffs"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Nutrition and hydration after death",
+    "mode": "remote",
+    "setup": "Stage known food and water percentages on the disposable player. Supply native death and respawn steps. Run at 0/0, then with food above 80 and water below 80, and the inverse.",
+    "review": true,
+    "domain": "stamina",
+    "steps": [
+      {
+        "markRespawnNeeds": true
+      },
+      {
+        "fixture": "deathAndRespawn"
+      },
+      {
+        "expectRespawnNeeds": true
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "title": "First Aid Kit healing below cap",
+    "mode": "remote",
+    "setup": "Take known damage below effective cap with no other health changes. Supply starting health and First Aid Kit toolbelt slot. Repeat at cap and with bandages separately.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "expectStat": {
+          "name": "health",
+          "op": "==",
+          "value": {
+            "fixture": "health"
+          }
+        }
+      },
+      {
+        "markItem": "medicalFirstAidKit"
+      },
+      {
+        "select": {
+          "slot": {
+            "fixture": "slot"
+          }
+        }
+      },
+      {
+        "press": {
+          "action": "Primary",
+          "seconds": 0.2
+        }
+      },
+      {
+        "wait": 12
+      },
+      {
+        "expectItemDelta": {
+          "name": "medicalFirstAidKit",
+          "op": "==",
+          "value": -1
+        }
+      },
+      {
+        "expectStat": {
+          "name": "health",
+          "op": ">",
+          "value": {
+            "fixture": "health"
+          }
+        }
+      },
+      {
+        "screenshot": "first_aid"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Stone Axe repair completes",
+    "mode": "remote",
+    "setup": "Stage one damaged Stone Axe and sufficient stone. Supply axe selector, Repair selector and repaired-item slot expectation. Repeat with backpack and remote stones.",
+    "review": true,
+    "domain": "remoteResourceOriginals",
+    "steps": [
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "axe"
+          }
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "repair"
+          }
+        }
+      },
+      {
+        "wait": 12
+      },
+      {
+        "screenshot": "repair_queue"
+      },
+      {
+        "expectUiItem": {
+          "fixture": "repaired"
+        }
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Combine Station exclusion",
+    "mode": "remote",
+    "setup": "Open the native recipe catalogue, supply recipe search input selector and a native trader-station visit/check sequence.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "action": {
+          "command": "type",
+          "args": {
+            "fixture": "search"
+          }
+        }
+      },
+      {
+        "screenshot": "trader_station"
+      },
+      {
+        "expectNoUi": {
+          "text": "Combine Station"
+        }
+      },
+      {
+        "fixture": "traderVisit"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "title": "Five Purge starter truck claims",
+    "mode": "roster",
+    "setup": "Record five distinct first-time joins in sequence with player_reports_purge_roster.ps1. Begin with a new world and record each player before disconnecting.",
+    "review": false,
+    "domain": "nativeInventory",
+    "steps": []
+  },
+  {
+    "id": 18,
+    "title": "Cotton hand pickup",
+    "mode": "remote",
+    "setup": "Aim at a fresh wild cotton plant with no previous activation. Supply the native hold-E/radial hand action sequence. Run once with no cotton, then repeat on a second plant with the first cotton still in the backpack.",
+    "review": false,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "markItem": "resourceCropCottonPlant"
+      },
+      {
+        "fixture": "hand"
+      },
+      {
+        "wait": 5
+      },
+      {
+        "screenshot": "cotton"
+      },
+      {
+        "expectItemDelta": {
+          "name": "resourceCropCottonPlant",
+          "op": "==",
+          "value": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "title": "Journal formatting",
+    "mode": "remote",
+    "setup": "Have the authored Threat Scanner guide unlocked. Supply row selector.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "ui": {
+          "action": "open",
+          "window": "rebirthJournal"
+        }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "guide"
+          }
+        }
+      },
+      {
+        "expectUi": {
+          "id": "journalEntryTitle",
+          "exactText": "Threat Scanner"
+        }
+      },
+      {
+        "screenshot": "journal_formatting"
+      },
+      {
+        "expectNoUi": {
+          "text": "[bd9cd6]"
+        }
+      },
+      {
+        "expectNoUi": {
+          "text": "[-]"
+        }
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "title": "Solo vehicle Take All and creative grant",
+    "mode": "solo",
+    "setup": "Stage one known item in the vehicle and a Creative item absent from backpack. Supply the native Storage radial sequence as vehicle, plus Take All and Creative UI actions.",
+    "review": true,
+    "domain": "nativeInventory",
+    "steps": [
+      {
+        "markItem": {
+          "fixture": "lootItem"
+        }
+      },
+      {
+        "fixture": "vehicle"
+      },
+      {
+        "waitForWindowOpen": { "window": "rebirthContextNavigation", "timeout": 8 }
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "takeAll"
+          }
+        }
+      },
+      {
+        "wait": 3
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "lootItem"
+          },
+          "op": "==",
+          "value": 1
+        }
+      },
+      {
+        "ui": { "action": "close", "window": "bagStorage" }
+      },
+      {
+        "markItem": {
+          "fixture": "creativeItem"
+        }
+      },
+      {
+        "fixture": "creative"
+      },
+      {
+        "expectItemDelta": {
+          "name": {
+            "fixture": "creativeItem"
+          },
+          "op": "==",
+          "value": 1
+        }
+      },
+      {
+        "screenshot": "solo_inventory"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "title": "Truck refueling",
+    "mode": "remote",
+    "setup": "Open Service for an assembled truck with a partly empty tank and a known amount of fuel. Supply the refuel button and expected debit. Compare tank before/after.",
+    "review": true,
+    "domain": "restorationOriginal",
+    "steps": [
+      {
+        "markItem": "ammoGasCan"
+      },
+      {
+        "screenshot": "fuel_before"
+      },
+      {
+        "action": {
+          "command": "click",
+          "args": {
+            "fixture": "refuel"
+          }
+        }
+      },
+      {
+        "wait": 5
+      },
+      {
+        "screenshot": "fuel_after"
+      },
+      {
+        "expectItemDelta": {
+          "name": "ammoGasCan",
+          "op": "==",
+          "value": {
+            "fixture": "debit"
+          }
+        }
+      }
+    ]
+  }
+]

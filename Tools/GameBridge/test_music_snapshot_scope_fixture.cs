@@ -10,15 +10,27 @@ static class RebirthSurvivorClientState{public static string Id;public static st
 static class RebirthMusicTransferClient{public static int Resets;public static void Reset(){Resets++;}}
 class ItemValue{public int Type=1;public bool IsEmpty(){return Type==0;}public ItemValue Clone(){return new ItemValue{Type=Type};}}
 static class RebirthBackpackLibraryReservation{public static bool Held;public static bool IsHeld(EntityPlayerLocal p){return Held;}}
-class ConnectionManager{}
+class NetPackage{}
+class ConnectionManager{public void SendToServer(NetPackage package){if(package is NetPackageRebirthMusicLibraryRequest request)Client.Sent.Add(request.Operation);}}
 class SingletonMonoBehaviour<T> where T:new(){public static T Instance=new T();}
-class NetPackageRebirthMusicLibraryRequest{}
+class NetPackageRebirthMusicLibraryRequest:NetPackage{public int Operation;public NetPackageRebirthMusicLibraryRequest Setup(int player,int operation,int slot,ItemValue item,long revision,string creation){Operation=operation;return this;}}
+class NetPackagePlayerInventory:NetPackage{public void Setup(EntityPlayerLocal player,bool bag,bool belt,bool equipment,bool full){}}
+static class RebirthSurvivorSupportUiFeedback{public static void Receive(bool success,string message){}}
+static class Localization{public static string Get(string key)=>key;}
 static class NetPackageManager{public static T GetPackage<T>() where T:new(){return new T();}}
 static class RebirthAudiobookLibraryClient{public static void Reset(){}}
 // PRODUCTION_SCOPE
 static class Client{
 public static string CreationId="";public static long Revision=-1,Generation;public static bool PendingTransfer,Shuffle;public static List<string> Items=new List<string>();
-public static List<int> Sent=new List<int>();public static bool CanSend(ConnectionManager c,NetPackageRebirthMusicLibraryRequest r){return true;}public static void Dispatch(EntityPlayerLocal p,int op,int index=0,ItemValue item=null){Sent.Add(op);}
+public static List<int> Sent=new List<int>();
+private static NetPackage lastChecked;
+public static bool CanSend(ConnectionManager c,NetPackage request){lastChecked=request;return true;}
+public static void Dispatch(EntityPlayerLocal player,int op,int index=0,ItemValue item=null){Sent.Add(op);}
+public static void DispatchProjection(EntityPlayerLocal player,NetPackageRebirthMusicLibraryRequest request)
+{
+    if(!ReferenceEquals(lastChecked,request))throw new Exception("Cold Use lost its checked request");
+    Sent.Add(0);
+}
 // PRODUCTION_CLIENT
 }
 class Checks{static void A(bool b,string m){if(!b)throw new Exception(m);}static void Main(){var w=new World();w.Player=new EntityPlayerLocal{world=w};GameManager.Instance.World=w;string a=Guid.NewGuid().ToString("N"),b=Guid.NewGuid().ToString("N");RebirthSurvivorClientState.Id=a;Client.Receive(a,10,true,new[]{"first"},true);A(Client.Items[0]=="first"&&Client.PendingTransfer,"valid scope");int reset=RebirthMusicTransferClient.Resets;long generation=Client.Generation;RebirthSurvivorClientState.Id=b;Client.Receive(a,11,false,new[]{"stale"},false);A(Client.Items[0]=="first"&&Client.PendingTransfer&&reset==RebirthMusicTransferClient.Resets&&generation==Client.Generation,"delayed old does not reset receipt");Client.Receive(b,1,false,new[]{"new"},true);A(Client.Items[0]=="new"&&Client.Revision==1,"new character low revision");Client.Receive(b,0,true,new[]{"older"});A(Client.Items[0]=="new","older revision");w.Player=null;Client.Receive(b,2,true,new[]{"missing"});A(Client.Items[0]=="new","missing player");w.Player=new EntityPlayerLocal{world=w};w.Remote=false;RebirthWorldCharacterService.Record=new RebirthWorldCharacterRecord{Origin=new Origin{CreationId=b}};Client.Receive(b,2,true,new[]{"host"});A(Client.Items[0]=="host","host record");Client.Receive(b,3,false,null);A(Client.Items[0]=="host","null entries");RebirthWorldCharacterService.Record.Origin.CreationId=a;A(!Client.EnsureCurrent(w.Player)&&Client.Items.Count==0&&Client.Revision==-1,"cached old character cleared before use");int cleared=RebirthMusicTransferClient.Resets;A(!Client.EnsureCurrent(w.Player)&&RebirthMusicTransferClient.Resets==cleared,"empty cache not repeatedly reset");var legacy="legacy-"+new string('a',64);w.Remote=true;RebirthSurvivorClientState.Id=legacy;Client.Receive(legacy,1,false,new[]{"legacy-song"});A(Client.CreationId==legacy&&Client.Items[0]=="legacy-song"&&Client.EnsureCurrent(w.Player),"migrated remote snapshot accepted");

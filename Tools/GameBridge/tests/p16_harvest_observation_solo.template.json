@@ -1,0 +1,307 @@
+{
+  "name": "p16_harvest_observation_solo",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in an isolated loaded Purge save with a completed Survivor, closed UI, clear surroundings and reachable live targets. Copy this file to temp and replace every @TOKEN@ with the measured position, toolbelt slot, native hold duration or exact baseline item delta. Use identical tool, position, capacity, damage, and progression for baseline and candidate. No direct mutation or synthetic award. Confirm actual crosshair target with the bridge before opening the batch."
+    },
+    {
+      "_note": "Solo positive discrete evidence only. Use a mature authored *3HarvestPlayer crop with an actual inventory award, an eligible configured dead carcass, and salvage with a positively weighted result. For each, verify exact item delta, intended skill increase and untouched Mining/Logging counterpart. Repeat partial/full bag and unweighted salvage as separate controls using their captured baseline; a full-bag drop is not carried evidence. Dedicated actors require a separate baseline per P16-08 before expecting any practical training gain."
+    },
+    {
+      "markItem": "resourceRockSmall"
+    },
+    {
+      "markSkill": "skill.mining"
+    },
+    {
+      "markSkill": "skill.logging"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@ORE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@ORE_X@",
+          "y": "@ORE_Y@",
+          "z": "@ORE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@ORE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": "@ORE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.mining",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.logging",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "resourceWood"
+    },
+    {
+      "markSkill": "skill.logging"
+    },
+    {
+      "markSkill": "skill.mining"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@TREE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@TREE_X@",
+          "y": "@TREE_Y@",
+          "z": "@TREE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@TREE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceWood",
+        "op": "==",
+        "value": "@TREE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.logging",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.mining",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "@CROP_ITEM@"
+    },
+    {
+      "markSkill": "skill.farming"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@CROP_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@CROP_X@",
+          "y": "@CROP_Y@",
+          "z": "@CROP_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@CROP_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "@CROP_ITEM@",
+        "op": "==",
+        "value": "@CROP_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.farming",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "@CARCASS_ITEM@"
+    },
+    {
+      "markSkill": "skill.animal_processing"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@CARCASS_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": "@CARCASS_ENTITY@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@CARCASS_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "@CARCASS_ITEM@",
+        "op": "==",
+        "value": "@CARCASS_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.animal_processing",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "@SALVAGE_ITEM@"
+    },
+    {
+      "markSkill": "skill.salvage"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@SALVAGE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@SALVAGE_X@",
+          "y": "@SALVAGE_Y@",
+          "z": "@SALVAGE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@SALVAGE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "@SALVAGE_ITEM@",
+        "op": "==",
+        "value": "@SALVAGE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.salvage",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

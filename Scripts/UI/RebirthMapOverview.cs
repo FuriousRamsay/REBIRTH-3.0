@@ -54,9 +54,12 @@ internal sealed class RebirthMapOverview
         object currentWorld=map.localPlayer?.world;
         if(!ReferenceEquals(world,currentWorld)||!ReferenceEquals(player,map.localPlayer)||!ReferenceEquals(database,db))
         { Close(map);world=currentWorld;player=map.localPlayer;database=db; }
-        bool wanted=Supported(map)&&map.zoomScale>NativeMaximum(map.ActiveCanvasWidth,map.ActiveCanvasHeight);
-        active=wanted;
-        if(!Supported(map)){Bind(map,map.mapTexture);return;}
+        active=Supported(map)&&map.zoomScale>NativeMaximum(map.ActiveCanvasWidth,map.ActiveCanvasHeight);
+        if(!active)
+        {
+            Bind(map,map.mapTexture);
+            return;
+        }
         if(texture==null)
         {
             texture=new Texture2D(TextureSize,TextureSize,TextureFormat.RGBA32,false){name="REBIRTH known-map overview",wrapMode=TextureWrapMode.Clamp,filterMode=FilterMode.Point};
@@ -94,7 +97,7 @@ internal sealed class RebirthMapOverview
             texture.SetPixels32(pixels);texture.Apply(false,false);changed=false;
             displayedOriginX=originX;displayedOriginZ=originZ;displayedSpan=span;published=true;
         }
-        var shown=wanted&&published?texture:map.mapTexture;
+        var shown=published?texture:map.mapTexture;
         Bind(map,shown);
     }
 
@@ -111,6 +114,7 @@ internal sealed class RebirthMapOverview
 
     private void Begin(XUiC_RebirthMapArea map,bool reframe)
     {
+        RebirthDebug.Log("ui", "[REBIRTH MapOverview] atlas build");
         // Refresh existing content sparsely. Only a new frame clears the atlas;
         // stable known-map passes neither blank it nor upload identical pixels.
         if(reframe){Array.Clear(pixels,0,pixels.Length);Array.Clear(visited,0,visited.Length);filled.Clear();generation=0;}
@@ -212,7 +216,7 @@ internal sealed class RebirthMapOverview
     }
     internal void Close(XUiC_RebirthMapArea map)
     {
-        if(map.xuiTexture!=null&&map.xuiTexture.Texture==texture)Bind(map,map.mapTexture);
+        if(!ReferenceEquals(texture,null)&&ReferenceEquals(map.xuiTexture?.Texture,texture))Bind(map,map.mapTexture);
         if(texture!=null)UnityEngine.Object.Destroy(texture);
         texture=null;pixels=null;visited=null;regions.Clear();legacy.Clear();filled.Clear();filled.TrimExcess();world=player=null;database=null;staticSource=null;
         active=building=changed=published=false;span=displayedSpan=0;nextRefresh=0;

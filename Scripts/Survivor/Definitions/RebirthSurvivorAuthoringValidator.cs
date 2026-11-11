@@ -233,8 +233,7 @@ public static class RebirthSurvivorAuthoringValidator
         foreach(RebirthTraitDefinition t in bundle.Traits)
         {
             Required(t.Id,t.NameKey,"Trait name_key",r); Required(t.Id,t.DescriptionKey,"Trait description_key",r); Required(t.Id,t.IconKey,"Trait icon_key",r); Required(t.Id,t.ModifierId,"Trait modifier_id",r);
-            if(t.Points<0) r.Errors.Add(t.Id+" has negative Points; polarity owns spend/grant semantics.");
-            if(t.Polarity==RebirthTraitPolarity.Mixed&&t.Points!=0) r.Errors.Add(t.Id+" is Mixed but has non-zero points.");
+            if(t.Points<1) r.Errors.Add(t.Id+" must have at least one Point; polarity determines whether it costs or grants points.");
             if(t.Availability==RebirthDefinitionAvailability.Restricted&&t.AllowedBackgroundIds.Count==0) r.Errors.Add(t.Id+" is restricted but has no allowed Backgrounds.");
             if(t.Availability==RebirthDefinitionAvailability.Universal&&t.AllowedBackgroundIds.Count!=0) r.Errors.Add(t.Id+" is universal but declares allowed Backgrounds.");
             ValidateRefs(t.Id,t.AllowedBackgroundIds,bg,"allowed Background",r); ValidateRefs(t.Id,t.ConflictTraitIds,tr,"conflicting Trait",r); ValidateRefs(t.Id,t.ConflictDietIds,di,"conflicting Diet",r);

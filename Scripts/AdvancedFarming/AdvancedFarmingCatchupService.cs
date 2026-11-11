@@ -208,8 +208,13 @@ public static class AdvancedFarmingCatchupService
         int plots = 0;
         int plants = 0;
 
-        TileEntityPlantGrowingRebirth anchorPlantTe = world.GetTileEntity(anchorPos) as TileEntityPlantGrowingRebirth;
-        BlockValue anchorBlockValue = world.GetBlock(anchorPos);
+        TileEntityPlantGrowingRebirth anchorPlantTe = null;
+        BlockValue anchorBlockValue = default;
+        if (debug || sampling)
+        {
+            anchorPlantTe = world.GetTileEntity(anchorPos) as TileEntityPlantGrowingRebirth;
+            anchorBlockValue = world.GetBlock(anchorPos);
+        }
 
         if (sampling)
             AdvancedFarmingPerfSnapshotService.RecordProcessAreaAnchor(anchorBlockValue, anchorPlantTe != null);
@@ -970,7 +975,11 @@ public static class AdvancedFarmingCatchupService
             : 0UL;
 
         float rainfall = ResolveRainfallAtPosition(authoritativeWorld, pos);
-        bool openSky = IsOpenSkyAboveLoadedChunk(world, pos + Vector3i.up);
+        bool inspectSky = rainfall > 0f || debug;
+#if DEBUG
+        inspectSky |= AdvancedFarmingDebug.Catchup;
+#endif
+        bool openSky = inspectSky && IsOpenSkyAboveLoadedChunk(world, pos + Vector3i.up);
         bool trustworthyElapsed = IsTrustworthyRainSampleElapsed(blockValue, elapsedWorldTimeUnits, worldTimeIncrementPerRealSecond);
         int gained = 0;
 
@@ -1177,7 +1186,7 @@ public static class AdvancedFarmingCatchupService
                         continue;
 
                     BlockValue blockValue = world.GetBlock(pos);
-                    if (AdvancedFarmingActiveAreaRegistry.IsFullyGrownCrop(world, pos))
+                    if (IsFullyGrownPlant(blockValue))
                         continue;
 
                     result.Add(new PlantCatchupEntry
@@ -1200,7 +1209,8 @@ public static class AdvancedFarmingCatchupService
         if (world == null)
             return result;
 
-        List<AdvancedFarmingWaterProviderEntry> providers = AdvancedFarmingWaterProviderRegistry.CollectProvidersInArea(world, anchorPos, AreaRadius, anchorPos.y - 2, anchorPos.y + 3, true, true, -1);
+        List<AdvancedFarmingWaterProviderEntry> providers = AdvancedFarmingWaterProviderRegistry.CollectProvidersInArea(
+            world, anchorPos, AreaRadius, anchorPos.y - 2, anchorPos.y + 3, true, true, -1, includeBlockValue: false);
         for (int i = 0; i < providers.Count; i++)
         {
             AdvancedFarmingWaterProviderEntry provider = providers[i];

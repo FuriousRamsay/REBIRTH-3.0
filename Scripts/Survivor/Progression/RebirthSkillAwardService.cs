@@ -10,8 +10,24 @@ public static class RebirthSkillAwardService
     private sealed class CraftAttempt{internal bool EnteredAwardEffect;}
     private static readonly object Gate=new object();
     private static readonly Dictionary<string,WindowAmount> WindowAwards=new Dictionary<string,WindowAmount>(StringComparer.Ordinal);
-    private static readonly Dictionary<int,EntityPlayer> PendingOwnerPublications=new Dictionary<int,EntityPlayer>();
+    private static readonly Dictionary<int,OwnerPublication> PendingOwnerPublications=new Dictionary<int,OwnerPublication>();
     private static float nextOwnerPublicationAttempt;
+
+    private readonly struct OwnerPublication
+    {
+        internal readonly EntityPlayer Player;
+        internal readonly RebirthWorldCharacterRecord PracticeRecord;
+        internal readonly string Creation;
+        internal readonly int Deaths;
+
+        internal OwnerPublication(EntityPlayer player, RebirthWorldCharacterRecord practiceRecord = null)
+        {
+            Player = player;
+            PracticeRecord = practiceRecord;
+            Creation = practiceRecord?.Origin?.CreationId;
+            Deaths = practiceRecord == null ? 0 : player.Died;
+        }
+    }
     private struct WindowAmount { public float Started; public float Amount; }
 
     public static bool TryAwardTrainingEvidence(EntityPlayer player,RebirthSkillTrainingEvidence evidence,out RebirthSkillTrainingComputation computation,out float appliedSkillProgress,out float appliedAttribute)
@@ -28,14 +44,30 @@ public static class RebirthSkillAwardService
     /// evidence and a LOCKED training profile.
     /// </summary>
     public static bool TryAwardMigratedTrainingEvidence(EntityPlayer player,RebirthSkillTrainingEvidence evidence,out RebirthSkillTrainingComputation computation,out float appliedSkillProgress,out float appliedAttribute)
+        => TryAwardMigratedTrainingEvidence(player,evidence,false,out computation,out appliedSkillProgress,out appliedAttribute);
+
+    internal static bool TryAwardOrdinaryPractice(EntityPlayerLocal player, RebirthSkillTrainingEvidence evidence,
+        out RebirthSkillTrainingComputation computation, out float appliedSkill, out float appliedAttribute)
+    {
+        computation = null;
+        appliedSkill = appliedAttribute = 0f;
+        if (player?.world == null || player.IsDead() || !player.IsSpawned() ||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(), player) || evidence == null ||
+            evidence.MinimumInterval != 0f || !string.IsNullOrEmpty(evidence.DurableReceiptId)) return false;
+        if (player.world.IsRemote())
+            return RebirthOrdinarySkillPractice.TryAward(player, evidence, out computation, out appliedSkill, out appliedAttribute);
+        return TryAwardMigratedTrainingEvidence(player, evidence, true, out computation, out appliedSkill, out appliedAttribute);
+    }
+
+    private static bool TryAwardMigratedTrainingEvidence(EntityPlayer player, RebirthSkillTrainingEvidence evidence,
+        bool ordinary, out RebirthSkillTrainingComputation computation, out float appliedSkillProgress, out float appliedAttribute)
     {
         computation=null; appliedSkillProgress=0f; appliedAttribute=0f;
-        RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
-        if(evidence==null||!TryGetEligible(player,out identity,out record))return false;
-        RebirthSkillRuntimeState state; if(!record.Progression.Skills.TryGetValue(evidence.SkillId??string.Empty,out state)||state==null)return false;
-        float practical=state.Value+state.Progress;
-        if(!RebirthSkillTrainingCalculator.TryCalculate(evidence,practical,out computation)||computation==null)return false;
-        return TryAwardInternal(player,evidence.SkillId,computation.RawBeforeLearningModifiers,evidence.SourceKey,evidence.MinimumInterval,evidence.DurableReceiptId,out appliedSkillProgress,out appliedAttribute);
+        if(evidence==null||!TryGetEligible(player,out _,out var record))return false;
+        if(!record.Progression.Skills.TryGetValue(evidence.SkillId??string.Empty,out var state)||state==null)return false;
+        if(!RebirthSkillTrainingCalculator.TryCalculate(evidence,state.Value+state.Progress,out computation,ownerLocalPractice:ordinary))return false;
+        return TryAwardInternal(player,evidence.SkillId,computation.RawBeforeLearningModifiers,evidence.SourceKey,evidence.MinimumInterval,
+            evidence.DurableReceiptId,out appliedSkillProgress,out appliedAttribute,ordinary:ordinary);
     }
 
     /// <summary>Read-only unified evidence preview. It uses the same calculator and Skill projection path as the live award API.</summary>
@@ -66,7 +98,7 @@ public static class RebirthSkillAwardService
 
     private static bool TryAwardInternal(EntityPlayer player,string skillId,float rawProgress,string sourceKey,float minimumInterval,string durableReceiptId,
         out float appliedSkillProgress,out float appliedAttribute,
-        RebirthCraftTrainingRules.Model? trainingModel=null,int trainingCycles=1,float preparationMultiplier=1f,CraftAttempt attempt=null)
+        RebirthCraftTrainingRules.Model? trainingModel=null,int trainingCycles=1,float preparationMultiplier=1f,CraftAttempt attempt=null,bool ordinary=false)
     {
         appliedSkillProgress=0f; appliedAttribute=0f;
         RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
@@ -77,7 +109,7 @@ public static class RebirthSkillAwardService
             // The reward and receipt live in the same player snapshot. If a previous write failed
             // but the in-memory record remains dirty, retry that exact snapshot before acking.
             if(record.Dirty && !RebirthWorldCharacterRepository.SaveIfDirty(identity,"skill-award-receipt-retry:"+skillId))return false;
-            lock(Gate) PendingOwnerPublications[player.entityId]=player;
+            QueueOwnerPublication(player);
             return true;
         }
         if(!IsFinite(rawProgress) || rawProgress<0f || string.IsNullOrEmpty(skillId) ||
@@ -95,6 +127,7 @@ public static class RebirthSkillAwardService
 
         string cooldownKey=skillId+"|"+(sourceKey??string.Empty);
         double nowActive=record.Condition!=null?Math.Max(0d,record.Condition.ActivePlaySeconds):0d;
+        bool deferred=false;
         lock(Gate)
         {
             RebirthSkillAntiRepeatRuntimeState antiRepeat=record.Progression.SkillAntiRepeat ?? (record.Progression.SkillAntiRepeat=new RebirthSkillAntiRepeatRuntimeState());
@@ -135,13 +168,13 @@ public static class RebirthSkillAwardService
             string attributeId=RebirthAttributeProgressionService.GetPrimaryAttributeForSkill(skillId);
             if(attributeId.Length>0)
                 RebirthAttributeProgressionService.ApplyTraining(record,attributeId,appliedSkillProgress*RebirthProgressionRuntimeConfig.SkillProgressToAttribute*RebirthArmorBonusSpecials.AttributeGainFactor(player),out appliedAttribute);
-            record.Touch("skill-award:"+skillId);
+
+            deferred=ordinary && RebirthWorldCharacterRepository.TryScheduleOrdinaryPracticeCheckpoint(record);
+            record.Touch("skill-award:"+skillId,requiresDurability:!deferred);
         }
-        // Durability remains synchronous at the accepted logical event boundary. Owner-state
-        // projection is safe to coalesce to one latest-revision body per game-update frame.
-        bool persisted=RebirthWorldCharacterRepository.SaveIfDirty(identity,"skill-award:"+skillId);
+        bool persisted=!deferred && RebirthWorldCharacterRepository.SaveIfDirty(identity,"skill-award:"+skillId);
         if(!string.IsNullOrEmpty(durableReceiptId) && !persisted)return false;
-        lock(Gate) PendingOwnerPublications[player.entityId]=player;
+        QueueOwnerPublication(new OwnerPublication(player,deferred ? record : null));
         RebirthStatisticsService.RecordSkillProgress(player,skillId,appliedSkillProgress);
         return true;
     }
@@ -185,11 +218,20 @@ public static class RebirthSkillAwardService
         float support=RebirthTraitSupportService.GetSkillGainMultiplier(record,beforeValue);
         float trait=RebirthTraitGameplayModifierService.GetSkillGainMultiplier(record.Origin.TraitIds,skillId,beforeValue);
         if(!IsFinite(support)||!IsFinite(trait)||!IsFinite(lesson))return false;
-        float total=Math.Max(0f,beforeProgress)+rawProgress*support*trait*lesson;
-        if(!IsFinite(total))return false;
-        while(total>=1f&&nextValue<definition.Max){nextValue+=1f;total-=1f;}
-        nextValue=Math.Max(definition.Min,Math.Min(definition.Max,nextValue));
-        nextProgress=nextValue>=definition.Max?0f:Math.Max(0f,Math.Min(.999999f,total));
+        return TryAddSkillProgress(definition,beforeValue,beforeProgress,rawProgress*support*trait*lesson,out nextValue,out nextProgress);
+    }
+
+    internal static bool TryAddSkillProgress(RebirthSkillDefinition definition, float value, float progress, double gain,
+        out float nextValue, out float nextProgress)
+    {
+        nextValue = value;
+        nextProgress = progress;
+        float total = Math.Max(0f, progress) + (float)gain;
+        if (definition == null || !IsFinite(value) || !IsFinite(progress) || gain < 0 ||
+            double.IsNaN(total) || double.IsInfinity(total)) return false;
+        double levels = Math.Floor(total);
+        nextValue = (float)Math.Max(definition.Min, Math.Min(definition.Max, value + levels));
+        nextProgress = nextValue >= definition.Max ? 0f : (float)Math.Min(.999999, total - levels);
         return true;
     }
 
@@ -355,35 +397,53 @@ public static class RebirthSkillAwardService
     public static void QueueOwnerPublication(EntityPlayer player)
     {
         if (player == null || player.world == null || player.world.IsRemote()) return;
-        lock (Gate) PendingOwnerPublications[player.entityId] = player;
+        QueueOwnerPublication(new OwnerPublication(player));
     }
+
+    internal static void QueueOrdinaryOwnerPublication(EntityPlayer player, RebirthWorldCharacterRecord record) =>
+        QueueOwnerPublication(new OwnerPublication(player, record));
+
+    private static void QueueOwnerPublication(OwnerPublication publication)
+    {
+        var player=publication.Player;
+        lock(Gate)
+        {
+            if(publication.PracticeRecord!=null && PendingOwnerPublications.TryGetValue(player.entityId,out var pending) &&
+                ReferenceEquals(pending.Player,player) && pending.PracticeRecord==null)return;
+            PendingOwnerPublications[player.entityId]=publication;
+        }
+    }
+
     public static void FlushOwnerPublications()
     {
         World world=GameManager.Instance!=null?GameManager.Instance.World:null;
         if(world==null||world.IsRemote()||Time.realtimeSinceStartup<nextOwnerPublicationAttempt)return;
-        KeyValuePair<int,EntityPlayer>[] pending;
+        KeyValuePair<int,OwnerPublication>[] pending;
         lock(Gate)
         {
             if(PendingOwnerPublications.Count==0)return;
             nextOwnerPublicationAttempt=Time.realtimeSinceStartup+1f;
-            pending=new List<KeyValuePair<int,EntityPlayer>>(PendingOwnerPublications).ToArray();PendingOwnerPublications.Clear();
+            pending=new List<KeyValuePair<int,OwnerPublication>>(PendingOwnerPublications).ToArray();PendingOwnerPublications.Clear();
         }
         for(int i=0;i<pending.Length;i++)
         {
+            var publication=pending[i].Value;
             EntityPlayer player=world.GetEntity(pending[i].Key) as EntityPlayer;
-            if(player==null||!ReferenceEquals(player,pending[i].Value)||!ReferenceEquals(player.world,world))continue;
+            if(player==null||!ReferenceEquals(player,publication.Player)||!ReferenceEquals(player.world,world))continue;
             RebirthStablePlayerIdentity identity;RebirthWorldCharacterRecord record;
             if(!RebirthStablePlayerIdentity.TryResolveServerEntity(player,out identity)||identity==null||
                 !RebirthWorldCharacterRepository.TryGet(identity,out record)||record==null)continue;
-            if(record.Dirty && !RebirthWorldCharacterRepository.SaveIfDirty(identity,"owner-publication-retry"))
+            bool practiceOnly=publication.PracticeRecord!=null;
+            if(practiceOnly && (!ReferenceEquals(record,publication.PracticeRecord) || record.Origin?.CreationId!=publication.Creation ||
+                player.IsDead() || !player.IsSpawned() || player.Died!=publication.Deaths || RebirthCharacterCreationHoldService.IsHeld(player)))continue;
+            if(record.Dirty && (!practiceOnly || record.RequiresDurableOwnerPublication) &&
+                !RebirthWorldCharacterRepository.TrySaveIfDirtyForLifecycle(identity,"owner-publication-retry"))
             {
-                if(ReferenceEquals(GameManager.Instance.World,world))
-                    lock(Gate) PendingOwnerPublications[player.entityId]=player;
+                if(ReferenceEquals(GameManager.Instance.World,world))QueueOwnerPublication(publication);
                 continue;
             }
             if(!RebirthSurvivorNetworkService.SendOwnerState(player,record.Revision,true,"skill-award-coalesced"))
-                if(ReferenceEquals(GameManager.Instance.World,world))
-                    lock(Gate) PendingOwnerPublications[player.entityId]=player;
+                if(ReferenceEquals(GameManager.Instance.World,world))QueueOwnerPublication(publication);
         }
     }
 

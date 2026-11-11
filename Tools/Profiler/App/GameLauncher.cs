@@ -42,7 +42,7 @@ static class GameLauncher
     /// <summary>Also sample the game worker threads (pathfinding, jobs, AI). Off by default: it briefly suspends busy threads.</summary>
     public static bool SampleThreads;
 
-    public static int Launch(string gameExe, string arguments, string modulePath, string outputPath, bool trackAllocations)
+    public static int Launch(string gameExe, string arguments, string modulePath, string outputPath, bool trackAllocations, Action<int> beforeResume = null)
     {
         Environment.SetEnvironmentVariable("PROFILER_OUT", outputPath);
         Environment.SetEnvironmentVariable("PROFILER_ALLOC", trackAllocations ? "1" : "0");
@@ -86,6 +86,8 @@ static class GameLauncher
                 throw new InvalidOperationException($"The sampler could not start (code {initResult}). See {outputPath}.log");
 
             var launchedPid = (int)pi.dwProcessId;
+            // Publish optional eval ownership while launch still owns the suspended child.
+            beforeResume?.Invoke(launchedPid);
             var currentProcess = GetCurrentProcess();
             if (!DuplicateHandle(currentProcess, pi.hProcess, currentProcess, out var observationHandle, 0, false, 2))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not retain the game process handle for exit diagnostics");

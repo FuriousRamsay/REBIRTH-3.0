@@ -140,6 +140,7 @@ public sealed class RebirthCraftingCommandBridge
 
     public void ExecuteCraft(Recipe recipe, int craftingTier)
     {
+        RebirthDebug.Log("crafting", $"[REBIRTH ContainerCraft] button recipe={recipe?.GetName()} count={craftCount?.Count}");
         // The button can have been drawn before the most recent inventory mutation. Recheck
         // the actual request on click, then let the native action recheck the current materials.
         // Do not normalize a zero request to one or alter an existing queue on rejection.

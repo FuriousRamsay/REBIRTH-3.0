@@ -93,6 +93,45 @@ class BatchTests(unittest.TestCase):
         self.assertEqual([r['status'] for r in report['cases']], ['FAIL', 'BLOCKED'])
         self.assertEqual(len(calls), 1)
 
+    def test_live_prerequisite_parks_case_and_runs_next_in_same_lease(self):
+        self.plan['cases'][0]['readyWhen'] = [{'path': ['surroundings', 'count'], 'equals': 0}]
+        self.plan['cases'][1]['readyWhen'] = [{'path': ['state', 'world', 'gameName'], 'equals': 'CodexTest'}]
+        calls = []
+
+        def recorded(command, **kwargs):
+            calls.append(command)
+            return success(command, **kwargs)
+
+        _, report = self.execute(recorded)
+        self.assertEqual(report['status'], 'PARTIAL_SELECTED')
+        self.assertEqual([r['status'] for r in report['cases']], ['PARKED', 'PASS'])
+        evidence = Path(report['cases'][0]['evidence'])
+        self.assertEqual(batch.read(evidence / 'prerequisites.json'), [
+            {'path': ['surroundings', 'count'], 'equals': 0, 'available': False, 'observed': None}])
+        self.assertEqual(len(calls), 1)
+        self.assertFalse((evidence / 'screenshot.json').exists())
+        self.assertTrue(report['leaseReleased'])
+
+    def test_live_prerequisite_does_not_skip_over_held_cursor(self):
+        class HeldCursorBridge(FakeBridge):
+            def call(self, endpoint, method='GET', **query):
+                value = super().call(endpoint, method, **query)
+                if endpoint == '/gearobserve':
+                    value['cursor']['count'] = 1
+                return value
+
+        self.plan['cases'][0]['readyWhen'] = [{'path': ['surroundings', 'count'], 'equals': 0}]
+        _, report = batch.run(self.plan, batch.prepare(self.plan), None, HeldCursorBridge,
+                              lambda *_args, **_kwargs: self.fail('No case input may run'))
+        self.assertEqual([r['status'] for r in report['cases']], ['FAIL', 'BLOCKED'])
+        self.assertFalse(report['leaseReleased'])
+
+    def test_live_prerequisite_rejects_invalid_fields_before_contact(self):
+        self.plan['cases'][0]['readyWhen'] = [{'path': ['console', 'command'], 'equals': False}]
+        with self.assertRaises(ValueError):
+            batch.prepare(self.plan)
+        self.assertEqual(FakeBridge.instances, [])
+
     def test_no_screenshot_batch_still_observes_and_releases(self):
         self.plan['captureScreenshots'] = False
         _, report = self.execute()

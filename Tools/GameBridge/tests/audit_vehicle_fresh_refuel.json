@@ -1,0 +1,16 @@
+{
+  "name": "Purge vehicle fresh refuel catalogue control",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Requires a disposable Purge save. Prepare an owned, placed 80s Camper Truck with a 400-unit tank at zero and exactly 100 Gas Can units in owned inventory. Open Service through the actual vehicle radial before running. Use a genuinely fresh request, then run separately on solo and a dedicated client. Confirm paired host exact fuel changes from 0 to 4 units. The rounded native display alone does not prove exact settlement."},
+    {"_note": "For the dedicated wake, time the exact saved Applied ACK, next eligible authority update, durable result and owner release. Confirm the same exact source debit and saved fuel once. A saved rejection or failed journal write must leave the accelerated reply unused. Exercise ordinary durable replay, duplicate ACK and the part and Solo paths separately."},
+    {"expectWindowOpen": "rebirthVehicleRestoration"},
+    {"expectUi": {"window": "rebirthVehicleRestoration", "id": "vehicleFuelValue", "exactText": "0%"}},
+    {"expectItem": {"name": "ammoGasCan", "min": 100, "max": 100}},
+    {"action": {"command": "click", "args": {"id": "vehicleRefuel", "window": "rebirthVehicleRestoration"}}},
+    {"waitForUi": {"window": "rebirthVehicleRestoration", "id": "vehicleFuelValue", "exactText": "1%", "timeout": 12}},
+    {"expectNoItem": "ammoGasCan"},
+    {"screenshot": "audit_vehicle_fresh_refuel"},
+    {"expectNoErrors": true}
+  ]
+}

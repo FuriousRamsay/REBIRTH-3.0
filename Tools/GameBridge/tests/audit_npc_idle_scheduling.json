@@ -1,0 +1,18 @@
+{
+  "name": "NPC idle settlement needs and equipment retry smoke",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run on disposable solo and dedicated Purge with no natural humanoid NPCs. Capture equivalent idle native session counters before and after a host tick. Check that empty needs do not dirty the store, then repeat with a real existing need. Equipment mailbox delayed, repeated, out-of-order and expired control uses the controlled exact snapshot/native actor fixture on a dedicated peer, separately from this smoke."
+    },
+    {
+      "wait": 11
+    },
+    {
+      "screenshot": "audit_npc_idle_scheduling"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

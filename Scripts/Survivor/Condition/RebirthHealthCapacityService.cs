@@ -42,6 +42,10 @@ public static class RebirthHealthCapacityService
     }
 
     public static bool Tick(EntityPlayer player, RebirthWorldCharacterRecord record, float activeSeconds)
+        => Tick(player, record, activeSeconds, null, null);
+
+    internal static bool Tick(EntityPlayer player, RebirthWorldCharacterRecord record, float activeSeconds,
+        RebirthConditionResolver.NativeInputs? sampled, RebirthConditionResolvedSnapshot resolved)
     {
         if (player == null || player.Stats == null || record == null || record.Condition == null || activeSeconds <= 0f)
             return false;
@@ -69,19 +73,20 @@ public static class RebirthHealthCapacityService
         float beforeMalnutrition = condition.SevereMalnutritionActiveSeconds;
         condition.HealthCapacity = Mathf.Clamp(condition.HealthCapacity, min, potential);
 
-        float hydrationPercent = Percent(player.Stats.Water != null ? player.Stats.Water.Value : 100f,
-            player.Stats.Water != null ? player.Stats.Water.ModifiedMax : 100f);
-        float nutritionPercent = Percent(player.Stats.Food != null ? player.Stats.Food.Value : 100f,
-            player.Stats.Food != null ? player.Stats.Food.ModifiedMax : 100f);
+        var inputs = sampled ?? new RebirthConditionResolver.NativeInputs(player);
+        float hydrationPercent = inputs.Hydration;
+        float nutritionPercent = inputs.Nutrition;
 
         condition.SevereDehydrationActiveSeconds = hydrationPercent < RebirthConditionRuntimeConfig.DehydrationThresholdPercent
             ? Math.Max(0f, condition.SevereDehydrationActiveSeconds + activeSeconds) : 0f;
         condition.SevereMalnutritionActiveSeconds = nutritionPercent < RebirthConditionRuntimeConfig.MalnutritionThresholdPercent
             ? Math.Max(0f, condition.SevereMalnutritionActiveSeconds + activeSeconds) : 0f;
 
-        RebirthMetabolismState metabolism;
-        RebirthWorldCharacterService.TryGetMetabolism(player, out metabolism);
-        RebirthConditionResolvedSnapshot resolved = RebirthConditionResolver.Resolve(player, record, metabolism);
+        if (resolved == null)
+        {
+            RebirthWorldCharacterService.TryGetMetabolism(player, out var metabolism);
+            resolved = RebirthConditionResolver.Resolve(player, record, metabolism, inputs);
+        }
 
         float loss = 0f;
         if (condition.SevereDehydrationActiveSeconds > RebirthConditionRuntimeConfig.DehydrationGraceRealSeconds)
@@ -105,8 +110,8 @@ public static class RebirthHealthCapacityService
             condition.HealthCapacity = Mathf.Max(min, condition.HealthCapacity - adjustedLoss);
         }
 
-        float nativeBlockage = Mathf.Max(0f, EffectManager.GetValue(PassiveEffects.HealthMaxBlockage, _entity: player));
-        bool illness = RebirthConditionTraitModifierService.IsSeriousIllness(player);
+        float nativeBlockage = inputs.HealthBlockage;
+        bool illness = inputs.SeriousIllness;
         float nativeMultiplier = resolved.HealthCapacityLossMultiplier *
             (illness ? resolved.HealthCapacityIllnessLossMultiplier : resolved.HealthCapacityInjuryLossMultiplier);
         float authoredIllnessPenalty = illness ? RebirthConditionRuntimeConfig.DysenteryNativeCapacityPenalty : 0f;
@@ -229,8 +234,4 @@ public static class RebirthHealthCapacityService
         return Mathf.Lerp(criticalRate, zeroRate, criticalT);
     }
 
-    private static float Percent(float value, float max)
-    {
-        return max > 0.001f ? Mathf.Clamp01(value / max) : 0f;
-    }
 }

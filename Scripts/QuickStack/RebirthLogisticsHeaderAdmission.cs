@@ -39,7 +39,8 @@ internal static class RebirthLogisticsHeaderAdmission
     private static string ReadText(string path)
     {
         var file=new FileInfo(path);if(!file.Exists||file.Length<1||file.Length>MaximumBytes||(file.Attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
-        using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumBytes}))return XElement.Load(reader).ToString(SaveOptions.DisableFormatting);
+        using(var stream=File.OpenRead(path))
+        using(var reader=XmlReader.Create(stream,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumBytes}))return XElement.Load(reader).ToString(SaveOptions.DisableFormatting);
     }
     private static string HostPath(string owner,Guid operation)=>Path.Combine(GameIO.GetSaveGameDir(),"RebirthLogisticsHeaders",owner,operation.ToString("N")+".xml");
     private static string Archive(string path)=>Path.Combine(Path.GetDirectoryName(path),"archive",Path.GetFileName(path));
@@ -65,7 +66,49 @@ internal static class RebirthLogisticsHeaderAdmission
         string path=HostPath(h.Command.Owner,h.Command.Operation);if(File.Exists(Archive(path))||File.Exists(path+".tmp")||File.Exists(path+".bak"))return false;
         string text=Write(h).ToString(SaveOptions.DisableFormatting);var bytes=Encoding.UTF8.GetBytes(text);if(bytes.Length>MaximumBytes)return false;
         Directory.CreateDirectory(Path.GetDirectoryName(path));using(var stream=new FileStream(path+".tmp",FileMode.CreateNew,FileAccess.Write,FileShare.None)){stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
-        if(replace)File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);return XNode.DeepEquals(Write(h),Write(ReadHost(h.Command.Owner,h.Command.Operation)));
+        if(replace)File.Replace(path+".tmp",path,null);else File.Move(path+".tmp",path);
+        if(!XNode.DeepEquals(Write(h),Write(ReadHost(h.Command.Owner,h.Command.Operation))))return false;
+        if(h.State>=2&&h.BodyIndex!=1)TryArchiveHost(path);
+        return true;
+    }
+    private static bool Terminal(Header header)
+        => header.State>=2||RebirthLogisticsTransferJournal.TryRead(header.Command.Owner,header.Command.Operation,out var original)&&
+            original.Phase==4&&RebirthLogisticsNativeBodyIntent.Command.From(original).Binding==header.Command.Binding;
+
+    private static bool ArchiveHost(string path)
+    {
+        string archive=Archive(path);if(File.Exists(archive))return false;
+        Directory.CreateDirectory(Path.GetDirectoryName(archive));File.Move(path,archive);return true;
+    }
+    private static void TryArchiveHost(string path)
+    {
+        try{if(File.Exists(path))ArchiveHost(path);}
+        catch{/* The exact committed header remains readable at its primary path. */}
+    }
+    internal static void ArchiveCompletedTransfer(RebirthLogisticsTransferJournal.Record original)
+    {
+        try
+        {
+            if(original.Phase!=4)return;
+            var header=ReadHost(original.Owner,original.Operation);
+            if(header!=null&&header.BodyIndex!=1&&header.Command.Binding==RebirthLogisticsNativeBodyIntent.Command.From(original).Binding)
+                TryArchiveHost(HostPath(original.Owner,original.Operation));
+        }
+        catch{/* Unknown header history remains in place for existing recovery. */}
+    }
+    private static bool DepositOwnerBudget(string owner)
+    {
+        string directory=Path.GetDirectoryName(HostPath(owner,Guid.Empty));
+        if(!Directory.Exists(directory))return true;
+        int active=0,files=0;
+        foreach(string path in Directory.EnumerateFiles(directory,"*",SearchOption.TopDirectoryOnly))
+        {
+            if(++files>4096)return false;
+            var header=Parse(ReadText(path));
+            if(header.Command.Owner!=owner||Path.GetFileName(path)!=header.Command.Operation.ToString("N")+".xml")return false;
+            if(!Terminal(header)&&++active>=128)return false;
+        }
+        return true;
     }
     private static bool HostBudget(string owner,int incoming)
     {
@@ -76,8 +119,7 @@ internal static class RebirthLogisticsHeaderAdmission
             foreach(string path in Directory.EnumerateFiles(directory,"*",SearchOption.TopDirectoryOnly))
             {
                 if(++total>4096)return false;var h=Parse(ReadText(path));if(Path.GetFileName(path)!=h.Command.Operation.ToString("N")+".xml"||h.Command.Owner!=nativeOwner)return false;
-                bool terminal=h.State>=2||RebirthLogisticsTransferJournal.TryRead(nativeOwner,h.Command.Operation,out var original)&&original.Phase==4&&RebirthLogisticsNativeBodyIntent.Command.From(original).Binding==h.Command.Binding;
-                if(terminal){string archive=Archive(path);if(File.Exists(archive))return false;Directory.CreateDirectory(Path.GetDirectoryName(archive));File.Move(path,archive);continue;}
+                if(Terminal(h)){if(!ArchiveHost(path))return false;continue;}
                 if(nativeOwner==owner&&++own>=128)return false;bytes+=new FileInfo(path).Length;if(bytes+incoming>33554432)return false;
             }
         }
@@ -107,7 +149,9 @@ internal static class RebirthLogisticsHeaderAdmission
             {
                 if(mode==RequestMode.Query||actor.IsDead()||actor.Died!=c.Deaths||c.Creation!=RebirthCamperCharacterAccess.CurrentCreation(actor)||RebirthLogisticsTransferJournal.TryRead(c.Owner,c.Operation,out _))return;
                 h=new Header{Command=c,Entity=actor.entityId,Nonce=Guid.NewGuid().ToString("N"),State=mode==RequestMode.Cancel?2:0,BodyIndex=mode==RequestMode.Cancel?0:1};
-                if(!HostBudget(c.Owner,Encoding.UTF8.GetByteCount(Write(h).ToString(SaveOptions.DisableFormatting)))||!SaveHost(h,false))return;
+                bool deposit=mode==RequestMode.Prepare&&c.Action==QuickStackRadialAction.Deposit;
+                if(!(deposit?DepositOwnerBudget(c.Owner):HostBudget(c.Owner,Encoding.UTF8.GetByteCount(Write(h).ToString(SaveOptions.DisableFormatting))))||
+                    !SaveHost(h,false))return;
             }
             if(h.Command.Binding!=c.Binding)return;
             if(h.BodyIndex==1)
@@ -212,8 +256,11 @@ internal static class RebirthLogisticsHeaderAdmission
         }
         catch{/* Native fatal always proceeds. */}
     }
-    private static string OwnerDirectory(RebirthLogisticsNativeBodyIntent.Command c)=>Path.Combine(GameIO.GetPlayerDataDir(),"RebirthLogisticsHeaderAdmission",c.World,c.Owner);
-    private static string OwnerPath(Header h)=>Path.Combine(OwnerDirectory(h.Command),h.Command.Operation.ToString("N"),"header.xml");
+    internal static string OwnerIoRoot()=>RebirthDurableFileCommit.WindowsIoPath(Path.GetFullPath(GameIO.GetPlayerDataDir()),includeDescendants:true);
+    private static string OwnerDirectory(string world,string owner)=>Path.Combine(OwnerIoRoot(),"RebirthLogisticsHeaderAdmission",world,owner);
+    private static string OwnerDirectory(RebirthLogisticsNativeBodyIntent.Command c)=>OwnerDirectory(c.World,c.Owner);
+    internal static string OwnerOperationDirectory(RebirthLogisticsNativeBodyIntent.Command c)=>Path.Combine(OwnerDirectory(c),c.Operation.ToString("N"));
+    private static string OwnerPath(Header h)=>Path.Combine(OwnerOperationDirectory(h.Command),"header.xml");
     private static string Marker(Header h,string kind)=>new XElement("ownerHeader",new XAttribute("version",1),new XAttribute("kind",kind),new XAttribute("nonce",h.Nonce??string.Empty),new XAttribute("entity",h.Entity),CommandXml(h.Command)).ToString(SaveOptions.DisableFormatting);
     private static bool WriteOnce(string path,string text)
     {
@@ -275,7 +322,7 @@ internal static class RebirthLogisticsHeaderAdmission
     private static bool Load(EntityPlayerLocal player)
     {
         if(!RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var owner))return false;
-        string root=Path.Combine(GameIO.GetPlayerDataDir(),"RebirthLogisticsHeaderAdmission",RebirthLogisticsTransferJournal.WorldKey(player.world),owner.StorageKey);if(!Directory.Exists(root))return true;int count=0;
+        string root=OwnerDirectory(RebirthLogisticsTransferJournal.WorldKey(player.world),owner.StorageKey);if(!Directory.Exists(root))return true;int count=0;
         foreach(string directory in Directory.EnumerateDirectories(root))
         {
             if(Path.GetFileName(directory)=="archive")continue;if(++count>128)throw new InvalidDataException();

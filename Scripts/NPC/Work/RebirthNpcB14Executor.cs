@@ -438,7 +438,8 @@ internal static class RebirthNpcB14HarvestExecutor
     {
         bool retired = npc != null && npc.RebirthRuntimeState != null && RebirthNpcB14Store.TryRetire(npc.RebirthRuntimeState.StableId);
 #if DEBUG
-        if (retired) DebugSetPlayerVar("rbnpc_b14_completed", 1f); // outcome recorded + row acknowledged
+        // Test marker for the Game Bridge scenario only: never written into normal saves (owner 2026-11-09).
+        if (retired && GamePrefs.GetString(EnumGamePrefs.GameName).StartsWith("CodexTest", StringComparison.Ordinal)) DebugSetPlayerVar("rbnpc_b14_completed", 1f);
 #endif
         return retired;
     }

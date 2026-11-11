@@ -116,7 +116,7 @@ public static class RebirthPhase9TechnicalTrainingService
             string content,slot;
             if(!TryParseComponentSource(source,out content,out slot))return false;
             ComponentProfile p;
-            if(!Components.TryGetValue(ComponentKey(content,slot),out p)||p==null)return false;
+            if(!TryGetMechanicsComponent(content,slot,out p))return false;
             float fraction=Mathf.Clamp01(actualWorkFraction);
             if(fraction<=0f)return false;
             raw=mechanicsComplexityGain*p.Complexity*fraction*(a=="replace"?mechanicsReplaceFactor:1f);
@@ -138,7 +138,7 @@ public static class RebirthPhase9TechnicalTrainingService
         if(action=="repair")raw=mechanicsComplexityGain*mechanicsRepairDefaultComplexity*Mathf.Clamp01(fraction);
         else if(action=="install"||action=="replace")
         {
-            if(!TryParseComponentSource(source,out var content,out var slot)||!Components.TryGetValue(ComponentKey(content,slot),out var profile)||profile==null)
+            if(!TryParseComponentSource(source,out var content,out var slot)||!TryGetMechanicsComponent(content,slot,out var profile))
                 throw new InvalidDataException("Mechanics original component profile is unavailable.");
             raw=mechanicsComplexityGain*profile.Complexity*Mathf.Clamp01(fraction)*(action=="replace"?mechanicsReplaceFactor:1f);
         }
@@ -220,6 +220,10 @@ public static class RebirthPhase9TechnicalTrainingService
         check("BaseMinibike Engine complexity 4",Components.TryGetValue(ComponentKey("BaseMinibike","Engine"),out engine)&&Near(engine.Complexity,4f));
         check("BaseBicycle Wheel1 complexity 1",Components.TryGetValue(ComponentKey("BaseBicycle","Wheel1"),out wheel)&&Near(wheel.Complexity,1f));
         check("BaseMinibike Battery complexity 1.5",Components.TryGetValue(ComponentKey("BaseMinibike","Battery"),out battery)&&Near(battery.Complexity,1.5f));
+        check("Camper80s HeadlightLeft uses the V8 truck profile",
+            TryGetMechanicsComponent("Camper80s","HeadlightLeft",out var camperLight)&&Near(camperLight.Complexity,1f));
+        check("Camper80s Battery uses the V8 truck profile",
+            TryGetMechanicsComponent("Camper80s","Battery",out var camperBattery)&&Near(camperBattery.Complexity,1.5f));
         check("engine install=.60",Near(mechanicsComplexityGain*4f,.60f));
         check("engine replace~=.514",Near(mechanicsComplexityGain*4f*mechanicsReplaceFactor,.5142857f));
         check("hotwire=.60",Near(mechanicsHotwireGain,.60f));
@@ -247,6 +251,17 @@ public static class RebirthPhase9TechnicalTrainingService
         if(p.Length<3)return false;
         if(!string.Equals(p[0],"block",StringComparison.OrdinalIgnoreCase)&&!string.Equals(p[0],"entity",StringComparison.OrdinalIgnoreCase))return false;
         content=p[1]??string.Empty;slot=p[2]??string.Empty;return content.Length>0&&slot.Length>0;
+    }
+    private static bool TryGetMechanicsComponent(string content,string slot,out ComponentProfile profile)
+    {
+        if(Components.TryGetValue(ComponentKey(content,slot),out profile))return true;
+        if(!string.Equals(content,"Camper80s",StringComparison.OrdinalIgnoreCase))return false;
+
+        // The 80s camper uses the same authored V8 repair slots as the base 4x4.
+        var camper=RebirthVehicleDefinitionRegistry.GetContent(content);
+        var truck=RebirthVehicleDefinitionRegistry.GetContent("Base4x4");
+        return camper!=null&&truck!=null&&camper.FamilyId==truck.FamilyId&&
+            Components.TryGetValue(ComponentKey(truck.ContentId,slot),out profile);
     }
     private static string ComponentKey(string content,string slot){return (content??string.Empty).Trim()+"|"+(slot??string.Empty).Trim();}
     private static void Ensure(){if(!ready)Load();}

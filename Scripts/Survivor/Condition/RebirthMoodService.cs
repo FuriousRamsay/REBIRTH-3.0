@@ -8,8 +8,12 @@ public static class RebirthMoodService
     public static bool Tick(EntityPlayer player, RebirthWorldCharacterRecord record, RebirthMetabolismState metabolism, float activeSeconds)
     {
         if (record == null || record.Condition == null || activeSeconds <= 0f) return false;
+        return Tick(record, RebirthConditionResolver.Resolve(player, record, metabolism), activeSeconds);
+    }
+
+    internal static bool Tick(RebirthWorldCharacterRecord record, RebirthConditionResolvedSnapshot resolved, float activeSeconds)
+    {
         RebirthWorldConditionState condition = record.Condition;
-        RebirthConditionResolvedSnapshot resolved = RebirthConditionResolver.Resolve(player, record, metabolism);
         float oldTarget = condition.MoodTarget;
         float oldCurrent = condition.MoodCurrent;
         condition.MoodTarget = resolved.MoodTarget;

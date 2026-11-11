@@ -1,0 +1,14 @@
+{
+  "name": "Purge reconnect after completed starter truck claim",
+  "preconditions": "On an isolated dedicated Purge host, finish the first-entry truck handoff and dismount. Move out of replica range. Exit to the main menu and rejoin using the same player account, server process and client process. Start this check as soon as the client reports ingame, before interacting with any window. Record the existing authority claim before and after.",
+  "stopOnFailure": true,
+  "steps": [
+    { "screenshot": "purge_completed_truck_rejoin" },
+    { "expectNoUi": { "text": "Building environment" } },
+    { "expectNoUi": { "window": "rebirthPurgeInformation", "id": "purgeInformationClose" } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "expectWindowOpen": "crafting" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true }
+  ]
+}

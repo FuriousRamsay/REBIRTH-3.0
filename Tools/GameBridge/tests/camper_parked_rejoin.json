@@ -1,0 +1,16 @@
+{
+  "name": "Parked camper logout and rejoin",
+  "status": "AUTHORED_NOT_RUN",
+  "fixture": "Use a disposable Purge save with an existing 80s truck. Park on level ground, leave the driver's seat occupied, and release the controls before logging out.",
+  "observe": "Use gamebridge.ps1 energy entity=ID to record mobility.rigidbody.worldPosition, velocity, rotation and the driver seat before logout and on return. In dedicated Purge, an observer already near the parked truck should also watch it throughout the reconnect.",
+  "cases": [
+    { "mode": "Dedicated Purge", "body": "installed", "action": "Quit to menu from the driver's seat and rejoin the same running server." },
+    { "mode": "Dedicated Purge", "body": "absent", "action": "Repeat with a bare truck on the same surface." },
+    { "mode": "Solo Purge", "body": "installed", "action": "Quit to menu from the driver's seat and reload the same save." }
+  ],
+  "expect": [
+    "The same truck remains at the parking spot throughout the join and stays upright.",
+    "The truck shows no sudden upward motion or rollover before player input.",
+    "Enter and drive the truck normally after reconnecting."
+  ]
+}

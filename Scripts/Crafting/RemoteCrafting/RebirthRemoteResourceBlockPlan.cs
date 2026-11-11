@@ -109,7 +109,7 @@ internal static class RebirthRemoteResourceBlockPlan
             if(definition.CanRepair(block)||!nativeAction.isUpgradeItem||!progress.UseStarted||!progress.UpgradeChanged||progress.Target!=position||
                 !int.TryParse(definition.Properties.GetString("UpgradeBlock","UpgradeHitCount"),out int hits)||
                 progress.UpgradeHits<(hits+progress.HitOffset<1f?1:(int)(hits+progress.HitOffset))||
-                !RemoteResourceActionConsumerPatchInstaller.TryBuildUpgradeRequirement(nativeAction,block,out var need))return false;
+                !RemoteResourceActionConsumerPatchInstaller.TryBuildUpgradeRequirementAfterHitCountCheck(nativeAction,definition,out var need))return false;
             requirements.Add(need);return true;
         }
         if(!definition.CanRepair(block)||definition.MaxDamage<=0)return false;

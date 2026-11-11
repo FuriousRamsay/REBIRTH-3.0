@@ -1,0 +1,105 @@
+{
+  "name": "p22_authored_item_placement_admission",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable matching host/client XML with the temp-only P22 fixture mod installed to both test installations, Survivor progression and guard ON. Before counting success, inspect the merged p22FixtureVoxelPlaceable Action1, confirm actual class ItemActionPlaceAsBlock with output palletBricksBase and default texture, and verify target runtime method declarations and placement target. Choose a clear reachable native support surface in a loaded chunk, exact target air, no other palletBricksBase within isolation radius, no item or durable action on cursor, and one fixture item in the exact slot. In dedicated capture authenticated saved owner Before/After, authored operation and native server region after real input. Successful visible block + debit alone can also be vanilla fallback and is insufficient; require exact owned original/receipt."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@AUTHORED_SLOT@"
+        }
+      }
+    },
+    {
+      "markItem": "p22FixtureVoxelPlaceable"
+    },
+    {
+      "console": "rbsurvivor provenance item"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@AUTHORED_AIM_X@",
+          "y": "@AUTHORED_AIM_Y@",
+          "z": "@AUTHORED_AIM_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectNearbyBlockCount": {
+        "name": "palletBricksBase",
+        "radius": "@ISOLATED_RADIUS@",
+        "count": 0
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.25
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "p22FixtureVoxelPlaceable",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@AUTHORED_X@",
+          "y": "@AUTHORED_Y@",
+          "z": "@AUTHORED_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "palletBricksBase"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@AUTHORED_X@",
+          "y": "@AUTHORED_Y@",
+          "z": "@AUTHORED_Z@"
+        }
+      }
+    },
+    {
+      "expectNearbyBlockCount": {
+        "name": "palletBricksBase",
+        "radius": "@ISOLATED_RADIUS@",
+        "count": 1
+      }
+    },
+    {
+      "console": "rbsurvivor provenance block @AUTHORED_X@ @AUTHORED_Y@ @AUTHORED_Z@"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Run cold and warm with the same resolved native type but distinct legal target sites. Negative controls use torch/candle for actual unsupported inherited OnBlockAdded, loaded occupied/replaced exact target, owner restriction and normal native frame. For an admitted original whose voxel changes before host mutation use an isolated exact phase fixture and actual click, then verify original never invoked, original source debit/refund state and unchanged replacement on both peers. Run the same successfully admitted operation across save/reload once."
+    }
+  ]
+}

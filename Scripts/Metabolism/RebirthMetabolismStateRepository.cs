@@ -350,6 +350,11 @@ public static partial class RebirthMetabolismStateRepository
             new XAttribute("autoSipCooldownRealSeconds", S(state.AutoSipCooldownRemainingRealSeconds)),
             new XAttribute("lastWorldTime", state.LastProcessedWorldTime),
             new XAttribute("nextEntryId", state.NextEntryId));
+        if (state.NutritionBeforeDeath >= 0f && state.HydrationBeforeDeath >= 0f)
+        {
+            e.SetAttributeValue("nutritionBeforeDeath", S(state.NutritionBeforeDeath));
+            e.SetAttributeValue("hydrationBeforeDeath", S(state.HydrationBeforeDeath));
+        }
         RebirthHydrationGeneration.Write(e,state.HydrationGenerationId);
 
         if (state.HydrationSlotItem != null && !state.HydrationSlotItem.IsEmpty())
@@ -423,6 +428,8 @@ public static partial class RebirthMetabolismStateRepository
         state.AutoSipEnabled = AB(e, "autoSip", true);
         state.AutoSipCooldownRemainingRealSeconds = AF(e, "autoSipCooldownRealSeconds", 0f);
         state.LastProcessedWorldTime = AU(e, "lastWorldTime", 0UL);
+        state.NutritionBeforeDeath = AF(e, "nutritionBeforeDeath", -1f);
+        state.HydrationBeforeDeath = AF(e, "hydrationBeforeDeath", -1f);
         state.NextEntryId = Math.Max(1, AI(e, "nextEntryId", 1));
         state.HydrationSlotItem = ItemStack.Empty.Clone();
 

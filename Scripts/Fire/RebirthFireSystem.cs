@@ -915,6 +915,9 @@ public sealed class RebirthFireService
 
     public int CountNearby(Vector3i center, int range)
     {
+        if (firePositionsByChunk.Count == 0)
+            return 0;
+
         int count = 0;
         int radius = Math.Max(0, range);
         int minChunkX = World.toChunkXZ(center.x - radius);
@@ -964,6 +967,9 @@ public sealed class RebirthFireService
     public void CollectBurningWithin(Vector3i center, float radius, List<Vector3i> output)
     {
         output.Clear();
+        if (firePositionsByChunk.Count == 0)
+            return;
+
         float clampedRadius = Mathf.Max(0f, radius);
         float radiusSquared = clampedRadius * clampedRadius;
         int blockRadius = Mathf.CeilToInt(clampedRadius);
@@ -1309,7 +1315,7 @@ public sealed class RebirthFireService
         heatMapEventsLastUpdate = 0;
         spreadThrottleFractionLastUpdate = ComputeSpreadThrottleFraction();
 
-        if (!RebirthFirePersistenceScope.IsCurrentWorld(world) || !IsServer())
+        if (!RebirthFirePersistenceScope.IsCurrentWorld(world))
             return;
 
         RebirthFireSleeperActivation.Update(world);
@@ -2048,8 +2054,15 @@ public sealed class RebirthFireService
         if (player == null)
             return;
 
-        Dictionary<Vector3i, float> map;
-        if (!visibilityByPlayer.TryGetValue(playerEntityId, out map))
+        int count = visiblePositions == null ? 0 : Math.Min(visiblePositions.Count, RebirthFireVisualManager.FireParticleCap);
+        visibilityByPlayer.TryGetValue(playerEntityId, out Dictionary<Vector3i, float> map);
+        if (count == 0)
+        {
+            map?.Clear();
+            return;
+        }
+
+        if (map == null)
         {
             map = new Dictionary<Vector3i, float>();
             visibilityByPlayer[playerEntityId] = map;
@@ -2060,7 +2073,6 @@ public sealed class RebirthFireService
         float now = Time.realtimeSinceStartup;
         float maximumDistance = RebirthFireVisualManager.FireRenderDistance + 8f;
         float maximumDistanceSquared = maximumDistance * maximumDistance;
-        int count = visiblePositions == null ? 0 : Math.Min(visiblePositions.Count, RebirthFireVisualManager.FireParticleCap);
         for (int i = 0; i < count; i++)
         {
             Vector3i position = visiblePositions[i];

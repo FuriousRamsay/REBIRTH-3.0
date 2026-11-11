@@ -84,9 +84,9 @@ public sealed class XUiC_RebirthJournal : XUiController {
     public override void Init(){base.Init();
         Wire("journalClose",()=>xui.playerUI.windowManager.Close("rebirthJournal"));Wire("journalNew",()=>Edit(null));Wire("journalEdit",()=>Edit(selected));Wire("journalCancel",()=>{editing=false;Render();});Wire("journalSave",Save);Wire("journalDelete",Delete);
         typeDropdown=GetChildById("journalTypeDropdown") as XUiC_RebirthJournalTypeDropdown;
-        Wire("journalReadToggle",()=>{if(selected!=null){RebirthJournalGuideService.Mark(selected,!RebirthJournalGuideService.IsRead(selected));Render();}});
-        Wire("journalFilterUnread",()=>{if(!editing&&selected!=null){RebirthJournalGuideService.Mark(selected,false);Render();}});
-        Wire("journalReadAll",()=>{RebirthJournalGuideService.MarkAll(entries);Render();});
+        Wire("journalReadToggle",()=>{if(selected!=null){MarkRead(selected,!RebirthJournalGuideService.IsRead(selected));Render();}});
+        Wire("journalFilterUnread",()=>{if(!editing&&selected!=null){MarkRead(selected,false);Render();}});
+        Wire("journalReadAll",MarkAllRead);
         Wire("journalImageOpen",OpenImage);Wire("journalArt",OpenImage);
         Wire("journalImageClose",()=>SetImageOpen(false));
         var imageInput=GetChildById("journalImageInput");
@@ -94,10 +94,32 @@ public sealed class XUiC_RebirthJournal : XUiController {
         imageInput.OnDrag += DragImage;
         Wire("journalSort",()=>{sort=sort=="Newest"?"Type":sort=="Type"?"Title":"Newest";list?.ResetPosition();Render();});
         foreach(var kind in new[]{"All","Notes","Places","Plans","Lore"}){var k=kind;Wire("journalFilter"+k,()=>{if(editing)return;filter=k;list?.ResetPosition();Render();});}
-        for(int i=0;i<12;i++){int index=i;Wire("journalRow"+i,()=>{if(editing)return;int n=list.FirstDataIndex+index;if(n<visible.Count){selected=visible[n];RebirthJournalGuideService.Mark(selected,true);SetImageOpen(false);resetReader=true;deleteArmed=false;Render();}});}
+        for(int i=0;i<12;i++){int index=i;Wire("journalRow"+i,()=>{if(editing)return;int n=list.FirstDataIndex+index;if(n<visible.Count){selected=visible[n];MarkRead(selected,true);SetImageOpen(false);resetReader=true;deleteArmed=false;Render();}});}
         list=GetChildById("journalListScroll") as XUiC_RebirthCharacterOverviewList;list.DataRangeChanged+=RenderRows;
         Input("journalTitleInput").SupportBbCode=false;Input("journalBodyInput").SupportBbCode=false;
     }
+    private void MarkRead(RebirthJournalEntry entry,bool read)
+    {
+        int previous=RebirthJournalGuideService.Revision;
+        if(RebirthJournalGuideService.Mark(entry,read,out var committedRevision))
+            AcceptLocalReadRevision(previous,committedRevision);
+    }
+
+    private void MarkAllRead()
+    {
+        int previous=RebirthJournalGuideService.Revision;
+        if(RebirthJournalGuideService.MarkAll(entries,out var committedRevision))
+            AcceptLocalReadRevision(previous,committedRevision);
+        Render();
+    }
+
+    private void AcceptLocalReadRevision(int previous,int? committedRevision)
+    {
+        if(committedRevision.HasValue&&guideRevision==previous&&committedRevision.Value==unchecked(previous+1)&&
+            RebirthJournalGuideService.Revision==committedRevision.Value)
+            guideRevision=committedRevision.Value;
+    }
+
     private void Wire(string id,Action action){GetChildById(id+"Hit").OnPress+=(s,b)=>{if((b==0||b==-1)&&!RebirthConsoleInputGuardRuntime.BlocksGameplayInput())action();};}
     private XUiC_TextInput Input(string id)=>(XUiC_TextInput)GetChildById(id);
     private void Label(string id,string text)=>(GetChildById(id).ViewComponent as XUiV_Label)?.SetTextImmediately(text);
@@ -177,6 +199,7 @@ public sealed class XUiC_RebirthJournal : XUiController {
         if(art)LoadImage(selected.Image);
         var body=(XUiV_Label)GetChildById("journalEntryBody").ViewComponent;body.Position=new Vector2i(24,art?-442:-100);body.Size=new Vector2i(1180,560);
         string text=selected?.Body??Localization.Get("xuiRebirthJournalEmptyHelp");
+        body.SupportBbCode=selected?.Authored==true;
         body.Overflow=UILabel.Overflow.ResizeHeight;
         body.SetTextImmediately(text);
         body.Update(0f);

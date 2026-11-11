@@ -4,13 +4,13 @@ class World{}
 class EntityPlayer{}
 class EntityPlayerLocal:EntityPlayer{}
 enum EnumDropEvent {Harvest}
-class ItemValue {public string Name;public ItemValue(string name){Name=name;}public bool IsEmpty()=>Name=="";}
+class ItemValue {public string Name;public int Seed;public ItemValue(string name){Name=name;}public bool IsEmpty()=>Name=="";public ItemValue Clone()=>new ItemValue(Name){Seed=Seed};}
 class ItemStack {public ItemValue itemValue;public int count;public ItemStack(ItemValue item,int count){itemValue=item;this.count=count;}public bool IsEmpty()=>count==0;}
 static class ItemClass {public static ItemValue GetItem(string name)=>new ItemValue(name);}
 class Block {public bool Grown;public Dictionary<EnumDropEvent,List<SItemDropProb>> itemsToDrop=new Dictionary<EnumDropEvent,List<SItemDropProb>>();public class SItemDropProb {public string name,tag;public float prob=1;}}
 struct BlockValue {public Block Block;public ItemValue ToItemValue()=>new ItemValue("cropBlock");}
 static class RebirthUtilities {public static bool IsPlayerGrownHarvestCrop(BlockValue value)=>value.Block.Grown;}
-static class RebirthStationGridIngredients {public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a.count==b.count&&a.itemValue.Name==b.itemValue.Name;}
+static class RebirthStationGridIngredients {public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a.count==b.count&&a.itemValue.Name==b.itemValue.Name&&a.itemValue.Seed==b.itemValue.Seed;}
 static class Fixture {
 // PRODUCTION_METHODS
 static void Check(bool value,string text){if(!value)throw new Exception(text);}

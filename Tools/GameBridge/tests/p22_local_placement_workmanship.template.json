@@ -1,0 +1,343 @@
+{
+  "name": "p22_local_placement_workmanship",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable solo or listen host, Survivor progression and normal game mode, guard ON, empty cursor. Prepare four exact distinct sites within reach and actual native items with known slot IDs. FRAME_ITEM is exact carried name; FRAME_BLOCK is the expected selected native placed shape. Fresh and picked-up generator stacks must be separate and separately selected. Capture the actual carried electrical condition/workmanship/owner/skill/serviceCount before use. Use the same current creator for fresh frame and electrical unless deliberately testing carried author. Fill tokens only from actual UI and authority state. Dedicated remote uses the same physical gestures as a differential control and runs authority-side diagnostics separately; plain remote capture absence does not qualify this local positive test."
+    },
+    {
+      "_note": "Check one actual local placement with its own native capture scope, then a refused or unrelated nested invocation. Only the admitted placement may capture workmanship. Observe the same exact native block and marker through both the copied bytes and decoded record, then repeat after reopen."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@FRAME_SLOT@"
+        }
+      }
+    },
+    {
+      "markItem": "@FRAME_ITEM@"
+    },
+    {
+      "console": "rbsurvivor provenance item"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@FRAME_AIM_X@",
+          "y": "@FRAME_AIM_Y@",
+          "z": "@FRAME_AIM_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.25
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@FRAME_ITEM@",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@FRAME_X@",
+          "y": "@FRAME_Y@",
+          "z": "@FRAME_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@FRAME_BLOCK@"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@FRAME_X@",
+          "y": "@FRAME_Y@",
+          "z": "@FRAME_Z@"
+        }
+      }
+    },
+    {
+      "console": "rbsurvivor provenance block @FRAME_X@ @FRAME_Y@ @FRAME_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "block=@FRAME_BLOCK@ kind=ConstructionPlacement"
+      }
+    },
+    {
+      "console": "rbsurvivor provenance electrical @FRAME_X@ @FRAME_Y@ @FRAME_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "pos=@FRAME_PRINTED_POS@ record=none"
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@FRESH_SLOT@"
+        }
+      }
+    },
+    {
+      "markItem": "generatorbank"
+    },
+    {
+      "console": "rbsurvivor provenance item"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@FRESH_AIM_X@",
+          "y": "@FRESH_AIM_Y@",
+          "z": "@FRESH_AIM_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.25
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "generatorbank",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@FRESH_X@",
+          "y": "@FRESH_Y@",
+          "z": "@FRESH_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "generatorbank"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@FRESH_X@",
+          "y": "@FRESH_Y@",
+          "z": "@FRESH_Z@"
+        }
+      }
+    },
+    {
+      "console": "rbsurvivor provenance electrical @FRESH_X@ @FRESH_Y@ @FRESH_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "pos=@FRESH_PRINTED_POS@ kind="
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@CARRIED_SLOT@"
+        }
+      }
+    },
+    {
+      "markItem": "generatorbank"
+    },
+    {
+      "console": "rbsurvivor provenance item"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@CARRIED_AIM_X@",
+          "y": "@CARRIED_AIM_Y@",
+          "z": "@CARRIED_AIM_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.25
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "generatorbank",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@CARRIED_X@",
+          "y": "@CARRIED_Y@",
+          "z": "@CARRIED_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "generatorbank"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@CARRIED_X@",
+          "y": "@CARRIED_Y@",
+          "z": "@CARRIED_Z@"
+        }
+      }
+    },
+    {
+      "console": "rbsurvivor provenance electrical @CARRIED_X@ @CARRIED_Y@ @CARRIED_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "pos=@CARRIED_PRINTED_POS@ kind=@CARRIED_KIND@ condition=@CARRIED_CONDITION@ workmanship=@CARRIED_WORKMANSHIP@ configuredBy=@CARRIED_AUTHOR@ background=@CARRIED_BACKGROUND@ bonus=@CARRIED_BONUS@ electricalSkill=@CARRIED_SKILL@ serviceCount=@CARRIED_SERVICE_COUNT@"
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@TRAP_SLOT@"
+        }
+      }
+    },
+    {
+      "markItem": "dartTrap"
+    },
+    {
+      "console": "rbsurvivor provenance item"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@TRAP_AIM_X@",
+          "y": "@TRAP_AIM_Y@",
+          "z": "@TRAP_AIM_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.25
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "dartTrap",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@TRAP_X@",
+          "y": "@TRAP_Y@",
+          "z": "@TRAP_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "dartTrap"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@TRAP_X@",
+          "y": "@TRAP_Y@",
+          "z": "@TRAP_Z@"
+        }
+      }
+    },
+    {
+      "console": "rbsurvivor provenance block @TRAP_X@ @TRAP_Y@ @TRAP_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "block=dartTrap kind=TechnicalTrapPlacement"
+      }
+    },
+    {
+      "console": "rbsurvivor provenance electrical @TRAP_X@ @TRAP_Y@ @TRAP_Z@"
+    },
+    {
+      "expectLog": {
+        "contains": "pos=@TRAP_PRINTED_POS@ kind="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Retain exact native chunk and sidecar state, authoritative source owner and fresh/retained distinction after reload. A non-electrical item with stale electrical metadata is a separate detached fixture; a real carried construction item can repeat the FRAME steps with captured original creator and workmanship. PRINTED_POS is the actual native Vector3i format in rbsurvivor provenance output."
+    }
+  ]
+}

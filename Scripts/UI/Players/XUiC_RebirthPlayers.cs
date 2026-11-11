@@ -306,6 +306,7 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
     private float refreshTimer;
     private RebirthCharacterModelBinder model;
     private int profileEntityId=-1;
+    private EntityPlayer profileActor;
     private float profileRefreshAt;
     private RebirthPublicPlayerProfile publicProfile;
     private XUiV_Label profileBackgroundLabel, profileIdentityLabel;
@@ -391,7 +392,7 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
         playersList = null;
         editorEntityId = -1;
         editorRevision = -1L; editorGroupId = string.Empty; editorDirty=false; editorConflict=false;
-        model?.Clear();RebirthPublicPlayerProfile.Received-=ReceiveProfile;publicProfile=null;profileEntityId=-1;
+        model?.Clear();backgroundArt?.Clear();RebirthPublicPlayerProfile.Received-=ReceiveProfile;publicProfile=null;profileActor=null;profileEntityId=-1;
         base.OnClose();
     }
 
@@ -454,7 +455,10 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
         if (emptyHint != null && emptyHint.ViewComponent != null && emptyHint.ViewComponent.IsVisible == hasSelection)
             emptyHint.ViewComponent.IsVisible = !hasSelection;
         if (!hasSelection)
+        {
+            if (profileEntityId != -1) RefreshProfile(null, null, -1);
             return;
+        }
 
         EntityPlayerLocal local = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         EntityPlayer selected = GameManager.Instance != null && GameManager.Instance.World != null
@@ -509,22 +513,45 @@ public sealed class XUiC_RebirthPlayerDetails : XUiController
 
     private void ReceiveProfile(RebirthPublicPlayerProfile profile)
     {
-        if(profile!=null&&profile.EntityId==profileEntityId){publicProfile=profile;RenderProfile();}
+        var world = GameManager.Instance?.World;
+        if (profile != null && profile.EntityId == profileEntityId && profileActor != null &&
+            ReferenceEquals(world, profileActor.world) && ReferenceEquals(world?.GetEntity(profileEntityId), profileActor))
+            SetProfile(profile);
     }
-    private void RefreshProfile(EntityPlayer selected,EntityPlayerLocal local,int entityId)
+
+    private void SetProfile(RebirthPublicPlayerProfile profile)
     {
-        bool changed=profileEntityId!=entityId;
-        if(changed){profileEntityId=entityId;publicProfile=null;model?.Clear();profileRefreshAt=0;}
-        if(selected!=null)model?.Bind(selected,changed);else model?.Clear();
-        if(Time.realtimeSinceStartup>=profileRefreshAt)
-        {
-            profileRefreshAt=Time.realtimeSinceStartup+5f;
-            var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-            if(connection!=null&&connection.IsServer)publicProfile=RebirthPublicPlayerProfile.FromServer(selected);
-            else if(selected!=null&&local!=null&&selected.entityId==local.entityId)publicProfile=RebirthPublicPlayerProfile.Build(selected,RebirthSurvivorClientState.GetOwnerStateSnapshot());
-            else if(local!=null&&connection!=null)connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthPublicProfileRequest>().Setup(local.entityId,entityId));
-        }
+        if (ReferenceEquals(publicProfile, profile) || publicProfile?.HasSameFields(profile) == true) return;
+        publicProfile = profile;
         RenderProfile();
+    }
+
+    private void RefreshProfile(EntityPlayer selected, EntityPlayerLocal local, int entityId)
+    {
+        bool changed = profileEntityId != entityId || !ReferenceEquals(profileActor, selected);
+        if (changed)
+        {
+            profileEntityId = entityId;
+            profileActor = selected;
+            publicProfile = null;
+            profileRefreshAt = 0;
+            model?.Clear();
+            RenderProfile();
+        }
+        if (selected == null) return;
+
+        // The native model has an independent appearance revision and retry path.
+        model?.Bind(selected, changed);
+        if (Time.realtimeSinceStartup < profileRefreshAt) return;
+
+        profileRefreshAt = Time.realtimeSinceStartup + 5f;
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection?.IsServer == true)
+            SetProfile(RebirthPublicPlayerProfile.FromServer(selected));
+        else if (ReferenceEquals(local, selected))
+            SetProfile(RebirthPublicPlayerProfile.Build(selected, RebirthSurvivorClientState.GetOwnerStateSnapshot(out _)));
+        else if (local != null && connection != null)
+            connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthPublicProfileRequest>().Setup(local.entityId, entityId));
     }
     private RebirthSurvivorArtTextureBinder backgroundArt;
     private void RenderProfile()

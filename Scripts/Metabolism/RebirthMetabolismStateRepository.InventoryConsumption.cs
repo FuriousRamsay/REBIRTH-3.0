@@ -18,15 +18,17 @@ public static partial class RebirthMetabolismStateRepository
     internal static bool SaveInventoryServing(RebirthConsumptionDurableDelivery.InventoryOriginal original,out string full)
     {
         full=null;var token=original?.Metabolism;
-        if(token?.Applied!=true||!original.Current()||!TryFlush("player-source-consumption"))return false;
+        if(token?.Applied!=true||!original.Current()||!TrySaveIfDirty("player-source-consumption",out _))return false;
         lock(Sync)
         {
             if(!ScopeCurrentLocked()||token.Generation!=loadGeneration||!States.TryGetValue(token.Id,out var state)||!ReferenceEquals(state,token.After))return false;
             ValidateStateForPersistence(state);full=SerializePlayer(token.Id,state).ToString(SaveOptions.DisableFormatting);
             var file=new FileInfo(scopePath);if(!file.Exists||file.Length<1||file.Length>8*1024*1024||(file.Attributes&FileAttributes.ReparsePoint)!=0)return false;
-            using var reader=XmlReader.Create(scopePath,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=8*1024*1024});
+            using var reader=XmlReader.Create(scopePath,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=8*1024*1024,IgnoreWhitespace=true});
             var document=XDocument.Load(reader);var row=document.Root.Elements("player").SingleOrDefault(value=>(string)value.Attribute("id")==token.Id);
-            return row!=null&&XNode.DeepEquals(row,SerializePlayer(token.Id,state));
+            // This receipt proves the one serving row. Compare its serialized
+            // XML on both sides, independent of the whole-world retirement check.
+            return row!=null&&XNode.DeepEquals(row,XElement.Parse(full));
         }
     }
 }

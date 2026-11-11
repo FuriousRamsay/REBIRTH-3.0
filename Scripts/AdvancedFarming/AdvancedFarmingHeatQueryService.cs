@@ -10,13 +10,11 @@ public static class AdvancedFarmingHeatQueryService
     {
         public Vector3i Pos;
         public int BlockType;
-        public int LastSeenWorldSeconds;
         public bool Burning;
     }
 
     private struct CachedHeatQueryResult
     {
-        public Vector3i PlantPos;
         public int TargetType;
         public int Range;
         public int HeightMin;
@@ -126,7 +124,6 @@ public static class AdvancedFarmingHeatQueryService
             return;
 
         long key = MakePosKey(pos);
-        int now = RebirthUtilities.TotalGameSecondsPassed();
 
         if (isBurning)
         {
@@ -141,7 +138,6 @@ public static class AdvancedFarmingHeatQueryService
             {
                 Pos = pos,
                 BlockType = blockType,
-                LastSeenWorldSeconds = now,
                 Burning = true
             };
 
@@ -198,7 +194,7 @@ public static class AdvancedFarmingHeatQueryService
         if (s_heatQueryCache.TryGetValue(cacheKey, out CachedHeatQueryResult cached)
             && cached.PolicyVersion == s_policyVersion
             && (cachedAge = now - cached.WorldSeconds) >= 0
-            && cachedAge <= GetHeatQueryCacheLifetimeSeconds(cached.PlantPos))
+            && cachedAge <= HeatQueryCacheSeconds)
         {
             if (cached.Result)
                 AdvancedFarmingPerfSnapshotService.RecordHeatRegistryHit();
@@ -211,7 +207,7 @@ public static class AdvancedFarmingHeatQueryService
         if (s_heatSources.Count == 0)
         {
             AdvancedFarmingPerfSnapshotService.RecordHeatRegistryMiss();
-            StoreHeatQueryCache(cacheKey, plantPos, targetType, blockRange, blockHeightMin, blockHeightMax, now, false);
+            StoreHeatQueryCache(cacheKey, targetType, blockRange, blockHeightMin, blockHeightMax, now, false);
             return false;
         }
 
@@ -242,7 +238,7 @@ public static class AdvancedFarmingHeatQueryService
             }
 
             AdvancedFarmingPerfSnapshotService.RecordHeatRegistryHit();
-            StoreHeatQueryCache(cacheKey, plantPos, targetType, blockRange, blockHeightMin, blockHeightMax, now, true);
+            StoreHeatQueryCache(cacheKey, targetType, blockRange, blockHeightMin, blockHeightMax, now, true);
             return true;
         }
 
@@ -255,16 +251,15 @@ public static class AdvancedFarmingHeatQueryService
         }
 
         AdvancedFarmingPerfSnapshotService.RecordHeatRegistryMiss();
-        StoreHeatQueryCache(cacheKey, plantPos, targetType, blockRange, blockHeightMin, blockHeightMax, now, false);
+        StoreHeatQueryCache(cacheKey, targetType, blockRange, blockHeightMin, blockHeightMax, now, false);
         return false;
     }
 
-    private static void StoreHeatQueryCache(long cacheKey, Vector3i plantPos, int targetType, int blockRange, int blockHeightMin, int blockHeightMax, int now, bool result)
+    private static void StoreHeatQueryCache(long cacheKey, int targetType, int blockRange, int blockHeightMin, int blockHeightMax, int now, bool result)
     {
         EvictHeatQueryCacheIfNeeded(now);
         s_heatQueryCache[cacheKey] = new CachedHeatQueryResult
         {
-            PlantPos = plantPos,
             TargetType = targetType,
             Range = blockRange,
             HeightMin = blockHeightMin,
@@ -284,7 +279,7 @@ public static class AdvancedFarmingHeatQueryService
         foreach (KeyValuePair<long, CachedHeatQueryResult> pair in s_heatQueryCache)
         {
             int age = now - pair.Value.WorldSeconds;
-            if (age < 0 || age > GetHeatQueryCacheLifetimeSeconds(pair.Value.PlantPos))
+            if (age < 0 || age > HeatQueryCacheSeconds)
                 s_heatQueryCacheRemovalScratch.Add(pair.Key);
         }
 
@@ -295,11 +290,6 @@ public static class AdvancedFarmingHeatQueryService
 
         if (s_heatQueryCache.Count >= MaxHeatQueryCacheEntries)
             s_heatQueryCache.Clear();
-    }
-
-    private static int GetHeatQueryCacheLifetimeSeconds(Vector3i plantPos)
-    {
-        return HeatQueryCacheSeconds + PositiveModulo(HashPosition(plantPos) ^ 0x68127d, HeatQueryCacheJitterSeconds);
     }
 
     private static long MakeHeatQueryCacheKey(Vector3i plantPos, int targetType, int blockRange, int blockHeightMin, int blockHeightMax)
@@ -315,27 +305,6 @@ public static class AdvancedFarmingHeatQueryService
             key = (key ^ blockHeightMin) * 1099511628211L;
             key = (key ^ blockHeightMax) * 1099511628211L;
             return key;
-        }
-    }
-
-    private static int PositiveModulo(int value, int divisor)
-    {
-        if (divisor <= 0)
-            return 0;
-
-        int result = value % divisor;
-        return result < 0 ? result + divisor : result;
-    }
-
-    private static int HashPosition(Vector3i pos)
-    {
-        unchecked
-        {
-            int hash = 216613626;
-            hash = (hash ^ pos.x) * 16777619;
-            hash = (hash ^ pos.y) * 16777619;
-            hash = (hash ^ pos.z) * 16777619;
-            return hash;
         }
     }
 

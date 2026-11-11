@@ -1,0 +1,31 @@
+{
+  "name": "Modifier Station observes stable native armor and kit input",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepared single-player or dedicated Purge Modifier Station with Hammer and Pliers. Enter from real station activation. On the same open screen use real drag/Shift-click to insert armor and kit. Verify Apply becomes visible and one Apply consumes one kit and yields one modified item. If using a different known item class, select the exact item from the actual UI tree."
+    },
+    {
+      "expectUi": {
+        "id": "btnEnchant"
+      }
+    },
+    {
+      "screenshot": "audit_modifier_ready"
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectUi": {
+        "id": "btnEnchant"
+      }
+    },
+    {
+      "screenshot": "audit_modifier_idle"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

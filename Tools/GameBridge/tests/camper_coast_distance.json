@@ -1,0 +1,11 @@
+{
+  "name": "80s truck coasting distance",
+  "status": "AUTHORED_NOT_RUN",
+  "setup": "Use the same fueled 80s truck, loadout, and flat straight road on the baseline and candidate DLLs. Keep cruise off. Record the vehicle position and longitudinal speed at throttle release and after it stops using the Game Bridge energy entity observation.",
+  "cases": [
+    "Forward: release the throttle at the same starting speed on both builds and compare coasting distance.",
+    "Reverse: repeat from the same reverse starting speed and compare coasting distance.",
+    "Brake control: use the handbrake and then test opposite-direction braking. Compare against the baseline at matching speeds."
+  ],
+  "expect": "Target roughly twice the distance in both coast cases. Record actual ratios because native drag, tires, and terrain also contribute to stopping distance. Handbrake and opposite-direction braking should match the baseline."
+}

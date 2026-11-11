@@ -32,7 +32,7 @@ internal static class RebirthRecyclerNativeLoop
     private sealed class Frame
     {
         internal TileEntityWorkstation Station;internal Frame Previous;
-        internal readonly Dictionary<RecipeQueueItem,float> Before=new Dictionary<RecipeQueueItem,float>();
+        internal Dictionary<RecipeQueueItem,float> Before;
         internal Carryover Credit;
     }
     private sealed class Carryover
@@ -93,6 +93,7 @@ internal static class RebirthRecyclerNativeLoop
         // Retain only the original productive invocation's native carryover.
         if((wasEarned||RebirthProductiveEarnedCoordinator.HoldTimer(station,row))&&before<=0&&target<before)
             target=before<0?before:-float.Epsilon; // Enter native completion without banking retry elapsed.
+        frame.Before ??= new Dictionary<RecipeQueueItem,float>();
         if(!frame.Before.ContainsKey(row))frame.Before[row]=before;
         if(row.Recipe==null||row.Multiplier<=0){row.CraftingTimeLeft=target;return;}
         if(RebirthRecyclerRuntime.IsMarked(row.Recipe)||RebirthCookingHeat.Managed(row.Recipe))
@@ -141,7 +142,7 @@ internal static class RebirthRecyclerNativeLoop
         {
             // Native has already subtracted carryover from this newly active
             // row. Restore its original timer before the specialized owner runs.
-            if(frame==null||!ReferenceEquals(frame.Station,station)||!frame.Before.TryGetValue(row,out float original))return false;
+            if(frame==null||!ReferenceEquals(frame.Station,station)||frame.Before==null||!frame.Before.TryGetValue(row,out float original))return false;
             float budget=Math.Max(0,original-row.CraftingTimeLeft);row.CraftingTimeLeft=Math.Max(0,original);
             if(RebirthRecyclerRuntime.IsMarked(row.Recipe))DispatchMarked(station,row,budget);
             else RebirthCookingHeat.TickTile(station,budget);

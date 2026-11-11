@@ -84,6 +84,7 @@ public static class RebirthSurvivorTraitUiDebug
             else
             {
                 s.MixedCount++;
+                s.PositiveSpent += trait.Points;
             }
         }
 

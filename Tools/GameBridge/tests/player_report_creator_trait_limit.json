@@ -1,0 +1,18 @@
+{
+  "name": "Survivor Creator scrolls selected traits and enforces the total limit",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Start on Traits in English with ten selected traits, including visible Cold Tolerant, and with visible Fast Reader unselected and otherwise eligible. Review the scroll screenshot for the last selected entries." },
+    { "expectWindowOpen": "rebirthSurvivorCreator" },
+    { "expectUi": { "id": "traitSelectedHeading", "exactText": "SELECTED TRAITS (10/10)" } },
+    { "scroll": { "id": "traitSelectedNativeScrollView", "window": "rebirthSurvivorCreator", "delta": -8 } },
+    { "screenshot": "creator_selected_traits_end" },
+    { "click": { "exactText": "Fast Reader", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "creatorStatusText", "text": "You can select up to 10 traits." } },
+    { "expectUi": { "id": "traitSelectedHeading", "exactText": "SELECTED TRAITS (10/10)" } },
+    { "click": { "exactText": "Cold Tolerant", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "traitSelectedHeading", "exactText": "SELECTED TRAITS (9/10)" } },
+    { "click": { "exactText": "Fast Reader", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "traitSelectedHeading", "exactText": "SELECTED TRAITS (10/10)" } }
+  ]
+}

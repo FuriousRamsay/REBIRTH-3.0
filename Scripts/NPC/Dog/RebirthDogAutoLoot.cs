@@ -88,17 +88,34 @@ public static partial class RebirthDogAutoLootBridge
     public static bool TryInterceptSlot(XUi xui, int slotIndex, bool takeAllFallback)
     {
         if (replayingVanilla || !RebirthDogInventoryPolicy.AutoLootEnabled || xui == null) return false;
-        if(!CanAdmitAutoLoot(xui))return true;
         TEFeatureStorage source = xui.LootContainer;
         EntityPlayerLocal player = xui.playerUI?.entityPlayer;
-        PersistentPlayerData persistent = GameManager.Instance?.GetPersistentLocalPlayer();
-        if (source == null || player == null || persistent?.PrimaryId == null || source.ItemGrid.items == null ||
+        if (source == null || player == null || source.ItemGrid.items == null ||
             slotIndex < 0 || slotIndex >= source.ItemGrid.items.Length) return false;
 
+        var world = player.world;
+        var key = new PendingKey(source.ToWorldPos(), slotIndex);
+        lock (Sync)
+        {
+            // This slot still belongs to its earlier request. A retired world
+            // or a different storage instance at the same position does not
+            // own the current slot.
+            if (Pending.TryGetValue(key, out var existing))
+                return existing != null && ReferenceEquals(existing.World, world) &&
+                    ReferenceEquals(existing.Source, source);
+        }
+
         ItemStack current = source.ItemGrid.items[slotIndex];
-        if (current == null || current.IsEmpty() || current.count <= 0 ||
-            !RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue) &&
-            !IsNamedSmartLootSource(source)) return false;
+        if (current == null || current.IsEmpty() || current.count <= 0) return false;
+        if (!IsNamedSmartLootSource(source) &&
+            (!RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue) || !HasOwnedDog(player))) return false;
+
+        // The NPC admission checks qualify optional routing only. Without a
+        // request owning this slot, ordinary loot can take the native path.
+        if (world?.IsRemote() == true && !RebirthNpcRecoveryProjectionScope.IsCurrentRemoteScope(world)) return false;
+        if (!CanAdmitAutoLoot(xui)) return false;
+        PersistentPlayerData persistent = GameManager.Instance?.GetPersistentLocalPlayer();
+        if (persistent?.PrimaryId == null) return false;
 
         // Bind the request to the complete native item image. A same-type,
         // same-count replacement can carry different mods, quality or metadata.
@@ -107,13 +124,13 @@ public static partial class RebirthDogAutoLootBridge
         catch { return false; }
         if (string.IsNullOrEmpty(requestedImage) || requestedImage.Length > 65536) return false;
 
-        PendingKey key = new PendingKey(source.ToWorldPos(), slotIndex);
         Guid operationId = Guid.NewGuid();
         lock (Sync)
         {
-            PendingTransfer existing;
-            if (Pending.TryGetValue(key, out existing)) return true;
-            Pending[key] = CapturePendingAutoLoot(operationId,xui,player,source,current);
+            if (Pending.TryGetValue(key, out var existing))
+                return existing != null && ReferenceEquals(existing.World, world) &&
+                    ReferenceEquals(existing.Source, source);
+            Pending[key] = CapturePendingAutoLoot(operationId,xui,player,source,requestedImage,current.count);
         }
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -136,6 +153,18 @@ public static partial class RebirthDogAutoLootBridge
                     current.itemValue.type, current.count, requestedImage, takeAllFallback));
         }
         return true;
+    }
+
+    private static bool HasOwnedDog(EntityPlayerLocal player)
+    {
+        if (!RebirthDogLifecycleService.TryResolveOwnerId(player, out string ownerId)) return false;
+        foreach (var state in RebirthNpcRuntimeRegistry.GetOwnedActiveSnapshot(ownerId))
+        {
+            if (RebirthNpcRuntimeRegistry.TryGetEntityId(state.StableId, out int entityId) &&
+                player.world.GetEntity(entityId) is EntityRebirthDogCompanion dog && dog.enabled && !dog.IsDead())
+                return true;
+        }
+        return false;
     }
 
     public static void ReceiveResult(
@@ -519,35 +548,34 @@ public static class RebirthDogAutoLootStashItemsPatch
         XUiC_ItemStack[] controllers = _srcGrid.GetItemStackControllers();
         if (controllers == null || controllers.Length == 0) return;
 
-        PackedBoolArray effectiveIgnored = _ignoredSlots?.Clone() ?? new PackedBoolArray(controllers.Length);
-        if (effectiveIgnored.Length < controllers.Length) effectiveIgnored.Length = controllers.Length;
+        PackedBoolArray effectiveIgnored = null;
+        if (_ignoredSlots != null && _ignoredSlots.Length < controllers.Length)
+        {
+            // Preserve the native packed representation when expanding an older short mask.
+            effectiveIgnored = _ignoredSlots.Clone();
+            effectiveIgnored.Length = controllers.Length;
+        }
 
-        bool changed = false;
         for (int slot = 0; slot < controllers.Length; slot++)
         {
-            if (slot < _ignoreSlots || effectiveIgnored[slot]) continue;
+            if (StackSortUtil.IsIgnoredSlot(_ignoreSlots, effectiveIgnored ?? _ignoredSlots, slot)) continue;
             XUiC_ItemStack controller = controllers[slot];
             if (controller == null || controller.StackLock) continue;
 
             ItemStack stack = controller.ItemStack;
-            if (stack == null || stack.IsEmpty() ||
-                !RebirthDogInventoryPolicy.IsDogAutoLootItem(stack.itemValue) &&
-                !RebirthDogAutoLootBridge.IsNamedSmartLootSource(_srcWindow.xui.LootContainer)) continue;
+            if (stack == null || stack.IsEmpty()) continue;
 
             if (RebirthDogAutoLootBridge.TryInterceptSlot(_srcWindow.xui, slot, true))
             {
                 // Prevent vanilla StashItems from also moving this slot while the
                 // server-authoritative dog-routing request is outstanding.
+                effectiveIgnored ??= _ignoredSlots?.Clone() ?? new PackedBoolArray(controllers.Length);
                 effectiveIgnored[slot] = true;
-                changed = true;
+                __state = true;
             }
         }
 
-        if (changed)
-        {
-            _ignoredSlots = effectiveIgnored;
-            __state = true;
-        }
+        if (__state) _ignoredSlots = effectiveIgnored;
     }
 
     public static void Postfix(bool __state, ref ValueTuple<bool, bool> __result)

@@ -28,7 +28,7 @@ internal static partial class RebirthConsumptionDurableDelivery
     private static bool TryRefuseSavedUnissuedInventoryRequest(EntityPlayer actor,Guid operation,RebirthMetabolismSourceKind kind,int slot,int count,byte[] fingerprint)
     {
         if(inventoryOriginals.ContainsKey(operation)||!RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner))return false;
-        string directory=Path.Combine(GameIO.GetSaveGameDir(),"RebirthData","PlayerConsumption",owner.StorageKey,operation.ToString("N"));
+        string directory=InventoryOriginalDirectory(GameIO.GetSaveGameDir(),owner.StorageKey,operation);
         if(!System.IO.Directory.Exists(directory))return false;
         if(!RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out var memory))return true;
         using(memory)try

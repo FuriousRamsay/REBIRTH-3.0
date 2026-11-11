@@ -31,11 +31,12 @@ internal static class RebirthLogisticsNativeBodyIntent
     private static World currentWorld;private static Intent pending;private static DateTime next;
     private static bool acknowledged,remotePrepared;private static string preparedNonce;
     private static readonly RebirthRemoteResourceRepairSendQueue wire=new RebirthRemoteResourceRepairSendQueue();
-    private static string PathFor(Intent value)=>Path.Combine(GameIO.GetPlayerDataDir(),"RebirthLogisticsNativeBodyIntent",value.World,value.Owner,value.Operation.ToString("N")+".xml");
+    private static string PathFor(Intent value)=>Path.Combine(RebirthLogisticsHeaderAdmission.OwnerIoRoot(),"RebirthLogisticsNativeBodyIntent",value.World,value.Owner,value.Operation.ToString("N")+".xml");
     private static string ReadFile(string path)
     {
         var file=new FileInfo(path);if(!file.Exists||file.Length<1||file.Length>MaximumBytes||(file.Attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
-        using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumBytes}))return XElement.Load(reader).ToString(SaveOptions.DisableFormatting);
+        using(var stream=File.OpenRead(path))
+        using(var reader=XmlReader.Create(stream,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumBytes}))return XElement.Load(reader).ToString(SaveOptions.DisableFormatting);
     }
     private static Intent Parse(string text)
     {

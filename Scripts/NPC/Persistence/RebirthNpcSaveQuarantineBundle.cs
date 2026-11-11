@@ -481,7 +481,7 @@ internal static partial class RebirthNpcSaveQuarantineBundle
         "native-equipment-projection","recovery-projection-mailbox","runtime-registry","client-network-epoch"};
     internal static void RetireEndedClientProjections()
     {
-        if(!ThreadManager.IsMainThread()||transferring)return;
+        if(!ThreadManager.IsMainThread()||transferring||retained.Count==0)return;
         foreach(var original in retained.ToArray())
         {
             try

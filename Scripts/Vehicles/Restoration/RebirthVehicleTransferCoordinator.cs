@@ -24,6 +24,8 @@ internal static partial class RebirthVehicleTransferCoordinator
         private bool running,finished;
         private bool ownerAcknowledged;
         private bool historical;
+        private NetPackageRebirthVehicleAssemblyRequest.NativeTerminalQuery terminalQuery;
+        private bool terminalWakeUsed;
         internal bool Rejected {get;private set;}
         internal bool OwnerRejected,NeverEntered;
         internal bool Finished=>finished;
@@ -33,7 +35,7 @@ internal static partial class RebirthVehicleTransferCoordinator
             peer=sender;channel=sender?.netConnection!=null&&sender.netConnection.Length>0?sender.netConnection[0]:null;
             deaths=player.Died;directory=GameIO.GetSaveGameDir();store=new RebirthVehicleTransferPlanStore(directory,GameIO.GetSaveGameDir,MetadataCurrent);
         }
-        internal static bool TryCreate(EntityPlayer player,ClientInfo sender,RebirthVehicleTransferPlan plan,out Transfer transfer)
+        internal static bool TryCreate(EntityPlayer player,ClientInfo sender,RebirthVehicleTransferPlan plan,bool preparedHere,out Transfer transfer)
         {
             transfer=null;var next=new Transfer(player,sender,plan);
             next.historical=next.store.HasCompletion(plan);
@@ -41,8 +43,10 @@ internal static partial class RebirthVehicleTransferCoordinator
             {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" scope invalid");return false;}
             if(!next.historical&&!TryReadNativeReservation(player,plan.TransactionId,plan.ActorId,plan.CreationId,plan.Fingerprint,plan.Custody,false,next.Current,out _,out _))
             {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" saved reservation refused");return false;}
-            next.store.Prepare(plan);
-            if(!next.Current()||next.store.Read(plan.TransactionId)?.ToXml().ToString()!=plan.ToXml().ToString())
+            // A fresh main-thread admission already prepared this exact
+            // plan under the store lock. Recovery still validates the catalogue.
+            if(!preparedHere)next.store.Prepare(plan);
+            if(!next.Current()||(!preparedHere&&next.store.Read(plan.TransactionId)?.ToXml().ToString()!=plan.ToXml().ToString()))
             {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" plan readback refused");return false;}
             next.historical=next.store.HasCompletion(plan);
             transfer=next;return true;
@@ -55,9 +59,50 @@ internal static partial class RebirthVehicleTransferCoordinator
         internal bool Acknowledge(ClientInfo sender,string hash)
         {
             if(!Current()||!ReferenceEquals(peer,sender)||hash!=RebirthVehicleTransferCustody.Hash(Plan.ToXml().ToString(System.Xml.Linq.SaveOptions.DisableFormatting))||
-                !store.HasCompletion(Plan)||!HasSavedOwnerSeen(this))return false;
-            ownerAcknowledged=true;return Current();
+                !store.TryReadCompletion(Plan,out bool applied)||!HasSavedOwnerSeen(this))return false;
+            ownerAcknowledged=true;
+            if(!Current())return false;
+            if(applied&&historical&&!Rejected&&Plan.NativeDeaths==deaths&&terminalQuery!=null&&!terminalWakeUsed)
+            {
+                try
+                {
+                    terminalWakeUsed=true;
+                    terminalWakes.Add(this);
+                }
+                catch{ /* The optional wake does not change ordinary ACK acceptance. */ }
+            }
+            return true;
         }
+        internal bool MatchesTerminalQuery(World queryWorld,EntityPlayer player,ClientInfo sender,string gameId,string creation,string fingerprint)
+            =>ReferenceEquals(world,queryWorld)&&ReferenceEquals(Player,player)&&ReferenceEquals(peer,sender)&&
+                world.worldState?.Guid==gameId&&Plan.CreationId==creation&&Plan.Fingerprint==fingerprint&&
+                Plan.NativeDeaths==deaths&&Current();
+        internal bool CanRememberTerminalQuery(World queryWorld,EntityPlayer player,ClientInfo sender,string gameId,string creation,string fingerprint)
+            =>terminalQuery==null&&!terminalWakeUsed&&MatchesTerminalQuery(queryWorld,player,sender,gameId,creation,fingerprint);
+        internal void RememberTerminalQuery(NetPackageRebirthVehicleAssemblyRequest.NativeTerminalQuery query)
+            =>terminalQuery=query;
+        internal void ClearTerminalWake()
+        {
+            terminalQuery=null;
+            terminalWakes.Remove(this);
+        }
+        internal bool PublishTerminalWake()
+        {
+            var query=terminalQuery;
+            terminalQuery=null;
+            bool attemptedAdvance=false;
+            try{if(query!=null)query.Publish(this,ref attemptedAdvance);}
+            catch{ /* The authenticated custody query remains the retry path. */ }
+            return attemptedAdvance;
+        }
+        // The ACK wake can enter only the already durable completion branch.
+        internal bool AdvanceAcknowledgedTerminal(ref bool attemptedAdvance)
+        {
+            if(!historical||!ownerAcknowledged||Rejected||Plan.NativeDeaths!=deaths||!store.HasAppliedCompletion(Plan))return false;
+            attemptedAdvance=true;
+            return Advance()&&Finished&&!Rejected&&Current()&&store.HasAppliedCompletion(Plan);
+        }
+
         internal bool Current()=>MetadataCurrent()&&(Plan.NativeDeaths==Player.Died||historical&&store.HasCompletion(Plan));
         private bool MetadataCurrent()
         {
@@ -102,6 +147,41 @@ internal static partial class RebirthVehicleTransferCoordinator
             var entity=id>=0?world.GetEntity(id) as EntityVehicle:null;
             return id<0||entity?.vehicle!=null&&entity.vehicle.GetFuelLevel()==0f;
         }
+        private bool NormalizeEntityBefore(EntityVehicle entity, float? fuelLevel, float? fuelCapacity,
+            Dictionary<Guid,RebirthVehicleOwnerTransferResult> receipts, ref RebirthVehicleAssembly observed)
+        {
+            if (Plan.Target.Carrier != RebirthVehicleAssemblyCarrier.VehicleEntity || entity?.vehicle == null ||
+                observed.PendingInventoryTransferId != Guid.Empty || observed.LastAppliedInventoryTransferId == Plan.TransactionId ||
+                !fuelLevel.HasValue || !fuelCapacity.HasValue)
+                return true;
+
+            float level = fuelLevel.Value, capacity = fuelCapacity.Value;
+            if (!(capacity > 0f) || float.IsNaN(level) || float.IsInfinity(level) || level < 0f || level > capacity)
+                return true;
+            float fraction = RebirthVehicleTransferFuel.AssemblyFraction(level,capacity);
+            if (observed.FuelPercent == fraction)
+                return true;
+
+            var normalized = observed.DeepClone();
+            normalized.FuelPercent = fraction;
+            if (RebirthVehicleAssemblySerializer.ToBase64(normalized) != Plan.BeforePayload ||
+                receipts.Values.Any(value => value != RebirthVehicleOwnerTransferResult.Pending))
+                return true;
+            if (Plan.Fuel != null && (Plan.Fuel.BeforeLevel != level || Plan.Fuel.Capacity != capacity) ||
+                Plan.Health != null && (Plan.Health.Before != entity.Health || Plan.Health.Maximum != entity.GetMaxHealth()))
+                return false;
+
+            var native = entity.vehicle;
+            if (!Current() || !ReferenceEquals(world.GetEntity(entity.entityId),entity)) return false;
+            RebirthVehicleAssemblyIndex.RegisterEntity(entity,normalized);
+            if (!Current() || !ReferenceEquals(world.GetEntity(entity.entityId),entity) ||
+                !ReferenceEquals(entity.vehicle,native) || native.GetFuelLevel() != level || native.GetMaxFuelLevel() != capacity ||
+                !RebirthVehicleAssemblyIndex.TryGetEntity(entity,out var indexed) || !ReferenceEquals(indexed,normalized))
+                return false;
+            observed = normalized;
+            return true;
+        }
+
         internal bool Advance()
         {
             if(running||!Current())return false;if(finished)return true;running=true;
@@ -111,8 +191,18 @@ internal static partial class RebirthVehicleTransferCoordinator
                 if(!EnsureOwnerReady(this))
                 {
                     if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+" owner ready false rejected="+OwnerRejected);
-                    if(!OwnerRejected||!RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var untouched,out _,out _)||
-                        RebirthVehicleAssemblySerializer.ToBase64(untouched)!=Plan.BeforePayload)return false;
+                    if(!OwnerRejected||!RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var untouched,out _,out var untouchedId))
+                        return false;
+                    if (RebirthVehicleAssemblySerializer.ToBase64(untouched) != Plan.BeforePayload)
+                    {
+                        var untouchedEntity = untouchedId >= 0 ? world.GetEntity(untouchedId) as EntityVehicle : null;
+                        var untouchedNative = untouchedEntity?.vehicle;
+                        if (untouchedNative == null || !ReadReceipts(out var untouchedReceipts) ||
+                            !NormalizeEntityBefore(untouchedEntity,untouchedNative.GetFuelLevel(),untouchedNative.GetMaxFuelLevel(),
+                                untouchedReceipts,ref untouched) ||
+                            RebirthVehicleAssemblySerializer.ToBase64(untouched) != Plan.BeforePayload)
+                            return false;
+                    }
                     if(assemblySave==null)assemblySave=RebirthVehicleAssemblySave.Begin(world,Plan,Current,Plan.BeforePayload);
                     bool NoEffectSaved()=>Current()&&assemblySave!=null&&assemblySave.Saved()&&ReadyStage(Player,Plan)==RebirthVehicleOwnerTransferResult.Rejected&&
                         ReadReceipts(out var native)&&native.Values.All(value=>value==RebirthVehicleOwnerTransferResult.Pending);
@@ -138,8 +228,11 @@ internal static partial class RebirthVehicleTransferCoordinator
                     RebirthVehicleAssemblyService.TryConvertPaid(world,Player,Plan,Current);return false;
                 }
                 bool saved=((assemblySave!=null&&assemblySave.Saved())||ObservedBlockPayload(Plan.AfterPayload)||LegacySiphonPublished())&&(!Plan.Target.ConvertsToEntity||conversionSave!=null&&conversionSave.Saved());
+                var fuelVehicle=entity?.vehicle;
+                float? fuelLevel=fuelVehicle?.GetFuelLevel(),fuelCapacity=fuelVehicle?.GetMaxFuelLevel();
+                if(!NormalizeEntityBefore(entity,fuelLevel,fuelCapacity,receipts,ref observed))return false;
                 var step=RebirthVehicleTransferRecovery.Next(Plan,observed,receipts,saved,out var receipt,
-                    entity?.vehicle?.GetFuelLevel(),entity?.vehicle?.GetMaxFuelLevel(),entity?.Health,entity?.GetMaxHealth());
+                    fuelLevel,fuelCapacity,entity?.Health,entity?.GetMaxHealth());
                 if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+
                     " step="+step+" savedAssembly="+saved+" receipts="+string.Join(",",receipts.Values));
                 if(step==RebirthVehicleTransferStep.Reconcile&&receipts.Values.Any(value=>value==RebirthVehicleOwnerTransferResult.Indeterminate))

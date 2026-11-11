@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 public static partial class RebirthMetabolismStateRepository
 {
-    internal static NpcServingState QualifyColdNpcServing(EntityPlayer actor,string before,out RebirthMetabolismState detached)
+    internal static NpcServingState QualifyColdNpcServing(EntityPlayer actor,string before,out RebirthMetabolismState detached,bool ignoreFormattingWhitespace=false)
     {
         detached=null;
         try
@@ -16,7 +16,7 @@ public static partial class RebirthMetabolismStateRepository
             {
                 if(!ScopeCurrentLocked())return null;
                 var file=new FileInfo(scopePath);if(!file.Exists||file.Length<1||file.Length>8*1024*1024||(file.Attributes&FileAttributes.ReparsePoint)!=0)return null;
-                using var reader=System.Xml.XmlReader.Create(scopePath,new System.Xml.XmlReaderSettings{DtdProcessing=System.Xml.DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=8*1024*1024});
+                using var reader=System.Xml.XmlReader.Create(scopePath,new System.Xml.XmlReaderSettings{DtdProcessing=System.Xml.DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=8*1024*1024,IgnoreWhitespace=ignoreFormattingWhitespace});
                 var saved=XDocument.Load(reader);var row=System.Linq.Enumerable.SingleOrDefault(saved.Root.Elements("player"),node=>(string)node.Attribute("id")==token.Id);
                 return row!=null&&XNode.DeepEquals(row,SerializePlayer(token.Id,token.Original))&&NpcServingBeforeCurrent(token)?token:null;
             }
@@ -39,9 +39,9 @@ public static partial class RebirthMetabolismStateRepository
         }
         catch{return null;}
     }
-    internal static NpcServingState QualifyColdAppliedNpcServing(EntityPlayer actor,string saved,string historicalBefore)
+    internal static NpcServingState QualifyColdAppliedNpcServing(EntityPlayer actor,string saved,string historicalBefore,bool ignoreFormattingWhitespace=false)
     {
-        var token=QualifyColdNpcServing(actor,saved,out _);if(token==null)return null;
+        var token=QualifyColdNpcServing(actor,saved,out _,ignoreFormattingWhitespace);if(token==null)return null;
         token.After=token.Original;token.Applied=true;token.Before=historicalBefore;return token;
     }
     internal static RebirthMetabolismState ReadHistoricalNpcServing(string id,string full)

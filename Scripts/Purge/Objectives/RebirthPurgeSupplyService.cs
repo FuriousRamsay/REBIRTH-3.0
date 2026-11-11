@@ -47,6 +47,16 @@ internal static class RebirthPurgeSupplyService
         if(!TryDeliveryPublication(original,out expected)||!original.TryReserve(destination,out successor))return false;
         return TryDeliveryCommit(expected,successor,out published);
     }
+    // Only the exact currently published reservation may arm a native flight.
+    // The accepted callback can then keep its identity if the store later closes.
+    internal static RebirthPoiWorldBinding CurrentFlightBinding(RebirthPurgeSupplyAccount original,Guid world)
+    {
+        if(!TryDeliveryPublication(original,out _)||binding.WorldId!=world||original.InFlight==0||original.Delivery==null)
+            return null;
+        var plan=original.Delivery;
+        return (plan.Version==3?plan.Phase==RebirthPurgeSupplyDeliveryPhase.Started:
+            plan.Phase==RebirthPurgeSupplyDeliveryPhase.Prepared||plan.CanResumeFlight)?binding:null;
+    }
     internal static bool TryLaunched(RebirthPurgeSupplyCrateStamp launch)
     {
         var current=Published;RebirthPurgeSupplyAccount original,successor,published;

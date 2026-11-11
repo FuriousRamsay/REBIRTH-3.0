@@ -45,7 +45,7 @@ internal static partial class RebirthNpcMetabolismCustody
     {
         if(nativeObserversInstalled)return;
         RebirthRemoteResourcePlacedStationOriginal.InstallProtocolInfrastructure();
-        RebirthDogLifecycleService.InstallHireNativeObservers();InstallOwnerObservers();
+        RebirthDogLifecycleService.InstallHireNativeObservers();InstallOwnerObservers();InstallClientNativePlayerPacketObserver();
         nativeObserversInstalled=true; // Publish only after all shared original sources installed.
     }
     private static void InstallOwnerObservers()

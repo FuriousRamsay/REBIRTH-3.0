@@ -8,8 +8,16 @@ internal static partial class RebirthHydrationProposalClient
         private readonly string fragmentScope="hydration-proposal|"+Guid.NewGuid().ToString("N");
         internal bool ReceiveFragment(string digest,int total,int count,int index,string part,double now)
         {
-            if(!Current()||!RebirthHydrationOriginalTransport.TryReceive(fragmentScope,Operation,digest,total,count,index,part,now,out var candidate))return false;
-            return candidate==null?Current():Receive(candidate);
+            if (!Current()) return false;
+            if (!RebirthHydrationOriginalTransport.TryReceive(fragmentScope, Operation, digest, total, count, index, part, now, out var candidate))
+            {
+                RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] proposal fragment refused operation={Operation:N} index={index}");
+                return false;
+            }
+            if (candidate == null) return Current();
+            bool accepted = Receive(candidate);
+            RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] proposal received operation={Operation:N} originalSaved={originalSaved} ownerCheckpoint={accepted}");
+            return accepted;
         }
     }
     internal static bool ReceiveFragment(World world,int playerId,Guid operation,string digest,int total,int count,int index,string part)

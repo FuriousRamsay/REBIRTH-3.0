@@ -8,16 +8,18 @@ class EntityPlayer {internal int entityId=1;}
 class ClientInfo {}
 class ItemValue {internal string Value="original";}
 class ItemStack {internal int count=1;internal ItemValue itemValue=new ItemValue();internal bool IsEmpty()=>count<=0;}
-class PlayerDataFile {internal int id=1,deaths;internal ItemStack dragAndDropItem;internal string[] Native=new string[0],Queue=new string[0];internal bool RawReady=true;}
+class PlayerDataFile {internal int id=1,deaths;internal ItemStack dragAndDropItem;internal string[] Native=new string[0],Queue=new string[0];internal bool RawReady=true;internal int QueueReads;}
 internal static partial class RebirthRepairOriginalCorrection {
  // ACTUAL_UPLOAD_TYPE
  private static string Image(ItemValue value)=>value.Value;
- private static bool TryQueueNativeItems(PlayerDataFile source,out string[] native){native=source.Native;return source.RawReady;}
- private static string[] QueueImages(PlayerDataFile source)=>source.Queue;
+ private sealed class QueueWitness {internal string[] Native,Images;}
+ private static bool TryGetCurrentQueueWitness(PlayerDataFile source,out QueueWitness witness,bool requireNative=false)
+ {source.QueueReads++;witness=new QueueWitness{Native=source.Native,Images=source.Queue};return !requireNative||source.RawReady;}
  private static void Need(bool value,string error){if(!value)throw new Exception(error);}
  private static Upload Make(){var result=new Upload{Source=new PlayerDataFile(),Player=new EntityPlayer(),BagSource=new MemoryStream(new byte[]{1,2,3}),BeltSource=new MemoryStream(new byte[]{4,5}),EquipmentSource=new MemoryStream(new byte[]{6,7}),NativeQueueItems=new string[0],Queue=new string[0]};result.BagSource.Position=2;result.BeltSource.Position=1;result.EquipmentSource.Position=1;return result;}
  internal static void Exercise(){
   var u=Make();Need(FreezeUploadHead(u)&&UploadHeadUnchanged(u),"unchanged accepted head refused");
+  Need(u.Source.QueueReads==1,"accepted head did not validate the queue exactly once");
   Need(u.BagSource.Position==2&&u.BeltSource.Position==1&&u.EquipmentSource.Position==1,"hashing changed native stream cursor");
   foreach(int area in new[]{0,1,2}){
    u=Make();Need(FreezeUploadHead(u),"fixture could not freeze head");var stream=area==0?u.BagSource:area==1?u.BeltSource:u.EquipmentSource;

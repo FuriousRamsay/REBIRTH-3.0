@@ -83,12 +83,9 @@ public static class RebirthSurvivorGearService
         if (!RebirthWorldCharacterService.TryGet(player, out record) || record == null || !record.IsComplete || record.Support == null)
         { message = Localization.Get("xuiRebirthGearCharacterUnavailable"); return false; }
 
-        if(string.Equals(profile.GearSlotId,SupportSlotId,StringComparison.Ordinal))
-        {
-            var metabolism=RebirthMetabolismStateRepository.GetOrCreate(player);
-            if(metabolism?.HydrationSlotItem!=null&&!metabolism.HydrationSlotItem.IsEmpty())
-            { message=Localization.Get("xuiRebirthSupportSlotOccupied");return false; }
-        }
+        if(string.Equals(profile.GearSlotId,SupportSlotId,StringComparison.Ordinal)&&
+            RebirthMetabolismLiveAction.BlocksSupportGear(player))
+        { message=Localization.Get("xuiRebirthSupportSlotOccupied");return false; }
         if(RebirthBackpackLibraryReservation.BlocksResourceUse(player))
         {message=Localization.Get("xuiRebirthLibraryTransferPending");return false;}
         float strength = GetAttributeCurrent(record, "strength");

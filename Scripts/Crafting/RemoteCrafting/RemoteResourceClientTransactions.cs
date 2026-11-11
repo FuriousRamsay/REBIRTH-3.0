@@ -63,10 +63,14 @@ public static class RemoteResourceClientTransactionCoordinator
     }
 
     public static bool HasPendingInventoryOperation(EntityPlayerLocal player)
+        => HasPendingInventoryOperation(player,includeScopedCraft:true);
+
+    internal static bool HasPendingInventoryOperation(EntityPlayerLocal player,bool includeScopedCraft)
         => player?.world!=null&&GameManager.Instance!=null&&
             ReferenceEquals(GameManager.Instance.World,player.world)&&
             ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&
-            (RebirthCamperStationContentsDelivery.HoldsOwner(player)||RebirthConsumptionDurableDelivery.HoldsInventoryOwner(player)||RemoteResourceClientGrantContext.Active||RebirthRemoteResourceOwnerAction.IsHeld(player)||RebirthHydrationOwnerHold.IsHeld(player));
+            (RebirthCamperStationContentsDelivery.HoldsOwner(player)||RebirthConsumptionDurableDelivery.HoldsInventoryOwner(player)||RemoteResourceClientGrantContext.Active||
+             (includeScopedCraft?RebirthRemoteResourceOwnerAction.IsHeld(player):RebirthRemoteResourceOwnerAction.BlocksNativeInventory(player))||RebirthHydrationOwnerHold.IsHeld(player));
 
     public static bool IsDedicatedClient
     {
@@ -127,6 +131,7 @@ public static class RemoteResourceClientTransactionCoordinator
     {
         if (!RemoteResourcesRuntimePolicy.Enabled || entry == null) return true;
         if (ReferenceEquals(resumeCraft, entry)) return true;
+        if (RebirthRemoteResourceLiveCraft.Applies(entry)) return true;
         if (!IsDedicatedClient)
         {
             EntityPlayerLocal local = entry.ItemController != null && entry.ItemController.xui != null &&
@@ -147,6 +152,11 @@ public static class RemoteResourceClientTransactionCoordinator
         // Let the vanilla helper build the exact modified ingredient list. If the current
         // replicated availability does not satisfy it, vanilla handles the disabled action.
         if (!entry.hasItems(xui, recipe)) return true;
+        return BeforeCraftWithIngredients(entry, recipe, player);
+    }
+
+    private static bool BeforeCraftWithIngredients(ItemActionEntryCraft entry, Recipe recipe, EntityPlayerLocal player)
+    {
         int craftCount = Math.Max(1, entry.craftCountControl.Count);
         List<ItemStack> requirements = CloneRequirements(entry.tempIngredientList, craftCount);
         if (RebirthRemoteResourcePlacedStationOriginal.ProtocolActive &&
@@ -225,9 +235,10 @@ public static class RemoteResourceClientTransactionCoordinator
     // Called only by the purpose-scoped durable craft coordinator after its
     // host saved the exact original action permission. Not a legacy result API.
     internal static bool ResumeOriginalCraft(ItemActionEntryCraft entry,RebirthRemoteResourceClientOriginal.Intent original,Guid source,string binding,
-        ItemStack[] paid,Recipe expected,int count,RebirthCamperEnergyActorImage after,Func<bool> authenticatedPermission,out string markedRecipe)
+        ItemStack[] paid,Recipe expected,int count,RebirthCamperEnergyActorImage after,Func<bool> authenticatedPermission,
+        bool deferOwnerPublication,out Recipe accepted)
     {
-        markedRecipe=null;
+        accepted=null;
         try
         {
             var player=entry?.ItemController?.xui?.playerUI?.entityPlayer;
@@ -249,38 +260,40 @@ public static class RemoteResourceClientTransactionCoordinator
             {
                 using(var scope=RebirthRemoteResourceOwnerAction.BeginCraftOriginalScope(player,entry,original,source,binding,authenticatedPermission))
                 {
-                    if(scope==null)return false;
+                    if(scope==null)
+                    {
+                        RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] native resume scope unavailable operation={original.Operation:N}");
+                        return false;
+                    }
                     resumeCraft=entry;try{entry.OnActivated();}finally{resumeCraft=null;}
                 }
             }
             finally{RemoteResourceClientGrantContext.End();}
             var rows=player.PlayerUI.xui.GetCraftingData()?.RecipeQueueItems?.Where(row=>row?.Recipe!=null&&!existing.Any(recipe=>ReferenceEquals(recipe,row.Recipe))).ToArray();
+            RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] native resume new rows={rows?.Length??-1} operation={original.Operation:N}");
             if(rows==null||rows.Length!=1||rows[0].Multiplier!=count||rows[0].Quality!=expected.craftingTier||
                 !RebirthRemoteResourceOwnerAction.StampActualRecipe(rows[0].Recipe,source,binding))return false;
-            markedRecipe=RebirthRemoteResourceOwnerAction.RecipeImage(rows[0].Recipe);
+            string markedRecipe=RebirthRemoteResourceOwnerAction.RecipeImage(rows[0].Recipe);
             if(markedRecipe!=RebirthRemoteResourceOwnerAction.RecipeImage(expectedMarked)||!after.Matches(RebirthCamperEnergyActorImage.Capture(player)))return false;
+            if(deferOwnerPublication&&(authenticatedPermission?.Invoke()!=true||!RebirthRemoteResourceOwnerAction.HoldsOriginalScope(player,original)))return false;
             player.Buffs.SetCustomVar(RebirthRemoteResourceOwnerAction.Receipt(original.Operation),2f,true);
-            GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);return true;
+            if(!deferOwnerPublication)
+            {GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);}
+            accepted=rows[0].Recipe;return true;
         }
-        catch{markedRecipe=null;return false;}
+        catch(Exception error){RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] native resume threw {error.GetType().Name} operation={original?.Operation:N}");return false;}
     }
     public static bool BeforeItemRepairActivated(ItemActionEntryRepair entry)
     {
         if (!RemoteResourcesRuntimePolicy.Enabled || entry == null) return true;
-        if (!IsDedicatedClient)
-        {
-            EntityPlayerLocal local = entry.ItemController != null && entry.ItemController.xui != null &&
-                entry.ItemController.xui.playerUI != null ? entry.ItemController.xui.playerUI.entityPlayer : null;
-            if (local != null) RemoteResourceSnapshotCache.ForceRebuild(local);
-            return true;
-        }
+        if (!IsDedicatedClient) return true;
         if (ReferenceEquals(resumeRepair, entry)) return true;
         if (RebirthRemoteResourceRepairProtocol.TryAttach(entry)) return false;
 
         XUi xui = entry.ItemController != null ? entry.ItemController.xui : null;
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         if (player == null) return true;
-        ItemStack itemStack = ItemStack.Empty.Clone();
+        ItemStack itemStack = null;
         XUiC_EquipmentStack equipment = entry.ItemController as XUiC_EquipmentStack;
         XUiC_ItemStack grid = entry.ItemController as XUiC_ItemStack;
         if (equipment != null) itemStack = equipment.ItemStack;
@@ -296,16 +309,20 @@ public static class RemoteResourceClientTransactionCoordinator
         // Vanilla repairs as much as the currently available tool count allows rather than
         // requiring enough material for a full repair. Preserve that behavior here.
         if (count == 0) return true;
-        ItemStack requirement = new ItemStack(new ItemValue(repairTool.Id), count);
-        List<ItemStack> full = new List<ItemStack> { requirement };
-        if (HasAllLocal(player, full)) return true;
-        List<ItemStack> shortfall;
-        if (!TryBuildRemoteShortfall(player, full, out shortfall) || shortfall.Count == 0)
+        var kit = new ItemValue(repairTool.Id);
+        int localCount = CountConsumableLocal(player, kit);
+        if (localCount >= count) return true;
+        int needed = Math.Max(0, count - localCount);
+        if (needed == 0 || (player.world.IsRemote()
+            ? RemoteResourceClientAvailability.GetCount(player, kit)
+            : RemoteResourceTransactions.CountRemote(player, kit)) < needed)
         {
             RemoteResourceClientAvailability.InvalidateAndRequest(player);
             return false;
         }
 
+        var full = new List<ItemStack> { new ItemStack(kit, count) };
+        var shortfall = new List<ItemStack> { new ItemStack(kit.Clone(), needed) };
         ulong requestId = NextRequestId();
         RebirthRemoteResourceRepairProtocol.Begin(player,entry,clientSessionEpoch,requestId,full,shortfall);
         return false;
@@ -398,15 +415,14 @@ public static class RemoteResourceClientTransactionCoordinator
         List<ItemStack> requirements;
         if (!TryBuildBlockRepairRequirements(action, actionData, out target, out requirements) || requirements.Count == 0)
             return true;
-        if (HasAllLocal(player, requirements)) return true;
-
-        List<ItemStack> shortfall;
-        if (!TryBuildRemoteShortfall(player, requirements, out shortfall) || shortfall.Count == 0)
+        if (!TryBuildRemoteShortfall(player, requirements, out var shortfall, omitEmptyList: true))
         {
             RemoteResourceClientAvailability.InvalidateAndRequest(player);
             RemoteResourceLiveSync.DispatchLocalUi(player);
             return false;
         }
+
+        if (shortfall == null) return true;
 
         ulong requestId = NextRequestId();
         if (RebirthRemoteResourceBlockProtocol.IsActive)
@@ -424,21 +440,18 @@ public static class RemoteResourceClientTransactionCoordinator
 
         EntityPlayerLocal player = actionData.invData != null ? actionData.invData.holdingEntity as EntityPlayerLocal : null;
         if (player == null || actionData.invData.world == null) return true;
-        BlockValue blockValue = actionData.invData.world.GetBlock(action.blockTargetPos);
+        Block block = actionData.invData.world.GetBlock(action.blockTargetPos).Block;
         int requiredHits;
-        if (blockValue.Block == null || !int.TryParse(blockValue.Block.Properties.GetString("UpgradeBlock", "UpgradeHitCount"), out requiredHits))
+        if (block == null || !int.TryParse(block.Properties.GetString("UpgradeBlock", "UpgradeHitCount"), out requiredHits))
             return true;
         requiredHits = requiredHits + action.hitCountOffset < 1f ? 1 : (int)(requiredHits + action.hitCountOffset);
         if (action.blockUpgradeCount < requiredHits) return true;
 
         ItemStack requirement;
-        if (!RemoteResourceActionConsumerPatchInstaller.TryBuildUpgradeRequirement(action, blockValue, out requirement))
+        if (!RemoteResourceActionConsumerPatchInstaller.TryBuildUpgradeRequirementAfterHitCountCheck(action, block, out requirement))
             return true;
         List<ItemStack> requirements = new List<ItemStack> { requirement };
-        if (HasAllLocal(player, requirements)) return true;
-
-        List<ItemStack> shortfall;
-        if (!TryBuildRemoteShortfall(player, requirements, out shortfall) || shortfall.Count == 0)
+        if (!TryBuildRemoteShortfall(player, requirements, out var shortfall, omitEmptyList: true))
         {
             action.blockUpgradeCount = 0;
             action.bUpgradeCountChanged = false;
@@ -446,6 +459,8 @@ public static class RemoteResourceClientTransactionCoordinator
             RemoteResourceLiveSync.DispatchLocalUi(player);
             return false;
         }
+
+        if (shortfall == null) return true;
 
         ulong requestId = NextRequestId();
         if (RebirthRemoteResourceBlockProtocol.IsActive)
@@ -539,9 +554,10 @@ public static class RemoteResourceClientTransactionCoordinator
         return true;
     }
 
-    private static bool TryBuildRemoteShortfall(EntityPlayerLocal player, IList<ItemStack> requirements, out List<ItemStack> shortfall)
+    private static bool TryBuildRemoteShortfall(EntityPlayerLocal player, IList<ItemStack> requirements, out List<ItemStack> shortfall,
+        bool omitEmptyList = false)
     {
-        shortfall = new List<ItemStack>();
+        shortfall = omitEmptyList ? null : new List<ItemStack>();
         for (int i = 0; requirements != null && i < requirements.Count; i++)
         {
             ItemStack required = requirements[i];
@@ -549,7 +565,7 @@ public static class RemoteResourceClientTransactionCoordinator
             int needed = Math.Max(0, required.count - local);
             if (needed == 0) continue;
             if ((player.world.IsRemote()?RemoteResourceClientAvailability.GetCount(player, required.itemValue):RemoteResourceTransactions.CountRemote(player,required.itemValue)) < needed) return false;
-            shortfall.Add(new ItemStack(required.itemValue.Clone(), needed));
+            (shortfall ??= new List<ItemStack>()).Add(new ItemStack(required.itemValue.Clone(), needed));
         }
         return true;
     }
@@ -745,7 +761,29 @@ public static class RemoteResourceClientGrantContext
 internal static class RemoteResourceCraftPreflightPatch
 {
     private static bool Prefix(ItemActionEntryCraft __instance)
-    { return RemoteResourceClientTransactionCoordinator.BeforeCraftActivated(__instance); }
+    {
+#if REBIRTH_DEBUG
+        if (RebirthRemoteResourceLiveCraft.Applies(__instance))
+            RebirthRemoteResourceLiveCraft.TraceClick(__instance);
+#endif
+        return RemoteResourceClientTransactionCoordinator.BeforeCraftActivated(__instance);
+    }
+
+#if REBIRTH_DEBUG
+    private static void Finalizer()
+    {
+        RebirthRemoteResourceLiveCraft.EndTrace();
+    }
+#endif
+}
+
+[HarmonyPatch(typeof(XUiC_RecipeCraftCount),nameof(XUiC_RecipeCraftCount.CalculateMaxCount))]
+internal static class RebirthRemoteResourceCraftCountRefreshPatch
+{
+    // Reservation temporarily removes ingredients from availability. Keep the
+    // captured count across native refreshes of that exact recipe and control.
+    private static bool Prefix(XUiC_RecipeCraftCount __instance)
+        =>!RebirthRemoteResourceCraftProtocol.PreservesRequestedCount(__instance);
 }
 
 [HarmonyPatch(typeof(ItemActionEntryRepair), nameof(ItemActionEntryRepair.OnActivated))]
@@ -753,6 +791,43 @@ internal static class RemoteResourceItemRepairPreflightPatch
 {
     private static bool Prefix(ItemActionEntryRepair __instance)
     { return RemoteResourceClientTransactionCoordinator.BeforeItemRepairActivated(__instance); }
+
+    private static int CountKits(XUiM_PlayerInventory inventory, ItemValue kit, int due)
+    {
+        if (due > 0 && RemoteResourcesRuntimePolicy.Enabled && !RemoteResourceClientGrantContext.Active &&
+            SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer == true &&
+            inventory?.localPlayer is EntityPlayerLocal player && player.world?.IsRemote() == false &&
+            inventory.Backpack != null && inventory.Toolbelt != null)
+        {
+            // Native caps this count at due. Remote availability cannot change that result
+            // when the same native Backpack and Toolbelt queries already cover it.
+            int carried = inventory.Backpack.GetItemCount(kit) + inventory.Toolbelt.GetItemCount(kit);
+            if (carried >= due) return carried;
+            RemoteResourceSnapshotCache.ForceRebuild(player);
+        }
+
+        return inventory.GetItemCount(kit);
+    }
+
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        var code = instructions.ToList();
+        var nativeCount = AccessTools.Method(typeof(XUiM_PlayerInventory), nameof(XUiM_PlayerInventory.GetItemCount),
+            new[] { typeof(ItemValue) });
+        var nativeMin = AccessTools.Method(typeof(Mathf), nameof(Mathf.Min), new[] { typeof(int), typeof(int) });
+        var countKits = AccessTools.DeclaredMethod(typeof(RemoteResourceItemRepairPreflightPatch), nameof(CountKits));
+        int count = code.FindIndex(instruction => instruction.Calls(nativeCount));
+        if (count < 0 || count + 2 >= code.Count || code.Count(instruction => instruction.Calls(nativeCount)) != 1 ||
+            !code[count + 1].IsLdloc() || !code[count + 2].Calls(nativeMin) || code[count].blocks.Count != 0)
+            throw new InvalidOperationException("Native Item Repair kit count changed.");
+
+        var due = code[count + 1];
+        var loadDue = new CodeInstruction(due.opcode, due.operand);
+        loadDue.labels.AddRange(code[count].labels);
+        code[count] = new CodeInstruction(System.Reflection.Emit.OpCodes.Call, countKits);
+        code.Insert(count, loadDue);
+        return code;
+    }
 }
 
 [HarmonyPatch(typeof(ItemActionRepair), nameof(ItemActionRepair.ExecuteAction))]
@@ -1099,6 +1174,32 @@ internal static class RebirthRemoteResourcePersonalQueueCancelHoldPatch
     private static bool Prefix(XUiC_RecipeStack __instance)=>!RebirthRemoteResourceOwnerAction.BlocksPersonalQueue(__instance);
 }
 
+[HarmonyPatch(typeof(XUiM_LootContainer), nameof(XUiM_LootContainer.StashItems))]
+internal static class RebirthRemoteResourceBackpackStashHoldPatch
+{
+    [HarmonyPriority(Priority.First + 1)]
+    private static bool Prefix(XUiC_ItemStackGrid _srcGrid, ref PackedBoolArray _ignoredSlots, ref ValueTuple<bool, bool> __result)
+    {
+        if (_srcGrid is not XUiC_Backpack backpack) return true;
+        var player = backpack.xui?.playerUI?.entityPlayer;
+        // Native stash writes its destination before clearing the source.
+        if (RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player,includeScopedCraft:false))
+        {
+            __result = (false, false);
+            return false;
+        }
+        var grid = player?.bag?.ItemGrid;
+        if (!RebirthRemoteResourceOwnerAction.BlocksNativeInventory(player,grid)) return true;
+        int length = backpack.GetItemStackControllers().Length;
+        var ignored = _ignoredSlots?.Clone() ?? new PackedBoolArray(length);
+        if (ignored.Length < length) ignored.Length = length;
+        for (int slot=0;slot<length;slot++)
+            if (RebirthRemoteResourceOwnerAction.BlocksNativeInventory(player,grid,slot)) ignored[slot] = true;
+        _ignoredSlots = ignored;
+        return true;
+    }
+}
+
 public static class RemoteResourceClientTransactionPatchInstaller
 {
     private static bool installed;
@@ -1111,7 +1212,9 @@ public static class RemoteResourceClientTransactionPatchInstaller
         RebirthRemoteResourceBlockProtocol.Install();
         RebirthProductiveEarnedUiDeferredTransport.InstallSelectedSendObserver();
         Harmony harmony = new Harmony("rebirth.remote.resources.client.transactions.3.1");
+        RebirthRemoteResourceLiveCraft.Install(harmony);
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceCraftPreflightPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourceCraftCountRefreshPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceItemRepairPreflightPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceBlockRepairPreflightPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceBlockUpgradePreflightPatch));
@@ -1119,6 +1222,7 @@ public static class RemoteResourceClientTransactionPatchInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceClientTransactionUpdatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourcePersonalQueueHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourcePersonalQueueCancelHoldPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourceBackpackStashHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourceCraftOriginalQueueCapture));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthRemoteResourceCraftOriginalIngredientsSeal));
         RebirthRemoteResourcePreAdmissionRefusal.Install(harmony);

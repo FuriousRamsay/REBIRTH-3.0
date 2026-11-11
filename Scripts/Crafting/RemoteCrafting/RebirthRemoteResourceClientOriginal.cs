@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 // Durable original owner input, separate from both source payment and actual
 // native usage. Presence of this intent never proves that anything was paid.
-internal static class RebirthRemoteResourceClientOriginal
+internal static partial class RebirthRemoteResourceClientOriginal
 {
     internal const int MaximumOriginalBytes=16*1024*1024;
     internal static bool CompleteEndedPlacedNoEffect(RebirthRemoteResourcePlacedStationOriginal.EndedNeverEnteredClient proof)
@@ -73,7 +73,8 @@ internal static class RebirthRemoteResourceClientOriginal
         internal void WriteDetachedTo(XmlWriter writer)=>image.WriteTo(writer);
         internal Intent(Guid operation,XElement root){Operation=operation;image=new XElement(root);digest=RebirthRemoteResourceDurableJournal.Digest(image.ToString(SaveOptions.DisableFormatting));}
     }
-    private static RebirthRemoteResourceClientOriginalJournal Journal()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientOriginals"));
+    private static RebirthRemoteResourceClientOriginalJournal Journal(string saveDirectory=null)=>new RebirthRemoteResourceClientOriginalJournal(
+        Path.Combine(saveDirectory??GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientOriginals"),ClearPendingRecovery);
     private static RebirthRemoteResourceClientOriginalJournal Terminals()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientTerminals"));
     private static RebirthRemoteResourceClientOriginalJournal Actions()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientActions"));
     private static RebirthRemoteResourceClientOriginalJournal Sources()=>new RebirthRemoteResourceClientOriginalJournal(Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientSources"));
@@ -414,17 +415,19 @@ internal static class RebirthRemoteResourceClientOriginal
         }
         catch{return false;}
     }
-    internal static bool TryReadCraftTerminal(Guid sourceOperation,string binding,out XElement terminal)
+    internal static bool TryReadCraftTerminal(Guid sourceOperation,string binding,out XElement terminal,string saveDirectory=null)
     {
         terminal=null;
         try
         {
             if(!ThreadManager.IsMainThread()||sourceOperation==Guid.Empty||!Hex(binding))return false;
-            var record=Terminals().Read(sourceOperation);if(record?.State!=RebirthCamperTransferJournal.Phase.Applied||record.Before.Length>16*1024*1024)return false;
+            var record=RebirthRemoteResourceClientOriginalJournal.ObserveExisting(
+                Path.Combine(saveDirectory??GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientTerminals"),sourceOperation);
+            if(record?.State!=RebirthCamperTransferJournal.Phase.Applied||record.Before.Length>16*1024*1024)return false;
             XElement root;using(var input=new MemoryStream(record.Before,false))using(var reader=XmlReader.Create(input,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=16*1024*1024}))root=XElement.Load(reader);
             if(root.Name!="fetchClientCraftTerminal"||root.Attributes().Count()!=12||root.Elements().Count()!=2||(int?)root.Attribute("version")!=1||
                 (string)root.Attribute("sourceOperation")!=sourceOperation.ToString("N")||(string)root.Attribute("binding")!=binding||!Hex((string)root.Attribute("hostProof"))||
-                !Guid.TryParseExact((string)root.Attribute("original"),"N",out var original)||original!=record.Vehicle||!TryRead(original,out var intent)||
+                !Guid.TryParseExact((string)root.Attribute("original"),"N",out var original)||original!=record.Vehicle||!TryRead(original,out var intent,saveDirectory)||
                 intent.Kind!=RemoteResourceClientOperation.Craft||intent.Digest!=(string)root.Attribute("originalDigest")||intent.World!=(string)root.Attribute("world")||
                 intent.Owner!=(string)root.Attribute("owner")||intent.Creation!=(string)root.Attribute("creation")||intent.Deaths!=(int?)root.Attribute("deaths")||
                 (int?)root.Attribute("count") is not int count||count<1||count>short.MaxValue||(int?)root.Attribute("quality") is not int quality||quality<0||quality>byte.MaxValue||root.Element("markedRecipe")?.Value.Length>6*1024*1024)return false;
@@ -432,13 +435,13 @@ internal static class RebirthRemoteResourceClientOriginal
         }
         catch{terminal=null;return false;}
     }
-    internal static bool CompleteCraftTerminal(Intent original,Guid sourceOperation,string binding)
+    internal static bool CompleteCraftTerminal(Intent original,Guid sourceOperation,string binding,string saveDirectory=null)
     {
         try
         {
-            if(original==null||!TryReadCraftTerminal(sourceOperation,binding,out var proof)||(string)proof.Attribute("original")!=original.Operation.ToString("N")||
+            if(original==null||!TryReadCraftTerminal(sourceOperation,binding,out var proof,saveDirectory)||(string)proof.Attribute("original")!=original.Operation.ToString("N")||
                 (string)proof.Attribute("originalDigest")!=original.Digest)return false;
-            var journal=Journal();var record=journal.Read(original.Operation);if(record==null||Decode(record).Digest!=original.Digest)return false;
+            var journal=Journal(saveDirectory);var record=journal.Read(original.Operation);if(record==null||Decode(record).Digest!=original.Digest)return false;
             if(record.State==RebirthCamperTransferJournal.Phase.Prepared)record=journal.Advance(original.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
             if(record.State==RebirthCamperTransferJournal.Phase.Uncertain)record=journal.Advance(original.Operation,RebirthCamperTransferJournal.Phase.Uncertain,RebirthCamperTransferJournal.Phase.Applied);
             return record.State==RebirthCamperTransferJournal.Phase.Applied;
@@ -565,10 +568,14 @@ internal static class RebirthRemoteResourceClientOriginal
     }
     internal static bool HasNeverPreparedRepairAction(Intent original)
     {try{return original?.Kind==RemoteResourceClientOperation.ItemRepair&&Actions().Read(original.Operation)==null;}catch{return false;}}
+    internal static string ProtocolWorld(World world, RemoteResourceClientOperation kind) =>
+        kind == RemoteResourceClientOperation.Craft || kind == RemoteResourceClientOperation.ItemRepair
+            ? RebirthRemoteResourceNetworkScope.ProtocolWorld(world)
+            : world?.worldState?.Guid;
     internal static bool Current(EntityPlayerLocal player,Intent original)=>ThreadManager.IsMainThread()&&player?.world!=null&&
         (player.world.IsRemote()||original?.Kind==RemoteResourceClientOperation.Craft&&RebirthRemoteResourceCraftOriginal.ValidateInput(original,out _,out _,out _,out _,out _))&&player.IsSpawned()&&!player.IsDead()&&
         ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&ReferenceEquals(player.world.GetEntity(player.entityId),player)&&
-        original!=null&&original.World==player.world.worldState.Guid&&original.Deaths==player.Died&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
+        original!=null&&original.World==ProtocolWorld(player.world,original.Kind)&&original.Deaths==player.Died&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
         RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)&&identity.CanonicalId==original.Owner;
     internal static bool TryPrepare(EntityPlayerLocal player,ulong epoch,ulong request,RemoteResourceClientOperation kind,
         IList<ItemStack> fullRequirements,IList<ItemStack> remoteRequirements,XElement actualAction,out Intent original)
@@ -578,8 +585,10 @@ internal static class RebirthRemoteResourceClientOriginal
         {
             if(!ThreadManager.IsMainThread()||player?.world==null||!player.world.IsRemote()&&kind!=RemoteResourceClientOperation.Craft||!player.IsSpawned()||player.IsDead()||epoch==0||request==0||
                 !RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)||actualAction?.Name!="action")return false;
-            string creation=RebirthCamperCharacterAccess.CurrentCreation(player);var key=Key(player.world.worldState.Guid,identity.CanonicalId,creation,epoch,request,kind);
-            var root=new XElement("fetchClientOriginal",new XAttribute("version",1),new XAttribute("world",player.world.worldState.Guid),new XAttribute("owner",identity.CanonicalId),
+            string world = ProtocolWorld(player.world, kind);
+            if (!Guid.TryParse(world, out var worldId) || worldId == Guid.Empty) return false;
+            string creation=RebirthCamperCharacterAccess.CurrentCreation(player);var key=Key(world,identity.CanonicalId,creation,epoch,request,kind);
+            var root=new XElement("fetchClientOriginal",new XAttribute("version",1),new XAttribute("world",world),new XAttribute("owner",identity.CanonicalId),
                 new XAttribute("creation",creation),new XAttribute("deaths",player.Died),new XAttribute("epoch",epoch),new XAttribute("request",request),new XAttribute("kind",(byte)kind),new XAttribute("operation",key.ToString("N")),
                 new XElement("requirements",Image(fullRequirements.ToArray())),new XElement("remoteRequirements",Image(remoteRequirements.ToArray())),
                 new XElement("actorBefore",ActorImage(RebirthCamperEnergyActorImage.Capture(player))),new XElement("queueBefore",QueueImage(player.PlayerUI.xui.GetCraftingData())),new XElement(actualAction));
@@ -603,8 +612,18 @@ internal static class RebirthRemoteResourceClientOriginal
         }
         catch{original=null;return false;}
     }
-    internal static bool TryRead(Guid operation,out Intent original)
-    {original=null;try{var record=Journal().Read(operation);if(record==null)return false;original=Decode(record);return true;}catch{return false;}}
+    internal static bool TryRead(Guid operation,out Intent original,string saveDirectory=null)
+    {
+        original=null;
+        try
+        {
+            var record=RebirthRemoteResourceClientOriginalJournal.ObserveExisting(
+                Path.Combine(saveDirectory??GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientOriginals"),operation);
+            if(record==null)return false;
+            original=Decode(record);return true;
+        }
+        catch{return false;}
+    }
     // Read-only scenario observation; no terminal is created or advanced here.
     internal static bool IsCompletedBlockOriginal(Intent original)
     {
@@ -618,7 +637,12 @@ internal static class RebirthRemoteResourceClientOriginal
     }
     internal static bool TryReadPending(out Intent[] originals)
     {
-        originals=null;var result=new List<Intent>();
+        ClearPendingRecovery();
+        return ReadPending(out originals,out _);
+    }
+    private static bool ReadPending(out Intent[] originals,out long bytes)
+    {
+        originals=null;bytes=0;var result=new List<Intent>();
         try
         {
             string directory=Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","RemoteResourceClientOriginals");if(!Directory.Exists(directory)){originals=new Intent[0];return true;}
@@ -628,7 +652,7 @@ internal static class RebirthRemoteResourceClientOriginal
                 if(!Guid.TryParseExact(Path.GetFileName(file).Substring(0,32),"N",out var operation))return false;
                 var record=Journal().Read(operation);if(record==null)return false;
                 if(record.State==RebirthCamperTransferJournal.Phase.Applied||record.State==RebirthCamperTransferJournal.Phase.Rejected){Journal().Archive(operation);continue;}
-                if(++count>4096)return false;result.Add(Decode(record));
+                if(++count>4096)return false;result.Add(Decode(record));bytes+=record.Before.LongLength;
             }
             originals=result.ToArray();return true;
         }

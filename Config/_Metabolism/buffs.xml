@@ -43,8 +43,9 @@
     </buff>
     <buff name="buffRebirthStarving" name_key="buffRebirthStarvingName" description_key="buffRebirthStarvingDesc" tooltip_key="buffRebirthStarvingTooltip" icon="ui_game_symbol_fork" icon_color="255,0,0" icon_blink="true">
       <stack_type value="ignore" />
+      <update_rate value="6.666667" />
       <effect_group>
-        <passive_effect name="HealthChangeOT" operation="base_subtract" value=".15" />
+        <triggered_effect trigger="onSelfBuffUpdate" action="DamageEntity, RebirthUtils" target="self" damage="1" damage_source="starve" />
       </effect_group>
     </buff>
     <!-- Fullness presentation is primarily handled by the HUD; these remain hidden so

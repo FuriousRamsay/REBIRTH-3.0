@@ -2,6 +2,7 @@
   "name": "Trader job card refresh capture (stand facing a trader with available jobs)",
   "stopOnFailure": true,
   "steps": [
+    {"_note":"For the dedicated correlation case, hold the genuine Jobs reply, close the native dialog, and reopen the same trader. Deliver the old reply before and after a fresh Jobs click. It must leave native offers and the new pending request alone. The genuine fresh response must still apply, including an empty list."},
     {"action":{"command":"cleararea","args":{"radius":40}}},
     {"action":{"command":"restore","args":{}}},
     {"action":{"command":"activate","args":{}}},

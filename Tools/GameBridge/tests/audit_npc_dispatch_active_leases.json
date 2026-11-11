@@ -1,0 +1,35 @@
+{
+  "name": "NPC dispatch active lease and retained history",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepared solo and dedicated Purge with a real placed owned dog. Use native companion interaction to issue alternating Follow and Stay orders, and observe an existing same-order retry, actor unload/rejoin and prior lease history. Never enable unfinished natural human spawns. Controlled exact recovery can use its own fixture."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "audit_npc_dispatch_activity"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    }
+  ]
+}

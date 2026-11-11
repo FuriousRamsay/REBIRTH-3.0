@@ -34,6 +34,7 @@ internal static class RebirthHumanStartingLoadout
                 if(!(world.GetEntity(pid) is EntityRebirthHumanoidNPC pn)||pn.IsDead()||pn.Buffs==null||++PersistRetry[pid]>PersistRetryMax||RebirthP2NpcEquipmentRestore.PersistBirth(pn,0))PersistRetry.Remove(pid);
                 if(--budget<=0)break;
             }
+        if(budget<=0)return;
         foreach(var runtime in RebirthNpcRuntimeRegistry.GetSnapshot())
         {
             if(budget<=0)break;

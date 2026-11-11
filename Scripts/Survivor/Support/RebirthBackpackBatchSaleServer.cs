@@ -13,7 +13,7 @@ public static partial class RebirthBackpackLibraryServer
         if(state.GearRevision!=revision||state.PendingLibraryTransfer!=null||state.PendingGearTransfer!=null||state.PendingMusicTransfer!=null||
             !state.EquippedGearBySlot.TryGetValue("backpack",out var item)||string.IsNullOrEmpty(item)||!state.EquippedGearItemDataBySlot.TryGetValue("backpack",out var data)||!RebirthNativeItemCodec.TryDecode(data,out var pack)||pack.ItemClass?.GetItemName()!=item)return false;
         var bag=local?player.bag?.ItemGrid.items:RebirthPlayerDataInventory.ReadSlots(sender.latestPlayerData,true);
-        if(!RebirthStashBatchPrice.Plan(player,trader.TraderData,pack,out var after,out _,out int total)||
+        if(!RebirthStashBatchPrice.Plan(player,trader.TraderData,pack,out var after,out int total)||
             !RebirthBackpackLibraryReceipt.TryCreateSale(creation,revision,pack,after,bag,player.bag?.LockedSlots,total,out var planned,traderId)||
             !RebirthBackpackLibraryJournal.Prepare(state,planned,creation,()=>Save(player,record)))return false;
         receipt=planned;return true;

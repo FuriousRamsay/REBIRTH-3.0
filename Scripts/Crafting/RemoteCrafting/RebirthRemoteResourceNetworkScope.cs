@@ -9,10 +9,13 @@ internal sealed class RebirthRemoteResourceNetworkScope
     private readonly ConnectionManager manager;private readonly ClientInfo peer;private readonly INetConnection connection;private readonly bool local;
     private RebirthRemoteResourceNetworkScope(EntityPlayer value,ConnectionManager current,ClientInfo sender,INetConnection native,bool primary)
     {actor=value;world=value.world;entity=value.entityId;manager=current;peer=sender;connection=native;local=primary;}
-    internal static bool IsPacket(NetPackage packet)=>packet is NetPackageRebirthRemoteRepairOriginal||packet is NetPackageRebirthRemoteRepairResult;
+    internal static bool IsPacket(NetPackage packet)=>packet is NetPackageRebirthRemoteRepairOriginal or NetPackageRebirthRemoteRepairResult
+        or NetPackageRebirthWorkbenchCraftRequest or NetPackageRebirthWorkbenchCraftResult;
     private sealed class Session{internal readonly string Value=Guid.NewGuid().ToString("N");}
     private static readonly ConditionalWeakTable<INetConnection,Session> sessions=new ConditionalWeakTable<INetConnection,Session>();
     internal static string SessionKey(INetConnection connection)=>sessions.GetValue(connection,_=>new Session()).Value;
+    internal static string ProtocolWorld(World world) =>
+        world?.IsRemote() == true ? GamePrefs.GetString(EnumGamePrefs.GameGuidClient) : world?.worldState?.Guid;
     internal static RebirthRemoteResourceNetworkScope Capture(EntityPlayer actor)
     {
         var world=GameManager.Instance?.World;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;

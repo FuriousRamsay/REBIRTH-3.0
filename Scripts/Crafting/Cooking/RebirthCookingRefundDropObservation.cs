@@ -20,7 +20,7 @@ internal sealed class RebirthCookingRefundDropObservation:IDisposable
     // The caller already owns the immutable overflow original. A remote actor
     // needs its authenticated native action scope; this API never accepts a
     // client-authored drop payload or treats the live result as a saved receipt.
-    internal static bool TryDrop(EntityPlayer actor,ItemStack offer,Func<bool> currentOriginal,out bool attempted,out EntityItem observed,Func<bool> beforeInvoke=null)
+    internal static bool TryDrop(EntityPlayer actor,ItemStack offer,Func<bool> currentOriginal,out bool attempted,out EntityItem observed,Func<bool> beforeInvoke=null,Vector3? position=null)
     {
         attempted=false;observed=null;
         if(current!=null||!ThreadManager.IsMainThread()||currentOriginal==null||actor?.world is not World world||world.IsRemote()||offer==null||offer.IsEmpty()||offer.count<1)return false;
@@ -42,7 +42,7 @@ internal sealed class RebirthCookingRefundDropObservation:IDisposable
             if(beforeInvoke!=null&&!beforeInvoke())return false;
             if(!proof.Current())return false;
             attempted=true;
-            GameManager.Instance.ItemDropServer(argument,actor.position,Vector3.zero,actor.entityId,120f,false);
+            GameManager.Instance.ItemDropServer(argument,position??actor.position,Vector3.zero,actor.entityId,120f,false);
             var item=proof.spawned;
             bool accepted=proof.Current()&&!proof.ambiguous&&item!=null&&ReferenceEquals(world.GetEntity(item.entityId),item)&&
                 !item.IsMarkedForUnload()&&item.belongsPlayerId==actor.entityId&&ReferenceEquals(item.world,world)&&

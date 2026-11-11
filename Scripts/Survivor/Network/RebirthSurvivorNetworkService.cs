@@ -385,7 +385,7 @@ public static class RebirthSurvivorNetworkService
             return false;
         }
         if (CanSuppressOwnerBody(identity, knownRevision, force)) return false;
-        RebirthSurvivorOwnerStateSnapshot snapshot = CaptureOwnerState(identity);
+        RebirthSurvivorOwnerStateSnapshot snapshot = CaptureOwnerState(identity, clientInfo);
         EntityPlayerLocal localPlayer = GameManager.Instance != null && GameManager.Instance.World != null
             ? GameManager.Instance.World.GetEntity(clientInfo.entityId) as EntityPlayerLocal
             : null;
@@ -426,8 +426,9 @@ public static class RebirthSurvivorNetworkService
             return false;
         }
         if (CanSuppressOwnerBody(identity, knownRevision, force)) return false;
-        RebirthSurvivorOwnerStateSnapshot snapshot = CaptureOwnerState(identity);
         EntityPlayerLocal localPlayer = player as EntityPlayerLocal;
+        RebirthSurvivorOwnerStateSnapshot snapshot = CaptureOwnerState(identity,
+            localPlayer == null ? connection.Clients?.ForEntityId(player.entityId) : null);
         if (localPlayer != null)
             RebirthSurvivorClientState.ReceiveOwnerState(snapshot);
         else
@@ -454,7 +455,10 @@ public static class RebirthSurvivorNetworkService
         return true;
     }
 
-    public static RebirthSurvivorOwnerStateSnapshot CaptureOwnerState(RebirthStablePlayerIdentity identity)
+    public static RebirthSurvivorOwnerStateSnapshot CaptureOwnerState(RebirthStablePlayerIdentity identity) =>
+        CaptureOwnerState(identity, null);
+
+    private static RebirthSurvivorOwnerStateSnapshot CaptureOwnerState(RebirthStablePlayerIdentity identity, ClientInfo client)
     {
         RebirthSurvivorOwnerStateSnapshot snapshot = new RebirthSurvivorOwnerStateSnapshot();
         snapshot.PublicationSerial=System.Threading.Interlocked.Increment(ref ownerPublicationSerial);
@@ -524,6 +528,17 @@ public static class RebirthSurvivorNetworkService
 
         if (record.Progression != null)
         {
+            if (client != null)
+            {
+                snapshot.OrdinaryPracticeSequence = RebirthOrdinarySkillPractice.ObserveOwner(GameManager.Instance?.World, client, record);
+                foreach (var pair in record.Progression.TeachingLessons)
+                {
+                    var lesson = pair.Value;
+                    if (lesson != null && lesson.RemainingActiveSeconds > 0f)
+                        snapshot.OrdinaryPracticeLessons.Add(new RebirthSurvivorOrdinaryPracticeLesson(
+                            pair.Key, UnityEngine.Mathf.Clamp(lesson.GainMultiplier, 1f, 3f), lesson.RemainingActiveSeconds));
+                }
+            }
             snapshot.HealthPotential = record.Progression.HealthPotential;
             List<string> attrIds = new List<string>(record.Progression.Attributes.Keys); attrIds.Sort(StringComparer.Ordinal);
             for (int i = 0; i < attrIds.Count && i < RebirthSurvivorNetworkProtocol.MaxAttributes; i++)

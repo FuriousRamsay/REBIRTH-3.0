@@ -13,10 +13,19 @@ public static class RebirthAttributeProgressionService
         RebirthAttributeDefinition def=FindDefinition(attributeId);
         if(def==null || state.Current>=def.Max) return false;
 
-        float potential=Math.Max(def.Min,state.Potential);
-        float ratio=potential>0.0001f?state.Current/potential:1f;
+        float before = state.Current;
+        state.Current = ProjectTraining(def, before, state.Potential, rawAmount);
+        applied = state.Current - before;
+        return applied > 0.00001f;
+    }
+
+    internal static float ProjectTraining(RebirthAttributeDefinition def, float current, float basePotential, float rawAmount)
+    {
+        if (rawAmount <= 0f || current >= def.Max) return current;
+        float potential=Math.Max(def.Min,basePotential);
+        float ratio=potential>0.0001f?current/potential:1f;
         float multiplier;
-        if(state.Current>potential) multiplier=RebirthProgressionRuntimeConfig.AbovePotentialMultiplier;
+        if(current>potential) multiplier=RebirthProgressionRuntimeConfig.AbovePotentialMultiplier;
         else if(ratio<=RebirthProgressionRuntimeConfig.BelowPotentialFullUntil) multiplier=1f;
         else
         {
@@ -25,11 +34,7 @@ public static class RebirthAttributeProgressionService
             multiplier=1f+(RebirthProgressionRuntimeConfig.AtPotentialMultiplier-1f)*t;
         }
         float delta=rawAmount*Math.Max(0f,multiplier);
-        if(delta<=0f)return false;
-        float before=state.Current;
-        state.Current=Math.Max(def.Min,Math.Min(def.Max,state.Current+delta));
-        applied=state.Current-before;
-        return applied>0.00001f;
+        return delta <= 0f ? current : Math.Max(def.Min, Math.Min(def.Max, current + delta));
     }
 
     public static string GetPrimaryAttributeForSkill(string skillId)
@@ -40,7 +45,7 @@ public static class RebirthAttributeProgressionService
         return definition.PrimaryAttributeId??string.Empty;
     }
 
-    private static RebirthAttributeDefinition FindDefinition(string id)
+    internal static RebirthAttributeDefinition FindDefinition(string id)
     {
         RebirthSurvivorDefinitionBundle bundle=RebirthSurvivorDefinitionRegistry.Bundle;
         if(bundle==null || bundle.Progression==null)return null;

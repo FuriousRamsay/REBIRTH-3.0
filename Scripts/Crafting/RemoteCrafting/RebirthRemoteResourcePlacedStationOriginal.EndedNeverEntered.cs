@@ -34,7 +34,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
     internal static bool IsEndedQueryScope(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)=>EndedClientScope(player,original);
     private static bool EndedClientScope(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)=>ThreadManager.IsMainThread()&&player?.world?.IsRemote()==true&&
         ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&player.IsSpawned()&&!player.IsDead()&&IsCandidate(original)&&
-        player.world.worldState.Guid==original.World&&player.Died>original.Deaths&&RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)&&owner.CanonicalId==original.Owner&&
+        RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world)==original.World&&player.Died>original.Deaths&&RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)&&owner.CanonicalId==original.Owner&&
         RebirthCamperCharacterAccess.CurrentCreation(player)==original.Creation;
     private static void AcceptEndedNeverEntered(EntityPlayerLocal player,ClientJob job,XElement reply)
     {

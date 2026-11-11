@@ -131,9 +131,12 @@ public static class RebirthPlacedWorkmanshipService
         string blockName=current.Block.GetBlockName()??string.Empty;
         bool technical=TechnicalTrapNames.Contains(blockName);
         // Electrical configuration is a separate component and may coexist with Engineer trap provenance.
-        bool restoredElectrical=RebirthInfrastructureWorkService.RestorePickedUpConfiguration(world,result.blockPos,heldBeforePlacement);
-        if(RebirthInfrastructureWorkService.IsElectricalBlock(current.Block) && !restoredElectrical)RebirthInfrastructureWorkService.CaptureBuiltConfiguration(world,result.blockPos,player);
-        if(RebirthInfrastructureWorkService.IsElectricalBlock(current.Block) && !technical)return;
+        if(RebirthInfrastructureWorkService.IsElectricalBlock(current.Block))
+        {
+            if(!RebirthInfrastructureWorkService.RestorePickedUpConfiguration(world,result.blockPos,heldBeforePlacement))
+                RebirthInfrastructureWorkService.CaptureBuiltConfiguration(world,result.blockPos,player);
+            if(!technical)return;
+        }
 
         RebirthPlacedWorkmanshipRecord carried;
         if(TryReadCarried(heldBeforePlacement,result.blockPos,current,out carried))
@@ -430,7 +433,7 @@ public static class RebirthPlacedWorkmanshipPlacementPatch
     }
     public static void Postfix(WorldBase __0,BlockPlacement.Result __1,EntityAlive __2,PlacementScopeState __state)
     {
-        if(__state.IsOutermost)RebirthPlacedWorkmanshipService.CapturePlacement(__0,__1,__2 as EntityPlayer,held);
+        if(__state.OriginalScope!=null)RebirthPlacedWorkmanshipService.CapturePlacement(__0,__1,__2 as EntityPlayer,held);
     }
     public static Exception Finalizer(Exception __exception,PlacementScopeState __state)
     {

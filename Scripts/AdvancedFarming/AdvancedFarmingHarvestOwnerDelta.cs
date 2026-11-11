@@ -145,7 +145,7 @@ internal static partial class AdvancedFarmingHarvestOwnerDelta
         var player=attempt.Player;
         return ThreadManager.IsMainThread()&&ReferenceEquals(GameManager.Instance?.World,attempt.World)&&ReferenceEquals(attempt.World.GetPrimaryPlayer(),player)&&
             ReferenceEquals(attempt.World.GetEntity(player.entityId),player)&&player.IsSpawned()&&!player.IsDead()&&attempt.Plan.Deaths==player.Died&&GameIO.GetSaveGameDir()==attempt.Directory&&
-            player.world.worldState?.Guid==attempt.Plan.World&&RebirthCamperCharacterAccess.CurrentCreation(player)==attempt.Plan.Creation&&
+            AdvancedFarmingHarvestProtocol.WorldKey(attempt.World)==attempt.Plan.World&&RebirthCamperCharacterAccess.CurrentCreation(player)==attempt.Plan.Creation&&
             ReferenceEquals(player.bag.ItemGrid,attempt.Bag)&&ReferenceEquals(player.inventory.ItemGrid,attempt.Belt)&&attempt.Current()&&
             !RebirthPlacedOriginal.IsHeld(player)&&!RebirthCookingOutputDelivery.IsHeld(player)&&!RebirthLogisticsOwnerReceipt.IsHeld(player)&&!RebirthGearOwnerReservation.IsHeld(player)&&!RebirthBackpackLibraryReservation.IsHeld(player)&&
             !RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)&&!RebirthCamperStationNativeActorPayment.Blocks(player.bag)&&

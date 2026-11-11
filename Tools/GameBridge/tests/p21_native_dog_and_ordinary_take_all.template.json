@@ -1,0 +1,118 @@
+{
+  "name": "p21_native_dog_and_ordinary_take_all",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepared disposable solo or authenticated dedicated Purge. Optional P11 Debug qualification flags stay OFF. Guard ON. Actual owned Active dog, room for one cloth; a native test source contains exactly one unlocked cloth. Another ordinary native test source contains exactly one small stone and one different held/ignored locked cell, with no preference tracker and room in the player inventory. Substitute exact observed coordinates and UI paths in a disposable template copy. Use both peer audits outside the scenario to require dog count +1 after Shift-click and one conserved route. Reopen or use native authority source observation to qualify exact slot conservation."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "markItem": "resourceCloth"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": "@DOG_X@",
+          "y": "@DOG_Y@",
+          "z": "@DOG_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "looting"
+    },
+    {
+      "expectUiItem": {
+        "path": "@DOG_SLOT_PATH@",
+        "item": "resourceCloth",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "click": {
+        "path": "@DOG_SLOT_PATH@",
+        "shift": 1
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "path": "@DOG_SLOT_PATH@",
+        "item": "resourceCloth"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCloth",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "markItem": "resourceRockSmall"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": "@ORDINARY_X@",
+          "y": "@ORDINARY_Y@",
+          "z": "@ORDINARY_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "looting"
+    },
+    {
+      "expectUiItem": {
+        "path": "@ORDINARY_SLOT_PATH@",
+        "item": "resourceRockSmall",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "R"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Check the exact ignored cell remains intact on authority. Repeat separately on a same-process reconnect with exact pending dog source A and ordinary source B. Finish matching-slot A as a positive hold control. A delayed/replaced item or stale response requires a prepared exact source and proof of the actual packet, outside this ordinary fixture."
+    }
+  ]
+}

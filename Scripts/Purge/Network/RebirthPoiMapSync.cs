@@ -78,6 +78,7 @@ internal static class RebirthPoiMapSync
     private static Dictionary<string, RebirthPoiMapRecord> map = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal);
     private static Dictionary<string, RebirthPoiMapRecord> building;
     private static List<RebirthPoiMapRecord> changedRecords;
+    private static int matchedPriorKeys;
     private static RebirthPoiMapRecord[] fullRecords = new RebirthPoiMapRecord[0];
     private static IEnumerator<RebirthPoiClearanceRecord> scan;
     private static RebirthPoiWorldSnapshot original, observed;
@@ -143,7 +144,7 @@ internal static class RebirthPoiMapSync
         scan?.Dispose(); scan = null; building = null; original = null; observed = null;
         originalCensus = null; observedCensus = null;
         observedHistory=-1;observedCounters=-1;RebirthPurgePoiHistory.Reset();
-        changedRecords = null; fullRecords = new RebirthPoiMapRecord[0];
+        changedRecords = null; matchedPriorKeys = 0; fullRecords = new RebirthPoiMapRecord[0];
         peers.Clear(); roundRobin.Clear(); deltas.Clear(); map = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal); sequence = 0; fullSnapshotFloor = 0;
         worldId = Guid.Empty; session = Guid.NewGuid(); overflow = false;
         clientWorld = null; clientRequest = Guid.Empty; receiver = null; presented = null; nextClientRequest = 0; nextPoll = 0; nextSend = 0; clientNeedsSnapshot = true;
@@ -261,6 +262,7 @@ internal static class RebirthPoiMapSync
             originalHistory=RebirthPurgePoiHistory.Revision;originalCounters=RebirthPurgeScanner.CounterRevision;
             building = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal);
             changedRecords = new List<RebirthPoiMapRecord>();
+            matchedPriorKeys = 0;
             scan = snapshot.Shards.Values.SelectMany(s => s.Records.Values).GetEnumerator();
         }
         if (scan != null)
@@ -282,7 +284,12 @@ internal static class RebirthPoiMapSync
                 int areas,entities;bool approximate;ReadCounters(record,out areas,out entities,out approximate);
                 var projected = new RebirthPoiMapRecord(record.Identity, record.Epoch, record.ResetOnly?RebirthPoiClearanceState.ResetPending:record.State, tier,history?.Discoverer??"",history?.Contributors??"",history?.DiscoveredAt??0,history?.PurgedAt??0,areas,entities,approximate);
                 building.Add(record.Identity.Key, projected);
-                RebirthPoiMapRecord previous; if (!map.TryGetValue(record.Identity.Key, out previous) || !projected.Same(previous)) changedRecords.Add(projected);
+                if (map.TryGetValue(record.Identity.Key, out var previous))
+                {
+                    matchedPriorKeys++;
+                    if (projected.Same(previous)) continue;
+                }
+                changedRecords.Add(projected);
             }
         }
         if (Now >= nextSend) { nextSend = Now + .1; SendPages(connection); }
@@ -316,7 +323,7 @@ internal static class RebirthPoiMapSync
         observedCensus = originalCensus; originalCensus = null;
         observedHistory=originalHistory;observedCounters=originalCounters;
         var changed = changedRecords.ToArray(); changedRecords = null;
-        bool removed = map.Keys.Any(key => !building.ContainsKey(key));
+        bool removed = matchedPriorKeys != map.Count;
         if (sequence == 0 || changed.Length > 0 || removed)
         {
             sequence++;
@@ -334,6 +341,8 @@ internal static class RebirthPoiMapSync
         var needed = deltas.Where(d => d.Item1 > peer.Sent).ToArray();
         if (needed.Length == 0 || needed[0].Item1 != peer.Sent + 1)
             return new Transfer(fullRecords, sequence, peer.Sent, true);
+        if (needed.Length == 1 && needed[0].Item1 == sequence)
+            return new Transfer(needed[0].Item2, sequence, peer.Sent, false);
         var changes = new Dictionary<string, RebirthPoiMapRecord>(StringComparer.Ordinal);
         foreach (var delta in needed) foreach (var record in delta.Item2) changes[record.Identity.Key] = record;
         return new Transfer(changes.Values.ToArray(), sequence, peer.Sent, false);

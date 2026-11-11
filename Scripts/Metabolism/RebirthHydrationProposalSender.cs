@@ -14,8 +14,9 @@ internal static class RebirthHydrationProposalSender
                 if(!proposal.Current()||!proposal.Lease.Current()||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance))return false;
                 var packet=NetPackageManager.GetPackage<NetPackageRebirthHydrationProposalFragment>().Setup(proposal,index);
                 if(!proposal.Current())return false;
-                manager.SendPackage(packet,_attachedToEntityId:proposal.Player.entityId);
+                proposal.Peer.SendPackage(packet);
             }
+            RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] proposal queued operation={proposal.Original.Operation:N} fragments={proposal.Body.Count}");
             return proposal.Current();
         }
         catch{return false;}

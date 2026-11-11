@@ -1,0 +1,23 @@
+{
+  "name": "Dedicated personal Craft accepts only three of ten clicks",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Use a disposable dedicated Purge save. Select Stone Axe at batch size one with an empty queue and no carried ingredients. Put six Small Stones, six Plant Fibers and three Tree Branches in one eligible crate. Read the host crate counts before and after." },
+    { "expectWindowOpen": "crafting" },
+    { "markItem": "meleeToolRepairT0StoneAxe" },
+    { "console": "rbdebug on crafting" },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "wait": 7 },
+    { "expectItemDelta": { "name": "meleeToolRepairT0StoneAxe", "op": "==", "value": 3 } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -93,8 +93,15 @@ internal static class AdvancedFarmingHarvestAdmission
         catch(Exception error){quarantined=true;Log.Warning("[REBIRTH Farming] original harvest reservations quarantined: "+error.GetType().Name);}
         return !quarantined;
     }
-    private static bool SameItem(ItemValue expected,ItemStack actual)
-    {return expected!=null&&actual!=null&&!actual.IsEmpty()&&RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(expected,1),new ItemStack(actual.itemValue,1));}
+    internal static bool SameHarvestItem(ItemValue expected,ItemStack actual)
+    {
+        if(expected==null||actual==null||actual.IsEmpty())return false;
+        // Authored harvest items receive a clock seed. Native stacking keeps
+        // the existing item's seed, while all other serialized fields must match.
+        var template=expected.Clone();
+        template.Seed=actual.itemValue.Seed;
+        return RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(template,1),new ItemStack(actual.itemValue,1));
+    }
     internal static bool ValidOriginalYield(World world,EntityPlayer owner,BlockValue source,ItemStack[] outputs,bool replant)
     {
         if(world==null||owner==null||outputs==null||outputs.Length>1||source.Block?.itemsToDrop==null)return false;
@@ -112,13 +119,13 @@ internal static class AdvancedFarmingHarvestAdmission
                 // Preserve original architecture: remote owner rolls base1 because
                 // RollAdvancedFarmingHarvestCount exits on world.IsRemote(). A host
                 // owner's original stochastic result is0..3, never rerolled here.
-                if(owner is not EntityPlayerLocal)return outputs.Length==1&&outputs[0].count==1&&SameItem(item,outputs[0]);
-                return outputs.Length==0||outputs[0].count>=1&&outputs[0].count<=3&&SameItem(item,outputs[0]);
+                if(owner is not EntityPlayerLocal)return outputs.Length==1&&outputs[0].count==1&&SameHarvestItem(item,outputs[0]);
+                return outputs.Length==0||outputs[0].count>=1&&outputs[0].count<=3&&SameHarvestItem(item,outputs[0]);
             }
             // Native owner effects/RNG remain owner-produced. Validate an authored
             // eligible native item and a bounded count; do not substitute stale
             // server-side passive effects or perform a second probability roll.
-            if(outputs.Length==1&&outputs[0].count>=1&&outputs[0].count<=ushort.MaxValue&&SameItem(item,outputs[0]))return true;
+            if(outputs.Length==1&&outputs[0].count>=1&&outputs[0].count<=ushort.MaxValue&&SameHarvestItem(item,outputs[0]))return true;
         }
         return false;
     }

@@ -147,11 +147,22 @@ internal sealed class RebirthPurgeMilestoneStore
                 // Lost final-write response can be reconciled only by a fresh open.
                 if(final!=original)return false;
                 if(File.Exists(path+".candidate")){PublishCandidate(Read(path+".candidate"));return true;}
-                var candidateValues=new Dictionary<string,Receipt>(receipts,StringComparer.Ordinal);
-                var biomeNames=new HashSet<string>(candidateValues.Values.Select(v=>v.Biome),StringComparer.Ordinal);
+                Dictionary<string,Receipt> candidateValues=null;
+                HashSet<string> biomeNames=null;
                 foreach(var receipt in earned)
-                { if(receipt==null)return false;if(!candidateValues.ContainsKey(receipt.Key)){candidateValues.Add(receipt.Key,receipt);biomeNames.Add(receipt.Biome);}if(candidateValues.Count>1024||biomeNames.Count>64)return false; }
-                if(candidateValues.Count==receipts.Count)return true;
+                {
+                    if(receipt==null)return false;
+                    if((candidateValues??receipts).ContainsKey(receipt.Key))continue;
+                    if(candidateValues==null)
+                    {
+                        candidateValues=new Dictionary<string,Receipt>(receipts,StringComparer.Ordinal);
+                        biomeNames=new HashSet<string>(candidateValues.Values.Select(v=>v.Biome),StringComparer.Ordinal);
+                    }
+                    candidateValues.Add(receipt.Key,receipt);
+                    biomeNames.Add(receipt.Biome);
+                    if(candidateValues.Count>1024||biomeNames.Count>64)return false;
+                }
+                if(candidateValues==null)return true;
                 string candidate=Encode(candidateValues,original==null?"":Hash(original));
                 using(var stream=new FileStream(path+".candidate",FileMode.CreateNew,FileAccess.Write,FileShare.None))
                 { byte[] bytes=new UTF8Encoding(false,true).GetBytes(candidate);stream.Write(bytes,0,bytes.Length);stream.Flush(true); }

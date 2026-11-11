@@ -205,12 +205,11 @@ public static partial class RebirthMetabolismService
         AdvanceIntestinalResidence(state, deltaRealSeconds);
 
         float hydrationPointsAdded;
-        float beverageEnergyAdded;
         float energyBeforeIntestinalAbsorption = state.Energy;
         float fluidNutritionAbsorbedUnits;
         float fluidNutritionPointsAdded;
         float fluidAbsorbedMl = ProcessIntestinalFluidAbsorption(player, state, mods,
-            intestinalFluidAbsorptionRate * (deltaRealSeconds / 60f), out hydrationPointsAdded, out beverageEnergyAdded,
+            intestinalFluidAbsorptionRate * (deltaRealSeconds / 60f), out hydrationPointsAdded,
             out fluidNutritionAbsorbedUnits, out fluidNutritionPointsAdded);
         float solidNutritionPointsAdded;
         float solidNutritionAbsorbedUnits = ProcessIntestinalNutritionAbsorption(player, state, mods,
@@ -225,7 +224,7 @@ public static partial class RebirthMetabolismService
         LogEnergyDiagnostic(player,state,nowReal,deltaRealSeconds,energyDiagnosticBefore,energyAfterWorkAndRecovery,
             energyDiagnosticStaminaBefore,energyDiagnosticActivityBefore,energyUsePerRealMinute,energyRecoveryPerRealMinute,
             mods.EnergyUse,mods.EnergyRecovery);
-        beverageEnergyAdded = Mathf.Max(0f, state.Energy - energyBeforeIntestinalAbsorption);
+        float beverageEnergyAdded = Mathf.Max(0f, state.Energy - energyBeforeIntestinalAbsorption);
 
         float perMinute = deltaRealMinutes > 0.00001f ? 1f / deltaRealMinutes : 0f;
         state.LastGastricFluidTransferMlPerRealMinute = gastricFluidMovedMl * perMinute;
@@ -552,16 +551,23 @@ public static partial class RebirthMetabolismService
             !ReferenceEquals(GameManager.Instance?.World, player.world) || !ReferenceEquals(player.world.GetEntity(player.entityId), player) || player.IsDead() ||
             RebirthCharacterCreationHoldService.IsHeld(player))
             return Fail(RebirthMetabolismConsumeFailure.NotAuthoritative, "Not authoritative.");
-        var values = kind == RebirthMetabolismSourceKind.Backpack ? player.bag?.ItemGrid?.items :
-            kind == RebirthMetabolismSourceKind.HeldToolbelt ? player.inventory?.ItemGrid?.items : null;
-        int length = values?.Length ?? 0;
-        if (kind == RebirthMetabolismSourceKind.HeldToolbelt) length = Math.Min(length, Math.Max(0, player.inventory?.Length ?? 0));
-        if (expected == null || expected.IsEmpty() || expected.itemValue == null || slot < 0 || slot >= length ||
-            !RebirthStationGridIngredients.IsSameStackSnapshot(values[slot], expected))
+        var current = GetConsumptionInventorySource(player, kind, slot);
+        if (current == null || expected == null || expected.IsEmpty() || expected.itemValue == null ||
+            !RebirthStationGridIngredients.IsSameStackSnapshot(current, expected))
             return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
         // Selection and the source published to the owner now name the same
         // complete native preimage. Never run another type/seed search here.
         return ConsumeAt(player, kind, slot, expected.Clone(), autoSip);
+    }
+
+    internal static ItemStack GetConsumptionInventorySource(EntityPlayer player, RebirthMetabolismSourceKind kind, int slot)
+    {
+        var values = kind == RebirthMetabolismSourceKind.Backpack ? player.bag?.ItemGrid?.items :
+            kind == RebirthMetabolismSourceKind.HeldToolbelt ? player.inventory?.ItemGrid?.items : null;
+        int length = values?.Length ?? 0;
+        if (kind == RebirthMetabolismSourceKind.HeldToolbelt)
+            length = Math.Min(length, Math.Max(0, player.inventory?.Length ?? 0));
+        return slot >= 0 && slot < length ? values[slot] : null;
     }
 
     public static RebirthConsumeResult ConsumeHydrationSlot(EntityPlayer player, bool autoSip)
@@ -588,12 +594,41 @@ public static partial class RebirthMetabolismService
         return ConsumeAt(player, RebirthMetabolismSourceKind.Backpack, -1, stack, false, commit);
     }
 
-    private static RebirthConsumeResult ConsumeAt(EntityPlayer player, RebirthMetabolismSourceKind sourceKind, int slot, ItemStack stack, bool autoSip, Func<ItemStack, ItemStack, ItemStack, bool> externalCommit = null)
+    internal static RebirthConsumeResult PrepareLiveServing(EntityPlayer player, RebirthMetabolismSourceKind kind, int slot,
+        ItemStack source, out ItemStack replacement, out ItemStack siblings, out Func<RebirthConsumeResult> complete)
     {
-        if(sourceKind==RebirthMetabolismSourceKind.HydrationSlot&&(RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player)))
+        ItemStack next = null, untouched = null;
+        Func<RebirthConsumeResult> publish = null;
+        var state = RebirthMetabolismStateRepository.GetOrCreate(player);
+        var result = ConsumeAt(player, kind, slot, source, false, (_, after, remaining) =>
+        {
+            next = after ?? ItemStack.Empty.Clone();
+            untouched = remaining;
+            return true;
+        }, finish => publish = finish);
+        replacement = next;
+        siblings = untouched;
+        complete = publish == null ? null : () => ReferenceEquals(RebirthMetabolismStateRepository.GetOrCreate(player), state)
+            ? publish() : RebirthMetabolismLiveAction.Changed();
+        return result;
+    }
+
+    private static RebirthConsumeResult ConsumeAt(EntityPlayer player, RebirthMetabolismSourceKind sourceKind, int slot, ItemStack stack, bool autoSip, Func<ItemStack, ItemStack, ItemStack, bool> externalCommit = null,
+        Action<Func<RebirthConsumeResult>> defer = null)
+    {
+        RebirthConsumeResult Finish(Func<RebirthConsumeResult> complete)
+        {
+            if (defer == null) return complete();
+            defer(complete);
+            return new RebirthConsumeResult { Success = true };
+        }
+
+        if (RebirthMetabolismLiveAction.HoldsServing(player))
+            return InventoryServingPending();
+        if(sourceKind==RebirthMetabolismSourceKind.HydrationSlot&&(RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player)||RebirthMetabolismLiveAction.HoldsSipSlot(player)))
             return Fail(RebirthMetabolismConsumeFailure.ItemChanged,"Original hydration transfer is still settling.");
         if(PlanningNpcSource==null&&RebirthNpcMetabolismCustody.HoldsPlayer(player))return Fail(RebirthMetabolismConsumeFailure.ItemChanged,"Original NPC consumption is still settling.");
-        if(PlanningNpcSource==null&&RebirthConsumptionDurableDelivery.HoldsInventoryOriginal(player))return Fail(RebirthMetabolismConsumeFailure.ItemChanged,"Original player consumption is still settling.");
+        if(PlanningNpcSource==null&&RebirthConsumptionDurableDelivery.HoldsInventoryOriginal(player))return InventoryServingPending();
         if (stack == null || stack.IsEmpty() || stack.itemValue == null)
             return Fail(RebirthMetabolismConsumeFailure.InvalidItem, "Invalid item.");
 
@@ -625,11 +660,6 @@ public static partial class RebirthMetabolismService
             if (remaining <= 0.01f)
                 return Fail(RebirthMetabolismConsumeFailure.NoLiquid, "Container is empty.");
 
-            RebirthMetabolismSnapshot before = BuildSnapshot(player, state, mods, 0f, 0f, 0f, 0f,
-                RebirthMetabolismConfig.BaseIntestinalFluidAbsorptionMlPerRealMinute * mods.FluidAbsorption,
-                RebirthMetabolismConfig.BaseSolidGastricEmptyingMlPerRealMinute * mods.DigestionSpeed,
-                RebirthMetabolismConfig.BaseIntestinalNutrientAbsorptionUnitsPerRealMinute * mods.DigestionSpeed, 0f);
-
             float sipTarget = autoSip ? (def.AutoSipMl > 0f ? def.AutoSipMl : RebirthMetabolismConfig.AutoSipDefaultMl) : def.ManualSipMl;
             if (sipTarget <= 0f) sipTarget = autoSip ? RebirthMetabolismConfig.AutoSipDefaultMl : 125f;
 
@@ -641,8 +671,9 @@ public static partial class RebirthMetabolismService
             float usefulMl = float.MaxValue;
             if (autoSip && !def.AllowConsumeWhenHydrated)
             {
+                float projectedHydration = GetProjectedHydration(player, state, mods);
                 float targetHydration = player.Stats.Water.ModifiedMax * RebirthMetabolismConfig.AutoSipStopProjectedPercent;
-                float deficitPoints = Mathf.Max(0f, targetHydration - before.ProjectedHydration);
+                float deficitPoints = Mathf.Max(0f, targetHydration - projectedHydration);
                 usefulMl = deficitPoints * RebirthMetabolismConfig.MlPerHydrationPoint
                     / Mathf.Max(0.01f, mods.FluidUtilization * def.LiquidHydrationYield);
 
@@ -662,7 +693,6 @@ public static partial class RebirthMetabolismService
 
             RebirthIngestionEntry entry = new RebirthIngestionEntry
             {
-                EntryId = state.AllocateEntryId(),
                 Kind = RebirthIngestionKind.Fluid,
                 SourceItemName = def.ItemName,
                 LiquidProfileId = RebirthLiquidContainerService.GetLiquidProfile(stack.itemValue, def),
@@ -695,35 +725,39 @@ public static partial class RebirthMetabolismService
                 : RebirthConsumptionSourceWriteback.TryCommit(player, sourceKind, slot, expectedSource, sourcePlan.Replacement, state);
             if (!committed)
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
-            ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,consumed,true);
-            MergeOrAddEntry(state, entry);
-            StartDigestionDiagnostic(player, entry);
-            if(externalCommit == null && untouchedSiblings!=null&&!untouchedSiblings.IsEmpty())
+            return Finish(() =>
             {
-                ItemStack remainder=untouchedSiblings;
-                bool accepted=(player.bag!=null&&player.bag.AddItem(remainder))||remainder.count<=0;
-                if(!accepted&&player.inventory!=null)accepted=player.inventory.AddItem(remainder)||remainder.count<=0;
-                if(!accepted&&remainder.count>0&&player.world!=null&&player.world.gameManager!=null)
-                    player.world.gameManager.ItemDropServer(remainder,player.GetPosition(),Vector3.zero);
-            }
+                entry.EntryId = state.AllocateEntryId();
+                ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,consumed,true);
+                MergeOrAddEntry(state, entry);
+                StartDigestionDiagnostic(player, entry);
+                if(externalCommit == null && untouchedSiblings!=null&&!untouchedSiblings.IsEmpty())
+                {
+                    ItemStack remainder=untouchedSiblings;
+                    bool accepted=(player.bag!=null&&player.bag.AddItem(remainder))||remainder.count<=0;
+                    if(!accepted&&player.inventory!=null)accepted=player.inventory.AddItem(remainder)||remainder.count<=0;
+                    if(!accepted&&remainder.count>0&&player.world!=null&&player.world.gameManager!=null)
+                        player.world.gameManager.ItemDropServer(remainder,player.GetPosition(),Vector3.zero);
+                }
 
-            ConsumeNativeEffect(player, stack.itemValue, true);
-            ConsumeEffect(NpcDeferredKind.StressDrink,player,def.ItemName,consumed/Mathf.Max(1f,def.ContainerCapacityMl));
-            ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-drink");
-            state.Touch();
-            PublishConsumeState(player);
-            return new RebirthConsumeResult
-            {
-                Success = true,
-                Failure = RebirthMetabolismConsumeFailure.None,
-                ConsumedMl = consumed,
-                RemainingMl = remaining,
-                AddedEntryId = entry.EntryId,
-                CreatedEmptyItem = createdEmpty,
-                Message = stomachLimited
-                    ? "Drank " + consumed.ToString("0", CultureInfo.InvariantCulture) + " mL. Stomach is full; the rest stayed in the container."
-                    : "Drank " + consumed.ToString("0", CultureInfo.InvariantCulture) + " mL."
-            };
+                ConsumeNativeEffect(player, stack.itemValue, true);
+                ConsumeEffect(NpcDeferredKind.StressDrink,player,def.ItemName,consumed/Mathf.Max(1f,def.ContainerCapacityMl));
+                ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-drink");
+                state.Touch();
+                PublishConsumeState(player);
+                return new RebirthConsumeResult
+                {
+                    Success = true,
+                    Failure = RebirthMetabolismConsumeFailure.None,
+                    ConsumedMl = consumed,
+                    RemainingMl = remaining,
+                    AddedEntryId = entry.EntryId,
+                    CreatedEmptyItem = createdEmpty,
+                    Message = stomachLimited
+                        ? "Drank " + consumed.ToString("0", CultureInfo.InvariantCulture) + " mL. Stomach is full; the rest stayed in the container."
+                        : "Drank " + consumed.ToString("0", CultureInfo.InvariantCulture) + " mL."
+                };
+            });
         }
 
         if (def.IsFood)
@@ -746,7 +780,6 @@ public static partial class RebirthMetabolismService
 
             RebirthIngestionEntry entry = new RebirthIngestionEntry
             {
-                EntryId = state.AllocateEntryId(),
                 Kind = RebirthIngestionKind.Food,
                 SourceItemName = def.ItemName,
                 LiquidProfileId = def.FoodWaterMl > 0f ? "foodWater" : string.Empty,
@@ -771,36 +804,43 @@ public static partial class RebirthMetabolismService
             };
             if (!DecrementSource(player, sourceKind, slot, expectedSource, state, externalCommit))
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
-            ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,0f,false);
-            MergeOrAddEntry(state, entry);
-            StartDigestionDiagnostic(player, entry);
-            ConsumeNativeEffect(player, stack.itemValue, false);
-            ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-food");
-            // Dry food can have a real hydration cost; zero food water alone is not thirst.
-            float hydrationCostMl = Mathf.Max(0f, RebirthConsumableResolver.GetFloat(stack.itemValue.ItemClass, "RebirthHydrationCostMl", 0f));
-            ConsumeEffect(NpcDeferredKind.HydrationCost,player,def.ItemName,hydrationCostMl / Mathf.Max(0.001f, RebirthMetabolismConfig.MlPerHydrationPoint));
-            state.Touch();
-            PublishConsumeState(player);
-            return new RebirthConsumeResult
+            return Finish(() =>
             {
-                Success = true,
-                Failure = RebirthMetabolismConsumeFailure.None,
-                AddedEntryId = entry.EntryId,
-                Message = mealOverfillsStomach ? "Meal consumed. You are stuffed." : "Meal entered digestion."
-            };
+                entry.EntryId = state.AllocateEntryId();
+                ConsumeEffect(NpcDeferredKind.Consumption,player,def.ItemName,0f,false);
+                MergeOrAddEntry(state, entry);
+                StartDigestionDiagnostic(player, entry);
+                ConsumeNativeEffect(player, stack.itemValue, false);
+                ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-food");
+                // Dry food can have a real hydration cost; zero food water alone is not thirst.
+                float hydrationCostMl = Mathf.Max(0f, RebirthConsumableResolver.GetFloat(stack.itemValue.ItemClass, "RebirthHydrationCostMl", 0f));
+                ConsumeEffect(NpcDeferredKind.HydrationCost,player,def.ItemName,hydrationCostMl / Mathf.Max(0.001f, RebirthMetabolismConfig.MlPerHydrationPoint));
+                state.Touch();
+                PublishConsumeState(player);
+                return new RebirthConsumeResult
+                {
+                    Success = true,
+                    Failure = RebirthMetabolismConsumeFailure.None,
+                    AddedEntryId = entry.EntryId,
+                    Message = mealOverfillsStomach ? "Meal consumed. You are stuffed." : "Meal entered digestion."
+                };
+            });
         }
 
         if (def.IsSupplement)
         {
             if (!DecrementSource(player, sourceKind, slot, expectedSource, state, externalCommit))
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
-            ConsumeEffect(NpcDeferredKind.Treatment,player,def.ItemName);
-            ApplySupplement(player, state, def.SupplementProfile);
-            ConsumeNativeEffect(player, stack.itemValue, false);
-            ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-supplement");
-            state.Touch();
-            PublishConsumeState(player);
-            return new RebirthConsumeResult { Success = true, Message = "Supplement taken." };
+            return Finish(() =>
+            {
+                ConsumeEffect(NpcDeferredKind.Treatment,player,def.ItemName);
+                ApplySupplement(player, state, def.SupplementProfile);
+                ConsumeNativeEffect(player, stack.itemValue, false);
+                ConsumeEffect(NpcDeferredKind.Trait,player,def.ItemName,0f,false,"trait-support-metabolism-supplement");
+                state.Touch();
+                PublishConsumeState(player);
+                return new RebirthConsumeResult { Success = true, Message = "Supplement taken." };
+            });
         }
 
         return Fail(RebirthMetabolismConsumeFailure.InvalidItem, "Unsupported consumable.");
@@ -1151,10 +1191,11 @@ public static partial class RebirthMetabolismService
 
         // Getting-better attacks remain unpleasant but are less destructive than untreated ones.
         float contentFraction = recoveringAttack ? 0.20f : 0.35f;
+        bool traceEpisode = RebirthDebug.IsOn("metabolism");
         if (vomiting)
         {
-            float stomachFluidBefore = GetFluidMl(state);
-            float stomachSolidBefore = GetSolidMl(state);
+            float stomachFluidBefore = traceEpisode ? GetFluidMl(state) : 0f;
+            float stomachSolidBefore = traceEpisode ? GetSolidMl(state) : 0f;
             ExpelStomachFraction(state, contentFraction);
             float directFluidLossMl = recoveringAttack ? 20f : 35f;
             ApplyDirectHydrationLoss(player, directFluidLossMl);
@@ -1163,16 +1204,16 @@ public static partial class RebirthMetabolismService
             GameManager.ShowTooltipMP(player, Localization.Get("xuiRebirthDysenteryVomit"), "");
             if (!TryPlaySound(player, "FuriousRamsayVomit"))
                 TryPlaySound(player, "player#vomit");
-            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=vomit stomachLost="
+            if (traceEpisode) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=vomit stomachLost="
                 + (stomachFluidBefore - GetFluidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-liquid/"
                 + (stomachSolidBefore - GetSolidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-solids"
-                + " directFluidLoss=" + directFluidLossMl.ToString("0", CultureInfo.InvariantCulture) + "mL"); }
+                + " directFluidLoss=" + directFluidLossMl.ToString("0", CultureInfo.InvariantCulture) + "mL");
         }
         else
         {
-            float gutFluidBefore = GetIntestinalFluidMl(state);
-            float gutSolidBefore = GetIntestinalSolidMl(state);
-            float gutNutritionBefore = GetIntestinalNutritionUnits(state);
+            float gutFluidBefore = traceEpisode ? GetIntestinalFluidMl(state) : 0f;
+            float gutSolidBefore = traceEpisode ? GetIntestinalSolidMl(state) : 0f;
+            float gutNutritionBefore = traceEpisode ? GetIntestinalNutritionUnits(state) : 0f;
             ExpelIntestinalFraction(state, contentFraction);
             float directFluidLossMl = recoveringAttack ? 45f : 75f;
             ApplyDirectHydrationLoss(player, directFluidLossMl);
@@ -1180,11 +1221,11 @@ public static partial class RebirthMetabolismService
             CleanupEntries(state);
             TryPlaySound(player, "FuriousRamsayDiarrhea");
             GameManager.ShowTooltipMP(player, Localization.Get("xuiRebirthDysenteryDiarrhea"), "");
-            { if ((RebirthLogSettings.AutomaticLoggingDefault || DebugEnabled)) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=diarrhea intestineLost="
+            if (traceEpisode) RebirthDebug.Log("metabolism", "[REBIRTH Metabolism] Dysentery episode=diarrhea intestineLost="
                 + (gutFluidBefore - GetIntestinalFluidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-liquid/"
                 + (gutSolidBefore - GetIntestinalSolidMl(state)).ToString("0.0", CultureInfo.InvariantCulture) + "mL-chyme/"
                 + (gutNutritionBefore - GetIntestinalNutritionUnits(state)).ToString("0.00", CultureInfo.InvariantCulture) + " nutrition"
-                + " directFluidLoss=" + directFluidLossMl.ToString("0", CultureInfo.InvariantCulture) + "mL"); }
+                + " directFluidLoss=" + directFluidLossMl.ToString("0", CultureInfo.InvariantCulture) + "mL");
         }
 
         state.Touch();
@@ -1416,11 +1457,10 @@ public static partial class RebirthMetabolismService
     }
 
     private static float ProcessIntestinalFluidAbsorption(EntityPlayer player, RebirthMetabolismState state,
-        RebirthMetabolismModifiers mods, float budgetMl, out float hydrationPointsAdded, out float beverageEnergyAdded,
+        RebirthMetabolismModifiers mods, float budgetMl, out float hydrationPointsAdded,
         out float nutritionUnitsAbsorbed, out float nutritionPointsAdded)
     {
         hydrationPointsAdded = 0f;
-        beverageEnergyAdded = 0f;
         nutritionUnitsAbsorbed = 0f;
         nutritionPointsAdded = 0f;
         if (budgetMl <= 0f || state == null || state.IngestionEntries.Count == 0)
@@ -1454,9 +1494,7 @@ public static partial class RebirthMetabolismService
             {
                 float absorbedEnergy = entry.IntestinalEnergyUnits * (absorbed / beforeFluid);
                 entry.IntestinalEnergyUnits = Mathf.Max(0f, entry.IntestinalEnergyUnits - absorbedEnergy);
-                float beforeEnergy = state.Energy;
                 state.Energy = Mathf.Min(RebirthMetabolismConfig.EnergyMax, state.Energy + absorbedEnergy);
-                beverageEnergyAdded += Mathf.Max(0f, state.Energy - beforeEnergy);
             }
 
             // Nutrition dissolved in a drink travels with that liquid. Keeping it tied to the
@@ -1638,22 +1676,30 @@ public static partial class RebirthMetabolismService
             return;
         if (GetFullnessMl(state) / capacity >= RebirthMetabolismConfig.FullThreshold)
             return;
-        RebirthMetabolismSnapshot snap = BuildSnapshot(player, state, mods, 0f, 0f, 0f, 0f,
-            RebirthMetabolismConfig.BaseIntestinalFluidAbsorptionMlPerRealMinute * mods.FluidAbsorption,
-            RebirthMetabolismConfig.BaseSolidGastricEmptyingMlPerRealMinute * mods.DigestionSpeed,
-            RebirthMetabolismConfig.BaseIntestinalNutrientAbsorptionUnitsPerRealMinute * mods.DigestionSpeed,
-            EstimateCurrentGastricEmptyingMlPerRealMinute(state, mods, capacity));
+        float projectedHydration = GetProjectedHydration(player, state, mods);
         float max = Mathf.Max(1f, player.Stats.Water.ModifiedMax);
-        if (snap.ProjectedHydration / max >= RebirthMetabolismConfig.AutoSipStartProjectedPercent)
+        if (projectedHydration / max >= RebirthMetabolismConfig.AutoSipStartProjectedPercent)
             return;
         RebirthConsumeResult result = ConsumeHydrationSlot(player, true);
         if (result.Success)
             state.AutoSipCooldownRemainingRealSeconds = RebirthMetabolismConfig.AutoSipCooldownRealSeconds;
     }
 
+    private static float GetProjectedHydration(EntityPlayer player, RebirthMetabolismState state, RebirthMetabolismModifiers mods)
+    {
+        var water = player.Stats.Water;
+        float hydration = water.Value;
+        float maximum = water.ModifiedMax;
+        return Mathf.Min(maximum, hydration + GetPendingHydrationPoints(state, mods));
+    }
+
     public static RebirthMetabolismSnapshot BuildSnapshot(EntityPlayer player)
     {
-        RebirthMetabolismState state = RebirthMetabolismStateRepository.GetOrCreate(player);
+        return BuildSnapshot(player, RebirthMetabolismStateRepository.GetOrCreate(player));
+    }
+
+    private static RebirthMetabolismSnapshot BuildSnapshot(EntityPlayer player, RebirthMetabolismState state)
+    {
         if (IsServerAuthority && state != null && IsGodModeActive(player))
         {
             state.Energy = RebirthMetabolismConfig.EnergyMax;
@@ -1677,11 +1723,12 @@ public static partial class RebirthMetabolismService
             ? state.LastEnergyRecoveryPerRealMinute : EstimateEnergyRecoveryPerRealMinute(player, state, mods);
         if (state != null && state.HasEnergyRateSample)
             food += state.LastEnergyRecoveryNutritionUsePerRealMinute * 60f;
+        float stomachSolidMl = GetSolidMl(state);
         return BuildSnapshot(player, state, mods, hyd, food, energyUse, energyRecovery,
             RebirthMetabolismConfig.BaseIntestinalFluidAbsorptionMlPerRealMinute * mods.FluidAbsorption,
             RebirthMetabolismConfig.BaseSolidGastricEmptyingMlPerRealMinute * mods.DigestionSpeed,
             RebirthMetabolismConfig.BaseIntestinalNutrientAbsorptionUnitsPerRealMinute * mods.DigestionSpeed,
-            EstimateCurrentGastricEmptyingMlPerRealMinute(state, mods, capacity));
+            EstimateCurrentGastricEmptyingMlPerRealMinute(state, mods, capacity, stomachSolidMl), stomachSolidMl);
     }
 
     private static void ResolveActivityNoMutation(EntityPlayer player, RebirthMetabolismState state, out float hydration, out float energyUsePerRealMinute)
@@ -1698,7 +1745,7 @@ public static partial class RebirthMetabolismService
     private static RebirthMetabolismSnapshot BuildSnapshot(EntityPlayer player, RebirthMetabolismState state, RebirthMetabolismModifiers mods,
         float hydrationLossMlPerReal60Minutes, float foodUsePerReal60Minutes, float energyUsePerRealMinute, float energyRecoveryPerRealMinute,
         float absorptionRate, float solidGastricRate,
-        float nutrientAbsorptionRate, float gastricEmptyingRate)
+        float nutrientAbsorptionRate, float gastricEmptyingRate, float? observedStomachSolidMl = null)
     {
         RebirthMetabolismSnapshot s = new RebirthMetabolismSnapshot();
         s.OwnerEntityId = player != null ? player.entityId : -1;
@@ -1713,7 +1760,7 @@ public static partial class RebirthMetabolismService
         s.Energy = state != null ? Mathf.Clamp(state.Energy, 0f, RebirthMetabolismConfig.EnergyMax) : RebirthMetabolismConfig.EnergyMax;
         s.EnergyMax = RebirthMetabolismConfig.EnergyMax;
         s.StomachFluidMl = GetFluidMl(state);
-        s.StomachSolidMl = GetSolidMl(state);
+        s.StomachSolidMl = observedStomachSolidMl ?? GetSolidMl(state);
         s.FullnessMl = s.StomachFluidMl + s.StomachSolidMl;
         s.StomachCapacityMl = Mathf.Max(100f, mods.StomachCapacity);
         s.IntestinalFluidMl = GetIntestinalFluidMl(state);
@@ -1731,9 +1778,8 @@ public static partial class RebirthMetabolismService
         float totalPendingStage;
         // Pending values are assigned a few lines below; compute stage after they are available.
         s.IntestinalStagePercent = 0f;
-        s.GastricHoldSecondsRemaining = GetGastricHoldSecondsRemaining(state);
-        s.FluidGastricHoldSecondsRemaining = GetFluidGastricHoldSecondsRemaining(state);
-        s.SolidGastricHoldSecondsRemaining = GetSolidGastricHoldSecondsRemaining(state);
+        ReadGastricHolds(state, out s.GastricHoldSecondsRemaining,
+            out s.FluidGastricHoldSecondsRemaining, out s.SolidGastricHoldSecondsRemaining);
         s.GastricEmptyingMlPerRealMinute = gastricEmptyingRate;
         s.DigestiveHealth = state != null ? state.DigestiveHealth : RebirthMetabolismConfig.BaseDigestiveHealth;
         s.PendingHydration = GetPendingHydrationPoints(state, mods);
@@ -1905,28 +1951,25 @@ public static partial class RebirthMetabolismService
         return result;
     }
 
-    private static float GetFluidGastricHoldSecondsRemaining(RebirthMetabolismState state)
+    private static void ReadGastricHolds(RebirthMetabolismState state, out float combined, out float fluid, out float solid)
     {
-        float max = 0f;
-        if (state == null) return max;
+        combined = fluid = solid = 0f;
+        if (state == null) return;
         for (int i = 0; i < state.IngestionEntries.Count; i++)
         {
-            RebirthIngestionEntry e = state.IngestionEntries[i];
-            if (e != null && e.RemainingFluidVolumeMl > 0.01f) max = Mathf.Max(max, e.FluidHoldSecondsRemaining);
+            RebirthIngestionEntry entry = state.IngestionEntries[i];
+            if (entry == null) continue;
+            if (entry.RemainingFluidVolumeMl > 0.01f)
+            {
+                fluid = Mathf.Max(fluid, entry.FluidHoldSecondsRemaining);
+                combined = Mathf.Max(combined, entry.FluidHoldSecondsRemaining);
+            }
+            if (entry.RemainingSolidVolumeMl > 0.01f)
+            {
+                solid = Mathf.Max(solid, entry.SolidHoldSecondsRemaining);
+                combined = Mathf.Max(combined, entry.SolidHoldSecondsRemaining);
+            }
         }
-        return max;
-    }
-
-    private static float GetSolidGastricHoldSecondsRemaining(RebirthMetabolismState state)
-    {
-        float max = 0f;
-        if (state == null) return max;
-        for (int i = 0; i < state.IngestionEntries.Count; i++)
-        {
-            RebirthIngestionEntry e = state.IngestionEntries[i];
-            if (e != null && e.RemainingSolidVolumeMl > 0.01f) max = Mathf.Max(max, e.SolidHoldSecondsRemaining);
-        }
-        return max;
     }
 
     public static float GetGastricHoldSecondsRemaining(RebirthMetabolismState state)
@@ -1944,13 +1987,12 @@ public static partial class RebirthMetabolismService
     }
 
     private static float EstimateCurrentGastricEmptyingMlPerRealMinute(RebirthMetabolismState state,
-        RebirthMetabolismModifiers mods, float stomachCapacityMl)
+        RebirthMetabolismModifiers mods, float stomachCapacityMl, float stomachSolidMl)
     {
         if (state == null) return 0f;
         float total = 0f;
-        float solid = GetSolidMl(state);
         float solidLoad = stomachCapacityMl > 0.001f
-            ? Mathf.Clamp01(solid / Mathf.Max(1f, stomachCapacityMl * 0.70f))
+            ? Mathf.Clamp01(stomachSolidMl / Mathf.Max(1f, stomachCapacityMl * 0.70f))
             : 0f;
 
         for (int i = 0; i < state.IngestionEntries.Count; i++)
@@ -2051,15 +2093,14 @@ public static partial class RebirthMetabolismService
         state.IngestionEntries.Add(entry);
     }
 
-    internal static bool TryFindMatchingStack(EntityPlayer player, int itemType, ushort seed, out RebirthMetabolismSourceKind kind, out int slot, out ItemStack stack, ItemValue expectedItem = null, byte[] expectedFingerprint = null)
+    internal static bool TryFindMatchingStack(EntityPlayer player, int itemType, ushort seed, out RebirthMetabolismSourceKind kind, out int slot, out ItemStack stack, ItemValue expectedItem = null)
     {
         kind = RebirthMetabolismSourceKind.HeldToolbelt;
         slot = -1;
         stack = null;
         if (player == null) return false;
         bool Selected(ItemStack candidate) => Matches(candidate, itemType, seed) &&
-            (expectedItem == null || RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(candidate.itemValue.Clone(), 1), new ItemStack(expectedItem.Clone(), 1))) &&
-            (expectedFingerprint == null || RebirthConsumptionSourceIdentity.MatchesFingerprint(candidate.itemValue, expectedFingerprint));
+            (expectedItem == null || RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(candidate.itemValue.Clone(), 1), new ItemStack(expectedItem.Clone(), 1)));
 
         ItemStack[] tool = player.inventory?.ItemGrid?.items;
         if (tool == null) return false;
@@ -2167,7 +2208,10 @@ public static partial class RebirthMetabolismService
 
     private static bool CompleteLocalHydrationTransfer(EntityPlayerLocal player,bool inBag,int slot,bool returning,out string message)
     {
-        var result=RebirthHydrationLocalTransfer.TryBegin(player,inBag,slot,returning);
+        var result = RebirthHydrationLocalTransfer.TryResume(player);
+        if (result == RebirthHydrationLocalTransfer.Result.Refused &&
+            RebirthMetabolismLiveAction.MoveLocal(player, inBag, slot, returning))
+            result = RebirthHydrationLocalTransfer.Result.Applied;
         bool applied=result==RebirthHydrationLocalTransfer.Result.Applied;
         message=Localization.Get(applied?(returning?"xuiRebirthWaterSupportReturned":"xuiRebirthWaterSupportEquipped"):
             result==RebirthHydrationLocalTransfer.Result.Pending?"xuiRebirthHydrationTransferPending":"xuiRebirthHydrationTransferUnavailable");
@@ -2185,7 +2229,14 @@ public static partial class RebirthMetabolismService
         if (state == null)
             return;
 
-        if (!(RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player))&&state.HydrationSlotItem != null && !state.HydrationSlotItem.IsEmpty())
+        if (RebirthSurvivorMode.IsEnabledForCurrentWorld() && state.NutritionBeforeDeath < 0f &&
+            player.Stats?.Food != null && player.Stats.Water != null)
+        {
+            state.NutritionBeforeDeath = player.Stats.Food.ValuePercent;
+            state.HydrationBeforeDeath = player.Stats.Water.ValuePercent;
+        }
+
+        if (!(RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player)||RebirthMetabolismLiveAction.HoldsSipSlot(player))&&state.HydrationSlotItem != null && !state.HydrationSlotItem.IsEmpty())
         {
             ItemStack slot = state.HydrationSlotItem.Clone();
             AddToBackpackOrDrop(player, slot);
@@ -2199,6 +2250,21 @@ public static partial class RebirthMetabolismService
         state.RuntimeEntityId = -1;
         state.Touch();
         RebirthMetabolismStateRepository.SaveIfDirty("player-death");
+    }
+
+    internal static void RestoreRespawnNeeds(EntityPlayer player, RebirthMetabolismState state)
+    {
+        if (player.Stats?.Food == null || player.Stats.Water == null)
+            return;
+
+        const float minimum = 0.8f;
+        float nutrition = state.NutritionBeforeDeath >= 0f ? state.NutritionBeforeDeath : player.Stats.Food.ValuePercent;
+        float hydration = state.HydrationBeforeDeath >= 0f ? state.HydrationBeforeDeath : player.Stats.Water.ValuePercent;
+        player.Stats.Food.Value = Mathf.Clamp(nutrition, minimum, 1f) * player.Stats.Food.ModifiedMax;
+        player.Stats.Water.Value = Mathf.Clamp(hydration, minimum, 1f) * player.Stats.Water.ModifiedMax;
+        state.NutritionBeforeDeath = state.HydrationBeforeDeath = -1f;
+        state.Touch();
+        SendSnapshotToOwner(player, true);
     }
 
     public static void ToggleAutoSip(EntityPlayer player)
@@ -2250,6 +2316,11 @@ public static partial class RebirthMetabolismService
         SetExclusiveFoodBuff(player, foodPercent);
     }
 
+    private static readonly string[] HydrationStatusBuffs =
+        { "buffRebirthThirsty", "buffRebirthDehydrated", "buffRebirthSevereDehydration", "buffRebirthCriticalDehydration" };
+    private static readonly string[] FoodStatusBuffs =
+        { "buffRebirthHungry", "buffRebirthVeryHungry", "buffRebirthStarving" };
+
     private static void SetExclusiveHydrationBuff(EntityPlayer player, float p)
     {
         string wanted = p <= 0.01f ? "buffRebirthCriticalDehydration" :
@@ -2257,8 +2328,7 @@ public static partial class RebirthMetabolismService
                         p < 0.25f ? "buffRebirthSevereDehydration" :
                         p < 0.40f ? "buffRebirthDehydrated" :
                         p < 0.55f ? "buffRebirthThirsty" : string.Empty;
-        string[] all = { "buffRebirthThirsty", "buffRebirthDehydrated", "buffRebirthSevereDehydration", "buffRebirthCriticalDehydration" };
-        for (int i = 0; i < all.Length; i++) SetBuff(player, all[i], all[i] == wanted);
+        foreach (string buff in HydrationStatusBuffs) SetBuff(player, buff, buff == wanted);
     }
 
     private static void SetExclusiveFoodBuff(EntityPlayer player, float p)
@@ -2266,8 +2336,7 @@ public static partial class RebirthMetabolismService
         string wanted = p < 0.05f ? "buffRebirthStarving" :
                         p < 0.20f ? "buffRebirthVeryHungry" :
                         p < 0.40f ? "buffRebirthHungry" : string.Empty;
-        string[] all = { "buffRebirthHungry", "buffRebirthVeryHungry", "buffRebirthStarving" };
-        for (int i = 0; i < all.Length; i++) SetBuff(player, all[i], all[i] == wanted);
+        foreach (string buff in FoodStatusBuffs) SetBuff(player, buff, buff == wanted);
     }
 
     private static void SetBuff(EntityPlayer player, string name, bool wanted)
@@ -2294,6 +2363,9 @@ public static partial class RebirthMetabolismService
             player.world.gameManager.ItemDropServer(stack, player.GetPosition(), Vector3.zero);
         return false;
     }
+
+    internal static RebirthConsumeResult InventoryServingPending() =>
+        Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Original player consumption is still settling.");
 
     private static RebirthConsumeResult Fail(RebirthMetabolismConsumeFailure failure, string message)
     {
@@ -2437,7 +2509,7 @@ public static partial class RebirthMetabolismService
         if (!IsServerAuthority || player == null) return;
         RebirthMetabolismState state = RebirthMetabolismStateRepository.GetOrCreate(player);
         if (state == null) return;
-        RebirthMetabolismSnapshot snapshot = BuildSnapshot(player);
+        RebirthMetabolismSnapshot snapshot = BuildSnapshot(player, state);
         long sequence;
         if (!snapshotSequences.TryGetValue(player.entityId, out sequence)) sequence = 0L;
         snapshot.Sequence = sequence + 1L;
@@ -2592,9 +2664,7 @@ public static class RebirthMetabolismClientState
             return;
 
         if(local!=null&&local.world!=null&&local.world.IsRemote()&&local.Stats!=null&&
-            RebirthSurvivorMode.IsEnabledForCurrentWorld()&&
-            !float.IsNaN(value.Food)&&!float.IsInfinity(value.Food)&&
-            !float.IsNaN(value.Hydration)&&!float.IsInfinity(value.Hydration))
+            RebirthSurvivorMode.IsEnabledForCurrentWorld())
         {
             local.Stats.Food.Value=Mathf.Clamp(value.Food,0f,local.Stats.Food.ModifiedMax);
             local.Stats.Water.Value=Mathf.Clamp(value.Hydration,0f,local.Stats.Water.ModifiedMax);

@@ -76,6 +76,7 @@ public static class RebirthTraderJobsInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthSilentSharedQuestNetworkPatch));
 
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderResponseClickPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderPendingListDialogClosePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderRandomFetchServerPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthTraderRandomClientListArrivedPatch));
         #if DEBUG

@@ -1,0 +1,98 @@
+{
+  "name": "p18_wild_crop_eligibility",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, two mature natural cotton cells with a one-unit prompt. Fill coordinates and timing from actual targets and baseline. Keep both cells and the player within native activation range. First input uses the native Hold E radial and hand command. Check exact raw world removal and inventory count on the real dedicated authority."
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@COTTON_A_X@",
+          "y": "@COTTON_A_Y@",
+          "z": "@COTTON_A_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@COTTON_A_BLOCK@"
+    },
+    {
+      "action": {
+        "command": "target",
+        "args": {}
+      }
+    },
+    {
+      "markItem": "resourceCropCottonPlant"
+    },
+    {
+      "action": {
+        "command": "radialselect",
+        "args": {
+          "x": "@COTTON_A_X@",
+          "y": "@COTTON_A_Y@",
+          "z": "@COTTON_A_Z@",
+          "block": 1,
+          "command": "take"
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCropCottonPlant",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@COTTON_B_X@",
+          "y": "@COTTON_B_Y@",
+          "z": "@COTTON_B_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@COTTON_B_BLOCK@"
+    },
+    {
+      "action": {
+        "command": "target",
+        "args": {}
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCropCottonPlant",
+        "op": "==",
+        "value": 2
+      }
+    },
+    {
+      "_note": "Inspect prompt snapshots and actual grant on varied held harvest effects, player-grown and trader-area controls. For secondary fallback use an authored test plant with multiple eligible entries and known ordered rolls in an isolated config; never manipulate production drops. Separate full bag native-drop and rapid distinct-token cases remain required for full native scope."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -35,7 +35,8 @@ internal static class RebirthTraderStationPlacer
     private const float IntervalSeconds = 5f;
     private static float nextCheck;
     private static World boundWorld;
-    private static readonly HashSet<string> Settled = new HashSet<string>(StringComparer.Ordinal);
+    private static readonly HashSet<(int InstanceId, string Block)> Settled = new HashSet<(int, string)>();
+    private static readonly Dictionary<Prefab, List<Vector3i>> ExcludedStationOffsets = new Dictionary<Prefab, List<Vector3i>>();
 
     internal static void Update()
     {
@@ -43,42 +44,78 @@ internal static class RebirthTraderStationPlacer
         nextCheck = Time.realtimeSinceStartup + IntervalSeconds;
         var world = GameManager.Instance?.World;
         if (world == null || world.IsRemote() || world.IsEditor()) return;
-        if (!ReferenceEquals(world, boundWorld)) { boundWorld = world; Settled.Clear(); }
-        if (!RebirthXmlOptionConditionResolver.IsCharacterProgression("Rebirth")) return;
+        if (!ReferenceEquals(world, boundWorld))
+        {
+            boundWorld = world;
+            Settled.Clear();
+            ExcludedStationOffsets.Clear();
+        }
+        bool rebirthProgression = RebirthXmlOptionConditionResolver.IsCharacterProgression("Rebirth");
         var prefabs = GameManager.Instance.GetDynamicPrefabDecorator()?.allPrefabs;
         if (prefabs == null) return;
         for (int i = 0; i < prefabs.Count; i++)
         {
             var instance = prefabs[i];
-            Spot[] spots;
-            if (instance?.prefab == null || !Spots.TryGetValue(instance.prefab.PrefabName ?? string.Empty, out spots)) continue;
-            for (int s = 0; s < spots.Length; s++) Place(world, instance, spots[s]);
+            if (instance?.prefab?.bTraderArea != true) continue;
+            RemoveExcludedStations(world, instance);
+            if (rebirthProgression && Spots.TryGetValue(instance.prefab.PrefabName ?? string.Empty, out var spots))
+                for (int s = 0; s < spots.Length; s++) Place(world, instance, spots[s]);
+        }
+    }
+
+    private static void RemoveExcludedStations(World world, PrefabInstance instance)
+    {
+        var prefab = instance.prefab;
+        if (prefab.blockCells == null) return;
+        if (!ExcludedStationOffsets.TryGetValue(prefab, out var offsets))
+        {
+            offsets = new List<Vector3i>();
+            // The decorator stores the rotated prefab. These offsets are already world-aligned.
+            var size = instance.boundingBoxSize;
+            for (int y = 0; y < size.y; y++)
+            for (int z = 0; z < size.z; z++)
+            for (int x = 0; x < size.x; x++)
+            {
+                var authored = prefab.GetBlock(x, y, z);
+                if (!authored.ischild && RebirthTraderStationPlaceholders.Excluded(authored))
+                    offsets.Add(new Vector3i(x, y, z));
+            }
+            ExcludedStationOffsets.Add(prefab, offsets);
+        }
+
+        foreach (var offset in offsets)
+        {
+            var pos = instance.boundingBoxPosition + offset;
+            if (world.GetChunkFromWorldPos(pos) == null || !world.IsWithinTraderArea(pos)) continue;
+            var current = world.GetBlock(pos);
+            if (current.isair || current.ischild) continue;
+            var authored = prefab.GetBlock(offset.x, offset.y, offset.z);
+            if (!RebirthTraderStationPlaceholders.MatchesSaved(authored, current)) continue;
+            var tile = world.GetTileEntity(pos);
+            if (tile?.IsUserAccessing() == true ||
+                tile is TileEntityWorkstation station && (station.IsPlayerPlaced || !station.IsEmpty) ||
+                tile is TileEntityComposite composite && composite.PlayerPlaced &&
+                composite.ToWorldPos() == pos && ReferenceEquals(composite.TeData?.Block, current.Block)) continue;
+            world.SetBlockRPC(pos, BlockValue.Air);
+            RebirthDebug.Log("trader", "[REBIRTH TraderStations] Removed " + current.Block?.GetBlockName() + " at " + pos);
         }
     }
 
     private static Vector3i ToWorld(PrefabInstance instance, Spot spot)
     {
-        int maxX = instance.boundingBoxSize.x - 1, maxZ = instance.boundingBoxSize.z - 1, dx, dz;
-        switch (instance.rotation & 3)
-        {
-            case 1: dx = maxZ - spot.Z; dz = spot.X; break;
-            case 2: dx = maxX - spot.X; dz = maxZ - spot.Z; break;
-            case 3: dx = spot.Z; dz = maxX - spot.X; break;
-            default: dx = spot.X; dz = spot.Z; break;
-        }
-        return instance.boundingBoxPosition + new Vector3i(dx, spot.Y, dz);
+        return instance.GetWorldPositionOfPoiOffset(new Vector3i(spot.X, spot.Y, spot.Z));
     }
 
     private static void Place(World world, PrefabInstance instance, Spot spot)
     {
-        string key = instance.id + "|" + spot.Block;
+        var key = (instance.id, spot.Block);
         if (Settled.Contains(key)) return;
         Vector3i pos = ToWorld(instance, spot);
         if (world.GetChunkFromWorldPos(pos) == null) return;
 
-        string where = instance.prefab.PrefabName + " " + spot.Block + " local " + spot.X + "," + spot.Y + "," + spot.Z + " world " + pos;
+        string prefabName = instance.prefab.PrefabName;
         if (instance.GetPositionRelativeToPoi(pos) != new Vector3i(spot.X, spot.Y, spot.Z))
-        { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] Rotation mismatch, skipped " + where); return; }
+        { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] Rotation mismatch, skipped " + DescribeSpot(prefabName, spot, pos)); return; }
 
         BlockValue value = Block.GetBlockValue(spot.Block);
         if (value.isair || value.Block == null) { Settled.Add(key); return; }
@@ -95,15 +132,16 @@ internal static class RebirthTraderStationPlacer
 
         for (int i = 0; i < cells.Count; i++) if (world.GetChunkFromWorldPos(cells[i]) == null) return;
 
-        var clear = new List<Vector3i>();
+        List<Vector3i> clear = null;
         for (int i = 0; i < cells.Count; i++)
         {
             BlockValue present = world.GetBlock(cells[i]);
             if (present.isair) continue;
             if (!Clearable(present))
-            { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] Spot blocked by " + present.Block?.GetBlockName() + ", skipped " + where); return; }
+            { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] Spot blocked by " + present.Block?.GetBlockName() + ", skipped " + DescribeSpot(prefabName, spot, pos)); return; }
             Vector3i parent = cells[i];
             if (present.ischild && present.Block?.multiBlockPos != null) parent = present.Block.multiBlockPos.GetParentPos(cells[i], present);
+            clear ??= new List<Vector3i>();
             if (!clear.Contains(parent)) clear.Add(parent);
         }
         for (int i = 0; i < cells.Count; i++)
@@ -111,18 +149,45 @@ internal static class RebirthTraderStationPlacer
             Vector3i below = cells[i] + Vector3i.down;
             if (cells.Contains(below)) continue;
             if (world.GetBlock(below).isair)
-            { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] No floor, skipped " + where); return; }
+            { Settled.Add(key); Log.Warning("[REBIRTH TraderStations] No floor, skipped " + DescribeSpot(prefabName, spot, pos)); return; }
         }
 
         // Clear first and place on a later pass, so multiblock children are gone before the new parent.
-        if (clear.Count > 0)
+        if (clear != null)
         {
-            for (int i = 0; i < clear.Count; i++) world.SetBlockRPC(clear[i], BlockValue.Air);
+            bool ProtectPlayerClutter(Vector3i parent)
+            {
+                var current = world.GetBlock(parent);
+                if (current.isair || current.ischild || current.Block == null ||
+                    world.GetTileEntity(parent) is not TileEntityComposite tile || !tile.PlayerPlaced ||
+                    tile.ToWorldPos() != parent || !ReferenceEquals(tile.TeData?.Block, current.Block))
+                    return false;
+
+                Settled.Add(key);
+                Log.Warning("[REBIRTH TraderStations] Spot blocked by player-placed " + current.Block.GetBlockName() +
+                    " at " + parent + ", skipped " + DescribeSpot(prefabName, spot, pos));
+                return true;
+            }
+
+            for (int i = 0; i < clear.Count; i++)
+                if (ProtectPlayerClutter(clear[i])) return;
+            for (int i = 0; i < clear.Count; i++)
+            {
+                // A prior native clear can run callbacks before the next target is cleared.
+                if (i > 0 && ProtectPlayerClutter(clear[i])) return;
+                world.SetBlockRPC(clear[i], BlockValue.Air);
+            }
             return;
         }
         world.SetBlockRPC(pos, value);
         Settled.Add(key);
-        RebirthDebug.Log("trader", "[REBIRTH TraderStations] Placed " + where);
+        if (RebirthDebug.On && RebirthDebug.IsOn("trader"))
+            RebirthDebug.Log("trader", "[REBIRTH TraderStations] Placed " + DescribeSpot(prefabName, spot, pos));
+    }
+
+    private static string DescribeSpot(string prefabName, Spot spot, Vector3i pos)
+    {
+        return prefabName + " " + spot.Block + " local " + spot.X + "," + spot.Y + "," + spot.Z + " world " + pos;
     }
 
     // What the 2.6 traders replaced at these spots: vegetation, busted or collapsed stations, loose yard clutter.

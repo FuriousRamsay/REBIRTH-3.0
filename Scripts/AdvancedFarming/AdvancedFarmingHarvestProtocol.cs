@@ -14,6 +14,19 @@ internal static class AdvancedFarmingHarvestProtocol
     private sealed class Token {internal World World;internal uint Raw;internal string Source;internal long Epoch;}
     private sealed class Client {internal World World;internal EntityPlayerLocal Player;internal AdvancedFarmingHarvestReceipt.Record Record;internal AdvancedFarmingHarvestOwnerDelta.Plan Plan;internal int Phase=-1;internal float Next;internal bool OwnerRetired,Prepared;}
     private sealed class Server {internal AdvancedFarmingHarvestReceipt.Record Record;internal EntityPlayer Owner;internal AdvancedFarmingHarvestPublication.Proof Proof;}
+    private sealed class WildPickupIntent
+    {
+        internal Guid Id;
+        internal World World;
+        internal EntityPlayerLocal Player;
+        internal Vector3i Position;
+        internal uint Raw;
+        internal long Epoch;
+        internal int Deaths;
+        internal float Expires;
+        internal Func<bool> Start;
+    }
+    private static WildPickupIntent wildPickup;
     private static readonly Dictionary<Vector3i,Token> Tokens=new Dictionary<Vector3i,Token>();
     private static readonly Dictionary<Vector3i,long> Epochs=new Dictionary<Vector3i,long>();
     private static readonly Dictionary<Guid,Client> Clients=new Dictionary<Guid,Client>();
@@ -35,7 +48,7 @@ internal static class AdvancedFarmingHarvestProtocol
     internal static void ObservePreparedOriginal(Guid operation)
     {if(operation!=Guid.Empty&&ThreadManager.IsMainThread()&&GameManager.Instance?.World?.IsRemote()==false&&!Servers.ContainsKey(operation)&&!Recovery.Contains(operation))Recovery.Enqueue(operation);}
     private static void SetWorld(World world)
-    {string directory=GameIO.GetSaveGameDir();if(ReferenceEquals(currentWorld,world)&&currentDirectory==directory)return;if(currentWorld!=null){AdvancedFarmingHarvestOwnerDelta.ReleaseObservationWorld(currentWorld);AdvancedFarmingHarvestPublication.RetireObservationWorld(currentWorld);AdvancedFarmingHarvestDrops.RetireWorld(currentWorld);}currentWorld=world;currentDirectory=directory;Tokens.Clear();Epochs.Clear();Servers.Clear();Clients.Clear();Recovery.Clear();recoveryLoaded=false;nextRecovery=0f;}
+    {string directory=GameIO.GetSaveGameDir();if(ReferenceEquals(currentWorld,world)&&currentDirectory==directory)return;if(currentWorld!=null){AdvancedFarmingHarvestOwnerDelta.ReleaseObservationWorld(currentWorld);AdvancedFarmingHarvestPublication.RetireObservationWorld(currentWorld);AdvancedFarmingHarvestDrops.RetireWorld(currentWorld);}currentWorld=world;currentDirectory=directory;wildPickup=null;Tokens.Clear();Epochs.Clear();Servers.Clear();Clients.Clear();Recovery.Clear();recoveryLoaded=false;nextRecovery=0f;}
     internal static void Install()
     {
         if(harmony!=null)return;harmony=new Harmony("rebirth.farming.original-harvest");
@@ -43,8 +56,9 @@ internal static class AdvancedFarmingHarvestProtocol
     }
     internal static void SourceChanged(WorldBase world,Vector3i position)
     {if(!ThreadManager.IsMainThread()||!ReferenceEquals(world,GameManager.Instance?.World))return;if(Epochs.Count>=16384){Epochs.Clear();Tokens.Clear();}Epochs.TryGetValue(position,out long epoch);Epochs[position]=epoch+1;Tokens.Remove(position);}
-    private static bool Local(Client attempt)=>ReferenceEquals(GameManager.Instance?.World,attempt.World)&&ReferenceEquals(attempt.World.GetPrimaryPlayer(),attempt.Player)&&ReferenceEquals(attempt.World.GetEntity(attempt.Player.entityId),attempt.Player)&&!attempt.Player.IsDead()&&attempt.Player.Died==attempt.Record.Deaths&&attempt.World.worldState?.Guid==attempt.Record.World&&RebirthCamperCharacterAccess.CurrentCreation(attempt.Player)==attempt.Record.Creation;
-    private static XElement Envelope(EntityPlayer player,string kind)=>new XElement("harvest",new XAttribute("kind",kind),new XAttribute("world",player.world.worldState.Guid),new XAttribute("creation",RebirthCamperCharacterAccess.CurrentCreation(player)),new XAttribute("deaths",player.Died));
+    internal static string WorldKey(World world) => world.IsRemote() ? GamePrefs.GetString(EnumGamePrefs.GameGuidClient) : world.worldState?.Guid;
+    private static bool Local(Client attempt)=>ReferenceEquals(GameManager.Instance?.World,attempt.World)&&ReferenceEquals(attempt.World.GetPrimaryPlayer(),attempt.Player)&&ReferenceEquals(attempt.World.GetEntity(attempt.Player.entityId),attempt.Player)&&!attempt.Player.IsDead()&&attempt.Player.Died==attempt.Record.Deaths&&WorldKey(attempt.World)==attempt.Record.World&&RebirthCamperCharacterAccess.CurrentCreation(attempt.Player)==attempt.Record.Creation;
+    private static XElement Envelope(EntityPlayer player,string kind)=>new XElement("harvest",new XAttribute("kind",kind),new XAttribute("world",WorldKey(player.world)),new XAttribute("creation",RebirthCamperCharacterAccess.CurrentCreation(player)),new XAttribute("deaths",player.Died));
     private static bool Owner(World world,EntityPlayer player,XElement request)=>world!=null&&!world.IsRemote()&&ReferenceEquals(GameManager.Instance?.World,world)&&player!=null&&ReferenceEquals(player.world,world)&&ReferenceEquals(world.GetEntity(player.entityId),player)&&!player.IsDead()&&world.worldState?.Guid==(string)request.Attribute("world")&&RebirthCamperCharacterAccess.CurrentCreation(player)==(string)request.Attribute("creation")&&player.Died==(int)request.Attribute("deaths");
     private static void Send(EntityPlayerLocal player,XElement request)
     {if(player.world.IsRemote())SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageFarmingHarvestRequestRebirth>().Setup(player.entityId,request.ToString(SaveOptions.DisableFormatting)));else ReceiveServer((World)player.world,player.entityId,request);}
@@ -56,19 +70,50 @@ internal static class AdvancedFarmingHarvestProtocol
     {var request=Envelope(player,"events");request.Add(new XAttribute("operation",operation.ToString("N")));Send(player,request);}
     internal static bool CanCaptureOriginal(WorldBase world,Vector3i position,BlockValue expected,EntityPlayer player)
     {try{return CanCaptureOriginalCore(world,position,expected,player);}catch(Exception error){Log.Warning("[REBIRTH Farming] original source probe refused: "+error.GetType().Name);return false;}}
-    private static bool CanCaptureOriginalCore(WorldBase world,Vector3i position,BlockValue expected,EntityPlayer player)
+    internal static bool TryStartWildPickup(WorldBase world, Vector3i position, BlockValue expected,
+        EntityPlayerLocal player, Func<bool> start)
+    {
+        try
+        {
+            if (!ThreadManager.IsMainThread()) return false;
+            wildPickup = null;
+            if (CanCaptureOriginalCore(world, position, expected, player, start)) return start();
+            bool queued = wildPickup != null && ReferenceEquals(wildPickup.Start, start);
+            RebirthDebug.Log("advancedfarming", $"[REBIRTH WildPickup] {(queued ? "probe queued" : "pickup refused before probe")} position={position}");
+            return queued;
+        }
+        catch (Exception error)
+        {
+            if (ReferenceEquals(wildPickup?.Start, start)) wildPickup = null;
+            RebirthDebug.Log("advancedfarming", "[REBIRTH Farming] Wild pickup refused: " + error.GetType().Name);
+            return false;
+        }
+    }
+
+    private static bool CanCaptureOriginalCore(WorldBase world,Vector3i position,BlockValue expected,EntityPlayer player, Func<bool> start = null)
     {
         if(player is not EntityPlayerLocal local||world is not World concrete||!ReferenceEquals(concrete.GetPrimaryPlayer(),local)||local.IsDead()||Clients.Values.Any(c=>Local(c))||AdvancedFarmingHarvestOwnerDelta.IsHeld(local)||RebirthCookingOutputDelivery.IsHeld(local)||RebirthLogisticsOwnerReceipt.IsHeld(local)||
             RebirthDogLifecycleService.HasHireInventoryHold(local)||AdvancedFarmingWaterExchangeOriginal.IsHeld(local)||RebirthCamperEnergyOwnerHold.Blocks(local.bag)||RebirthCamperEnergyOwnerHold.Blocks(local.inventory))return false;
-        SetWorld(concrete);if(string.IsNullOrEmpty(RebirthCamperCharacterAccess.CurrentCreation(local))||!Guid.TryParse(concrete.worldState?.Guid,out _))return false;
+        SetWorld(concrete);if(string.IsNullOrEmpty(RebirthCamperCharacterAccess.CurrentCreation(local))||!Guid.TryParse(WorldKey(concrete),out _))return false;
         Epochs.TryGetValue(position,out long epoch);
         if(Tokens.TryGetValue(position,out var token)&&ReferenceEquals(token.World,concrete)&&token.Epoch==epoch&&CompatibleSourceRaw(token.Raw,expected.rawData))return true;
-        var probe=Envelope(local,"probe");probe.Add(new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),new XAttribute("raw",expected.rawData),new XAttribute("epoch",epoch));Send(local,probe);
+        var probe=Envelope(local,"probe");probe.Add(new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),new XAttribute("raw",expected.rawData),new XAttribute("epoch",epoch));
+        if (start != null && concrete.IsRemote())
+        {
+            wildPickup = new WildPickupIntent
+            {
+                Id = Guid.NewGuid(), World = concrete, Player = local, Position = position,
+                Raw = expected.rawData, Epoch = epoch, Deaths = local.Died,
+                Expires = UnityEngine.Time.realtimeSinceStartup + 5f, Start = start
+            };
+            probe.Add(new XAttribute("intent", wildPickup.Id.ToString("N")));
+        }
+        Send(local,probe);
         // A probe response never replays a stale action against later regrowth.
         return !world.IsRemote()&&Tokens.TryGetValue(position,out token)&&CompatibleSourceRaw(token.Raw,expected.rawData);
     }
     internal static bool Begin(WorldBase world,Vector3i position,BlockValue expected,EntityPlayer owner,IList<ItemStack> outputs,bool replant,string terminal="")
-    {try{return BeginCore(world,position,expected,owner,outputs,replant,terminal);}catch(Exception error){Log.Warning("[REBIRTH Farming] original output capsule refused: "+error.GetType().Name);return false;}}
+    {try{return BeginCore(world,position,expected,owner,outputs,replant,terminal);}catch(Exception error){Log.Warning("[REBIRTH Farming] original output capsule refused: "+error.GetType().Name);RebirthDebug.Log("advancedfarming",error.ToString());return false;}}
     private static bool BeginCore(WorldBase world,Vector3i position,BlockValue expected,EntityPlayer owner,IList<ItemStack> outputs,bool replant,string terminal)
     {
         if(owner is not EntityPlayerLocal player||world is not World concrete||!CanCaptureOriginal(world,position,expected,owner)||!Tokens.TryGetValue(position,out var token)||!RebirthStablePlayerIdentity.TryResolveServerEntity(owner,out var identity))return false;
@@ -77,7 +122,7 @@ internal static class AdvancedFarmingHarvestProtocol
         // A full destination retains the complete original output for the domain
         // native-drop publication path; never call unreceipted ItemDropServer.
         if(!fits){bag=ItemStack.Clone(beforeBag);belt=ItemStack.Clone(beforeBelt);}
-        var plan=new AdvancedFarmingHarvestOwnerDelta.Plan{Operation=Guid.NewGuid(),World=concrete.worldState.Guid,Creation=RebirthCamperCharacterAccess.CurrentCreation(player),Owner=identity.CanonicalId,Deaths=player.Died,BeforeBag=beforeBag,BeforeBelt=beforeBelt,AfterBag=bag,AfterBelt=belt,SourceHash=AdvancedFarmingHarvestOwnerDelta.SourceHash(beforeBag,beforeBelt,RebirthCamperStationNativeActorPayment.Locks(player.bag.LockedSlots),player.inventory.Length)};
+        var plan=new AdvancedFarmingHarvestOwnerDelta.Plan{Operation=Guid.NewGuid(),World=WorldKey(concrete),Creation=RebirthCamperCharacterAccess.CurrentCreation(player),Owner=identity.CanonicalId,Deaths=player.Died,BeforeBag=beforeBag,BeforeBelt=beforeBelt,AfterBag=bag,AfterBelt=belt,SourceHash=AdvancedFarmingHarvestOwnerDelta.SourceHash(beforeBag,beforeBelt,RebirthCamperStationNativeActorPayment.Locks(player.bag.LockedSlots),player.inventory.Length)};
         var record=new AdvancedFarmingHarvestReceipt.Record{Operation=plan.Operation,Source=Guid.ParseExact(token.Source,"N"),World=plan.World,Owner=plan.Owner,Creation=plan.Creation,Deaths=plan.Deaths,X=position.x,Y=position.y,Z=position.z,Raw=expected.rawData,Block=checked((ushort)expected.type),Meta=checked((byte)expected.meta),Meta2=checked((byte)expected.meta2),Rotation=checked((byte)expected.rotation),Replant=replant,Terminal=terminal,PlanImage=AdvancedFarmingHarvestOwnerDelta.Encode(plan),Outputs=AdvancedFarmingHarvestReceipt.OutputImage(outputs.ToArray())};
         var dropPosition=player.GetPosition();record.DropX=dropPosition.x;record.DropY=dropPosition.y;record.DropZ=dropPosition.z;
         record.EventsRequired=AdvancedFarmingHarvestEvents.Required(record);AdvancedFarmingHarvestReceipt.Decode(AdvancedFarmingHarvestReceipt.Encode(record));Clients.Add(record.Operation,new Client{World=concrete,Player=player,Record=record,Plan=plan});return true;
@@ -96,14 +141,33 @@ internal static class AdvancedFarmingHarvestProtocol
     {
         try
         {
-            SetWorld(world);var player=world?.GetEntity(entityId) as EntityPlayer;if(!Owner(world,player,request))return;
             string kind=(string)request.Attribute("kind");
+            SetWorld(world);var player=world?.GetEntity(entityId) as EntityPlayer;
+            if(!Owner(world,player,request))
+            {
+                if(kind=="probe")RebirthDebug.Log("advancedfarming",$"[REBIRTH WildPickup] authority refused probe scope actor={entityId}");
+                return;
+            }
             if(kind=="probe")
             {
                 var position=new Vector3i((int)request.Attribute("x"),(int)request.Attribute("y"),(int)request.Attribute("z"));uint raw=(uint)request.Attribute("raw");
-                if((player.GetPosition()-position.ToVector3()).sqrMagnitude>64f||world.IsWithinTraderArea(position)||!CompatibleSourceRaw(raw,world.GetBlock(position).rawData))return;
-                string source=AdvancedFarmingHarvestSettlement.EnsureSource(world,position);if(source==null)return;
-                var answer=Envelope(player,"token");answer.Add(new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),new XAttribute("raw",raw),new XAttribute("epoch",(long)request.Attribute("epoch")),new XAttribute("source",source));Reply(player,answer);return;
+                if((player.GetPosition()-position.ToVector3()).sqrMagnitude>64f||world.IsWithinTraderArea(position)||!CompatibleSourceRaw(raw,world.GetBlock(position).rawData))
+                {
+                    RebirthDebug.Log("advancedfarming",$"[REBIRTH WildPickup] authority refused probe position={position} clientRaw={raw} serverRaw={world.GetBlock(position).rawData}");
+                    return;
+                }
+                string source=AdvancedFarmingHarvestSettlement.EnsureSource(world,position);
+                if(source==null)
+                {
+                    RebirthDebug.Log("advancedfarming",$"[REBIRTH WildPickup] authority source unavailable position={position}");
+                    return;
+                }
+                var answer=Envelope(player,"token");answer.Add(new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),new XAttribute("raw",raw),new XAttribute("epoch",(long)request.Attribute("epoch")),new XAttribute("source",source));
+                if (Guid.TryParseExact((string)request.Attribute("intent"), "N", out var intent))
+                    answer.Add(new XAttribute("intent", intent.ToString("N")));
+                Reply(player,answer);
+                RebirthDebug.Log("advancedfarming",$"[REBIRTH WildPickup] authority replied position={position}");
+                return;
             }
             if(kind=="events"){if(Guid.TryParseExact((string)request.Attribute("operation"),"N",out var original))AdvancedFarmingHarvestEvents.Request(world,player,original);return;}
             if(kind!="submit")return;
@@ -130,7 +194,7 @@ internal static class AdvancedFarmingHarvestProtocol
     {
         try
         {
-            var player=world?.GetPrimaryPlayer();if(player==null||world.worldState?.Guid!=(string)response.Attribute("world")||RebirthCamperCharacterAccess.CurrentCreation(player)!=(string)response.Attribute("creation")||player.Died!=(int)response.Attribute("deaths"))return;
+            var player=world?.GetPrimaryPlayer();if(player==null||!ReferenceEquals(world,GameManager.Instance?.World)||WorldKey(world)!=(string)response.Attribute("world")||RebirthCamperCharacterAccess.CurrentCreation(player)!=(string)response.Attribute("creation")||player.Died!=(int)response.Attribute("deaths"))return;
             if((string)response.Attribute("kind")=="refused")
             {
                 if(Guid.TryParseExact((string)response.Attribute("operation"),"N",out var operation)&&Clients.TryGetValue(operation,out var original)&&Local(original)&&original.Phase<0&&original.Record.Source.ToString("N")== (string)response.Attribute("source")&&AdvancedFarmingHarvestOwnerDelta.AbandonRejectedWithoutEffect(player,original.Plan))Clients.Remove(operation);
@@ -139,8 +203,29 @@ internal static class AdvancedFarmingHarvestProtocol
             if((string)response.Attribute("kind")=="token")
             {
                 var position=new Vector3i((int)response.Attribute("x"),(int)response.Attribute("y"),(int)response.Attribute("z"));Epochs.TryGetValue(position,out long epoch);
-                uint raw=(uint)response.Attribute("raw");if(epoch!=(long)response.Attribute("epoch")||!CompatibleSourceRaw(raw,world.GetBlock(position).rawData)||!Guid.TryParseExact((string)response.Attribute("source"),"N",out var source))return;
-                if(Tokens.Count>=2048)Tokens.Clear();Tokens[position]=new Token{World=world,Epoch=epoch,Raw=raw,Source=source.ToString("N")};return;
+                uint raw=(uint)response.Attribute("raw");
+                if(epoch!=(long)response.Attribute("epoch")||!CompatibleSourceRaw(raw,world.GetBlock(position).rawData)||!Guid.TryParseExact((string)response.Attribute("source"),"N",out var source))
+                {
+                    RebirthDebug.Log("advancedfarming",$"[REBIRTH WildPickup] client refused source token position={position}");
+                    return;
+                }
+                if(Tokens.Count>=2048)Tokens.Clear();Tokens[position]=new Token{World=world,Epoch=epoch,Raw=raw,Source=source.ToString("N")};
+                var intent = wildPickup;
+                if (intent != null && (string)response.Attribute("intent") == intent.Id.ToString("N") &&
+                    ReferenceEquals(intent.World, world) && ReferenceEquals(intent.Player, player) &&
+                    intent.Position == position && intent.Raw == raw && intent.Epoch == epoch)
+                {
+                    wildPickup = null;
+                    if (!player.IsDead() && player.Died == intent.Deaths &&
+                        UnityEngine.Time.realtimeSinceStartup <= intent.Expires &&
+                        (player.GetPosition() - position.ToVector3()).sqrMagnitude <= 64f)
+                    {
+                        bool started = intent.Start();
+                        RebirthDebug.Log("advancedfarming", $"[REBIRTH WildPickup] client start={started} position={position}");
+                        if(!started)GameManager.ShowTooltip(intent.Player, "This crop could not be picked up.");
+                    }
+                }
+                return;
             }
             if((string)response.Attribute("kind")=="events"){var original=AdvancedFarmingHarvestReceipt.Decode((string)response.Element("record"));AdvancedFarmingHarvestEvents.Receive(world,original,(int)response.Attribute("index"),(bool)response.Attribute("done"));return;}
             if((string)response.Attribute("kind")!="status")return;var record=AdvancedFarmingHarvestReceipt.Decode((string)response.Element("record"));
@@ -153,12 +238,24 @@ internal static class AdvancedFarmingHarvestProtocol
             if(!Local(attempt)||attempt.Record.PlanImage!=record.PlanImage||attempt.Record.Outputs!=record.Outputs||attempt.Record.Terminal!=record.Terminal||attempt.Record.Source!=record.Source)return;
             if((int)record.State<attempt.Phase)return;attempt.Phase=(int)record.State;
         }
-        catch(Exception error){Log.Warning("[REBIRTH Farming] original harvest response retained: "+error.GetType().Name);}
+        catch(Exception error)
+        {
+            Log.Warning("[REBIRTH Farming] original harvest response retained: "+error.GetType().Name);
+            RebirthDebug.Log("advancedfarming",error.ToString());
+        }
     }
     internal static void Pump(World world)
     {
         if(world==null)return;
         SetWorld(world);AdvancedFarmingHarvestEvents.Pump(world);
+        if (wildPickup != null && UnityEngine.Time.realtimeSinceStartup > wildPickup.Expires)
+        {
+            var expired = wildPickup;
+            wildPickup = null;
+            if (ReferenceEquals(world.GetPrimaryPlayer(), expired.Player) &&
+                !expired.Player.IsDead() && expired.Player.Died == expired.Deaths)
+                GameManager.ShowTooltip(expired.Player, "This crop could not be picked up.");
+        }
         if(Clients.Count>0)foreach(var attempt in Clients.Values.ToArray())
         {
             if(!Local(attempt))continue;
@@ -219,6 +316,7 @@ internal static class AdvancedFarmingHarvestProtocol
                     if(!AdvancedFarmingHarvestEvents.PrepareStatistics(owner,r))continue;
                     if(AdvancedFarmingHarvestSettlement.MatchesSource(world,position,r.Source.ToString("N")))
                     {if(!AdvancedFarmingHarvestOwnerDelta.SavedUnspent(identity,AdvancedFarmingHarvestOwnerDelta.Decode(r.PlanImage))||!RebirthUtilities.CommitHarvestSource(world,position,original,r.Replant,r.Operation,r.Source))continue;}
+                    if(!AdvancedFarmingHarvestSettlement.TryRestoreDestinationCommit(world,position,r.Operation,r.Source,r.Raw,destination.rawData))continue;
                     if(!AdvancedFarmingHarvestTerminalPlot.Commit(world,owner,r))continue;
                     Func<bool> postimage=()=>AdvancedFarmingHarvestSettlement.HasCommit(world,position,r.Operation,r.Source,r.Raw,destination.rawData)&&AdvancedFarmingHarvestTerminalPlot.Committed(world,r);
                     if(attempt.Proof==null&&!AdvancedFarmingHarvestPublication.Observe(r.Operation,r.Source,world,position,postimage,out attempt.Proof))continue;

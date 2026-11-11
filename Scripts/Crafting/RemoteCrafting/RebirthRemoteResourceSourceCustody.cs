@@ -171,14 +171,21 @@ internal static class RebirthRemoteResourceSourceCustody
                 if(stage==2&&!Effect(1,out _))return false;
                 if(!RebirthRemoteResourceSourceEffectCodec.TryPlan(prior,Original.Incarnation,Original.Domain,Original.Operation,Original.Owner,Original.Binding,stage,Original.StageDigest(stage),out var next))return false;
                 watch?.Dispose();watch=null;watchStage=-1;
-                for(int index=0;index<to.Length;index++)
+                // A static deposit can leave the debit image unchanged. It still needs the saved stage marker.
+                bool unchangedStaticDebit = stage == 1 &&
+                    Original.Domain == RebirthRemoteResourceSourceEffectCodec.Domain.Logistics &&
+                    Original.Kind == RemoteResourceSourceKind.StaticContainer && Same(from, to);
+                if (!unchangedStaticDebit)
                 {
-                    if(!Authority()||!Locks()||!Mixed(Source.CopySlots(),from,to))return false;
-                    if(RebirthStationGridIngredients.IsSameStackSnapshot(Source.CopySlots()[index],to[index]))continue;
-                    var desired=to[index].Clone();var array=Source.CopySlots();array[index]=desired.Clone();
-                    var one=new Permit{Lease=this,Slot=index,Desired=desired,Array=array};if(permit!=null)return false;
-                    permit=one;try{Source.SetSlot(index,desired);}finally{permit=null;}
-                    if(!one.Consumed||!Current()||!RebirthStationGridIngredients.IsSameStackSnapshot(Source.CopySlots()[index],desired))return false;
+                    for(int index=0;index<to.Length;index++)
+                    {
+                        if(!Authority()||!Locks()||!Mixed(Source.CopySlots(),from,to))return false;
+                        if(RebirthStationGridIngredients.IsSameStackSnapshot(Source.CopySlots()[index],to[index]))continue;
+                        var desired=to[index].Clone();var array=Source.CopySlots();array[index]=desired.Clone();
+                        var one=new Permit{Lease=this,Slot=index,Desired=desired,Array=array};if(permit!=null)return false;
+                        permit=one;try{Source.SetSlot(index,desired);}finally{permit=null;}
+                        if(!one.Consumed||!Current()||!RebirthStationGridIngredients.IsSameStackSnapshot(Source.CopySlots()[index],desired))return false;
+                    }
                 }
                 // Only a completed actual original delta can stamp an effect.
                 // Partial throws have no invented marker; the original hold

@@ -1,0 +1,25 @@
+{
+  "name": "Native personal Craft from carried and container ingredients",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run in a disposable solo or dedicated Purge save with Stone Axe selected, an empty queue, two Small Stones in one eligible nearby crate, and two Plant Fibers and one Tree Branch in the player's inventory. No stones should be carried. On dedicated, set up the carried ingredients after the last full native player save." },
+    { "expectWindowOpen": "crafting" },
+    { "expectNoItem": "resourceRockSmall" },
+    { "markItem": "resourceYuccaFibers" },
+    { "markItem": "FuriousRamsayTreeBranch" },
+    { "markItem": "meleeToolRepairT0StoneAxe" },
+    { "console": "rbdebug on crafting" },
+    { "console": "rbcraftlatency arm meleeToolRepairT0StoneAxe" },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "waitForUi": { "id": "rebirthQueueName", "exactText": "Stone Axe", "window": "crafting", "timeout": 4 } },
+    { "expectLog": { "contains": "[REBIRTH CraftLatency] queue item=" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] queue recipe=" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] debit recipe=" } },
+    { "expectItemDelta": { "name": "resourceYuccaFibers", "op": "==", "value": -2 } },
+    { "expectItemDelta": { "name": "FuriousRamsayTreeBranch", "op": "==", "value": -1 } },
+    { "expectNoItem": "resourceRockSmall" },
+    { "wait": 5 },
+    { "expectItemDelta": { "name": "meleeToolRepairT0StoneAxe", "op": "==", "value": 1 } },
+    { "expectNoErrors": true }
+  ]
+}

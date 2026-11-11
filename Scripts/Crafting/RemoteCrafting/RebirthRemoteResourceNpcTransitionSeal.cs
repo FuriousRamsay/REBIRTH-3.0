@@ -41,7 +41,7 @@ internal static class RebirthRemoteResourceNpcTransitionSeal
             string save=Path.GetFullPath(GameIO.GetSaveGameDir());long epoch=RebirthRemoteResourceDurableJournal.MutationEpoch;
             if(!RebirthRemoteResourceDurableJournal.TryReadPending(world,out var pending))return false;
             var identities=OriginalHeads(pending);
-            string root=Path.Combine(save,"RebirthData","RemoteResources","Outcomes");
+            string root=RebirthRemoteResourceDurableJournal.OutcomesRoot(save);
             if(!TryHeads(root,out var heads)||!TryHeads(root,out var confirmed)||!heads.SequenceEqual(confirmed,StringComparer.Ordinal)||epoch!=RebirthRemoteResourceDurableJournal.MutationEpoch||
                 !RebirthRemoteResourceDurableJournal.TransitionQuiescent||!ReferenceEquals(GameManager.Instance?.World,world)||Path.GetFullPath(GameIO.GetSaveGameDir())!=save)return false;
             if(!RebirthRemoteResourceDurableJournal.TryReadPending(world,out var again)||!identities.SequenceEqual(OriginalHeads(again),StringComparer.Ordinal)||
@@ -73,8 +73,15 @@ internal static class RebirthRemoteResourceNpcTransitionSeal
         {
             // Check all existing ancestors on every observation, including
             // after switching worlds: a substituted junction is not the saved A.
+            char separator = Path.DirectorySeparatorChar;
+            string volumeRoot = Path.GetPathRoot(root).TrimEnd(separator);
             for(var ancestor=new DirectoryInfo(root);ancestor!=null;ancestor=ancestor.Parent)
+            {
                 if(ancestor.Exists&&(ancestor.Attributes&FileAttributes.ReparsePoint)!=0)return false;
+                // Unity's Windows Mono can report a parent for an extended-length drive root.
+                if (string.Equals(ancestor.FullName.TrimEnd(separator), volumeRoot, StringComparison.OrdinalIgnoreCase))
+                    break;
+            }
             var result=new List<string>();var queue=new Queue<string>();queue.Enqueue(root);long bytes=0;int entries=1;
             while(queue.Count!=0)
             {

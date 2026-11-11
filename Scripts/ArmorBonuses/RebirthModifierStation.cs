@@ -11,13 +11,16 @@ using Random = System.Random;
 [Preserve]
 public sealed class XUiC_RebirthKitInputGrid : XUiC_WorkstationInputGrid
 {
-    public override void UpdateBackend(ItemStack[] stacks)
+    public override void UpdateBackend(ItemStack[] stacks) => UpdateBackend(stacks, null);
+
+    internal void UpdateBackend(ItemStack[] stacks, Func<bool> current)
     {
         var original = WorkstationData?.TileEntity?.Input;
         if (original == null || stacks == null) return;
         var merged = ItemStack.CreateArray(original.Length);
         for (int i = 0; i < original.Length; i++) merged[i] = original[i].Clone();
         for (int i = 0; i < stacks.Length && i < merged.Length; i++) merged[i] = stacks[i].Clone();
+        if (current?.Invoke() == false) return;
         base.UpdateBackend(merged);
     }
 
@@ -140,21 +143,49 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
     /// <summary>Applies the kit with the player's choices (null = no focus). The console test command calls this too.</summary>
     internal void Apply(RebirthArmorBonusKitRequest request)
     {
-        var station = (windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity;
-        var slots = grid?.GetItemStackControllers()?.Select(c => c?.ItemStack ?? ItemStack.Empty.Clone()).ToArray(); // what the slots show, not the cached array
-        if (station == null || slots == null || slots.Length < 2) { Fail("xuiEnchantSlotsUnavailable"); return; }
-        grid.UpdateBackend(slots);
-
-        // The server rolls the kit. A client asks, and gets the slots back in the reply.
-        if (GameManager.Instance.World.IsRemote())
+        var model = (windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData;
+        var station = model?.TileEntity;
+        var world = GameManager.Instance?.World;
+        if (world?.IsRemote() == true && station != null)
         {
-            var player = xui.playerUI.entityPlayer;
-            SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthModifierApply>().Setup(player.entityId, station.ToWorldPos(), request));
+            ApplyRemote(world, model, request);
             return;
         }
+
+        var slots = ReadInputSlots(grid);
+        if (station == null || slots == null || slots.Length < 2) { Fail("xuiEnchantSlotsUnavailable"); return; }
+        grid.UpdateBackend(slots);
+        if (GameManager.Instance?.World?.IsRemote() != false) return;
         string failKey, before, after;
         if (!RebirthModifierStationService.TryApply(station, request, xui.playerUI.entityPlayer, random, out failKey, out before, out after)) { Fail(failKey); return; }
         Show(station.Input, station.Output, before, after);
+    }
+
+    private static ItemStack[] ReadInputSlots(XUiC_RebirthKitInputGrid input) =>
+        input?.GetItemStackControllers()?.Select(c => c?.ItemStack ?? ItemStack.Empty.Clone()).ToArray();
+
+    private void ApplyRemote(World world, XUiM_Workstation model, RebirthArmorBonusKitRequest request)
+    {
+        var input = grid;
+        var player = xui?.playerUI?.entityPlayer;
+        int deaths = player?.Died ?? 0;
+        var position = model.TileEntity.ToWorldPos();
+        bool IsCurrent() =>
+            player != null && !player.IsDead() && player.Died == deaths &&
+            ReferenceEquals(xui?.playerUI?.entityPlayer, player) && ReferenceEquals(player.world, world) &&
+            ReferenceEquals(world.GetPrimaryPlayer(), player) && ReferenceEquals(world.GetEntity(player.entityId), player) &&
+            ReferenceEquals(grid, input) && (input == null || ReferenceEquals(input.WorkstationData, model)) &&
+            ReferenceEquals(CurrentRemoteModel(world, position), model);
+        if (!IsCurrent()) return;
+        var slots = ReadInputSlots(input);
+        if (slots == null || slots.Length < 2) { Fail("xuiEnchantSlotsUnavailable", IsCurrent); return; }
+        if (!IsCurrent()) return;
+        input.UpdateBackend(slots, IsCurrent);
+        if (!IsCurrent()) return;
+
+        // The server rolls the kit and returns the slots in the reply.
+        SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(
+            NetPackageManager.GetPackage<NetPackageRebirthModifierApply>().Setup(player.entityId, position, request));
     }
 
     /// <summary>Bonuses before and after the last applied kit (raw rbArmorBonus text), for the result card.</summary>
@@ -162,28 +193,40 @@ public sealed class XUiC_RebirthModifierPanel : XUiController
     /// <summary>Counts successful applies, so the workspace shows each result card once.</summary>
     internal int ResultVersion;
 
-    internal void Show(ItemStack[] input, ItemStack[] output, string before, string after)
+    internal void Show(ItemStack[] input, ItemStack[] output, string before, string after, Func<bool> current = null)
     {
+        if (current?.Invoke() == false) return;
         LastBefore = before ?? string.Empty;
         LastAfter = after ?? string.Empty;
         ResultVersion++;
         RebirthDebug.Log("armorbonuses", "[REBIRTH Modifier] applied: before [" + LastBefore + "] after [" + LastAfter + "]");
+        if (current?.Invoke() == false) return;
         grid.SetSlots(input);
+        if (current?.Invoke() == false) return;
         windowGroup.Controller.GetChildByType<XUiC_WorkstationOutputGrid>()?.SetSlots(output);
+        if (current?.Invoke() == false) return;
         message = string.Empty;
         windowGroup.Controller.SetAllChildrenDirty();
     }
 
-    internal bool Shows(Vector3i position)
+    internal XUiM_Workstation CurrentRemoteModel(World world, Vector3i position)
     {
-        var station = (windowGroup?.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity;
-        return windowGroup?.isShowing == true && station != null && station.ToWorldPos() == position;
+        if (Current != this || windowGroup?.isShowing != true || world?.IsRemote() != true ||
+            !ReferenceEquals(GameManager.Instance?.World, world)) return null;
+        var model = (windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData;
+        var station = model?.TileEntity;
+        return station != null && !station.IsRemoving && station.ToWorldPos() == position &&
+            ReferenceEquals(world.GetTileEntity(position), station) ? model : null;
     }
 
-    internal void Fail(string key)
+    internal void Fail(string key, Func<bool> current = null)
     {
-        message = Localization.Get(key);
+        if (current?.Invoke() == false) return;
+        string localized = Localization.Get(key);
+        if (current?.Invoke() == false) return;
+        message = localized;
         RebirthDebug.Log("armorbonuses", "[REBIRTH Modifier] refused: " + key);
+        if (current?.Invoke() == false) return;
         GameManager.ShowTooltip(xui.playerUI.entityPlayer, message, string.Empty, "ui_denied");
     }
 }
@@ -347,14 +390,18 @@ public sealed class NetPackageRebirthModifierResult : NetPackage
     public override void ProcessPackage(World world, GameManager callbacks)
     {
         var panel = XUiC_RebirthModifierPanel.Current;
-        if (panel == null || !panel.Shows(position)) return;
+        var model = panel?.CurrentRemoteModel(world, position);
+        if (model == null) return;
+        bool Current() => ReferenceEquals(panel.CurrentRemoteModel(world, position), model);
         if (applied)
         {
-            var station = world?.GetTileEntity(position) as TileEntityWorkstation;
-            if (station != null) { station.Input = input; station.Output = output; }
-            panel.Show(input, output, before, after);
+            var station = model.TileEntity;
+            station.Input = input;
+            if (!Current()) return;
+            station.Output = output;
+            panel.Show(input, output, before, after, Current);
         }
-        else panel.Fail(failKey);
+        else panel.Fail(failKey, Current);
     }
 
     public int GetLength() => 1024;

@@ -26,7 +26,11 @@ SandboxOptions.SandboxOptionManager.Income=.75f;Check(RebirthStashBatchPrice.Pri
 v.ItemClass.EconomicBundleSize=1;RebirthBackpackSellStashContents.Cells=new[]{new ItemStack(v,6),new ItemStack(v,6)};t.Existing=3;
 Check(RebirthStashBatchPrice.Plan(p,t,new ItemValue(),out _,out var sold,out int total)&&total==210&&sold.Count==2,"Duplicate stacks exceeded shared trader limit");
 Check(RebirthBackpackSellStashContents.Written[0].count==0&&RebirthBackpackSellStashContents.Written[1].count==5&&RebirthBackpackSellStashContents.Cells[0].count==6,"Planning mutated source or remainder wrong");
+var pack=new ItemValue();
+Check(RebirthStashBatchPrice.Plan(p,t,pack,out var after,out int preparedTotal)&&after==pack&&preparedTotal==total,"List-free preparation changed the payout or pack");
+Check(RebirthBackpackSellStashContents.Written[0].count==0&&RebirthBackpackSellStashContents.Written[1].count==5&&RebirthBackpackSellStashContents.Cells[0].count==6,"List-free preparation changed the remainder or source");
 v.ItemClass.EconomicValue=0;Check(!RebirthStashBatchPrice.Plan(p,t,new ItemValue(),out _,out _,out _),"Zero payout emptied stash");
+Check(!RebirthStashBatchPrice.Plan(p,t,pack,out _,out _),"List-free preparation accepted zero payout");
 return "PASS: production batch price/planner: bonuses, override, quality, condition, bundles, rounding, shared buy limit, detached plan and zero-price refusal.";}}
 "@
 $production=[regex]::Replace((Get-Content (Join-Path $PSScriptRoot '../../Scripts/UI/RebirthStashBatchPrice.cs') -Raw),'(?m)^using [^;]+;\r?\n','')

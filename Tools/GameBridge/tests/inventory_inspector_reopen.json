@@ -1,0 +1,27 @@
+{
+  "name": "Inventory inspector opens native Modify before and after reopening Crafting",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Disposable Rebirth Purge, English XUi, all windows closed, a single modifiable Primitive Gloves stack in a fully visible backpack cell, and empty cursor. Use the current observed exact selectors if a fixture's localization differs. Repeat the inspector checks on Character and an open native crate, then after reconnect as a separate gate."},
+    {"expectItem": {"name": "armorPrimitiveGloves", "min": 1, "max": 1}},
+    {"key": {"name": "Tab"}},
+    {"expectWindowOpen": "crafting"},
+    {"click": {"item": "armorPrimitiveGloves", "window": "crafting"}},
+    {"expectUi": {"window": "crafting", "id": "rebirthCraftingItemContextName", "exactText": "Primitive Gloves"}},
+    {"click": {"text": "Modify", "window": "crafting"}},
+    {"expectWindowOpen": "assemble"},
+    {"screenshot": "inventory-inspector-first-modify"},
+    {"key": {"name": "Escape"}},
+    {"waitForWindowOpen": {"window": "crafting", "timeout": 4}},
+    {"key": {"name": "Escape"}},
+    {"key": {"name": "Tab"}},
+    {"expectWindowOpen": "crafting"},
+    {"click": {"item": "armorPrimitiveGloves", "window": "crafting"}},
+    {"expectUi": {"window": "crafting", "id": "rebirthCraftingItemContextName", "exactText": "Primitive Gloves"}},
+    {"click": {"text": "Modify", "window": "crafting"}},
+    {"expectWindowOpen": "assemble"},
+    {"screenshot": "inventory-inspector-reopened-modify"},
+    {"expectItem": {"name": "armorPrimitiveGloves", "min": 1, "max": 1}},
+    {"expectNoErrors": true}
+  ]
+}

@@ -146,9 +146,9 @@ public static class QuickStackWorkstationOutputService
                 int moved = before - transfer.count;
                 if (moved <= 0) continue;
 
-                ItemStack after = output.Clone();
-                after.count -= moved;
-                proposed[slot] = after.count > 0 ? after : ItemStack.Empty.Clone();
+                output.count -= moved;
+                if (output.count <= 0)
+                    proposed[slot] = ItemStack.Empty.Clone();
                 if (selectedLimits != null) selectedLimits[output.itemValue.type] = allowed - moved;
                 collectedHere += moved;
                 changedStacksHere++;

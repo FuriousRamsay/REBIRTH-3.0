@@ -1,0 +1,216 @@
+{
+  "name": "p17_block_repair_upgrade_preflight",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, no open modal, three exact reachable prepared blocks for this batch. Copy to temp and fill all @TOKENS@ from measured baseline. A1 and A2 are fully local native repair/upgrade. B is remote-shortfall repair or upgrade with all missing materials in one identified crate. Preserve actual reach, repair amount, upgrade threshold, tool slot, permissions and inventory state. Use a different material for local and remote controls if their local stock would overlap."
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@A1_TOOL_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@A1_X@",
+          "y": "@A1_Y@",
+          "z": "@A1_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@A1_TYPE@"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@A1_X@",
+          "y": "@A1_Y@",
+          "z": "@A1_Z@"
+        }
+      }
+    },
+    {
+      "markItem": "@A1_ITEM@"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": "@A1_HOLD_SECONDS@"
+        }
+      }
+    },
+    {
+      "wait": "@A1_SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@A1_ITEM@",
+        "op": "==",
+        "value": "@A1_CARRIED_DELTA@"
+      }
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@A1_X@",
+          "y": "@A1_Y@",
+          "z": "@A1_Z@"
+        }
+      }
+    },
+    {
+      "expectTarget": "@A1_AFTER_TYPE@"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@A2_TOOL_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@A2_X@",
+          "y": "@A2_Y@",
+          "z": "@A2_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@A2_TYPE@"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@A2_X@",
+          "y": "@A2_Y@",
+          "z": "@A2_Z@"
+        }
+      }
+    },
+    {
+      "markItem": "@A2_ITEM@"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": "@A2_HOLD_SECONDS@"
+        }
+      }
+    },
+    {
+      "wait": "@A2_SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@A2_ITEM@",
+        "op": "==",
+        "value": "@A2_CARRIED_DELTA@"
+      }
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@A2_X@",
+          "y": "@A2_Y@",
+          "z": "@A2_Z@"
+        }
+      }
+    },
+    {
+      "expectTarget": "@A2_AFTER_TYPE@"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@B_TOOL_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@B_X@",
+          "y": "@B_Y@",
+          "z": "@B_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@B_TYPE@"
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@B_X@",
+          "y": "@B_Y@",
+          "z": "@B_Z@"
+        }
+      }
+    },
+    {
+      "markItem": "@B_ITEM@"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": "@B_HOLD_SECONDS@"
+        }
+      }
+    },
+    {
+      "wait": "@B_SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@B_ITEM@",
+        "op": "==",
+        "value": "@B_CARRIED_DELTA@"
+      }
+    },
+    {
+      "action": {
+        "command": "blockdamage",
+        "args": {
+          "x": "@B_X@",
+          "y": "@B_Y@",
+          "z": "@B_Z@"
+        }
+      }
+    },
+    {
+      "expectTarget": "@B_AFTER_TYPE@"
+    },
+    {
+      "_note": "Compare retained blockdamage replies for actual exact repair and upgrade, and compare source crate snapshots for exact remote debit. Game Bridge item delta covers bag+belt only. Native tool wear and durable world/refund traces require the separate operator checks. Repeat an unavailable remote case and a mixed local/remote stock case with the same template. Apply no extra hits during protocol settlement."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

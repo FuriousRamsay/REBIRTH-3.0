@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -25,6 +25,8 @@ public static class RebirthOreSenseService
     private static readonly List<RebirthOreSenseEntry> VisualScratch=new List<RebirthOreSenseEntry>();
     private static readonly List<LineRenderer> Markers=new List<LineRenderer>();
     private static readonly Vector3[] CubePositions=new Vector3[16];
+    private static readonly Vector3i?[] MarkerPositions=new Vector3i?[MaxVisualMarkers];
+    private static readonly Dictionary<string,RebirthOreSenseType> OreTypes=new Dictionary<string,RebirthOreSenseType>(StringComparer.Ordinal);
     private static Material lineMaterial;
     private static bool installed,active,offsetsReady,hasCenter;
     private static Vector3i center;
@@ -84,9 +86,31 @@ public static class RebirthOreSenseService
 
     private static bool TryClassify(BlockValue bv,out RebirthOreSenseType type,out string name)
     {
-        type=RebirthOreSenseType.Unknown;name=string.Empty;if(bv.isair||bv.Block==null)return false;name=bv.Block.GetBlockName()??string.Empty;string n=name.ToLowerInvariant();
-        bool oreWord=n.Contains("ore")||n.Contains("oilshale")||n.Contains("oil_shale")||n.Contains("shale");if(!oreWord)return false;
-        if(n.Contains("iron"))type=RebirthOreSenseType.Iron;else if(n.Contains("lead"))type=RebirthOreSenseType.Lead;else if(n.Contains("coal"))type=RebirthOreSenseType.Coal;else if(n.Contains("nitrate")||n.Contains("potassium"))type=RebirthOreSenseType.Nitrate;else if(n.Contains("shale")||n.Contains("oil"))type=RebirthOreSenseType.OilShale;else return false;return true;
+        type=RebirthOreSenseType.Unknown;
+        name=string.Empty;
+        if(bv.isair)return false;
+        var block=bv.Block;
+        if(block==null)return false;
+
+        // Use the current native name, so a replacement block or name can
+        // never inherit the classification of the old definition.
+        name=block.GetBlockName()??string.Empty;
+        if(!OreTypes.TryGetValue(name,out type))
+        {
+            type=ClassifyName(name.ToLowerInvariant());
+            OreTypes.Add(name,type);
+        }
+        return type!=RebirthOreSenseType.Unknown;
+    }
+
+    private static RebirthOreSenseType ClassifyName(string name)
+    {
+        if(!name.Contains("ore")&&!name.Contains("oil_shale")&&!name.Contains("shale"))return RebirthOreSenseType.Unknown;
+        if(name.Contains("iron"))return RebirthOreSenseType.Iron;
+        if(name.Contains("lead"))return RebirthOreSenseType.Lead;
+        if(name.Contains("coal"))return RebirthOreSenseType.Coal;
+        if(name.Contains("nitrate")||name.Contains("potassium"))return RebirthOreSenseType.Nitrate;
+        return name.Contains("shale")||name.Contains("oil")?RebirthOreSenseType.OilShale:RebirthOreSenseType.Unknown;
     }
 
     private static void RefreshVisuals(World world,Vector3 playerPos,float range)
@@ -94,7 +118,22 @@ public static class RebirthOreSenseService
         VisualScratch.Clear();foreach(RebirthOreSenseEntry e in Cache.Values){e.Distance=(e.Position.ToVector3()+new Vector3(.5f,.5f,.5f)-playerPos).magnitude;if(e.Distance<=range)VisualScratch.Add(e);}VisualScratch.Sort((a,b)=>a.Distance.CompareTo(b.Distance));
         List<RebirthOreSenseEntry> entries=VisualScratch;
         nearestType=entries.Count>0?Friendly(entries[0].Type):string.Empty;nearestDistance=entries.Count>0?entries[0].Distance:0f;int count=Math.Min(MaxVisualMarkers,entries.Count);EnsureMarkerCount(count);
-        for(int i=0;i<Markers.Count;i++){LineRenderer lr=Markers[i];bool show=i<count;if(lr==null)continue;lr.enabled=show;if(!show)continue;RebirthOreSenseEntry e=entries[i];float edge=Mathf.Clamp01((range-e.Distance)/Mathf.Max(1f,range*.35f));Color c=ColorFor(e.Type);c.a=Mathf.Lerp(.10f,.82f,edge);lr.startColor=c;lr.endColor=c;SetCube(lr,e.Position.ToVector3()+new Vector3(.5f,.5f,.5f),.46f);}
+        for(int i=0;i<Markers.Count;i++)
+        {
+            LineRenderer marker=Markers[i];
+            if(marker==null)continue;
+            marker.enabled=i<count;
+            if(i>=count)continue;
+            RebirthOreSenseEntry entry=entries[i];
+            float edge=Mathf.Clamp01((range-entry.Distance)/Mathf.Max(1f,range*.35f));
+            Color color=ColorFor(entry.Type);
+            color.a=Mathf.Lerp(.10f,.82f,edge);
+            marker.startColor=color;
+            marker.endColor=color;
+            if(MarkerPositions[i]==entry.Position)continue;
+            SetCube(marker,entry.Position.ToVector3()+new Vector3(.5f,.5f,.5f),.46f);
+            MarkerPositions[i]=entry.Position;
+        }
         VisualScratch.Clear();
     }
     private static void EnsureMarkerCount(int count){while(Markers.Count<count){GameObject go=new GameObject("REBIRTH Ore Sense Marker");UnityEngine.Object.DontDestroyOnLoad(go);LineRenderer lr=go.AddComponent<LineRenderer>();lr.useWorldSpace=true;lr.positionCount=16;lr.startWidth=.025f;lr.endWidth=.025f;lr.numCapVertices=0;lr.numCornerVertices=0;if(lineMaterial==null){Shader s=Shader.Find("Hidden/Internal-Colored");if(s==null)s=Shader.Find("Sprites/Default");if(s!=null){lineMaterial=new Material(s);lineMaterial.hideFlags=HideFlags.HideAndDontSave;if(lineMaterial.HasProperty("_SrcBlend"))lineMaterial.SetInt("_SrcBlend",(int)UnityEngine.Rendering.BlendMode.SrcAlpha);if(lineMaterial.HasProperty("_DstBlend"))lineMaterial.SetInt("_DstBlend",(int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);if(lineMaterial.HasProperty("_Cull"))lineMaterial.SetInt("_Cull",(int)UnityEngine.Rendering.CullMode.Off);if(lineMaterial.HasProperty("_ZWrite"))lineMaterial.SetInt("_ZWrite",0);if(lineMaterial.HasProperty("_ZTest"))lineMaterial.SetInt("_ZTest",(int)UnityEngine.Rendering.CompareFunction.Always);}}if(lineMaterial!=null)lr.material=lineMaterial;Markers.Add(lr);}}
@@ -125,7 +164,7 @@ public static class RebirthOreSenseService
     private static void Deactivate(){active=false;hasCenter=false;Cache.Clear();scanIndex=0;nextScanCycle=0f;nearestType=string.Empty;nearestDistance=0f;ClearVisuals();}
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data){Deactivate();DestroyMarkers();}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){Deactivate();DestroyMarkers();}
-    private static void DestroyMarkers(){for(int i=0;i<Markers.Count;i++)if(Markers[i]!=null)UnityEngine.Object.Destroy(Markers[i].gameObject);Markers.Clear();if(lineMaterial!=null)UnityEngine.Object.Destroy(lineMaterial);lineMaterial=null;}
+    private static void DestroyMarkers(){for(int i=0;i<Markers.Count;i++)if(Markers[i]!=null)UnityEngine.Object.Destroy(Markers[i].gameObject);Markers.Clear();Array.Clear(MarkerPositions,0,MarkerPositions.Length);OreTypes.Clear();if(lineMaterial!=null)UnityEngine.Object.Destroy(lineMaterial);lineMaterial=null;}
 
     public static string BuildDebugReport(){StringBuilder b=new StringBuilder();b.Append("active=").Append(active).Append(" range=").Append(Range.ToString("0.0",CultureInfo.InvariantCulture)).Append(" cached=").Append(Cache.Count).Append(" scanIndex=").Append(scanIndex).Append('/').Append(Offsets.Count).Append(" passes=").Append(scanPasses).Append(" blocksScanned=").Append(blocksScanned).Append(" cacheHits=").Append(cacheHits).Append(" markers=").Append(Markers.Count).Append(" nearest=").Append(nearestType).Append('@').Append(nearestDistance.ToString("0.0",CultureInfo.InvariantCulture));return b.ToString();}
 }

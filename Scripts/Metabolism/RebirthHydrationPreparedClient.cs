@@ -16,7 +16,7 @@ internal static class RebirthHydrationPreparedClient
                 !RebirthHydrationOwnerCheckpoint.TryPersist(intent.Player,intent.Original,RebirthGearOwnerReceipt.Applying)||!intent.Current())return false;
             var packet=NetPackageManager.GetPackage<NetPackageRebirthHydrationPreparedRequest>().Setup(intent);
             if(!intent.Current()||!ReferenceEquals(game,GameManager.Instance)||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance))return false;
-            game.TriggerSendOfLocalPlayerDataFile(0f);
+            manager.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(intent.Player));
             if(!intent.Current()||!RebirthHydrationOwnerHold.Matches(intent.Player,intent.Original)||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance))return false;
             manager.SendToServer(packet);return intent.Current();
         }

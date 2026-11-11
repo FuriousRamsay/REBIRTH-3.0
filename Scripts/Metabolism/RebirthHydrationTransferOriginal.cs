@@ -12,6 +12,8 @@ internal sealed class RebirthHydrationTransferOriginal
     internal readonly string Owner,Creation,Digest,BagLocks;
     internal readonly int Deaths,Revision,OwnedBelt;
     internal readonly bool Equip;
+    private static readonly string[] AttributeNames =
+        {"version","operation","world","owner","creation","deaths","revision","ownedBelt","locks","action"};
     private readonly XElement image;
     private RebirthHydrationTransferOriginal(XElement value,Guid operation,Guid world,string creation,
         int deaths,int revision,int owned,bool equip)
@@ -44,10 +46,10 @@ internal sealed class RebirthHydrationTransferOriginal
         original=null;
         try
         {
-            string[] attributes={"version","operation","world","owner","creation","deaths","revision","ownedBelt","locks","action"};
-            if(node==null||node.Name!="hydrationTransfer"||node.Attributes().Count()!=attributes.Length||
-                attributes.Any(name=>node.Attribute(name)==null)||node.Elements().Count()!=1||node.Element("gearPlan")==null||
-                node.Nodes().Any(value=>!(value is XElement))||(string)node.Attribute("version")!="1"||
+            if(node==null||node.Name!="hydrationTransfer"||node.Attributes().Count()!=AttributeNames.Length||
+                AttributeNames.Any(name=>node.Attribute(name)==null)||
+                !(node.FirstNode is XElement gearPlan)||gearPlan.Name!="gearPlan"||gearPlan.NextNode!=null||
+                (string)node.Attribute("version")!="1"||
                 !Guid.TryParseExact((string)node.Attribute("operation"),"N",out var operation)||operation==Guid.Empty||
                 !Guid.TryParseExact((string)node.Attribute("world"),"N",out var world)||world==Guid.Empty||
                 !ValidOwner((string)node.Attribute("owner"))||
@@ -55,7 +57,7 @@ internal sealed class RebirthHydrationTransferOriginal
                 creation!=(string)node.Attribute("creation")||
                 !Number(node,"deaths",out var deaths)||!Number(node,"revision",out var revision)||revision==int.MaxValue||
                 !Number(node,"ownedBelt",out var owned)||owned<4||owned>18||
-                !RebirthGearInventoryPlanCodec.TryRead(node.Element("gearPlan"),out var plan))return false;
+                !RebirthGearInventoryPlanCodec.TryRead(gearPlan,out var plan))return false;
             string locks=(string)node.Attribute("locks"),action=(string)node.Attribute("action");
             if(plan.BagSlotsBefore!=plan.BagSlotsAfter||plan.BeltSlotsBefore!=plan.BeltSlotsAfter||
                 owned>plan.BeltSlotsBefore||plan.Recovery.Count!=0||plan.Changes.Count!=1||

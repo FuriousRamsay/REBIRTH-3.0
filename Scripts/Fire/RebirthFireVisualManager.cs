@@ -411,21 +411,13 @@ public static class RebirthFireVisualManager
         int baselineRevision = pendingSnapshotRevision;
         ulong committedId = pendingSnapshotId;
         List<PendingDelta> deltas = new List<PendingDelta>(PendingSnapshotDeltas);
-        ReplaceAuthoritativeProjection(baselineRevision, PendingSnapshotActiveAsStates(), PendingSnapshotSmoke);
+        ReplaceAuthoritativeProjection(baselineRevision, null, PendingSnapshotSmoke, PendingSnapshotActive);
         lastCommittedSnapshotId = committedId;
         ClearPendingSnapshot(false);
         deltas.Sort(delegate(PendingDelta a, PendingDelta b) { int order=a.Revision.CompareTo(b.Revision); return order!=0?order:a.ArrivalOrder.CompareTo(b.ArrivalOrder); });
         for (int i = 0; i < deltas.Count; i++)
             if (deltas[i].Revision > baselineRevision) ApplyDeltaImmediate(deltas[i].Revision, deltas[i].Entry);
         nextReconcileTime = 0f;
-    }
-
-    private static List<RebirthFireState> PendingSnapshotActiveAsStates()
-    {
-        List<RebirthFireState> states = new List<RebirthFireState>(PendingSnapshotActive.Count);
-        foreach (Vector3i position in PendingSnapshotActive)
-            states.Add(new RebirthFireState { Position = position });
-        return states;
     }
 
     private static void BeginPendingSnapshot(ulong worldEpoch, ulong snapshotId, int revision, ushort chunkCount, int totalFires, int totalCooldowns)
@@ -481,7 +473,8 @@ public static class RebirthFireVisualManager
     private static void ReplaceAuthoritativeProjection(
         int revision,
         IList<RebirthFireState> fires,
-        IDictionary<Vector3i, ulong> cooldowns)
+        IDictionary<Vector3i, ulong> cooldowns,
+        HashSet<Vector3i> packetPositions = null)
     {
         Active.Clear();
         Smoke.Clear();
@@ -490,6 +483,8 @@ public static class RebirthFireVisualManager
         NormalCoverage.Clear();
         if (fires != null)
             for (int i = 0; i < fires.Count; i++) Active.Add(fires[i].Position);
+        else if (packetPositions != null)
+            foreach (Vector3i position in packetPositions) Active.Add(position);
         if (cooldowns != null)
             foreach (KeyValuePair<Vector3i, ulong> pair in cooldowns) Smoke[pair.Key] = pair.Value;
         lastRevision = revision;
@@ -578,7 +573,7 @@ public static class RebirthFireVisualManager
             ReconcileLights();
 
         EntityPlayerLocal player = world.GetPrimaryPlayer();
-        if (player != null)
+        if (player != null && RenderedFire.Count != 0)
             CheckLocalPlayerFireContact(player);
 
         if (Time.realtimeSinceStartup < nextReconcileTime)

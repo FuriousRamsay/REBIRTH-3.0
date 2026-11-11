@@ -10,12 +10,36 @@ using UnityEngine;
 /// </summary>
 public static class RebirthConditionResolver
 {
+    internal readonly struct NativeInputs
+    {
+        internal readonly bool HasStats,SeriousIllness;
+        internal readonly float Hydration,Nutrition,HealthBlockage,BaseHealth,CoreTemperature;
+
+        internal NativeInputs(EntityPlayer player)
+        {
+            var stats=player?.Stats;
+            HasStats=stats!=null;
+            var water=stats?.Water;
+            var food=stats?.Food;
+            Hydration=Percent(water?.Value??100f,water?.ModifiedMax??100f);
+            Nutrition=Percent(food?.Value??100f,food?.ModifiedMax??100f);
+            HealthBlockage=HasStats?Mathf.Max(0f,EffectManager.GetValue(PassiveEffects.HealthMaxBlockage,_entity:player)):0f;
+            BaseHealth=stats?.Health!=null?Mathf.Max(1f,stats.Health.Max):100f;
+            CoreTemperature=HasStats?player.PlayerStats.CoreTemp:0f;
+            SeriousIllness=RebirthConditionTraitModifierService.IsSeriousIllness(player);
+        }
+    }
+
     public static RebirthConditionResolvedSnapshot Resolve(RebirthWorldCharacterRecord record)
     {
         return Resolve(null, record, null);
     }
 
     public static RebirthConditionResolvedSnapshot Resolve(EntityPlayer player, RebirthWorldCharacterRecord record, RebirthMetabolismState metabolism)
+        => Resolve(player, record, metabolism, new NativeInputs(player));
+
+    internal static RebirthConditionResolvedSnapshot Resolve(EntityPlayer player, RebirthWorldCharacterRecord record,
+        RebirthMetabolismState metabolism, in NativeInputs inputs)
     {
         RebirthConditionResolvedSnapshot result = new RebirthConditionResolvedSnapshot();
         float neutral = RebirthConditionRuntimeConfig.MoodNeutral;
@@ -31,18 +55,17 @@ public static class RebirthConditionResolver
 
         // Apply authored Trait runtime components before condition causes so category multipliers
         // such as Pain Tolerant and Heat Tolerant can scale the matching cause exactly once.
-        RebirthConditionTraitModifierService.ApplyRuntimeComponents(player, metabolism, record, result);
+        RebirthConditionTraitModifierService.ApplyRuntimeComponents(player, metabolism, record, result,
+            inputs.HealthBlockage > 0.01f, inputs.SeriousIllness);
         float directTraitMoodDelta = RebirthConditionTraitModifierService.GetDirectMoodTargetDelta(player, record);
         AddMoodContributor(result, "trait_mood", "trait", "runtime_components", directTraitMoodDelta, ref totalMoodDelta);
         float supportMoodDelta = RebirthTraitSupportService.ApplyConditionEffects(player, metabolism, record, result);
         AddMoodContributor(result, "trait_support", "support", "support_profiles", supportMoodDelta, ref totalMoodDelta);
 
-        if (player != null && player.Stats != null)
+        if (inputs.HasStats)
         {
-            float hydrationPercent = Percent(player.Stats.Water != null ? player.Stats.Water.Value : 100f,
-                player.Stats.Water != null ? player.Stats.Water.ModifiedMax : 100f);
-            float nutritionPercent = Percent(player.Stats.Food != null ? player.Stats.Food.Value : 100f,
-                player.Stats.Food != null ? player.Stats.Food.ModifiedMax : 100f);
+            float hydrationPercent = inputs.Hydration;
+            float nutritionPercent = inputs.Nutrition;
 
             if (hydrationPercent < 0.25f)
             {
@@ -68,20 +91,18 @@ public static class RebirthConditionResolver
                 }
             }
 
-            float nativeHealthBlockage = Mathf.Max(0f, EffectManager.GetValue(PassiveEffects.HealthMaxBlockage, _entity: player));
-            if (nativeHealthBlockage > 0.01f)
+            if (inputs.HealthBlockage > 0.01f)
             {
-                float baseMax = player.Stats.Health != null ? Mathf.Max(1f, player.Stats.Health.Max) : 100f;
-                float severity = Mathf.Clamp01(nativeHealthBlockage / Mathf.Max(20f, baseMax * 0.25f));
+                float severity = Mathf.Clamp01(inputs.HealthBlockage / Mathf.Max(20f, inputs.BaseHealth * 0.25f));
                 AddMoodContributor(result, "injury_pain", "injury", "native_health_blockage",
                     Mathf.Lerp(-5f, -15f, severity) * result.InjuryMoodMultiplier, ref totalMoodDelta);
             }
 
-            if (RebirthConditionTraitModifierService.IsSeriousIllness(player))
+            if (inputs.SeriousIllness)
                 AddMoodContributor(result, "serious_illness", "illness", "buff",
                     -12f, ref totalMoodDelta);
 
-            float core = player.PlayerStats.CoreTemp;
+            float core = inputs.CoreTemperature;
             if (core >= 75f)
             {
                 float severity = Mathf.Clamp01((core - 75f) / 25f);

@@ -24,6 +24,7 @@ internal static partial class RebirthRepairOriginalCorrection
     {
         internal Guid Operation;internal string World,Owner,Creation,Input,Expected=string.Empty,Before=string.Empty,After=string.Empty;
         internal string Payment=string.Empty,PaidInput=string.Empty,PaymentProof=string.Empty,CancelInput=string.Empty;
+        internal XElement CancelOverflow;
         internal int Amount;internal bool Admitted,Cancelled,CancelConfirmed,CancelReturned,OutputInvoking,NativeDelivered;
         internal int Deaths;internal bool Published,BaseOnly,BaseOnlyConfirmed;
     }
@@ -35,7 +36,8 @@ internal static partial class RebirthRepairOriginalCorrection
     private static readonly Dictionary<XUiC_RecipeStack,Guid> Staged=new Dictionary<XUiC_RecipeStack,Guid>();
     private static readonly Dictionary<XUiC_RecipeStack,Client> Cards=new Dictionary<XUiC_RecipeStack,Client>();
     private sealed class Client
-    {internal Receipt Receipt,PendingOutcome;internal ItemActionEntryRepair Entry;internal bool NativePaid,PaidAccepted;internal string PendingExpected;internal World World;internal string Directory;internal EntityPlayerLocal Player;internal float Next;}
+    {internal Receipt Receipt,PendingOutcome;internal ItemActionEntryRepair Entry;internal bool NativePaid,PaidAccepted;internal string PendingExpected;internal World World;internal string Directory;internal EntityPlayerLocal Player;internal float Next;
+        internal XUiC_RecipeStack NativeCard;internal ItemValue NativeQueueItem;internal Recipe NativeRecipe;}
     private sealed class Upload
     {internal World World;internal EntityPlayer Player;internal ClientInfo Sender;internal PlayerDataFile Source;internal MemoryStream BagSource,BeltSource,EquipmentSource;internal ItemStack CursorSource;internal string Creation,Directory;internal int Deaths;internal ItemStack[] Bag,Belt,Equipment;internal string[] Queue,QueueOperations,NativeQueueItems;internal string CursorOperation;internal bool HeadFrozen;internal string BagHash,BeltHash,EquipmentHash,CursorImage;}
     
@@ -137,7 +139,7 @@ internal static partial class RebirthRepairOriginalCorrection
             return output.UseTimes<input.UseTimes&&Image(expected)==Image(output);
         }catch{return false;}
     }
-    private static string Encode(Receipt r)=>new XElement("repairOriginal",new XAttribute("version",1),new XAttribute("operation",r.Operation.ToString("N")),new XAttribute("world",r.World),new XAttribute("owner",r.Owner),new XAttribute("creation",r.Creation),new XAttribute("deaths",r.Deaths),new XAttribute("amount",r.Amount),new XAttribute("admitted",r.Admitted),new XAttribute("cancelled",r.Cancelled),new XAttribute("cancelConfirmed",r.CancelConfirmed),new XAttribute("published",r.Published),r.BaseOnly?new XAttribute("baseOnly",true):null,r.BaseOnlyConfirmed?new XAttribute("baseOnlyConfirmed",true):null,r.CancelReturned?new XAttribute("cancelReturned",true):null,new XAttribute("invoking",r.OutputInvoking),new XAttribute("nativeDelivered",r.NativeDelivered),new XElement("input",r.Input),new XElement("expected",r.Expected),new XElement("before",r.Before),new XElement("after",r.After),r.Payment.Length==0?null:new XElement("payment",r.Payment),r.PaidInput.Length==0?null:new XElement("paidInput",r.PaidInput),r.PaymentProof.Length==0?null:new XElement("paymentProof",r.PaymentProof),r.CancelInput.Length==0?null:new XElement("cancelInput",r.CancelInput)).ToString(SaveOptions.DisableFormatting);
+    private static string Encode(Receipt r)=>new XElement("repairOriginal",new XAttribute("version",1),new XAttribute("operation",r.Operation.ToString("N")),new XAttribute("world",r.World),new XAttribute("owner",r.Owner),new XAttribute("creation",r.Creation),new XAttribute("deaths",r.Deaths),new XAttribute("amount",r.Amount),new XAttribute("admitted",r.Admitted),new XAttribute("cancelled",r.Cancelled),new XAttribute("cancelConfirmed",r.CancelConfirmed),new XAttribute("published",r.Published),r.BaseOnly?new XAttribute("baseOnly",true):null,r.BaseOnlyConfirmed?new XAttribute("baseOnlyConfirmed",true):null,r.CancelReturned?new XAttribute("cancelReturned",true):null,new XAttribute("invoking",r.OutputInvoking),new XAttribute("nativeDelivered",r.NativeDelivered),new XElement("input",r.Input),new XElement("expected",r.Expected),new XElement("before",r.Before),new XElement("after",r.After),r.Payment.Length==0?null:new XElement("payment",r.Payment),r.PaidInput.Length==0?null:new XElement("paidInput",r.PaidInput),r.PaymentProof.Length==0?null:new XElement("paymentProof",r.PaymentProof),r.CancelInput.Length==0?null:new XElement("cancelInput",r.CancelInput),r.CancelOverflow).ToString(SaveOptions.DisableFormatting);
     private static Receipt Decode(string image)
     {
         if(image==null||image.Length>MaximumImage*8)throw new InvalidDataException();XElement e;
@@ -145,6 +147,7 @@ internal static partial class RebirthRepairOriginalCorrection
         if(e.Name!="repairOriginal"||(int?)e.Attribute("version")!=1)throw new InvalidDataException();
         var r=new Receipt{Operation=Guid.ParseExact((string)e.Attribute("operation"),"N"),World=(string)e.Attribute("world"),Owner=(string)e.Attribute("owner"),Creation=(string)e.Attribute("creation"),Deaths=(int)e.Attribute("deaths"),Amount=(int)e.Attribute("amount"),Admitted=(bool)e.Attribute("admitted"),Cancelled=(bool)e.Attribute("cancelled"),CancelConfirmed=(bool)e.Attribute("cancelConfirmed"),Published=(bool)e.Attribute("published"),BaseOnly=(bool?)e.Attribute("baseOnly")??false,BaseOnlyConfirmed=(bool?)e.Attribute("baseOnlyConfirmed")??false,Input=(string)e.Element("input"),Expected=(string)e.Element("expected"),OutputInvoking=(bool)e.Attribute("invoking"),NativeDelivered=(bool)e.Attribute("nativeDelivered"),Before=(string)e.Element("before"),After=(string)e.Element("after"),Payment=(string)e.Element("payment")??string.Empty,PaidInput=(string)e.Element("paidInput")??string.Empty,PaymentProof=(string)e.Element("paymentProof")??string.Empty,CancelInput=(string)e.Element("cancelInput")??string.Empty};
         r.CancelReturned=(bool?)e.Attribute("cancelReturned")??false;
+        r.CancelOverflow=e.Element("cancelOverflow");
         if(r.Operation==Guid.Empty||!Guid.TryParse(r.World,out _)||string.IsNullOrEmpty(r.Owner)||r.Owner.Length>512||string.IsNullOrEmpty(r.Creation)||r.Creation.Length>512||r.Deaths<0||r.Amount<=0||r.Amount>ushort.MaxValue||r.CancelReturned&&!r.Cancelled||Encode(r)!=image)throw new InvalidDataException();
         var input=ReadItem(r.Input);if(input.UseTimes<=0||!SameOperation(input,r.Operation,OriginalKey)||!input.TryGetMetadata(WorldKey,out string world)||world!=r.World||!input.TryGetMetadata(CreationKey,out string creation)||creation!=r.Creation||!input.TryGetMetadata(OwnerKey,out string owner)||owner!=r.Owner||!input.TryGetMetadata(DeathsKey,out int deaths)||deaths!=r.Deaths)throw new InvalidDataException();
         if(r.Payment.Length==0)
@@ -160,7 +163,7 @@ internal static partial class RebirthRepairOriginalCorrection
             if(Image(bound)!=r.Input)throw new InvalidDataException();
             if(!ValidCancellationInput(r))throw new InvalidDataException();
         }
-        if(r.Expected.Length!=0&&!ValidNativeOutput(r,ReadItem(r.Expected))||r.BaseOnly&&(r.Published||r.Cancelled||r.OutputInvoking||!r.NativeDelivered||!r.Admitted||(r.Payment.Length==0?r.PaymentProof.Length!=0||r.PaidInput.Length!=0:r.PaymentProof.Length!=64)||r.Before.Length==0||r.After.Length==0||!SameExceptWear(ReadItem(r.Before),ReadItem(r.Expected))||!TryMergeBaseOnly(ReadItem(r.Before),r,out _))||r.BaseOnlyConfirmed&&!r.BaseOnly||!r.BaseOnly&&(r.Before.Length!=0&&r.Before!=r.Expected||r.Before.Length!=0&&!ValidNativeOutput(r,ReadItem(r.Before))||r.After.Length!=0&&(r.Before.Length==0||!TryMerge(ReadItem(r.Before),r,out _)))||r.Published&&r.After.Length==0||r.CancelConfirmed&&!r.Cancelled||(r.OutputInvoking||r.NativeDelivered)&&r.Before.Length==0||r.OutputInvoking&&r.NativeDelivered)throw new InvalidDataException();return r;
+        if(r.CancelOverflow!=null&&!ValidCancelOverflow(r)||r.Expected.Length!=0&&!ValidNativeOutput(r,ReadItem(r.Expected))||r.BaseOnly&&(r.Published||r.Cancelled||r.OutputInvoking||!r.NativeDelivered||!r.Admitted||(r.Payment.Length==0?r.PaymentProof.Length!=0||r.PaidInput.Length!=0:r.PaymentProof.Length!=64)||r.Before.Length==0||r.After.Length==0||!SameExceptWear(ReadItem(r.Before),ReadItem(r.Expected))||!TryMergeBaseOnly(ReadItem(r.Before),r,out _))||r.BaseOnlyConfirmed&&!r.BaseOnly||!r.BaseOnly&&(r.Before.Length!=0&&r.Before!=r.Expected||r.Before.Length!=0&&!ValidNativeOutput(r,ReadItem(r.Before))||r.After.Length!=0&&(r.Before.Length==0||!TryMerge(ReadItem(r.Before),r,out _)))||r.Published&&r.After.Length==0||r.CancelConfirmed&&!r.Cancelled||(r.OutputInvoking||r.NativeDelivered)&&r.Before.Length==0||r.OutputInvoking&&r.NativeDelivered)throw new InvalidDataException();return r;
     }
     internal static bool ValidCancellationInput(Receipt r)
     {
@@ -193,12 +196,17 @@ internal static partial class RebirthRepairOriginalCorrection
         catch{return false;}
     }
     private static void WorldScope(World world)
-    {if(!ThreadManager.IsMainThread()||world==null||!ReferenceEquals(GameManager.Instance?.World,world))return;string directory=GameIO.GetSaveGameDir();if(ReferenceEquals(activeWorld,world)&&activeDirectory==directory)return;activeWorld=world;activeDirectory=directory;Cards.Clear();Staged.Clear();PreparedRemote.Clear();activation=null;Clients.Clear();Uploads.Clear();ownedCandidates.Clear();nextScan=0;}
-    private static bool Current(Client c)=>ReferenceEquals(GameManager.Instance?.World,c.World)&&GameIO.GetSaveGameDir()==c.Directory&&ReferenceEquals(c.World.GetPrimaryPlayer(),c.Player)&&ReferenceEquals(c.Player.world,c.World)&&ReferenceEquals(c.World.GetEntity(c.Player.entityId),c.Player)&&c.Player.IsSpawned()&&!c.Player.IsDead()&&c.Player.Died==c.Receipt.Deaths&&c.World.worldState?.Guid==c.Receipt.World&&RebirthCamperCharacterAccess.CurrentCreation(c.Player)==c.Receipt.Creation&&TryRepairIdentity(c.Player,out var identity)&&identity.CanonicalId==c.Receipt.Owner;
-    private static bool SamePhysicalActor(Client c)=>ReferenceEquals(GameManager.Instance?.World,c.World)&&GameIO.GetSaveGameDir()==c.Directory&&ReferenceEquals(c.World.GetPrimaryPlayer(),c.Player)&&ReferenceEquals(c.World.GetEntity(c.Player.entityId),c.Player)&&!c.Player.IsDead()&&c.Player.Died>=c.Receipt.Deaths&&c.World.worldState?.Guid==c.Receipt.World&&RebirthCamperCharacterAccess.CurrentCreation(c.Player)==c.Receipt.Creation&&TryRepairIdentity(c.Player,out var identity)&&identity.CanonicalId==c.Receipt.Owner;
+    {if(!ThreadManager.IsMainThread()||world==null||!ReferenceEquals(GameManager.Instance?.World,world))return;string directory=GameIO.GetSaveGameDir();if(ReferenceEquals(activeWorld,world)&&activeDirectory==directory)return;activeWorld=world;activeDirectory=directory;Cards.Clear();Staged.Clear();PreparedRemote.Clear();activation=null;Clients.Clear();Uploads.Clear();ownedCandidates.Clear();ClearCancelDropWatches();nextScan=0;}
+    private static bool Current(Client c)=>ReferenceEquals(GameManager.Instance?.World,c.World)&&GameIO.GetSaveGameDir()==c.Directory&&ReferenceEquals(c.World.GetPrimaryPlayer(),c.Player)&&ReferenceEquals(c.Player.world,c.World)&&ReferenceEquals(c.World.GetEntity(c.Player.entityId),c.Player)&&c.Player.IsSpawned()&&!c.Player.IsDead()&&c.Player.Died==c.Receipt.Deaths&&RebirthRemoteResourceNetworkScope.ProtocolWorld(c.World)==c.Receipt.World&&RebirthCamperCharacterAccess.CurrentCreation(c.Player)==c.Receipt.Creation&&TryRepairIdentity(c.Player,out var identity)&&identity.CanonicalId==c.Receipt.Owner;
+    private static bool SamePhysicalActor(Client c)=>ReferenceEquals(GameManager.Instance?.World,c.World)&&GameIO.GetSaveGameDir()==c.Directory&&ReferenceEquals(c.World.GetPrimaryPlayer(),c.Player)&&ReferenceEquals(c.World.GetEntity(c.Player.entityId),c.Player)&&!c.Player.IsDead()&&c.Player.Died>=c.Receipt.Deaths&&RebirthRemoteResourceNetworkScope.ProtocolWorld(c.World)==c.Receipt.World&&RebirthCamperCharacterAccess.CurrentCreation(c.Player)==c.Receipt.Creation&&TryRepairIdentity(c.Player,out var identity)&&identity.CanonicalId==c.Receipt.Owner;
     private static string Preview(Receipt r){var item=ReadItem(r.Input);ItemAction.HandleDegradation(item,null);item.UseTimes=Math.Max(0f,item.UseTimes-r.Amount);return Image(item);}
     private static int NativeKitCount(EntityPlayerLocal player,int type)
-    {return checked(player.bag.ItemGrid.items.Concat(player.inventory.ItemGrid.items).Where(s=>s!=null&&!s.IsEmpty()&&s.itemValue.type==type).Sum(s=>s.count));}
+    {
+        int count=0;
+        foreach(var stack in player.bag.ItemGrid.items.Concat(player.inventory.ItemGrid.items))
+            if(stack!=null&&!stack.IsEmpty()&&stack.itemValue.type==type)count=checked(count+stack.count);
+        return count;
+    }
     // Pure pre-source-debit support check. No operation ID, marker, prepared
     // object, journal or native effect is created by this method.
     internal static bool CanPrepareRemoteOriginal(ItemActionEntryRepair entry,int kitType,int totalKits)
@@ -229,12 +237,12 @@ internal static partial class RebirthRepairOriginalCorrection
                 {
                     if(new FileInfo(path).Length>MaximumImage*12L)return false;
                     var prior=Decode(ReadRepairText(path));
-                    terminal=prior.Owner==owner.CanonicalId&&prior.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&MatchesPriorTerminal(item,prior,player.world.worldState.Guid);
+                    terminal=prior.Owner==owner.CanonicalId&&prior.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&MatchesPriorTerminal(item,prior,RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world));
                 }
                 if(!terminal&&(!RebirthRemoteResourceRepairProtocol.TryGetAuthenticatedPriorRepairTerminal(entry,image,out var authenticatedPrior,out string proof)||authenticatedPrior!=priorId||proof?.Length!=64||proof.Any(ch=>!(ch>='0'&&ch<='9'||ch>='a'&&ch<='f'))))return false;
                 }
             }
-            return SupportsOriginalMetadata(item,owner.CanonicalId,RebirthCamperCharacterAccess.CurrentCreation(player),player.world.worldState.Guid)&&TryCalculateNativeAmount(player,item,kit,totalKits,out _);
+            return SupportsOriginalMetadata(item,owner.CanonicalId,RebirthCamperCharacterAccess.CurrentCreation(player),RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world))&&TryCalculateNativeAmount(player,item,kit,totalKits,out _);
         }catch{return false;}
     }
     // Host terminal lookup is not current item custody authority: C must bind
@@ -350,11 +358,13 @@ internal static partial class RebirthRepairOriginalCorrection
             int before=NativeKitCount(owner,kit.Id);int needed=Convert.ToInt32(Math.Ceiling((float)Mathf.CeilToInt(item.UseTimes)/(float)kit.RepairAmount.Value));
             // Match the native original's requested quantity only. Projected
             // availability is NEVER evidence that any material was paid.
-            int total=Math.Min(controller.xui.PlayerInventory.GetItemCount(new ItemValue(kit.Id)),needed);string paidInput=Image(item),paymentText=string.Empty;int local=total;
-            if(RebirthRemoteResourceOwnerAction.TryCaptureRepairPaymentIntent(entry,paidInput,total,out var payment))
-            {if(payment.KitType!=kit.Id||payment.LocalKits>before||payment.TotalKits!=total||!RebirthRemoteResourceOwnerAction.TryDecodeRepairPaymentIntent(payment.Encode(),out _))return prior;paymentText=payment.Encode();local=payment.LocalKits;}
-            else if(!RebirthSurvivorMode.IsEnabledForCurrentWorld()||total!=Math.Min(before,needed))return prior;
-            activation=new Activation{Entry=entry,Player=owner,Controller=itemController,Equipment=equipment,KitType=kit.Id,BeforeKits=before,ExpectedKits=local,TotalKits=total,NativeInput=paidInput,Payment=paymentText,PaidInput=paymentText.Length==0?string.Empty:paidInput};
+            int total=Math.Min(controller.xui.PlayerInventory.GetItemCount(new ItemValue(kit.Id)),needed);
+            string paidInput=Image(item);
+            if(!RebirthRemoteResourceOwnerAction.TryCaptureRepairPaymentIntent(entry,paidInput,total,out var payment)||
+                payment.KitType!=kit.Id||payment.LocalKits>before||payment.TotalKits!=total)return prior;
+            string paymentText=payment.Encode();
+            if(!RebirthRemoteResourceOwnerAction.TryDecodeRepairPaymentIntent(paymentText,out _))return prior;
+            activation=new Activation{Entry=entry,Player=owner,Controller=itemController,Equipment=equipment,KitType=kit.Id,BeforeKits=before,ExpectedKits=payment.LocalKits,TotalKits=total,NativeInput=paidInput,Payment=paymentText,PaidInput=paidInput};
         }catch{activation=null;}return prior;
     }
     internal static bool ShouldAdjustNativeRepairQueue(EntityPlayer player,ItemValue item)
@@ -394,17 +404,22 @@ internal static partial class RebirthRepairOriginalCorrection
             var p=card?.xui?.playerUI?.entityPlayer;if(p==null||item==null||activation==null||!ReferenceEquals(activation.Player,p)||card.IsCrafting||card.originalItem!=null&&!card.originalItem.IsEmpty()||!TryRepairIdentity(p,out var identity))return true;
             if(amount<=0||amount>ushort.MaxValue)return !remote;
             WorldScope((World)p.world);if(Cards.Values.Count(Current)>=16&&!Cards.ContainsKey(card))return !remote;
-            Guid op=Guid.NewGuid();Prepared prepared=null;var staged=ReadItem(Image(item));
+            Guid op;
+            Prepared prepared=null;
+            string inputImage=Image(item);
+            var staged=ReadItem(inputImage);
             if(activation.Payment.Length!=0)
             {
-                if(!PreparedRemote.TryGetValue(activation.Entry,out prepared)||!ReferenceEquals(prepared.Player,p)||!ReferenceEquals(prepared.World,p.world)||prepared.Directory!=GameIO.GetSaveGameDir()||!MatchesPreparedOriginal(prepared.Receipt,activation.Payment,activation.PaidInput,Image(item),amount)||!RebirthRemoteResourceOwnerAction.TryStampRepairQueueOriginal(staged,out var marked))return false;
+                if(!PreparedRemote.TryGetValue(activation.Entry,out prepared)||!ReferenceEquals(prepared.Player,p)||!ReferenceEquals(prepared.World,p.world)||prepared.Directory!=GameIO.GetSaveGameDir()||!MatchesPreparedOriginal(prepared.Receipt,activation.Payment,activation.PaidInput,inputImage,amount)||!RebirthRemoteResourceOwnerAction.TryStampRepairQueueOriginal(staged,out var marked))return false;
                 op=prepared.Receipt.Operation;staged=ReadItem(Image(marked));
             }
+            else op=Guid.NewGuid();
             RebirthItemProvenanceAdapter.EnsureDurabilityOriginalMaxUseTimes(staged,staged.MaxUseTimes);
-            staged.SetMetadata(OriginalKey,op.ToString("N"));staged.SetMetadata(WorldKey,p.world.worldState.Guid);staged.SetMetadata(CreationKey,RebirthCamperCharacterAccess.CurrentCreation(p));staged.SetMetadata(OwnerKey,identity.CanonicalId);staged.SetMetadata(DeathsKey,p.Died);
+            staged.SetMetadata(OriginalKey,op.ToString("N"));staged.SetMetadata(WorldKey,RebirthRemoteResourceNetworkScope.ProtocolWorld(p.world));staged.SetMetadata(CreationKey,RebirthCamperCharacterAccess.CurrentCreation(p));staged.SetMetadata(OwnerKey,identity.CanonicalId);staged.SetMetadata(DeathsKey,p.Died);
             staged.SetMetadata(PaidKitTypeKey,activation.KitType);staged.SetMetadata(PaidKitCountKey,activation.TotalKits);
-            Decode(Encode(new Receipt{Operation=op,World=p.world.worldState.Guid,Owner=identity.CanonicalId,Creation=RebirthCamperCharacterAccess.CurrentCreation(p),Deaths=p.Died,Amount=amount,Input=Image(staged),Payment=activation.Payment,PaidInput=activation.PaidInput}));
-            if(prepared!=null&&Image(staged)!=prepared.Receipt.Input)return false;
+            string stagedImage=Image(staged);
+            Decode(Encode(new Receipt{Operation=op,World=RebirthRemoteResourceNetworkScope.ProtocolWorld(p.world),Owner=identity.CanonicalId,Creation=RebirthCamperCharacterAccess.CurrentCreation(p),Deaths=p.Died,Amount=amount,Input=stagedImage,Payment=activation.Payment,PaidInput=activation.PaidInput}));
+            if(prepared!=null&&stagedImage!=prepared.Receipt.Input)return false;
             // Unsupported original images leave the native action unmarked.
             if(activation.Payment.Length!=0)foreach(string key in new[]{RebirthRemoteResourceOwnerAction.Marker,RebirthRemoteResourceOwnerAction.BindingMarker}){staged.TryGetMetadata(key,out string value);item.SetMetadata(key,value);}
             if(staged.TryGetMetadata("RebirthDurabilityOriginalMaxUseTimes",out int cap))item.SetMetadata("RebirthDurabilityOriginalMaxUseTimes",cap);
@@ -417,20 +432,29 @@ internal static partial class RebirthRepairOriginalCorrection
     {
         return prepared!=null&&prepared.Operation!=Guid.Empty&&prepared.Payment.Length!=0&&prepared.Expected.Length!=0&&prepared.Payment==payment&&prepared.PaidInput==paidInput&&actualInput==paidInput&&amount>0&&prepared.Amount==amount;
     }
+    private static bool HasIndependentPayment(Receipt receipt)
+        =>receipt.Admitted&&receipt.Payment.Length!=0&&receipt.PaymentProof.Length==64;
+
     internal static bool TryBindNativeRefund(XUiC_RecipeStack card,Receipt receipt)
     {
         try
         {
-            if(card?.recipe==null||card.recipeCount!=1||receipt==null||Image(card.originalItem)!=receipt.Input)return false;
-            var original=ReadItem(receipt.Input);
-            if(!original.TryGetMetadata(PaidKitTypeKey,out int type)||!original.TryGetMetadata(PaidKitCountKey,out int count)||count<=0)return false;
-            var tools=original.ItemClass.RepairTools;var kit=tools==null||tools.Length==0?null:ItemClass.GetItemClass(tools[0].Value);
-            if(kit==null||kit.Id!=type||kit.RepairAmount.Value<=0||count>Math.Ceiling((float)Mathf.CeilToInt(original.UseTimes)/kit.RepairAmount.Value))return false;
-            if(receipt.Payment.Length!=0&&(!RebirthRemoteResourceOwnerAction.TryDecodeRepairPaymentIntent(receipt.Payment,out var payment)||payment.KitType!=type||payment.TotalKits!=count))return false;
-            // Native OnActivated paid fresh kit ItemValues. Keep the native
-            // cancellation delivery/drop path, changing only its exact quantity.
-            card.recipe.ingredients.Clear();card.recipe.ingredients.Add(new ItemStack(new ItemValue(type),count));return true;
+            if(!TryPrepareNativeRefund(card,receipt,out var recipe,out var refund))return false;
+            recipe.ingredients.Clear();recipe.ingredients.Add(refund);return true;
         }catch{return false;}
+    }
+    private static bool TryPrepareNativeRefund(XUiC_RecipeStack card,Receipt receipt,out Recipe recipe,out ItemStack refund)
+    {
+        recipe=card?.recipe;refund=null;
+        if(recipe?.ingredients==null||card.recipeCount!=1||receipt==null||Image(card.originalItem)!=receipt.Input)return false;
+        var original=ReadItem(receipt.Input);
+        if(!original.TryGetMetadata(PaidKitTypeKey,out int type)||!original.TryGetMetadata(PaidKitCountKey,out int count)||count<=0)return false;
+        var tools=original.ItemClass.RepairTools;var kit=tools==null||tools.Length==0?null:ItemClass.GetItemClass(tools[0].Value);
+        if(kit==null||kit.Id!=type||kit.RepairAmount.Value<=0||count>Math.Ceiling((float)Mathf.CeilToInt(original.UseTimes)/kit.RepairAmount.Value))return false;
+        if(receipt.Payment.Length!=0&&(!RebirthRemoteResourceOwnerAction.TryDecodeRepairPaymentIntent(receipt.Payment,out var payment)||payment.KitType!=type||payment.TotalKits!=count))return false;
+        // Native OnActivated paid fresh kit ItemValues. Keep the native
+        // cancellation delivery/drop path, changing only its exact quantity.
+        refund=new ItemStack(new ItemValue(type),count);return true;
     }
     internal static void QueueAccepted(XUiC_RecipeStack card,bool accepted)
     {
@@ -442,19 +466,74 @@ internal static partial class RebirthRepairOriginalCorrection
             {
                 if(!Staged.TryGetValue(card,out var staged)||staged!=op)return;Staged.Remove(card);
                 if(!TryRepairIdentity(p,out var identity))return;
-                var r=new Receipt{Operation=op,World=p.world.worldState.Guid,Owner=identity.CanonicalId,Creation=RebirthCamperCharacterAccess.CurrentCreation(p),Deaths=p.Died,Amount=card.AmountToRepair,Input=Image(card.originalItem),Payment=activation.Payment,PaidInput=activation.PaidInput};r.Expected=Preview(r);Decode(Encode(r));
+                var r=new Receipt{Operation=op,World=RebirthRemoteResourceNetworkScope.ProtocolWorld(p.world),Owner=identity.CanonicalId,Creation=RebirthCamperCharacterAccess.CurrentCreation(p),Deaths=p.Died,Amount=card.AmountToRepair,Input=Image(card.originalItem),Payment=activation.Payment,PaidInput=activation.PaidInput};r.Expected=Preview(r);Decode(Encode(r));
                 if(activation.Payment.Length!=0)
                 {if(!PreparedRemote.TryGetValue(activation.Entry,out var prepared)||prepared.Receipt.Operation!=op||prepared.Receipt.Input!=r.Input||prepared.Receipt.Amount!=r.Amount)return;PreparedRemote.Remove(activation.Entry);}
                 if(!TryBindNativeRefund(card,r))return;
-                var c=new Client{Receipt=r,Entry=activation.Entry,World=(World)p.world,Player=p,Directory=GameIO.GetSaveGameDir()};Cards[card]=c;activation.Queued.Add(c);return;
+                var c=new Client{Receipt=r,Entry=activation.Entry,World=(World)p.world,Player=p,Directory=GameIO.GetSaveGameDir()};BindAcceptedCard(card,c);activation.Queued.Add(c);return;
             }
             // Native reload/queue shift may recreate the UI card. Never mint a
             // new repair permission from a restored card or a type/seed match.
             var marker=card.originalItem;if(!marker.TryGetMetadata(WorldKey,out string world)||!marker.TryGetMetadata(OwnerKey,out string owner)||!marker.TryGetMetadata(CreationKey,out string creation)||!marker.TryGetMetadata(DeathsKey,out int deaths))return;
             var keyReceipt=new Receipt{Operation=op,World=world,Owner=owner,Creation=creation,Deaths=deaths};
             string path=PathFor(keyReceipt,false);if(!File.Exists(path)||new FileInfo(path).Length>MaximumImage*12L)return;var stored=Decode(ReadRepairText(path));var restored=new Client{Receipt=stored,World=(World)p.world,Player=p,Directory=GameIO.GetSaveGameDir()};
-            if((Current(restored)||SamePhysicalActor(restored))&&Image(marker)==stored.Input&&(card.AmountToRepair==stored.Amount||card.AmountToRepair==0&&stored.Expected.Length!=0)){if(card.AmountToRepair>0&&!TryBindNativeRefund(card,stored))return;Cards[card]=restored;Clients[op]=restored;}
+            if((Current(restored)||SamePhysicalActor(restored))&&Image(marker)==stored.Input&&(card.AmountToRepair==stored.Amount||card.AmountToRepair==0&&stored.Expected.Length!=0)){if(card.AmountToRepair>0&&!TryBindNativeRefund(card,stored))return;BindAcceptedCard(card,restored);Clients[op]=restored;}
         }catch(Exception error){Log.Warning("[REBIRTH Repair] original queue restore retained: "+error.GetType().Name);}
+    }
+    private static void BindAcceptedCard(XUiC_RecipeStack card,Client client)
+    {
+        client.NativeCard=card;
+        client.NativeQueueItem=card.originalItem;
+        client.NativeRecipe=card.GetRecipe();
+        Cards[card]=client;
+    }
+    // Native CopyTo carries the same item and recipe references. Resolve only
+    // after the former slot no longer owns this original in the native queue.
+    private static bool ResolveRotatedRepairCard(XUiC_RecipeStack card,ref Client mapped)
+    {
+        if(card==null||card.Owner is not XUiC_RebirthCraftingQueue queue||
+            card.windowGroup?.Controller is not XUiC_RebirthPersonalCrafting)return true;
+        if(mapped!=null&&ReferenceEquals(card.originalItem,mapped.NativeQueueItem))return true;
+        if(card.originalItem==null||!card.originalItem.TryGetMetadata(OriginalKey,out string marker)||
+            !Guid.TryParseExact(marker,"N",out var operation)||!Clients.TryGetValue(operation,out var original)||
+            original.NativeCard==null||!ReferenceEquals(original.NativeCard.Owner,queue))return true;
+
+        var receipt=original.Receipt;
+        if(!receipt.Admitted)return true;
+        var former=original.NativeCard;
+        if(ReferenceEquals(former,card))return ReferenceEquals(mapped,original);
+        if(!ThreadManager.IsMainThread()||!ReferenceEquals(card.xui?.playerUI?.entityPlayer,original.Player)||
+            !ReferenceEquals(former.xui,card.xui)||!Current(original)||
+            receipt.Cancelled||receipt.OutputInvoking||receipt.NativeDelivered||receipt.Published||
+            original.PendingOutcome!=null||card.GetRecipeCount()!=1||card.AmountToRepair<=0||card.AmountToRepair!=receipt.Amount||
+            !ReferenceEquals(card.originalItem,original.NativeQueueItem)||!ReferenceEquals(card.GetRecipe(),original.NativeRecipe)||
+            original.NativeRecipe==null||Image(card.originalItem)!=receipt.Input)return false;
+
+        int from=-1,to=-1;
+        var rows=queue.GetRecipesToCraft();
+        for(int i=0;i<rows.Length;i++)
+        {
+            var row=rows[i];
+            if(ReferenceEquals(row,card))
+            {
+                if(to>=0)return false;
+                to=i;continue;
+            }
+            if(ReferenceEquals(row,former))
+            {
+                if(from>=0)return false;
+                from=i;
+            }
+            if(row!=null&&SameOperation(row.originalItem,operation,OriginalKey))return false;
+        }
+        if(from<0||to<=from||!Read(receipt,false,out var saved,original.Directory)||Encode(saved)!=Encode(receipt))return false;
+
+        Cards[card]=original;
+        if(Cards.TryGetValue(former,out var formerBinding)&&ReferenceEquals(formerBinding,original))
+            Cards.Remove(former);
+        original.NativeCard=card;
+        mapped=original;
+        return true;
     }
     internal static bool OutputPrefix(XUiC_RecipeStack card)
     {try{return OutputPrefixCore(card);}catch(Exception failure){Log.Warning("[REBIRTH Repair] original output held: "+failure.GetType().Name);return false;}}
@@ -464,9 +543,20 @@ internal static partial class RebirthRepairOriginalCorrection
         try
         {
             if(entry==null||payment.Length==0||!ThreadManager.IsMainThread())return false;
-            var matches=Cards.Where(pair=>ReferenceEquals(pair.Value.Entry,entry)&&pair.Value.NativePaid&&pair.Value.PaidAccepted&&Current(pair.Value)&&pair.Value.Receipt.Payment==payment&&pair.Key.AmountToRepair==pair.Value.Receipt.Amount&&pair.Key.originalItem!=null&&Image(pair.Key.originalItem)==pair.Value.Receipt.Input).Select(pair=>pair.Value).GroupBy(c=>c.Receipt.Operation).ToArray();
-            if(matches.Length!=1)return false;var c=matches[0].First();if(!Read(c.Receipt,false,out var saved)||Encode(saved)!=Encode(c.Receipt))return false;
-            operation=c.Receipt.Operation;queuedInput=c.Receipt.Input;amount=c.Receipt.Amount;return true;
+            Client match=null;
+            bool ambiguous=false;
+            foreach(var pair in Cards)
+            {
+                var candidate=pair.Value;
+                var card=pair.Key;
+                if(!ReferenceEquals(candidate.Entry,entry)||!candidate.NativePaid||!candidate.PaidAccepted||
+                    !Current(candidate)||candidate.Receipt.Payment!=payment||card.AmountToRepair!=candidate.Receipt.Amount||
+                    card.originalItem==null||Image(card.originalItem)!=candidate.Receipt.Input)continue;
+                if(match==null)match=candidate;
+                else if(candidate.Receipt.Operation!=match.Receipt.Operation)ambiguous=true;
+            }
+            if(match==null||ambiguous||!Read(match.Receipt,false,out var saved)||Encode(saved)!=Encode(match.Receipt))return false;
+            operation=match.Receipt.Operation;queuedInput=match.Receipt.Input;amount=match.Receipt.Amount;return true;
         }catch{return false;}
     }
     internal static bool TryObserveRestoredRemoteOriginal(EntityPlayerLocal player,string payment,string paidInput,string queuedInput,int amount,out Guid operation)
@@ -499,7 +589,9 @@ internal static partial class RebirthRepairOriginalCorrection
     }
     private static bool OutputPrefixCore(XUiC_RecipeStack card)
     {
-        if(!Cards.TryGetValue(card,out var c))
+        Cards.TryGetValue(card,out var c);
+        if(!ResolveRotatedRepairCard(card,ref c))return false;
+        if(c==null)
         {
             if(card?.originalItem==null||!card.originalItem.TryGetMetadata(OriginalKey,out string marker))return true;
             QueueAccepted(card,true);
@@ -512,17 +604,25 @@ internal static partial class RebirthRepairOriginalCorrection
         }
         bool originalEpisode=Current(c);
         if(c.Player==null||!ReferenceEquals(card.xui?.playerUI?.entityPlayer,c.Player)||(!originalEpisode&&!SamePhysicalActor(c))||!Clients.ContainsKey(c.Receipt.Operation)||originalEpisode&&!c.Receipt.Admitted||c.Receipt.Cancelled||c.Receipt.NativeDelivered||c.Receipt.OutputInvoking)return false;
-        if(card.originalItem==null||Image(card.originalItem)!=c.Receipt.Input||card.AmountToRepair!=0&&card.AmountToRepair!=c.Receipt.Amount)return false;
+        int amount=card.AmountToRepair;
+        if(card.originalItem==null||Image(card.originalItem)!=c.Receipt.Input||amount!=0&&amount!=c.Receipt.Amount)return false;
         if(c.Receipt.Expected.Length==0||!Read(c.Receipt,false,out var staged)||staged.Expected!=c.Receipt.Expected)return false;
+        ItemValue paidRetry=null;
+        if(amount==0&&c.Receipt.Payment.Length!=0)
+        {
+            // The paid original must already own the exact native retry image.
+            if(!HasIndependentPayment(c.Receipt)||c.Receipt.Before!=c.Receipt.Expected||staged.Before!=c.Receipt.Before)return false;
+            paidRetry=ReadItem(staged.Before);
+        }
         // This domain invocation record is written BEFORE any native delivery.
         // An interrupted invocation is retained, never blindly replayed on reload.
         string prior=Encode(c.Receipt);var next=Decode(prior);next.Before=next.Expected;next.OutputInvoking=true;if(!Save(next,false,prior))return false;c.Receipt=next;
-        if(card.AmountToRepair==0)
+        if(amount==0)
         {
             if(c.Receipt.Before.Length==0)return false;
             // Exact original full-bag retry/reload only. No second degradation,
             // repair quest callback, kit debit or native action is invoked.
-            card.outputItemValue=ReadItem(c.Receipt.Before);
+            card.outputItemValue=paidRetry??ReadItem(c.Receipt.Before);
         }
         return true;
     }
@@ -545,7 +645,9 @@ internal static partial class RebirthRepairOriginalCorrection
         state=null;
         try
         {
-            if(!Cards.TryGetValue(card,out var c))
+            Cards.TryGetValue(card,out var c);
+            if(!ResolveRotatedRepairCard(card,ref c))return false;
+            if(c==null)
             {
                 if(card?.originalItem==null||!card.originalItem.TryGetMetadata(OriginalKey,out string marker))return true;
                 QueueAccepted(card,true);
@@ -558,31 +660,69 @@ internal static partial class RebirthRepairOriginalCorrection
             // The native refund includes the source-paid remote kits. Do not
             // let cancellation erase the positive queued-usage witness before
             // the host has durably retired that original source payment.
-            if(c.Receipt.Payment.Length!=0&&(!c.Receipt.Admitted||c.Receipt.PaymentProof.Length!=64||c.Receipt.CancelInput.Length==0))return false;
+            bool paidOriginal=c.Receipt.Payment.Length!=0;
+            if(paidOriginal&&(!HasIndependentPayment(c.Receipt)||c.Receipt.CancelInput.Length==0))return false;
             if(!c.NativePaid&&(!Read(c.Receipt,false,out var paid,c.Directory)||Encode(paid)!=Encode(c.Receipt)))return false;
-            if(!TryBindNativeRefund(card,c.Receipt))return false;
+            Recipe refundRecipe=null;
+            ItemStack refundKit=null;
+            ItemValue nativeItem=null,refundItem=null;
+            if(paidOriginal)
+            {
+                if(!TryPrepareNativeRefund(card,c.Receipt,out refundRecipe,out refundKit))return false;
+                nativeItem=card.originalItem;
+                refundItem=ReadItem(c.Receipt.CancelInput);
+            }
+            else if(!TryBindNativeRefund(card,c.Receipt))return false;
             // Persist withdrawal of this original bonus permission BEFORE native
             // cancellation returns/refunds its own source. Failure runs no cancel.
             // Retiring a previous episode writes only its captured original
             // journal; it never admits work into the new world or creation.
             if(!File.Exists(PathFor(c.Receipt,false,c.Directory))&&!Save(c.Receipt,false,null,c.Directory))return false;
+            if(paidOriginal&&(!ReferenceEquals(card.recipe,refundRecipe)||!ReferenceEquals(card.originalItem,nativeItem)))return false;
             var next=Decode(Encode(c.Receipt));next.Cancelled=true;if(!Save(next,false,Encode(c.Receipt),c.Directory))return false;
             c.Receipt=next;Clients[next.Operation]=c;
-            // The host retired only C's exact terminal markers. The native
-            // cancellation still returns its original tool and actual paid kits.
-            if(next.CancelInput.Length!=0)card.originalItem=ReadItem(next.CancelInput);
-            state=c;return true;
+            if(paidOriginal)
+            {
+                // Install the paid inputs only after the existing receipt commit.
+                refundRecipe.ingredients.Clear();
+                refundRecipe.ingredients.Add(refundKit);
+                card.originalItem=refundItem;
+            }
+            state=paidOriginal&&Current(c)?BeginCancelOverflow(c,card):c;return true;
         }catch{return false;}
+    }
+    internal static void ClearNativeCancelCard(XUiC_RecipeStack card)
+    {
+        Cards.TryGetValue(card,out var client);
+        bool paidCancel=client!=null&&HasIndependentPayment(client.Receipt)&&client.Receipt.Cancelled&&
+            ReferenceEquals(client.NativeCard,card)&&ReferenceEquals(client.NativeRecipe,card.GetRecipe());
+        card.ClearRecipe();
+        // The native queue refresh can immediately reuse this card for another repair.
+        if(paidCancel&&card.GetRecipe()==null&&card.originalItem?.IsEmpty()!=false)
+            StageCancelReturn(client);
     }
     internal static void Cancelled(XUiC_RecipeStack card,object state)
     {
-        if(state is not Client c||!SamePhysicalActor(c)||!ReferenceEquals(card.xui?.playerUI?.entityPlayer,c.Player)||
-            !c.Receipt.Cancelled||c.Receipt.CancelReturned||card.originalItem!=null&&!card.originalItem.IsEmpty())return;
+        var c=state is PaidCancelOverflow paid?paid.Client:state as Client;
+        if(c==null||!SamePhysicalActor(c)||!ReferenceEquals(card.xui?.playerUI?.entityPlayer,c.Player)||
+            !c.Receipt.Cancelled||c.Receipt.CancelReturned)return;
+        if(c.PendingOutcome?.CancelReturned!=true)
+        {
+            if(card.originalItem?.IsEmpty()==false)return;
+            StageCancelReturn(c);
+        }
+        if(PublishPendingOutcome(c))UploadOwner(c.Player);
+    }
+    private static void StageCancelReturn(Client c)
+    {
+        if(c.Receipt.CancelReturned||c.PendingOutcome!=null)return;
+        var overflow=activePaidCancel;
+        if(ReferenceEquals(overflow?.Client,c)&&!ObserveCancelKitReturn(overflow))return;
         // Queue absence is not proof that the native refund returned. Preserve
         // its positively returned outcome before accepting a delayed host ACK.
         string prior=Encode(c.Receipt);var returned=Decode(prior);returned.CancelReturned=true;
+        if(ReferenceEquals(overflow?.Client,c))returned.CancelOverflow=overflow.Drops;
         c.PendingOutcome=returned;c.PendingExpected=prior;Clients[c.Receipt.Operation]=c;
-        if(PublishPendingOutcome(c))UploadOwner(c.Player);
     }
     private static void UploadOwner(EntityPlayerLocal owner)
     {GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);}
@@ -611,7 +751,10 @@ internal static partial class RebirthRepairOriginalCorrection
         // A merely executed early-returning PlayerData method is no witness.
         if(!AcceptedNativeUpload(package,latest))return;
         var bag=RebirthGearPlayerDataInventory.ReadSlots(latest,true);var belt=RebirthGearPlayerDataInventory.ReadSlots(latest,false);var equipment=ReadEquipment(latest);if(bag==null||belt==null||equipment==null)return;
-        WorldScope(world);var upload=new Upload{World=world,Player=player,Sender=package.Sender,Source=latest,BagSource=latest.bagData,BeltSource=latest.inventoryData,EquipmentSource=latest.equipmentData,CursorSource=latest.dragAndDropItem,Creation=RebirthCamperCharacterAccess.CurrentCreation(player),Deaths=player.Died,Directory=GameIO.GetSaveGameDir(),Bag=bag,Belt=belt,Equipment=equipment,Queue=QueueImages(latest),QueueOperations=QueueOperations(latest),NativeQueueItems=TryQueueNativeItems(latest,out var nativeQueue)?nativeQueue:null,CursorOperation=latest.dragAndDropItem==null||latest.dragAndDropItem.IsEmpty()?string.Empty:Marker(latest.dragAndDropItem.itemValue)};
+        WorldScope(world);
+        string creation=RebirthCamperCharacterAccess.CurrentCreation(player);
+        if(!TryGetCurrentQueueWitness(latest,out var queue,requireNative:true))return;
+        var upload=new Upload{World=world,Player=player,Sender=package.Sender,Source=latest,BagSource=latest.bagData,BeltSource=latest.inventoryData,EquipmentSource=latest.equipmentData,CursorSource=latest.dragAndDropItem,Creation=creation,Deaths=player.Died,Directory=GameIO.GetSaveGameDir(),Bag=bag,Belt=belt,Equipment=equipment,Queue=queue.Images,QueueOperations=QueueOperations(latest),NativeQueueItems=(string[])queue.Native.Clone(),CursorOperation=latest.dragAndDropItem==null||latest.dragAndDropItem.IsEmpty()?string.Empty:Marker(latest.dragAndDropItem.itemValue)};
         if(FreezeUploadHead(upload))Uploads[player.entityId]=upload;
     }
     // Read-only actual package/head relation, never an independent authority.
@@ -702,17 +845,26 @@ internal static partial class RebirthRepairOriginalCorrection
     private static string QueueShape(RecipeQueueItem row)=>row==null?string.Empty:row.AmountToRepair+":"+row.Multiplier+":"+row.Recipe?.itemValueType+":"+row.Recipe?.count+":"+row.Recipe?.IsScrap;
     private static string QueueKey(RecipeQueueItem row,string nativeImage)
     {return row?.RepairItem==null||row.RepairItem.IsEmpty()||row.Recipe==null||row.Recipe.IsScrap||row.Recipe.count!=1||row.Recipe.itemValueType!=row.RepairItem.type||row.Multiplier!=1||row.AmountToRepair==0?string.Empty:nativeImage+":"+row.AmountToRepair;}
+    private static bool TryGetCurrentQueueWitness(PlayerDataFile saved,out QueueWitness witness,bool requireNative=false)
+    {
+        witness=null;
+        if(saved==null||!NativeQueues.TryGetValue(saved,out var captured))return false;
+        var rows=saved.craftingData?.RecipeQueueItems??Array.Empty<RecipeQueueItem>();
+        if(rows.Length!=captured.Rows.Length||requireNative&&(captured.Native==null||rows.Length!=captured.Native.Length))return false;
+        for(int i=0;i<rows.Length;i++)
+            if(!ReferenceEquals(rows[i],captured.Rows[i])||!ReferenceEquals(rows[i]?.RepairItem,captured.Items[i])||
+                (rows[i]?.RepairItem==null?string.Empty:Image(rows[i].RepairItem))!=captured.Typed[i]||QueueShape(rows[i])!=captured.Shape[i])return false;
+        witness=captured;return true;
+    }
     private static string[] QueueImages(PlayerDataFile saved)
     {
-        if(saved==null||!NativeQueues.TryGetValue(saved,out var witness))return Array.Empty<string>();var rows=saved.craftingData?.RecipeQueueItems??Array.Empty<RecipeQueueItem>();if(rows.Length!=witness.Rows.Length)return Array.Empty<string>();
-        for(int i=0;i<rows.Length;i++)if(!ReferenceEquals(rows[i],witness.Rows[i])||!ReferenceEquals(rows[i]?.RepairItem,witness.Items[i])||(rows[i]?.RepairItem==null?string.Empty:Image(rows[i].RepairItem))!=witness.Typed[i]||QueueShape(rows[i])!=witness.Shape[i])return Array.Empty<string>();return witness.Images;
+        return TryGetCurrentQueueWitness(saved,out var witness)?witness.Images:Array.Empty<string>();
     }
     private static string[] QueueOperations(PlayerDataFile saved)=>saved?.craftingData?.RecipeQueueItems?.Where(row=>row?.RepairItem!=null&&row.RepairItem.HasMetadata(OriginalKey)).Select(row=>{row.RepairItem.TryGetMetadata(OriginalKey,out string operation);return operation;}).ToArray()??Array.Empty<string>();
     private static bool TryQueueNativeItems(PlayerDataFile saved,out string[] images)
     {
-        images=null;if(saved==null||!NativeQueues.TryGetValue(saved,out var witness)||witness.Native==null)return false;var rows=saved.craftingData?.RecipeQueueItems??Array.Empty<RecipeQueueItem>();
-        if(rows.Length!=witness.Rows.Length||rows.Length!=witness.Native.Length)return false;
-        for(int i=0;i<rows.Length;i++)if(!ReferenceEquals(rows[i],witness.Rows[i])||!ReferenceEquals(rows[i]?.RepairItem,witness.Items[i])||(rows[i]?.RepairItem==null?string.Empty:Image(rows[i].RepairItem))!=witness.Typed[i]||QueueShape(rows[i])!=witness.Shape[i])return false;
+        images=null;
+        if(!TryGetCurrentQueueWitness(saved,out var witness,requireNative:true))return false;
         images=(string[])witness.Native.Clone();return true;
     }
     internal static bool HasOriginalQueuedItem(string[] images,string exactInput)
@@ -863,7 +1015,7 @@ internal static partial class RebirthRepairOriginalCorrection
             {
                 if(new FileInfo(path).Length>MaximumImage*12L)throw new InvalidDataException();var r=Decode(ReadRepairText(path));
                 if(r.Operation!=id)throw new InvalidDataException();
-                if(r.World!=world.worldState?.Guid||r.Owner!=identity.CanonicalId||r.Creation!=RebirthCamperCharacterAccess.CurrentCreation(actor))continue;
+                if(r.World!=RebirthRemoteResourceNetworkScope.ProtocolWorld(world)||r.Owner!=identity.CanonicalId||r.Creation!=RebirthCamperCharacterAccess.CurrentCreation(actor))continue;
                 bool scope=r.Deaths==actor.Died&&!actor.IsDead();
                 string Fingerprint(string value)=>string.IsNullOrEmpty(value)?null:RebirthRemoteResourceDurableJournal.Digest(value);
                 string paidSource=null,binding=null;if(r.Payment.Length!=0&&RebirthRemoteResourceOwnerAction.TryDecodeRepairPaymentIntent(r.Payment,out var payment)){paidSource=payment.SourceOperation.ToString("N");binding=payment.Binding;}
@@ -881,12 +1033,14 @@ internal static partial class RebirthRepairOriginalCorrection
         }
         return new{scope=true,authoritative=!world.IsRemote(),nativePrimaryReadable=nativeReadable,nativeRawQueueReadable=savedQueueItems!=null,nativeWorldItemsTruncated=worldItemsTruncated,deaths=actor.Died,truncated,records=records.ToArray()};
     }
-    internal static void ReceiveServer(World world,int playerId,string image)
+    internal static void ReceiveServer(World world,int playerId,string image,ClientInfo sender=null)
     {
         try
         {
             if(world==null||world.IsRemote()||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world))return;WorldScope(world);var request=Decode(image);var owner=world.GetEntity(playerId) as EntityPlayer;
             if(owner==null||!ReferenceEquals(owner.world,world)||owner.IsDead()||owner.Died<request.Deaths||request.World!=world.worldState.Guid||request.Creation!=RebirthCamperCharacterAccess.CurrentCreation(owner)||!TryRepairIdentity(owner,out var identity)||identity.CanonicalId!=request.Owner)return;
+            if(request.CancelOverflow!=null&&owner is not EntityPlayerLocal&&
+                !ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance?.Clients?.ForEntityId(playerId),sender))return;
             if(owner.Died>request.Deaths){if(request.Cancelled)ConfirmHistoricalCancellation(owner,request);else SettleEndedBase(owner,request);return;}
             if(request.BaseOnly||request.BaseOnlyConfirmed)return;
             Receipt r;if(Read(request,true,out var existing))r=existing;else
@@ -907,7 +1061,7 @@ internal static partial class RebirthRepairOriginalCorrection
                 string prior=Encode(r);var next=Decode(prior);next.CancelInput=Image(cancelInput);if(!Save(next,true,prior))return;r=next;
             }
             if(r.CancelConfirmed||r.Published){Reply(owner,r);return;}
-            if(request.Cancelled&&r.After.Length==0){if(!request.CancelReturned||!QueueAbsentProof(owner,r))return;string prior=Encode(r);r.Cancelled=true;r.CancelReturned=true;r.CancelConfirmed=true;if(!Save(r,true,prior))return;Reply(owner,r);return;}
+            if(request.Cancelled&&r.After.Length==0){if(!request.CancelReturned||!QueueAbsentProof(owner,r)||!SettleCancelOverflow(owner,request,ref r))return;string prior=Encode(r);r.Cancelled=true;r.CancelReturned=true;r.CancelConfirmed=true;if(!Save(r,true,prior))return;Reply(owner,r);return;}
             if(r.Cancelled){Reply(owner,r);return;}
             if(r.Before.Length==0&&request.Before.Length!=0)
             {
@@ -934,6 +1088,7 @@ internal static partial class RebirthRepairOriginalCorrection
             var before=c.Receipt;if(!(Current(c)||SamePhysicalActor(c)&&(r.BaseOnly||r.CancelConfirmed&&r.Cancelled&&(r.CancelReturned||before.CancelReturned)))||before.BaseOnly&&!r.BaseOnly||before.BaseOnlyConfirmed&&!r.BaseOnlyConfirmed||before.Input!=r.Input||before.Expected!=r.Expected||before.Amount!=r.Amount||before.Payment!=r.Payment||before.PaidInput!=r.PaidInput||before.PaymentProof.Length!=0&&before.PaymentProof!=r.PaymentProof||before.CancelInput.Length!=0&&before.CancelInput!=r.CancelInput||before.Admitted&&!r.Admitted||before.Cancelled&&!r.Cancelled||before.CancelConfirmed&&!r.CancelConfirmed||before.Before.Length!=0&&r.Before.Length!=0&&before.Before!=r.Before&&!(r.BaseOnly&&!before.BaseOnly&&SameExceptWear(ReadItem(r.Before),ReadItem(before.Before)))||before.After.Length!=0&&before.After!=r.After||before.Published&&!r.Published)return;
             // A delayed admission ACK cannot erase an already captured original
             // output or cancellation that has not yet reached the host.
+            if(!SameCancelDrops(r.CancelOverflow,before.CancelOverflow))return;
             if(r.Before.Length==0&&before.Before.Length!=0)r.Before=before.Before;if(before.Cancelled)r.Cancelled=true;if(before.CancelReturned)r.CancelReturned=true;if(before.NativeDelivered)r.NativeDelivered=true;if(before.OutputInvoking&&!r.NativeDelivered)r.OutputInvoking=true;
             if(!Save(r,false,Encode(before)))return;c.Receipt=r;
         }catch(Exception failure){Log.Warning("[REBIRTH Repair] owner correction retained: "+failure.GetType().Name);}
@@ -950,7 +1105,7 @@ internal static partial class RebirthRepairOriginalCorrection
     }
     internal static void Pump(World world)
     {
-        if(!ThreadManager.IsMainThread()||world==null||!ReferenceEquals(GameManager.Instance?.World,world))return;WorldScope(world);if(!world.IsRemote())PruneUploads(world);var owner=world.GetPrimaryPlayer();if(owner==null)return;
+        if(!ThreadManager.IsMainThread()||world==null||!ReferenceEquals(GameManager.Instance?.World,world))return;WorldScope(world);if(!world.IsRemote()){PruneUploads(world);PruneCancelDropWatches(world);}var owner=world.GetPrimaryPlayer();if(owner==null)return;
         if(UnityEngine.Time.realtimeSinceStartup>=nextScan)
         {
             nextScan=UnityEngine.Time.realtimeSinceStartup+2f;
@@ -1005,7 +1160,7 @@ internal static partial class RebirthRepairOriginalCorrection
         }
     }
     internal static void Install(Harmony harmony)
-    {RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalActivation));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalRawItem));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalRawPacket));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairSignatureCancelPatch));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalNativeUpload));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalNativePlayerData));}
+    {RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalActivation));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalRawItem));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalRawPacket));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairSignatureCancelPatch));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalNativeUpload));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalNativePlayerData));RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthRepairOriginalCachedOutput));}
 }
 [HarmonyPatch(typeof(ItemActionEntryRepair),nameof(ItemActionEntryRepair.OnActivated))]
 internal static class RebirthRepairOriginalActivation

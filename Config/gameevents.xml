@@ -1,7 +1,21 @@
 <?xml version='1.0' encoding='utf-8'?>
 <configs>
+  <!-- Native infection restore is gated by the live death policy when the action runs. -->
+  <append xpath="/gameevents/action_sequence[@name='game_on_respawn_none' or @name='game_on_respawn_default']">
+    <action class="AddBuff">
+      <property name="buff_name" value="buffInfectionCatch"/>
+      <requirement class="CVar">
+        <property name="cvar" value="infectionCounterRespawn"/>
+        <property name="operation" value="GT"/>
+        <property name="value" value="0"/>
+      </requirement>
+    </action>
+  </append>
   <conditional>
     <if cond="character_progression('Rebirth')">
+      <remove xpath="/gameevents/action_sequence[@name='game_first_spawn']/action[@class='AddBuff'][property[@name='buff_name' and @value='buffDukeNote']]"/>
+      <!-- REBIRTH restores nutrition and hydration on the authoritative death respawn. -->
+      <remove xpath="/gameevents/action_sequence[@name='game_on_respawn_none' or @name='game_on_respawn_default' or @name='game_on_respawn_injured' or @name='game_on_respawn_permanent']/action[@class='ModifyEntityStat'][property[@name='stat' and (@value='Food' or @value='Water')]]"/>
       <append xpath="/gameevents">
         <action_sequence name="rebirthCamperRewardFuel250">
           <property name="allow_user_trigger" value="false"/>

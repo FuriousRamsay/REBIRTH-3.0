@@ -89,6 +89,13 @@ public static class RebirthContainerRenameService
         if (commands == null || world == null)
             return;
 
+        int firstEdit = 0;
+        while (firstEdit < commands.Length &&
+            !string.Equals(commands[firstEdit].text, TEFeatureRebirthContainerName.EditCommand, StringComparison.OrdinalIgnoreCase))
+            firstEdit++;
+        if (firstEdit == commands.Length)
+            return;
+
         ResolveParentBlock(world, ref blockPos, ref blockValue);
         TileEntityComposite composite = world.GetTileEntity(blockPos) as TileEntityComposite;
         EntityPlayer focusingPlayer = entityFocusing as EntityPlayer;
@@ -97,7 +104,8 @@ public static class RebirthContainerRenameService
         bool enabled = entityFocusing is EntityPlayerLocal &&
             CanRename(composite, userId, world, focusingPlayer);
 
-        for (int i = 0; i < commands.Length; i++)
+        commands[firstEdit].enabled = enabled;
+        for (int i = firstEdit + 1; i < commands.Length; i++)
         {
             if (string.Equals(commands[i].text, TEFeatureRebirthContainerName.EditCommand, StringComparison.OrdinalIgnoreCase))
                 commands[i].enabled = enabled;

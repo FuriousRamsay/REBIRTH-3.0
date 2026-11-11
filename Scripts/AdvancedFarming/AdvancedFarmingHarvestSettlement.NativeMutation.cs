@@ -12,6 +12,13 @@ internal static partial class AdvancedFarmingHarvestSettlement
         public void Dispose(){if(ReferenceEquals(mutating,this))mutating=null;World=null;Chunk=null;Memory?.Dispose();Memory=null;}
     }
     [ThreadStatic]private static NativeMutation mutating;
+    private static string NativeMutationPath(Guid operation)
+        =>Path.Combine(GameIO.GetSaveGameDir(),"rebirth","farming-harvest","v1","source-attempts",operation.ToString("N")+".xml");
+    private static string NativeMutationImage(World world,Vector3i position,Guid operation,Guid source,uint before,uint after)
+        =>new XElement("harvestNativeMutation",new XAttribute("version",1),new XAttribute("world",world.worldState.Guid),
+            new XAttribute("operation",operation.ToString("N")),new XAttribute("source",source.ToString("N")),
+            new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),
+            new XAttribute("before",before),new XAttribute("after",after)).ToString(SaveOptions.DisableFormatting);
     internal static NativeMutation BeginNativeMutation(World world,Vector3i position,Guid operation,Guid source,uint before,uint after)
     {
         NativeMutation scope=null;
@@ -21,11 +28,9 @@ internal static partial class AdvancedFarmingHarvestSettlement
                 !ReferenceEquals(GameManager.Instance?.World,world)||world.GetBlock(position).rawData!=before||!MatchesSource(world,position,source.ToString("N"))||
                 !SourceChunk(world,position,out var chunk,out _)||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(65536,out var memory))return null;
             scope=new NativeMutation{World=world,Chunk=chunk,Position=position,Operation=operation,Source=source,Before=before,After=after,Memory=memory};
-            string path=Path.Combine(GameIO.GetSaveGameDir(),"rebirth","farming-harvest","v1","source-attempts",operation.ToString("N")+".xml");
+            string path=NativeMutationPath(operation);
             if(File.Exists(path)||File.Exists(path+".tmp")||File.Exists(path+".bak"))return null;
-            var image=new XElement("harvestNativeMutation",new XAttribute("version",1),new XAttribute("world",world.worldState.Guid),
-                new XAttribute("operation",operation.ToString("N")),new XAttribute("source",source.ToString("N")),new XAttribute("x",position.x),new XAttribute("y",position.y),new XAttribute("z",position.z),
-                new XAttribute("before",before),new XAttribute("after",after)).ToString(SaveOptions.DisableFormatting);
+            string image=NativeMutationImage(world,position,operation,source,before,after);
             Directory.CreateDirectory(Path.GetDirectoryName(path));byte[] bytes=Encoding.UTF8.GetBytes(image);
             using(var file=new FileStream(path+".tmp",FileMode.CreateNew,FileAccess.Write,FileShare.None)){file.Write(bytes,0,bytes.Length);file.Flush(true);}
             if(File.ReadAllText(path+".tmp",new UTF8Encoding(false,true))!=image||!RebirthDurableFileCommit.TryPublish(path+".tmp",path,out _)||File.ReadAllText(path,new UTF8Encoding(false,true))!=image)return null;
@@ -52,5 +57,23 @@ internal static partial class AdvancedFarmingHarvestSettlement
             scope.World.GetBlock(scope.Position).rawData!=scope.After)return false;
         return BindDestination(scope.World,scope.Position,scope.Operation,new BlockValue{rawData=scope.After})&&
             RecordCommit(scope.World,scope.Position,scope.Operation,scope.Source,scope.Before,scope.After);
+    }
+    internal static bool TryRestoreDestinationCommit(World world,Vector3i position,Guid operation,Guid source,uint before,uint after)
+    {
+        if(HasCommit(world,position,operation,source,before,after))return true;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||!ReferenceEquals(GameManager.Instance?.World,world)||
+            operation==Guid.Empty||source==Guid.Empty||before==after||!SourceChunk(world,position,out var chunk,out _)||
+            chunk.ChunkCustomData.dict.ContainsKey(CommitPrefix+operation.ToString("N"))||
+            world.GetBlock(position).rawData!=after||!MatchesSource(world,position,operation.ToString("N")))return false;
+        // Only the observed native mutation binds the destination to its
+        // operation ID. Require its exact durable before/after intent as well.
+        try
+        {
+            var file=new FileInfo(NativeMutationPath(operation));
+            if(!file.Exists||file.Length<1||file.Length>2048||(file.Attributes&FileAttributes.ReparsePoint)!=0||
+                File.ReadAllText(file.FullName,new UTF8Encoding(false,true))!=NativeMutationImage(world,position,operation,source,before,after))return false;
+            return MatchesSource(world,position,operation.ToString("N"))&&RecordCommit(world,position,operation,source,before,after);
+        }
+        catch{return false;}
     }
 }

@@ -1,0 +1,18 @@
+{
+  "name": "Purge sip slot transfer after idle recovery",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Disposable dedicated Rebirth Purge client. Set hydration high enough to avoid an automatic sip during the scenario. Prepare exactly one Boiled Water in visible Character backpack slot characterBagSlot1. Open the Character Equipment view with the support slot empty. For the timing comparison use a copy of a genuine save with several already Applied sip transfers. Record actual reads of its HydrationClientOriginals or RBH journal during the idle interval with a file-I/O trace. This UI scenario verifies a working new transfer and exact inventory count, independent of that trace."},
+    {"expectUi": {"id": "survivorOverviewDrinkSlotState", "exactText": "EMPTY"}},
+    {"expectItem": {"name": "drinkJarBoiledWater", "min": 1, "max": 1}},
+    {"wait": 3},
+    {"action": {"command": "drag", "args": {"from.id": "characterBagSlot1", "to.id": "survivorGearInputSupport", "strict": 1}}},
+    {"waitForUi": {"id": "survivorOverviewDrinkSlotState", "exactText": "IN SLOT", "timeout": 12}},
+    {"expectNoItem": "drinkJarBoiledWater"},
+    {"action": {"command": "click", "args": {"id": "survivorGearInputSupport", "shift": 1}}},
+    {"waitForUi": {"id": "survivorOverviewDrinkSlotState", "exactText": "EMPTY", "timeout": 12}},
+    {"expectItem": {"name": "drinkJarBoiledWater", "min": 1, "max": 1}},
+    {"screenshot": "audit_sip_idle_recovery"},
+    {"expectNoErrors": true}
+  ]
+}

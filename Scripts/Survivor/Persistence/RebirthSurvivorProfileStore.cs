@@ -220,6 +220,7 @@ public static class RebirthSurvivorProfileStore
             : new List<RebirthSurvivorCreationError>();
         bool missing = false;
         bool needsReview = false;
+        bool tooManyTraits = false;
         for (int i = 0; i < errors.Count; i++)
         {
             RebirthSurvivorCreationErrorCode code = errors[i].Code;
@@ -230,14 +231,17 @@ public static class RebirthSurvivorProfileStore
                 missing = true;
                 break;
             }
+            if (code == RebirthSurvivorCreationErrorCode.TooManyTraits)
+                tooManyTraits = true;
             if (code == RebirthSurvivorCreationErrorCode.InsufficientCreationPoints ||
                 code == RebirthSurvivorCreationErrorCode.UnspentCreationPoints)
                 needsReview = true;
         }
         RebirthSurvivorProfileCompatibilityKind kind = missing
             ? RebirthSurvivorProfileCompatibilityKind.MissingDefinition
-            : (needsReview ? RebirthSurvivorProfileCompatibilityKind.NeedsReview : RebirthSurvivorProfileCompatibilityKind.InvalidCombination);
+            : (needsReview || tooManyTraits ? RebirthSurvivorProfileCompatibilityKind.NeedsReview : RebirthSurvivorProfileCompatibilityKind.InvalidCombination);
         string message = missing ? "one or more saved definitions no longer exist"
+            : tooManyTraits ? RebirthSurvivorUiText.TraitSelectionLimitMessage()
             : (needsReview ? "Trait-point balance changed under the current definitions; review required" : "saved combination is not valid under current definitions");
         return new RebirthSurvivorProfileCompatibility(kind, message, errors);
     }
@@ -433,6 +437,8 @@ public static class RebirthSurvivorProfileStore
     {
         if (validation == null) return "selection validation did not return a result";
         if (validation.Errors.Count == 0) return "selection is invalid";
+        if (validation.Errors[0].Code == RebirthSurvivorCreationErrorCode.TooManyTraits)
+            return RebirthSurvivorUiText.TraitSelectionLimitMessage();
         return validation.Errors[0].ToString();
     }
 

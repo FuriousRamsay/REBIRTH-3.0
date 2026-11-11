@@ -1,0 +1,96 @@
+{
+  "name": "Purge existing starter-truck owner does not see the unread intro on rejoin",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in both isolated solo Purge and dedicated Purge. Use a completed starter-truck claim and keep the character on foot beside its truck. Restore a fixture with an unread intro or a missing local intro marker, with no retained manual reading intent. Keep authority claim, player and world unchanged. Start at native gameplay reveal and never dismiss a popup before these assertions."
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthPurgeInformation",
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings",
+        "args": {}
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player"
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthPurgeInformation",
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "screenshot": "purge_existing_unread_rejoin"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthJournal",
+        "text": "The Purge"
+      }
+    },
+    {
+      "click": {
+        "window": "rebirthJournal",
+        "text": "The Purge"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthJournal",
+        "text": "to do the work others left unfinished"
+      }
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "_note": "Check that the recorded starter truck and on-foot state stayed unchanged and the intro reading-note recipe stayed unlocked. Then run the first note use in purge_information_reading.json (real Primary action) to prove manual popup and exactly one item consumed."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

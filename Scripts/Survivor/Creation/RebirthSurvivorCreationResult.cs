@@ -24,7 +24,8 @@ public enum RebirthSurvivorCreationErrorCode
     AttributeOutOfRange,
     PotentialBelowCurrent,
     UnknownCreationModifier,
-    InvalidSkillBiasTier
+    InvalidSkillBiasTier,
+    TooManyTraits
 }
 
 public sealed class RebirthSurvivorCreationError

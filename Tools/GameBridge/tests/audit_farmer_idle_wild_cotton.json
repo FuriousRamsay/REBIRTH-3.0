@@ -1,0 +1,14 @@
+{
+  "name": "Purge wild cotton remains active with zero loaded farm plots",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Use a disposable Purge world with Advanced Farming on and zero loaded REBIRTH farm plots. Confirm the actual no-plot fixture and use a mature wild Cotton with a one-unit native pickup prompt. Leave the cursor empty, reserve inventory room and aim at the plant. Repeat on a second plant while the first cotton is still in the backpack. Run solo and dedicated. Separate add/remove-plot and native water exchange controls use actual live fixtures."},
+    {"expectTarget": "plantedCotton3Harvest"},
+    {"markItem": "resourceCropCottonPlant"},
+    {"action": {"command": "key", "args": {"name": "E"}}},
+    {"wait": 5},
+    {"expectItemDelta": {"name": "resourceCropCottonPlant", "op": "==", "value": 1}},
+    {"screenshot": "audit_farmer_idle_wild_cotton"},
+    {"expectNoErrors": true}
+  ]
+}

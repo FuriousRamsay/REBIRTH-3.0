@@ -37,7 +37,7 @@ internal static class RebirthRemoteResourceCraftSettlement
             (string)wrapper.Attribute("nativeBeforeProof")==RebirthRemoteResourceDurableJournal.Digest(original.Digest+"|"+original.Copy().Element("queueBefore").Value+"|"+action.Element("beforeActor").Value)&&
             wrapper.Element("original")?.Value==action.ToString(SaveOptions.DisableFormatting);
     }
-    internal static bool Prepare(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,XElement incoming,out bool permission)
+    internal static bool Prepare(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,XElement incoming,out bool permission,bool nativeBeforeConfirmed=false)
     {
         permission=false;
         try
@@ -45,12 +45,12 @@ internal static class RebirthRemoteResourceCraftSettlement
             if(!Read(actor,original,out var identity,out var root)||root.Phase!=2||!CanonicalAction(original,root,out var action)||!XNode.DeepEquals(action,incoming))return false;
             var body=root.Copy();if(((int?)body.Attribute("ownerRejecting")??0)!=0)return false;
             var existing=body.Element("ownerAction");
-            if(!RebirthRemoteResourceCraftingRead.TryRead(identity,out var actual,out var saved,out var queue)||saved.id!=actor.entityId||saved.deaths!=original.Deaths||
-                queue!=original.Copy().Element("queueBefore").Value||!RebirthRemoteResourceClientOriginal.ReadActor(action.Element("beforeActor").Value).Matches(actual)||
-                !RebirthCookingRemoteAdmissionBackend.NativePhase(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=1f)return false;
+            if(!nativeBeforeConfirmed&&(!RebirthRemoteResourceCraftingRead.TryRead(identity,out var actual,out var saved,out var queue)||saved.id!=actor.entityId||saved.deaths!=original.Deaths||
+                !RebirthRemoteResourceCraftingRead.MatchesSavedQueue(original.Copy().Element("queueBefore").Value,queue)||!RebirthRemoteResourceClientOriginal.ReadActor(action.Element("beforeActor").Value).Matches(actual)||
+                !RebirthCookingRemoteAdmissionBackend.NativePhase(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=1f))return false;
             if(existing!=null){permission=MatchesRootAction(original,root);return permission;}
             var wrapper=new XElement("ownerAction",new XAttribute("domain","native-craft"),new XAttribute("child",original.Operation.ToString("N")),
-                new XAttribute("nativeBeforeProof",RebirthRemoteResourceDurableJournal.Digest(original.Digest+"|"+queue+"|"+RebirthRemoteResourceClientOriginal.ActorImage(actual))),new XElement("original",action.ToString(SaveOptions.DisableFormatting)));
+                new XAttribute("nativeBeforeProof",RebirthRemoteResourceDurableJournal.Digest(original.Digest+"|"+original.Copy().Element("queueBefore").Value+"|"+action.Element("beforeActor").Value)),new XElement("original",action.ToString(SaveOptions.DisableFormatting)));
             if(!RebirthRemoteResourceDurableJournal.TryAdvance(root,value=>value.Add(wrapper),()=>Scope(actor,original),out var savedRoot))return false;
             permission=MatchesRootAction(original,savedRoot);return permission;
         }
@@ -89,7 +89,7 @@ internal static class RebirthRemoteResourceCraftSettlement
             // Exact full queue BEFORE, not absence of an ingredient marker:
             // an exception could leave a newly accepted unmarked queue row.
             if(!RebirthRemoteResourceCraftingRead.TryRead(identity,out var actorImage,out var saved,out string queue)||saved.id!=actor.entityId||saved.deaths!=original.Deaths||
-                queue!=original.Copy().Element("queueBefore").Value||!RebirthRemoteResourceClientOriginal.ReadActor(original.Copy().Element("actorBefore").Value).Matches(actorImage)||
+                !RebirthRemoteResourceCraftingRead.MatchesSavedQueue(original.Copy().Element("queueBefore").Value,queue)||!RebirthRemoteResourceClientOriginal.ReadActor(original.Copy().Element("actorBefore").Value).Matches(actorImage)||
                 !RebirthCookingRemoteAdmissionBackend.NativePhase(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=5f)return false;
             return RebirthRemoteResourceDurableJournal.TryAdvance(root,value=>value.SetAttributeValue("ownerNoUseProof",proof),()=>Scope(actor,original),out _);
         }

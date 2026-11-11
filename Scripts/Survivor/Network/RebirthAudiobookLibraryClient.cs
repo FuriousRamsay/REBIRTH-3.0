@@ -26,7 +26,7 @@ public static class RebirthAudiobookLibraryClient
         var request=NetPackageManager.GetPackage<NetPackageRebirthMusicLibraryRequest>();
         if(!RebirthMusicLibraryClient.CanSend(connection,request))return false;
         useWorld=player.world;useOwner=player.entityId;useCreation=canonical;pendingUse=item.Clone();
-        RebirthMusicLibraryClient.Dispatch(player,0);
+        RebirthMusicLibraryClient.DispatchProjection(player,request);
         return true;
     }
     private static void ClearUse(){useWorld=null;useOwner=0;useCreation=string.Empty;pendingUse=null;}

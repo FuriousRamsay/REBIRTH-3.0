@@ -1,0 +1,25 @@
+{
+  "name": "Camper cargo maintenance guard leaves ordinary native inventory stack and movement available",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in disposable solo Purge and on the genuine dedicated Purge client. Keep guard on. Start with an ordinary nearby storage crate open through real interaction, exactly two resourceWood in one crate cell, one compatible resourceWood already in the player's backpack and no other resourceWood. The first native toolbelt slot must be empty. Prepare the owned camper maintenance fixture separately in the same session."
+    },
+    { "expectWindowOpen": "looting" },
+    { "expectUi": { "window": "looting", "item": "resourceWood" } },
+    { "markItem": "resourceWood" },
+    { "action": { "command": "click", "args": { "window": "looting", "item": "resourceWood", "shift": 1 } } },
+    { "expectItemDelta": { "name": "resourceWood", "op": "==", "value": 2 } },
+    { "expectNoUi": { "window": "looting", "item": "resourceWood" } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "action": { "command": "drag", "args": { "from.item": "resourceWood", "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/0" } } },
+    { "expectUiItem": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/0", "item": "resourceWood", "min": 3, "max": 3 } },
+    { "expectItemDelta": { "name": "resourceWood", "op": "==", "value": 2 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true },
+    {
+      "_note": "In the same running pair, execute audit_camper_claim_and_maintenance.json with its actual Maintenance Technician fixture. Verify one exact native held Bag-to-grid cargo debit and corresponding repair, the nonowner control, unrelated backpack movement, and unchanged crash/reload handling. This ordinary stack scenario does not measure Harmony allocation or establish the exact held wrong-slot control by itself."
+    }
+  ]
+}

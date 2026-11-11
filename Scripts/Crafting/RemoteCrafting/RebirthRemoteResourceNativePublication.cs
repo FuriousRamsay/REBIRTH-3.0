@@ -39,6 +39,7 @@ internal static class RebirthRemoteResourceNativePublication
         internal ItemStack[] Items;internal bool[] Locks;internal DateTime Expires;internal bool Closed;
         internal Chunk Chunk;internal TileEntity Tile;internal Marker[] Markers;
         internal RebirthStationSnapshotEvidence.Request ChunkProof;internal byte[] TileSpan;internal long TileOffset=-1;
+        private bool publishedTileSpans;
         private byte[] nativePayload;
         private IDisposable payloadAllocation;
         internal void RememberPayload(byte[] bytes,IDisposable allocation)
@@ -67,10 +68,23 @@ internal static class RebirthRemoteResourceNativePublication
             if(!Current())return false;
             if(Vehicle!=null)return RebirthLogisticsVehiclePublication.Verify(Vehicle,Current);
             if(Drone!=null)return RebirthLogisticsDronePublication.Verify(Drone,Current);
-            if(ChunkProof==null||TileSpan==null||Markers==null||Markers.Length>RebirthRemoteResourceDurableJournal.MaximumSources+1)return false;
-            var offsets=new long[Markers.Length+1];var spans=new byte[Markers.Length+1][];offsets[0]=TileOffset;spans[0]=TileSpan;
-            for(int index=0;index<Markers.Length;index++){offsets[index+1]=Markers[index].Offset;spans[index+1]=Markers[index].Span;}
-            return RebirthStationSnapshotEvidence.TryValidatePublishedSnapshotSpans(ChunkProof,offsets,spans,out _)&&Current();
+            return (System.Threading.Volatile.Read(ref publishedTileSpans)||HasPublishedTileSpans(ChunkProof))&&Current();
+        }
+        private bool HasPublishedTileSpans(RebirthStationSnapshotEvidence.Request request)
+        {
+            var markers=Markers;
+            var tile=TileSpan;
+            if(request==null||tile==null||markers==null||markers.Length>RebirthRemoteResourceDurableJournal.MaximumSources+1)return false;
+            var offsets=new long[markers.Length+1];var spans=new byte[markers.Length+1][];offsets[0]=TileOffset;spans[0]=tile;
+            for(int index=0;index<markers.Length;index++){offsets[index+1]=markers[index].Offset;spans[index+1]=markers[index].Span;}
+            return RebirthStationSnapshotEvidence.TryValidatePublishedSnapshotSpans(request,offsets,spans,out _);
+        }
+        internal void ObservePublishedTileSpans(RebirthStationSnapshotEvidence.Request request)
+        {
+            // Native readback invokes this before recycling the pooled snapshot.
+            // Only retain the exact saved-span verdict, without reading live state on the writer.
+            if(ReferenceEquals(ChunkProof,request)&&HasPublishedTileSpans(request))
+                System.Threading.Volatile.Write(ref publishedTileSpans,true);
         }
         // Detached observation only. The bytes are the positively published
         // native snapshot, not a newly serialized approximation of current state.
@@ -288,10 +302,15 @@ internal static class RebirthRemoteResourceNativePublication
     private static Watch BeginCore(RebirthRemoteResourceNativeBinding source,Func<bool> originalCurrent,int maximumKeys,string[] exactChunkMarkerKeys,
         IRebirthStationSnapshotByteBudget budget=null)
     {
-        if(!installed||source?.Current()!=true||originalCurrent?.Invoke()!=true||!ThreadManager.IsMainThread())return null;
-        foreach(var stale in pending.ToArray())if(!stale.Current())stale.Dispose();if(pending.Count>=16)return null;
+        Watch Refuse(string reason)
+        {
+            RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] source snapshot={reason} source={source?.Id}");
+            return null;
+        }
+        if(!installed||source?.Current()!=true||originalCurrent?.Invoke()!=true||!ThreadManager.IsMainThread())return Refuse("scope");
+        foreach(var stale in pending.ToArray())if(!stale.Current())stale.Dispose();if(pending.Count>=16)return Refuse("watch-limit");
         var watch=new Watch{Source=source,Original=originalCurrent,Items=source.CopySlots(),Locks=source.CopyLocks(),Expires=DateTime.UtcNow.AddSeconds(30)};
-        if(watch.Items==null||watch.Locks==null||watch.Items.Length!=watch.Locks.Length)return null;
+        if(watch.Items==null||watch.Locks==null||watch.Items.Length!=watch.Locks.Length)return Refuse("slot-image");
         try
         {
             if(source.Vehicle!=null)
@@ -299,7 +318,7 @@ internal static class RebirthRemoteResourceNativePublication
             if(source.Drone!=null)
             {watch.Drone=RebirthLogisticsDronePublication.Begin(source.Drone,watch.Current);if(watch.Drone==null)return null;Track(watch);return watch;}
             watch.Tile=source.Endpoint as TileEntity;watch.Chunk=watch.Tile?.GetChunk();
-            if(watch.Chunk==null||exactChunkMarkerKeys==null||exactChunkMarkerKeys.Length>maximumKeys||exactChunkMarkerKeys.Distinct(StringComparer.Ordinal).Count()!=exactChunkMarkerKeys.Length)return null;
+            if(watch.Chunk==null||exactChunkMarkerKeys==null||exactChunkMarkerKeys.Length>maximumKeys||exactChunkMarkerKeys.Distinct(StringComparer.Ordinal).Count()!=exactChunkMarkerKeys.Length)return Refuse("chunk-or-marker-keys");
             var markerKeys=exactChunkMarkerKeys.ToList();
             if(source.Station!=null)
             {
@@ -320,25 +339,28 @@ internal static class RebirthRemoteResourceNativePublication
                 var value=watch.Chunk.ChunkCustomData.dict[key];
                 markers.Add(new Marker{Key=key,Value=value,Bytes=(byte[])value.data.Clone()});
             }
-            watch.Markers=markers.ToArray();if(!watch.Current())return null;
+            watch.Markers=markers.ToArray();if(!watch.Current())return Refuse("snapshot-scope");
             var provider=source.World.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;var regions=provider?.m_RegionFileManager;
-            if(regions==null||!(regions.regionFileAccess is RegionFileAccessSectorBased)||string.IsNullOrEmpty(regions.saveDirectory))return null;
+            if(regions==null||!(regions.regionFileAccess is RegionFileAccessSectorBased)||string.IsNullOrEmpty(regions.saveDirectory))return Refuse("region-provider");
             var access=regions.regionFileAccess;string directory=Path.GetFullPath(regions.saveDirectory);var original=watch.Original;
             watch.Original=()=>original()&&ReferenceEquals(source.World.ChunkCache?.ChunkProvider,provider)&&ReferenceEquals(provider.m_RegionFileManager,regions)&&
                 ReferenceEquals(regions.regionFileAccess,access)&&Path.GetFullPath(regions.saveDirectory)==directory;
             watch.ChunkProof=RebirthStationSnapshotEvidence.Watch(source.World,watch.Chunk,watch.Chunk.X,watch.Chunk.Z,watch.Current,watch.Tile,budget:budget);
-            if(watch.ChunkProof==null)return null;Track(watch);
+            if(watch.ChunkProof==null)return Refuse("chunk-watch");
+            var request=watch.ChunkProof;
+            request.OnPublished=(_,_)=>watch.ObservePublishedTileSpans(request);
+            Track(watch);
             lock(watch.Chunk)
             {
                 if(!watch.Current()||watch.Chunk.IsLocked||watch.Chunk.InProgressSaving||watch.Chunk.NeedsDecoration||watch.Chunk.InProgressDecorating||watch.Chunk.NeedsLightCalculation||watch.Chunk.InProgressLighting)
-                {watch.Dispose();return null;}
+                {watch.Dispose();return Refuse($"chunk-busy locked={watch.Chunk.IsLocked} saving={watch.Chunk.InProgressSaving} decoration={watch.Chunk.NeedsDecoration}/{watch.Chunk.InProgressDecorating} lighting={watch.Chunk.NeedsLightCalculation}/{watch.Chunk.InProgressLighting}");}
                 watch.Chunk.InProgressSaving=true;
             }
-            try{if(!watch.Current()){watch.Dispose();return null;}regions.SaveChunkSnapshot(watch.Chunk,true);}
+            try{if(!watch.Current()){watch.Dispose();return Refuse("scope-before-save");}regions.SaveChunkSnapshot(watch.Chunk,true);}
             finally{lock(watch.Chunk)watch.Chunk.InProgressSaving=false;}
             return watch;
         }
-        catch{watch.Dispose();return null;}
+        catch(Exception error){watch.Dispose();return Refuse(error.GetType().Name);}
     }
     internal static Watch BeginElectricalTarget(RemoteResourceTransactions.ActionPayment original)
     {

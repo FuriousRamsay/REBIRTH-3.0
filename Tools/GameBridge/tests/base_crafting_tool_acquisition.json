@@ -1,0 +1,24 @@
+{
+  "name": "Base Game Purge personal Hammer and Pliers craft from normally acquired tools",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Disposable solo or dedicated Base Game progression and Purge. Use the normal native toolbox loot window to acquire one Pliers and one Screwdriver from naturally rolled, previously unopened toolBox or rollingToolBox containers. Save before/after container and inventory receipts. Craft or loot one native Claw Hammer. Prepare an empty personal queue and a free backpack cell. The scenario starts after that native acquisition and confirms the personal craft. For localized clients use the observed Craft action caption."},
+    {"expectItem": {"name": "FuriousRamsayPliers", "min": 1}},
+    {"expectItem": {"name": "FuriousRamsayScrewdriver", "min": 1}},
+    {"expectItem": {"name": "meleeToolRepairT1ClawHammer", "min": 1}},
+    {"expectNoItem": "FuriousRamsayHammerPliers"},
+    {"markItem": "FuriousRamsayPliers"},
+    {"markItem": "FuriousRamsayScrewdriver"},
+    {"markItem": "meleeToolRepairT1ClawHammer"},
+    {"action": {"command": "key", "args": {"name": "Tab"}}},
+    {"expectWindowOpen": "crafting"},
+    {"action": {"command": "click", "args": {"recipe": "FuriousRamsayHammerPliers", "exact": 1, "window": "crafting"}}},
+    {"action": {"command": "click", "args": {"text": "Craft", "window": "crafting"}}},
+    {"expectItemDelta": {"name": "FuriousRamsayPliers", "op": "==", "value": -1}},
+    {"expectItemDelta": {"name": "meleeToolRepairT1ClawHammer", "op": "==", "value": -1}},
+    {"wait": 12},
+    {"expectItem": {"name": "FuriousRamsayHammerPliers", "min": 1, "max": 1}},
+    {"expectItemDelta": {"name": "FuriousRamsayScrewdriver", "op": "==", "value": 0}},
+    {"expectNoErrors": true}
+  ]
+}

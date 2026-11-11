@@ -11,6 +11,8 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
 {
     public void InitMod(Mod modInstance)
     {
+        // This is REBIRTH's first native ModAPI entry on the dedicated server.
+        RebirthModApiStartupLogFilter.Install(modInstance);
         RebirthSandboxMenuPatchInstaller.Install();
         RebirthAlwaysStaggerPatchInstaller.Install();
         RebirthHeadshotOnlyBehaviorInstaller.Install();
@@ -81,8 +83,8 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
         if (!AdvancedFarmingRuntimePolicy.Enabled)
             return;
 
-        // With no real REBIRTH farm plots loaded, Advanced Farming is inert.
-        // Global hooks remain installed but every runtime subsystem exits here.
+        // These queues belong to loaded farm plots. Harvest, water and
+        // deferred native plant state still have work outside plot areas.
         if (!AdvancedFarmingActiveAreaRegistry.HasAnyFarmPlots)
         {
             AdvancedFarmingDynamicLightOpacityService.ClearPendingSunlightRefreshes();
@@ -95,7 +97,6 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
         AdvancedFarmingSyncService.PumpPendingGeometryDrivenPlantLightRefreshes();
         AdvancedFarmingDoorVisualRefreshService.PumpPendingVisualRefreshesForGameUpdate();
         AdvancedFarmingSyncService.PumpPendingPlantStateSnapshots();
-        AdvancedFarmingCatchupService.PumpCatchupWatchForGameUpdate(world);
     }
 
     private static void ResetAdvancedFarmingRuntimeState(string reason)

@@ -77,9 +77,14 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
                 !ValidateInput(original,out var position,out uint block,out string window,out var authored,out _,out _,out _,out int belt,out var payment,out bool turnsOn,out var input))return false;
             Guid source=RebirthRemoteResourceDurableJournal.Operation(world,owner.StorageKey,original.Creation,original.Epoch,original.Request,original.Kind);
             if(RebirthRemoteResourcePreAdmissionRefusal.BlocksAdmission(source)||!KnownAdmissionFiles(source))return false;
-            byte[] body=Encoding.UTF8.GetBytes(original.Copy().ToString(SaveOptions.DisableFormatting));var journal=Admissions();var retained=journal.Read(source);
+            var image=original.Copy();
+            byte[] body=Encoding.UTF8.GetBytes(image.ToString(SaveOptions.DisableFormatting));var journal=Admissions();var retained=journal.Read(source);
             if(retained==null)
             {
+                var action=image.Element("action");
+                string outputDefinition=action.Element("outputDefinition").Value;
+                string outputImage=action.Element("outputImage").Value;
+                string authoredImage=action.Element("authored").Value;
                 if(!RebirthRemoteResourcePlacedStationScope.TryResolveLayout(actor,position,original.Creation,out var station,out string actualWindow,out var actualPayment,out bool actualTurnsOn)||
                     !HasActualAcceptedUpload(actor,original,source,station)||
                     actualWindow!=window||actualPayment!=payment||actualTurnsOn!=turnsOn||station.blockValue.rawData!=block||
@@ -87,17 +92,17 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
                     !RebirthRemoteResourcePlacedStationScope.AllowsRecipe(actor,station,authored)||
                     !CraftingManager.GetAllRecipes().Any(recipe=>recipe!=null&&recipe.craftingToolType==authored.craftingToolType&&
                         recipe.materialBasedRecipe==authored.materialBasedRecipe&&recipe.tags.ToString()==authored.tags.ToString()&&
-                        RebirthRecipeOutputs.DefinitionIdentity(recipe)==original.Copy().Element("action").Element("outputDefinition").Value&&
-                        RebirthRecipeOutputs.TryCaptureFrozenOutputs(recipe,out string frozen)&&frozen==original.Copy().Element("action").Element("outputImage").Value&&
-                        RebirthRemoteResourceOwnerAction.RecipeImage(recipe)==original.Copy().Element("action").Element("authored").Value)||
+                        RebirthRecipeOutputs.DefinitionIdentity(recipe)==outputDefinition&&
+                        RebirthRecipeOutputs.TryCaptureFrozenOutputs(recipe,out string frozen)&&frozen==outputImage&&
+                        RebirthRemoteResourceOwnerAction.RecipeImage(recipe)==authoredImage)||
                     belt!=actor.inventory.Length||input.Length!=station.Input?.Length||input.Where((item,index)=>!RebirthStationGridIngredients.IsSameStackSnapshot(item,station.Input[index])).Any())return false;
-                var queue=RebirthCookingRemoteAdmission.ReadProtocolXml(original.Copy().Element("action").Element("queue").Value,RebirthRemoteResourcePlacedStationQueue.MaximumBytes);
+                var queue=RebirthCookingRemoteAdmission.ReadProtocolXml(action.Element("queue").Value,RebirthRemoteResourcePlacedStationQueue.MaximumBytes);
                 if(queue.Element("native")?.Value!=RebirthCookingRemoteAdmissionBackend.Queue(station.Queue)||
                     !RebirthCamperEnergySavedOwner.TryRead(owner,out var before,out var saved)||saved.id!=actor.entityId||saved.deaths!=original.Deaths||
-                    !RebirthRemoteResourceClientOriginal.ReadActor(original.Copy().Element("actorBefore").Value).Matches(before)||
+                    !RebirthRemoteResourceClientOriginal.ReadActor(image.Element("actorBefore").Value).Matches(before)||
                     !RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=10f)return false;
-                var required=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(original.Copy().Element("requirements").Value));
-                var remote=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(original.Copy().Element("remoteRequirements").Value));
+                var required=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(image.Element("requirements").Value));
+                var remote=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(image.Element("remoteRequirements").Value));
                 if(payment==RebirthRemoteResourcePlacedStationScope.PaymentSource.OwnerInventory?!RebirthRemoteResourceCraftPlan.IsExactShortfall(before,required,remote,belt):
                     !RebirthRemoteResourcePlacedStationInputPlan.TryCreate(input,required,remote,out _))return false;
                 if(!ServerScope(actor,original)||!RebirthRemoteResourcePlacedStationIdentity.EnsureFresh(actor,original,source,station))return false;

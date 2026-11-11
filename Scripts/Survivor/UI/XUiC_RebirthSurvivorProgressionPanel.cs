@@ -39,11 +39,11 @@ public sealed class XUiC_RebirthSurvivorProgressionPanel : XUiController
 
     private void RefreshSnapshot(bool force)
     {
-        RebirthSurvivorOwnerHeader header = RebirthSurvivorClientState.GetOwnerHeader();
+        RebirthSurvivorOwnerHeader header = RebirthSurvivorClientState.GetOwnerHeader(showOrdinaryProgress: true);
         long textRevision = RebirthUiProjectionTextCache.Revision;
         bool changed = !header.Equals(lastHeader);
         if (!force && !changed && textRevision == lastTextRevision) return;
-        if (force || changed) snapshot = RebirthSurvivorClientState.GetOwnerStateSnapshot(out lastHeader);
+        if (force || changed) snapshot = RebirthSurvivorClientState.GetOwnerStateSnapshot(out lastHeader, showOrdinaryProgress: true);
         lastTextRevision = textRevision;
         cachedAttributes = BuildAttributes();
         cachedSkills = BuildSkills();

@@ -296,6 +296,7 @@ public sealed class RebirthCharacterModelBinder
                 {
                     light.transform.position = bounds.center + new Vector3(1.25f, bounds.extents.y, -2f);
                     light.type = LightType.Point;
+                    light.cullingMask = 1 << SnapshotLayer;
                     light.range = 20f;
                     light.intensity = 1.45f;
                     light.color = new Color(1f, 0.93f, 0.86f, 1f);

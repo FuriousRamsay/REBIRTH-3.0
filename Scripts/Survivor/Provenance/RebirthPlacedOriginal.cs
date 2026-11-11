@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,21 +186,41 @@ internal static class RebirthPlacedOriginal
         if(!Current(a)||a.ConversionFactory||insensitive||a.Action.changeItemTo!=name)throw new InvalidOperationException("Original placement conversion unavailable");
         var output=ActorImage(a.Record.After).Belt[a.Record.Slot];if(output.count!=1)throw new InvalidDataException();var value=FreshConversion(name,output.itemValue);a.ConversionFactory=true;return value;
     }
+    private static readonly ConcurrentDictionary<(Type BlockType,string Method),Type> PlacementDeclarations =
+        new ConcurrentDictionary<(Type BlockType,string Method),Type>();
+
+    private static Type PlacementDeclaration(Type blockType,string method) =>
+        PlacementDeclarations.GetOrAdd((blockType,method),key=>key.BlockType.GetMethod(key.Method).DeclaringType);
+
     private static bool TryTarget(EntityPlayer owner,Record r,out BlockValue target)
     {
         target=BlockValue.Air;
         try
         {
             var input=Item(r.Input);var action=input.ItemClass.Actions?.OfType<ItemActionPlaceAsBlock>().SingleOrDefault();if(action==null)return false;if(action.changeItemTo!=null&&ItemClass.GetItemClass(action.changeItemTo)==null)return false;
-            var source=input.ItemClass.OnConvertToBlockValue(input,action.blockToPlace);if(source.Block==null||source.Block.GetType().GetMethod(nameof(Block.OnBlockPlaceBefore)).DeclaringType!=typeof(Block))return false;
+            var source=input.ItemClass.OnConvertToBlockValue(input,action.blockToPlace);
+            var sourceBlock=source.Block;
+            if(sourceBlock==null||PlacementDeclaration(sourceBlock.GetType(),nameof(Block.OnBlockPlaceBefore))!=typeof(Block))return false;
+
             target=source;
-            if(source.Block.SelectAlternates){target=source.Block.GetAltBlockValue(input.Meta);target.rotation=source.rotation;}
-            else if(source.Block.placeAltBlockNames!=null&&source.Block.placeAltBlockNames.Length!=0)return false; // Do not rerun native random selection.
-            var block=target.Block;if(block is BlockPowered&&!(block is BlockPoweredLight)&&block.GetType()!=typeof(BlockSwitch)&&block.GetType().GetMethod(nameof(Block.OnBlockAdded)).DeclaringType==typeof(Block))return false;return block!=null&&!target.isair&&(!block.isMultiBlock||block.multiBlockPos!=null&&block.multiBlockPos.Length<=16)&&!(block is BlockPlantGrowingRebirth)&&block.GetType().GetMethod(nameof(Block.PlaceBlock)).DeclaringType==typeof(Block)&&SupportedAdded(block)&&(block.GetType().GetMethod(nameof(Block.OnBlockDamaged)).DeclaringType==typeof(Block)||block.GetType().GetMethod(nameof(Block.OnBlockDamaged)).DeclaringType==typeof(BlockBladeTrap)||block.GetType().GetMethod(nameof(Block.OnBlockDamaged)).DeclaringType==typeof(BlockElectricWire));
+            if(sourceBlock.SelectAlternates){target=sourceBlock.GetAltBlockValue(input.Meta);target.rotation=source.rotation;}
+            else if(sourceBlock.placeAltBlockNames!=null&&sourceBlock.placeAltBlockNames.Length!=0)return false; // Do not rerun native random selection.
+
+            var block=target.Block;
+            if(block==null)return false;
+            Type blockType=block.GetType();
+            if(block is BlockPowered&&!(block is BlockPoweredLight)&&blockType!=typeof(BlockSwitch)&&
+                PlacementDeclaration(blockType,nameof(Block.OnBlockAdded))==typeof(Block))return false;
+            if(target.isair||block.isMultiBlock&&(block.multiBlockPos==null||block.multiBlockPos.Length>16)||
+                block is BlockPlantGrowingRebirth||PlacementDeclaration(blockType,nameof(Block.PlaceBlock))!=typeof(Block)||
+                !SupportedAdded(blockType))return false;
+
+            Type damageDeclaration=PlacementDeclaration(blockType,nameof(Block.OnBlockDamaged));
+            return damageDeclaration==typeof(Block)||damageDeclaration==typeof(BlockBladeTrap)||damageDeclaration==typeof(BlockElectricWire);
         }catch{return false;}
     }
-    private static bool SupportedAdded(Block block)
-    {var declared=block.GetType().GetMethod(nameof(Block.OnBlockAdded)).DeclaringType;return declared==typeof(Block)||declared==typeof(BlockPowerSource)||declared==typeof(BlockRanged)||declared==typeof(BlockPoweredTrap)||declared==typeof(BlockLauncher)||declared==typeof(BlockTimerRelay)||declared==typeof(BlockPressurePlate)||declared==typeof(BlockMotionSensor)||declared==typeof(BlockElectricWire)||declared==typeof(BlockLight);}
+    private static bool SupportedAdded(Type blockType)
+    {var declared=PlacementDeclaration(blockType,nameof(Block.OnBlockAdded));return declared==typeof(Block)||declared==typeof(BlockPowerSource)||declared==typeof(BlockRanged)||declared==typeof(BlockPoweredTrap)||declared==typeof(BlockLauncher)||declared==typeof(BlockTimerRelay)||declared==typeof(BlockPressurePlate)||declared==typeof(BlockMotionSensor)||declared==typeof(BlockElectricWire)||declared==typeof(BlockLight);}
     internal static BlockValue ExpectedBlock(Record r)
     {
         if(!RebirthOriginalNativeBlockChange.TryDecode(r.Changes,out var changes)||changes.Count!=1)throw new InvalidDataException();var value=changes[0].blockValue;
@@ -512,7 +533,11 @@ internal static class RebirthPlacedOriginal
     private static bool TargetBefore(World world,EntityPlayer owner,Record r,bool retained=false)=>r.TargetBirth.Length!=0&&RebirthOriginalNativeBlockIdentity.TryRead(world,r.Position,out string token)&&token==r.TargetBirth&&TargetRawBefore(world,owner,r,retained);
     private static bool TargetRawBefore(World world,EntityPlayer owner,Record r,bool retained=false)
     {
-        var chunk=world.GetChunkSync(World.toChunkXZ(r.X),World.toChunkXZ(r.Z)) as Chunk;if(world.GetTileEntity(r.Position)!=null||chunk==null||chunk.InProgressUnloading||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.ChunkCustomData.dict.Count>ushort.MaxValue-2||world.GetBlock(r.Position).rawData!=r.BeforeBlock||!world.GetBlock(r.Position).isair)return false;
+        var chunk=world.GetChunkSync(World.toChunkXZ(r.X),World.toChunkXZ(r.Z)) as Chunk;
+        if(world.GetTileEntity(r.Position)!=null||chunk==null||chunk.InProgressUnloading||chunk.NeedsDecoration||
+            chunk.InProgressDecorating||chunk.ChunkCustomData.dict.Count>ushort.MaxValue-2)return false;
+        BlockValue before=world.GetBlock(r.Position);
+        if(before.rawData!=r.BeforeBlock||!before.isair)return false;
         if(!TryTarget(owner,r,out var intended))return false;if(RebirthInfrastructureWorkService.IsElectricalBlock(intended.Block)&&(!PowerManager.HasInstance||PowerManager.Instance.PowerItemDictionary.ContainsKey(r.Position)))return false;if(r.Changes.Length!=0){if(!RebirthOriginalNativeBlockChange.TryDecode(r.Changes,out var original)||original.Count!=1)return false;intended=original[0].blockValue;}if(!intended.Block.CanPlaceBlockAt(world,r.Position,intended))return false;
         var delta=owner.position-r.Position.ToVector3();return (retained||delta.sqrMagnitude<=64f)&&world.CanPlaceBlockAt(r.Position,GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(owner.entityId));
     }

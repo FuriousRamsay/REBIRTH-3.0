@@ -54,7 +54,7 @@ public static class RebirthVehicleTransferPlanner
             || string.IsNullOrEmpty(nativeFuelItem) || float.IsNaN(nativeFuelLevel) || float.IsInfinity(nativeFuelLevel)
             || float.IsNaN(nativeFuelCapacity) || float.IsInfinity(nativeFuelCapacity)
             || nativeFuelCapacity <= 0f || nativeFuelLevel < 0f || nativeFuelLevel >= nativeFuelCapacity
-            || before.FuelPercent != nativeFuelLevel / nativeFuelCapacity)
+            || before.FuelPercent != RebirthVehicleTransferFuel.AssemblyFraction(nativeFuelLevel, nativeFuelCapacity))
             throw new InvalidDataException("Refuel requires an available entity revision and native tank observation.");
         var debits = (selectedDebits ?? Enumerable.Empty<RebirthVehicleTransferItem>()).Take(257).ToArray();
         if (debits.Length == 0 || debits.Length > 256 || debits.Any(i => i == null || !i.Debit)
@@ -76,7 +76,8 @@ public static class RebirthVehicleTransferPlanner
         var fuel = new RebirthVehicleTransferFuel(nativeFuelLevel, afterLevel, nativeFuelCapacity);
         var after = before.DeepClone();
         if (after.Revision == long.MaxValue) throw new InvalidDataException("Vehicle revision is exhausted.");
-        after.FuelPercent = afterLevel / nativeFuelCapacity; after.Revision++; after.LastAppliedInventoryTransferId = transactionId;
+        after.FuelPercent = RebirthVehicleTransferFuel.AssemblyFraction(afterLevel, nativeFuelCapacity);
+        after.Revision++; after.LastAppliedInventoryTransferId = transactionId;
         return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint,
             before, after, debits, target, fuel,null,nativeDeaths);
     }
@@ -99,7 +100,7 @@ public static class RebirthVehicleTransferPlanner
             if (!nativeFuelLevel.HasValue || !nativeFuelCapacity.HasValue)
                 throw new InvalidDataException("Entity siphon requires native fuel level and capacity.");
             fuel = new RebirthVehicleTransferFuel(nativeFuelLevel.Value, 0f, nativeFuelCapacity.Value);
-            if (before.FuelPercent != fuel.BeforeLevel / fuel.Capacity)
+            if (before.FuelPercent != RebirthVehicleTransferFuel.AssemblyFraction(fuel.BeforeLevel, fuel.Capacity))
                 throw new InvalidDataException("Native fuel and assembly observation disagree.");
             gasAmount = fuel.BeforeLevel * 25f;
             if(string.IsNullOrEmpty(nativeFuelItem))throw new InvalidDataException("Entity siphon requires the configured native fuel item.");

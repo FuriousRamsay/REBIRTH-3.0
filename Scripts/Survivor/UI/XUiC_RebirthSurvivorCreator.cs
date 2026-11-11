@@ -450,6 +450,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     private XUiV_Label traitAvailablePoints;
     private XUiV_Label traitSelectedHeading;
     private XUiV_Label traitSelectedText;
+    private XUiController traitSelectedNativeScrollView;
     private XUiController traitSelectedNativeScrollProxy;
     private XUiV_Label traitFocusedDetails;
     private XUiV_Sprite traitFocusedIcon;
@@ -506,12 +507,12 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     private bool nativeProfileModalWasOpen;
     private bool nativePortraitPreloadStarted;
     private bool nativePortraitPreloadComplete;
-    private int nativePortraitPreloadCursor;
-    private string nativePortraitPreloadRestoreName = string.Empty;
     private XUiController profilePortraitPreloadMask;
     private string pendingSelectedPortraitName = string.Empty;
     private int pendingSelectedPortraitReadyFrame = -1;
     private readonly HashSet<string> nativePortraitFailureLogged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    private int nextVisiblePortraitRow;
+    private float nextVisiblePortraitAt;
     private XUiController playerPreviewBackgroundTexture;
     private RebirthSurvivorArtTextureBinder playerPreviewBackgroundBinder;
     private XUiController backgroundScrollTrack;
@@ -665,6 +666,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         traitAvailablePoints = Label("traitAvailablePoints");
         traitSelectedHeading = Label("traitSelectedHeading");
         traitSelectedText = Label("traitSelectedText");
+        traitSelectedNativeScrollView = GetChildById("traitSelectedNativeScrollView");
         traitSelectedNativeScrollProxy = GetChildById("traitSelectedNativeScrollProxy");
         traitFocusedDetails = Label("traitFocusedDetails");
         traitFocusedIcon = Sprite("traitFocusedIcon");
@@ -1035,11 +1037,11 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         nativeProfileModalWasOpen = false;
         nativePortraitPreloadStarted = false;
         nativePortraitPreloadComplete = false;
-        nativePortraitPreloadCursor = 0;
-        nativePortraitPreloadRestoreName = string.Empty;
         pendingSelectedPortraitName = string.Empty;
         pendingSelectedPortraitReadyFrame = -1;
         nativePortraitFailureLogged.Clear();
+        nextVisiblePortraitRow = 0;
+        nextVisiblePortraitAt = 0f;
         nativeProfileCreatePhase = NativeProfileCreatePhase.None;
         nativeTemporaryProfileName = string.Empty;
         nativeOriginalProfileName = string.Empty;
@@ -1239,8 +1241,6 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         nativeProfileLastSelection = string.Empty;
         nativePortraitPreloadStarted = false;
         nativePortraitPreloadComplete = false;
-        nativePortraitPreloadCursor = 0;
-        nativePortraitPreloadRestoreName = string.Empty;
         nativeProfileCreatePhase = NativeProfileCreatePhase.None;
         nativeTemporaryProfileName = string.Empty;
         nativeOriginalProfileName = string.Empty;
@@ -1341,6 +1341,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             pendingSelectedPortraitName = model != null ? (model.PlayerProfileName ?? string.Empty).Trim() : string.Empty;
             pendingSelectedPortraitReadyFrame = Time.frameCount + 1;
             nativePortraitFailureLogged.Clear();
+            nextVisiblePortraitRow = 0;
             for (int i = 0; i < nativeProfilePortraits.Length; i++)
                 if (nativeProfilePortraits[i] != null) nativeProfilePortraits[i].ClearView();
             RenderProfiles();
@@ -1356,11 +1357,12 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             RenderProfiles();
         }
 
-        if (!nativeProfileModalOpen && !customCreateFlowActive && nativePortraitPreloadStarted && !nativePortraitPreloadComplete)
-            PumpNativeProfilePortraitPreload();
         if (!nativeProfileModalOpen && !customCreateFlowActive && nativePortraitPreloadComplete &&
             model != null && model.Step == RebirthSurvivorCreatorStep.Profile)
-            PumpSelectedProfilePortrait();
+        {
+            if (!PumpSelectedProfilePortrait())
+                PumpVisibleProfilePortrait();
+        }
 
         portraitPreloadActive = nativePortraitPreloadStarted && !nativePortraitPreloadComplete;
         if (!nativeProfileModalOpen && !customCreateFlowActive && !portraitPreloadActive &&
@@ -1859,6 +1861,9 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
 
             RebirthNativePlayerProfileBridge.EmbeddedProfileInfo profile = nativeProfileSnapshot[index];
             SetLabel(nativeProfileNames[row], RebirthNativePlayerProfileBridge.DisplayProfileName(profile?.Name));
+            if (nativeProfileNames[row] != null)
+                nativeProfileNames[row].Color = RebirthNativePlayerProfileBridge.IsReservedTemporaryProfileName(profile?.Name)
+                    ? new Color(1f, .6f, .6f) : Color.white;
             bool selected = profile != null && string.Equals(profile.Name, selectedName, StringComparison.OrdinalIgnoreCase);
             if (nativeProfileSelections[row] != null) nativeProfileSelections[row].IsVisible = selected;
             if (nativeProfileChecks[row] != null) nativeProfileChecks[row].IsVisible = selected;
@@ -1912,14 +1917,14 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     /// ProfilesList selection, so portrait work cannot blank, reorder, or desynchronize the
     /// roster/live SDCS preview. One frame is allowed for SDCSPreviewWindow to rebuild first.
     /// </summary>
-    private void PumpSelectedProfilePortrait()
+    private bool PumpSelectedProfilePortrait()
     {
-        if (string.IsNullOrEmpty(pendingSelectedPortraitName) || Time.frameCount < pendingSelectedPortraitReadyFrame) return;
+        if (string.IsNullOrEmpty(pendingSelectedPortraitName) || Time.frameCount < pendingSelectedPortraitReadyFrame) return false;
         string actualName;
         string actualSource;
         if (!RebirthNativePlayerProfileBridge.TryResolveEmbeddedPlayerProfileName(this, out actualName, out actualSource) ||
             !string.Equals(actualName, pendingSelectedPortraitName, StringComparison.OrdinalIgnoreCase))
-            return;
+            return false;
 
         Archetype archetype;
         string archetypeSource;
@@ -1941,25 +1946,20 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         pendingSelectedPortraitName = string.Empty;
         pendingSelectedPortraitReadyFrame = -1;
         BindVisibleNativePortraits();
+        return true;
     }
 
     /// <summary>
-    /// Warm stock/default portraits without touching native selection. Default 3.1 Player
-    /// Profile names map to named SDCS Archetypes. Two are built per update after the visible
-    /// rows, so scrolling quickly hits the shared cache without a selection-cycling freeze.
-    /// Custom profiles are skipped until genuinely selected and captured above.
+    /// Keep the native selection interactive while the visible roster builds its portraits.
     /// </summary>
     private void BeginNativeProfilePortraitPreload()
     {
         // Do not cycle the embedded native Player Profile selection in the background.
         // That selection is also the live SDCS preview authority; changing it to manufacture
         // thumbnails can leave the Creator on the wrong model and can trigger overlapping
-        // preview rebuilds.  Existing persistent portrait-cache entries remain available, and
-        // an uncached portrait is captured only after the player genuinely selects that profile.
+        // preview rebuilds. The visible-row pump reads named profile data directly.
         nativePortraitPreloadStarted = true;
         nativePortraitPreloadComplete = true;
-        nativePortraitPreloadCursor = nativeProfileSnapshot != null ? nativeProfileSnapshot.Count : 0;
-        nativePortraitPreloadRestoreName = model != null ? (model.PlayerProfileName ?? string.Empty).Trim() : string.Empty;
         SetVisible(profilePortraitPreloadMask, false);
         SetNativeProfileInteractionEnabled(true);
         BindVisibleNativePortraits();
@@ -1967,18 +1967,39 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             RebirthPlayerProfilePortraitBinder.GetCachedCount() + " profiles=" + nativeProfileCount); }
     }
 
-    private void PumpNativeProfilePortraitPreload()
+    private void PumpVisibleProfilePortrait()
     {
-        // Intentionally no-op. Portrait generation must never mutate ProfileSDF/native selection
-        // behind the player's back. PumpSelectedProfilePortrait owns uncached capture.
-    }
+        if (nativeProfileSnapshot == null || Time.realtimeSinceStartup < nextVisiblePortraitAt)
+            return;
 
-    private void CompleteNativeProfilePortraitPreload()
-    {
-        nativePortraitPreloadComplete = true;
-        SetVisible(profilePortraitPreloadMask, false);
-        SetNativeProfileInteractionEnabled(true);
-        BindVisibleNativePortraits();
+        nextVisiblePortraitAt = Time.realtimeSinceStartup + 0.15f;
+        for (int checkedRows = 0; checkedRows < NativeProfileVisibleRows; checkedRows++)
+        {
+            int row = nextVisiblePortraitRow;
+            nextVisiblePortraitRow = (row + 1) % NativeProfileVisibleRows;
+            if (nativeProfileScrollOffset + row >= nativeProfileSnapshot.Count) continue;
+            var profile = nativeProfileSnapshot[nativeProfileScrollOffset + row];
+            var binder = nativeProfilePortraits[row];
+            if (binder == null || string.IsNullOrEmpty(profile?.Name) ||
+                binder.HasPortraitFor(profile.Name))
+                continue;
+
+            try
+            {
+                // Resolve the name the same way as SDCSPreviewWindow. The roster's
+                // reflected object can contain a different or incomplete appearance.
+                var archetype = Archetype.GetArchetype(profile.Name);
+                if (archetype == null && ProfileSDF.ProfileExists(profile.Name))
+                    archetype = ProfileSDF.CreateTempArchetype(profile.Name);
+                if (archetype != null)
+                    binder.Bind(profile.Name, archetype);
+            }
+            catch (Exception ex)
+            {
+                RebirthDebug.Log("survivor", "[REBIRTH Survivor] Visible profile portrait could not be prepared: " + ex.Message);
+            }
+            return;
+        }
     }
 
     private void SetNativeProfileInteractionEnabled(bool enabled)
@@ -2130,24 +2151,21 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         string remainingColor = remaining < 0 ? "E75A5A" : (remaining == 0 ? "D6C978" : "8FD18F");
         SetLabel(traitAvailablePoints, "[" + remainingColor + "]" + remaining.ToString(CultureInfo.InvariantCulture) + "[-]");
         SetLabel(traitBudgetText, RebirthSurvivorUiText.BuildTraitBudgetCompact(model));
-        SetLabel(traitSelectedHeading, RebirthSurvivorUiText.L("xuiRebirthSurvivorSelectedTraits", "SELECTED TRAITS") +
-            " (" + model.SelectedTraitIds.Count.ToString(CultureInfo.InvariantCulture) + ")");
+        int selectedCount = model.SelectedTraitIds.Count;
+        SetLabel(traitSelectedHeading, string.Format(CultureInfo.CurrentCulture,
+            RebirthSurvivorUiText.L("xuiRebirthSurvivorSelectedTraitsCount", "SELECTED TRAITS ({0}/{1})"),
+            selectedCount, RebirthSurvivorCreationValidator.MaxSelectedTraits));
         string selectedTraitSummary = RebirthSurvivorUiText.BuildSelectedTraitSummary(model);
-        SetLabel(traitSelectedText, selectedTraitSummary);
-        if (traitSelectedText != null)
+        if (traitSelectedText != null && traitSelectedText.Text != selectedTraitSummary)
         {
-            int selectedTraitLines = 1;
-            for (int i = 0; i < selectedTraitSummary.Length; i++) if (selectedTraitSummary[i] == '\n') selectedTraitLines++;
-            // The native scroll view measures its child height. resizeheight alone could stop
-            // at the original 118px authoring height, causing later selected Traits to exist in
-            // the model but remain unreachable. Give the label an explicit content extent.
-            int selectedTraitContentHeight = Math.Max(118, selectedTraitLines * 23 + 8);
-            traitSelectedText.Size = new Vector2i(500, selectedTraitContentHeight);
-            // An explicit one-pixel proxy is used as well because the 7DTD native ScrollView
-            // can cache the authored label extent. The proxy guarantees the scrollbar's full
-            // range tracks every selected Trait, including long 20+ Trait lists.
-            if (traitSelectedNativeScrollProxy != null && traitSelectedNativeScrollProxy.ViewComponent != null)
-                traitSelectedNativeScrollProxy.ViewComponent.Size = new Vector2i(1, selectedTraitContentHeight);
+            traitSelectedText.SetTextImmediately(selectedTraitSummary);
+            traitSelectedText.Update(0f);
+            int measured = traitSelectedText.label != null
+                ? Mathf.CeilToInt(traitSelectedText.label.printedSize.y)
+                : selectedCount * 23;
+            int contentHeight = Math.Max(118, measured + 8);
+            traitSelectedText.Size = new Vector2i(traitSelectedText.Size.x, contentHeight);
+            RebirthStatisticsScrollLayout.Refresh(traitSelectedNativeScrollView, traitSelectedNativeScrollProxy, 1, contentHeight);
         }
 
         if (string.IsNullOrEmpty(focusedTraitId) || model.GetTrait(focusedTraitId) == null)
@@ -2165,7 +2183,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         {
             SetSprite(traitFocusedIcon, string.Empty);
             SetLabel(traitFocusedDetails, RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitHelp",
-                "Choose enduring positive, negative, and mixed Traits. Positive Traits spend points; negative Traits grant points."));
+                "Choose enduring Traits. Positive and mixed Traits cost points. Negative Traits grant points."));
         }
 
         XUiController removeUnavailable = GetChildById("btnRemoveUnavailableTraits");
@@ -2212,7 +2230,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
 
             string summary = BuildTraitRowSummary(choice);
             SetLabel(summaries[i], summary);
-            string pointColor = negativeSide ? "8FD18F" : (trait.Points == 0 ? "D6C978" : "E75A5A");
+            string pointColor = negativeSide ? "8FD18F" : "E75A5A";
             SetLabel(points[i], "[" + pointColor + "]" + RebirthSurvivorUiText.PointText(trait) + "[-]");
             SetLabel(actions[i], choice.IsSelected ? "[E7A15A]−[-]" : (choice.CanToggle ? "[B58CFF]+[-]" : "[707070]×[-]"));
         }
@@ -2221,6 +2239,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     private static string BuildTraitRowSummary(RebirthSurvivorTraitChoice choice)
     {
         if (choice == null || choice.Definition == null) return string.Empty;
+        if (choice.AtSelectionLimit) return "[707070]" + RebirthSurvivorUiText.TraitSelectionLimitMessage() + "[-]";
         if (!choice.IsEligibleForBackground) return "[707070]" + RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitUnavailableBackground", "Unavailable for this Experience.") + "[-]";
         if (choice.HasDietConflict) return "[E7A15A]" + RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitDietConflict", "Conflicts with the selected Diet.") + "[-]";
         if (choice.HasSelectedTraitConflict) return "[CC6B64]" + RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitConflictSelected", "Conflicts with a selected Trait.") + "[-]";

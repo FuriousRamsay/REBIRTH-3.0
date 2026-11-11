@@ -22,6 +22,7 @@ public static class RebirthItemConditionStatAdapter
     private static readonly Dictionary<Type, int> DegradationIndexCache = new Dictionary<Type, int>();
     private static bool warnedUnavailable;
     private const int FineProbeRadius = 48;
+    private static readonly long[] SlopeProbeOffsets = { 1, -1, 2, -2, 5, -5, 10, -10, 100, -100, 1000, -1000 };
     private static readonly int[] CoarseProbeOffsets = { 64, 96, 128, 160, 192 };
 
     public static bool TrySetEffectiveMaxUseTimes(ItemValue item, int desiredMax, int upperCap, out int appliedMax, out string reason)
@@ -49,11 +50,10 @@ public static class RebirthItemConditionStatAdapter
 
         // Probe the actual game formula rather than assuming the Stat.value encoding.  Item
         // magnitude is expected to be monotonic, but quality/other effects may change its scale.
-        long[] probes = new long[] { 1, -1, 2, -2, 5, -5, 10, -10, 100, -100, 1000, -1000 };
         double slope = 0.0;
-        for (int i = 0; i < probes.Length; i++)
+        for (int i = 0; i < SlopeProbeOffsets.Length; i++)
         {
-            long candidate = ClampRaw(raw + probes[i], minRaw, maxRaw);
+            long candidate = ClampRaw(raw + SlopeProbeOffsets[i], minRaw, maxRaw);
             if (candidate == raw) continue;
             int candidateMax;
             if (!TryEvaluateRaw(item, index, valueMember, candidate, rawType, out candidateMax)) continue;

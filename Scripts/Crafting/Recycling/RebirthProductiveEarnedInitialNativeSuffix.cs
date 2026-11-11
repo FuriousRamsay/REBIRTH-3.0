@@ -45,7 +45,7 @@ internal static partial class RebirthProductiveEarnedCoordinator
     internal static bool IsInitialNativeSuffixPublication(TileEntityWorkstation station,RebirthProductiveEarnedArtifact.Prepared artifact)
     {
         var scope=nativeTerminalOuterTick;
-        return scope!=null&&!scope.EarnedAmbiguous&&ReferenceEquals(scope.Station,station)&&ReferenceEquals(scope.World,GameManager.Instance?.World)&&
+        return scope.Token!=0&&!scope.EarnedAmbiguous&&ReferenceEquals(scope.Station,station)&&ReferenceEquals(scope.World,GameManager.Instance?.World)&&
             scope.EarnedInvocation!=null&&ReferenceEquals(scope.Earned?.Artifact,artifact)&&scope.Earned.NativeSuffixRequired&&
             retained.TryGetValue(station,out var original)&&ReferenceEquals(original,scope.Earned)&&artifact.MatchesAfter(station);
     }
@@ -58,9 +58,10 @@ internal static partial class RebirthProductiveEarnedCoordinator
         if(File.Exists(path)||File.Exists(path+".tmp"))return TryReadInitialNativeSuffix(artifact.OriginalPath,artifact.CopyImage(),out body,out offset);
         body=frame.AfterNative;offset=frame.AfterElapsedOffset;return body!=null;
     }
-    private static void ObserveInitialNativeSuffixReturned(TileEntityWorkstation station,bool ran,object state)
+    private static void ObserveInitialNativeSuffixReturned(TileEntityWorkstation station,bool ran,NativeTerminalTickState state)
     {
-        if(!ran||state is not NativeTerminalOuterTick scope||!ReferenceEquals(nativeTerminalOuterTick,scope)||scope.EarnedAmbiguous||
+        var scope=nativeTerminalOuterTick;
+        if(!ran||!NativeTerminalTickCurrent(state)||scope.EarnedAmbiguous||
             scope.EarnedInvocation==null||!ReferenceEquals(scope.Station,station)||!ReferenceEquals(scope.World,GameManager.Instance?.World)||
             !retained.TryGetValue(station,out var original)||!ReferenceEquals(original,scope.Earned)||original.OutputTimerObserved||
             original.Artifact?.MatchesAfter(station)!=true)return;

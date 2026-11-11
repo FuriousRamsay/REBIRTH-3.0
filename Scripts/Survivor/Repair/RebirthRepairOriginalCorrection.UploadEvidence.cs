@@ -38,7 +38,8 @@ internal static partial class RebirthRepairOriginalCorrection
         {
             return RepairBlobDigest(upload.BagSource)==upload.BagHash&&RepairBlobDigest(upload.BeltSource)==upload.BeltHash&&
                 RepairBlobDigest(upload.EquipmentSource)==upload.EquipmentHash&&RepairCursorImage(upload.Source.dragAndDropItem)==upload.CursorImage&&
-                TryQueueNativeItems(upload.Source,out var native)&&native.SequenceEqual(upload.NativeQueueItems)&&QueueImages(upload.Source).SequenceEqual(upload.Queue);
+                TryGetCurrentQueueWitness(upload.Source,out var queue,requireNative:true)&&
+                queue.Native.SequenceEqual(upload.NativeQueueItems)&&queue.Images.SequenceEqual(upload.Queue);
         }
         catch{return false;}
     }

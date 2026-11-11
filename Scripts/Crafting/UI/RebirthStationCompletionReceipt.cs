@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 // Detached native completion record; not output delivery or durable terminal evidence.
 internal static class RebirthStationCompletionReceipt
@@ -29,8 +30,11 @@ internal static class RebirthStationCompletionReceipt
     }
     // Identity filter only; never substitutes for authenticated native terminal proof.
     internal static bool TryReadIdentity(CraftCompleteData data,out Identity identity)
+        =>TryReadIdentity(data,out identity,out _);
+    // A null extras result means the ordinal output marker was absent.
+    internal static bool TryReadIdentity(CraftCompleteData data,out Identity identity,out IReadOnlyList<ItemStack> extras)
     {
-        identity=null;
+        identity=null;extras=null;
         try
         {
             var item=data?.CraftedItemStack?.itemValue;
@@ -45,11 +49,12 @@ internal static class RebirthStationCompletionReceipt
                 !item.TryGetMetadata(Prefix+"count",out int count)||count<1||count>32767||count!=data.CraftedItemStack.count||
                 !item.TryGetMetadata(Prefix+"xp",out int xp)||xp<0||xp!=data.CraftExpGain)return false;
             foreach(char c in definition)if(!Uri.IsHexDigit(c))return false;
+            IReadOnlyList<ItemStack> validatedExtras=null;
             foreach(var key in item.Metadata.Keys)
                 if(key.StartsWith(Prefix,StringComparison.Ordinal))
                     switch(key.Substring(Prefix.Length))
-                    {case "version":case "job":case "creation":case "definition":case "tier":case "count":case "xp":break;case "outputs":if(!RebirthRecipeOutputIntegration.ReadReceipt(data,out _))return false;break;default:return false;}
-            identity=new Identity(job,creation,definition,tier,count,xp);return true;
+                    {case "version":case "job":case "creation":case "definition":case "tier":case "count":case "xp":break;case "outputs":if(!RebirthRecipeOutputIntegration.ReadReceipt(data,out validatedExtras))return false;break;default:return false;}
+            identity=new Identity(job,creation,definition,tier,count,xp);extras=validatedExtras;return true;
         }
         catch{return false;}
     }

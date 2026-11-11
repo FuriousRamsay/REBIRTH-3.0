@@ -8,17 +8,49 @@ using System.Xml.Linq;
 
 internal static partial class RebirthConsumptionDurableDelivery
 {
+    private readonly struct InventoryPurposeIdentity
+    {
+        private readonly string account, worldKey, creation;
+        private readonly int deaths, servingType;
+        private readonly ushort servingSeed;
+
+        internal InventoryPurposeIdentity(string account, string worldKey, string creation, int deaths, int servingType, ushort servingSeed)
+        {
+            this.account = account;
+            this.worldKey = worldKey;
+            this.creation = creation;
+            this.deaths = deaths;
+            this.servingType = servingType;
+            this.servingSeed = servingSeed;
+        }
+
+        internal bool Current(EntityPlayerLocal player, string clientCreation, bool metadataOnly) =>
+            creation == clientCreation &&
+            (metadataOnly ? deaths >= 0 && deaths <= player.Died : deaths == player.Died) &&
+            RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner) && owner.CanonicalId == account &&
+            RebirthConsumptionSourceIdentity.TryGetWorldKey(player.world, out var currentWorld) && currentWorld == worldKey &&
+            HasCurrentServingAction();
+
+        private bool HasCurrentServingAction()
+        {
+            var definition = ItemClass.GetForId(servingType);
+            if (definition is ItemClassQuest) definition = ItemClassQuest.GetItemQuestById(servingSeed);
+            return definition?.Actions[0] is ItemActionConsumeMetabolismRebirth;
+        }
+    }
+
     private sealed class InventoryClient
     {
         internal Guid Operation;internal EntityPlayerLocal Actor;internal World World;internal ConnectionManager Manager;internal INetConnection Connection;
         internal string Creation,Text,Path;internal int Deaths;internal RebirthConsumptionInventoryPlan Plan;internal ItemValue Serving;
         internal float HydrationCost;internal IDisposable Memory;internal bool Local;internal RebirthConsumeResult Result;
+        internal InventoryPurposeIdentity PurposeIdentity;
         internal bool Current()=>ThreadManager.IsMainThread()&&ReferenceEquals(GameManager.Instance?.World,World)&&ReferenceEquals(World.GetPrimaryPlayer(),Actor)&&
             ReferenceEquals(World.GetEntity(Actor.entityId),Actor)&&!Actor.IsDead()&&Actor.Died==Deaths&&RebirthCamperCharacterAccess.CurrentCreation(Actor)==Creation&&
             ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,Manager)&&(Local?Manager.IsServer:
                 !Manager.IsServer&&Manager.connectionToServer?.Length>0&&ReferenceEquals(Manager.connectionToServer[0],Connection)&&!Connection.IsDisconnected());
     }
-    private sealed class InventoryPermit{internal InventoryClient Client;internal ItemStackGrid Grid;internal int Slot;internal ItemStack Value;internal bool Consumed;}
+    private sealed class InventoryPermit{internal InventoryClient Client;internal ItemStackGrid Grid;internal int Slot;internal ItemStack Value;internal bool Belt,Consumed;}
     private static readonly Dictionary<Guid,InventoryClient> inventoryClients=new Dictionary<Guid,InventoryClient>();
     [ThreadStatic]private static InventoryPermit inventoryPermit;
     [ThreadStatic]private static InventoryOriginal inventoryLocalAdmission;
@@ -27,7 +59,11 @@ internal static partial class RebirthConsumptionDurableDelivery
     internal static bool ConsumeInventorySlot(ItemStackGrid grid,int slot,ItemStack value)
     {
         var permit=inventoryPermit;
-        if(permit==null||permit.Consumed||!permit.Client.Current()||!ReferenceEquals(permit.Grid,grid)||permit.Slot!=slot||!ReferenceEquals(permit.Value,value))return false;
+        if(permit==null||permit.Consumed||!permit.Client.Current()||!ReferenceEquals(permit.Grid,grid)||permit.Slot!=slot)return false;
+        // Native Inventory.SetItem wraps a positive stack again and binds the same detached ItemValue to it.
+        if(!ReferenceEquals(permit.Value,value)&&
+            (!permit.Belt||value==null||value.count<=0||value.count!=permit.Value.count||value.itemValue==null||
+             !ReferenceEquals(value.itemValue,permit.Value.itemValue)||!ReferenceEquals(value.itemValue.owner,value)))return false;
         permit.Consumed=true;return true;
     }
     private static ItemStack PurposeStack(XElement row)
@@ -43,21 +79,36 @@ internal static partial class RebirthConsumptionDurableDelivery
         var bytes=Convert.FromBase64String(row.Value);var result=RebirthCamperInventorySnapshot.Restore(bytes);
         if(Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(result))!=row.Value)throw new InvalidDataException();return result;
     }
-    private static bool TryReadInventoryPurpose(EntityPlayerLocal player,string text,out Guid operation,out RebirthConsumptionInventoryPlan plan,out ItemValue serving,out float cost,out RebirthConsumeResult result,bool metadataOnly=false)
+    private static bool TryReadInventoryPurpose(EntityPlayerLocal player,string text,out Guid operation,out RebirthConsumptionInventoryPlan plan,
+        out ItemValue serving,out float cost,out RebirthConsumeResult result,out InventoryPurposeIdentity identity)
     {
-        operation=Guid.Empty;plan=null;serving=null;cost=0f;result=default;
+        operation=Guid.Empty;plan=null;serving=null;cost=0f;result=default;identity=default;
         if(text==null||Encoding.UTF8.GetByteCount(text)>MaximumInventoryPurpose)return false;
         if(!RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out var scratch))return false;
         using var decoderScratch=scratch;
+        return ReadInventoryPurposeInWorkspace(player, text, out operation, out plan, out serving, out cost, out result, out identity, false);
+    }
+
+    // Cold restoration already owns the same bounded workspace and transfers it
+    // to the accepted client. Ordinary packet decode reserves it independently.
+    private static bool ReadInventoryPurposeInWorkspace(EntityPlayerLocal player,string text,out Guid operation,
+        out RebirthConsumptionInventoryPlan plan,out ItemValue serving,out float cost,out RebirthConsumeResult result,
+        out InventoryPurposeIdentity identity,bool metadataOnly)
+    {
+        operation=Guid.Empty;plan=null;serving=null;cost=0f;result=default;identity=default;
+        if(text==null||Encoding.UTF8.GetByteCount(text)>MaximumInventoryPurpose)return false;
         using var reader=XmlReader.Create(new StringReader(text),new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=MaximumInventoryPurpose});
         var root=XElement.Load(reader);
+        string creation = (string)root.Attribute("creation");
         string[] members={"beforeBag","beforeBelt","afterBag","afterBelt","bagLocks","beltLocks","source","replacement","siblings","serving","sourceAddress","nativeSecondary","feedback"};
         if(root.Name!="playerOwnerConsumption"||root.Attributes().Count()!=7||(int?)root.Attribute("version")!=1||root.Elements().Count()!=members.Length||
             members.Any(name=>root.Elements(name).Count()!=1)||!Guid.TryParseExact((string)root.Attribute("operation"),"N",out operation)||operation==Guid.Empty||
             !RebirthStablePlayerIdentity.TryFromLocalPlatform(out var account)||(string)root.Attribute("account")!=account.CanonicalId||
-            (string)root.Attribute("creation")!=RebirthCamperCharacterAccess.CurrentCreation(player)||
-            (metadataOnly?((int?)root.Attribute("deaths") is not int historical||historical<0||historical>player.Died):(int?)root.Attribute("deaths")!=player.Died)||
-            (string)root.Attribute("world")!=player.world.worldState.Guid||((string)root.Attribute("binding"))?.Length!=64)return false;
+            creation!=RebirthCamperCharacterAccess.CurrentCreation(player)||(int?)root.Attribute("deaths") is not int purposeDeaths||
+            (metadataOnly?purposeDeaths<0||purposeDeaths>player.Died:purposeDeaths!=player.Died)||
+            !Guid.TryParse((string)root.Attribute("world"),out var originalWorld)||
+            !RebirthConsumptionSourceIdentity.TryGetWorldKey(player.world,out var worldKey)||originalWorld.ToString("N")!=worldKey||
+            ((string)root.Attribute("binding"))?.Length!=64)return false;
         var bag=PurposeInventory(root.Element("beforeBag"));var belt=PurposeInventory(root.Element("beforeBelt"));
         var afterBag=PurposeInventory(root.Element("afterBag"));var afterBelt=PurposeInventory(root.Element("afterBelt"));
         var address=root.Element("sourceAddress");if(address.HasElements||address.Attributes().Count()!=3)return false;
@@ -81,6 +132,7 @@ internal static partial class RebirthConsumptionDurableDelivery
         float consumed=(float)message.Attribute("consumed"),remaining=(float)message.Attribute("remaining");
         if(float.IsNaN(consumed)||float.IsInfinity(consumed)||consumed<0||float.IsNaN(remaining)||float.IsInfinity(remaining)||remaining<0)return false;
         result=new RebirthConsumeResult{Success=true,Failure=RebirthMetabolismConsumeFailure.None,ConsumedMl=consumed,RemainingMl=remaining,AddedEntryId=(int)message.Attribute("entry"),CreatedEmptyItem=(bool)message.Attribute("empty"),Message=message.Value};
+        identity = new InventoryPurposeIdentity(account.CanonicalId, worldKey, creation, purposeDeaths, serving.type, serving.Seed);
         return true;
     }
     private static void PublishInventoryOwner(InventoryClient client)
@@ -105,20 +157,42 @@ internal static partial class RebirthConsumptionDurableDelivery
             if(local==null)
             {if(!RebirthRemoteResourceNetworkScope.Receive(packet,world,callbacks,false,out connection))return true;}
             else if(!local.Current()||!ReferenceEquals(local.Actor,world.GetPrimaryPlayer())||local.Purpose!=text||!ReferenceEquals(callbacks,GameManager.Instance))return true;
-            var player=world.GetPrimaryPlayer();if(player==null||player.entityId!=actor||!TryReadInventoryPurpose(player,text,out var operation,out var plan,out var serving,out float cost,out var result,phase==3))return true;
-            if(!inventoryClients.TryGetValue(operation,out var client))
+            var player=world.GetPrimaryPlayer();if(player==null||player.entityId!=actor)return true;
+            InventoryClient client = null;
+            foreach (var attached in inventoryClients.Values)
             {
-                if(phase==0&&(!plan.MatchesBefore(player.bag.ItemGrid.items,player.inventory.ItemGrid.items)||!plan.MatchesLocks(player)))
+                if (!string.Equals(attached.Text, text, StringComparison.Ordinal)) continue;
+                client = attached;
+                break;
+            }
+
+            Guid operation;
+            if (client != null)
+            {
+                bool metadataOnly = phase == 3;
+                if (!ReferenceEquals(client.Actor, player) || !ReferenceEquals(client.World, world) ||
+                    !ReferenceEquals(player.world, world) || client.Local != (local != null) ||
+                    !ReferenceEquals(client.Connection, connection) || !client.Current() ||
+                    !client.PurposeIdentity.Current(player, client.Creation, metadataOnly) ||
+                    (!metadataOnly && client.Plan.BeltCount != RebirthToolbeltCapacity.GetOwnedSlotCount(player, client.Plan.BeforeBelt.Length))) return true;
+                operation = client.Operation;
+            }
+            else
+            {
+                if (phase != 0 || !TryReadInventoryPurpose(player, text, out operation, out var plan, out var serving,
+                    out float cost, out var result, out var identity) || inventoryClients.ContainsKey(operation)) return true;
+                if(!plan.MatchesBefore(player.bag.ItemGrid.items,player.inventory.ItemGrid.items)||!plan.MatchesLocks(player))
                 {
                     if(local!=null)RefuseUnissuedInventoryOriginal(local);
                     else if(Encoding.UTF8.GetByteCount(text)>48000)QueueInventoryRefusal(player,operation,text);
                     else SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthNpcConsumptionOwnerReturn>().Setup(actor,text,0),false);
                     return true;
                 }
-                if(phase!=0||inventoryClients.Count>=4||RebirthCookingOutputDelivery.IsHeld(player)||!plan.MatchesBefore(player.bag.ItemGrid.items,player.inventory.ItemGrid.items)||
+                if(inventoryClients.Count>=4||RebirthCookingOutputDelivery.IsHeld(player)||!plan.MatchesBefore(player.bag.ItemGrid.items,player.inventory.ItemGrid.items)||
                     !RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out var memory))return true;
                 client=new InventoryClient{Operation=operation,Actor=player,World=world,Manager=SingletonMonoBehaviour<ConnectionManager>.Instance,Connection=connection,
                     Creation=RebirthCamperCharacterAccess.CurrentCreation(player),Deaths=player.Died,Text=text,Plan=plan,Serving=serving,HydrationCost=cost,Result=result,Memory=memory,Local=local!=null,
+                    PurposeIdentity=identity,
                     Path=Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PlayerConsumptionClient",operation.ToString("N"))};
                 preparing=client;
                 byte[] bytes=Encoding.UTF8.GetBytes(text);var saved=InventoryClientJournal(client).Prepare(operation,operation,client.Creation,0,bytes,bytes);
@@ -170,7 +244,7 @@ internal static partial class RebirthConsumptionDurableDelivery
                 if(record.State!=RebirthCamperTransferJournal.Phase.Prepared||!record.Before.SequenceEqual(before)||!record.After.SequenceEqual(after))return true;
                 journal.Advance(key,record.State,RebirthCamperTransferJournal.Phase.Uncertain);
                 player.Buffs.SetCustomVar(InventorySourceReceipt(operation),-1f-ordinal,true);
-                var value=command.After.Clone();var permit=new InventoryPermit{Client=client,Grid=command.Bag?player.bag.ItemGrid:player.inventory.ItemGrid,Slot=command.Slot,Value=value};
+                var value=command.After.Clone();var permit=new InventoryPermit{Client=client,Grid=command.Bag?player.bag.ItemGrid:player.inventory.ItemGrid,Slot=command.Slot,Value=value,Belt=!command.Bag};
                 if(inventoryPermit!=null)return true;inventoryPermit=permit;
                 ObserveInventoryCall(operation,0);
                 try{if(command.Bag)player.bag.SetSlot(command.Slot,value);else player.inventory.SetItem(command.Slot,value);}finally{inventoryPermit=null;}

@@ -10,11 +10,11 @@ internal static class RebirthStationOutputDelta
         try
         {
             if(before==null||after==null||before.Count<1||before.Count>255||before.Count!=after.Count||
-                !RebirthStationCompletionReceipt.TryReadIdentity(receipt,out var identity))return false;
+                !RebirthStationCompletionReceipt.TryReadIdentity(receipt,out var identity,out var extras))return false;
             var physical=receipt.CraftedItemStack.itemValue.Clone();
             foreach(var field in new[]{"version","job","creation","definition","tier","count","xp"})
                 physical.Metadata.Remove(RebirthStationCompletionReceipt.Prefix+field);
-            if(!RebirthRecipeOutputIntegration.ReadReceipt(receipt,out var extras))return false;
+            if(extras==null&&!RebirthRecipeOutputIntegration.ReadReceipt(receipt,out extras))return false;
             physical.Metadata.Remove(RebirthStationCompletionReceipt.Prefix+RebirthRecipeOutputIntegration.ReceiptField);
             if(extras.Count>0)
             {

@@ -1,3 +1,17 @@
 <configs>
-  <!-- Base Game progression: no Survivor loot layer. -->
+  <!-- Preserve the native toolbox rolls. The b10 Rebirth roll picks one of four
+       weighted tools. Half its group chance gives these two equal-weight tools
+       the same nominal individual chance without adding extra forge tools. -->
+  <insertBefore xpath="/lootcontainers/lootgroup[1]">
+    <lootgroup name="rebirthBaseToolboxCraftingTools" count="1">
+      <item name="FuriousRamsayPliers" count="1"/>
+      <item name="FuriousRamsayScrewdriver" count="1"/>
+    </lootgroup>
+  </insertBefore>
+  <append xpath="/lootcontainers/lootgroup[@name='groupToolbox']">
+    <item group="rebirthBaseToolboxCraftingTools" count="1" prob="0.10" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupRollingToolbox']">
+    <item group="rebirthBaseToolboxCraftingTools" count="1" prob="0.175" force_prob="true"/>
+  </append>
 </configs>

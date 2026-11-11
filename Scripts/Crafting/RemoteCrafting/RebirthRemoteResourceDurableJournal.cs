@@ -61,11 +61,19 @@ internal static class RebirthRemoteResourceDurableJournal
         using(var hash=SHA256.Create())return new Guid(hash.ComputeHash(Encoding.UTF8.GetBytes(image)).Take(16).ToArray());
     }
     private static bool Hex(string value,int length)=>value?.Length==length&&value.All(character=>character>='0'&&character<='9'||character>='a'&&character<='f');
+    internal static string OutcomesRoot(string save)
+    {
+        string root=Path.Combine(Path.GetFullPath(save),"RebirthData","RemoteResources","Outcomes");
+        // Use the same on-disk layout with Windows extended-length I/O. The
+        // owner key, original identity and immutable artifact names stay intact.
+        if(Path.DirectorySeparatorChar!='\\'||root.StartsWith(@"\\?\",StringComparison.Ordinal))return root;
+        return root.StartsWith(@"\\",StringComparison.Ordinal)?@"\\?\UNC\"+root.Substring(2):@"\\?\"+root;
+    }
     private static string DirectoryFor(string owner)
     {
         if(!Hex(owner,64)||!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false)throw new InvalidOperationException();
         string save=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(save))throw new InvalidDataException();
-        string root=Path.Combine(Path.GetFullPath(save),"RebirthData","RemoteResources","Outcomes"),directory=Path.Combine(root,owner);
+        string root=OutcomesRoot(save),directory=Path.Combine(root,owner);
         if(Directory.Exists(root)&&(File.GetAttributes(root)&FileAttributes.ReparsePoint)!=0||Directory.Exists(directory)&&(File.GetAttributes(directory)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
         return directory;
     }
@@ -440,7 +448,7 @@ internal static class RebirthRemoteResourceDurableJournal
             if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||!ReferenceEquals(GameManager.Instance?.World,world)||
                 !RemoteResourceWorldIdentity.TryGet(world,out string worldId))return false;
             string save=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(save))return false;
-            string root=Path.Combine(Path.GetFullPath(save),"RebirthData","RemoteResources","Outcomes");
+            string root=OutcomesRoot(save);
             if(!Directory.Exists(root)){records=new Record[0];return true;}
             if((File.GetAttributes(root)&FileAttributes.ReparsePoint)!=0||Directory.EnumerateFiles(root).Any())return false;
             var pending=new System.Collections.Generic.List<Record>();int owners=0;long reserved=0;
@@ -581,11 +589,12 @@ internal static class RebirthRemoteResourceDurableJournal
             if(!TryReadCore(candidate.Owner,candidate.Operation,budget,out var saved,out _)||saved==null||saved.Revision!=candidate.Revision||saved.Owner!=candidate.Owner||saved.Binding!=candidate.Binding||current()!=true)return false;
             record=saved;if(saved.Phase==4)ArchiveTerminal(saved,budget);return true;
         }
-        catch
+        catch(Exception error)
         {
             // This invocation never returned a saved-before-effect permit. Keep
             // its failed staging bytes recoverable without making a later exact
             // retry confuse this known failed write with a committed effect.
+            RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] source journal publication operation={candidate.Operation:N} revision={candidate.Revision} error={error.GetType().Name} stagedPathLength={temporary?.Length ?? 0}");
             try
             {
                 if(temporary!=null&&File.Exists(temporary))

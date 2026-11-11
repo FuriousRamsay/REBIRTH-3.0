@@ -126,9 +126,9 @@
     </entity_class>
     <!-- Explicit group bootstrap only; absent from ordinary ambient spawn pools. -->
     <!-- Natural occurrence policy is read from this class by RebirthP4NaturalGroupOccurrence.
-         Default ON (lead decision); set NaturalGroupEnabled=false only as a fail-closed switch for a source defect. Server-only; bounded by cap, per-slot chance and distance. -->
+         Natural human groups stay disabled while human NPC behavior is incomplete. -->
     <entity_class name="npcRebirthGroupLeaderManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="NaturalGroupEnabled" value="true" />
+      <property name="NaturalGroupEnabled" value="false" />
       <property name="NaturalGroupWorldCap" value="2" />
       <property name="NaturalGroupSlotChance" value="0.15" />
       <property name="NaturalGroupMinPlayerDistance" value="45" />

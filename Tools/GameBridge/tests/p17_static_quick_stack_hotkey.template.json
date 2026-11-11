@@ -1,0 +1,160 @@
+{
+  "name": "p17_static_quick_stack_hotkey",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge. Loaded static crate in reach, no vehicle, follower, drone or station destination. Start with the exact matching destination stack and an unlocked carried source stack. Use the existing native hotkey and game bridge guard. Substitute all @TOKENS@ in a temp copy from an observed baseline. SETTLE_SECONDS is the observed terminal bound for this route, chosen from baseline rather than treated as a latency result."
+    },
+    {
+      "_note": "For dedicated admission, start a fresh request in the current life and preserve the exact client intent file, the authenticated host header and the owner terminal receipt. Qualify one Windows disposable save where the intent and header staging paths exceed 260 characters. Capture the same physical names across reopen, and test next-life body recovery and later-life references separately."
+    },
+    {
+      "_note": "For the static-crate publication case, retain the native crate and carried counts, the exact host admission phase, and the terminal receipt for the same hotkey. Check that the saved crate proof advances after the native writer recycles its snapshot. Reopen only the disposable save and verify the same crate incarnation and exact conserved counts."
+    },
+    {
+      "_note": "For dedicated phase pacing, record first saved host phase, first owner change and full settlement against the B41F baseline. A repeat of the same phase should still use the normal resend delay. Keep the existing wire capacity and exact item conservation checks when a send waits."
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@CRATE_X@",
+          "y": "@CRATE_Y@",
+          "z": "@CRATE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@CRATE_TYPE@"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": "@CRATE_X@",
+          "y": "@CRATE_Y@",
+          "z": "@CRATE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectUiItem": {
+        "path": "@CRATE_SLOT_PATH@",
+        "item": "@ITEM@",
+        "min": "@CRATE_BEFORE@",
+        "max": "@CRATE_BEFORE@"
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "markItem": "@ITEM@"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "rebirth.QuickStack",
+          "seconds": 0.15
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@ITEM@",
+        "op": "==",
+        "value": "@EXACT_OWNER_DEBIT@"
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": "@CRATE_X@",
+          "y": "@CRATE_Y@",
+          "z": "@CRATE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectUiItem": {
+        "path": "@CRATE_SLOT_PATH@",
+        "item": "@ITEM@",
+        "min": "@CRATE_AFTER@",
+        "max": "@CRATE_AFTER@"
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "_note": "Repeat native activation while no more compatible unlocked items remain. Verify no second credit. For dedicated, confirm saved stage 1 effect marker even though slot image is unchanged, then saved credit and final owner receipt. Repeat full crate, protected owner slot, reconnect and mixed pull/deposit in separate prepared controls."
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "rebirth.QuickStack",
+          "seconds": 0.15
+        }
+      }
+    },
+    {
+      "wait": "@REPEAT_SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "@ITEM@",
+        "op": "==",
+        "value": "@EXACT_OWNER_DEBIT@"
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": "@CRATE_X@",
+          "y": "@CRATE_Y@",
+          "z": "@CRATE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectUiItem": {
+        "path": "@CRATE_SLOT_PATH@",
+        "item": "@ITEM@",
+        "min": "@CRATE_AFTER@",
+        "max": "@CRATE_AFTER@"
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

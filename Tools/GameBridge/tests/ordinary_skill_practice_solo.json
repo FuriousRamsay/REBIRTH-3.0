@@ -1,0 +1,13 @@
+{
+  "name": "Solo Purge ordinary skill practice",
+  "notes": "Disposable West Xuyofu Territory Purge fixture, current Rebirth Survivor, clear course near 188.5,247.8. Check that local training advances during the course without a remote upload.",
+  "steps": [
+    { "markSkill": "skill.athletics" },
+    { "walkto": { "x": 180.438, "z": 250.773, "run": 1, "radius": 0.65, "maxSeconds": 7 } },
+    { "walkto": { "x": 188.5, "z": 247.76, "run": 1, "radius": 0.65, "maxSeconds": 7 } },
+    { "walkto": { "x": 180.438, "z": 250.773, "run": 1, "radius": 0.65, "maxSeconds": 7 } },
+    { "walkto": { "x": 188.5, "z": 247.76, "run": 1, "radius": 0.65, "maxSeconds": 7 } },
+    { "expectSkillGain": { "skill": "skill.athletics", "op": ">", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

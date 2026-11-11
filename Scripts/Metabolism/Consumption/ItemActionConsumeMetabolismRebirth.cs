@@ -16,6 +16,33 @@ using UnityEngine;
 public class ItemActionConsumeMetabolismRebirth : ItemActionEat
 {
     private static readonly Dictionary<int, float> animationStartTimes = new Dictionary<int, float>();
+
+    private sealed class ConsumptionData : MyInventoryData
+    {
+        internal RebirthConsumptionActionSource Source;
+        internal ConsumptionData(ItemInventoryData inventory, int index) : base(inventory, index) {}
+    }
+
+    public override ItemActionData CreateModifierData(ItemInventoryData inventory, int index)
+        => new ConsumptionData(inventory, index);
+
+    public override void ExecuteAction(ItemActionData actionData, bool released)
+    {
+        var data = actionData as ConsumptionData;
+        if (data == null || !released || data.bEatingStarted || !UseAnimation)
+        {
+            base.ExecuteAction(actionData, released);
+            return;
+        }
+
+        RebirthConsumptionActionSource source = null;
+        if (data.invData?.holdingEntity is EntityPlayerLocal owner &&
+            RebirthConsumptionActionSource.TryCaptureHand(owner, data.invData, out var captured))
+            source = captured;
+        base.ExecuteAction(actionData, released);
+        data.Source = data.bEatingStarted ? source : null;
+    }
+
     public override bool ExecuteInstantAction(EntityAlive ent, ItemStack stack, bool isHeldItem, XUiC_ItemStack stackController)
     {
         EntityPlayer player = ent as EntityPlayer;
@@ -34,8 +61,14 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
                 GameManager.ShowTooltip(player as EntityPlayerLocal, "Make room in your backpack to use this item.");
                 return true;
             }
+            DispatchCreative(player, stack.itemValue);
+            return true;
         }
-        Dispatch(player, stack.itemValue, false);
+
+        if (RebirthConsumptionActionSource.TryCaptureInstant(player as EntityPlayerLocal, stackController, stack, isHeldItem, out var exact))
+            DispatchExact(player, exact);
+        else
+            SourceChanged(player);
         return true;
     }
 
@@ -63,10 +96,12 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
     // inventory mutation and food effects. No second vanilla whole-item consumption follows.
     internal void CompleteConsumption(ItemActionData actionData, string completionSource)
     {
-        var data = actionData as ItemActionEat.MyInventoryData;
+        var data = actionData as ConsumptionData;
         if (data == null || !data.bEatingStarted) return;
         float completionPercent = PercentDone(actionData);
         data.bEatingStarted = false;
+        var source = data.Source;
+        data.Source = null;
         if (actionData.invData?.holdingEntity is EntityPlayer animationPlayer)
         {
             float began;
@@ -78,13 +113,18 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
                 + " elapsed=" + (timed ? (Time.realtimeSinceStartup - began).ToString("0.00", CultureInfo.InvariantCulture) : "unknown")
                 + "s percent=" + completionPercent.ToString("0.00", CultureInfo.InvariantCulture));
         }
-        if (actionData.invData?.holdingEntity is EntityPlayer player &&
-            actionData.invData.itemStack != null && !actionData.invData.itemStack.IsEmpty())
-            Dispatch(player, actionData.invData.itemStack.itemValue, false);
+        if (actionData.invData?.holdingEntity is EntityPlayer player)
+        {
+            if (source?.CurrentForAction(player, actionData.invData) == true)
+                DispatchExact(player, source);
+            else
+                SourceChanged(player);
+        }
     }
 
     public override void StopHolding(ItemActionData data)
     {
+        if (data is ConsumptionData consumption) consumption.Source = null;
         if (data?.invData?.holdingEntity is EntityPlayer player && animationStartTimes.TryGetValue(player.entityId, out float began))
         {
             RebirthDebug.Log("metabolism", "[REBIRTH ConsumeAnimation] stopped entity=" + player.entityId
@@ -99,8 +139,30 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
             eatData.bEatingStarted = false;
     }
 
-    private static void Dispatch(EntityPlayer player, ItemValue itemValue, bool autoSip)
+    private static void SourceChanged(EntityPlayer player)
     {
+        if (player is EntityPlayerLocal local)
+            GameManager.ShowTooltip(local, "The selected consumption source is no longer current. Use an item from your backpack or toolbelt.");
+    }
+
+    private static void DispatchExact(EntityPlayer player, RebirthConsumptionActionSource source)
+    {
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection == null || connection.IsServer)
+        {
+            RebirthMetabolismUiFeedback.Receive(RebirthMetabolismService.ConsumeInventorySource(
+                player, source.Kind, source.Slot, source.Before, false));
+            return;
+        }
+
+        if (!RebirthMetabolismLiveAction.Begin(player as EntityPlayerLocal, RebirthMetabolismLiveAction.Kind.Serve,
+            source.Kind, source.Slot, source.Before))
+            SourceChanged(player);
+    }
+
+    private static void DispatchCreative(EntityPlayer player, ItemValue itemValue)
+    {
+        const bool autoSip = false;
         if (player == null || itemValue == null || !RebirthConsumptionOwnerPublication.TryCaptureCreation(player, out _))
             return;
 
@@ -112,8 +174,10 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
             return;
         }
 
-        connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthMetabolismConsumeRequest>()
-            .Setup(player, itemValue, autoSip));
+        if (!RebirthMetabolismService.TryFindMatchingStack(player, itemValue.type, itemValue.Seed,
+                out var kind, out var slot, out var source, itemValue) ||
+            !RebirthMetabolismLiveAction.Begin(player as EntityPlayerLocal, RebirthMetabolismLiveAction.Kind.Serve, kind, slot, source))
+            GameManager.ShowTooltip(player as EntityPlayerLocal, "Item is no longer available.");
     }
 }
 

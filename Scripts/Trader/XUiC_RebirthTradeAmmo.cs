@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -151,35 +152,56 @@ public class XUiC_RebirthTradeAmmo : XUiController
     private void Confirm()
     {
         var player = xui.playerUI.entityPlayer;
-        if (player == null || received <= 0) return;
+        var bag = player?.bag;
+        if (bag == null || received <= 0) return;
 
-        // Re-read the backpack: it can change while the window is open.
-        for (int i = 0; i < Items.Length; i++)
-            if (i != selected && amounts[i] > UnlockedCount(Items[i])) { SetTarget(selected); return; }
-
-        for (int i = 0; i < Items.Length; i++)
-            if (i != selected && amounts[i] > 0) Take(Items[i], amounts[i]);
-
-        var reward = new ItemStack(ItemClass.GetItem(Items[selected]), received);
-        var inventory = xui.PlayerInventory;
-        if (!inventory.AddItem(reward, true) && !reward.IsEmpty()) inventory.DropItem(reward);
-        Close();
-    }
-
-    private void Take(string itemName, int amount)
-    {
-        var bag = xui.playerUI.entityPlayer.bag;
-        int type = ItemClass.GetItem(itemName).type;
+        // Capture only the unlocked cells this quote will spend.
+        int target = selected;
+        float rate = exchangeRate;
+        var debits = new List<(int Slot, int Type, ItemStack Before, int Count)>();
         var slots = bag.ItemGrid.items;
-        for (int i = 0; i < slots.Length && amount > 0; i++)
+        for (int i = 0; i < Items.Length; i++)
         {
-            if (Locked(bag, i) || slots[i] == null || slots[i].IsEmpty() || slots[i].itemValue.type != type) continue;
-            int used = Mathf.Min(amount, slots[i].count);
-            amount -= used;
-            var left = slots[i].Clone();
-            left.count -= used;
-            bag.SetSlot(i, left.count > 0 ? left : ItemStack.Empty.Clone());
+            if (i == target || amounts[i] <= 0) continue;
+            int remaining = amounts[i];
+            int type = ItemClass.GetItem(Items[i]).type;
+            for (int slot = 0; slot < slots.Length && remaining > 0; slot++)
+            {
+                var stack = slots[slot];
+                if (Locked(bag, slot) || stack == null || stack.IsEmpty() || stack.itemValue.type != type) continue;
+                int count = Mathf.Min(remaining, stack.count);
+                debits.Add((slot, i, stack.Clone(), count));
+                remaining -= count;
+            }
+            if (remaining > 0) { SetTarget(target); return; }
         }
+
+        var taken = new int[Items.Length];
+        foreach (var debit in debits)
+        {
+            slots = bag.ItemGrid.items;
+            if (debit.Slot >= slots.Length || Locked(bag, debit.Slot) ||
+                !RebirthStationGridIngredients.IsSameStackSnapshot(slots[debit.Slot], debit.Before)) break;
+            var after = debit.Before.Clone();
+            after.count -= debit.Count;
+            if (after.count == 0) after = ItemStack.Empty.Clone();
+            bag.SetSlot(debit.Slot, after.Clone());
+            slots = bag.ItemGrid.items;
+            if (debit.Slot >= slots.Length || !RebirthStationGridIngredients.IsSameStackSnapshot(slots[debit.Slot], after)) break;
+            taken[debit.Type] += debit.Count;
+        }
+
+        float value = 0f;
+        for (int i = 0; i < taken.Length; i++) value += taken[i] * rate * Values[i];
+        if (value <= 0f) { SetTarget(target); return; }
+        int rewardCount = (int)(value / Values[target]);
+        if (rewardCount > 0)
+        {
+            var reward = new ItemStack(ItemClass.GetItem(Items[target]), rewardCount);
+            var inventory = xui.PlayerInventory;
+            if (!inventory.AddItem(reward, true) && !reward.IsEmpty()) inventory.DropItem(reward);
+        }
+        Close();
     }
 
     private void Close()

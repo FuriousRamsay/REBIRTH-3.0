@@ -1,0 +1,8 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="FuriousRamsayHammerPliers" count="1" craft_time="10" always_unlocked="true">
+      <ingredient name="meleeToolRepairT1ClawHammer" count="1" />
+      <ingredient name="FuriousRamsayPliers" count="1" />
+    </recipe>
+  </append>
+</configs>

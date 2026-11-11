@@ -215,28 +215,28 @@
   <trait id="trait.people_person" name_key="xuiRebirthTraitPeoplePerson" description_key="xuiRebirthTraitPeoplePersonDesc" category="Psychological" polarity="positive" points="1" availability="universal" icon_key="rb_trait_people_person" modifier_id="modifier.trait.people_person">
     <authoring effect_summary="A friendly owned companion within 15 m adds +3 to the current Mood target." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
   </trait>
-  <trait id="trait.loner" name_key="xuiRebirthTraitLoner" description_key="xuiRebirthTraitLonerDesc" category="Psychological" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_loner" modifier_id="modifier.trait.loner">
+  <trait id="trait.loner" name_key="xuiRebirthTraitLoner" description_key="xuiRebirthTraitLonerDesc" category="Psychological" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_loner" modifier_id="modifier.trait.loner">
     <authoring effect_summary="Being without a nearby owned companion adds +2 to Mood target; having one within 15 m adds -1." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
   </trait>
-  <trait id="trait.fast_metabolism" name_key="xuiRebirthTraitFastMetabolism" description_key="xuiRebirthTraitFastMetabolismDesc" category="Metabolism" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_fast_metabolism" modifier_id="modifier.trait.fast_metabolism">
+  <trait id="trait.fast_metabolism" name_key="xuiRebirthTraitFastMetabolism" description_key="xuiRebirthTraitFastMetabolismDesc" category="Metabolism" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_fast_metabolism" modifier_id="modifier.trait.fast_metabolism">
     <conflicts>
       <trait id="trait.slow_metabolism" />
     </conflicts>
     <authoring effect_summary="Energy recovery from adequate Nutrition is about 10% faster, but ongoing Nutrition demand is about 12% higher." implementation_surface="REBIRTH Nutrition/Energy" />
   </trait>
-  <trait id="trait.slow_metabolism" name_key="xuiRebirthTraitSlowMetabolism" description_key="xuiRebirthTraitSlowMetabolismDesc" category="Metabolism" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_slow_metabolism" modifier_id="modifier.trait.slow_metabolism">
+  <trait id="trait.slow_metabolism" name_key="xuiRebirthTraitSlowMetabolism" description_key="xuiRebirthTraitSlowMetabolismDesc" category="Metabolism" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_slow_metabolism" modifier_id="modifier.trait.slow_metabolism">
     <conflicts>
       <trait id="trait.fast_metabolism" />
     </conflicts>
     <authoring effect_summary="Ongoing Nutrition demand is about 10% lower, but Energy recovery from Nutrition is about 8% slower." implementation_surface="REBIRTH Nutrition/Energy" />
   </trait>
-  <trait id="trait.food_indifferent" name_key="xuiRebirthTraitFoodIndifferent" description_key="xuiRebirthTraitFoodIndifferentDesc" category="Food/Mood" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_food_indifferent" modifier_id="modifier.trait.food_indifferent">
+  <trait id="trait.food_indifferent" name_key="xuiRebirthTraitFoodIndifferent" description_key="xuiRebirthTraitFoodIndifferentDesc" category="Food/Mood" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_food_indifferent" modifier_id="modifier.trait.food_indifferent">
     <conflicts>
       <trait id="trait.refined_palate" />
     </conflicts>
     <authoring effect_summary="Positive and negative food-quality Mood influences are both about 35% weaker. Nutrition/Hydration are unchanged." implementation_surface="REBIRTH food Mood profile service" />
   </trait>
-  <trait id="trait.sweet_tooth" name_key="xuiRebirthTraitSweetTooth" description_key="xuiRebirthTraitSweetToothDesc" category="Food/Mood" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_sweet_tooth" modifier_id="modifier.trait.sweet_tooth">
+  <trait id="trait.sweet_tooth" name_key="xuiRebirthTraitSweetTooth" description_key="xuiRebirthTraitSweetToothDesc" category="Food/Mood" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_sweet_tooth" modifier_id="modifier.trait.sweet_tooth">
     <authoring effect_summary="Authored sweet comfort foods gain about +3 extra temporary Mood influence, but repetition of sweet foods loses novelty about 20% faster." implementation_surface="REBIRTH food tags + Mood/variety service" />
   </trait>
   <trait id="trait.heavy_drinker" name_key="xuiRebirthTraitHeavyDrinker" description_key="xuiRebirthTraitHeavyDrinkerDesc" category="Habit" polarity="negative" points="2" availability="universal" icon_key="rb_trait_heavy_drinker" modifier_id="modifier.trait.heavy_drinker">
@@ -248,7 +248,7 @@
   <trait id="trait.caffeine_dependent" name_key="xuiRebirthTraitCaffeineDependent" description_key="xuiRebirthTraitCaffeineDependentDesc" category="Habit" polarity="negative" points="1" availability="universal" icon_key="rb_trait_caffeine_dependent" modifier_id="modifier.trait.caffeine_dependent">
     <authoring effect_summary="After the initial grace window, expired caffeine satisfaction contributes -3 Mood Target. Coffee manages the habit for about 45 active-play minutes and contributes +2 Mood while managed; repeated uses refresh rather than stack the support." implementation_surface="Existing Coffee use + server-authoritative Trait Support + REBIRTH Mood/Skill gain" />
   </trait>
-  <trait id="trait.teetotaler" name_key="xuiRebirthTraitTeetotaler" description_key="xuiRebirthTraitTeetotalerDesc" category="Habit" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_teetotaler" modifier_id="modifier.trait.teetotaler">
+  <trait id="trait.teetotaler" name_key="xuiRebirthTraitTeetotaler" description_key="xuiRebirthTraitTeetotalerDesc" category="Habit" polarity="mixed" points="1" availability="universal" icon_key="rb_trait_teetotaler" modifier_id="modifier.trait.teetotaler">
     <conflicts>
       <trait id="trait.heavy_drinker" />
     </conflicts>

@@ -461,6 +461,10 @@ public sealed class QuickStackTransferPlanner
 
 public static class QuickStackTransferExecutor
 {
+    // Quick Stack does not own a permit for an action-payment grid write.
+    private static bool IsLiveDestinationActionHeld(TEFeatureStorage loot)
+        => !RebirthLogisticsPlanning.IsActive && RemoteResourceTransactions.ActionBlocksNative(loot);
+
     /// <summary>
     /// Moves an arbitrary source stack into the live Quick Stack destinations while
     /// revalidating authorization and capacity at commit time. This is the common
@@ -511,6 +515,7 @@ public static class QuickStackTransferExecutor
                 if (live[i] == null || live[i].IsEmpty()) continue;
                 int amount;
                 if (!live[i].CanStackPartlyWith(remaining, out amount) || amount <= 0) continue;
+                if (IsLiveDestinationActionHeld(loot)) break;
                 ItemStack after = live[i].Clone();
                 after.count += amount;
                 RebirthLogisticsPlanning.SetStorageSlot(loot,i, after);
@@ -528,6 +533,7 @@ public static class QuickStackTransferExecutor
                 {
                     if (destinationLocks != null && i < destinationLocks.Length && destinationLocks[i]) continue;
                     if (live[i] != null && !live[i].IsEmpty()) continue;
+                    if (IsLiveDestinationActionHeld(loot)) break;
                     int amount = Math.Min(maxStack, remaining.count);
                     RebirthLogisticsPlanning.SetStorageSlot(loot,i, new ItemStack(remaining.itemValue.Clone(), amount));
                     remaining.count -= amount;
@@ -546,11 +552,19 @@ public static class QuickStackTransferExecutor
         return moved;
     }
 
+    // Detached owner plans never call either live backpack setter.
+    internal static bool CanDepositFromBackpack(EntityPlayer player)
+        => RebirthLogisticsPlanning.IsActive || !(player is EntityPlayerLocal local) ||
+            (!RebirthGearOwnerReservation.BlocksInventory(local.bag, true) &&
+             !RebirthPlacedOriginal.Blocks(local.bag?.ItemGrid));
+
     public static int Commit(World world, EntityPlayer player, int bagSlot, QuickStackTransferPlanner.Plan plan, bool owned)
     {
         ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
         if (bagSlot < 0 || bagSlot >= bag.Length || bag[bagSlot] == null || bag[bagSlot].IsEmpty() || plan == null)
             return 0;
+
+        if (!CanDepositFromBackpack(player)) return 0;
 
         ItemStack remaining;
         int moved = CommitExternal(world, player, bag[bagSlot], plan, owned, out remaining);

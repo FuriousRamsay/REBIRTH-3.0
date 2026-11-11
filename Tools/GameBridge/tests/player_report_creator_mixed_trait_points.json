@@ -1,0 +1,14 @@
+{
+  "name": "Survivor Creator charges one point for a mixed trait",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Start on Traits in English with two available points and Food Indifferent visible and unselected." },
+    { "expectWindowOpen": "rebirthSurvivorCreator" },
+    { "expectUi": { "id": "traitAvailablePoints", "exactText": "2" } },
+    { "click": { "exactText": "MIXED Food Indifferent", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "traitAvailablePoints", "exactText": "1" } },
+    { "expectUi": { "id": "traitFocusedDetails", "text": "Creation Points: -1" } },
+    { "click": { "exactText": "MIXED Food Indifferent", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "traitAvailablePoints", "exactText": "2" } }
+  ]
+}

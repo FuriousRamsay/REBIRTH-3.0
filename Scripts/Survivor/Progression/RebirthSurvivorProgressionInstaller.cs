@@ -134,6 +134,7 @@ public static class RebirthSurvivorProgressionInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorEquipmentRepairSkillPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorServiceCraftTimePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivorServiceRepairQueuePatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthEquippedArmorRepair));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRepairSignatureQueuePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRepairSignatureCompletionPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSkillWaveALockServerPatch));

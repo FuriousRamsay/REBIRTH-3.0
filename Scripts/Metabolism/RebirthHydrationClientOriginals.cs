@@ -11,15 +11,21 @@ internal static partial class RebirthHydrationClientOriginals
     {
         private readonly EntityPlayerLocal player;private readonly World nativeWorld;private readonly GameManager game;
         private readonly ConnectionManager manager;private readonly object peer;private readonly int deaths;
-        private readonly Guid world;private readonly string owner,creation,path;
-        internal Session(EntityPlayerLocal player,Guid world,string owner,string creation,string path)
-        {this.player=player;this.world=world;this.owner=owner;this.creation=creation;this.path=path;nativeWorld=player.world;
+        private readonly Guid world;private readonly string owner,creation,path,root;
+        internal Session(EntityPlayerLocal player,Guid world,string owner,string creation,string path,string root)
+        {this.player=player;this.world=world;this.owner=owner;this.creation=creation;this.path=path;this.root=root;nativeWorld=player.world;
             game=GameManager.Instance;manager=SingletonMonoBehaviour<ConnectionManager>.Instance;peer=manager.connectionToServer[0];deaths=player.Died;}
-        internal bool Current()=>ReferenceEquals(player.world,nativeWorld)&&ReferenceEquals(game,GameManager.Instance)&&
+        private bool NativeCurrent()=>ReferenceEquals(player.world,nativeWorld)&&ReferenceEquals(game,GameManager.Instance)&&
             ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance)&&manager.connectionToServer!=null&&manager.connectionToServer.Length>0&&
-            ReferenceEquals(manager.connectionToServer[0],peer)&&player.Died==deaths&&RebirthHydrationClientOriginals.Current(player,world,owner,creation,path);
+            ReferenceEquals(manager.connectionToServer[0],peer)&&player.Died==deaths;
+        internal bool Current()=>NativeCurrent()&&RebirthHydrationClientOriginals.Current(player,world,owner,creation,path);
+        internal bool IdleCurrent(EntityPlayerLocal candidate)=>ReferenceEquals(player,candidate)&&NativeCurrent()&&
+            TryIdentify(player,out var currentWorld,out string currentOwner,out string currentCreation,out string currentRoot)&&
+            world==currentWorld&&owner==currentOwner&&creation==currentCreation&&root==currentRoot;
     }
     private static bool running;
+    private static Session emptyRecoveryScope;
+    internal static void ClearIdleRecovery()=>emptyRecoveryScope=null;
     internal static bool Prepare(EntityPlayerLocal player,RebirthHydrationTransferOriginal original)
         =>With(player,original,false);
     internal static bool Close(EntityPlayerLocal player,RebirthHydrationTransferOriginal original)
@@ -27,11 +33,12 @@ internal static partial class RebirthHydrationClientOriginals
     private static bool With(EntityPlayerLocal player,RebirthHydrationTransferOriginal original,bool close)
     {
         if(running)return false;running=true;
+        ClearIdleRecovery();
         try
         {
-            if(!Scope(player,out var world,out var owner,out var creation,out var path)||original==null||
+            if(!Scope(player,out var world,out var owner,out var creation,out var path,out var root)||original==null||
                 !original.Matches(world,owner,creation,player.Died))return false;
-            var session=new Session(player,world,owner,creation,path);
+            var session=new Session(player,world,owner,creation,path,root);
             var journal=new RebirthCamperTransferJournal(path);var bytes=Bytes(original);
             var record=journal.Read(original.Operation);
             if(record==null)
@@ -51,19 +58,34 @@ internal static partial class RebirthHydrationClientOriginals
             return Matches(journal.Read(original.Operation),original)&&
                 (!close||record.State==RebirthCamperTransferJournal.Phase.Applied)&&session.Current();
         }
-        catch{return false;}
+        catch(Exception error)
+        {
+            RebirthDebug.Log("metabolism",$"[REBIRTH HydrationTransfer] owner journal {(close?"close":"prepare")} failed: {error.GetType().Name}");
+            return false;
+        }
         finally{running=false;}
+    }
+    // Idle recovery caches only a positively checked empty journal. Explicit
+    // proposal and native reentry still read their original evidence fresh.
+    internal static bool TryReadForIdleRecovery(EntityPlayerLocal player,out RebirthHydrationTransferOriginal original)
+    {
+        original=null;
+        try { if(emptyRecoveryScope?.IdleCurrent(player)==true)return true; }
+        catch { ClearIdleRecovery(); }
+        return TryRead(player,out original);
     }
     internal static bool TryRead(EntityPlayerLocal player,out RebirthHydrationTransferOriginal original)
     {
         original=null;if(running)return false;running=true;
+        ClearIdleRecovery();
         try
         {
-            if(!Scope(player,out var world,out var owner,out var creation,out var path))return false;
-            var session=new Session(player,world,owner,creation,path);
-            if(!Directory.Exists(path))return session.Current();
-            var journal=new RebirthCamperTransferJournal(path);
-            return ReadPending(journal,world,owner,out original)&&session.Current();
+            if(!Scope(player,out var world,out var owner,out var creation,out var path,out var root))return false;
+            var session=new Session(player,world,owner,creation,path,root);
+            if(Directory.Exists(path)&&!ReadPending(new RebirthCamperTransferJournal(path),world,owner,out original))return false;
+            if(!session.Current())return false;
+            if(original==null)emptyRecoveryScope=session;
+            return true;
         }
         catch{original=null;return false;}
         finally{running=false;}
@@ -102,25 +124,46 @@ internal static partial class RebirthHydrationClientOriginals
         using(var hash=System.Security.Cryptography.SHA256.Create())
         {var digest=hash.ComputeHash(Encoding.UTF8.GetBytes(original.World.ToString("N")+"|"+original.Owner+"|"+original.Creation));var bytes=new byte[16];Array.Copy(digest,bytes,16);return new Guid(bytes);}
     }
-    private static bool Scope(EntityPlayerLocal player,out Guid world,out string owner,out string creation,out string path)
+    private static bool TryIdentify(EntityPlayerLocal player,out Guid world,out string owner,out string creation,out string root)
     {
-        world=Guid.Empty;owner=creation=path=null;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        world=Guid.Empty;owner=creation=root=null;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         if(!ThreadManager.IsMainThread()||player?.world?.IsRemote()!=true||manager==null||manager.IsServer||
             !ReferenceEquals(player.world,GameManager.Instance?.World)||!ReferenceEquals(player.world.GetPrimaryPlayer(),player)||
             !ReferenceEquals(player.world.GetEntity(player.entityId),player)||player.IsDead()||!player.IsSpawned()||
             manager.connectionToServer==null||manager.connectionToServer.Length==0||manager.connectionToServer[0]==null||manager.connectionToServer[0].IsDisconnected()||
             !Guid.TryParse(GamePrefs.GetString(EnumGamePrefs.GameGuidClient),out world)||world==Guid.Empty||
             !RebirthHydrationTransferScope.TryObserve(player,out creation)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var identity))return false;
-        owner=identity.StorageKey;string root=GameIO.GetPlayerDataDir();if(string.IsNullOrWhiteSpace(root))return false;
+        owner=identity.StorageKey;root=GameIO.GetPlayerDataDir();if(string.IsNullOrWhiteSpace(root))return false;
+        root=Path.GetFullPath(root);
+        return true;
+    }
+    private static bool Scope(EntityPlayerLocal player,out Guid world,out string owner,out string creation,out string path,out string root)
+    {
+        path=null;
+        if(!TryIdentify(player,out world,out owner,out creation,out root))return false;
+        string legacy,compact;
         using(var hash=System.Security.Cryptography.SHA256.Create())
         {
             string account=BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(owner))).Replace("-",string.Empty).ToLowerInvariant();
-            path=Path.Combine(Path.GetFullPath(root),"REBIRTH","HydrationClientOriginals",world.ToString("N"),account);
+            legacy=Path.Combine(root,"REBIRTH","HydrationClientOriginals",world.ToString("N"),account);
+            var scopeHash=hash.ComputeHash(Encoding.UTF8.GetBytes(world.ToString("N")+"|"+owner));
+            string scope=BitConverter.ToString(scopeHash,0,20).Replace("-",string.Empty).ToLowerInvariant();
+            compact=Path.Combine(root,"RBH",scope);
         }
+        if(!SafePath(legacy)||!SafePath(compact))return false;
+        // Keep existing history in place. An empty legacy directory can be left
+        // by a failed first write and does not own any transaction.
+        bool hasLegacy=Directory.Exists(legacy)&&Directory.EnumerateFileSystemEntries(legacy).Any();
+        if(hasLegacy&&Directory.Exists(compact)&&Directory.EnumerateFileSystemEntries(compact).Any())return false;
+        path=hasLegacy?legacy:compact;
+        return true;
+    }
+    private static bool SafePath(string path)
+    {
         for(string next=path;!string.IsNullOrEmpty(next);next=Path.GetDirectoryName(next))
             try{if((File.GetAttributes(next)&FileAttributes.ReparsePoint)!=0)return false;}catch(FileNotFoundException){}catch(DirectoryNotFoundException){}
         return true;
     }
     private static bool Current(EntityPlayerLocal player,Guid world,string owner,string creation,string path)=>
-        Scope(player,out var nextWorld,out var nextOwner,out var nextCreation,out var nextPath)&&world==nextWorld&&owner==nextOwner&&creation==nextCreation&&path==nextPath;
+        Scope(player,out var nextWorld,out var nextOwner,out var nextCreation,out var nextPath,out _)&&world==nextWorld&&owner==nextOwner&&creation==nextCreation&&path==nextPath;
 }

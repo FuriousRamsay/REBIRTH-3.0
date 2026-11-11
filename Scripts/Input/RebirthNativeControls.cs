@@ -515,18 +515,20 @@ public static class RebirthNativeControls
         return false;
     }
 
-    private static string DescribeQuickStackHotkeyBlockReason(EntityPlayerLocal player)
+    private static string GetQuickStackHotkeyBlockReason(EntityPlayerLocal player)
     {
         if (player == null)
             return "player-null";
         if (player.AttachedToEntity is EntityVehicle)
             return "attached-vehicle";
+
+        // Debug mode blocks Quick Stack only when its configured binding overlaps stock God Mode.
         if (HasDebugGodBindingConflict(Actions == null ? null : Actions.QuickStack))
             return "debug-god-binding-conflict";
-        return "none";
+        return null;
     }
 
-    private static string DescribeCompanionTeleportHotkeyBlockReason(EntityPlayerLocal player)
+    private static string GetCompanionTeleportHotkeyBlockReason(EntityPlayerLocal player)
     {
         if (player == null)
             return "player-null";
@@ -534,7 +536,7 @@ public static class RebirthNativeControls
             return "attached-vehicle";
         if (HasDebugGodBindingConflict(Actions == null ? null : Actions.CompanionTeleport))
             return "debug-god-binding-conflict";
-        return "none";
+        return null;
     }
 
     public static string GetQuickStackHotkeyTraceStatus(EntityPlayerLocal player)
@@ -600,8 +602,8 @@ public static class RebirthNativeControls
                " inputActive=" + inputActive +
                " modalOpen=" + modalOpen +
                " onFootBlock=" + DescribeOnFootBlockReason(player) +
-               " quickHotkeyBlock=" + DescribeQuickStackHotkeyBlockReason(player) +
-               " teleportHotkeyBlock=" + DescribeCompanionTeleportHotkeyBlockReason(player) +
+               " quickHotkeyBlock=" + (GetQuickStackHotkeyBlockReason(player) ?? "none") +
+               " teleportHotkeyBlock=" + (GetCompanionTeleportHotkeyBlockReason(player) ?? "none") +
                " policyEnabled=" + QuickStackRuntimePolicy.Enabled +
                " policyMode=" + QuickStackRuntimePolicy.Mode +
                " radius=" + QuickStackRuntimePolicy.Radius +
@@ -707,34 +709,6 @@ public static class RebirthNativeControls
     }
 
 
-    private static bool CanDispatchQuickStackHotkey(EntityPlayerLocal player)
-    {
-        if (player == null)
-            return false;
-
-        // Debug mode alone does not suppress Quick Stack. It is ignored only when the
-        // configured Quick Stack binding actually overlaps the configured stock God Mode
-        // binding, which preserves the stock Q debug action without disabling unrelated
-        // REBIRTH bindings. Vehicle attachment is always a hard shortcut gate.
-        if (player.AttachedToEntity is EntityVehicle)
-            return false;
-        if (HasDebugGodBindingConflict(Actions == null ? null : Actions.QuickStack))
-            return false;
-
-        return true;
-    }
-
-    private static bool CanDispatchCompanionTeleportHotkey(EntityPlayerLocal player)
-    {
-        if (player == null)
-            return false;
-        if (player.AttachedToEntity is EntityVehicle)
-            return false;
-        if (HasDebugGodBindingConflict(Actions == null ? null : Actions.CompanionTeleport))
-            return false;
-        return true;
-    }
-
     private static void TryConsumeCompanionCardStyleToggle(EntityPlayerLocal player)
     {
         if (player == null || Actions == null || !Actions.Enabled || Actions.ToggleCompanionCardStyle == null)
@@ -754,7 +728,7 @@ public static class RebirthNativeControls
 
     private static void TryConsumeOnFootActions(EntityPlayerLocal player)
     {
-        bool rawQDown = Input.GetKeyDown(KeyCode.Q);
+        bool rawQDown = QuickStackHotkeyDiagnostics.Enabled && Input.GetKeyDown(KeyCode.Q);
         bool quickWasPressed = Actions != null &&
                                Actions.QuickStack != null &&
                                Actions.QuickStack.WasPressed;
@@ -809,8 +783,8 @@ public static class RebirthNativeControls
         // fall through and become Companion Teleport.
         if (quickWasPressed)
         {
-            string hotkeyBlock = DescribeQuickStackHotkeyBlockReason(player);
-            if (!CanDispatchQuickStackHotkey(player))
+            string hotkeyBlock = GetQuickStackHotkeyBlockReason(player);
+            if (hotkeyBlock != null)
             {
                 { if (QuickStackHotkeyDiagnostics.Enabled) QuickStackHotkeyDiagnostics.Write(
                     "quickstack press blocked hotkeyGate=" + hotkeyBlock +
@@ -847,8 +821,8 @@ public static class RebirthNativeControls
         if (!teleportWasPressed)
             return;
 
-        string teleportBlock = DescribeCompanionTeleportHotkeyBlockReason(player);
-        if (!CanDispatchCompanionTeleportHotkey(player))
+        string teleportBlock = GetCompanionTeleportHotkeyBlockReason(player);
+        if (teleportBlock != null)
         {
             { if (QuickStackHotkeyDiagnostics.Enabled) QuickStackHotkeyDiagnostics.Write(
                 "companion teleport press blocked hotkeyGate=" + teleportBlock +
@@ -880,8 +854,7 @@ public static class RebirthNativeControls
             EnsureRegisteredFromNativePlatform("gameplay-dispatch");
 
         TraceQuickStackHotkeyFrame(player);
-        RebirthCompanionColorService.RefreshLocalNavColors(player);
-        RebirthCompanionCollisionService.RefreshOwnedCompanionPlayerCollision(player);
+        RebirthOwnedCompanionIndex.RefreshLocalPresentation(player);
         TryConsumeCompanionCardStyleToggle(player);
 
         if (!(player.AttachedToEntity is EntityVehicle))

@@ -9,24 +9,21 @@ internal static partial class RebirthHydrationTransferJournal
         completingColdLocal=true;
         try
         {
-            if(!RebirthHydrationColdOwnerWitness.TryObserve(player,original,out var witness)||!ColdLocalCommitted(witness))return false;
-            if(HasSavedCompletion(original))return ColdLocalCommitted(witness);
+            if(!RebirthHydrationColdOwnerWitness.TryObserveCompletedLocal(player,original,out var witness))return false;
+            if(HasSavedCompletion(original))return witness.CurrentCompletedLocal();
             string path=CompletionPath(original,true);RequireSafe(path);
             var journal=new RebirthCamperTransferJournal(path);RequireSafe(path);byte[] bytes=Bytes(original);
             var record=journal.Prepare(original.Operation,Group(original.World,original.Owner,original.Creation),original.Creation,original.Revision,bytes,bytes);
-            if(!Matches(record,original)||!ColdLocalCommitted(witness))return false;
+            if(!Matches(record,original)||!witness.CurrentCompletedLocal())return false;
             if(record.State==RebirthCamperTransferJournal.Phase.Prepared)
                 record=journal.Advance(original.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
-            if(!ColdLocalCommitted(witness))return false;
+            if(!witness.CurrentCompletedLocal())return false;
             if(record.State==RebirthCamperTransferJournal.Phase.Uncertain)
                 record=journal.Advance(original.Operation,RebirthCamperTransferJournal.Phase.Uncertain,RebirthCamperTransferJournal.Phase.Applied);
             return record.State==RebirthCamperTransferJournal.Phase.Applied&&Matches(record,original)&&
-                HasSavedCompletion(original)&&ColdLocalCommitted(witness);
+                HasSavedCompletion(original)&&witness.CurrentCompletedLocal();
         }
         catch{return false;}
         finally{completingColdLocal=false;}
     }
-    private static bool ColdLocalCommitted(RebirthHydrationColdOwnerWitness witness)=>witness!=null&&witness.Current()&&
-        HasApplied(witness.Player,witness.Original)&&RebirthMetabolismStateRepository.HasSavedColdLocalHydrationAfter(witness.Player,witness.Original)&&
-        witness.Current();
 }

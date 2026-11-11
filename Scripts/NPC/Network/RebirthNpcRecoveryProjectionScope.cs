@@ -15,13 +15,26 @@ internal static partial class RebirthNpcRecoveryProjectionScope
     }
     private static void EnsureScope()
     {
+        if (!TryEnsureScope())
+            throw new InvalidOperationException("Original client recovery-generation floor requires typed projection retirement");
+    }
+
+    internal static bool IsCurrentRemoteScope(World current)
+    {
+        return ThreadManager.IsMainThread() && current?.IsRemote() == true &&
+            ReferenceEquals(current, GameManager.Instance?.World) && TryEnsureScope();
+    }
+
+    private static bool TryEnsureScope()
+    {
         var current=GameManager.Instance?.World;string save=GameIO.GetSaveGameDir();
         uint nextEpoch=RebirthNpcNetworkEpoch.ClientEpoch,nextConnection=RebirthNpcNetworkEpoch.ClientConnectionEpoch;
         if(!ReferenceEquals(world,current)||directory!=save||epoch!=nextEpoch||connection!=nextConnection)
         {
-            if(world!=null&&world.IsRemote())throw new InvalidOperationException("Original client recovery-generation floor requires typed projection retirement");
+            if(world!=null&&world.IsRemote())return false;
             world=current;directory=save;epoch=nextEpoch;connection=nextConnection;generation=0;
         }
+        return true;
     }
     internal static bool Observe(ulong incoming)
     {

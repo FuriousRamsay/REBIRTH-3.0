@@ -94,9 +94,10 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
         // 2.6: clicking a scrappable item shows what it scraps into.
         if(stack==null || stack.IsEmpty())stack=XUiC_RebirthCraftingItemContext.LastInspected;
         string next="", why=GetChildByType<XUiC_RebirthRecyclerInputGrid>()?.GateReason;
+        RebirthRecyclerRule rule=null;
         if(stack!=null && !stack.IsEmpty() && station!=null)
         {
-            if(RebirthRecyclerRules.TryResolve(stack.itemValue.type,station.block.GetBlockName(),out var rule,out var reason))
+            if(RebirthRecyclerRules.TryResolve(stack.itemValue.type,station.block.GetBlockName(),out rule,out var reason))
             {
                 var text=new StringBuilder();
                 foreach(var output in rule.Outputs)
@@ -106,7 +107,7 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
                         .Append(" (").Append((output.TimeSeconds*stack.count).ToString("0.##")).Append("s)\n");
                 }
                 next=text.ToString();
-                if(!RebirthRecyclerRuntime.CanAccept(xui.playerUI.entityPlayer,station,stack,out var admissionReason))why=admissionReason;
+                if(!RebirthRecyclerRuntime.CanAcceptWithRule(station,stack,rule,out var admissionReason))why=admissionReason;
                 if(why=="xuiScrapToolRequired")
                 {
                     RebirthRecyclerRules.ToolsHealthy(station.Tools,rule,out var missing,out _);
@@ -119,7 +120,7 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
         }
         string translated=string.IsNullOrEmpty(why)?Localization.Get("xuiRebirthRecyclingDrop"):Localization.Get(why);
         string status=!string.IsNullOrEmpty(why)?translated:next.Length==0?Localization.Get("xuiRebirthScrapOutputEmpty"):string.Empty;
-        if(next!=yields || status!=shownStatus)RenderRows(stack,station,status,next.Length>0);
+        if(next!=yields || status!=shownStatus)RenderRows(stack,next.Length>0?rule:null,status);
         if(next!=yields || translated!=gate){yields=next;gate=translated;RefreshBindings();}
     }
 
@@ -135,16 +136,15 @@ public sealed class XUiC_RebirthRecyclerPreview : XUiController
 
     /// <summary>2.6 scrap list (XUiC_ScrapList / XUiC_ScrapEntry): one row per output with its icon, name, time and
     /// amount, in its own Scrap Output panel (owner 2026-11-08).</summary>
-    private void RenderRows(ItemStack stack,TileEntityWorkstation station,string status,bool hasOutputs)
+    private void RenderRows(ItemStack stack,RebirthRecyclerRule rule,string status)
     {
         shownStatus=status;
         if(GetChildById("scrapPreviewStatus")?.ViewComponent is XUiV_Label statusLabel)statusLabel.Text=status;
-        var outputs=new System.Collections.Generic.List<RebirthRecyclerOutput>();
-        if(hasOutputs && RebirthRecyclerRules.TryResolve(stack.itemValue.type,station.block.GetBlockName(),out var rule,out _))outputs.AddRange(rule.Outputs);
+        var outputs=rule?.Outputs;
         for(int i=0;i<PreviewRows;i++)
         {
             var row=GetChildById("scrapRow"+i)?.ViewComponent;if(row==null)continue;
-            bool show=i<outputs.Count && i<Capacity;
+            bool show=outputs!=null && i<outputs.Count && i<Capacity;
             if(row.IsVisible!=show)row.IsVisible=show;
             if(!show)continue;
             var item=outputs[i].Stack.itemValue.ItemClass;
@@ -275,8 +275,12 @@ public sealed class XUiC_RebirthRecyclerInputSlot : XUiC_ItemStack
     public override void Update(float dt)
     {
         var cursor=xui.DragAndDropWindow?.CurrentStack;
-        var grid=GetParentByType<XUiC_RebirthRecyclerInputGrid>();
-        bool accept=cursor==null || cursor.IsEmpty() || grid==null || grid.Accepts(cursor,out _);
+        bool accept=true;
+        if(cursor!=null && !cursor.IsEmpty())
+        {
+            var grid=GetParentByType<XUiC_RebirthRecyclerInputGrid>();
+            accept=grid==null || grid.Accepts(cursor,out _);
+        }
         ViewComponent.EventOnPress=accept;
         base.Update(dt);
     }

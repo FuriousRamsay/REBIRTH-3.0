@@ -1,0 +1,78 @@
+{
+  "name": "p25_milling_post_tick_first_native",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, Guard ON, no UI. Actual Mortar and Pestle WorkbenchMortarPestle001_FR at 22,45,995 with one native Wheat Flour application whose exact output is four. Prepare 4\u20137 seconds remaining and zero flour output. Use an actual paid row, never an injected receipt or job. For the first-in-tick qualification capture pending milling originals immediately before/after this native tick."
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 45,
+        "z": 995,
+        "station": "WorkbenchMortarPestle001_FR",
+        "field": "queueCount",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 45,
+        "z": 995,
+        "station": "WorkbenchMortarPestle001_FR",
+        "field": "output",
+        "item": "rebirthCookingFoodP01",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "station": {
+        "x": 22,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "wait": 10
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 45,
+        "z": 995,
+        "station": "WorkbenchMortarPestle001_FR",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 45,
+        "z": 995,
+        "station": "WorkbenchMortarPestle001_FR",
+        "field": "output",
+        "item": "rebirthCookingFoodP01",
+        "op": "==",
+        "value": 4
+      }
+    },
+    {
+      "station": {
+        "x": 22,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Pair authority proof of the first original registered inside the native tick with matching StationTickReturned/body/saved terminal and exact payment/receipt. Repeat quiet idle, genuine cold retained after reload, and native exception with no terminal. The JSON only asserts physical native state and does not see internal original custody."
+    }
+  ]
+}

@@ -645,12 +645,12 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
 
     private void RefreshSnapshots(bool force)
     {
-        RebirthSurvivorOwnerHeader header = RebirthSurvivorClientState.GetOwnerHeader();
+        RebirthSurvivorOwnerHeader header = RebirthSurvivorClientState.GetOwnerHeader(showOrdinaryProgress: true);
         long textRevision = RebirthUiProjectionTextCache.Revision;
         bool ownerChanged = !header.Equals(lastOwnerHeader);
         bool characterChanged = ownerChanged || textRevision != lastTextRevision;
         RebirthSurvivorOwnerStateSnapshot next = snapshot;
-        if (force || ownerChanged) next = RebirthSurvivorClientState.GetOwnerStateSnapshot(out lastOwnerHeader);
+        if (force || ownerChanged) next = RebirthSurvivorClientState.GetOwnerStateSnapshot(out lastOwnerHeader, showOrdinaryProgress: true);
         lastTextRevision = textRevision;
         long revision = next != null ? next.CharacterRevision : long.MinValue;
 

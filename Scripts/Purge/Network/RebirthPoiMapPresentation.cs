@@ -137,12 +137,13 @@ internal static class RebirthPoiMapPresentation
         int xmin = (int)Math.Floor(left / CellSize), xmax = (int)Math.Floor(right / CellSize);
         int zmin = (int)Math.Floor(bottom / CellSize), zmax = (int)Math.Floor(top / CellSize);
         bool purge = RebirthSandboxOptionManager.Current.IsPurge;
+        var current = RebirthPoiMapSync.LocalMap;
         for (int x = xmin; x <= xmax; x++) for (int z = zmin; z <= zmax; z++)
         {
             List<RebirthPoiMapRecord> bucket; if (!cells.TryGetValue(Cell(x, z), out bucket)) continue;
             foreach (var candidate in bucket)
             {
-                RebirthPoiMapRecord record; var current = RebirthPoiMapSync.LocalMap;
+                RebirthPoiMapRecord record;
                 if (current == null || !current.TryGetValue(candidate.Identity.Key, out record)) continue;
                 var id = record.Identity; double px = id.X + id.SizeX * .5, pz = id.Z + id.SizeZ * .5;
                 if (px < left || px > right || pz < bottom || pz > top || record.State == RebirthPoiClearanceState.ResetPending

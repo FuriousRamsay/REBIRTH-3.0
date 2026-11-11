@@ -37,6 +37,12 @@ internal static class RebirthRampageArmorEffect
             }
         }
 
+        if (actualHealthLoss <= 0f || !response.Dismember ||
+            response.HitBodyPart != EnumBodyPartHit.Head || buffs.HasBuff(CooldownBuff)) return;
+
+        float chanceTier = TierBonus(buffs.GetCustomVar("$RampageIncreaseChance"));
+        if (chanceTier <= 0f) return;
+
         // The 2.6 damage hook used item and target tags. It sent both melee
         // and ranged zombie/bandit head dismemberments into this same chain,
         // despite the legacy buff's "Ranged" name. Preserve that behavior.
@@ -46,11 +52,7 @@ internal static class RebirthRampageArmorEffect
             weaponTags.IndexOf("melee", StringComparison.OrdinalIgnoreCase) >= 0;
         bool eligibleTarget = targetTags.IndexOf("zombie", StringComparison.OrdinalIgnoreCase) >= 0 ||
             targetTags.IndexOf("bandit", StringComparison.OrdinalIgnoreCase) >= 0;
-        if (actualHealthLoss <= 0f || !eligibleTarget || !eligibleWeapon || !response.Dismember ||
-            response.HitBodyPart != EnumBodyPartHit.Head || buffs.HasBuff(CooldownBuff)) return;
-
-        float chanceTier = TierBonus(buffs.GetCustomVar("$RampageIncreaseChance"));
-        if (chanceTier <= 0f) return;
+        if (!eligibleTarget || !eligibleWeapon) return;
 
         // Despite its legacy name, "Chance" shortened the time needed for
         // three eligible decapitations: Tier 1 grants 12 seconds, Tier 5 20.

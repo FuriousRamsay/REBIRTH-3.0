@@ -8,12 +8,17 @@ internal static class RebirthHydrationOwningAction
     {
         RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] client-request action={(returning?"return":"equip")} actor={player?.entityId.ToString()??"none"} source={(bag?"bag":"belt")} index={index} remote={player?.world?.IsRemote().ToString()??"none"}");
         if(player?.world?.IsRemote()!=true||!ThreadManager.IsMainThread())return false;
-        if(!RebirthHydrationProposalClient.Intent.TryBegin(player,bag,index,returning,out var intent))
-        {RebirthDebug.Log("metabolism", "[REBIRTH HydrationTransfer] client-request refused at intent admission");return false;}
-        intent.Advance(System.Diagnostics.Stopwatch.GetTimestamp()/(double)System.Diagnostics.Stopwatch.Frequency);
-        bool current=intent.Current();
-        RebirthDebug.Log("metabolism", $"[REBIRTH HydrationTransfer] client-request result={(current?"pending":"scope-changed")}");
-        return current; // Accepted/pending, never a financial receipt.
+        if (!RebirthHydrationClientOriginals.TryReadForIdleRecovery(player, out var saved)) return false;
+        if (RebirthHydrationProposalClient.TryGetCurrent(player, out var intent) ||
+            saved != null && RebirthHydrationProposalClient.Intent.TryRecover(player, saved, out intent))
+        {
+            intent.Advance(System.Diagnostics.Stopwatch.GetTimestamp()/(double)System.Diagnostics.Stopwatch.Frequency);
+            return intent.Current();
+        }
+        if (saved != null || RebirthHydrationOwnerHold.HoldsMetabolismOwner(player)) return false;
+        return RebirthMetabolismLiveAction.Begin(player,
+            returning ? RebirthMetabolismLiveAction.Kind.Return : RebirthMetabolismLiveAction.Kind.Equip,
+            bag ? RebirthMetabolismSourceKind.Backpack : RebirthMetabolismSourceKind.HeldToolbelt, index);
     }
     internal static bool BeginMatching(EntityPlayerLocal player,ItemValue item,bool returning)
     {

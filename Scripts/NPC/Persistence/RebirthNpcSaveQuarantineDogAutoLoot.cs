@@ -17,14 +17,15 @@ public static partial class RebirthDogAutoLootBridge
         if(!ThreadManager.IsMainThread()||world==null||actor==null||!ReferenceEquals(actor.world,world)||!ReferenceEquals(world.GetEntity(actor.entityId),actor)||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return false;
         lock(Sync){if(Pending.Count>=1024)return false;foreach(var p in Pending.Values)if(p==null||!ReferenceEquals(p.World,world)||p.Generation!=AutoLootGeneration(world))return false;return true;}
     }
-    private static PendingTransfer CapturePendingAutoLoot(Guid operation,XUi ui,EntityPlayerLocal actor,TEFeatureStorage source,ItemStack input)
+    private static PendingTransfer CapturePendingAutoLoot(Guid operation,XUi ui,EntityPlayerLocal actor,TEFeatureStorage source,string itemImage,int count)
     {
         var world=actor.world;
-        return new PendingTransfer{Operation=operation,World=world,Actor=actor,Ui=ui,Source=source,Epoch=world.IsRemote()?RebirthNpcNetworkEpoch.ClientEpoch:RebirthNpcNetworkEpoch.GetServerEpoch(),Connection=world.IsRemote()?RebirthNpcNetworkEpoch.ClientConnectionEpoch:0,Generation=AutoLootGeneration(world),Item=RebirthNativeItemCodec.Encode(input.itemValue),Count=input.count};
+        return new PendingTransfer{Operation=operation,World=world,Actor=actor,Ui=ui,Source=source,Epoch=world.IsRemote()?RebirthNpcNetworkEpoch.ClientEpoch:RebirthNpcNetworkEpoch.GetServerEpoch(),Connection=world.IsRemote()?RebirthNpcNetworkEpoch.ClientConnectionEpoch:0,Generation=AutoLootGeneration(world),Item=itemImage,Count=count};
     }
     private static bool PendingAutoLootCurrent(PendingTransfer p)
     {
         var world=GameManager.Instance?.World;
+        if (world?.IsRemote() == true && !RebirthNpcRecoveryProjectionScope.IsCurrentRemoteScope(world)) return false;
         if(!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||p==null||world==null||!ReferenceEquals(p.World,world)||!ReferenceEquals(p.Actor?.world,world)||!ReferenceEquals(world.GetEntity(p.Actor.entityId),p.Actor)||!ReferenceEquals(LocalPlayerUI.GetUIForPrimaryPlayer()?.xui,p.Ui)||!ReferenceEquals(p.Ui?.LootContainer,p.Source)||p.Generation!=AutoLootGeneration(world))return false;
         if(!ReferenceEquals(world.GetTileEntity(p.Source.ToWorldPos())?.GetSelfOrFeature<TEFeatureStorage>(),p.Source))return false;
         return p.Epoch==(world.IsRemote()?RebirthNpcNetworkEpoch.ClientEpoch:RebirthNpcNetworkEpoch.GetServerEpoch())&&p.Connection==(world.IsRemote()?RebirthNpcNetworkEpoch.ClientConnectionEpoch:0);

@@ -24,7 +24,11 @@ internal static partial class RebirthConsumptionDurableDelivery
             bool Current()=>original.Current()&&original.LastPurpose==phase&&ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance?.Clients?.ForEntityId(original.Actor.entityId),peer)&&
                 peer.netConnection?.Length>0&&ReferenceEquals(peer.netConnection[0],connection)&&!connection.IsDisconnected();
             bool queued=inventoryPurposeWire.EnqueueObserved(key,body,Current,()=>RebirthRemoteResourceRepairProtocol.TransportReady(connection),index=>
-                peer.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcConsumptionOwner>().Setup(original.Actor.entityId,phase,PurposeFragment(original.Operation,body,index,false))),_=>memory.Dispose());
+                peer.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcConsumptionOwner>().Setup(original.Actor.entityId,phase,PurposeFragment(original.Operation,body,index,false))),sent=>
+                {
+                    try{if(phase==3&&sent&&Current())original.RetirementPurposeSent=true;}
+                    finally{memory.Dispose();}
+                });
             if(!queued)memory.Dispose();return queued;
         }
         catch{memory.Dispose();throw;}

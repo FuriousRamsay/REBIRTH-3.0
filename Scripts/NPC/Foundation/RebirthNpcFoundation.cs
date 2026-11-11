@@ -615,6 +615,24 @@ public static partial class RebirthNpcRuntimeRegistry
         lock (Sync) return EntityByStableId.TryGetValue(stableId, out entityId);
     }
 
+    internal static bool TryGetProfileAndOwnership(RebirthNpcStableId stableId, out string profileId, out RebirthNpcOwnershipKind ownership)
+    {
+        lock (Sync)
+        {
+            if (EntityByStableId.TryGetValue(stableId, out int entityId) &&
+                ByEntityId.TryGetValue(entityId, out var state) && state.StableId == stableId)
+            {
+                profileId = state.ProfileId;
+                ownership = state.OwnershipKind;
+                return true;
+            }
+
+            profileId = null;
+            ownership = default;
+            return false;
+        }
+    }
+
     public static bool TryChangeProfile(int entityId, string profileId)
     {
         RebirthNpcProfileRegistry.ResolveRequired(profileId);
@@ -674,15 +692,35 @@ public static partial class RebirthNpcRuntimeRegistry
             RebirthNpcRuntimeState[] result = new RebirthNpcRuntimeState[ByEntityId.Count];
             int index = 0;
             foreach (RebirthNpcRuntimeState state in ByEntityId.Values) result[index++] = state.CloneForProjection();
-            // Stable IDs format as fixed-width High/Low hexadecimal, so unsigned
-            // numeric ordering is identical without strings per sort comparison.
-            Array.Sort(result, (left, right) =>
-            {
-                int high = left.StableId.High.CompareTo(right.StableId.High);
-                return high != 0 ? high : left.StableId.Low.CompareTo(right.StableId.Low);
-            });
+            Array.Sort(result, CompareStableIds);
             return result;
         }
+    }
+
+    internal static RebirthNpcRuntimeState[] GetOwnedActiveSnapshot(string ownerId)
+    {
+        lock (Sync)
+        {
+            List<RebirthNpcRuntimeState> owned = null;
+            foreach (RebirthNpcRuntimeState state in ByEntityId.Values)
+            {
+                if (state.Presence != RebirthNpcPresenceState.Active ||
+                    state.OwnershipKind != RebirthNpcOwnershipKind.Player ||
+                    !string.Equals(state.OwnerId ?? string.Empty, ownerId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                (owned ??= new List<RebirthNpcRuntimeState>()).Add(state.CloneForProjection());
+            }
+            if (owned == null) return Array.Empty<RebirthNpcRuntimeState>();
+            owned.Sort(CompareStableIds);
+            return owned.ToArray();
+        }
+    }
+
+    private static int CompareStableIds(RebirthNpcRuntimeState left, RebirthNpcRuntimeState right)
+    {
+        // Fixed-width High/Low hexadecimal and unsigned numeric order agree.
+        int high = left.StableId.High.CompareTo(right.StableId.High);
+        return high != 0 ? high : left.StableId.Low.CompareTo(right.StableId.Low);
     }
 
     public static int Count

@@ -236,7 +236,6 @@ public static class AdvancedFarmingTemperatureService
     public static void NotifyWorldBlockChanged(Vector3i blockPos)
     {
         ClearCacheAround(blockPos, ThermalSearchHorizontalRadius + 2, ThermalSearchUp + ThermalSearchDown + 2);
-        AdvancedFarmingHoverTextService.ClearConditionCache();
     }
 
     public static void ClearCacheAround(Vector3i center, int horizontalRadius, int verticalRadius)

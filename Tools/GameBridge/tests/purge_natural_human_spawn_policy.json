@@ -1,0 +1,11 @@
+{
+  "name": "Purge natural human groups remain disabled",
+  "preconditions": "Use a fresh isolated Purge save with a spawned player in loaded wilderness beyond any POI. Move the authority clock across a six-hour boundary on a non-blood-moon day. Match the location and slot against a separate positive-control run with the old policy enabled. On dedicated, pair these client samples with the host world-integration journal. This scenario does not cover retained group restoration or dog deployment.",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectNearbyEntityCount": { "contains": "npcRebirthGroup", "radius": 96, "count": 0 } },
+    { "wait": 22 },
+    { "expectNearbyEntityCount": { "contains": "npcRebirthGroup", "radius": 96, "count": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

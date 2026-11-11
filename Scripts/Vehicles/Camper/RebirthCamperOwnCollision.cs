@@ -204,26 +204,28 @@ internal static class RebirthCamperOwnCollision
             }
             // Repair existing clones too: a loading-time world offset must not
             // survive the existing five-second rebind just because two were found.
-            AlignHoodSupport(clone.transform,node,state.Model,state.Body.transform);
+            CopyColliderPose(clone.transform, node, state.Body.transform, state.Model);
         }
     }
-    internal static bool AlignHoodSupport(Transform support,Transform source,Transform model,Transform physics)
+    internal static void CopyColliderPose(Transform target, Transform source, Transform sourceRoot, Transform targetRoot)
     {
-        // Model can already have its saved pose while native Physics is still at
-        // the origin. Compose authored LOCAL ancestors, never their transient
-        // world separation. The current hood/front-cab chain is WalkIn -> Physics.
-        Matrix4x4 pose=Matrix4x4.identity;
-        for(var part=source;part!=physics;part=part.parent)
+        // The model and Physics roots can have different world poses while loading.
+        // Keep the collider in the truck's authored local coordinates.
+        Matrix4x4 pose = Matrix4x4.identity;
+        for (var part = source; part != sourceRoot; part = part.parent)
         {
-            if(part==null)return false;
-            pose=Matrix4x4.TRS(part.localPosition,part.localRotation,part.localScale)*pose;
+            if (part == null) return;
+            pose = Matrix4x4.TRS(part.localPosition, part.localRotation, part.localScale) * pose;
         }
-        Vector3 position=pose.GetColumn(3),scale=pose.lossyScale;
-        Quaternion rotation=pose.rotation;
-        if(support.parent==model&&support.localPosition==position&&support.localRotation==rotation&&support.localScale==scale)return false;
-        if(support.parent!=model)support.SetParent(model,false);
-        support.localPosition=position;support.localRotation=rotation;support.localScale=scale;
-        return true;
+        Vector3 position = pose.GetColumn(3);
+        Quaternion rotation = pose.rotation;
+        Vector3 scale = pose.lossyScale;
+        if (target.parent == targetRoot && target.localPosition == position &&
+            target.localRotation == rotation && target.localScale == scale) return;
+
+        if (target.parent != targetRoot) target.SetParent(targetRoot, false);
+        target.SetLocalPositionAndRotation(position, rotation);
+        target.localScale = scale;
     }
     internal static void ApplyBodyGuardrails(bool hasBody,GameObject guardrails)
     {

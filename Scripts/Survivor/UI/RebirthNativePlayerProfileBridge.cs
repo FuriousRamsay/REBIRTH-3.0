@@ -42,7 +42,7 @@ public static class RebirthNativePlayerProfileBridge
     public static string DisplayProfileName(string profileName)
     {
         return IsReservedTemporaryProfileName(profileName)
-            ? "[FF9999](" + RebirthSurvivorUiText.L("xuiRebirthTemporaryPlayerProfile", "Temporary Profile - Please Save") + ")[-]"
+            ? "(" + RebirthSurvivorUiText.L("xuiRebirthTemporaryPlayerProfile", "Temporary Profile - Please Save") + ")"
             : profileName ?? string.Empty;
     }
     public static void InvalidateEmbeddedProfileSnapshot()

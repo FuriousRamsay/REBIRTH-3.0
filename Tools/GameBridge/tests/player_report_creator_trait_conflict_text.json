@@ -1,0 +1,11 @@
+{
+  "name": "Survivor Creator explains trait conflicts by name",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Start on Traits with Cold Tolerant selected and Cold Sensitive visible. Use English for the exact footer text check." },
+    { "expectWindowOpen": "rebirthSurvivorCreator" },
+    { "click": { "exactText": "Cold Sensitive", "window": "rebirthSurvivorCreator" } },
+    { "expectUi": { "id": "creatorStatusText", "text": "You can't choose Cold Sensitive while Cold Tolerant is selected." } },
+    { "expectNoUi": { "id": "creatorStatusText", "text": "trait.cold_tolerant" } }
+  ]
+}

@@ -174,15 +174,19 @@ internal static class RebirthRemoteResourceCraftOriginal
     }
     internal static bool CompleteIfPresent(RebirthRemoteResourceClientOriginal.Intent original)
     {try{return Actions().Read(original.Operation)==null||Complete(original);}catch{return false;}}
-    internal static bool ObserveLocalUsage(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)
+    internal static bool ObserveLocalUsage(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original,Recipe accepted=null)
     {
         try
         {
             if(!RebirthRemoteResourceClientOriginal.Current(player,original)||!TryRead(original,out var action,out var state)||state==RebirthCamperTransferJournal.Phase.Prepared||
                 !Guid.TryParseExact((string)action.Attribute("source"),"N",out var source)||
-                !RebirthRemoteResourceClientOriginal.ReadActor(action.Element("afterActor").Value).Matches(RebirthCamperEnergyActorImage.Capture(player)))return false;
+                !RebirthRemoteResourceCraftPlan.MatchesPaidCells(
+                    RebirthRemoteResourceClientOriginal.ReadActor(action.Element("beforeActor").Value),
+                    RebirthRemoteResourceClientOriginal.ReadActor(action.Element("afterActor").Value),
+                    RebirthCamperEnergyActorImage.Capture(player)))return false;
             var rows=player.PlayerUI.xui.GetCraftingData()?.RecipeQueueItems?.Where(row=>row?.Recipe!=null&&RebirthRemoteResourceOwnerAction.IsMarked(row.Recipe,source,(string)action.Attribute("binding"))).ToArray();
-            return rows?.Length==1&&(rows[0].RepairItem==null||rows[0].RepairItem.type==0)&&rows[0].AmountToRepair==0&&rows[0].Multiplier==(int)action.Attribute("count")&&rows[0].Quality==(int)action.Attribute("quality")&&
+            return rows?.Length==1&&(accepted==null||ReferenceEquals(rows[0].Recipe,accepted))&&
+                (rows[0].RepairItem==null||rows[0].RepairItem.type==0)&&rows[0].AmountToRepair==0&&rows[0].Multiplier==(int)action.Attribute("count")&&rows[0].Quality==(int)action.Attribute("quality")&&
                 RebirthRemoteResourceOwnerAction.RecipeImage(rows[0].Recipe)==action.Element("markedRecipe").Value;
         }
         catch{return false;}

@@ -58,7 +58,11 @@ internal static partial class RebirthProductiveEarnedUiCoordinator
     internal static bool CanSyncQueueHandoff(XUiC_WorkstationWindowGroup group)
         =>group?.craftingQueue==null||!handoffs.TryGetValue(group.craftingQueue,out var value)||ReferenceEquals(handoffSync,value);
     internal static bool CanTickQueueHandoff(TileEntityWorkstation station)
-        =>!handoffs.Values.Any(value=>ReferenceEquals(value.Binding.Station,station));
+    {
+        foreach (var handoff in handoffs.Values)
+            if (ReferenceEquals(handoff.Binding.Station, station)) return false;
+        return true;
+    }
     internal static bool CanSendQueueHandoff(EntityPlayerLocal actor,TileEntityWorkstation station,Guid operation,string digest)
         =>handoffs.Values.Any(value=>ReferenceEquals(value.Binding.Actor,actor)&&ReferenceEquals(value.Binding.Station,station)&&
             value.Binding.Operation==operation&&value.Image!=null&&Hash(value.Image)==digest&&value.Current()&&HandoffUiCurrent(value));

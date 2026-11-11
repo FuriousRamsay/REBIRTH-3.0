@@ -1,0 +1,53 @@
+{
+  "name": "Players public profile stays visible through unchanged refresh",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Use an existing solo or dedicated Purge survivor with an authored background. Compare four visible public practical skills against the pre-change Character profile including a tie. Dedicated follow-up uses an online target, then offline target, then switches rows while the first response is pending. No network payload is used as UI input."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "players"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "players",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "window": "players",
+        "id": "rebirthProfileSkillValue0"
+      }
+    },
+    {
+      "screenshot": "audit_players_public_profile_first"
+    },
+    {
+      "wait": 6
+    },
+    {
+      "expectUi": {
+        "window": "players",
+        "id": "rebirthProfileSkillValue0"
+      }
+    },
+    {
+      "screenshot": "audit_players_public_profile_after_refresh"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    }
+  ]
+}

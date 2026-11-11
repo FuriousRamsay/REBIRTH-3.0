@@ -124,7 +124,7 @@
 <include filename="_Survivor/container_junk_balance.xml"/>
 <conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
   <include filename="_Workstations/birdnest_loot.xml"/>
-  <include filename="_Rage/loot.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rage/loot.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_loot.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_loot.xml"/></if></conditional>
   <!-- Apply after included loot definitions: murky water is a full cooking

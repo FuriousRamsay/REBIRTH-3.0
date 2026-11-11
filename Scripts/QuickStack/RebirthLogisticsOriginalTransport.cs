@@ -54,7 +54,15 @@ internal static partial class RebirthLogisticsOriginalTransport
         internal World World;internal RebirthLogisticsOriginalAdmission Admission;
         internal ConnectionManager Manager;internal ClientInfo Peer;internal INetConnection Connection;
         internal RebirthLogisticsServerOperation Running;internal bool Cancel;internal DateTime NextResult;
+        internal int LastOfferedPhase = -1, DeferredResultPhase = -1;
+        internal ResultFrame QueuedResult, DeferredResult;
         public void Dispose(){Admission?.Dispose();Running?.Dispose();}
+    }
+    private sealed class ResultFrame
+    {
+        internal string Key;
+        internal int Phase;
+        internal bool? Sent;
     }
     private static readonly Dictionary<string,Job> jobs=new Dictionary<string,Job>(StringComparer.Ordinal);
     private static readonly RebirthRemoteResourceRepairSendQueue resultWire=new RebirthRemoteResourceRepairSendQueue();
@@ -80,7 +88,7 @@ internal static partial class RebirthLogisticsOriginalTransport
     // Activation is deliberately separate from class/package discovery. The
     // installer must supply authenticated result delivery before any producer
     // switches away from its existing native local path.
-    private static Action<EntityPlayer,RebirthLogisticsTransferJournal.Record> deliver;
+    private static Action<EntityPlayer,RebirthLogisticsTransferJournal.Record,Job,bool> deliver;
     internal static bool Active=>deliver!=null;
     private static void Activate()
     {
@@ -106,7 +114,7 @@ internal static partial class RebirthLogisticsOriginalTransport
             if(original.Phase<4&&nativeSender!=null&&RebirthStablePlayerIdentity.TryFromClientInfo(nativeSender,out var nativeOwner)&&nativeOwner.StorageKey==original.Owner&&
                 RebirthLogisticsOwnerReceipt.TrySavedOperation(nativeOwner,out var nativeOperation,out _,out float nativeHeld,out _)&&nativeOperation==operation&&nativeHeld==1f)
                 RebirthLogisticsNativeDeathReceipt.ObserveSaved(nativeSender);
-            if(original.Phase==4){deliver(actor,original);return;}
+            if(original.Phase==4){deliver(actor,original,null,false);return;}
         }
         else if(mode==Mode.Query)return; // A query never creates a replacement operation; Cancel may freeze only this unpaid original.
         if(jobs.TryGetValue(key,out var existing))
@@ -165,12 +173,46 @@ internal static partial class RebirthLogisticsOriginalTransport
                 }
                 if(job.Cancel)job.Running.RequestAbort();
                 bool terminal=job.Running.Step(out original);
-                if(original!=null&&(terminal||DateTime.UtcNow>=job.NextResult)){deliver(job.Actor,original);job.NextResult=DateTime.UtcNow.AddSeconds(2);}
+                if (original != null)
+                {
+                    bool afterDrain = job.DeferredResult?.Sent == true && original.Phase == job.DeferredResultPhase &&
+                        CanTrackStaticResultDrain(job, original);
+                    if (job.DeferredResult?.Sent != null)
+                    {
+                        job.DeferredResult = null;
+                        job.DeferredResultPhase = -1;
+                    }
+                    if (terminal || DateTime.UtcNow >= job.NextResult || CanOfferNewStaticDepositPhase(job, original) || afterDrain)
+                    {
+                        deliver(job.Actor, original, terminal ? null : job, afterDrain);
+                        job.LastOfferedPhase = original.Phase;
+                        job.NextResult = DateTime.UtcNow.AddSeconds(2);
+                    }
+                }
                 if(terminal){job.Dispose();jobs.Remove(pair.Key);}
             }
             catch(Exception error){Log.Warning("[QuickStack] Original transport retained: "+error.Message);}
         }
     }
+    private static bool CanOfferNewStaticDepositPhase(Job job, RebirthLogisticsTransferJournal.Record original)
+    {
+        // The retry interval still applies to the same saved phase and a busy wire queue.
+        return original.Phase > job.LastOfferedPhase && IsCurrentLifeStaticDeposit(job, original);
+    }
+    private static bool IsCurrentLifeStaticDeposit(Job job, RebirthLogisticsTransferJournal.Record original)
+        => original.Deaths == job.Actor.Died && original.Action == QuickStackRadialAction.Deposit &&
+            original.Npcs.Count == 0 && original.Legs.Count != 0 &&
+            original.Legs.All(leg => leg.Kind == RemoteResourceSourceKind.StaticContainer);
+
+    private static bool CanTrackStaticResultDrain(Job job, RebirthLogisticsTransferJournal.Record original)
+        => job != null && original.Phase < 4 && !original.Rejecting && !original.OwnerEscrowRecovery &&
+            original.Outcome == (original.Phase < 2 ? 0 : 1) &&
+            original.Operation == job.Operation && original.Owner == job.Owner && original.Epoch == job.Epoch && original.Request == job.Request &&
+            IsCurrentLifeStaticDeposit(job, original) &&
+            ReferenceEquals(GameManager.Instance?.World, job.World) && GameIO.GetSaveGameDir() == job.Directory &&
+            ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance, job.Manager) &&
+            TryCurrentPeer(job.Actor, out var peer, out var connection) &&
+            ReferenceEquals(peer, job.Peer) && ReferenceEquals(connection, job.Connection);
     private static bool installed;
     internal static void Install()
     {
@@ -196,18 +238,30 @@ internal static partial class RebirthLogisticsOriginalTransport
     internal const int ChunkChars=12000,ChunkBytes=9000,MaxFrameChars=4*1024*1024,MaxChunks=(MaxFrameChars+ChunkBytes-1)/ChunkBytes;
     internal static string Digest(string value)
     {using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-",string.Empty).ToLowerInvariant();}
-    private static void SendResult(EntityPlayer actor,RebirthLogisticsTransferJournal.Record original)
+    private static void SendResult(EntityPlayer actor,RebirthLogisticsTransferJournal.Record original,Job job,bool afterDrain)
     {
         var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;var world=GameManager.Instance?.World;
         if(actor==null||world?.IsRemote()!=false||!ReferenceEquals(actor.world,world)||!ReferenceEquals(world.GetEntity(actor.entityId),actor)||
             !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)||identity.StorageKey!=original.Owner)return;
         string key="logistics-result|"+original.World+"|"+original.Owner+"|"+Digest(original.Creation)+"|"+original.Operation.ToString("N")+"|"+original.Epoch+"|"+original.Request;
-        if(resultWire.IsQueued(key))return;
+        if(resultWire.IsQueued(key))
+        {
+            var queued=job?.QueuedResult;
+            if(queued!=null&&queued.Key==key&&queued.Sent==null&&queued.Phase<original.Phase&&
+                original.Phase>job.LastOfferedPhase&&CanTrackStaticResultDrain(job,original))
+            {
+                job.DeferredResult=queued;
+                job.DeferredResultPhase=original.Phase;
+            }
+            return;
+        }
         string text=RebirthLogisticsTransferJournal.Encode(original);
         if(text.Length>MaxFrameChars||Encoding.UTF8.GetByteCount(text)>MaxFrameChars)throw new System.IO.InvalidDataException();
         var body=new RebirthRemoteResourceFragments.Body(Encoding.UTF8.GetBytes(text));
         int entity=actor.entityId,deaths=actor.Died;string owner=original.Owner,creation=original.Creation,nativeWorld=original.World,directory=GameIO.GetSaveGameDir();Guid operation=original.Operation;
         if(!TryCurrentPeer(actor,out var client,out var connection))return;
+        bool track=CanTrackStaticResultDrain(job,original)&&ReferenceEquals(client,job.Peer)&&ReferenceEquals(connection,job.Connection);
+        if(afterDrain&&!track)return;
         bool Current()=>ReferenceEquals(GameManager.Instance?.World,world)&&world.IsRemote()==false&&ReferenceEquals(world.GetEntity(entity),actor)&&!actor.IsDead()&&actor.Died==deaths&&
             GameIO.GetSaveGameDir()==directory&&RebirthLogisticsTransferJournal.WorldKey(world)==nativeWorld&&RebirthCamperCharacterAccess.CurrentCreation(actor)==creation&&
             ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,manager)&&TryCurrentPeer(actor,out var livePeer,out var liveConnection)&&
@@ -217,8 +271,18 @@ internal static partial class RebirthLogisticsOriginalTransport
             manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthLogisticsTerminalPhysical>().Setup(operation,RebirthLogisticsTransferJournal.ImmutablePlanDigest(original),Digest(RebirthLogisticsTransferJournal.Encode(original)),physicalProof,original.Deaths),_attachedToEntityId:entity);
         // Rejection leaves the same durable original; query/normal result tick
         // retries. No fresh operation, terminal receipt or item effect is made.
-        resultWire.Enqueue(key,body,Current,()=>SendReady(connection),index=>manager.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthLogisticsOriginalResult>().Setup(operation,body.Hash,index,body.Count,body.Part(index)),_attachedToEntityId:entity));
+        Action<int> send=index=>manager.SendPackage(
+            NetPackageManager.GetPackage<NetPackageRebirthLogisticsOriginalResult>().Setup(operation,body.Hash,index,body.Count,body.Part(index)),_attachedToEntityId:entity);
+        if(!track)
+        {
+            resultWire.Enqueue(key,body,Current,()=>SendReady(connection),send);
+            return;
+        }
+
+        var frame=new ResultFrame{Key=key,Phase=original.Phase};
+        // The callback records local drain only. The next job step must re-read the durable phase.
+        if(resultWire.EnqueueObserved(key,body,Current,()=>SendReady(connection),send,sent=>frame.Sent=sent))
+            job.QueuedResult=frame;
     }
     internal static void ReceivePhysicalTerminalEvidence(World world,Guid operation,string binding,string result,string proof,int deaths)
     {
@@ -374,7 +438,7 @@ internal static partial class RebirthLogisticsOriginalTransport
         if(player?.world?.IsRemote()!=true||operation==Guid.Empty||!RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity))throw new InvalidDataException();
         owner=identity.StorageKey;string world=RebirthLogisticsTransferJournal.WorldKey(player.world);
         if(world==null)throw new InvalidDataException();
-        return Path.Combine(Path.GetFullPath(GameIO.GetPlayerDataDir()),"RebirthLogisticsOriginalIntent",world,owner,operation.ToString("N")+".xml");
+        return Path.Combine(RebirthLogisticsHeaderAdmission.OwnerIoRoot(),"RebirthLogisticsOriginalIntent",world,owner,operation.ToString("N")+".xml");
     }
     private static XElement Intent(EntityPlayerLocal player,Guid operation,string owner)=>new XElement("intent",
         new XAttribute("version",1),new XAttribute("operation",operation.ToString("N")),new XAttribute("world",RebirthLogisticsTransferJournal.WorldKey(player.world)),
@@ -384,7 +448,8 @@ internal static partial class RebirthLogisticsOriginalTransport
     private static string ReadIntentFile(string path)
     {
         var file=new FileInfo(path);if(!file.Exists||file.Length<1||file.Length>65536||(file.Attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
-        using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=65536}))
+        using(var stream=File.OpenRead(path))
+        using(var reader=XmlReader.Create(stream,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=65536}))
             return XElement.Load(reader,LoadOptions.None).ToString(SaveOptions.DisableFormatting);
     }
     private static bool SaveIntent(EntityPlayerLocal player)
@@ -424,18 +489,21 @@ internal static partial class RebirthLogisticsOriginalTransport
         }
         catch{return false;}
     }
+    private enum CommandLife { Admission, NextLife, LaterReference }
+
     internal static bool TryReadCommandScope(EntityPlayerLocal player,Guid operation,out RebirthLogisticsNativeBodyIntent.Command command)
-        =>ReadCommandScope(player,operation,false,out command);
+        =>ReadCommandScope(player,operation,CommandLife.NextLife,out command);
     // Reference metadata only; never used for owner debit, body spawn or payment.
     internal static bool TryReadReferenceCommandScope(EntityPlayerLocal player,Guid operation,out RebirthLogisticsNativeBodyIntent.Command command)
-        =>ReadCommandScope(player,operation,true,out command);
-    private static bool ReadCommandScope(EntityPlayerLocal player,Guid operation,bool laterLifeReference,out RebirthLogisticsNativeBodyIntent.Command command)
+        =>ReadCommandScope(player,operation,CommandLife.LaterReference,out command);
+    private static bool ReadCommandScope(EntityPlayerLocal player,Guid operation,CommandLife life,out RebirthLogisticsNativeBodyIntent.Command command)
     {
         command=null;
         try
         {
             if(player?.world?.IsRemote()!=true||!ReferenceEquals(GameManager.Instance?.World,player.world)||!RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity))return false;
-            if(latest?.Operation==operation&&latest.Owner==identity.StorageKey&&latest.World==RebirthLogisticsTransferJournal.WorldKey(player.world)&&latest.Creation==RebirthCamperCharacterAccess.CurrentCreation(player))
+            // Fresh admission must reread its durable command from the same life.
+            if(life!=CommandLife.Admission&&latest?.Operation==operation&&latest.Owner==identity.StorageKey&&latest.World==RebirthLogisticsTransferJournal.WorldKey(player.world)&&latest.Creation==RebirthCamperCharacterAccess.CurrentCreation(player))
             {command=RebirthLogisticsNativeBodyIntent.Command.From(latest);return true;}
             string path=IntentPath(player,operation,out var owner);var envelope=XElement.Parse(ReadIntentFile(path));var value=envelope.Element("intent");
             if(envelope.Name!="original"||envelope.Attributes().Count()!=1||envelope.Elements().Count()!=1||value==null||value.Attributes().Count()!=9||value.Elements().Count()!=2||
@@ -443,7 +511,15 @@ internal static partial class RebirthLogisticsOriginalTransport
                 (string)value.Attribute("owner")!=owner||(string)value.Attribute("world")!=RebirthLogisticsTransferJournal.WorldKey(player.world)||(string)value.Attribute("creation")!=RebirthCamperCharacterAccess.CurrentCreation(player))return false;
             int deaths=(int)value.Attribute("deaths"),request=(int)value.Attribute("request");ulong epoch=(ulong)value.Attribute("epoch");byte action=checked((byte)(int)value.Attribute("action"));
             var target=value.Element("target");var selection=value.Element("selection");if(target==null||selection==null||target.HasElements||selection.HasElements||target.HasAttributes||selection.HasAttributes||
-                epoch==0||request<=0||deaths<0||deaths==int.MaxValue||(laterLifeReference?player.Died<deaths+1:player.Died!=deaths+1)||action>(byte)QuickStackRadialAction.PullDroneCredits)return false;
+                epoch==0||request<=0||deaths<0||deaths==int.MaxValue||action>(byte)QuickStackRadialAction.PullDroneCredits)return false;
+            bool matchesLife=life switch
+            {
+                CommandLife.Admission => player.Died==deaths,
+                CommandLife.NextLife => player.Died==deaths+1,
+                CommandLife.LaterReference => player.Died>deaths,
+                _ => false
+            };
+            if(!matchesLife)return false;
             string a=new UTF8Encoding(false,true).GetString(Convert.FromBase64String(target.Value)),b=new UTF8Encoding(false,true).GetString(Convert.FromBase64String(selection.Value));
             if(a.Length>512||b.Length>8192||Convert.ToBase64String(Encoding.UTF8.GetBytes(a))!=target.Value||Convert.ToBase64String(Encoding.UTF8.GetBytes(b))!=selection.Value)return false;
             command=new RebirthLogisticsNativeBodyIntent.Command(operation,(string)value.Attribute("world"),owner,(string)value.Attribute("creation"),deaths,epoch,request,(QuickStackRadialAction)action,a,b);return true;
@@ -501,7 +577,7 @@ internal static partial class RebirthLogisticsOriginalTransport
         preparedHere=true;
         // The native hold is deferred until the authenticated host header ACK
         // and the owner's AcceptedHeader/HoldAttempted sidecars are durable.
-        if(!TryReadCommandScope(player,clientOperation,out var command)||!RebirthLogisticsHeaderAdmission.Start(player,command))return;
+        if(!ReadCommandScope(player,clientOperation,CommandLife.Admission,out var command)||!RebirthLogisticsHeaderAdmission.Start(player,command))return;
         RebirthLogisticsHeaderAdmission.Tick(player);
     }
     private static void SendClient(EntityPlayerLocal player,Mode mode)

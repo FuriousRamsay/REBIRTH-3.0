@@ -28,7 +28,7 @@ public sealed class NetPackageRebirthVehicleCustodySnapshot:NetPackage
     public override void ProcessPackage(World world,GameManager callbacks)
     {
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=true||!ReferenceEquals(world,GameManager.Instance?.World)||connection==null||connection.IsServer||world.worldState?.Guid!=game)return;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=true||!ReferenceEquals(world,GameManager.Instance?.World)||connection==null||connection.IsServer||RebirthVehicleClientCustody.ProtocolWorld(world)!=game)return;
         var owner=world.GetPrimaryPlayer();if(owner==null||!XUiC_RebirthVehicleRestoration.TryGetRequestCharacter(owner,out var current)||current!=creation)return;
         XUiC_RebirthVehicleRestoration.Receive(id,carrier,position,entity,RebirthVehicleAssemblySerializer.FromBase64(payload),message,outcome,pickup);
     }

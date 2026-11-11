@@ -91,7 +91,8 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (accept != null) accept.OnPressed -= AcceptPressed;
         if (HoveredCard?.xui == xui) HoveredCard = null;
         if (requestedFocus?.xui == xui) requestedFocus = null;
-        Hide(); base.Cleanup();
+        ClearPreviewState();
+        base.Cleanup();
     }
     // Switching this nested panel on and off makes NGUI rebuild it on every hover change, seen as a
     // flash. It stays active and parks off screen instead, as XUiC_RebirthContextSlot.Present does.
@@ -106,13 +107,24 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (root != null && !root.gameObject.activeSelf) root.gameObject.SetActive(true);
         if (!value && ViewComponent.Position != ParkedPosition) { ViewComponent.Position = ParkedPosition; ViewComponent.TryUpdatePosition(); }
         if (value) showingCard = source;
-        else if (ReferenceEquals(showingCard, source)) showingCard = null;
     }
     private void Hide()
     {
-        Visible(false); source = null; sourceArrow = null; acceptanceToken = null; nextTextRefresh = 0; leaveAfter = 0;
+        Visible(false);
+        ClearPreviewState();
         if (accept != null) accept.Enabled = false;
         if (image != null) image.Texture = null;
+    }
+
+    private void ClearPreviewState()
+    {
+        if (ReferenceEquals(showingCard, source)) showingCard = null;
+        shown = false;
+        source = null;
+        sourceArrow = null;
+        acceptanceToken = null;
+        nextTextRefresh = 0;
+        leaveAfter = 0;
     }
     private bool ValidSource(XUiC_RebirthTraderJobCard card) => card != null && card.xui == xui
         && card.windowGroup == windowGroup && card.CardMode && card.CurrentResponse is DialogResponseQuest

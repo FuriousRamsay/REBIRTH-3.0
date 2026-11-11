@@ -33,7 +33,7 @@ internal static class RebirthLogisticsHistoricalBeforeCapsule
                 !RebirthLogisticsOwnerReceipt.TryLocalHeader(player,out var liveNonce)||liveNonce!=acceptedNonce)return false;
             var scope=new RebirthLogisticsTransferJournal.Record{Operation=command.Operation,World=command.World,Owner=command.Owner,Creation=command.Creation,Deaths=command.Deaths,Epoch=command.Epoch,Request=command.Request,Action=command.Action,Target=command.Target,Selection=command.Selection};
             if(!RebirthLogisticsHeaderAdmission.TryAcceptedNonce(player,scope,out var accepted)||accepted!=acceptedNonce)return false;
-            string directory=Path.Combine(GameIO.GetPlayerDataDir(),"RebirthLogisticsHeaderAdmission",command.World,command.Owner,operation.ToString("N"));
+            string directory=RebirthLogisticsHeaderAdmission.OwnerOperationDirectory(command);
             string body=Path.Combine(directory,"native0.ttp"),metadata=body+".xml";
             if(!Directory.Exists(directory)||File.Exists(body)||File.Exists(metadata)||File.Exists(body+".tmp")||File.Exists(metadata+".tmp")||File.Exists(body+".bak")||File.Exists(metadata+".bak"))return false;
             if(!RebirthLogisticsOwnerReceipt.TrySaved(owner,operation,0,out var saved)||saved.id!=player.entityId||saved.deaths!=command.Deaths||saved.bDead||
@@ -59,7 +59,7 @@ internal static class RebirthLogisticsHistoricalBeforeCapsule
         }
         catch{return false;} // Failed candidates retained, never native proof.
     }
-    private static string LocalPath(RebirthLogisticsNativeBodyIntent.Command c)=>Path.Combine(GameIO.GetPlayerDataDir(),"RebirthLogisticsHeaderAdmission",c.World,c.Owner,c.Operation.ToString("N"),"native0.ttp");
+    private static string LocalPath(RebirthLogisticsNativeBodyIntent.Command c)=>Path.Combine(RebirthLogisticsHeaderAdmission.OwnerOperationDirectory(c),"native0.ttp");
     private static string HostPath(string owner,Guid operation)
     {
         string root=Path.Combine(GameIO.GetSaveGameDir(),"RebirthLogisticsHistoricalBefore",owner,operation.ToString("N")+".owner0"),archive=Path.Combine(Path.GetDirectoryName(root),"archive",Path.GetFileName(root));
@@ -103,7 +103,8 @@ internal static class RebirthLogisticsHistoricalBeforeCapsule
     private static XElement Metadata(string path)
     {
         if(!File.Exists(path)||File.Exists(path+".tmp")||File.Exists(path+".bak")||new FileInfo(path).Length>4096||(File.GetAttributes(path)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException();
-        using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=4096}))return XElement.Load(reader);
+        using(var stream=File.OpenRead(path))
+        using(var reader=XmlReader.Create(stream,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=4096}))return XElement.Load(reader);
     }
     private static PlayerDataFile ReadLocalCapsule(RebirthLogisticsNativeBodyIntent.Command c,string nonce,out string fullHash)
     {

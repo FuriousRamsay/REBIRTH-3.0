@@ -66,7 +66,13 @@ public static partial class RebirthNpcInventoryTransactionService
                     Guid stackId;
                     if(binding==null)
                     {
-                        var matching=old.Where(r=>!physical.Contains(r.StackId)&&!managed.Contains(r.StackId)&&r.Count==stack.count&&r.Payload==RebirthNativeItemCodec.Encode(stack.itemValue)).ToArray();
+                        string payload=null;
+                        var matching=old.Where(r=>
+                        {
+                            if(physical.Contains(r.StackId)||managed.Contains(r.StackId)||r.Count!=stack.count)return false;
+                            payload??=RebirthNativeItemCodec.Encode(stack.itemValue);
+                            return r.Payload==payload;
+                        }).Take(2).ToArray();
                         if(matching.Length>1)return false;
                         stackId=matching.Length==1?matching[0].StackId:Guid.NewGuid();
                         binding=new XElement("binding",new XAttribute("area",area),new XAttribute("index",i),new XAttribute("id",stackId.ToString("N")));bindings.Add(binding);

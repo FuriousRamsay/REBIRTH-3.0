@@ -1,0 +1,24 @@
+{
+  "name": "Trader direct acceptance, exact native offer and daily or concurrent limit",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run against a prepared single-player and dedicated Purge trader with one eligible normal job. Enter dialog through native trader interaction. Capture offer and journal before selection."
+    },
+    {
+      "screenshot": "audit_trader_normal_offer"
+    },
+    {
+      "_note": "Select one current normal job through the real card. Capture accepted QuestCode and the removed offer. Repeat with final concurrent slot, daily cap, older unstamped active journal and a stale list response. A failed or stale offer must remain or refresh without adding a duplicate quest."
+    },
+    {
+      "_note": "For the exact native journal gate, compare a freshly added quest with a different offer that shares an active code and a repeat of the accepted instance after day rollover. Only the first actual admission may stamp the acceptance day or consume the corresponding offer. Verify special and authenticated dedicated offers separately."
+    },
+    {
+      "screenshot": "audit_trader_normal_offer_result"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

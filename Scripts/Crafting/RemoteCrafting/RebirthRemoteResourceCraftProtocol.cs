@@ -10,12 +10,20 @@ using UnityEngine;
 // and terminal delivery are separate durable stages of one original action.
 internal static class RebirthRemoteResourceCraftProtocol
 {
+    private const int FreshPersonalStage = 9;
+    private const string OwnerSaveRequired = "owner-save-required";
+
     private sealed class Pending
     {
         internal RebirthRemoteResourceClientOriginal.Intent Original;
         internal ItemActionEntryCraft Entry;
+        internal Recipe RequestedRecipe;
+        internal int RequestedCount;
         internal float Next;
-        internal bool Ack,Rejecting,Used,RefundApplied;
+        internal bool Ack,Rejecting,Used,RefundApplied,FreshRemote,RefreshedBefore;
+        internal Recipe AcceptedRecipe;
+        internal INetConnection AcceptedConnection;
+        internal int AcceptedFrame;
         internal Guid Source;
         internal string Binding,SourceWorld,NoUse;
         internal ItemStack[] Paid;
@@ -32,6 +40,9 @@ internal static class RebirthRemoteResourceCraftProtocol
     {if(installed)return;ModEvents.GameUpdate.RegisterHandler(Update);installed=true;}
     private static void Bind(World current)
     {string path=GameIO.GetSaveGameDir();if(ReferenceEquals(world,current)&&directory==path)return;pending.Clear();localRequests.Clear();world=current;directory=path;scanAt=0;}
+
+    internal static void ForgetCompleted(Guid original) => pending.Remove(original);
+
     internal static bool Begin(EntityPlayerLocal player,ItemActionEntryCraft entry,ulong epoch,ulong request,List<ItemStack> full,List<ItemStack> remote)
     {
         try
@@ -40,25 +51,59 @@ internal static class RebirthRemoteResourceCraftProtocol
             if(!installed||player?.world==null||player.world.IsRemote()&&!RebirthRemoteResourceRepairProtocol.SupportsClientTransport()||pending.Count>=32||
                 !RebirthRemoteResourceCraftOriginal.Capture(player,entry,epoch,request,full,remote,out var original)||
                 !RebirthRemoteResourceOwnerAction.TryHoldPreparedOriginal(player,original))return false;
-            pending.Add(original.Operation,new Pending{Original=original,Entry=entry});SaveNative(player,original,10);return true;
+            var value=new Pending{Original=original,Entry=entry,FreshRemote=player.world.IsRemote(),
+                RequestedRecipe=entry.craftCountControl.recipe,RequestedCount=entry.craftCountControl.Count};
+            pending.Add(original.Operation,value);
+            if(value.FreshRemote)
+            {
+                value.Next=Time.realtimeSinceStartup+1;
+                Send(player,value,FreshPersonalStage);
+            }
+            else SaveNative(player,original,10);
+            return true;
         }
         catch{return false;}
     }
     internal static bool TryAttach(ItemActionEntryCraft entry)
     {
+        if (pending.Count == 0) return false;
+
         var player=entry?.ItemController?.xui?.playerUI?.entityPlayer;var recipe=(entry?.ItemController as XUiC_RecipeEntry)?.Recipe;
         if(recipe==null||!RebirthRemoteResourceCraftOriginal.IsPersonalEntry(entry)||entry.craftCountControl?.WindowGroup?.Controller.GetChildByType<XUiC_WorkstationInputGrid>()!=null)return false;
         foreach(var value in pending.Values)
         {
-            var action=value.Original.Copy().Element("action");
-            if(RebirthRemoteResourcePreAdmissionRefusal.ClientRequested(value.Original)||!RebirthRemoteResourceClientOriginal.Current(player,value.Original)||entry.craftCountControl.Count!=(int)action.Attribute("count")||
-                entry.craftingTier!=(int)action.Attribute("quality")||RebirthRemoteResourceOwnerAction.RecipeImage(recipe)!=action.Element("baseRecipe").Value)continue;
-            value.Entry=entry;value.Next=0;return true;
+            var original = value.Original;
+            if (RebirthRemoteResourcePreAdmissionRefusal.ClientRequested(original) ||
+                !RebirthRemoteResourceClientOriginal.Current(player, original))
+                continue;
+
+            var action = original.Copy().Element("action");
+            if (entry.craftCountControl.Count != (int)action.Attribute("count") ||
+                entry.craftingTier != (int)action.Attribute("quality") ||
+                RebirthRemoteResourceOwnerAction.RecipeImage(recipe) != action.Element("baseRecipe").Value)
+                continue;
+            value.Entry=entry;value.RequestedRecipe=entry.craftCountControl.recipe;value.RequestedCount=entry.craftCountControl.Count;value.Next=0;return true;
         }
         return false;
     }
-    internal static bool HasPendingForUi(XUi ui)=>ui!=null&&pending.Values.Any(value=>value.NoUse==null&&
-        ReferenceEquals(value.Entry?.ItemController?.xui,ui)&&Current(ui.playerUI?.entityPlayer,value));
+    internal static bool HasPendingForUi(XUi ui)
+    {
+        if (ui == null) return false;
+        foreach (var value in pending.Values)
+            if (value.NoUse == null && ReferenceEquals(value.Entry?.ItemController?.xui, ui) &&
+                Current(ui.playerUI?.entityPlayer, value))
+                return true;
+        return false;
+    }
+    internal static bool PreservesRequestedCount(XUiC_RecipeCraftCount counter)
+    {
+        if(counter==null||counter.recipe==null||counter.Count<1)return false;
+        foreach(var value in pending.Values)
+            if(!value.Used&&!value.Rejecting&&value.NoUse==null&&ReferenceEquals(value.Entry?.craftCountControl,counter)&&
+                ReferenceEquals(value.RequestedRecipe,counter.recipe)&&value.RequestedCount==counter.Count&&
+                Current(counter.xui?.playerUI?.entityPlayer,value))return true;
+        return false;
+    }
     internal static void CancelUnadmittedForUi(XUi ui)
     {
         var player=ui?.playerUI?.entityPlayer;if(player==null)return;
@@ -93,14 +138,16 @@ internal static class RebirthRemoteResourceCraftProtocol
         var record=journal.Prepare(operation,original.Operation,original.Creation,0,bytes,bytes);
         if(!record.Before.SequenceEqual(bytes)||!record.After.SequenceEqual(bytes))return false;
         if(record.State==RebirthCamperTransferJournal.Phase.Prepared)record=journal.Advance(operation,record.State,RebirthCamperTransferJournal.Phase.Uncertain);
-        if(record.State==RebirthCamperTransferJournal.Phase.Uncertain)record=journal.Advance(operation,record.State,RebirthCamperTransferJournal.Phase.Applied);
+        // These per-operation witnesses can be read from their primary files.
+        // Copying the same durable files to an archive gates the native queue.
+        if(record.State==RebirthCamperTransferJournal.Phase.Uncertain)record=journal.Advance(operation,record.State,RebirthCamperTransferJournal.Phase.Applied,archiveTerminal:false);
         return record.State==RebirthCamperTransferJournal.Phase.Applied;
     }
     private static void Send(EntityPlayerLocal player,Pending value,int stage,string action="")
     {
         if(!Current(player,value))return;
         var persistent=GameManager.Instance.GetPersistentLocalPlayer();if(player.world.IsRemote()&&persistent?.PrimaryId==null)return;
-        if(stage!=0&&player.world.IsRemote())GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);
+        if(stage!=0&&stage!=FreshPersonalStage&&player.world.IsRemote())GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);
         var original=value.Original;
         XElement source=value.Ack?new XElement("originalRef",new XAttribute("operation",original.Operation.ToString("N")),new XAttribute("digest",original.Digest),new XAttribute("epoch",original.Epoch),new XAttribute("request",original.Request)):original.Copy();
         var request=new XElement("craftRequest",new XAttribute("version",2),new XAttribute("stage",stage),source,new XElement("ownerActionBody",action));
@@ -113,6 +160,28 @@ internal static class RebirthRemoteResourceCraftProtocol
         }
         NetPackageRebirthRemoteRepairOriginal.Send(player.entityId,persistent.PrimaryId,original,request.ToString(SaveOptions.DisableFormatting));
     }
+    private static INetConnection CurrentClientConnection(EntityPlayerLocal player)
+    {
+        var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        var connections=manager?.connectionToServer;
+        return player.world?.IsRemote()==true&&manager?.IsServer==false&&manager.IsConnected&&connections?.Length>0&&
+            connections[0]?.IsDisconnected()==false?connections[0]:null;
+    }
+    private static bool HasWarmAcceptance(EntityPlayerLocal player,Pending value)
+        =>value.AcceptedRecipe!=null&&player.Died==value.Original.Deaths;
+
+    private static void PublishAccepted(EntityPlayerLocal player,Pending value)
+    {
+        var original=value.Original;
+        bool CurrentAccepted()=>Current(player,value)&&ReferenceEquals(CurrentClientConnection(player),value.AcceptedConnection)&&
+            RebirthRemoteResourceOwnerAction.HoldsOriginalScope(player,original)&&
+            player.Buffs.GetCustomVar(RebirthRemoteResourceOwnerAction.Receipt(original.Operation))==2f;
+        if(!CurrentAccepted()||!RebirthRemoteResourceCraftOriginal.ObserveLocalUsage(player,original,value.AcceptedRecipe))return;
+        GameManager.Instance.SaveLocalPlayerData();
+        if(!CurrentAccepted())return;
+        Send(player,value,2); // Existing Send requests the native upload after the local save.
+        value.AcceptedRecipe=null;value.AcceptedConnection=null;
+    }
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
         var current=GameManager.Instance?.World;Bind(current);if(current==null)return;
@@ -120,7 +189,7 @@ internal static class RebirthRemoteResourceCraftProtocol
         if(now>=scanAt)
         {
             scanAt=now+5;
-            if(RebirthRemoteResourceClientOriginal.TryReadPending(out var originals))foreach(var original in originals)
+            if(RebirthRemoteResourceClientOriginal.TryReadPendingForRecovery(player,out var originals))foreach(var original in originals)
             {
                 if(original.Kind!=RemoteResourceClientOperation.Craft||RebirthRemoteResourceFetchedStationOriginal.IsCandidate(original)||RebirthRemoteResourcePlacedStationOriginal.IsCandidate(original)||pending.Count>=32||pending.ContainsKey(original.Operation)||!RebirthRemoteResourceCraftAdoption.QueryScope(player,original))continue;
                 try
@@ -143,9 +212,17 @@ internal static class RebirthRemoteResourceCraftProtocol
         }
         if(pending.Count>0)foreach(var value in pending.Values.ToArray())
         {
-            if(!Current(player,value)||now<value.Next)continue;value.Next=now+1;
+            if(!Current(player,value)||now<value.Next)continue;
+            bool warmAccepted=HasWarmAcceptance(player,value);
+            if(warmAccepted&&value.AcceptedFrame==Time.frameCount)continue;
+            value.Next=now+1;
             try
             {
+                if(warmAccepted)
+                {
+                    PublishAccepted(player,value);
+                    continue;
+                }
                 if(RebirthRemoteResourcePreAdmissionRefusal.HasClientTerminal(value.Original))
                 {if(RebirthRemoteResourceClientOriginal.CompleteNeverAdmitted(player,value.Original))pending.Remove(value.Original.Operation);continue;}
                 if(RebirthRemoteResourcePreAdmissionRefusal.ClientRequested(value.Original))
@@ -164,7 +241,7 @@ internal static class RebirthRemoteResourceCraftProtocol
                     else if(value.Rejecting){if(RebirthRemoteResourceCraftOriginal.SaveOwnerFive(player,value.Original))Send(player,value,4);else Send(player,value,3);}
                     else Send(player,value,phase==RebirthCamperTransferJournal.Phase.Prepared?1:8);
                 }
-                else Send(player,value,0);
+                else Send(player,value,value.FreshRemote?FreshPersonalStage:0);
             }
             catch{/* Retain the immutable original and exact native hold. */}
         }
@@ -185,23 +262,45 @@ internal static class RebirthRemoteResourceCraftProtocol
         ReferenceEquals(GameManager.Instance?.World,actor.world)&&ReferenceEquals(actor.world.GetEntity(actor.entityId),actor)&&original.Kind==RemoteResourceClientOperation.Craft&&
         actor.Died==original.Deaths&&actor.world.worldState.Guid==original.World&&RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner)&&owner.CanonicalId==original.Owner&&
         RebirthOriginalActionScope.Matches(actor,owner.StorageKey,original.Creation);
-    private static bool Admit(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original)
+    private static bool Admit(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,bool fresh,
+        out bool needsOwnerSave,out bool beforeConfirmed)
     {
-        if(!Scope(actor,original)&&!RebirthRemoteResourceCraftAdoption.HostScope(actor,original)||!RebirthRemoteResourceCraftOriginal.ValidateInput(original,out _,out _,out _,out int belt,out _)||
-            !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner)||!RemoteResourceWorldIdentity.TryGet(actor.world,out string sourceWorld))return false;
+        needsOwnerSave=false;
+        beforeConfirmed=false;
+        bool Refuse(string reason)
+        {
+            RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] admission={reason} operation={original.Operation:N}");
+            return false;
+        }
+        if(!Scope(actor,original)&&!RebirthRemoteResourceCraftAdoption.HostScope(actor,original))return Refuse("scope");
+        if(!RebirthRemoteResourceCraftOriginal.ValidateInput(original,out _,out _,out _,out int belt,out _))return Refuse("input");
+        if(!RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner)||!RemoteResourceWorldIdentity.TryGet(actor.world,out string sourceWorld))return Refuse("identity");
         Guid operation=RebirthRemoteResourceDurableJournal.Operation(sourceWorld,owner.StorageKey,original.Creation,original.Epoch,original.Request,original.Kind);
-        if(RebirthRemoteResourcePreAdmissionRefusal.BlocksAdmission(operation))return false;
+        if(RebirthRemoteResourcePreAdmissionRefusal.BlocksAdmission(operation))return Refuse("previously-refused");
         byte[] bytes=Encoding.UTF8.GetBytes(new XElement("craftSourceAdmission",new XAttribute("originalDigest",original.Digest),original.Copy()).ToString(SaveOptions.DisableFormatting));
         var journal=Admissions();var retained=journal.Read(operation);
-        if(retained!=null)return retained.Vehicle==original.Operation&&retained.OwnerCreation==original.Creation&&retained.Before.SequenceEqual(bytes)&&retained.After.SequenceEqual(bytes)&&Publish(journal,operation,original,bytes);
-        if(actor.Died!=original.Deaths)return false;
-        if(!RebirthRemoteResourceCraftingRead.TryRead(owner,out var before,out var saved,out string queue)||saved.id!=actor.entityId||saved.deaths!=original.Deaths||
-            !RebirthRemoteResourceClientOriginal.ReadActor(original.Copy().Element("actorBefore").Value).Matches(before)||queue!=original.Copy().Element("queueBefore").Value||belt!=actor.inventory.Length||
-            !RebirthCookingRemoteAdmissionBackend.NativePhase(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=10f)return false;
-        var needs=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(original.Copy().Element("requirements").Value));
-        var remote=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(original.Copy().Element("remoteRequirements").Value));
-        if(!RebirthRemoteResourceCraftPlan.IsExactShortfall(before,needs,remote,belt)||!RebirthRemoteResourceCraftPlan.TryDebit(before,needs,remote,belt,out _,out _))return false;
-        return Publish(journal,operation,original,bytes);
+        if(retained!=null)
+        {
+            bool matches=retained.Vehicle==original.Operation&&retained.OwnerCreation==original.Creation&&retained.Before.SequenceEqual(bytes)&&retained.After.SequenceEqual(bytes)&&Publish(journal,operation,original,bytes);
+            beforeConfirmed=fresh&&matches;
+            return matches;
+        }
+        if(actor.Died!=original.Deaths)return Refuse("life");
+        var image=original.Copy();
+        if(!RebirthRemoteResourceCraftingRead.TryRead(owner,out var before,out var saved,out string queue)||
+            saved.id!=actor.entityId||saved.deaths!=original.Deaths||
+            !RebirthRemoteResourceClientOriginal.ReadActor(image.Element("actorBefore").Value).Matches(before)||
+            !RebirthRemoteResourceCraftingRead.MatchesSavedQueue(image.Element("queueBefore").Value,queue))
+        {needsOwnerSave=fresh;return Refuse("saved-owner-before");}
+        if(belt!=actor.inventory.Length)return Refuse($"toolbelt client={belt} server={actor.inventory.Length}");
+        if(!fresh&&(!RebirthCookingRemoteAdmissionBackend.NativePhase(saved,RebirthRemoteResourceOwnerAction.Receipt(original.Operation),out float phase,out bool present)||!present||phase!=10f))return Refuse("saved-owner-phase");
+        var needs=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(image.Element("requirements").Value));
+        var remote=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(image.Element("remoteRequirements").Value));
+        if(!RebirthRemoteResourceCraftPlan.IsExactShortfall(before,needs,remote,belt)||!RebirthRemoteResourceCraftPlan.TryDebit(before,needs,remote,belt,out _,out _))return Refuse("shortfall");
+        if(!Publish(journal,operation,original,bytes))return Refuse("publish");
+        beforeConfirmed=fresh;
+        RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] admission=accepted operation={original.Operation:N}");
+        return true;
     }
     internal static bool HasSavedPersonalAdmission(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,RebirthRemoteResourceDurableJournal.Record root)
     {
@@ -261,7 +360,9 @@ internal static class RebirthRemoteResourceCraftProtocol
             if(!local&&!RebirthRemoteResourceRepairProtocol.SupportsServerActor(actor))return;
             var body=RebirthCookingRemoteAdmission.ReadProtocolXml(text,24*1024*1024);
             if(body.Name!="craftRequest"||body.Attributes().Count()!=2||(int?)body.Attribute("version")!=2||body.Elements().Count()!=2||body.Element("ownerActionBody")==null)return;
-            int stage=(int)body.Attribute("stage");if(stage<0||stage>8)return;
+            int stage=(int)body.Attribute("stage");if(stage<0||stage>FreshPersonalStage)return;
+            bool fresh=!local&&stage==FreshPersonalStage;
+            if(stage==FreshPersonalStage&&!fresh)return;
             RebirthRemoteResourceClientOriginal.Intent original;
             if(body.Element("fetchClientOriginal")!=null)
             {if(!RebirthRemoteResourceClientOriginal.TryDecodeOriginal(body.Element("fetchClientOriginal").ToString(SaveOptions.DisableFormatting),out original))return;}
@@ -273,7 +374,11 @@ internal static class RebirthRemoteResourceCraftProtocol
                 var admission=RebirthCookingRemoteAdmission.ReadProtocolXml(new UTF8Encoding(false,true).GetString(record.Before),17*1024*1024);
                 if(!RebirthRemoteResourceClientOriginal.TryDecodeOriginal(admission.Element("fetchClientOriginal")?.ToString(SaveOptions.DisableFormatting),out original)||original.Operation.ToString("N")!=(string)reference.Attribute("operation")||original.Digest!=(string)reference.Attribute("digest"))return;
             }
-            if(!Admit(actor,original))return;
+            if(!Admit(actor,original,fresh,out bool needsOwnerSave,out bool beforeConfirmed))
+            {
+                if(needsOwnerSave)Reply(actor,original,null,false,disposition:OwnerSaveRequired);
+                return;
+            }
             if(actor.Died>original.Deaths)
             {
                 bool refundPermission=false;
@@ -289,9 +394,15 @@ internal static class RebirthRemoteResourceCraftProtocol
             }
             var remote=RebirthCamperInventorySnapshot.Restore(Convert.FromBase64String(original.Copy().Element("remoteRequirements").Value));
             bool permission=false;string continuation=null;
-            if(!RebirthRemoteResourceDurableDispatch.Resolve(actor,original.Epoch,original.Request,original.Kind,remote,stage!=0,out var result)||result==null)
+            if(!RebirthRemoteResourceDurableDispatch.Resolve(actor,original.Epoch,original.Request,original.Kind,remote,stage!=0&&!fresh,out var result)||result==null)
             {Reply(actor,original,null,false);return;}
-            if(stage==1&&RebirthRemoteResourceCraftSettlement.CanonicalAction(original,result,out var action))RebirthRemoteResourceCraftSettlement.Prepare(actor,original,action,out permission);
+            if(fresh)
+            {
+                permission=RebirthRemoteResourceCraftSettlement.MatchesRootAction(original,result);
+                if(!permission&&beforeConfirmed&&RebirthRemoteResourceCraftSettlement.CanonicalAction(original,result,out var freshAction))
+                    RebirthRemoteResourceCraftSettlement.Prepare(actor,original,freshAction,out permission,nativeBeforeConfirmed:true);
+            }
+            else if(stage==1&&RebirthRemoteResourceCraftSettlement.CanonicalAction(original,result,out var action))RebirthRemoteResourceCraftSettlement.Prepare(actor,original,action,out permission);
             else if(stage==2)RebirthRemoteResourceCraftSettlement.ObserveUsed(actor,original);
             else if(stage==8&&RebirthRemoteResourceCraftSettlement.CanonicalAction(original,result,out var continued)&&RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var continuedOwner))
                 RebirthRemoteResourceOwnerAction.PrepareCraftContinuation(actor,continuedOwner,original,result,continued,out continuation);
@@ -301,15 +412,19 @@ internal static class RebirthRemoteResourceCraftProtocol
             if(!RebirthRemoteResourceDurableDispatch.Resolve(actor,original.Epoch,original.Request,original.Kind,remote,true,out result)||result==null)return;
             Reply(actor,original,result,permission,continuation);
         }
-        catch{/* Unknown is not a refusal or payment. */}
+        catch(Exception error)
+        {
+            // Unknown is not a refusal or payment.
+            RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] request exception={error}");
+        }
     }
-    private static void Reply(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,RebirthRemoteResourceDurableJournal.Record result,bool permission,string continuation=null)
+    private static void Reply(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original,RebirthRemoteResourceDurableJournal.Record result,bool permission,string continuation=null,string disposition=null)
     {
         if(!RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner)||!RemoteResourceWorldIdentity.TryGet(actor.world,out string worldId))return;
         var root=result?.Copy();Guid source=result?.Operation??RebirthRemoteResourceDurableJournal.Operation(worldId,owner.StorageKey,original.Creation,original.Epoch,original.Request,original.Kind);
         var body=new XElement("craftResult",new XAttribute("version",2),new XAttribute("original",original.Operation.ToString("N")),new XAttribute("originalDigest",original.Digest),
             new XAttribute("sourceWorld",worldId),new XAttribute("sourceOperation",source.ToString("N")),new XAttribute("binding",result?.Binding??""),new XAttribute("phase",result?.Phase??0),new XAttribute("outcome",(int?)root?.Attribute("outcome")??0),
-            new XAttribute("permission",permission?1:0),new XAttribute("continuationProof",continuation??""),new XAttribute("rejecting",(int?)root?.Attribute("ownerRejecting")??0),new XAttribute("ownerProof",(string)root?.Attribute("ownerProof")??""),new XAttribute("disposition",(string)root?.Attribute("disposition")??""),
+            new XAttribute("permission",permission?1:0),new XAttribute("continuationProof",continuation??""),new XAttribute("rejecting",(int?)root?.Attribute("ownerRejecting")??0),new XAttribute("ownerProof",(string)root?.Attribute("ownerProof")??""),new XAttribute("disposition",disposition??(string)root?.Attribute("disposition")??""),
             new XAttribute("noUseProof",(string)root?.Attribute("ownerNoUseProof")??""),new XElement("paid",root?.Element("removed")?.Value??Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(Array.Empty<ItemStack>()))));
         if(actor is EntityPlayerLocal primary&&actor.world?.IsRemote()==false&&ReferenceEquals(actor.world.GetPrimaryPlayer(),primary)&&
             ReferenceEquals(GameManager.Instance?.World,actor.world)&&ReferenceEquals(actor.world.GetEntity(actor.entityId),actor))
@@ -323,7 +438,33 @@ internal static class RebirthRemoteResourceCraftProtocol
             if(!pending.TryGetValue(operation,out var value)||!Current(player,value))return;var original=value.Original;
             var body=RebirthCookingRemoteAdmission.ReadProtocolXml(text,12*1024*1024);
             if(body.Name!="craftResult"||body.Attributes().Count()!=14||body.Elements().Count()!=1||(int?)body.Attribute("version")!=2||(string)body.Attribute("original")!=operation.ToString("N")||
-                (string)body.Attribute("originalDigest")!=original.Digest||!Guid.TryParseExact((string)body.Attribute("sourceOperation"),"N",out var source)||!Ack(original,(string)body.Attribute("sourceWorld"),source))return;
+                (string)body.Attribute("originalDigest")!=original.Digest||!Guid.TryParseExact((string)body.Attribute("sourceOperation"),"N",out var source))return;
+            // The exact accepted row is already visible and still held. A
+            // repeat Paid reply cannot publish it in this same UI frame or
+            // turn missing warm publication evidence into an unused original.
+            if(HasWarmAcceptance(player,value)&&((int?)body.Attribute("phase")!=4||(int?)body.Attribute("outcome")!=1||
+                (string)body.Attribute("disposition")!="used"))return;
+            if((string)body.Attribute("disposition")==OwnerSaveRequired)
+            {
+                if(!value.FreshRemote||value.Ack)return;
+                if(!value.RefreshedBefore&&CurrentClientConnection(player)!=null)
+                {
+                    value.RefreshedBefore=true;
+                    // Put native PlayerData ahead of the retry. A matching Before
+                    // can authorize the same click without the legacy phase 10/1 loop.
+                    GameManager.Instance.doSendLocalPlayerData(player);
+                    value.Next=Time.realtimeSinceStartup+1f;
+                    Send(player,value,FreshPersonalStage);
+                }
+                else
+                {
+                    value.FreshRemote=false;
+                    SaveNative(player,original,10);
+                    Send(player,value,0);
+                }
+                return;
+            }
+            if(!Ack(original,(string)body.Attribute("sourceWorld"),source))return;
             value.Ack=true;bool Auth()=>Current(player,value);int phase=(int)body.Attribute("phase"),outcome=(int)body.Attribute("outcome");string binding=(string)body.Attribute("binding"),proof=(string)body.Attribute("ownerProof");
             if(phase==0&&outcome==0)return;
             if(phase==3&&outcome==2&&string.IsNullOrEmpty((string)body.Attribute("noUseProof"))){Send(player,value,5);return;}
@@ -385,11 +526,22 @@ internal static class RebirthRemoteResourceCraftProtocol
                 // partial effect keeps this original unknown and held.
                 value.Rejecting=RebirthRemoteResourceCraftOriginal.SaveRejection(original);if(value.Rejecting)Send(player,value,3);return;
             }
-            if((int)body.Attribute("permission")!=1){SaveNative(player,original,1);Send(player,value,1);return;}
+            if((int)body.Attribute("permission")!=1){value.FreshRemote=false;SaveNative(player,original,1);Send(player,value,1);return;}
+            var acceptedConnection=CurrentClientConnection(player);
             if(value.Entry!=null&&RebirthRemoteResourceCraftOriginal.Expected(original,paid,source,binding,out _,out _,out var marked,out int count,out _)&&
                 RebirthRemoteResourceCraftRecipe.TryUnmarked(marked,source,binding,out var expected)&&
-                RemoteResourceClientTransactionCoordinator.ResumeOriginalCraft(value.Entry,original,source,binding,paid,expected,count,after,Auth,out _))
-            {value.Used=true;Send(player,value,2);return;}
+                RemoteResourceClientTransactionCoordinator.ResumeOriginalCraft(value.Entry,original,source,binding,paid,expected,count,after,Auth,acceptedConnection!=null,out var accepted))
+            {
+                value.Used=true;
+                if(acceptedConnection==null)Send(player,value,2);
+                else
+                {
+                    value.AcceptedRecipe=accepted;value.AcceptedConnection=acceptedConnection;
+                    value.AcceptedFrame=Time.frameCount;value.Next=0;
+                    RebirthRemoteResourceOwnerAction.MarkNativeCraftQueued(player,original);
+                }
+                return;
+            }
             if(RebirthRemoteResourceCraftOriginal.TryRead(original,out _,out var attempted)&&attempted==RebirthCamperTransferJournal.Phase.Uncertain)
             {Send(player,value,8);return;}
             value.Rejecting=RebirthRemoteResourceCraftOriginal.SaveRejection(original);if(value.Rejecting)Send(player,value,3);

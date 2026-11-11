@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -595,9 +596,87 @@ public static class RebirthStatisticsNativeCounterReader
     private static readonly string[] ZombieNames={"KilledZombies","ZombieKills","zombieKills","NumZombiesKilled"};
     private static readonly string[] PlayerNames={"KilledPlayers","PlayerKills","playerKills","NumPlayersKilled"};
     private static readonly string[] DeathNames={"Deaths","deaths","NumDeaths"};
-    public static void InitializeBaseline(RebirthStatisticsRecord r,EntityPlayer p){if(r==null||p==null)return;r.NativeZombieBaseline=Math.Max(0L,ReadLong(p,ZombieNames));r.NativePlayerBaseline=Math.Max(0L,ReadLong(p,PlayerNames));r.NativeDeathBaseline=Math.Max(0L,ReadLong(p,DeathNames));r.NativeBaselineInitialized=true;}
-    public static bool Merge(RebirthStatisticsRecord r,EntityPlayer p){if(r==null||p==null)return false;if(!r.NativeBaselineInitialized)InitializeBaseline(r,p);bool changed=false;long z=Math.Max(0L,ReadLong(p,ZombieNames)-r.NativeZombieBaseline);if(z>r.ZombiesKilled){r.ZombiesKilled=z;changed=true;}long pk=Math.Max(0L,ReadLong(p,PlayerNames)-r.NativePlayerBaseline);if(pk>r.PlayerKills){r.PlayerKills=pk;changed=true;}long d=Math.Max(0L,ReadLong(p,DeathNames)-r.NativeDeathBaseline);if(d>r.Deaths){r.Deaths=d;changed=true;}return changed;}
-    private static long ReadLong(object o,string[] names){Type t=o.GetType();for(int i=0;i<names.Length;i++){try{PropertyInfo p=t.GetProperty(names[i],BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);if(p!=null){object v=p.GetValue(o,null);if(v!=null)return Convert.ToInt64(v,CultureInfo.InvariantCulture);}FieldInfo f=t.GetField(names[i],BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);if(f!=null){object v=f.GetValue(o);if(v!=null)return Convert.ToInt64(v,CultureInfo.InvariantCulture);}}catch{}}return 0L;}
+    private const BindingFlags CounterFlags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;
+    private static readonly ConcurrentDictionary<Type,Counters> MembersByType=new ConcurrentDictionary<Type,Counters>();
+
+    private sealed class Counters
+    {
+        internal readonly CounterMember[] Zombies,Players,Deaths;
+        internal Counters(Type type)
+        {
+            Zombies=Find(type,ZombieNames);
+            Players=Find(type,PlayerNames);
+            Deaths=Find(type,DeathNames);
+        }
+    }
+
+    private readonly struct CounterMember
+    {
+        internal readonly PropertyInfo Property;
+        internal readonly FieldInfo Field;
+        internal CounterMember(PropertyInfo property,FieldInfo field){Property=property;Field=field;}
+    }
+
+    private static CounterMember[] Find(Type type,string[] names)
+    {
+        var members=new List<CounterMember>(names.Length);
+        foreach(string name in names)
+        {
+            PropertyInfo property;
+            try{property=type.GetProperty(name,CounterFlags);}
+            catch(AmbiguousMatchException){continue;}
+            FieldInfo field=null;
+            try{field=type.GetField(name,CounterFlags);}
+            catch(AmbiguousMatchException){}
+            if(property!=null||field!=null)members.Add(new CounterMember(property,field));
+        }
+        return members.ToArray();
+    }
+
+    private static Counters ResolveMembers(Type type)=>new Counters(type);
+
+    public static void InitializeBaseline(RebirthStatisticsRecord r,EntityPlayer p)
+    {
+        if(r==null||p==null)return;
+        InitializeBaseline(r,p,MembersByType.GetOrAdd(p.GetType(),ResolveMembers));
+    }
+
+    private static void InitializeBaseline(RebirthStatisticsRecord r,EntityPlayer p,Counters counters)
+    {
+        r.NativeZombieBaseline=Math.Max(0L,ReadLong(p,counters.Zombies));
+        r.NativePlayerBaseline=Math.Max(0L,ReadLong(p,counters.Players));
+        r.NativeDeathBaseline=Math.Max(0L,ReadLong(p,counters.Deaths));
+        r.NativeBaselineInitialized=true;
+    }
+
+    public static bool Merge(RebirthStatisticsRecord r,EntityPlayer p)
+    {
+        if(r==null||p==null)return false;
+        var counters=MembersByType.GetOrAdd(p.GetType(),ResolveMembers);
+        if(!r.NativeBaselineInitialized)InitializeBaseline(r,p,counters);
+        bool changed=false;
+        long zombies=Math.Max(0L,ReadLong(p,counters.Zombies)-r.NativeZombieBaseline);
+        long players=Math.Max(0L,ReadLong(p,counters.Players)-r.NativePlayerBaseline);
+        long deaths=Math.Max(0L,ReadLong(p,counters.Deaths)-r.NativeDeathBaseline);
+        if(zombies>r.ZombiesKilled){r.ZombiesKilled=zombies;changed=true;}
+        if(players>r.PlayerKills){r.PlayerKills=players;changed=true;}
+        if(deaths>r.Deaths){r.Deaths=deaths;changed=true;}
+        return changed;
+    }
+
+    private static long ReadLong(object instance,CounterMember[] members)
+    {
+        foreach(var member in members)
+        {
+            try
+            {
+                var value=member.Property?.GetValue(instance,null)??member.Field?.GetValue(instance);
+                if(value!=null)return Convert.ToInt64(value,CultureInfo.InvariantCulture);
+            }
+            catch{}
+        }
+        return 0L;
+    }
 }
 
 [HarmonyPatch(typeof(GameUtils), "collectHarvestedItem")]

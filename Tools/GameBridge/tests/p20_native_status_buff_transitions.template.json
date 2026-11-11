@@ -1,0 +1,156 @@
+{
+  "name": "p20_native_status_buff_transitions",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable solo Purge, completed Survivor, Food and Water ModifiedMax 100, God Mode off, clear safe surroundings, no ongoing intake. Set STATUS_SETTLE_SECONDS to the shortest observed authoritative update bound. Interior values avoid ordinary decay crossing an exact threshold while polling. The nutrition/hydration commands are fixture setup only. For dedicated use authority-side setup for the authenticated actor, then observe same native sets on the server and owner projection rather than running local setters on the remote client."
+    },
+    {
+      "console": [
+        "rbmet autosip off",
+        "rbmet clearstomach"
+      ]
+    },
+    {
+      "console": [
+        "rbmet set nutrition 90",
+        "rbmet set hydration 90"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectNoBuff": "buffRebirthHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthVeryHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthStarving"
+    },
+    {
+      "expectNoBuff": "buffRebirthThirsty"
+    },
+    {
+      "expectNoBuff": "buffRebirthDehydrated"
+    },
+    {
+      "expectNoBuff": "buffRebirthSevereDehydration"
+    },
+    {
+      "expectNoBuff": "buffRebirthCriticalDehydration"
+    },
+    {
+      "console": [
+        "rbmet set nutrition 35",
+        "rbmet set hydration 50"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectBuff": "buffRebirthHungry"
+    },
+    {
+      "expectBuff": "buffRebirthThirsty"
+    },
+    {
+      "console": [
+        "rbmet set nutrition 15",
+        "rbmet set hydration 35"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectBuff": "buffRebirthVeryHungry"
+    },
+    {
+      "expectBuff": "buffRebirthDehydrated"
+    },
+    {
+      "expectNoBuff": "buffRebirthHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthThirsty"
+    },
+    {
+      "console": [
+        "rbmet set nutrition 2",
+        "rbmet set hydration 20"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectBuff": "buffRebirthStarving"
+    },
+    {
+      "expectBuff": "buffRebirthSevereDehydration"
+    },
+    {
+      "expectNoBuff": "buffRebirthVeryHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthDehydrated"
+    },
+    {
+      "console": [
+        "rbmet set nutrition 90",
+        "rbmet set hydration 8"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectBuff": "buffRebirthCriticalDehydration"
+    },
+    {
+      "expectNoBuff": "buffRebirthStarving"
+    },
+    {
+      "expectNoBuff": "buffRebirthSevereDehydration"
+    },
+    {
+      "console": [
+        "rbmet set nutrition 90",
+        "rbmet set hydration 90"
+      ]
+    },
+    {
+      "wait": "@STATUS_SETTLE_SECONDS@"
+    },
+    {
+      "expectNoBuff": "buffRebirthHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthVeryHungry"
+    },
+    {
+      "expectNoBuff": "buffRebirthStarving"
+    },
+    {
+      "expectNoBuff": "buffRebirthThirsty"
+    },
+    {
+      "expectNoBuff": "buffRebirthDehydrated"
+    },
+    {
+      "expectNoBuff": "buffRebirthSevereDehydration"
+    },
+    {
+      "expectNoBuff": "buffRebirthCriticalDehydration"
+    },
+    {
+      "console": "rbmet autosip on"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

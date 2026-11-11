@@ -11,7 +11,7 @@ internal static partial class RebirthRemoteResourceFetchedStationOriginal
     private static readonly Dictionary<Guid,ClientRequest> EndedQueries=new Dictionary<Guid,ClientRequest>();
     private static bool EndedZeroClientScope(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)=>ThreadManager.IsMainThread()&&player?.world?.IsRemote()==true&&
         player.IsSpawned()&&!player.IsDead()&&ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&ReferenceEquals(player.world.GetEntity(player.entityId),player)&&
-        IsCandidate(original)&&original.World==player.world.worldState.Guid&&player.Died>original.Deaths&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
+        IsCandidate(original)&&original.World==RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world)&&player.Died>original.Deaths&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
         RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var owner)&&owner.CanonicalId==original.Owner;
     private static World clientWorld;private static string clientDirectory;private static float clientScan;
     private static void BindClientWorld(World world)
@@ -83,7 +83,7 @@ internal static partial class RebirthRemoteResourceFetchedStationOriginal
         if(now>=clientScan)
         {
             clientScan=now+5;
-            if(RebirthRemoteResourceClientOriginal.TryReadPending(out var originals))foreach(var original in originals)
+            if(RebirthRemoteResourceClientOriginal.TryReadPendingForRecovery(player,out var originals))foreach(var original in originals)
             {
                 if(EndedZeroClientScope(player,original))
                 {

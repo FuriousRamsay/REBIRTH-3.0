@@ -1,0 +1,79 @@
+{
+  "name": "p23_native_purge_biome_readiness",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable daytime Purge, normal HUD and no active modal. Stand outside eligible POI with one genuinely known numeric biome objective. Run the same real native menu/HUD assertions in solo and dedicated, then repeat after crossing an observed actual biome boundary and in the alternate authored progression mode. Separate no-census or unknown-frame capture should keep the card hidden. Keep guard ON."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "purgeBiomeCounts",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "id": "purgeBiomeCounts",
+        "text": "/"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "purgeBiomeName"
+      }
+    },
+    {
+      "screenshot": "p23_biome_known_before_modal"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "M"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "map"
+    },
+    {
+      "expectNoUi": {
+        "id": "purgeBiomeCounts"
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "purgeBiomeCounts",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "id": "purgeBiomeCounts",
+        "text": "/"
+      }
+    },
+    {
+      "screenshot": "p23_biome_known_after_modal"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Separate controls include zero eligible with known slash count, unknown/no-census, late matching objective frame, actor/world switch, language and Blood Moon suppression. Compare expected actual biome and stage/supply numerics outside this smoke. Do not substitute mock CVar writes for actual readiness."
+    }
+  ]
+}

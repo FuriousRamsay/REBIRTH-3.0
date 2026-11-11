@@ -37,6 +37,13 @@ public static class RebirthStatisticsRepository
         return TryGet(identity, out record);
     }
 
+    internal static bool TryGetCached(RebirthStablePlayerIdentity identity, out RebirthStatisticsRecord record)
+    {
+        record = null;
+        if (!serverAuthority || identity == null || string.IsNullOrEmpty(identity.StorageKey)) return false;
+        lock (Sync) return Cache.TryGetValue(identity.StorageKey, out record) && record != null;
+    }
+
     public static bool TryGet(RebirthStablePlayerIdentity identity, out RebirthStatisticsRecord record)
     {
         string ignored;

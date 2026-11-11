@@ -7,7 +7,7 @@ using System.Text;
 
 public static class RebirthSurvivorNetworkProtocol
 {
-    public const int Version = 13; // Temporary owner effects carry authoritative expiry/action projections.
+    public const int Version = 14; // Owner state includes ordinary practice reconciliation.
     public const int MaxTraitIds = 64;
     public const int MaxCreationChoices = 32;
     public const int MaxAttributes = 8;
@@ -278,6 +278,20 @@ public sealed class RebirthSurvivorOwnerGearSnapshot
     public RebirthSurvivorOwnerGearSnapshot Clone() { return new RebirthSurvivorOwnerGearSnapshot { SlotId = SlotId ?? string.Empty, ItemId = ItemId ?? string.Empty }; }
 }
 
+public readonly struct RebirthSurvivorOrdinaryPracticeLesson
+{
+    public readonly string SkillId;
+    public readonly float Multiplier;
+    public readonly float RemainingActiveSeconds;
+
+    internal RebirthSurvivorOrdinaryPracticeLesson(string skillId, float multiplier, float remainingActiveSeconds)
+    {
+        SkillId = skillId;
+        Multiplier = multiplier;
+        RemainingActiveSeconds = remainingActiveSeconds;
+    }
+}
+
 /// <summary>
 /// Compact owning-client Survivor projection. Deliberately excludes meal history, persistence
 /// paths, stable player identity, and metabolism internals (which have their own snapshot).
@@ -325,6 +339,8 @@ public sealed class RebirthSurvivorOwnerStateSnapshot
     public int RageTier;
     public float StaminaRecoveryMultiplier = 1f;
     public long PublicationSerial;
+    public uint OrdinaryPracticeSequence;
+    public readonly List<RebirthSurvivorOrdinaryPracticeLesson> OrdinaryPracticeLessons = new List<RebirthSurvivorOrdinaryPracticeLesson>();
     public float RageSecondsRemaining;
     public string BlackMagicActions = string.Empty;
 
@@ -350,6 +366,8 @@ public sealed class RebirthSurvivorOwnerStateSnapshot
         copy.RageTier = RageTier;
         copy.StaminaRecoveryMultiplier = StaminaRecoveryMultiplier;
         copy.PublicationSerial = PublicationSerial;
+        copy.OrdinaryPracticeSequence = OrdinaryPracticeSequence;
+        copy.OrdinaryPracticeLessons.AddRange(OrdinaryPracticeLessons);
         copy.RageSecondsRemaining = RageSecondsRemaining;
         copy.BlackMagicActions = BlackMagicActions ?? string.Empty;
         copy.CreationId = CreationId ?? string.Empty;

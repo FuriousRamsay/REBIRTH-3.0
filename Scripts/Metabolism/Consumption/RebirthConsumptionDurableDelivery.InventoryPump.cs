@@ -21,7 +21,10 @@ internal static partial class RebirthConsumptionDurableDelivery
         if(peer?.loginDone!=true||peer.disconnecting||peer.netConnection==null||peer.netConnection.Length==0||peer.netConnection[0]==null||peer.netConnection[0].IsDisconnected())return false;
         if(System.Text.Encoding.UTF8.GetByteCount(original.Purpose)>48000)return QueueInventoryPurpose(original,phase,peer,peer.netConnection[0]);
         var packet=NetPackageManager.GetPackage<NetPackageRebirthNpcConsumptionOwner>().Setup(original.Actor.entityId,phase,original.Purpose);
-        if(!original.Current())return false;peer.SendPackage(packet);return true;
+        if(!original.Current())return false;
+        peer.SendPackage(packet);
+        if(phase==3&&original.LastPurpose==phase&&original.Current())original.RetirementPurposeSent=true;
+        return true;
     }
     private static void PumpInventoryOriginal(InventoryOriginal original)
     {
@@ -45,7 +48,17 @@ internal static partial class RebirthConsumptionDurableDelivery
             if(original.Committed)
             {
                 if(!ArchiveInventoryOwner(original,"retired")){SendInventoryPurpose(original,2);return;}
-                original.Record("retired");SendInventoryPurpose(original,3);original.Terminal=true;
+                if(!original.RetiredRecordSaved)
+                {
+                    original.Record("retired");original.RetiredRecordSaved=true;
+                }
+                if(ReferenceEquals(original.World.GetPrimaryPlayer(),original.Actor))SendInventoryPurpose(original,3);
+                else
+                {
+                    if(!original.RetirementPurposeSent)SendInventoryPurpose(original,3);
+                    if(!original.RetirementPurposeSent||!original.Current())return;
+                }
+                original.Terminal=true;
                 inventoryOriginals.Remove(original.Operation);
                 CompleteInventoryNativeLoad(original.Operation);
                 ReleaseInventoryOriginalMemory(original);return;
@@ -68,8 +81,7 @@ internal static partial class RebirthConsumptionDurableDelivery
     private static void PumpInventoryOriginals(ref ModEvents.SGameUpdateData data)
     {
         if(!ThreadManager.IsMainThread())return;
-        // The installed observers preserve old saved originals. Fresh servings
-        // use ConsumeAt, so clean worlds have no original work to poll.
+        // Active remote backpack servings and reconnect recovery share the pump.
         if(inventoryOriginals.Count==0&&inventoryPurposeWire.Count==0&&
             !inventoryNativeLoads.Any(load=>load.Operations.Length>0))return;
         foreach(var stale in inventoryOriginals.Values.Where(value=>!value.Current()).ToArray())

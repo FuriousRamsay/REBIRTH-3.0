@@ -90,6 +90,7 @@ public static class RebirthSurvivorUiText
     public static string FormatCreationError(RebirthSurvivorCreationError error)
     {
         if (error == null) return L("xuiRebirthSurvivorValidationUnavailable", "Validation unavailable.");
+        if (error.Code == RebirthSurvivorCreationErrorCode.TooManyTraits) return TraitSelectionLimitMessage();
         string text = L(error.MessageKey, error.Code.ToString());
         if (!string.IsNullOrEmpty(error.SubjectId))
             text += " [" + ResolveDefinitionName(error.SubjectId) + "]";
@@ -97,6 +98,10 @@ public static class RebirthSurvivorUiText
             text += " (" + ResolveDefinitionName(error.RelatedId) + ")";
         return text;
     }
+
+    internal static string TraitSelectionLimitMessage() => string.Format(CultureInfo.CurrentCulture,
+        L("xuiRebirthCreationErrorTooManyTraits", "You can select up to {0} traits. Remove one to make room."),
+        RebirthSurvivorCreationValidator.MaxSelectedTraits);
 
     public static string BuildValidationSummary(RebirthSurvivorCreationResult result)
     {
@@ -423,6 +428,18 @@ public static class RebirthSurvivorUiText
         return L(trait.NameKey, trait.Id);
     }
 
+    internal static string TraitSelectionConflict(RebirthTraitDefinition trait, string blockingTraitId)
+    {
+        string requested = TraitDisplayName(trait);
+        string selected = ResolveDefinitionName(blockingTraitId);
+        if (string.IsNullOrWhiteSpace(requested) || string.Equals(requested, trait.Id, StringComparison.OrdinalIgnoreCase) ||
+            string.IsNullOrWhiteSpace(selected) || string.Equals(selected, blockingTraitId, StringComparison.OrdinalIgnoreCase))
+            return L("xuiRebirthSurvivorTraitSelectionConflict", "This trait conflicts with a trait you already selected.");
+
+        return string.Format(CultureInfo.CurrentCulture,
+            L("xuiRebirthSurvivorTraitSelectionConflictFormat", "You can't choose {0} while {1} is selected."), requested, selected);
+    }
+
     public static string TraitDescription(RebirthTraitDefinition trait)
     {
         if (trait == null) return string.Empty;
@@ -449,7 +466,7 @@ public static class RebirthSurvivorUiText
             .Append("+ ").Append(L("xuiRebirthSurvivorTraitBudgetNegatives", "Negative Trait refunds")).Append(": ").Append(SignedPoints(b.NegativeApplied));
         if (RebirthSurvivorTraitPointEconomy.HasRefundCap(b.NegativeCap) && b.NegativeRequested > b.NegativeApplied)
             text.Append(" [808080](+").Append(b.NegativeRequested).Append(" requested; +").Append(b.NegativeCap).Append(" cap)[-]");
-        text.Append("\n- ").Append(L("xuiRebirthSurvivorTraitBudgetPositiveTraits", "Positive Traits")).Append(": ").Append(b.PositiveSpent)
+        text.Append("\n- ").Append(L("xuiRebirthSurvivorTraitBudgetPositiveTraits", "Positive and Mixed Traits")).Append(": ").Append(b.PositiveSpent)
             .Append("\n- ").Append(L("xuiRebirthSurvivorTraitBudgetAptitudes", "Skill Aptitudes")).Append(": ").Append(b.AptitudeSpent)
             .Append("\n[FFFFFF]= ").Append(L("xuiRebirthSurvivorTraitBudgetRemaining", "Remaining")).Append(": ").Append(b.Remaining).Append("[-]");
         return text.ToString();
@@ -464,7 +481,7 @@ public static class RebirthSurvivorUiText
             L("xuiRebirthSurvivorTraitBudgetBackground", "Experience") + " " + SignedPoints(b.Background) + "  +  " +
             L("xuiRebirthSurvivorTraitBudgetDiet", "Diet") + " " + SignedPoints(b.Diet) + "  +  " +
             L("xuiRebirthSurvivorTraitBudgetNegativesShort", "Neg") + " " + SignedPoints(b.NegativeApplied) + "\n" +
-            "- " + L("xuiRebirthSurvivorTraitBudgetPositiveShort", "Positive") + " " + b.PositiveSpent.ToString(CultureInfo.InvariantCulture) +
+            "- " + L("xuiRebirthSurvivorTraitBudgetPositiveShort", "Traits") + " " + b.PositiveSpent.ToString(CultureInfo.InvariantCulture) +
             "  -  " + L("xuiRebirthSurvivorTraitBudgetAptitudesShort", "Aptitudes") + " " + b.AptitudeSpent.ToString(CultureInfo.InvariantCulture) +
             "  =  [FFFFFF]" + L("xuiRebirthSurvivorTraitBudgetRemaining", "Remaining") + " " + b.Remaining.ToString(CultureInfo.InvariantCulture) + "[-]";
     }
@@ -587,8 +604,8 @@ public static class RebirthSurvivorUiText
             RebirthTraitDefinition trait = model.GetTrait(id);
             if (trait == null) continue;
             if (RebirthSkillAptitudeTraitFactory.IsAptitude(trait)) b.AptitudeSpent += trait.Points;
-            else if (trait.Polarity == RebirthTraitPolarity.Positive) b.PositiveSpent += trait.Points;
             else if (trait.Polarity == RebirthTraitPolarity.Negative) b.NegativeRequested += trait.Points;
+            else b.PositiveSpent += trait.Points;
         }
         b.NegativeApplied = RebirthSurvivorTraitPointEconomy.ApplyNegativeRefund(b.NegativeCap, b.NegativeRequested);
         b.Remaining = b.Base + b.Background + b.Diet + b.NegativeApplied - b.PositiveSpent - b.AptitudeSpent;
@@ -629,10 +646,8 @@ public static class RebirthSurvivorUiText
 
     public static string PointText(RebirthTraitDefinition trait)
     {
-        if (trait == null || trait.Points == 0 || (trait.Polarity != RebirthTraitPolarity.Positive && trait.Polarity != RebirthTraitPolarity.Negative)) return "0";
-        return trait.Polarity == RebirthTraitPolarity.Positive
-            ? "-" + trait.Points.ToString(CultureInfo.InvariantCulture)
-            : "+" + trait.Points.ToString(CultureInfo.InvariantCulture);
+        if (trait == null) return string.Empty;
+        return SignedPoints(trait.Polarity == RebirthTraitPolarity.Negative ? trait.Points : -trait.Points);
     }
     public static List<string> OrderedStartingKnowledgeIds(IList<string> knowledgeIds)
     {

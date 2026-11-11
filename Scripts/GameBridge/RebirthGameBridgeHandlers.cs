@@ -327,6 +327,11 @@ public static partial class RebirthGameBridgeHandlers
                 var owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
                 if (owner != null) o["rebirth"] = JObject.FromObject(owner);
             }
+            if (sections.Contains("ordinaryProgress"))
+            {
+                var display = RebirthSurvivorClientState.GetOwnerStateSnapshot(out _, showOrdinaryProgress: true);
+                if (display != null) o["ordinaryProgress"] = JArray.FromObject(display.Skills);
+            }
             if (sections.Contains("journal"))
             {
                 RebirthJournalGuideService.Poll(p);

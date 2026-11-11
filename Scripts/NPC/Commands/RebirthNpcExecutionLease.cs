@@ -540,18 +540,18 @@ public static partial class RebirthNpcExecutionLeaseRegistry
         }
     }
 
-    // Dispatch needs active custody only; the public snapshot retains terminal history.
+    // Dispatch uses current actors. History also keeps detached Work custody.
     internal static RebirthNpcExecutionLease[] GetActiveDispatchSnapshot()
     {
         lock (Sync)
         {
             int count = 0;
-            foreach (RebirthNpcExecutionLease lease in ByLeaseId.Values)
+            foreach (RebirthNpcExecutionLease lease in ActiveByEntity.Values)
                 if (lease.Status == RebirthNpcExecutionLeaseStatus.Active) count++;
             if (count == 0) return Array.Empty<RebirthNpcExecutionLease>();
             RebirthNpcExecutionLease[] result = new RebirthNpcExecutionLease[count];
             int index = 0;
-            foreach (RebirthNpcExecutionLease lease in ByLeaseId.Values)
+            foreach (RebirthNpcExecutionLease lease in ActiveByEntity.Values)
                 if (lease.Status == RebirthNpcExecutionLeaseStatus.Active)
                     result[index++] = lease.Clone();
             Array.Sort(result, (left, right) => left.LeaseId.CompareTo(right.LeaseId));

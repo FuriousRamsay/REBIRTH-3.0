@@ -127,16 +127,19 @@ public static class RebirthVehicleRespawnRuntimeRegistry
                 state.Block = targetBlock;
                 state.NativeDowngrade = targetBlock.DowngradeBlock;
                 state.HasOwnedWrite = false;
-                report.BaselineRecaptured++;
+                if (report != null)
+                    report.BaselineRecaptured++;
             }
         }
 
         if (RebirthVehicleBlockRespawnRuntimePolicy.Enabled)
         {
-            bool already = targetBlock.DowngradeBlock.type == marker.type;
+            bool already = report != null && targetBlock.DowngradeBlock.type == marker.type;
             targetBlock.DowngradeBlock = marker;
             state.LastWrittenDowngrade = marker;
             state.HasOwnedWrite = true;
+            if (report == null)
+                return;
             if (targetBlock.DowngradeBlock.type != marker.type)
                 report.WrongAfterBinding++;
             else if (already)
@@ -150,6 +153,8 @@ public static class RebirthVehicleRespawnRuntimeRegistry
             targetBlock.DowngradeBlock = state.NativeDowngrade;
             state.LastWrittenDowngrade = state.NativeDowngrade;
             state.HasOwnedWrite = true;
+            if (report == null)
+                return;
             if (targetBlock.DowngradeBlock.type != state.NativeDowngrade.type)
                 report.WrongAfterBinding++;
             else
@@ -159,6 +164,19 @@ public static class RebirthVehicleRespawnRuntimeRegistry
 
     public static bool EnsureSpawnedBlockIsRepeatable(
         Block spawnedBlock,
+        out string previousDowngrade)
+    {
+        return EnsureSpawnedBlockIsRepeatable(spawnedBlock, describePrevious: true, out previousDowngrade);
+    }
+
+    internal static bool EnsureSpawnedBlockIsRepeatable(Block spawnedBlock)
+    {
+        return EnsureSpawnedBlockIsRepeatable(spawnedBlock, describePrevious: false, out _);
+    }
+
+    private static bool EnsureSpawnedBlockIsRepeatable(
+        Block spawnedBlock,
+        bool describePrevious,
         out string previousDowngrade)
     {
         previousDowngrade = "unavailable";
@@ -171,12 +189,14 @@ public static class RebirthVehicleRespawnRuntimeRegistry
 
         lock (Sync)
         {
-            previousDowngrade = spawnedBlock.DowngradeBlock.isair || spawnedBlock.DowngradeBlock.Block == null
-                ? "air"
-                : spawnedBlock.DowngradeBlock.Block.blockName;
+            if (describePrevious)
+            {
+                previousDowngrade = spawnedBlock.DowngradeBlock.isair || spawnedBlock.DowngradeBlock.Block == null
+                    ? "air"
+                    : spawnedBlock.DowngradeBlock.Block.blockName;
+            }
 
-            BindingReport ignored = new BindingReport();
-            ApplyBindingUnsafe(spawnedBlock, marker, ignored);
+            ApplyBindingUnsafe(spawnedBlock, marker, null);
             return spawnedBlock.DowngradeBlock.type == marker.type;
         }
     }

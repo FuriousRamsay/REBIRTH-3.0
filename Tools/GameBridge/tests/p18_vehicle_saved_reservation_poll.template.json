@@ -1,0 +1,87 @@
+{
+  "name": "p18_vehicle_saved_reservation_poll",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge. Owned 80s Camper Truck, actual Service radial already open, HeadlightLeft empty, one unlocked resourceHeadlight and exactly 100 fuel in bag/belt. Native tank starts at 0 of 400. Observe exact slot path with uitree and substitute @HEADLIGHT_SLOT_PATH@ in a temp copy. Run dedicated and solo separately, then repeat delayed .ttp publication and saved-result reconnect as operator-controlled gates."
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleRestoration"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthVehicleRestoration",
+        "id": "vehicleFuelValue",
+        "exactText": "0%"
+      }
+    },
+    {
+      "expectItem": {
+        "name": "resourceHeadlight",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "expectItem": {
+        "name": "ammoGasCan",
+        "min": 100,
+        "max": 100
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "resourceHeadlight",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthVehicleRestoration",
+        "path": "@HEADLIGHT_SLOT_PATH@",
+        "item": "resourceHeadlight",
+        "timeout": 12
+      }
+    },
+    {
+      "expectNoItem": "resourceHeadlight"
+    },
+    {
+      "expectUiItem": {
+        "path": "@HEADLIGHT_SLOT_PATH@",
+        "item": "resourceHeadlight",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "vehicleRefuel",
+          "window": "rebirthVehicleRestoration"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthVehicleRestoration",
+        "id": "vehicleFuelValue",
+        "exactText": "1%",
+        "timeout": 12
+      }
+    },
+    {
+      "expectNoItem": "ammoGasCan"
+    },
+    {
+      "screenshot": "p18_vehicle_part_and_fuel"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

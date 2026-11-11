@@ -80,13 +80,15 @@ sealed class PlayTab : PagePanel
         Refill();
     }
 
+    internal string EvalStem { get; set; }
+
     /// <summary>Starts recording the running game. Returns false (with a message) when there is nothing to record.</summary>
     public bool Begin(double warmupSeconds)
     {
         if (recorder?.Running == true) return true;
         var m = monitor(); string lp = livePath();
         if (m == null || !m.FpsAvailable || lp == null || !File.Exists(lp)) { status.Text = "Nothing to record yet: start the game with the profiler (Launch game with profiler) first."; return false; }
-        recorder = new PlayRecorder(monitor, lp, modPattern());
+        recorder = new PlayRecorder(monitor, lp, modPattern(), EvalStem);
         shown = recorder.Result;
         UpdateChart();
         recorder.Status += s => BeginInvoke(() =>
@@ -106,18 +108,18 @@ sealed class PlayTab : PagePanel
     public bool EnsureRecording() => Begin(0);
 
     /// <summary>Stops the recording and returns the saved file.</summary>
-    public async Task<string> StopAndSave()
+    public async Task<string> StopAndSave(bool requireWrite = false)
     {
         string path = recorder?.ResultPath;
-        await End();
+        await End(requireWrite);
         return path;
     }
 
-    public async Task End()
+    public async Task End(bool requireWrite = false)
     {
         if (recorder == null) return;
         stop.Enabled = false;
-        await recorder.Stop();
+        await recorder.Stop(requireWrite);
         Refill(); UpdateChart(); FillSummary(recorder.SummaryRows());
         status.Text = $"Saved {recorder.Result.Hitches.Count} dips to {recorder.ResultPath}";
         start.Enabled = true;

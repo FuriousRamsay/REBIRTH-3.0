@@ -49,11 +49,14 @@ internal static class RebirthVehicleRespawnDowngradeChain
         if (source == null)
             return false;
 
+        BlockValue current = source.DowngradeBlock;
+        if (current.isair)
+            return false;
+
         BlockValue marker = Block.GetBlockValue("carRespawner_FR");
         if (marker.isair)
             return false;
 
-        BlockValue current = source.DowngradeBlock;
         int previousType = -1;
 
         for (int depth = 0; depth < MaximumChainDepth; depth++)

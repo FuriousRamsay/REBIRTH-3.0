@@ -430,6 +430,60 @@ public static partial class RebirthNpcWorldIntegrationService
             !ReferenceEquals(originalWorld.GetEntity(candidate.entityId),candidate))return false;
         request=confirmed;return true;
     }
+    internal static bool TryRecoverAlreadyLiveFreshGroup(World world, EntityRebirthHumanoidNPC actor)
+    {
+        if (actor == null || !actor.IsFreshGroupBootstrapPending || actor.IsDead() || actor.IsMarkedForUnload())
+            return false;
+
+        try
+        {
+            var runtime = actor.RebirthRuntimeState;
+            var source = RebirthNpcRuntimeNativeAdoption.NativeReentry.Capture(actor);
+            if (runtime == null || source == null || !ReferenceEquals(source.World, world) ||
+                source.StableId != runtime.StableId ||
+                !RebirthNpcRuntimeRegistry.TryGet(actor.entityId, out var registered) || !ReferenceEquals(registered, runtime))
+                return false;
+
+            EnsureInitialized();
+            EnsurePersistenceLoaded();
+            lock (Sync)
+            {
+                if (!IsPreparedContextCurrentNoLock() || worldSnapshotPublicationUncertain) return false;
+
+                RebirthNpcPendingSpawn request = null;
+                foreach (var pending in PendingSpawns.Values)
+                {
+                    if (pending.NativeEntityId != actor.entityId) continue;
+                    if (request != null) return false;
+                    request = pending;
+                }
+
+                if (request?.IsPublishing != true || request.StableId != runtime.StableId.ToString() ||
+                    request.Profile != "survivor.persistent" || request.Profile != runtime.ProfileId ||
+                    EntityClass.FromString(request.EntityClass) != actor.entityClass ||
+                    !HasSavedPendingSpawn(request, requireUniqueNativeId: true)) return false;
+
+                // The fresh creation used the initial aggregate generation. The
+                // pending request has no generation field for a later embodiment.
+                const uint initialGeneration = 1;
+                if (!RebirthNpcAggregatePersistenceStore.TryReadSavedPerson(runtime.StableId, out var saved) ||
+                    saved.Presence?.EmbodimentGeneration != initialGeneration ||
+                    saved.NativeReconstruction?.Matches(saved) != true ||
+                    !RebirthNpcAggregatePersistenceStore.TryGet(runtime.StableId, out var current) ||
+                    current.Presence?.EmbodimentGeneration != initialGeneration ||
+                    current.AggregateRevision != saved.AggregateRevision || current.AggregateChecksum != saved.AggregateChecksum)
+                    return false;
+
+                string payload = (string)saved.NativeReconstruction.Write().Element("actor")?.Attribute("payload");
+                if (string.IsNullOrEmpty(payload) || !source.MatchesSavedBodyFrame(Convert.FromBase64String(payload)))
+                    return false;
+
+                return TryCompletePublishedExistingPerson(request.ReplayKey.Substring("spawn:".Length), world, actor, out _);
+            }
+        }
+        catch { return false; }
+    }
+
     // Reconcile only an exact observed live publication, then atomically acknowledge its original journal key.
     internal static bool TryCompletePublishedExistingPerson(string replayId,World originalWorld,Entity candidate,out string reason)
     {
@@ -509,6 +563,9 @@ public static partial class RebirthNpcWorldIntegrationService
             key,stable,profile,entityClass,nativeId,generation,out _);
     }    // Final-file intent witness only; native execution requires separate live revalidation.
     internal static bool HasSavedPendingSpawn(RebirthNpcPendingSpawn request)
+        => HasSavedPendingSpawn(request, requireUniqueNativeId: false);
+
+    private static bool HasSavedPendingSpawn(RebirthNpcPendingSpawn request, bool requireUniqueNativeId)
     {
         if(request==null||!IsServer())return false;
         lock(Sync)
@@ -523,6 +580,9 @@ public static partial class RebirthNpcWorldIntegrationService
                 using(var reader=XmlReader.Create(path,settings))document.Load(reader);
                 if(!RebirthNpcWorldIdentityLoad.TryRead(document.DocumentElement,out var identities,out var saved,out var completed)||
                     completed.Contains(request.ReplayKey)||!saved.TryGetValue(request.ReplayKey,out var stored))return false;
+                if (requireUniqueNativeId)
+                    foreach (var other in saved.Values)
+                        if (!ReferenceEquals(other, stored) && other.NativeEntityId == request.NativeEntityId) return false;
                 return System.Xml.Linq.XNode.DeepEquals(stored.Write(),request.Write());
             }
             catch{return false;}
@@ -571,7 +631,18 @@ public static partial class RebirthNpcWorldIntegrationService
         lock(Sync){RegisterIdentityNoLock(ambientEntityId,stableId,target,true);Replay.Add("promote:"+replayId);promotions++;ObserveWorldMutationNoLock();}SaveIfDirty();reason="Ambient NPC promoted exactly once.";return true;
     }
     private static void RegisterIdentityNoLock(int ambient,RebirthNpcStableId id,string profile,bool persistent){var r=new RebirthNpcWorldIdentityRecord{AmbientEntityId=ambient,StableId=id,ProfileId=profile,DisplayName=GenerateName(id,RebirthNpcProfileRegistry.ResolveRequired(profile).Category),PromotedUtcTicks=DateTime.UtcNow.Ticks,Persistent=persistent};ByAmbient[ambient]=r;ByStable[id]=r;}
-    public static string GetDisplayName(RebirthNpcStableId id){EnsureInitialized();lock(Sync){RebirthNpcWorldIdentityRecord r;if(ByStable.TryGetValue(id,out r))return r.DisplayName;}RebirthNpcRuntimeState[] s=RebirthNpcRuntimeRegistry.GetSnapshot();for(int i=0;i<s.Length;i++)if(s[i].StableId==id)return GenerateName(id,RebirthNpcProfileRegistry.ResolveRequired(s[i].ProfileId).Category);return "Unknown NPC";}
+    public static string GetDisplayName(RebirthNpcStableId id)
+    {
+        EnsureInitialized();
+        lock (Sync)
+        {
+            if (ByStable.TryGetValue(id, out var record)) return record.DisplayName;
+        }
+
+        if (RebirthNpcRuntimeRegistry.TryGetProfileAndOwnership(id, out string profileId, out _))
+            return GenerateName(id, RebirthNpcProfileRegistry.ResolveRequired(profileId).Category);
+        return "Unknown NPC";
+    }
     internal static bool CanRecoverNpcStores(out string error)
     {
         error=string.Empty;lock(Sync)

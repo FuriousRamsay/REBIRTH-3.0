@@ -1,0 +1,18 @@
+{
+  "name": "Previously paid personal craft resumes after dedicated rejoin",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Use a disposable copy of the dedicated Purge reproduction and its matching client crafting records. At rejoin the player has two Stone Axes in the backpack, one already-paid Stone Axe queued, and nearby crate ingredients for another. Do not cancel the restored row." },
+    { "console": "rbdebug on crafting" },
+    { "expectWindowOpen": "crafting" },
+    { "wait": 5 },
+    { "expectItem": { "name": "meleeToolRepairT0StoneAxe", "min": 3, "max": 3 } },
+    { "click": { "recipe": "meleeToolRepairT0StoneAxe", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingCraft", "window": "crafting" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] queue recipe=meleeToolRepairT0StoneAxe accepted=True" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] debit recipe=meleeToolRepairT0StoneAxe" } },
+    { "wait": 5 },
+    { "expectItem": { "name": "meleeToolRepairT0StoneAxe", "min": 4, "max": 4 } },
+    { "expectNoErrors": true }
+  ]
+}

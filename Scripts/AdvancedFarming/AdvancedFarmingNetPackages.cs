@@ -838,8 +838,10 @@ public static class AdvancedFarmingSyncService
 
     public static void ClearPendingPlantStateSnapshots()
     {
-        s_pendingPlantSnapshots.Clear();
-        s_pendingGeometryLightRefreshes.Clear();
+        if (s_pendingPlantSnapshots.Count > 0)
+            s_pendingPlantSnapshots.Clear();
+        if (s_pendingGeometryLightRefreshes.Count > 0)
+            s_pendingGeometryLightRefreshes.Clear();
     }
 
     private static bool IsGeometryLightRefreshAreaReady(World world, Vector3i center, int horizontalRadius)

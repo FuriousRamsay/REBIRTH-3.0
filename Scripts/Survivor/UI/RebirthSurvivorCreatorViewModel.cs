@@ -57,12 +57,13 @@ public sealed class RebirthSurvivorTraitChoice
     public bool HasSelectedTraitConflict { get; private set; }
     public bool HasDietConflict { get; private set; }
     public string BlockingTraitId { get; private set; }
+    internal bool AtSelectionLimit { get; set; }
 
     public bool CanToggle
     {
         get
         {
-            return IsSelected || (IsEligibleForBackground && !HasSelectedTraitConflict && !HasDietConflict);
+            return IsSelected || (!AtSelectionLimit && IsEligibleForBackground && !HasSelectedTraitConflict && !HasDietConflict);
         }
     }
 
@@ -457,7 +458,7 @@ public sealed class RebirthSurvivorCreatorViewModel
 #endif
         if (IsReadOnly)
         {
-            reason = "profile is read-only";
+            reason = RebirthSurvivorUiText.L("xuiRebirthSurvivorReviewReadOnly", "This review is read-only.");
 #if REBIRTH_DEBUG
             RebirthSurvivorTraitUiDebug.LogRejected(this, id, reason, debugBefore);
 #endif
@@ -467,7 +468,7 @@ public sealed class RebirthSurvivorCreatorViewModel
         RebirthTraitDefinition definition;
         if (!RebirthSurvivorDefinitionRegistry.TryGetTrait(id, out definition) || definition == null)
         {
-            reason = "trait definition is unavailable";
+            reason = RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitSelectionUnavailable", "This trait is unavailable.");
 #if REBIRTH_DEBUG
             RebirthSurvivorTraitUiDebug.LogRejected(this, id, reason, debugBefore);
 #endif
@@ -487,14 +488,16 @@ public sealed class RebirthSurvivorCreatorViewModel
         RebirthSurvivorTraitChoice choice = BuildTraitChoice(definition);
         if (!choice.CanToggle)
         {
-            if (!choice.IsEligibleForBackground)
-                reason = "trait is not available to the selected Experience";
+            if (choice.AtSelectionLimit)
+                reason = RebirthSurvivorUiText.TraitSelectionLimitMessage();
+            else if (!choice.IsEligibleForBackground)
+                reason = RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitSelectionExperience", "This trait is unavailable for your selected Experience.");
             else if (choice.HasSelectedTraitConflict)
-                reason = "trait conflicts with " + choice.BlockingTraitId;
+                reason = RebirthSurvivorUiText.TraitSelectionConflict(definition, choice.BlockingTraitId);
             else if (choice.HasDietConflict)
-                reason = "trait conflicts with the selected Diet";
+                reason = RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitSelectionDiet", "This trait conflicts with your selected Diet.");
             else
-                reason = "trait cannot be selected";
+                reason = RebirthSurvivorUiText.L("xuiRebirthSurvivorTraitSelectionUnavailable", "This trait is unavailable.");
 #if REBIRTH_DEBUG
             RebirthSurvivorTraitUiDebug.LogToggle(this, definition, "add", false, reason, debugBefore);
 #endif
@@ -803,7 +806,10 @@ public sealed class RebirthSurvivorCreatorViewModel
             }
         }
         bool dietConflict = definition != null && !string.IsNullOrEmpty(dietId) && Contains(definition.ConflictDietIds, dietId);
-        return new RebirthSurvivorTraitChoice(definition, selected, eligible, conflict, dietConflict, blocking);
+        return new RebirthSurvivorTraitChoice(definition, selected, eligible, conflict, dietConflict, blocking)
+        {
+            AtSelectionLimit = !selected && selectedTraits.Count >= RebirthSurvivorCreationValidator.MaxSelectedTraits
+        };
     }
 
     private bool IsEligibleForBackground(RebirthTraitDefinition trait, RebirthBackgroundDefinition background)

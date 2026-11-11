@@ -1,0 +1,70 @@
+{
+  "name": "p24_static_source_available",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable English Purge with Guard ON and no active modal. Select an exact current source at a known coordinate. For available, put only 2 Small Stones, 2 Plant Fibers and 1 Tree Branch in its legitimate activated static storage. Keep every required item out of all carried and other nearby sources. For unavailable, repeat with the same position absent, in range but unsupported, or loaded and marked busy by a different authenticated actor. After closing that busy storage, rerun the available scenario. Use baseline/candidate with independently captured tile type, slot count, server busy, and source access."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "expectNoItem": "resourceRockSmall"
+    },
+    {
+      "expectNoItem": "resourceYuccaFibers"
+    },
+    {
+      "expectNoItem": "FuriousRamsayTreeBranch"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "meleeToolRepairT0StoneAxe",
+          "exact": 1
+        }
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "waitForUi": {
+        "id": "rebirthCraftingOutcomeStatusValue",
+        "exactText": "Ready to craft",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "p24_static_source_ready"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Run in solo and dedicated. The unavailable assertion requires independently proving that the UI has received its current projection, not only waiting. In solo, capture rbrr status for raw source rows. In dedicated, capture from the authority or the authenticated sender; a local client command is not server proof. For debit qualification, run the normal Craft action separately and compare exact before/after source slots and output."
+    }
+  ]
+}

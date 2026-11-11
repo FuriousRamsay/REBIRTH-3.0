@@ -210,13 +210,13 @@ sealed class PlayRecorder
 
     const double SliceSec = 2, WarmupSec = 60;
 
-    public PlayRecorder(Func<LiveMonitor> monitor, string livePath, string mod)
+    public PlayRecorder(Func<LiveMonitor> monitor, string livePath, string mod, string evalStem = null)
     {
         this.monitor = monitor; lastMonitor = monitor(); this.livePath = livePath; this.mod = mod;
         string outDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out"));
-        string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        dir = Path.Combine(outDir, "play_" + stamp);
-        resultPath = Path.Combine(outDir, "play_" + stamp + ".json");
+        string stem = evalStem ?? $"play_{DateTime.Now:yyyyMMdd_HHmmss}";
+        dir = Path.Combine(outDir, stem);
+        resultPath = Path.Combine(outDir, stem + ".json");
     }
 
     public void Start(double warmupSeconds = WarmupSec)
@@ -226,17 +226,18 @@ sealed class PlayRecorder
         loop = Task.Run(() => Loop(warmupSeconds, cts.Token));
     }
 
-    public async Task Stop()
+    public async Task Stop(bool requireWrite = false)
     {
         cts?.Cancel();
         try { if (loop != null) await loop; } catch { }
-        Save();
+        Save(requireWrite);
     }
 
-    void Save()
+    void Save(bool requireWrite = false)
     {
         CloseSegmentForSave();
-        try { result.Save(resultPath); File.WriteAllText(Path.ChangeExtension(resultPath, ".txt"), result.ToText(), new UTF8Encoding(true)); } catch { }
+        try { result.Save(resultPath); File.WriteAllText(Path.ChangeExtension(resultPath, ".txt"), result.ToText(), new UTF8Encoding(true)); }
+        catch when (!requireWrite) { }
     }
 
     async Task Loop(double warmup, CancellationToken ct)

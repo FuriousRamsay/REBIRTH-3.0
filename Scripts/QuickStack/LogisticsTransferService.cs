@@ -407,7 +407,8 @@ public static class LogisticsPreviewService
         return data;
     }
 
-    private static void BuildStaticDeposit(World world, EntityPlayer player, bool owned, LogisticsPreviewData data)
+    private static void BuildStaticDeposit(
+        World world, EntityPlayer player, bool owned, LogisticsPreviewData data, bool includeTargets = true)
     {
         // Category classification is stable definition data. The registry owns explicit
         // invalidation; preview generation must not flush/reclassify it every time.
@@ -448,11 +449,14 @@ public static class LogisticsPreviewService
 
             { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("preview target qualified pos=" + pos +
                 " assigned=[" + string.Join(",", QuickStackAcceptedCategoryRegistry.Get(pos)) + "]"); }
-            StaticContainerResourceSource target = new StaticContainerResourceSource(world, pos);
-            string atlas;
-            string icon;
-            GetStaticContainerIcon(world, pos, out atlas, out icon);
-            AddTarget(data, target.StableId, target.DisplayName, target.Position, player, false, atlas, icon);
+            if (includeTargets)
+            {
+                StaticContainerResourceSource target = new StaticContainerResourceSource(world, pos);
+                string atlas;
+                string icon;
+                GetStaticContainerIcon(world, pos, out atlas, out icon);
+                AddTarget(data, target.StableId, target.DisplayName, target.Position, player, false, atlas, icon);
+            }
             simulatedDestinations[pos] = CloneSlots(loot.ItemGrid.items);
             destinationLocks[pos] = loot.ItemGrid.SlotLocks;
         }
@@ -661,9 +665,9 @@ public static class LogisticsPreviewService
         // This intentionally includes every source type exposed by Deposit Items:
         // backpack, completed workstation outputs, vehicles, drones, dogs, and other
         // inventory-capable Rebirth companions.
-        LogisticsPreviewData preview = Build(
-            world, player, QuickStackRadialAction.Deposit, string.Empty);
-        if (preview == null || preview.ItemRows == null || preview.ItemRows.Count == 0)
+        LogisticsPreviewData preview = new LogisticsPreviewData();
+        BuildStaticDeposit(world, player, false, preview, includeTargets: false);
+        if (preview.ItemRows.Count == 0)
             return string.Empty;
 
         List<string> selected = new List<string>(preview.ItemRows.Count);
@@ -3229,6 +3233,8 @@ public static class LogisticsTransferService
             QuickStackTransferPlanner.Plan plan = QuickStackTransferPlanner.Find(
                 world, player, transfer, owned, RebirthSandboxOptionManager.Current.QuickStack);
             if (plan == null || plan.Destinations.Count == 0) continue;
+
+            if (!QuickStackTransferExecutor.CanDepositFromBackpack(player)) break;
 
             ItemStack remaining;
             int count = QuickStackTransferExecutor.CommitExternal(

@@ -7,6 +7,25 @@ using System.Xml.Linq;
 
 internal static partial class RebirthConsumptionDurableDelivery
 {
+    private static string LegacyInventoryOriginalOwnerDirectory(string save,string owner)
+        =>Path.Combine(save,"RebirthData","PlayerConsumption",owner);
+    private static string CompactInventoryOriginalRoot(string save)=>Path.Combine(save,"PC");
+
+    // Discovery only. The bound native Read names the operation before its
+    // exact account/operation path and receipt can be qualified.
+    internal static bool InventoryOriginalsMayExist(string save,string account)
+        =>System.IO.Directory.Exists(LegacyInventoryOriginalOwnerDirectory(save,RebirthStablePlayerIdentity.ComputeStorageKey(account)))||
+            System.IO.Directory.Exists(CompactInventoryOriginalRoot(save));
+
+    private static string InventoryOriginalDirectory(string save,string owner,Guid operation)
+    {
+        string legacy=Path.Combine(LegacyInventoryOriginalOwnerDirectory(save,owner),operation.ToString("N"));
+        if(System.IO.Directory.Exists(legacy))return legacy;
+        // A short scope keeps the longest staged receipt within native Windows
+        // paths. Original records still validate the full owner and operation.
+        string scope=RebirthRemoteResourceDurableJournal.Digest(owner+"|"+operation.ToString("N")).Substring(0,40);
+        return Path.Combine(CompactInventoryOriginalRoot(save),scope);
+    }
     // Actual selected player-source original. Reply delivery never serves as
     // source payment; only its native owner witness may cross that boundary.
     internal sealed class InventoryOriginal
@@ -23,12 +42,13 @@ internal static partial class RebirthConsumptionDurableDelivery
         internal bool BeforeIssued,SourceIssued,SourceSaved,CanonicalEntered,CanonicalSaved,DeferredEntered,DeferredReturned,DeferredStateSaved,SecondaryEntered,SecondarySaved,NativeEntered,NativeSaved,Committed,Terminal,ObservationRetired,MemoryReleased;
         internal int QualifiedPrefix;
         internal long NextPurpose;internal byte LastPurpose;
+        internal bool RetiredRecordSaved,RetirementPurposeSent;
         internal InventoryOriginal(Guid operation,EntityPlayer actor,RebirthStablePlayerIdentity identity,RebirthConsumptionInventoryPlan inventory,
             RebirthMetabolismStateRepository.NpcServingState metabolism,RebirthMetabolismService.NpcSourcePlan serving,IDisposable memory,string exactOriginal=null)
         {
             Operation=operation;Actor=actor;World=actor.world;Owner=identity.CanonicalId;Creation=RebirthCamperCharacterAccess.CurrentCreation(actor);Deaths=actor.Died;
             Inventory=inventory;Metabolism=metabolism;Serving=serving;Memory=memory;game=GameManager.Instance;network=RebirthRemoteResourceNetworkScope.Capture(actor);
-            save=Path.GetFullPath(GameIO.GetSaveGameDir());Directory=Path.Combine(save,"RebirthData","PlayerConsumption",identity.StorageKey,operation.ToString("N"));
+            save=Path.GetFullPath(GameIO.GetSaveGameDir());Directory=InventoryOriginalDirectory(save,identity.StorageKey,operation);
             var image=new XElement("playerSourceConsumption",new XAttribute("version",1),new XAttribute("operation",operation.ToString("N")),
                 new XAttribute("owner",Owner),new XAttribute("creation",Creation),new XAttribute("deaths",Deaths),new XAttribute("world",World.worldState.Guid),
                 new XAttribute("sourceKind",(byte)inventory.Kind),new XAttribute("sourceSlot",inventory.Slot),new XAttribute("beltCount",inventory.BeltCount),
@@ -151,7 +171,7 @@ internal static partial class RebirthConsumptionDurableDelivery
                 original.Record("secondary-intent");original.DeferredEntered=true;
                 ObserveInventoryCall(original.Operation,2);
                 RebirthMetabolismService.ApplyNpcSourceDeferredEffects(original.Serving,true);
-                original.DeferredReturned=true;original.Record("secondary-returned");
+                original.DeferredReturned=true;
             }
             original.Record("secondary-returned");
             if(!original.DeferredStateSaved)
@@ -175,10 +195,12 @@ internal static partial class RebirthConsumptionDurableDelivery
     internal static bool HoldsInventoryWorld(World world)=>inventoryNativeLoads.Any(value=>ReferenceEquals(value.World,world)&&value.OwnerCurrent()&&value.Operations.Length>0)||
         inventoryOriginals.Values.Any(value=>!value.Terminal&&value.Current()&&ReferenceEquals(value.World,world));
     internal static bool TryPrepareInventoryOriginal(Guid operation,EntityPlayer actor,RebirthMetabolismSourceKind kind,int slot,ItemStack expected,bool autoSip,
+        ItemStack[] bag,ItemStack[] belt,bool[] bagLocks,bool[] beltLocks,
         out InventoryOriginal original,out RebirthConsumeResult result)
     {
         original=null;result=new RebirthConsumeResult{Success=false,Failure=RebirthMetabolismConsumeFailure.ItemChanged,Message="The original serving could not be prepared."};
         IDisposable memory=null;
+        string stage="request";
         try
         {
             if(inventoryOriginals.TryGetValue(operation,out var existing))
@@ -191,20 +213,29 @@ internal static partial class RebirthConsumptionDurableDelivery
                 inventoryOriginals.Count>=16||!RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)||
                 !RebirthConsumptionOwnerPublication.TryCaptureCreation(actor,out _)||expected==null||expected.IsEmpty()||expected.count>ushort.MaxValue||
                 !RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out memory))return false;
-            if(System.IO.Directory.Exists(Path.Combine(Path.GetFullPath(GameIO.GetSaveGameDir()),"RebirthData","PlayerConsumption",identity.StorageKey,operation.ToString("N"))))return false;
+            stage="original-path";
+            if(System.IO.Directory.Exists(InventoryOriginalDirectory(Path.GetFullPath(GameIO.GetSaveGameDir()),identity.StorageKey,operation)))return false;
+            stage="metabolism-snapshot";
             var token=RebirthMetabolismStateRepository.CaptureNpcServingState(actor,out var detached);if(token==null)return false;
             string auditBefore=CaptureInventoryAuditFingerprint(actor);
+            stage="serving";
             var serving=RebirthMetabolismService.PlanNpcSource(actor,expected,detached,out var planned,autoSip);
             if(serving==null){result=planned;ObserveInventoryRefusal(actor,token,auditBefore,result);return false;}
-            var bag=actor.bag?.ItemGrid?.items;var belt=actor.inventory?.ItemGrid?.items;
+            stage="inventory-plan";
             if(bag==null||belt==null||!RebirthConsumptionInventoryPlan.TryCreate(kind,slot,RebirthToolbeltCapacity.GetOwnedSlotCount(actor,belt.Length),bag,belt,
-                RebirthCamperStationNativeActorPayment.Locks(actor.bag.LockedSlots),RebirthCamperStationNativeActorPayment.Locks(actor.inventory.ItemGrid.SlotLocks),expected,serving.Replacement??ItemStack.Empty.Clone(),serving.Siblings,out var inventory))
+                bagLocks,beltLocks,expected,serving.Replacement??ItemStack.Empty.Clone(),serving.Siblings,out var inventory))
             {ObserveInventoryRefusal(actor,token,auditBefore,result);return false;}
+            stage="original-serialization";
             var candidate=new InventoryOriginal(operation,actor,identity,inventory,token,serving,memory);
             if(!candidate.StateCurrent())return false;
+            stage="original-save";
             candidate.Record("prepared");inventoryOriginals.Add(operation,candidate);ObserveInventoryAdmission(operation,actor,candidate.Purpose);original=candidate;result=planned;memory=null;return true;
         }
-        catch{return false;}
-        finally{memory?.Dispose();}
+        catch(Exception error){stage+=":"+error.GetType().Name;return false;}
+        finally
+        {
+            memory?.Dispose();
+            if(original==null)RebirthConsumptionTrace.Note("request.prepare-refused",actor,kind:kind,slot:slot,reason:stage,success:false);
+        }
     }
 }

@@ -39,14 +39,19 @@ internal static class RebirthPurgeMilestoneService
         int target=progress.TargetPercentage,mode=RebirthPurgeObjectivePolicy.ProgressionMode;
         var definitions=RebirthPurgeDiscoveryPolicy.Definitions;
         if(ReferenceEquals(evaluated,progress.Published)&&evaluatedTarget==target&&evaluatedMode==mode&&ReferenceEquals(evaluatedDefinitions,definitions))return true;
-        var earned=progress.Published.Values.Where(b=>b.Eligible>0 && b.RemainingFor(target)==0)
-            .Select(b=>new RebirthPurgeMilestoneStore.Receipt(b.Biome,target,b.Eligible,b.Cleared,progress.Revision,progress.CensusGeneration,mode:mode,eligibleUnits:b.EligibleUnits,clearedUnits:b.ClearedUnits)).ToArray();
-        var receipts=earned.ToList();
-        if(RebirthPurgeDiscoveryPolicy.Available)
+        var receipts=progress.Published.Values.Where(b=>b.Eligible>0 && b.RemainingFor(target)==0)
+            .Select(b=>new RebirthPurgeMilestoneStore.Receipt(b.Biome,target,b.Eligible,b.Cleared,progress.Revision,progress.CensusGeneration,mode:mode,eligibleUnits:b.EligibleUnits,clearedUnits:b.ClearedUnits)).ToList();
+        if(RebirthPurgeDiscoveryPolicy.Available&&definitions.Count!=0)
         foreach(var biome in progress.Published.Values.Where(b=>b.Eligible>0))
-        foreach(var definition in definitions)
-            if(biome.ClearedUnits>=RebirthPurgeProgression.Required(biome.EligibleUnits,RebirthPurgeDiscoveryPolicy.ScaledNumerator(definition.Percent,target)))
-                receipts.Add(new RebirthPurgeMilestoneStore.Receipt(biome.Biome,RebirthPurgeDiscoveryPolicy.ScaledPercent(definition.Percent,target),biome.Eligible,biome.Cleared,progress.Revision,progress.CensusGeneration,definition.Id,definition.Tier,RebirthPurgeDiscoveryPolicy.ScaledNumerator(definition.Percent,target),mode,biome.EligibleUnits,biome.ClearedUnits));
+        {
+            int clearedUnits=biome.ClearedUnits,eligibleUnits=biome.EligibleUnits;
+            foreach(var definition in definitions)
+            {
+                int numerator=RebirthPurgeDiscoveryPolicy.ScaledNumerator(definition.Percent,target);
+                if(clearedUnits>=RebirthPurgeProgression.Required(eligibleUnits,numerator))
+                    receipts.Add(new RebirthPurgeMilestoneStore.Receipt(biome.Biome,RebirthPurgeDiscoveryPolicy.ScaledPercent(definition.Percent,target),biome.Eligible,biome.Cleared,progress.Revision,progress.CensusGeneration,definition.Id,definition.Tier,numerator,mode,eligibleUnits,clearedUnits));
+            }
+        }
         var previous=store.PublishedAll;
         if(store.TryRecord(receipts))
         {

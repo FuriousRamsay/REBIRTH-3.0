@@ -1184,6 +1184,10 @@ xuiRebirthMetabolismInfoExampleBody,Eat canned food and its Solid content enters
 xuiRebirthCategoryCharacter,CHARACTER
 xuiRebirthPlayerProgression,Character Progression
 xuiRebirthPlayerProgressionDesc,"Select the progression authority for this world. Rebirth enables Survivor Experience, Traits, Attributes, learn-by-doing Skills, and Knowledge. Base Game bypasses those REBIRTH systems and preserves native progression. Existing worlds keep the mode they were created with."
+xuiRebirthDeathDebuffs,Debuffs on Death
+xuiRebirthDeathDebuffsKeep,Keep Injuries
+xuiRebirthDeathDebuffsClear,Clear
+xuiRebirthDeathDebuffsDesc,"Choose whether injuries such as concussion, broken limbs, and infection carry over after an ordinary death. This overrides the base-game injury setting. Nutrition and hydration each respawn at their pre-death percentage or 80%, whichever is higher. Permadeath still clears injuries."
 xuiRebirthPlayerProgressionBaseGame,Base Game
 xuiRebirthPlayerProgressionRebirth,Rebirth
 xuiRebirthAttributeStrength,Strength
@@ -1651,6 +1655,7 @@ xuiRebirthCreationErrorRebirthModeDisabled,REBIRTH character creation is disable
 xuiRebirthCreationErrorDefinitionsUnavailable,REBIRTH Survivor definitions are unavailable. The character cannot be confirmed safely.
 xuiRebirthCreationErrorUnknownCreationModifier,A selected Trait references an unknown creation modifier.
 xuiRebirthCreationErrorInvalidSkillBiasTier,An Experience or Trait references an invalid starting Skill bias tier.
+xuiRebirthCreationErrorTooManyTraits,You can select up to {0} traits. Remove one to make room.
 xuiRebirthSurvivorProfiles,SURVIVOR PROFILES
 xuiRebirthSurvivorSavedProfiles,SAVED SURVIVOR PROFILES
 xuiRebirthSurvivorCreate,CREATE
@@ -1674,7 +1679,7 @@ xuiRebirthSurvivorIdentityHelp,Name this reusable starting template. This local 
 xuiRebirthSurvivorProfileNameRequired,Enter a Survivor Profile name before saving.
 xuiRebirthSurvivorChooseBackgroundPrompt,Choose an Experience to see its details.
 xuiRebirthSurvivorChooseDietPrompt,Choose a Diet to see its details.
-xuiRebirthSurvivorTraitHelp,Choose enduring Traits after your Experience and Diet establish the point budget. Positive Traits and Skill Aptitudes spend points; negative Traits grant points up to the refund cap.
+xuiRebirthSurvivorTraitHelp,"Choose enduring Traits after your Experience and Diet establish the point budget. Positive Traits, mixed Traits, and Skill Aptitudes cost points. Negative Traits grant points up to the refund cap."
 xuiRebirthSurvivorFilterAll,ALL AVAILABLE TRAITS
 xuiRebirthSurvivorFilterPositive,POSITIVE TRAITS
 xuiRebirthSurvivorFilterNegative,NEGATIVE TRAITS
@@ -2036,10 +2041,10 @@ xuiRebirthSurvivorDietShortPescatarian,Fish and seafood are allowed; avoids meat
 xuiRebirthSurvivorDietFoodListUnavailable,Diet food data failed startup validation. Check the output log.
 xuiRebirthSurvivorDietFoodCount,Current edible-food catalogue
 xuiRebirthSurvivorDietCompatibleCount,Compatible with this diet
-xuiRebirthSurvivorTraitBudgetPositiveTraits,Positive Traits
+xuiRebirthSurvivorTraitBudgetPositiveTraits,Positive and Mixed Traits
 xuiRebirthSurvivorTraitBudgetAptitudes,Skill Aptitudes
 xuiRebirthSurvivorTraitBudgetNegativesShort,Neg
-xuiRebirthSurvivorTraitBudgetPositiveShort,Positive
+xuiRebirthSurvivorTraitBudgetPositiveShort,Traits
 xuiRebirthSurvivorTraitBudgetAptitudesShort,Aptitudes
 xuiRebirthSurvivorReviewIdentity,SURVIVOR IDENTITY
 xuiRebirthSurvivorReviewPositiveTraits,POSITIVE TRAITS
@@ -2072,14 +2077,20 @@ xuiRebirthSurvivorTraitCategorySocial,SOCIAL
 xuiRebirthSurvivorTraitCategoryLifestyle,LIFESTYLE
 xuiRebirthSurvivorTraitCategoryAptitudes,APTITUDES
 xuiRebirthSurvivorPositiveMixedTraits,POSITIVE / MIXED TRAITS
-xuiRebirthSurvivorPositiveMixedTraitsHelp,Spend Trait points on positive Traits; mixed Traits cost 0.
+xuiRebirthSurvivorPositiveMixedTraitsHelp,Spend Trait points on positive and mixed Traits.
 xuiRebirthSurvivorNegativeTraitsWeaknesses,NEGATIVE TRAITS / WEAKNESSES
 xuiRebirthSurvivorNegativeTraitsHelp,Take weaknesses to earn Trait points up to the refund cap.
 xuiRebirthSurvivorTraitPointsAvailable,AVAILABLE
 xuiRebirthSurvivorSelectedTraits,SELECTED TRAITS
+xuiRebirthSurvivorSelectedTraitsCount,SELECTED TRAITS ({0}/{1})
 xuiRebirthSurvivorResetTraits,RESET TRAITS
 xuiRebirthSurvivorNoTraitsSelected,No Traits selected yet.
 xuiRebirthSurvivorTraitConflictSelected,Conflicts with a selected Trait.
+xuiRebirthSurvivorTraitSelectionConflictFormat,You can't choose {0} while {1} is selected.
+xuiRebirthSurvivorTraitSelectionConflict,This trait conflicts with a trait you already selected.
+xuiRebirthSurvivorTraitSelectionUnavailable,This trait is unavailable.
+xuiRebirthSurvivorTraitSelectionExperience,This trait is unavailable for your selected Experience.
+xuiRebirthSurvivorTraitSelectionDiet,This trait conflicts with your selected Diet.
 xuiRebirthSurvivorProfilesIntro,Select a Survivor Profile to inspect or edit it. Create a new profile at any time. You choose a profile only when first entering a Rebirth world.
 xuiRebirthSurvivorAvailableProfiles,AVAILABLE PROFILES
 xuiRebirthSurvivorSort,SORT
@@ -12350,12 +12361,12 @@ kitRetuning,"Retuning Kit"
 kitComprehensiveUpgrade,"Comprehensive Upgrade Kit"
 kitEliteReinforcement,"Elite Reinforcement Kit"
 kitBreakdown,"Breakdown Kit"
-kitSurvivorUpgradeDesc,"Adds the first bonus to armor with no bonuses. With Tailoring 10 you can choose its category, with Tailoring 25 the exact bonus; otherwise it is random. Rarity is rolled."
-kitAdjustmentDesc,"Adds a second bonus to armor with exactly one bonus. With Tailoring 10 you can choose its category, with Tailoring 25 the exact bonus; otherwise it is random. Rarity is rolled."
-kitRetuningDesc,"Changes armor with one or two bonuses. For each bonus choose Keep, Reroll (same bonus, new rarity and value) or Replace (a new bonus, which you can choose with enough Tailoring)."
-kitComprehensiveUpgradeDesc,"Adds three bonuses to armor with no bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose each of the three; the fourth is always random. Rarity is rolled."
-kitEliteReinforcementDesc,"Adds a third bonus to armor with exactly two bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose the third; the fourth is always random. Rarity is rolled."
-kitBreakdownDesc,"Removes the bonuses you choose from armor, or all of them. The bonuses you keep stay exactly as they are."
+kitSurvivorUpgradeDesc,"At a Modifier Station, put armor and this kit in their slots, then confirm. Adds the first bonus to armor with no bonuses. Tailoring 10 lets you choose the category and Tailoring 25 the exact bonus. Otherwise the bonus is random. Rarity is rolled."
+kitAdjustmentDesc,"At a Modifier Station, put armor and this kit in their slots, then confirm. Adds a second bonus to armor with exactly one bonus. Tailoring 10 lets you choose the category and Tailoring 25 the exact bonus. Otherwise the bonus is random. Rarity is rolled."
+kitRetuningDesc,"At a Modifier Station, put armor with one or two bonuses and this kit in their slots. Choose Keep, Reroll (same bonus, new rarity and value), or Replace for each bonus, then confirm. With enough Tailoring you can choose the replacement."
+kitComprehensiveUpgradeDesc,"At a Modifier Station, put armor and this kit in their slots, then confirm. Adds three bonuses to armor with no bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose each of the three. The fourth is always random. Rarity is rolled."
+kitEliteReinforcementDesc,"At a Modifier Station, put armor and this kit in their slots, then confirm. Adds a third bonus to armor with exactly two bonuses, with a 25% chance of a fourth. With enough Tailoring you can choose the third. The fourth is always random. Rarity is rolled."
+kitBreakdownDesc,"At a Modifier Station, put armor and this kit in their slots. Choose which bonuses to remove, then confirm. You can remove some or all bonuses. The bonuses you keep stay exactly as they are."
 aeEnchantInvalidKit,"Invalid modification kit."
 aeEnchantMissingKit,"Modification kit is missing."
 aeEnchantItemOnly,"Only modifiable items can be enhanced."

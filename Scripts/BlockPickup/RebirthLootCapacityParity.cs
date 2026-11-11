@@ -47,16 +47,15 @@ internal static class RebirthLootCapacityParity
         // A renamed/shared loot table can serve blocks with different legacy
         // dimensions. The explicit block override changes only the grid, not
         // the loot table/content or the current player-storage size policy.
-        string raw;
-        bool hasOverride = storage.Parent?.TeData?.Block?.Properties?.Values != null &&
-            storage.Parent.TeData.Block.Properties.Values.TryGetValue("RebirthLootContainerSize", out raw);
+        var properties = storage.Parent?.TeData?.Block?.Properties?.Values;
+        string raw = null;
+        bool hasOverride = properties != null && properties.TryGetValue("RebirthLootContainerSize", out raw);
         if (!hasOverride && !names.Contains(storage.lootListName)) return;
         var definition = LootContainer.GetLootContainer(storage.lootListName);
         if (definition == null) return;
         var size = definition.size;
         if (hasOverride)
         {
-            storage.Parent.TeData.Block.Properties.Values.TryGetValue("RebirthLootContainerSize", out raw);
             var parts = raw.Split(',');
             int width, height;
             if (parts.Length != 2 || !int.TryParse(parts[0], out width) || !int.TryParse(parts[1], out height)) return;

@@ -223,16 +223,22 @@ public static class RebirthJournalGuideService
         dirty = !Save();
         Revision++;
     }
-    public static bool Mark(RebirthJournalEntry entry, bool read)
+    public static bool Mark(RebirthJournalEntry entry, bool read) => Mark(entry, read, out _);
+
+    internal static bool Mark(RebirthJournalEntry entry, bool read, out int? committedRevision)
     {
+        committedRevision=null;
         if (!writable || entry==null) return false;
         if(IsRead(entry)==read)return true;
         bool had=Read.TryGetValue(entry.Id,out var old); Read[entry.Id]=read;
         if(!Save()){if(had)Read[entry.Id]=old;else Read.Remove(entry.Id);return false;}
-        Revision++; return true;
+        committedRevision=++Revision; return true;
     }
-    public static bool MarkAll(IEnumerable<RebirthJournalEntry> entries)
+    public static bool MarkAll(IEnumerable<RebirthJournalEntry> entries) => MarkAll(entries, out _);
+
+    internal static bool MarkAll(IEnumerable<RebirthJournalEntry> entries, out int? committedRevision)
     {
+        committedRevision=null;
         if(!writable)return false;
         var before=new Dictionary<string,bool>(Read);
         bool changed=false;
@@ -243,7 +249,7 @@ public static class RebirthJournalGuideService
         }
         if(!changed)return true;
         if(!Save()){Read.Clear();foreach(var kv in before)Read[kv.Key]=kv.Value;return false;}
-        Revision++;return true;
+        committedRevision=++Revision;return true;
     }
     private static bool Save()
     {

@@ -260,9 +260,13 @@ internal static partial class RebirthRecyclerPlacedSettlement
     {
         if(!authorityInstalled||station==null||station is RebirthCamperStationState)return false;
         var world=GameManager.Instance?.World;if(world==null||!ReferenceEquals(world.GetTileEntity(station.ToWorldPos()),station))return false;
+        var customData = station.GetChunk()?.ChunkCustomData?.dict;
+        if (customData == null || customData.Count == 0) return false;
         string prefix="RebirthRecyclerPlacedV1:"+station.localChunkPos.x+":"+station.localChunkPos.y+":"+station.localChunkPos.z+":";
         // Metadata may refuse unknown custody, never restore or authorize it.
-        return station.GetChunk()?.ChunkCustomData?.dict?.Keys.Any(key=>key.StartsWith(prefix,StringComparison.Ordinal))==true;
+        foreach (string key in customData.Keys)
+            if (key.StartsWith(prefix, StringComparison.Ordinal)) return true;
+        return false;
     }
     // Per frame: no closure or array when there is nothing loaded (profiler 2026-11-08).
     private static void SweepLoadedRecyclerStations(World world)

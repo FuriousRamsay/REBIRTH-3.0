@@ -1,0 +1,71 @@
+{
+  "name": "p25_native_workstation_fuel_state",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, Guard ON. Loaded native campfire at 14,45,995, no window or paid original. Prepare manually lit empty queue with fuel resourceWood >= 2, no smelting, sufficient known burn time and no other player opening it. Repeat the read-only fuel controls in both solo and dedicated. Inspect actual burning, fuel slots and queue from both captures."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "expectStation": {
+        "x": 14,
+        "y": 45,
+        "z": 995,
+        "station": "campfire",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 14,
+        "y": 45,
+        "z": 995,
+        "station": "campfire",
+        "field": "fuel",
+        "item": "resourceWood",
+        "op": ">=",
+        "value": 1
+      }
+    },
+    {
+      "station": {
+        "x": 14,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "station": {
+        "x": 14,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "expectStation": {
+        "x": 14,
+        "y": 45,
+        "z": 995,
+        "station": "campfire",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Qualify a normal UpdateTick and actual >=10s native catch-up, full/blocked or worn tool head with future row, pending/ready cook, smelt-only Forge and combined queue/material control independently. The read-only bridge does not expose HeatMap event or currentBurnTimeLeft directly. Pair native authority instrumentation for elapsed, fuel/heat and exact queue transition before claiming parity."
+    }
+  ]
+}

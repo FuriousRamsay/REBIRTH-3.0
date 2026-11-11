@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 // Server-owned durable write-ahead record. Payloads must contain complete native
 // cursor/player, cargo and module snapshots; this class never executes a retry.
@@ -20,6 +21,9 @@ public sealed class RebirthCamperTransferJournal
         internal Record(Guid operation, Guid vehicle, string owner, long revision, Phase state, byte[] prior, byte[] next)
         { Operation=operation; Vehicle=vehicle; OwnerCreation=owner; Revision=revision; State=state;
           before=(byte[])prior.Clone(); after=(byte[])next.Clone(); }
+        internal bool SamePreparedImage(Record other) =>
+            Operation==other.Operation&&Vehicle==other.Vehicle&&OwnerCreation==other.OwnerCreation&&
+            Revision==other.Revision&&Equal(before,other.before)&&Equal(after,other.after);
     }
     private const uint Magic = 0x314A4352; // RCJ1
     private const int MaximumFrame = 64 * 1024 * 1024;
@@ -60,11 +64,17 @@ public sealed class RebirthCamperTransferJournal
     }
 
     public Record Advance(Guid operation, Phase expected, Phase next)
+        =>Advance(operation,expected,next,MaximumFrame,null);
+
+    internal Record AdvanceBounded(Guid operation,Phase expected,Phase next,int maximumFrame,string ownerCreation)
+        =>Advance(operation,expected,next,maximumFrame,BoundedOwnerHeader(maximumFrame,ownerCreation));
+
+    private Record Advance(Guid operation,Phase expected,Phase next,int maximumFrame,byte[] ownerHeader)
     {
         bool valid = expected == Phase.Prepared && (next == Phase.Uncertain || next == Phase.Rejected)
             || expected == Phase.Uncertain && next == Phase.Applied;
         if (!valid) throw new InvalidOperationException("Invalid transfer journal transition.");
-        var record = Read(operation);
+        var record = Read(operation,maximumFrame,ownerHeader);
         if (record == null || record.State != expected) throw new InvalidOperationException("Transfer phase changed; reconcile first.");
         var advanced = new Record(record.Operation, record.Vehicle, record.OwnerCreation, record.Revision, next, record.Before, record.After);
         Publish(advanced);
@@ -110,7 +120,21 @@ public sealed class RebirthCamperTransferJournal
         }
     }
 
-    public Record Read(Guid operation)
+    public Record Read(Guid operation)=>Read(operation,MaximumFrame,null);
+
+    internal Record ReadBounded(Guid operation,int maximumFrame,string ownerCreation)
+        =>Read(operation,maximumFrame,BoundedOwnerHeader(maximumFrame,ownerCreation));
+
+    private static byte[] BoundedOwnerHeader(int maximumFrame,string ownerCreation)
+    {
+        if(maximumFrame<=0||maximumFrame>MaximumFrame||string.IsNullOrWhiteSpace(ownerCreation)||ownerCreation.Length>512)
+            throw new ArgumentException("Exact bounded journal scope required.");
+        using var buffer=new MemoryStream();
+        using var writer=new BinaryWriter(buffer,new UTF8Encoding(false,true),true);
+        writer.Write(ownerCreation);writer.Flush();return buffer.ToArray();
+    }
+
+    private Record Read(Guid operation,int maximumFrame,byte[] ownerHeader)
     {
         if (operation == Guid.Empty) throw new ArgumentException("Receipt identity required.");
         Record latest = null;
@@ -118,10 +142,10 @@ public sealed class RebirthCamperTransferJournal
         {
             string path = FileName(operation, phase);
             if (!File.Exists(path)) continue;
-            var current = ReadFile(path);
+            var current = ReadFile(path,maximumFrame,ownerHeader);
             if (current.Operation != operation || current.State != phase)
                 throw new InvalidDataException("Journal filename and identity disagree.");
-            if (latest != null && (!Equal(Encode(latest, Phase.Prepared), Encode(current, Phase.Prepared))
+            if (latest != null && (!(ownerHeader==null?Equal(Encode(latest, Phase.Prepared), Encode(current, Phase.Prepared)):latest.SamePreparedImage(current))
                 || phase == Phase.Rejected && latest.State != Phase.Prepared))
                 throw new InvalidDataException("Conflicting transfer records; manual reconciliation required.");
             if (latest == null && phase != Phase.Prepared || phase == Phase.Applied && (latest == null || latest.State != Phase.Uncertain))
@@ -243,18 +267,18 @@ public sealed class RebirthCamperTransferJournal
             }
     }
     private string FileName(Guid operation, Phase state) { return Path.Combine(root, operation.ToString("N") + "." + (int)state + ".rcj"); }
-    private static Record ReadFile(string path)
+    private static Record ReadFile(string path,int maximumFrame=MaximumFrame,byte[] ownerHeader=null)
     {
         // Bound corrupt files before allocation, including during index bootstrap.
-        using(var file=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))
+        using(var file=new FileStream(RebirthDurableFileCommit.WindowsIoPath(path),FileMode.Open,FileAccess.Read,FileShare.Read))
         {
             long length=file.Length;
-            if(length<32||length>MaximumFrame*2L+8192)throw new InvalidDataException("Invalid journal size.");
+            if(length<32||length>maximumFrame*2L+8192)throw new InvalidDataException("Invalid journal size.");
             var bytes=new byte[(int)length];int offset=0;
             while(offset<bytes.Length)
             {int count=file.Read(bytes,offset,bytes.Length-offset);if(count<=0)throw new EndOfStreamException("Incomplete journal receipt.");offset+=count;}
             if(file.Length!=length||file.ReadByte()!=-1)throw new InvalidDataException("Journal changed during read.");
-            return Decode(bytes);
+            return Decode(bytes,maximumFrame,ownerHeader);
         }
     }
     // Installation recovery may correlate a retained portable carrier with an
@@ -295,7 +319,7 @@ public sealed class RebirthCamperTransferJournal
         {
         PublicationStarting?.Invoke(root);
         string destination = FileName(record.Operation, record.State);
-        string temporary = destination + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        string temporary = RebirthDurableFileCommit.WindowsIoPath(destination + "." + Guid.NewGuid().ToString("N") + ".tmp");
         byte[] bytes = Encode(record, record.State);
         // Never overwrite a receipt. A leftover temporary file is evidence only,
         // never authority to replay a partially published inventory operation.
@@ -321,9 +345,9 @@ public sealed class RebirthCamperTransferJournal
             writer.Flush(); return memory.ToArray();
         }
     }
-    private static Record Decode(byte[] bytes)
+    private static Record Decode(byte[] bytes,int maximumFrame,byte[] ownerHeader)
     {
-        if (bytes.Length < 32 || bytes.Length > MaximumFrame * 2 + 8192) throw new InvalidDataException("Invalid journal size.");
+        if (bytes.Length < 32 || bytes.Length > maximumFrame * 2 + 8192) throw new InvalidDataException("Invalid journal size.");
         using (var memory = new MemoryStream(bytes, 0, bytes.Length - 32, false))
         using (var reader = new BinaryReader(memory))
         {
@@ -332,15 +356,22 @@ public sealed class RebirthCamperTransferJournal
             memory.Position=0;
             if (reader.ReadUInt32()!=Magic) throw new InvalidDataException("Unsupported transfer journal.");
             Guid operation=new Guid(reader.ReadBytes(16)), vehicle=new Guid(reader.ReadBytes(16));
+            if(ownerHeader!=null)
+            {
+                long ownerStart=memory.Position;
+                foreach(byte expected in ownerHeader)
+                    if(reader.ReadByte()!=expected)throw new InvalidDataException("Journal owner differs.");
+                memory.Position=ownerStart;
+            }
             string owner=reader.ReadString(); long revision=reader.ReadInt64(); Phase phase=(Phase)reader.ReadByte();
-            byte[] before=Frame(reader), after=Frame(reader);
+            byte[] before=Frame(reader,maximumFrame), after=Frame(reader,maximumFrame);
             if (memory.Position!=memory.Length || operation==Guid.Empty || vehicle==Guid.Empty || string.IsNullOrWhiteSpace(owner)
                 || revision<0 || !Enum.IsDefined(typeof(Phase),phase)) throw new InvalidDataException("Malformed transfer journal.");
             return new Record(operation,vehicle,owner,revision,phase,before,after);
         }
     }
-    private static byte[] Frame(BinaryReader reader)
-    { int length=reader.ReadInt32(); if(length<=0 || length>MaximumFrame || length>reader.BaseStream.Length-reader.BaseStream.Position)
+    private static byte[] Frame(BinaryReader reader,int maximumFrame)
+    { int length=reader.ReadInt32(); if(length<=0 || length>maximumFrame || length>reader.BaseStream.Length-reader.BaseStream.Position)
         throw new InvalidDataException("Incomplete journal frame."); return reader.ReadBytes(length); }
     private static bool Equal(byte[] left, byte[] right)
     { if(left.Length!=right.Length)return false; for(int i=0;i<left.Length;i++)if(left[i]!=right[i])return false; return true; }

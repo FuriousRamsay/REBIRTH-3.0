@@ -1,0 +1,13 @@
+{
+  "name": "Cruise control in the minimap HUD stack",
+  "status": "AUTHORED_NOT_RUN",
+  "setup": "Use a disposable REBIRTH world with an active cooking job, minimap visible, and a vehicle in an open area. Sit in the driver seat. Use the physical Q key with default bindings and capture the HUD at each step with Game Bridge screenshot and uitree.",
+  "cases": [
+    "With cruise off, record the resting positions of the minimap, cooking card, and any ammo or pickup displays.",
+    "Press Q once. Cruise Control: Normal appears immediately above the minimap, which stays in place. The other right-side displays move up by one row.",
+    "Press Q again. Cruise Control: Turbo replaces Normal in the same row. Other displays stay at the same height.",
+    "Press Q again. The cruise row disappears and the other displays return to their original positions.",
+    "Engage cruise and leave the driver seat. The cruise row disappears and the HUD collapses. Confirm no cruise display when pressing Q as a passenger.",
+    "Repeat with no cooking jobs and with the minimap hidden. The cruise row remains available to the driver."
+  ]
+}

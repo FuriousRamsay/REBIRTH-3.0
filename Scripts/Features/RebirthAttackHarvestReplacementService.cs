@@ -252,7 +252,7 @@ public static class RebirthAttackHarvestReplacementService
         }
     }
 
-    private static void EnsureRandom()
+    internal static void EnsureRandom()
     {
         if (GameUtils.random != null)
             return;

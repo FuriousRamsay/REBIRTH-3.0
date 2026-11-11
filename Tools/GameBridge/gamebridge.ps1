@@ -95,7 +95,8 @@ param(
     [string] $Contains,
     [float] $Radius = 40,
     [int] $MaxWidth = 1600,
-    [string] $SessionPath = $env:REBIRTH_BRIDGE_SESSION
+    [string] $SessionPath = $env:REBIRTH_BRIDGE_SESSION,
+    [string] $LaunchReceiptPath = $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -109,7 +110,7 @@ $GameDir    = (Resolve-Path (Join-Path $ModDir '..\..')).Path
 $GameExe    = Join-Path $GameDir '7DaysToDie.exe'
 $OutDir     = Join-Path $BridgeDir 'out'
 $SessionFile = if ($SessionPath) { [IO.Path]::GetFullPath($SessionPath) } else { Join-Path $OutDir 'session.json' }
-$LaunchFile = Join-Path $OutDir 'launch.json'
+$LaunchFile = if ($LaunchReceiptPath) { [IO.Path]::GetFullPath($LaunchReceiptPath) } else { Join-Path $OutDir 'launch.json' }
 $SavesRoot  = Join-Path $env:APPDATA '7DaysToDie\Saves'
 $PlayerLog  = Join-Path $env:USERPROFILE 'AppData\LocalLow\The Fun Pimps\7 Days To Die\Player.log'
 
@@ -135,12 +136,21 @@ function Fail([string] $msg) {
 
 function Get-GameProcess { Get-Process -Name '7DaysToDie' -ErrorAction SilentlyContinue | Select-Object -First 1 }
 
-function Get-OwnedGameProcess {
+function Get-OwnedGameProcess([ref]$Exited) {
     if (-not (Test-Path -LiteralPath $LaunchFile)) { return $null }
-    $owner = Get-Content -LiteralPath $LaunchFile -Raw | ConvertFrom-Json
-    $p = Get-Process -Id $owner.pid -ErrorAction SilentlyContinue
-    if (-not $p -or $p.Path -ine $GameExe -or $p.StartTime.ToUniversalTime().ToString('o') -ne $owner.processStartUtc) { return $null }
-    return $p
+    try {
+        $owner = Get-Content -LiteralPath $LaunchFile -Raw | ConvertFrom-Json -ErrorAction Stop
+        $ownerPid = $owner.pid -as [int]
+        if ($ownerPid -le 0 -or $owner.executable -ine $GameExe -or -not $owner.processStartUtc) { return $null }
+        $startUtc = ([datetime]$owner.processStartUtc).ToUniversalTime()
+        $p = Get-Process -Id $ownerPid -ErrorAction SilentlyContinue
+        if (-not $p) {
+            if ($null -ne $Exited) { $Exited.Value = $true }
+            return $null
+        }
+        if ($p.Path -ine $GameExe -or $p.StartTime.ToUniversalTime().Ticks -ne $startUtc.Ticks) { return $null }
+        return $p
+    } catch { return $null }
 }
 
 function Get-Session {
@@ -149,7 +159,7 @@ function Get-Session {
     $p = Get-Process -Id $s.pid -ErrorAction SilentlyContinue
     if (-not $p -or $p.Path -ine $GameExe -or -not $s.processStartUtc -or
         $p.StartTime.ToUniversalTime().Ticks -ne ([datetime]$s.processStartUtc).ToUniversalTime().Ticks) { return $null }
-    if (-not $SessionPath) {
+    if (-not $SessionPath -or $LaunchReceiptPath) {
         $owned = Get-OwnedGameProcess
         if (-not $owned -or $owned.Id -ne $p.Id) { return $null }
     }
@@ -336,12 +346,21 @@ function Start-Game($cfg) {
 }
 
 function Stop-Game {
-    $p = Get-OwnedGameProcess
+    $exited = $false
+    $p = Get-OwnedGameProcess ([ref]$exited)
     if (-not $p) {
+        if ($LaunchReceiptPath) {
+            if ($exited) { return }
+            Fail 'no live game matches the supplied launch receipt'
+        }
         if (Get-GameProcess) { Fail 'running game is not owned by this launcher; refusing to close it' }
         return
     }
-    if (-not (Get-Session)) { Fail 'owned process has no validated bridge session; refusing ambiguous window close' }
+    $session = Get-Session
+    if (-not $session -or $session.pid -ne $p.Id) {
+        if ($p.HasExited) { return }
+        Fail 'owned process has no matching validated bridge session; refusing ambiguous window close'
+    }
     $reply = Invoke-Bridge 'POST' '/quit' @{} $null 10
     if ($reply.Status -ge 400) { Fail ('quit refused: ' + $reply.Body) }
     if (-not $p.WaitForExit(120000)) { Fail 'the owned game did not exit within 120 s' }
@@ -438,6 +457,16 @@ function Get-StatValue($state, [string] $name) {
     if ($s) { return $s.value } else { return $null }
 }
 
+function Get-RespawnNeedsPercent($state) {
+    $needs = @{}
+    foreach ($name in 'food','water') {
+        $stat = $state.stats.$name
+        if ($null -eq $stat.value -or $stat.max -le 0) { throw "Missing valid $name stat" }
+        $needs[$name] = 100.0 * $stat.value / $stat.max
+    }
+    return $needs
+}
+
 function Assert-TestResponseField($response, [string] $field) {
     if ($null -eq $response -or $null -eq $response.Status -or $response.Status -lt 200 -or $response.Status -ge 300 -or
         $null -eq $response.Json -or $response.Json.ok -eq $false -or
@@ -499,6 +528,8 @@ function Invoke-TestFile([string] $file) {
     # Debug logging is off until "rbdebug on" (owner 2026-11-08); scenarios read automatic log lines, so turn it on.
     try { $null = Invoke-Bridge 'POST' '/console' @{} 'rbdebug on' 10 } catch { Write-Host "note: rbdebug on failed: $_" }
     $results = @(); $failed = 0; $i = 0; $skillMarks = @{}; $itemMarks = @{}; $fenceMarks = @{}
+    $preDeathNeeds = $null
+    $preDeathProjection = $null
     $evidenceDir = Join-Path $OutDir ('tests/' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '_' + [IO.Path]::GetFileNameWithoutExtension($file))
     New-Item -ItemType Directory -Path $evidenceDir -Force | Out-Null
     Write-Host "TEST: $($test.name)"
@@ -820,10 +851,16 @@ function Invoke-TestFile([string] $file) {
                 }
                 'expectSkillGain' {
                     if (-not $skillMarks.ContainsKey([string]$arg.skill)) { throw 'No skill baseline was recorded' }
-                    $r = Invoke-Bridge 'GET' '/state' @{sections='rebirth'}
-                    Assert-TestResponseField $r 'rebirth'
-                    $snapshot = $r.Json.rebirth
-                    $skill = @($snapshot.Skills | Where-Object { $_.Id -eq $arg.skill })
+                    if ($arg.local) {
+                        $r = Invoke-Bridge 'GET' '/state' @{sections='ordinaryProgress'}
+                        Assert-TestResponseField $r 'ordinaryProgress'
+                        $skills = $r.Json.ordinaryProgress
+                    } else {
+                        $r = Invoke-Bridge 'GET' '/state' @{sections='rebirth'}
+                        Assert-TestResponseField $r 'rebirth'
+                        $skills = $r.Json.rebirth.Skills
+                    }
+                    $skill = @($skills | Where-Object { $_.Id -eq $arg.skill })
                     if ($skill.Count -ne 1) { throw "Expected exactly one accepted skill '$($arg.skill)'" }
                     if ($null -eq $skill[0].Value -or $null -eq $skill[0].Progress) { throw 'Incomplete skill result' }
                     $gain = [double]$skill[0].Value + [double]$skill[0].Progress - $skillMarks[[string]$arg.skill]
@@ -864,6 +901,51 @@ function Invoke-TestFile([string] $file) {
                     $st = (Invoke-Bridge 'GET' '/state' @{ sections = 'stats' }).Json
                     $v = Get-StatValue $st $arg.name
                     $ok = Test-Compare $v $arg.op $arg.value; $detail = "$($arg.name)=$v (expected $($arg.op) $($arg.value))"
+                }
+                'markRespawnNeeds' {
+                    $before = (Invoke-Bridge 'GET' '/state' @{ sections = 'stats,consumption' }).Json
+                    $preDeathNeeds = Get-RespawnNeedsPercent $before
+                    $preDeathProjection = $before.consumption
+                    $detail = 'Before death: food={0:F2}%, water={1:F2}%' -f $preDeathNeeds.food,$preDeathNeeds.water
+                }
+                'expectRespawnNeeds' {
+                    if ($null -eq $preDeathNeeds) { throw 'No pre-death needs were recorded' }
+                    $samples = [Collections.Generic.List[object]]::new()
+                    $watch = [Diagnostics.Stopwatch]::StartNew()
+                    do {
+                        $sample = (Invoke-Bridge 'GET' '/state' @{ sections = 'stats,consumption' } $null 4).Json
+                        $projection = $sample.consumption.metabolism
+                        $samples.Add([pscustomobject]@{
+                            elapsedMs = $watch.ElapsedMilliseconds
+                            state = $sample.state
+                            needs = Get-RespawnNeedsPercent $sample
+                            owner = $sample.consumption.ownerEntityId
+                            sequence = $projection.sequence
+                            creation = $projection.creationId
+                        })
+                        if ($preDeathProjection.remote -and $watch.ElapsedMilliseconds -lt 3000) {
+                            Start-Sleep -Milliseconds 250
+                        }
+                    } while ($preDeathProjection.remote -and $watch.ElapsedMilliseconds -lt 3000)
+                    $first = $samples[0]
+                    $last = $samples[$samples.Count - 1]
+                    $after = $last.needs
+                    $samples.ToArray() | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $evidenceDir ('{0:D3}-respawn-needs.json' -f $i))
+                    $checks = foreach ($name in 'food','water') {
+                        $expected = [Math]::Max(80.0, $preDeathNeeds[$name])
+                        [pscustomobject]@{
+                            passed = [Math]::Abs($after[$name] - $expected) -le 1.0
+                            detail = '{0}={1:F2}% (expected {2:F2}% within 1 percentage point)' -f $name,$after[$name],$expected
+                        }
+                    }
+                    $freshProjection = !$preDeathProjection.remote -or (
+                        $last.owner -eq $preDeathProjection.ownerEntityId -and
+                        $preDeathProjection.metabolism.creationId -and
+                        $last.creation -eq $preDeathProjection.metabolism.creationId -and
+                        $last.sequence -gt $preDeathProjection.metabolism.sequence)
+                    $ok = $last.state -eq 'ingame' -and $freshProjection -and $false -notin $checks.passed
+                    $detail = 'First: food={0:F2}%, water={1:F2}%. Final: {2}. Fresh projection: {3}.' -f
+                        $first.needs.food,$first.needs.water,($checks.detail -join ', '),$freshProjection
                 }
                 'expectLivingEntities' {
                     $r = Invoke-Bridge 'GET' '/entities' @{ radius = $arg.radius; contains = $arg.contains }
@@ -1037,6 +1119,22 @@ function Invoke-TestFile([string] $file) {
                     $t = (Invoke-Bridge 'GET' '/target').Json.target
                     $name = "$($t.block.name) $($t.block.label) $($t.entity.class)"
                     $ok = $name -like "*$arg*"; $detail = "target: $($name.Trim())"
+                }
+                'expectNearbyBlockCount' {
+                    $r = Invoke-Bridge 'GET' '/findblocks' @{name=$arg.name;radius=$arg.radius;limit=15}
+                    Assert-TestResponseField $r 'count'
+                    $ok = $r.Json.count -eq [int]$arg.count
+                    $detail = "$($arg.name) matches: $($r.Json.count), expected $($arg.count)"
+                }
+                'expectNearbyEntityCount' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.contains) -or
+                        [double]$arg.radius -le 0 -or $null -eq $arg.count -or [int]$arg.count -lt 0) {
+                        throw 'expectNearbyEntityCount requires a class filter, positive radius, and nonnegative count.'
+                    }
+                    $r = Invoke-Bridge 'GET' '/entities' @{contains=$arg.contains;radius=$arg.radius;limit=15}
+                    Assert-TestResponseField $r 'count'
+                    $ok = $r.Json.count -eq [int]$arg.count
+                    $detail = "$($arg.contains) matches: $($r.Json.count), expected $($arg.count)"
                 }
                 'expectSkill' {
                     $r = Invoke-Bridge 'GET' '/state' @{ sections = 'skills' }

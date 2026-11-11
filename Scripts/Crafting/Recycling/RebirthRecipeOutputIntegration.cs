@@ -96,7 +96,7 @@ public static partial class RebirthRecipeOutputIntegration
     }
     internal static bool ReadReceipt(CraftCompleteData receipt,out IReadOnlyList<ItemStack> outputs)
     {
-        outputs=new List<ItemStack>();var value=receipt?.CraftedItemStack?.itemValue;
+        outputs=Array.Empty<ItemStack>();var value=receipt?.CraftedItemStack?.itemValue;
         if(value==null)return false;
         if(!value.HasMetadata(RebirthStationCompletionReceipt.Prefix+ReceiptField))return true; // Earlier receipts retain their exact primary-only semantics.
         if(!value.TryGetMetadata(RebirthStationCompletionReceipt.Prefix+ReceiptField,out string image)||image.Length>1048576)return false;

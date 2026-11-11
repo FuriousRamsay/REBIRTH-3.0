@@ -9,7 +9,7 @@ internal static class RebirthPurgeForestRoad
     private static World rejectedWorld;
     private static readonly List<Vector2> rejectedSites = new List<Vector2>();
     internal static void Reset()
-    {rejectedWorld=null;rejectedSites.Clear();cachedWorld=null;found=false;cached=SpawnPosition.Undef;roads=null;exclusions.Clear();}
+    {rejectedWorld=null;rejectedSites.Clear();cachedWorld=null;found=false;cached=cachedAnchor=SpawnPosition.Undef;roads=null;exclusions.Clear();}
     internal static void RejectSite(World world, Vector3 position)
     {
         if (!ReferenceEquals(rejectedWorld, world)) { rejectedWorld = world; rejectedSites.Clear(); }
@@ -22,7 +22,7 @@ internal static class RebirthPurgeForestRoad
             if (!RebirthPurgeStartPlacementPolicy.FarEnough(point.x - site.x, point.y - site.y)) return true;
         return false;
     }
-    private static World cachedWorld;private static SpawnPosition cached;private static bool found;
+    private static World cachedWorld;private static SpawnPosition cached,cachedAnchor;private static bool found;
     private static WorldGridCompressedData<byte> roads;
     private static readonly List<Rect> exclusions=new List<Rect>();
     // A bounded failed attempt is retried by the starter coordinator's five-
@@ -30,11 +30,15 @@ internal static class RebirthPurgeForestRoad
     internal static void RetryFailedSearch(World world)
     {if(ReferenceEquals(cachedWorld,world)&&!found)cachedWorld=null;}
     internal static bool Find(World world,out SpawnPosition position)
+        => Find(world,out position,out _,null);
+
+    internal static bool Find(World world,out SpawnPosition position,out SpawnPosition anchor,Predicate<SpawnPosition> available)
     {
-        position=SpawnPosition.Undef;
-        if(ReferenceEquals(cachedWorld,world)){position=cached;return found;}
+        position=anchor=SpawnPosition.Undef;
+        if(ReferenceEquals(cachedWorld,world)&&(!found||available==null||available(cached)))
+        {position=cached;anchor=cachedAnchor;return found;}
         if (!ReferenceEquals(rejectedWorld, world)) { rejectedWorld=world;rejectedSites.Clear(); }
-        cachedWorld=world;found=false;cached=SpawnPosition.Undef;
+        cachedWorld=world;found=false;cached=cachedAnchor=SpawnPosition.Undef;
         var provider=world?.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
         var biomes=provider?.GetBiomeProvider() as WorldBiomeProviderFromImage;
         var terrain=provider?.m_TerrainGenerator;
@@ -85,8 +89,10 @@ internal static class RebirthPurgeForestRoad
                     if(!clear)continue;
                     float y=terrain.GetTerrainHeightAt(Mathf.RoundToInt(centre.x),Mathf.RoundToInt(centre.y));
                     var candidate=new SpawnPosition(new Vector3(centre.x,y+.5f,centre.y),angle*22.5f);
-                    if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
-                    cached=candidate;found=true;position=cached;
+                    if(available!=null&&!available(candidate)||
+                        !PlayerAnchor(world,candidate,out var staged,requireRoad:true,requireForest:forestRoad)||
+                        !FootprintAvailable(world,provider,candidate))continue;
+                    cached=position=candidate;cachedAnchor=anchor=staged;found=true;
                     RebirthDebug.Log("purge", "[PurgeTruckStart] step=road.search.qualified-candidate "+(forestRoad?"forest road":"any road")+" clearance="+clearance+"m position="+cached.position+" heading="+cached.heading+" elapsedMs="+timer.ElapsedMilliseconds+" attempts="+(attempt+1));return true;
                 }
             }
@@ -99,8 +105,9 @@ internal static class RebirthPurgeForestRoad
             forest=road=settlement=run=slope=width=0;
         }
         BuildExclusions(decorator,ClearanceSteps[ClearanceSteps.Length-1]);
-        if(OffRoad(world,provider,biomes,terrain,random,true,timer,out position)||OffRoad(world,provider,biomes,terrain,random,false,timer,out position))
-        {cached=position;found=true;return true;}
+        if(OffRoad(world,provider,biomes,terrain,random,true,timer,available,out position,out anchor)||
+            OffRoad(world,provider,biomes,terrain,random,false,timer,available,out position,out anchor))
+        {cached=position;cachedAnchor=anchor;found=true;return true;}
         Log.Error("[PurgeTruckStart] step=site.search.failed elapsedMs="+timer.ElapsedMilliseconds+" (no road, forest or level spot qualified)");return false;
     }
     internal static bool Nearby(World world,Vector3 origin,float heading,float offset,out SpawnPosition candidate)
@@ -155,7 +162,7 @@ internal static class RebirthPurgeForestRoad
         }
         return true;
     }
-    internal static bool PlayerAnchor(World world,SpawnPosition truck,out SpawnPosition player)
+    internal static bool PlayerAnchor(World world,SpawnPosition truck,out SpawnPosition player,bool requireRoad=true,bool requireForest=true)
     {
         player=SpawnPosition.Undef;
         var provider=world?.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
@@ -168,8 +175,9 @@ internal static class RebirthPurgeForestRoad
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
         {
             int px=Mathf.RoundToInt(point.x)+x,pz=Mathf.RoundToInt(point.z)+z;
-            if(!Forest(map,px,pz)||!Road(map,px,pz))return false;
+            if(!Ground(map,px,pz,requireForest)||requireRoad&&!Road(map,px,pz))return false;
             float height=provider.m_TerrainGenerator.GetTerrainHeightAt(px,pz);
+            if(float.IsNaN(height)||float.IsInfinity(height))return false;
             low=Mathf.Min(low,height);high=Mathf.Max(high,height);
         }
         if(high-low>.45f)return false;
@@ -193,9 +201,10 @@ internal static class RebirthPurgeForestRoad
     }
     /// <summary>Owner fallback: a level spot clear of buildings, in pine forest first, then any biome.</summary>
     private static bool OffRoad(World world,ChunkProviderGenerateWorld provider,WorldBiomeProviderFromImage biomes,ITerrainGenerator terrain,
-        System.Random random,bool forestOnly,System.Diagnostics.Stopwatch timer,out SpawnPosition position)
+        System.Random random,bool forestOnly,System.Diagnostics.Stopwatch timer,Predicate<SpawnPosition> available,
+        out SpawnPosition position,out SpawnPosition anchor)
     {
-        position=SpawnPosition.Undef;
+        position=anchor=SpawnPosition.Undef;
         int margin=192,half=biomes.worldSizeHalf;long end=timer.ElapsedMilliseconds+1500;
         for(int attempt=0;attempt<200000;attempt++)
         {
@@ -211,8 +220,10 @@ internal static class RebirthPurgeForestRoad
             }
             if(high-low>.6f)continue;
             var candidate=new SpawnPosition(new Vector3(x,terrain.GetTerrainHeightAt(x,z)+.5f,z),heading);
-            if(!PlayerAnchor(world,candidate,out _)||!FootprintAvailable(world,provider,candidate))continue;
-            position=candidate;
+            if(available!=null&&!available(candidate)||
+                !PlayerAnchor(world,candidate,out var staged,requireRoad:false,requireForest:forestOnly)||
+                !FootprintAvailable(world,provider,candidate))continue;
+            position=candidate;anchor=staged;
             RebirthDebug.Log("purge", "[PurgeTruckStart] step=site.fallback "+(forestOnly?"off-road forest":"any biome")+" position="+candidate.position+" heading="+heading+" attempts="+(attempt+1)+" (no qualifying forest road)");
             return true;
         }

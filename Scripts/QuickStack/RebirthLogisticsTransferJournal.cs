@@ -392,8 +392,8 @@ internal static class RebirthLogisticsTransferJournal
             string archive=ArchiveFor(path);
             if(File.Exists(archive))
             {
-                if(!TryRead(record.Owner,record.Operation,out var completed)||completed.Phase!=4||Encode(completed)!=document.ToString(SaveOptions.DisableFormatting))return false;
-                return Current();
+                if(!TryRead(record.Owner,record.Operation,out var completed)||completed.Phase!=4||Encode(completed)!=document.ToString(SaveOptions.DisableFormatting)||!Current())return false;
+                RebirthLogisticsHeaderAdmission.ArchiveCompletedTransfer(completed);return true;
             }
             if(File.Exists(path))
             {
@@ -405,7 +405,10 @@ internal static class RebirthLogisticsTransferJournal
             {var bytes=Encoding.UTF8.GetBytes(document.ToString(SaveOptions.DisableFormatting));stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
             if(!Current()||!RebirthDurableFileCommit.TryPublish(temp,path,out _))return false;
             if(!Current()||!XNode.DeepEquals(document,Write(Read(ReadFile(path)))))return false;
-            ArchiveTerminal(path,document);return Current();
+            ArchiveTerminal(path,document);
+            if(!Current())return false;
+            if(record.Phase==4)RebirthLogisticsHeaderAdmission.ArchiveCompletedTransfer(record);
+            return true;
         }
         catch(Exception error){Log.Warning("[QuickStack] Original logistics journal retained/refused: "+error.Message);return false;}
         finally{writing=false;}

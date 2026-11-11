@@ -1,0 +1,59 @@
+{
+  "name": "p23_dedicated_purge_map_publication",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable dedicated Purge. Start with one authenticated client in a real discovered/uncleared POI. Independently capture authority with rbpurgetestobserve player ID. Use this native client scenario before and after one real room/actor change and keep the raw projection replies. The host-only expectPurge step is intentionally absent on remote. Inspect exact world/session/nonce/sequence and page counts from transport capture separately; remote projection lists the first 64 map rows only."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "TotalVolumesValue",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "id": "TotalEntitiesValue"
+      }
+    },
+    {
+      "console": "rbpurgetestobserve projection"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "M"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "map"
+    },
+    {
+      "screenshot": "p23_dedicated_map_existing_visible"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "console": "rbpurgetestobserve projection"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Re-run after a known scanner-only change and authentic same-process rejoin, and compare authority/client rows and visible hover. True removed-key snapshot and two-peer lag require separate exact fixture. Record the actually admitted packet shape, not an inferred delta from visible text."
+    }
+  ]
+}

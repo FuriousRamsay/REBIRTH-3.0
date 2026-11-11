@@ -93,11 +93,20 @@ internal sealed class RebirthRemoteResourceAdmission:IDisposable
     }
     private bool BeginIdentity(IRemoteResourceSource source)
     {
-        if(!Eligible(source))return false;expires=DateTime.UtcNow.AddSeconds(30);
+        if(!Eligible(source))
+        {
+            RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] source identity eligibility changed operation={operation:N} source={source.StableId}");
+            return false;
+        }
+        expires=DateTime.UtcNow.AddSeconds(30);
         if(source is StaticContainerResourceSource container&&container.NativeTile is TileEntityComposite tile)
         {
             string token=tile.GetFeature<TEFeatureRebirthContainerName>()?.Incarnation;
-            if(!RebirthRemoteResourceNativeBinding.TryResolve(world,source.StableId,source.Kind,token,out var binding))return false;
+            if(!RebirthRemoteResourceNativeBinding.TryResolve(world,source.StableId,source.Kind,token,out var binding))
+            {
+                RebirthDebug.Log("remoteresources", $"[REBIRTH RemoteCraft] source identity binding unavailable operation={operation:N} source={source.StableId} tokenPresent={!string.IsNullOrEmpty(token)}");
+                return false;
+            }
             var witness=RebirthRemoteResourceNativePublication.Begin(binding,()=>Eligible(source));watch=witness;saved=()=>witness?.Saved()==true;tokens[source.StableId]=token;native[source.StableId]=tile;return witness!=null;
         }
         if(source is WorkstationOutputResourceSource station)

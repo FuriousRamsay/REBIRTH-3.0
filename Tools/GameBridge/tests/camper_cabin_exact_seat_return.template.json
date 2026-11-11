@@ -1,0 +1,15 @@
+{
+  "name": "camper_cabin_exact_seat_return",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Disposable Purge. Before running, physically board the actual current owned camper seat from the approved Camp floor, rear entry floor or connecting ramp and confirm its exact capture and commit logs. This scenario begins seated, in Camp, in the same native world and camper entity. Open no menu, leave Guard enabled, and capture local position and native membership before boarding. Set the diagnostic with the Game Bridge setcvar command before this scenario and restore the prior value after the scenario. Prepare separate blocked and exterior controls without moving the saved point by a debug warp."},
+    {"expectCvar":{"name":"$rebirthCamperSeatReturnDebug","op":">","value":0}},
+    {"key":{"name":"E"}},
+    {"expectLog":{"contains":"[REBIRTH Camper Seat Return] player=@ACTOR_ENTITY@ @EXIT_STAGE@","min":1}},
+    {"screenshot":"camper_cabin_native_exit"},
+    {"action":{"command":"state","args":{"sections":"player,world"}}},
+    {"expectNoErrors":true},
+    {"_note":"Use exact EXIT_STAGE stage=returned for the clear cabin control, stage=exit-native capsule blocked= for a solid blocker in the upright capsule, and stage=exit-native no committed interior point for exterior boarding or post-reload. Confirm the position and native detach separately. A log from another rider or earlier run cannot count. Real multiplayer uses the authentic local client and host position observation after native sync."}
+  ]
+}
+

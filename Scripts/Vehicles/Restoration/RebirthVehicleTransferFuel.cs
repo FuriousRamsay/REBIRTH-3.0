@@ -11,6 +11,11 @@ public sealed class RebirthVehicleTransferFuel
     public float BeforeLevel { get; private set; }
     public float AfterLevel { get; private set; }
     public float Capacity { get; private set; }
+
+    // Compare the same single-precision value that assembly serialization stores.
+    internal static float AssemblyFraction(float level, float capacity) =>
+        (float)((double)level / capacity);
+
     public RebirthVehicleTransferFuel(float beforeLevel, float afterLevel, float capacity)
     {
         if (!Finite(beforeLevel) || !Finite(afterLevel) || !Finite(capacity) || capacity <= 0f

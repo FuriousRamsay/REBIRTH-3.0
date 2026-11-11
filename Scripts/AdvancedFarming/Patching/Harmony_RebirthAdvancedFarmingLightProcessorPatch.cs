@@ -167,7 +167,8 @@ public static class Harmony_RebirthAdvancedFarmingLightProcessorPatch
     private static byte RefreshLightAtLocalPosPatched(LightProcessor processor, Chunk c, int x, int y, int z, Chunk.LIGHT_TYPE type)
     {
         BlockValue currentValue = c.GetBlock(x, y, z);
-        int baseOpacity = currentValue.Block != null ? currentValue.Block.lightOpacity : 0;
+        Block currentBlock = currentValue.Block;
+        int baseOpacity = currentBlock != null ? currentBlock.lightOpacity : 0;
         if (baseOpacity == byte.MaxValue)
         {
             c.SetLight(x, y, z, 0, type);

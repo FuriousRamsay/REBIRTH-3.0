@@ -4,6 +4,7 @@
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/items.xml"/>
   <include filename="_Wood/items.xml"/>
+  <include filename="_Workstations/shared_recipe_tools.xml"/>
 	  <conditional>
     <if cond="character_progression('Rebirth')">
       <include filename="_Rebirth/items_starter.xml"/>
@@ -151,10 +152,7 @@
   <include filename="_Vehicles/standard_items.xml"/>
   <include filename="_Seeker/items.xml"/>
   <!-- Full set bonuses are removed. -->
-  <remove xpath="/items/item//effect_group[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/items/item//triggered_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/items/item//passive_effect[requirement[@name='HasBuff' and contains(@buff,'SetBonus')]]" />
-  <remove xpath="/items/item//triggered_effect[contains(@buff,'SetBonus')]" />
+  <remove xpath="/items/item//*[self::effect_group or self::triggered_effect or self::passive_effect][requirement[@name='HasBuff' and contains(@buff,'SetBonus')]] | /items/item//triggered_effect[contains(@buff,'SetBonus')]" />
   <include filename="_ArmorBonuses/items.xml"/>
   <include filename="_Workstations/ported_station_items.xml"/>
   <include filename="_Workstations/mind_control_items.xml"/>

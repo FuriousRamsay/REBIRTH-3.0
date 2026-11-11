@@ -813,10 +813,9 @@ public static class RebirthNpcPersistenceCoordinator
                 error = string.Empty;
                 CleanupPreSaveSnapshot(preSave);
                 preSave = null;
-                // Observation failure does not undo a positively committed save.
-                // It refuses later quarantine admission rather than guessing old
-                // custody from the newly selected world's paths.
-                if(!RebirthNpcSaveQuarantineCapture.RememberCurrent(out var transitionError))
+                // Only a world switch in this process can use the transition snapshot.
+                if (!GameManager.Instance.IsQuitting &&
+                    !RebirthNpcSaveQuarantineCapture.RememberCurrent(out var transitionError))
                     Log.Warning("[REBIRTH NPC] Original save transition capture retained unavailable: "+transitionError);
                 return true;
             }

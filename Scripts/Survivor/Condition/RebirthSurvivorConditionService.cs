@@ -136,12 +136,15 @@ public static class RebirthSurvivorConditionService
         RebirthWorldCharacterService.TryGetMetabolism(player, out metabolism);
         bool visibleChanged = RebirthTraitSupportService.Tick(player, record, elapsed);
         RebirthStressService.Tick(player,record,elapsed);
-        visibleChanged |= RebirthMoodService.Tick(player, record, metabolism, elapsed);
-        visibleChanged |= RebirthHealthCapacityService.Tick(player, record, elapsed);
+        var inputs = new RebirthConditionResolver.NativeInputs(player);
+        var resolved = RebirthConditionResolver.Resolve(player, record, metabolism, inputs);
+        visibleChanged |= RebirthMoodService.Tick(record, resolved, elapsed);
+        visibleChanged |= RebirthHealthCapacityService.Tick(player, record, elapsed, inputs, resolved);
+        // Publish the new mood and capacity using the same native condition sample.
         if (!string.IsNullOrEmpty(record.StablePlayerKey))
-            ResolvedByStableKey[record.StablePlayerKey] = RebirthConditionResolver.Resolve(player, record, metabolism);
+            ResolvedByStableKey[record.StablePlayerKey] = RebirthConditionResolver.Resolve(player, record, metabolism, inputs);
         // Track condition mutations immediately; packet throttling must not hide them from shutdown persistence.
-        RebirthWorldCharacterService.MarkDirty(record, "condition-active-tick");
+        record.Touch("condition-active-tick", requiresDurability: false);
         clock.UnsyncedSeconds += elapsed;
         if (clock.UnsyncedSeconds < RebirthConditionRuntimeConfig.OwnerSyncSeconds && !visibleChanged) return;
         if (clock.UnsyncedSeconds < RebirthConditionRuntimeConfig.OwnerSyncSeconds) return;

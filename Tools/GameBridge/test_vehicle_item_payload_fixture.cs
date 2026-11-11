@@ -85,6 +85,17 @@ bool missingFuel=false;try{RebirthVehicleTransferPlanner.Siphon(Guid.NewGuid(),p
 var emptyFuel=siphonBefore.DeepClone();emptyFuel.FuelPercent=0f;bool emptySiphon=false;try{RebirthVehicleTransferPlanner.Siphon(Guid.NewGuid(),plan.CreationId,"owner","empty",blockTarget,emptyFuel,emptyFuel.Revision);}catch(InvalidDataException){emptySiphon=true;}if(!emptySiphon)throw new Exception("Empty fuel credit created");
 var refillBefore=plan.ReadBefore();refillBefore.FuelPercent=0f;var gasDebit=new RebirthVehicleTransferItem(Guid.NewGuid(),true,"full-native-item",2500,RebirthVehiclePartSourceLocation.Backpack,0);var refill=RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(),plan.CreationId,"owner","refill",entityTarget,refillBefore,refillBefore.Revision,"ammoGasCan",0f,400f,new[]{gasDebit});if(refill.Fuel.AfterLevel!=100f||refill.ReadAfter().FuelPercent!=.25f||refill.Items[0].ReceiptId!=gasDebit.ReceiptId||refillBefore.FuelPercent!=0f)throw new Exception("Native refill cap/identity incorrect");
 var smallDebit=new RebirthVehicleTransferItem(Guid.NewGuid(),true,"full-native-item",10,RebirthVehiclePartSourceLocation.Toolbelt,1);var smallRefill=RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(),plan.CreationId,"owner","partial refill",entityTarget,refillBefore,refillBefore.Revision,"ammoGasCan",0f,40f,new[]{smallDebit});if(smallRefill.Fuel.AfterLevel!=.4f)throw new Exception("Partial refill arithmetic incorrect");
+const float drivenTankLevel = 398.7671f;
+const float tankCapacity = 400f;
+var drivenTank = refillBefore.DeepClone();
+drivenTank.FuelPercent = RebirthVehicleTransferFuel.AssemblyFraction(drivenTankLevel, tankCapacity);
+var drivenDebit = new RebirthVehicleTransferItem(Guid.NewGuid(), true, "full-native-item", 25, RebirthVehiclePartSourceLocation.Backpack, 0);
+var drivenRefill = RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(), plan.CreationId, "owner",
+    "driven partial tank", entityTarget, drivenTank, drivenTank.Revision, "ammoGasCan", drivenTankLevel, tankCapacity, new[]{drivenDebit});
+var restoredRefill = RebirthVehicleTransferPlan.Read(drivenRefill.ToXml());
+if (restoredRefill.Fuel.BeforeLevel != drivenTankLevel || restoredRefill.Fuel.AfterLevel != drivenTankLevel + 1f ||
+    restoredRefill.Items.Single().Count != 25 || restoredRefill.AfterPayload != drivenRefill.AfterPayload)
+    throw new Exception("Driven partial tank did not preserve its exact fuel and debit across serialization.");
 bool oversizedRefill=false;try{RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(),plan.CreationId,"owner","overflow refill",entityTarget,refillBefore,refillBefore.Revision,"ammoGasCan",0f,40f,new[]{gasDebit});}catch(InvalidDataException){oversizedRefill=true;}if(!oversizedRefill)throw new Exception("Overtank debit accepted");
 bool mixedRefill=false;try{RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(),plan.CreationId,"owner","mixed",entityTarget,refillBefore,refillBefore.Revision,"ammoGasCan",0f,400f,new[]{gasDebit,smallDebit});}catch(InvalidDataException){mixedRefill=true;}if(!mixedRefill)throw new Exception("Mixed inventory native policy ignored");
 bool wrongFuel=false;try{RebirthVehicleTransferPlanner.Refuel(Guid.NewGuid(),plan.CreationId,"owner","wrong item",entityTarget,refillBefore,refillBefore.Revision,"wrongFuel",0f,40f,new[]{smallDebit});}catch(InvalidDataException){wrongFuel=true;}if(!wrongFuel)throw new Exception("Wrong native fuel accepted");
@@ -117,6 +128,28 @@ receipts[debit.ReceiptId]=RebirthVehicleOwnerTransferResult.Pending;receipts[sec
 if(RebirthVehicleTransferRecovery.Next(multi,held,receipts,false,out next)!=RebirthVehicleTransferStep.ApplyDebitBatch||next!=Guid.Empty)throw new Exception("Multi-debit dispatched one receipt");IReadOnlyList<RebirthVehicleTransferItem> debitBatch;if(!RebirthVehicleTransferRecovery.TryGetDebitBatch(multi,out debitBatch)||debitBatch.Count!=2||debitBatch[0].ReceiptId!=debit.ReceiptId||debitBatch[1].ReceiptId!=secondDebit.ReceiptId)throw new Exception("Debit batch lost custody");
 receipts[debit.ReceiptId]=RebirthVehicleOwnerTransferResult.Applied;if(RebirthVehicleTransferRecovery.Next(multi,held,receipts,false,out next)!=RebirthVehicleTransferStep.Reconcile)throw new Exception("Partly applied batch retried remainder");receipts[secondDebit.ReceiptId]=RebirthVehicleOwnerTransferResult.Applied;if(RebirthVehicleTransferRecovery.Next(multi,held,receipts,false,out next)!=RebirthVehicleTransferStep.ApplyAssembly)throw new Exception("Saved full batch repeated");
 held.FuelPercent=.9f;if(RebirthVehicleTransferRecovery.Next(plan,held,receipts,false,out next)!=RebirthVehicleTransferStep.Reconcile)throw new Exception("Changed assembly overwritten");
+var changedPart = plan.ReadBefore();
+changedPart.Parts["Engine"] = new RebirthInstalledVehiclePart { ItemName = "part", Quality = 4, SerializedItemValue = "different-native-part" };
+if (RebirthVehicleTransferRecovery.Next(plan, changedPart, receipts, false, out next) != RebirthVehicleTransferStep.Reconcile)
+    throw new Exception("Same-revision part change accepted.");
+var changedTransfer = plan.ReadBefore();
+changedTransfer.LastAppliedInventoryTransferId = Guid.NewGuid();
+if (RebirthVehicleTransferRecovery.Next(plan, changedTransfer, receipts, false, out next) != RebirthVehicleTransferStep.Reconcile)
+    throw new Exception("Same-revision transaction identity change accepted.");
+var earlyFuel = refill.ReadBefore();
+if (!RebirthVehicleTransferReservation.TryReserve(earlyFuel, refill.TransactionId, earlyFuel.Revision))
+    throw new Exception("Early fuel fixture could not reserve.");
+var earlyFuelReceipts = new Dictionary<Guid,RebirthVehicleOwnerTransferResult> { { gasDebit.ReceiptId, RebirthVehicleOwnerTransferResult.Applied } };
+if (RebirthVehicleTransferRecovery.Next(refill, earlyFuel, earlyFuelReceipts, false, out next, refill.Fuel.AfterLevel, refill.Fuel.Capacity)
+    != RebirthVehicleTransferStep.ApplyAssembly ||
+    RebirthVehicleTransferRecovery.Next(refill, earlyFuel, earlyFuelReceipts, false, out next, refill.Fuel.AfterLevel, refill.Fuel.Capacity + 1f)
+    != RebirthVehicleTransferStep.Reconcile)
+    throw new Exception("Exact early fuel evidence changed.");
+var earlyHealth = repairPlan.ReadBefore();
+if (!RebirthVehicleTransferReservation.TryReserve(earlyHealth, repairPlan.TransactionId, earlyHealth.Revision) ||
+    RebirthVehicleTransferRecovery.Next(repairPlan, earlyHealth, healthReceipts, false, out next, null, null, repairPlan.Health.After, repairPlan.Health.Maximum)
+    != RebirthVehicleTransferStep.ApplyAssembly)
+    throw new Exception("Exact early health evidence changed.");
 var tempSave=Path.Combine(Path.GetTempPath(),"rebirth-transfer-store-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(tempSave);string currentSave=tempSave;bool sessionActive=true;
 try {
 var store=new RebirthVehicleTransferPlanStore(tempSave,()=>currentSave,()=>sessionActive);if(store.Discover().Count!=0)throw new Exception("Fresh store not empty");store.Prepare(plan);store.Prepare(plan);if(store.Read(planId).Items.Count!=2)throw new Exception("Stored operations lost");
@@ -135,8 +168,48 @@ currentSave=tempSave+"-other";bool wrongWorld=false;try{store.Read(planId);}catc
 var storeDir=Path.Combine(tempSave,"RebirthVehicleTransfers");var interrupted=Path.Combine(storeDir,"interrupted.tmp");File.WriteAllText(interrupted,"partial");bool interruptedBlocked=false;try{store.Prepare(plan);}catch(InvalidDataException){interruptedBlocked=true;}if(!interruptedBlocked)throw new Exception("Interrupted write admitted");File.Delete(interrupted);
 var recordPath=Path.Combine(storeDir,planId.ToString("N")+".xml");File.WriteAllText(recordPath,"broken");bool corrupt=false;try{store.Prepare(plan);}catch(XmlException){corrupt=true;}if(!corrupt||File.ReadAllText(recordPath)!="broken")throw new Exception("Corrupt plan overwritten");
 bool corruptDiscovery=false;try{freshStore.Discover();}catch(XmlException){corruptDiscovery=true;}if(!corruptDiscovery)throw new Exception("Partial corrupt catalogue accepted");
+File.WriteAllText(recordPath, plan.ToXml().ToString());
+var completionDir = Path.Combine(tempSave, "RebirthVehicleTransferCompletion");
+if (store.HasCompletion(plan) || store.HasRejectedCompletion(plan) || Directory.Exists(completionDir))
+    throw new Exception("Absent terminal yielded evidence or initialized storage.");
+int jointReads = 0;
+if (store.TryComplete(plan, () => ++jointReads < 2) || jointReads != 2 || store.HasCompletion(plan))
+    throw new Exception("An interrupted exact joint proof released custody.");
+var completionJournal = new RebirthCamperTransferJournal(completionDir);
+if (completionJournal.Read(planId)?.State != RebirthCamperTransferJournal.Phase.Prepared)
+    throw new Exception("Unfinished terminal was lost.");
+jointReads = 0;
+if (!store.TryComplete(plan, () => { jointReads++; return true; }) || jointReads != 4 ||
+    !store.HasCompletion(plan) || store.HasRejectedCompletion(plan) || store.Discover().Count != 0)
+    throw new Exception("Exact applied terminal or final readback changed.");
+freshStore.Prepare(independent);
+if (!freshStore.TryComplete(independent, () => true, true) ||
+    !freshStore.HasCompletion(independent) || !freshStore.HasRejectedCompletion(independent) ||
+    freshStore.TryComplete(independent, () => true, false))
+    throw new Exception("Rejected terminal or its outcome changed.");
+var badId = Guid.NewGuid();
+var badBefore = plan.ReadBefore();
+var badAfter = badBefore.DeepClone();
+badAfter.Revision++;
+badAfter.LastAppliedInventoryTransferId = badId;
+var badTerminal = RebirthVehicleTransferPlan.Create(badId, plan.CreationId, "bad-terminal-owner", "bad-terminal", badBefore, badAfter);
+var badImage = Encoding.UTF8.GetBytes(badTerminal.ToXml().ToString(SaveOptions.DisableFormatting));
+completionJournal.Prepare(badId, badBefore.AssemblyId, badTerminal.OwnerScope, badBefore.Revision, badImage, badImage.Concat(new byte[] { 0, 0 }).ToArray());
+completionJournal.Advance(badId, RebirthCamperTransferJournal.Phase.Prepared, RebirthCamperTransferJournal.Phase.Uncertain);
+completionJournal.Advance(badId, RebirthCamperTransferJournal.Phase.Uncertain, RebirthCamperTransferJournal.Phase.Applied);
+if (store.HasCompletion(badTerminal) || store.HasRejectedCompletion(badTerminal))
+    throw new Exception("Noncanonical rejected suffix released custody.");
 
-} finally {var storeDir=Path.Combine(tempSave,"RebirthVehicleTransfers");if(Directory.Exists(storeDir)){foreach(var file in Directory.GetFiles(storeDir))File.Delete(file);Directory.Delete(storeDir);}Directory.Delete(tempSave);}
+} finally {
+    foreach (var subdirectory in new[] { "RebirthVehicleTransfers", "RebirthVehicleTransferCompletion" })
+    {
+        string storePath = Path.Combine(tempSave, subdirectory);
+        if (!Directory.Exists(storePath)) continue;
+        foreach (var file in Directory.GetFiles(storePath)) File.Delete(file);
+        Directory.Delete(storePath);
+    }
+    Directory.Delete(tempSave);
+}
 var reloaded=RebirthVehicleTransferPlan.Read(plan.ToXml());if(reloaded.TransactionId!=planId||reloaded.ReadAfter().LastAppliedInventoryTransferId!=planId)throw new Exception("Plan identity roundtrip");
 var invalid=plan.ToXml();invalid.Add(new XElement(invalid.Element("before")));bool malformedPlan=false;try{RebirthVehicleTransferPlan.Read(invalid);}catch(InvalidDataException){malformedPlan=true;}if(!malformedPlan)throw new Exception("Duplicate snapshot accepted");
 var wrongAfter=plan.ReadAfter();wrongAfter.AssemblyId=Guid.NewGuid();bool wrongIdentity=false;try{RebirthVehicleTransferPlan.Create(planId,Guid.NewGuid(),"owner","fingerprint",plan.ReadBefore(),wrongAfter);}catch(InvalidDataException){wrongIdentity=true;}if(!wrongIdentity)throw new Exception("Different assembly accepted");

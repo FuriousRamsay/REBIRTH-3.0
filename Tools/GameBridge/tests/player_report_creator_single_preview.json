@@ -1,0 +1,16 @@
+{
+  "name": "Survivor Creator shows one selected player model",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Start on Player Profile in a first-spawn Survivor Creator with stock profiles Allie and Chong visible. Review the screenshots for a single silhouette and the selected profile's appearance." },
+    { "expectWindowOpen": "rebirthSurvivorCreator" },
+    { "screenshot": "creator_initial_single_model" },
+    { "click": { "exactText": "Allie", "window": "rebirthSurvivorCreator" } },
+    { "wait": 1 },
+    { "screenshot": "creator_allie_single_model" },
+    { "click": { "exactText": "Chong", "window": "rebirthSurvivorCreator" } },
+    { "wait": 1 },
+    { "screenshot": "creator_chong_single_model" },
+    { "expectNoErrors": true }
+  ]
+}

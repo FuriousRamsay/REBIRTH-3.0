@@ -44,7 +44,8 @@ public static class AdvancedFarmingDoorVisualRefreshService
 
     public static void ClearPendingVisualRefreshes()
     {
-        _pending.Clear();
+        if (_pending.Count > 0)
+            _pending.Clear();
     }
 
     public static void QueueDoorVisualRefresh(Vector3i worldPos)

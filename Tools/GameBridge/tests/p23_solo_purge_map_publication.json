@@ -1,0 +1,137 @@
+{
+  "name": "p23_solo_purge_map_publication",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable solo Purge. Enter a real discovered/uncleared POI with stable scanner and matching published map. No supplied mock counter. Take a baseline run, make one real room/actor change, hold the same POI and repeat to compare two actual source revisions. Keep guard ON; maintain the stable fixture out of combat for each check."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "field": "scannerCurrent",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "mapRecordFound",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "mapRecord.state",
+            "op": "==",
+            "value": "Discovered"
+          },
+          {
+            "field": "mapRecord.poiKey",
+            "op": "==",
+            "expectedField": "scanner.poiKey"
+          },
+          {
+            "field": "mapRecord.epoch",
+            "op": "==",
+            "expectedField": "scanner.epoch"
+          },
+          {
+            "field": "mapRecord.areasLeft",
+            "op": "==",
+            "expectedField": "scanner.areasLeft"
+          },
+          {
+            "field": "mapRecord.estimatedEntities",
+            "op": "==",
+            "expectedField": "scanner.enemies"
+          },
+          {
+            "field": "mapRecord.approximate",
+            "op": "==",
+            "expectedField": "scanner.approximate"
+          }
+        ]
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "M"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "map"
+    },
+    {
+      "screenshot": "p23_solo_map_existing_visible"
+    },
+    {
+      "console": "rbpurgetestobserve projection"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "field": "scannerCurrent",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "mapRecordFound",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "mapRecord.state",
+            "op": "==",
+            "value": "Discovered"
+          },
+          {
+            "field": "mapRecord.poiKey",
+            "op": "==",
+            "expectedField": "scanner.poiKey"
+          },
+          {
+            "field": "mapRecord.epoch",
+            "op": "==",
+            "expectedField": "scanner.epoch"
+          },
+          {
+            "field": "mapRecord.areasLeft",
+            "op": "==",
+            "expectedField": "scanner.areasLeft"
+          },
+          {
+            "field": "mapRecord.estimatedEntities",
+            "op": "==",
+            "expectedField": "scanner.enemies"
+          },
+          {
+            "field": "mapRecord.approximate",
+            "op": "==",
+            "expectedField": "scanner.approximate"
+          }
+        ]
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Repeat separately after an exact epoch reset and native world switch, then inspect the screenshots for old icons. ResetPending is still a key. True removed-key, lag, and aborted-scan tests require separate validated disposable frames or an authentic known logical deletion. A stable native UI pass does not establish exact packet count."
+    }
+  ]
+}

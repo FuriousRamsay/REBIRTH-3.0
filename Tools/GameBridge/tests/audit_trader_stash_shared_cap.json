@@ -1,0 +1,35 @@
+{
+  "name": "Trader stash quote shares one stock cap across exact item variants",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Use the same disposable active trader and stash snapshot on the baseline and candidate. Prepare an almost-full capped type in more than one stash slot, differing wear or quality within a sellable type, a partial bundle, a sellable block and an unsellable item. Confirm exact native stock before capture. Open the real trader window through dialogue."
+    },
+    {
+      "expectWindowOpen": "trader"
+    },
+    {
+      "expectUi": {
+        "window": "trader",
+        "id": "sellBackpackTotal"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "trader"
+        }
+      }
+    },
+    {
+      "screenshot": "audit_trader_stash_shared_cap"
+    },
+    {
+      "_note": "Compare the captured total against the baseline with the same stock and player perks. Reopen or let another eligible player change the native trader's stock and repeat capture. The next quote must reflect current stock. Then press the real Sell All button on a fresh copy and compare actual Dukes, whole bundles and exact leftovers against baseline. Repeat with an authenticated dedicated client and a second owner when available."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

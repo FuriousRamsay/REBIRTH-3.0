@@ -67,6 +67,8 @@ internal static class RebirthStationScopedToolRedrawPatch
     {
         if (!RebirthStationScopedRedraw.Applies(__instance) || __instance.WorkstationData == null) return true;
         if (__instance.toolWindow != null) RebirthStationScopedRedraw.Refresh(__instance.toolWindow, __instance.WorkstationData.GetToolStacks());
+        if (__instance is XUiC_RebirthCookingStation cooking)
+            cooking.GetChildByType<XUiC_RebirthCookingWorkspace>()?.RefreshStationState();
         return false;
     }
 }

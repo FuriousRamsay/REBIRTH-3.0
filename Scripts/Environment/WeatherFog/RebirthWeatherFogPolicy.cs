@@ -30,10 +30,10 @@ public static class RebirthWeatherFogPolicy
                 target = 0f;
                 break;
             case RebirthWeatherFogBehavior.Static:
-                target = GetStaticTarget(intensity);
+                target = GetIntensityScale(intensity);
                 break;
             default:
-                target = Mathf.Clamp01(vanillaTarget * GetDynamicMultiplier(intensity));
+                target = Mathf.Clamp01(vanillaTarget * GetIntensityScale(intensity));
                 break;
         }
         return Mathf.Lerp(currentDensity, target, transition);
@@ -47,25 +47,9 @@ public static class RebirthWeatherFogPolicy
         return player != null && player.IsUnderwaterCamera;
     }
 
-    private static float GetDynamicMultiplier(RebirthWeatherFogIntensity value)
+    private static float GetIntensityScale(RebirthWeatherFogIntensity value)
     {
-        // Exact user-defined fog intensity scale. Dynamic mode multiplies the
-        // vanilla atmospheric target by the selected value.
-        switch (value)
-        {
-            case RebirthWeatherFogIntensity.None: return 0f;
-            case RebirthWeatherFogIntensity.VeryLow: return 0.10f;
-            case RebirthWeatherFogIntensity.Low: return 0.175f;
-            case RebirthWeatherFogIntensity.Normal: return 0.30f;
-            case RebirthWeatherFogIntensity.Heavy: return 0.45f;
-            case RebirthWeatherFogIntensity.VeryHeavy: return 0.60f;
-            default: return 0.30f;
-        }
-    }
-
-    private static float GetStaticTarget(RebirthWeatherFogIntensity value)
-    {
-        // Static mode uses the same exact scale as fixed fog-density targets.
+        // Static uses the scale directly. Dynamic multiplies the native target by it.
         switch (value)
         {
             case RebirthWeatherFogIntensity.None: return 0f;

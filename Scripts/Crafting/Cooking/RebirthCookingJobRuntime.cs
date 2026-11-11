@@ -16,6 +16,7 @@ public static class RebirthCookingJobRuntime
         public float NextUnlockNotice;
         public EntityPlayer Player;
         public RebirthWorldCharacterRecord Record;
+        public bool HasObservedStationJobs;
         public string Xml = "<jobs />";
         public long PositionRevision = -1L;
         public readonly Dictionary<string, string> Positions = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -67,7 +68,7 @@ public static class RebirthCookingJobRuntime
         float now = Time.realtimeSinceStartup;
         if (now < nextTick) return;
         nextTick = now + 1f;
-        var stations = new Dictionary<string, StationState>(StringComparer.Ordinal);
+        Dictionary<string, StationState> stations = null;
         var online = new HashSet<int>();
         RebirthCookingStationTracking.BeginFrame(world);
         try
@@ -94,13 +95,35 @@ public static class RebirthCookingJobRuntime
                         return RebirthWorldCharacterService.FlushPlayer(player,"recipe-unlock-notice");
                     },name=>GameManager.ShowTooltipMP(player,string.Format(Localization.Get("xuiRebirthRecipeUnlocked"),Localization.Get(name)),"ui_success"));
                 }
-                try { Observe(owner, stations, now); }
+                try
+                {
+                    var memory = record.Progression.Cooking;
+                    IList<string> tokens = memory.ActiveStationTokens();
+                    if (tokens.Count != 0)
+                    {
+                        owner.HasObservedStationJobs = true;
+                        if (stations == null) stations = new Dictionary<string, StationState>(StringComparer.Ordinal);
+                        Observe(owner, stations, memory, tokens, now);
+                    }
+                    else if (owner.HasObservedStationJobs)
+                    {
+                        owner.HasObservedStationJobs = false;
+                        owner.Xml = "<jobs />";
+                        owner.Seen.Clear();
+                        owner.FirstUnseen.Clear();
+                        owner.Positions.Clear();
+                        owner.PositionRevision = -1L;
+                    }
+                }
                 catch (Exception ex) { Log.Warning("[REBIRTH Cooking] job maintenance failed: " + ex.Message); }
             }
         }
         finally { RebirthCookingStationTracking.EndFrame(); }
-        var gone = new List<int>(); foreach (int id in Owners.Keys) if (!online.Contains(id)) gone.Add(id);
-        foreach (int id in gone) Owners.Remove(id);
+        List<int> gone = null;
+        foreach (int id in Owners.Keys)
+            if (!online.Contains(id)) (gone ??= new List<int>()).Add(id);
+        if (gone != null)
+            foreach (int id in gone) Owners.Remove(id);
     }
     private static StationState GetStation(Dictionary<string, StationState> stations, string position)
     {
@@ -132,11 +155,9 @@ public static class RebirthCookingJobRuntime
         }
         stations[position] = state; return state;
     }
-    private static void Observe(OwnerState owner, Dictionary<string, StationState> stations, float now)
+    private static void Observe(OwnerState owner, Dictionary<string, StationState> stations,
+        RebirthCookingMemory memory, IList<string> tokens, float now)
     {
-        RebirthCookingMemory memory = owner.Record.Progression.Cooking;
-        IList<string> tokens = memory.ActiveStationTokens();
-        if (tokens.Count == 0) { owner.Xml = "<jobs />"; owner.Seen.Clear(); owner.FirstUnseen.Clear(); owner.Positions.Clear(); owner.PositionRevision = memory.JobRevision; return; }
         if (owner.PositionRevision != memory.JobRevision || owner.Positions.Count > tokens.Count)
         {
             owner.Positions.Clear();

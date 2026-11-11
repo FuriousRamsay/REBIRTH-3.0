@@ -1,0 +1,69 @@
+{
+  "name": "p19_manual_and_auto_sip_projection",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge completed Survivor, one clean drink of known volume in held slot, another in sip slot. Setup auto-sip off, no pending fluid, native hydration initially high. Do not alter production saves. Use actual held Primary input, then separate authority-native autosip controls. Fill all @TOKENS@ from an observed baseline. Snapshot observes exact ml/ingestion; a successful input alone is insufficient."
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@HELD_SLOT@"
+        }
+      }
+    },
+    {
+      "console": [
+        "rbmet autosip off",
+        "rbliquidobserve"
+      ]
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@HELD_SECONDS@"
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "console": "rbliquidobserve"
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "stats,consumption"
+        }
+      }
+    },
+    {
+      "_note": "Review first and second native liquid snapshots for exact manual sip at high hydration. For auto boundary below/equal/above, establish each fixture with one native-equipped bottle, actual current+pending water, no active cooldown, then enable auto sip and observe authority. Use the unchanged mp018_hydration_native_live.py route to qualify actual settled original and bag/belt/volume result separately."
+    },
+    {
+      "console": "rbmet autosip on"
+    },
+    {
+      "wait": "@AUTOSIP_OBSERVE_SECONDS@"
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "stats,consumption"
+        }
+      }
+    },
+    {
+      "console": "rbliquidobserve"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -40,6 +40,11 @@ internal static class AdvancedFarmingHarvestReceipt
         foreach(var item in outputs)if(item==null||item.IsEmpty()||item.count<=0||item.count>1000000)throw new InvalidDataException();
         return outputs;
     }
+    private static bool MatchesAssignedOutput(ItemStack before,ItemStack after,ItemStack output)
+    {
+        return RebirthStationGridIngredients.IsSameStackSnapshot(after,output)||
+            !before.IsEmpty()&&after.CanStackWith(output)&&AdvancedFarmingHarvestAdmission.SameHarvestItem(after.itemValue,output);
+    }
     private static bool AssignedOutputs(AdvancedFarmingHarvestOwnerDelta.Plan plan,ItemStack[] outputs,bool complete)
     {
         var remaining=new ItemStack[outputs.Length];for(int i=0;i<outputs.Length;i++)remaining[i]=outputs[i].Clone();
@@ -54,7 +59,7 @@ internal static class AdvancedFarmingHarvestReceipt
                 for(int i=0;i<remaining.Length&&count>0;i++)
                 {
                     if(remaining[i].count<=0)continue;var candidate=remaining[i].Clone();candidate.count=1;
-                    if(!RebirthStationGridIngredients.IsSameStackSnapshot(identity,candidate))continue;
+                    if(!MatchesAssignedOutput(before[slot],identity,candidate))continue;
                     int taken=Math.Min(count,remaining[i].count);count-=taken;remaining[i].count-=taken;
                 }
                 if(count!=0)return false;
@@ -74,7 +79,7 @@ internal static class AdvancedFarmingHarvestReceipt
                 if(after[slot].IsEmpty())continue;int count=after[slot].count-(before[slot].IsEmpty()?0:before[slot].count);
                 var identity=after[slot].Clone();identity.count=1;
                 for(int i=0;i<remaining.Length&&count>0;i++)
-                {var candidate=remaining[i].Clone();candidate.count=1;if(!RebirthStationGridIngredients.IsSameStackSnapshot(identity,candidate))continue;int taken=Math.Min(count,remaining[i].count);count-=taken;remaining[i].count-=taken;}
+                {var candidate=remaining[i].Clone();candidate.count=1;if(!MatchesAssignedOutput(before[slot],identity,candidate))continue;int taken=Math.Min(count,remaining[i].count);count-=taken;remaining[i].count-=taken;}
                 if(count!=0)throw new InvalidDataException();
             }
         }
@@ -107,7 +112,9 @@ internal static class AdvancedFarmingHarvestReceipt
         if(plan.Operation!=r.Operation||plan.World!=r.World||plan.Owner!=r.Owner||plan.Creation!=r.Creation||plan.Deaths!=r.Deaths)throw new InvalidDataException();
         if(r.DropNativeGeneration<0)throw new InvalidDataException();bool drop=r.DropNativeGeneration>0;
         if(drop?(r.State!=Phase.Retired||!Digest(r.DropNativeDigest)||r.DropOutputDigest!=OutputDigest(OutputImage(Remaining(r)))):(r.DropNativeDigest!=string.Empty||r.DropOutputDigest!=string.Empty))throw new InvalidDataException();
-        if(!AssignedOutputs(plan,ReadOutputs(r.Outputs),r.State==Phase.Retired&&!drop)||Encode(r)!=image)throw new InvalidDataException();return r;
+        if(!AssignedOutputs(plan,ReadOutputs(r.Outputs),r.State==Phase.Retired&&!drop))
+            throw new InvalidDataException("Harvest outputs do not match the owner inventory additions.");
+        if(Encode(r)!=image)throw new InvalidDataException();return r;
     }
     private static bool Digest(string value)
     {if(value==null||value.Length!=64)return false;foreach(char c in value)if(!(c>='0'&&c<='9')&&!(c>='a'&&c<='f'))return false;return true;}

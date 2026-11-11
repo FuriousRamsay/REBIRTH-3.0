@@ -1,0 +1,78 @@
+{
+  "name": "p25_native_queue_timer_history",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, Guard ON, no UI. At native Workbench 18,45,995, stage one exact accepted Cooler with <=2 seconds left and every output slot occupied by a different nonstackable item. No existing Cooler. Capture authority queue/receipt and exact output-slot state."
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "queueCount",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "output",
+        "item": "cntCoolerVariantHelper",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "station": {
+        "x": 18,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "queueCount",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "output",
+        "item": "cntCoolerVariantHelper",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "station": {
+        "x": 18,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Then free one native output cell with the real UI, close it, compare one exact receipt and output from same paid row, with no extra debit or tool wear. Use the positive scope template for the one-output invariant after capacity changes. Run an empty native frame and a marked-recycler or managed-food same-frame carryover separately; record first timer, restored time, and reentrant station scope from native diagnostic."
+    }
+  ]
+}

@@ -545,6 +545,13 @@ public static class RemoteResourceRegistry
 
     public static List<IRemoteResourceSource> ResolveNearby(World world, EntityPlayer player, float radius, bool includeStatic, bool includeWorkstations, bool includeMobile)
     {
+        return ResolveNearby(world, player, radius, includeStatic, includeWorkstations, includeMobile, out _);
+    }
+
+    internal static List<IRemoteResourceSource> ResolveNearby(World world, EntityPlayer player, float radius,
+        bool includeStatic, bool includeWorkstations, bool includeMobile, out List<Entity> nearbyEntities)
+    {
+        nearbyEntities = null;
         List<IRemoteResourceSource> result = new List<IRemoteResourceSource>();
         if (world == null || player == null) return result;
         if (includeStatic)
@@ -560,16 +567,16 @@ public static class RemoteResourceRegistry
         if (includeMobile)
         {
             Bounds bounds = new Bounds(player.position, Vector3.one * radius * 2f);
-            List<Entity> entities = world.GetEntitiesInBounds(typeof(EntityAlive), bounds, new List<Entity>());
-            for (int i = 0; i < entities.Count; i++)
+            nearbyEntities = world.GetEntitiesInBounds(typeof(EntityAlive), bounds, new List<Entity>());
+            for (int i = 0; i < nearbyEntities.Count; i++)
             {
-                EntityVehicle vehicle = entities[i] as EntityVehicle;
+                EntityVehicle vehicle = nearbyEntities[i] as EntityVehicle;
                 if (vehicle != null && vehicle.bag != null && (vehicle.position - player.position).sqrMagnitude <= radius * radius)
                 {
                     result.Add(new VehicleResourceSource(vehicle));
                     continue;
                 }
-                EntityDrone drone = entities[i] as EntityDrone;
+                EntityDrone drone = nearbyEntities[i] as EntityDrone;
                 if (drone != null && drone.bag != null && (drone.position - player.position).sqrMagnitude <= radius * radius)
                     result.Add(new DroneResourceSource(drone));
             }
@@ -720,7 +727,11 @@ public sealed class StaticContainerResourceSource : IRemoteResourceSource
     private TileEntity TileEntity { get { return world != null ? world.GetTileEntity(position) : null; } }
     internal World NativeWorld=>world;
     internal TileEntity NativeTile=>TileEntity;
-    private TEFeatureStorage Loot { get { TEFeatureStorage value; TileEntity te = TileEntity; return te != null && te.TryGetSelfOrFeature<TEFeatureStorage>(out value) ? value : null; } }
+    private TEFeatureStorage Loot { get { return FindLoot(TileEntity); } }
+    private static TEFeatureStorage FindLoot(TileEntity tile)
+    {
+        return tile != null && tile.TryGetSelfOrFeature<TEFeatureStorage>(out var loot) ? loot : null;
+    }
     public string StableId { get { return RemoteResourceIdentity.Static(position); } }
     public string DisplayName
     {
@@ -742,8 +753,16 @@ public sealed class StaticContainerResourceSource : IRemoteResourceSource
     }
     public RemoteResourceSourceKind Kind { get { return RemoteResourceSourceKind.StaticContainer; } }
     public Vector3 Position { get { return position.ToVector3(); } }
-    public bool IsLoaded { get { TileEntity te = TileEntity; TEFeatureStorage loot = Loot; return te != null && RemoteResourceSourcePolicy.IsSupportedStatic(te, loot); } }
-    public bool IsBusy { get { TileEntity te = TileEntity; TEFeatureStorage loot = Loot; return te == null || loot == null || te.IsUserAccessing() || RemoteResourceAccess.IsServerBusy(loot); } }
+    public bool IsLoaded { get { TileEntity te = TileEntity; return te != null && RemoteResourceSourcePolicy.IsSupportedStatic(te, FindLoot(te)); } }
+    public bool IsBusy
+    {
+        get
+        {
+            TileEntity te = TileEntity;
+            TEFeatureStorage loot = FindLoot(te);
+            return loot == null || te.IsUserAccessing() || RemoteResourceAccess.IsServerBusy(loot);
+        }
+    }
     public bool IsActivated { get { return RemoteResourceStateStore.IsActivated(StableId); } }
     public bool IsExcluded { get { return RemoteResourceStateStore.IsExcluded(StableId); } }
     public ItemStack[] Slots { get { TEFeatureStorage loot = Loot; return loot != null ? loot.ItemGrid.items : null; } }

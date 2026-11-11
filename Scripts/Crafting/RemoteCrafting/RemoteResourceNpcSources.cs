@@ -207,12 +207,8 @@ public static class RemoteResourceSourceDiscovery
         if (!RemoteResourcesRuntimePolicy.Enabled || world == null || player == null || radius <= 0f)
             return new List<IRemoteResourceSource>();
         List<IRemoteResourceSource> result = RemoteResourceRegistry.ResolveNearby(
-            world, player, radius, true, true, true);
-        if (world == null || player == null || radius <= 0f) return result;
-
+            world, player, radius, true, true, true, out var entities);
         float radiusSq = radius * radius;
-        Bounds bounds = new Bounds(player.position, Vector3.one * radius * 2f);
-        List<Entity> entities = world.GetEntitiesInBounds(typeof(EntityAlive), bounds, new List<Entity>());
         for (int i = 0; i < entities.Count; i++)
         {
             EntityRebirthNPC npc = entities[i] as EntityRebirthNPC;

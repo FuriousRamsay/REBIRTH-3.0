@@ -65,8 +65,12 @@ internal static partial class RebirthNpcPendingAppearanceSnapshots
     internal static void Tick()
     {
         var world=GameManager.Instance?.World;if(world?.IsRemote()!=true)return;Scope(world);
+        if (Pending.Count == 0)
+        {
+            cursor = 0;
+            return;
+        }
         var rows=new List<Snapshot>(Pending.Values);
-        if(rows.Count==0){cursor=0;return;}
         int count=Math.Min(8,rows.Count),start=cursor%rows.Count;
         for(int i=0;i<count;i++){var snapshot=rows[(start+i)%rows.Count];if(DateTime.UtcNow>=snapshot.Retry)Apply(world,snapshot);}
         cursor=(start+count)%rows.Count;

@@ -1,0 +1,17 @@
+{
+  "name": "Equipped armor repair returns to its original slot",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in solo and dedicated Purge. Prepare a damaged equipped armor piece and one stack of compatible repair materials, then select the equipped piece in Character. Capture equipment and inventory before activating Repair."
+    },
+    { "action": { "command": "state", "args": { "sections": "equipment,inventory" } } },
+    { "click": { "text": "Repair" } },
+    { "wait": 12 },
+    { "action": { "command": "state", "args": { "sections": "equipment,inventory" } } },
+    {
+      "_note": "Verify the original slot holds the repaired piece, wear decreased, and no copy appeared in inventory. Repeat with a different piece equipped in that slot before completion, then with armor repaired directly from the backpack. Verify the replacement stays equipped and each repaired item is delivered once."
+    },
+    { "expectNoErrors": true }
+  ]
+}

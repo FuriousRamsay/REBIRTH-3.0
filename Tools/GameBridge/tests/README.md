@@ -100,6 +100,8 @@ Fence wear checks use read-only `blockdamage x=X y=Y z=Z` on loaded blocks. `mar
 | `waitFor` | `{ "waitFor": { "cvar": "myCVar", "op": ">=", "value": 1, "timeout": 30 } }` | the CVar reaches the condition before the timeout |
 | `expectCvar` | `{ "expectCvar": { "name": "myCVar", "op": "==", "value": 0 } }` | comparison holds (ops: `== != > >= < <=`) |
 | `expectStat` | `{ "expectStat": { "name": "food", "op": "<", "value": 50 } }` | stat (`health`, `stamina`, `food`, `water`) matches |
+| `markRespawnNeeds` | `{ "markRespawnNeeds": true }` | records nutrition and hydration immediately before the native death fixture |
+| `expectRespawnNeeds` | `{ "expectRespawnNeeds": true }` | records the first and subsequent samples after the fixture. Dedicated clients sample for three seconds and require a newer metabolism projection for the same survivor. Each final need must be within one percentage point of the higher of its recorded value and 80%. |
 | `expectBuff` / `expectNoBuff` | `{ "expectBuff": "buffWellFed" }` | buff is / is not active on the player |
 | `expectItem` | `{ "expectItem": { "name": "foodCanChili", "min": 1, "max": 5 } }` | toolbelt + backpack count is in range |
 | `expectNoItem` | `{ "expectNoItem": "foodCanChili" }` | count is 0 |
@@ -107,7 +109,7 @@ Fence wear checks use read-only `blockdamage x=X y=Y z=Z` on loaded blocks. `mar
 | `expectWindowOpen` | `{ "expectWindowOpen": "backpack" }` | the window is currently open |
 | `screenshot` | `{ "screenshot": "after_cooking" }` | PNG was written (path printed; open it to inspect visually) |
 | `expectLog` | `{ "expectLog": { "contains": "[REBIRTH", "level": "warning", "min": 2 } }` | at least `min` matching log lines appeared since the test started (default 1) |
-| `expectNoLog` | `{ "expectNoLog": { "contains": "task=break action=start" } }` | no matching log lines appeared since the test started |
+| `expectNoLog` | `{ "expectNoLog": { "contains": "task=break action=start" } }` | no matching log lines appeared since the test started. Optional `level` is the minimum severity. Use `error` to include errors and exceptions while excluding warnings. |
 | `expectNoErrors` | `{ "expectNoErrors": true }` | no error/exception log lines since the test started |
 
 The runner prints one `PASS`/`FAIL` line per step, then a one-line JSON summary (including any new
@@ -232,6 +234,18 @@ Camper progressive armor: camper_armor_damage_inspect.json inspects the existing
 
 Use `prepare_and_check_batches.ps1` before launch. `run_prepared_tests.ps1` defaults to preflight; `-Run` uses one loaded session, and `-Run -Launch` launches once. `-Case`, `-Group` and `-Ack` select fixture-qualified cases. The batch owns an exclusive in-game lease, so standalone scripts cannot interfere. Native guard stays on. Manual test recording is available through `record_gamebridge_manual.py`. See `_Documentation/GameBridge/PREPARED_BATCH_TESTING_20261018.md` for commands, evidence, limits and the coverage ledger. A category manifest is a selection catalog, not proof all its historical fixtures can run together. The external respawn watcher is retired.
 
+Group cases by the same build, game mode, save and compatible setup. Put ready, short cases first. Set `captureScreenshots` to `false` for a batch whose assertions only use native state. Keep visual cases in a separate batch when their screenshots require review.
+
+Use `-Run -Launch -QuitAfterBatch` to close a locally launched batch when the runner returns. The wrapper pins the launched session, requests a native quit only for the matching launcher-owned process and prints shutdown time separately. If custody is uncertain and the bridge refuses quit, use the batch report and its recovery control file to inspect the owned session.
+
+For the REBIRTH design audit, prepare and dry-run the Solo Purge and Dedicated Purge manifests once design and implementation are complete. Give each case an audit ID, expected native action, initial state, bounded wait, result checks and cleanup check. Put clean-profile, clean-world and second-player cases in separate batches when their prerequisites differ. Record launch, action and result times separately. Close each owned game process as soon as its batch finishes and keep the evidence from each completed case. Return to parked cases after the ready batches.
+
+Split final script preparation into the Solo retained-save batch, the Dedicated retained-save batch, and separate prerequisite-heavy cases. Prepare those scripts in parallel. Run the two retained batches first on the final pinned build and the shared disposable fixture for each mode. Start with Journal and Character before Map, then add qualified ordinary gameplay cases that leave the next case ready. Run save-and-reopen controls together after the compatible in-session cases. Keep cold Creator, first-world starter trucks, genuine later-player joins and fault injection in their own fixture groups.
+
+Check that PowerShell resolves each runner helper to its intended function and record the exact predicate or error when readiness fails. A bridge menu state can precede the real title controls, and a target label can appear beyond native activation reach. Wait for the actual control or actionable target before sending input.
+
+A case can use `"readyWhen": [{"path": ["surroundings", "count"], "equals": 0}]` to check a scalar from the existing `state` or `surroundings` observation before any case input. A missing or unequal field saves `prerequisites.json` and marks the case `PARKED`. The runner checks cursor and pending ownership before advancing. A case failure, timeout or uncertain ownership still stops later inputs. `PARTIAL_SELECTED` records a mix of passes and parked cases, and `PARKED` records a batch with only parked cases. Both require a follow-up to close the parked work.
+
 ### Camper presentation regression — authored 2026-10-21, NOT RUN
 
 `camper_presentation_regression_live.py` uses the parent-pinned authenticated session and exclusive run token, refuses any save except CodexTest, and saves every real input/observation reply. Parent must commit/push the integration before executing; this script neither builds nor launches.
@@ -273,3 +287,47 @@ Radial (native activation menu) steps, added 20261022:
 - `activateNearestEntity` accepts `command`; for NPC classes (npc*, *Survivor*, *SDCS*) it defaults to `talk` and goes through `radialSelect`. Other targets keep the plain E tap unless `command` is given.
 
 NPC gear observation (read-only, added 20261022): `npcgear [entity=ID]` (GET /npcgear) returns for each loaded human NPC: entityId, class, stableId, `rbNpcBirthEquipment` / `rbNpcBirthTries` / `rbNpcBirthPending`, toolbelt slots 0-9 and equipment slots (name, count, quality, useTimes, meta, encoded frame), bag used/capacity, lockpick count, and for slots 4/5 the live native frame next to the saved humanEquipment binding. Runner step `{ "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "name", "compare": "name" } }` asserts exactly one living NPC of the class, marker 1, tries 0, a weapon in slot 4 or 5 and no repeated item name across equipment + slots 4/5; `save` writes `out/npcgear/<name>.json`, `compare` requires the same per-slot summary.
+
+## Exact serving source regression
+
+Run only against an explicitly sealed disposable Rebirth Purge solo fixture. The standard Game Bridge JSON assertions compare aggregate carried counts. This verifier compares the selected native cell, both complete native grids, and authoritative source and intake evidence.
+
+The test operator owns the normal Game Bridge setup and game lifecycle. Start with no unresolved serving, a quiet live Guard, no unrelated item action, an empty cursor, and room for three servings. Supply one ordinary foodCanPasta stack. Right-drag half of it to an empty owned belt cell, place any real cursor remainder using normal UI input, and select that belt slot. Require both cells to share the exact native hash, type and seed. Keep that belt selected for both Backpack inputs. Use real native Tab, click, key and Primary actions.
+
+1. Select the actual Backpack cell. Click the press collider for the selected Use or Eat action once.
+2. Select the actual Backpack cell again. Press the displayed Use key once and retain its GUI D-Pad Left dispatch.
+3. Close Crafting and Backpack. Use the matching selected belt item once through Primary with a positive input-frame witness.
+
+For every gesture, capture state sections player,inventory,consumption before input, on the first changed native grid and again without another input. Capture one bounded authority rbconsumptiontrace snapshot before and after, and the ConsumeAnimation completion and DigestionAudit admit logs since the gesture's baseline. The verifier requires one matching event of each kind. Keep the UI selection, action response and exact current owner evidence.
+
+### Evidence layout
+
+Use one evidence directory. Supply a separate fixture seal JSON with keys entityId, gameName, ownerKey, worldKey, creationId, deaths and candidate. Pin the actual installed Debug DLL SHA-256 as candidate. The actor and candidate also appear in startup.json as actor and closed-preflight.json as pin. The former is the current native topology record. The latter is the actual candidate preflight receipt.
+
+Each case prefix is backpack-button, backpack-keybind or closed-toolbelt. Save the following suffixes as JSON.
+
+| Suffix | Native evidence |
+| --- | --- |
+| before, first-after, after-no-input | Raw state with both complete native inventory grids |
+| preflight | Exact current open window IDs in windows and initial playerConsumption domain in serving |
+| select-backpack | Backpack selection response with HTTP status and raw body, for the two Backpack cases |
+| action-control | Selected Use label, corresponding native background collider and displayed shortcut, for the two Backpack cases |
+| native-bindings | Raw /actions response for the keybind case |
+| use-once | Actual input path, HTTP status and raw response body |
+| trace-before, trace-after | Console snapshots with HTTP status and raw JSON response body |
+| serving-scope | Final playerConsumption domain, including validated durable stages if used |
+| intake, animation | Raw log replies for accepted DigestionAudit and native ConsumeAnimation completion |
+
+When the authority uses a durable source instead of a direct debit, pass --save-root for the exact disposable primary save. The verifier reads the operation's exact prepared XML only after the authority reports source-saved and ingestion-saved. It checks scope, binding, source count and encoded native item hash.
+
+~~~powershell
+py -3 Tools/GameBridge/tests/verify_serving_source_native.py --fixture-seal $seal --evidence $evidence
+~~~
+
+Use --case to check one captured gesture. The script only reads the supplied evidence and, when requested, the bound durable receipt. It does not start the game or generate any test state. Compare native Backpack, keyboard and held results separately. Water, retained serving, dedicated transport, death and reconnect are separate cases.
+
+## Athletics checkpoint scenario
+
+Use the same sealed disposable Purge actor and dry on-foot course in Solo and dedicated. Measure exact live Athletics and linked Constitution against the same saved character. Include two eligible fractional awards in the first window and an award after the next window starts. Require live owner publication through the existing cadence, a save at the original 30-second deadline, and no deadline extension from later ordinary awards. Capture disk writes separately from owner publication and any incidental save.
+
+Use a second case for a clean leave before the deadline, then reopen and compare the exact saved character. Capture an exact write refusal and bounded retry on a separate disposable run. Use distinct fixtures for skill or gear threshold crossings, milestone awards and a positively identified paid receipt. Each keeps its existing strict path. Preserve raw native movement, owner projection, save and receipt evidence for each case.

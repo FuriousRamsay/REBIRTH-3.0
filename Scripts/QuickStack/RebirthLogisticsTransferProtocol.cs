@@ -299,7 +299,14 @@ internal sealed class RebirthLogisticsCompositePublication:IDisposable
     private static bool installed;
     private World world;private TileEntityComposite tile;private TEFeatureStorage storage;private TEFeatureRebirthContainerName name;
     private string incarnation;private byte[] items;private bool[] locks;private Func<bool> current;private RebirthStationSnapshotEvidence.Request request;
-    private long offset=-1;private byte[] span;private DateTime expires;private bool closed;
+    private sealed class TileSpan
+    {
+        internal readonly long Offset;
+        internal readonly byte[] Bytes;
+        internal TileSpan(long offset,byte[] bytes){Offset=offset;Bytes=bytes;}
+    }
+    private TileSpan span;
+    private DateTime expires;private bool closed,publishedSpan;
     private bool Current()
     {
         if(closed||!ThreadManager.IsMainThread()||expires<=DateTime.UtcNow||current?.Invoke()!=true||!ReferenceEquals(GameManager.Instance?.World,world)||world.IsRemote()||
@@ -323,7 +330,12 @@ internal sealed class RebirthLogisticsCompositePublication:IDisposable
         for(int i=0;i<result.locks.Length;i++)result.locks[i]=nativeLocks!=null&&nativeLocks[i];
         result.current=()=>originalCurrent()&&ReferenceEquals(tile.GetChunk(),chunk)&&ReferenceEquals(world.GetChunkSync(chunk.X,chunk.Z),chunk)&&!chunk.InProgressUnloading&&
             ReferenceEquals(world.ChunkCache?.ChunkProvider,provider)&&ReferenceEquals(provider.m_RegionFileManager,regions)&&ReferenceEquals(regions.regionFileAccess,access)&&Path.GetFullPath(regions.saveDirectory)==directory;
-        if(!result.Current())return null;result.request=RebirthStationSnapshotEvidence.Watch(world,chunk,chunk.X,chunk.Z,result.Current,tile);if(result.request==null)return null;pending.Add(result);
+        if(!result.Current())return null;
+        var request=RebirthStationSnapshotEvidence.Watch(world,chunk,chunk.X,chunk.Z,result.Current,tile);
+        if(request==null)return null;
+        result.request=request;
+        request.OnPublished=(_,_)=>result.ObservePublishedSpan(request);
+        pending.Add(result);
         try
         {
             lock(chunk){if(!result.Current()||chunk.IsLocked||chunk.InProgressSaving||chunk.NeedsDecoration||chunk.InProgressDecorating||chunk.NeedsLightCalculation||chunk.InProgressLighting){result.Dispose();return null;}chunk.InProgressSaving=true;}
@@ -332,11 +344,15 @@ internal sealed class RebirthLogisticsCompositePublication:IDisposable
         }
         catch{result.Dispose();return null;}
     }
-    internal bool Saved()
+    private void ObservePublishedSpan(RebirthStationSnapshotEvidence.Request published)
     {
-        if(!Current()||span==null||!RebirthStationSnapshotEvidence.TryCopy(request,out var bytes)||!RebirthStationSnapshotEvidence.HasPublished(request)||offset<8||offset>bytes.Length-span.Length)return false;
-        for(int i=0;i<span.Length;i++)if(bytes[(int)offset+i]!=span[i])return false;return Current();
+        // Keep the exact persisted verdict before the native writer resets its pooled snapshot.
+        var exactSpan=System.Threading.Volatile.Read(ref span);
+        if(ReferenceEquals(request,published)&&exactSpan!=null&&
+            RebirthStationSnapshotEvidence.TryValidatePublishedSnapshotSpans(published,new[]{exactSpan.Offset},new[]{exactSpan.Bytes},out _))
+            System.Threading.Volatile.Write(ref publishedSpan,true);
     }
+    internal bool Saved()=>System.Threading.Volatile.Read(ref publishedSpan)&&Current();
     public void Dispose(){if(closed)return;closed=true;request?.Dispose();pending.Remove(this);}
     internal static void Install()
     {
@@ -357,7 +373,7 @@ internal sealed class RebirthLogisticsCompositePublication:IDisposable
             {
                 var stream=_bw.BaseStream;long end=stream.Position,length=end-__state;if(length<=0||length>512*1024||!stream.CanRead||!stream.CanSeek)return;
                 var bytes=new byte[(int)length];try{stream.Position=__state;int copied=0;while(copied<bytes.Length){int count=stream.Read(bytes,copied,bytes.Length-copied);if(count<=0)return;copied+=count;}}finally{stream.Position=end;}
-                item.offset=__state;item.span=bytes;
+                System.Threading.Volatile.Write(ref item.span,new TileSpan(__state,bytes));
             }}catch{ /* Failed evidence cannot change native persistence. */ }
         }
     }
@@ -502,7 +518,21 @@ internal sealed class RebirthLogisticsServerOperation:IDisposable
         ReferenceEquals(world.GetEntity(actor.entityId),actor)&&ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,manager)&&
         RebirthLogisticsOriginalTransport.TryCurrentPeer(actor,out var livePeer,out var liveConnection)&&ReferenceEquals(livePeer,peer)&&ReferenceEquals(liveConnection,connection)&&
         (RebirthLogisticsDeathSettlement.ActorCurrent(actor,record)||RebirthLogisticsDeathSettlement.MatchesPaidSourceContinuation(actor,record));
-    private bool Refresh()=>Current()&&RebirthLogisticsTransferJournal.TryRead(owner.StorageKey,operation,out record)&&RebirthLogisticsTransferJournal.ImmutablePlanDigest(record)==binding;
+    private bool Refresh()
+    {
+        if(!Current()||!RebirthLogisticsTransferJournal.TryRead(owner.StorageKey,operation,out var retained)||
+            RebirthLogisticsTransferJournal.ImmutablePlanDigest(retained)!=binding)return false;
+        record=retained;
+        return true;
+    }
+    // Current() needs the existing authenticated record throughout each protocol call.
+    // An out parameter can be cleared before that call checks its scope.
+    private bool Adopt(bool accepted,RebirthLogisticsTransferJournal.Record retained)
+    {
+        if(!accepted||retained==null)return false;
+        record=retained;
+        return true;
+    }
     internal static bool TryBind(EntityPlayer actor,RebirthLogisticsTransferJournal.Record original,out RebirthLogisticsServerOperation server)
     {
         server=null;
@@ -541,6 +571,9 @@ internal sealed class RebirthLogisticsServerOperation:IDisposable
     private bool Good(RebirthNpcInventoryTransactionResult value)=>value==RebirthNpcInventoryTransactionResult.Applied||value==RebirthNpcInventoryTransactionResult.Replayed;
     private bool NpcTranche()
     {
+        if (record.Npcs.Count == 0 && !record.Legs.Exists(leg => leg.Kind == RemoteResourceSourceKind.NpcStorage))
+            return true;
+
         var ids=new List<RebirthNpcStableId>();
         foreach(var npc in record.Npcs){if(!RebirthNpcStableId.TryParse(npc.StableId,out var id))return false;ids.Add(id);}
         foreach(var dog in record.Legs.Where(value=>value.Kind==RemoteResourceSourceKind.NpcStorage)){if(!RebirthLogisticsDogTransfer.Original(dog,out var id,out _))return false;ids.Add(id);}
@@ -573,17 +606,17 @@ internal sealed class RebirthLogisticsServerOperation:IDisposable
                 bool credit=stage==2;
                 foreach(string stableId in record.Npcs.Where(value=>value.Published<stage).Select(value=>value.StableId).ToArray())
                 {
-                    if(!RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,"N:"+stableId,true,credit,Current,out record)||!RebirthNpcStableId.TryParse(stableId,out var id)||
+                    if(!Adopt(RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,"N:"+stableId,true,credit,Current,out var attempted), attempted)||!RebirthNpcStableId.TryParse(stableId,out var id)||
                         !Good(RebirthNpcInventoryTransactionService.ApplyLogisticsOriginalPlan(actor,record,id,credit,authority.AuthorityKey,out _)))return false;
                     RebirthNpcInventoryPersistenceStore.Save();
-                    if(!RebirthLogisticsTransferProtocol.ConfirmNpcPublished(record,stableId,credit,Current,out record))return false;
+                    if(!Adopt(RebirthLogisticsTransferProtocol.ConfirmNpcPublished(record,stableId,credit,Current,out var published), published))return false;
                 }
                 foreach(string legId in record.Legs.Where(value=>value.Kind==RemoteResourceSourceKind.NpcStorage&&value.Published<stage).Select(value=>value.Id).ToArray())
                 {
-                    if(!RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,legId,false,credit,Current,out record)||
+                    if(!Adopt(RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,legId,false,credit,Current,out var attempted), attempted)||
                         !RebirthLogisticsDogTransfer.TryApply(actor,record,legId,credit,authority.AuthorityKey,Current,out _,out _))return false;
                     RebirthNpcAggregatePersistenceStore.Save();
-                    if(!RebirthLogisticsTransferProtocol.ConfirmDogPublished(record,legId,credit,Current,out record))return false;
+                    if(!Adopt(RebirthLogisticsTransferProtocol.ConfirmDogPublished(record,legId,credit,Current,out var published), published))return false;
                 }
             }
         }
@@ -592,21 +625,22 @@ internal sealed class RebirthLogisticsServerOperation:IDisposable
     private bool AbortPaid()
     {
         if(record.Npcs.Any(value=>value.Attempted!=0)||record.Legs.Any(value=>value.Attempted>1||value.Kind==RemoteResourceSourceKind.NpcStorage&&value.Attempted!=0))return false;
-        if(!record.Rejecting&&!RebirthLogisticsTransferProtocol.PreparePaidAbort(record,Current,out record))return false;
+        if(!record.Rejecting&&!Adopt(RebirthLogisticsTransferProtocol.PreparePaidAbort(record,Current,out var rejecting), rejecting))return false;
         if(!ReserveNative())return false;
         foreach(string id in record.Legs.Where(value=>value.Attempted>0&&!value.Restored).Select(value=>value.Id).ToArray())
         {
             var lease=native[id];
             if(!lease.TryObserveSaved(3)&&!lease.TryRestoreOriginalBefore())return false;
-            if(!RebirthLogisticsTransferProtocol.ConfirmRestoredLeg(record,id,lease,Current,out record))return false;
+            if(!Adopt(RebirthLogisticsTransferProtocol.ConfirmRestoredLeg(record,id,lease,Current,out var restored), restored))return false;
         }
-        return RebirthLogisticsTransferProtocol.ConfirmAbort(record,Current,out record);
+        return Adopt(RebirthLogisticsTransferProtocol.ConfirmAbort(record,Current,out var aborted), aborted);
     }
     internal bool RequestAbort()
     {
         if(!Refresh()||record.Phase>1)return false;
-        return string.IsNullOrEmpty(record.OwnerDebitProof)?RebirthLogisticsTransferProtocol.PrepareRejection(record,Current,out record):
-            RebirthLogisticsTransferProtocol.PreparePaidAbort(record,Current,out record);
+        return string.IsNullOrEmpty(record.OwnerDebitProof)
+            ? Adopt(RebirthLogisticsTransferProtocol.PrepareRejection(record,Current,out var unpaid), unpaid)
+            : Adopt(RebirthLogisticsTransferProtocol.PreparePaidAbort(record,Current,out var paid), paid);
     }
     internal bool Step(out RebirthLogisticsTransferJournal.Record original)
     {
@@ -619,42 +653,42 @@ internal sealed class RebirthLogisticsServerOperation:IDisposable
             {
                 if(!PreflightUnpaid())
                 {
-                    if(DateTime.UtcNow>=unpaidDeadline)RebirthLogisticsTransferProtocol.PrepareRejection(record,Current,out record);
-                    Refresh();original=record;return false;
+                    if(DateTime.UtcNow>=unpaidDeadline)Adopt(RebirthLogisticsTransferProtocol.PrepareRejection(record,Current,out var rejected), rejected);
+                    original=Refresh()?record:null;return false;
                 }
-                record.Phase=1;if(!RebirthLogisticsTransferJournal.TryPublish(record,Current)){Refresh();original=record;return false;}
+                record.Phase=1;if(!RebirthLogisticsTransferJournal.TryPublish(record,Current)){original=Refresh()?record:null;return false;}
                 original=record;return false;
             }
             if(record.Phase==1)
             {
                 if(record.Rejecting&&string.IsNullOrEmpty(record.OwnerDebitProof)&&RebirthLogisticsTransferProtocol.ConfirmNoEffect(owner,record,Current,out var unpaid))record=unpaid;
-                if(record.Phase==1&&string.IsNullOrEmpty(record.OwnerDebitProof)&&!RebirthLogisticsTransferProtocol.ConfirmOwnerDebit(owner,record,Current,out record)){Refresh();original=record;return false;}
+                if(record.Phase==1&&string.IsNullOrEmpty(record.OwnerDebitProof)&&!Adopt(RebirthLogisticsTransferProtocol.ConfirmOwnerDebit(owner,record,Current,out var paid), paid)){original=Refresh()?record:null;return false;}
                 if(record.Phase==1)
                 {
-                    if(record.Rejecting||record.Legs.Any(value=>value.Restored)){AbortPaid();Refresh();original=record;return false;}
+                    if(record.Rejecting||record.Legs.Any(value=>value.Restored)){AbortPaid();original=Refresh()?record:null;return false;}
                     if(!ReserveNative()){original=record;return false;}
                     foreach(string id in record.Legs.Where(value=>value.Kind!=RemoteResourceSourceKind.NpcStorage&&value.Published<1).Select(value=>value.Id).ToArray())
                     {
-                        if(!RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,id,false,false,Current,out record)||!native[id].ApplyStage(1)||
-                            !RebirthLogisticsTransferProtocol.ConfirmNativePublished(record,id,false,native[id],Current,out record)){Refresh();original=record;return false;}
+                        if(!Adopt(RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,id,false,false,Current,out var attempted), attempted)||!native[id].ApplyStage(1)||
+                            !Adopt(RebirthLogisticsTransferProtocol.ConfirmNativePublished(record,id,false,native[id],Current,out var published), published)){original=Refresh()?record:null;return false;}
                     }
                     if(!NpcTranche())
                     {
                         if(Refresh()&&record.Npcs.All(value=>value.Attempted==0)&&record.Legs.All(value=>value.Kind!=RemoteResourceSourceKind.NpcStorage||value.Attempted==0))AbortPaid();
-                        Refresh();original=record;return false;
+                        original=Refresh()?record:null;return false;
                     }
                     foreach(string id in record.Legs.Where(value=>value.Kind!=RemoteResourceSourceKind.NpcStorage&&value.Published<2).Select(value=>value.Id).ToArray())
                     {
-                        if(!RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,id,false,true,Current,out record)||!native[id].ApplyStage(2)||
-                            !RebirthLogisticsTransferProtocol.ConfirmNativePublished(record,id,true,native[id],Current,out record)){Refresh();original=record;return false;}
+                        if(!Adopt(RebirthLogisticsTransferProtocol.PrepareLegAttempt(record,id,false,true,Current,out var attempted), attempted)||!native[id].ApplyStage(2)||
+                            !Adopt(RebirthLogisticsTransferProtocol.ConfirmNativePublished(record,id,true,native[id],Current,out var published), published)){original=Refresh()?record:null;return false;}
                     }
-                    if(!RebirthLogisticsTransferProtocol.ConfirmEndpointsPublished(record,Current,out record)){Refresh();original=record;return false;}
+                    if(!Adopt(RebirthLogisticsTransferProtocol.ConfirmEndpointsPublished(record,Current,out var publishedEndpoints), publishedEndpoints)){original=Refresh()?record:null;return false;}
                 }
             }
-            if(record.Phase==2||record.Phase==3)RebirthLogisticsTransferProtocol.ConfirmOwnerCompletion(owner,record,Current,out record);
-            Refresh();original=record;if(record?.Phase==4){Dispose();return true;}return false;
+            if(record.Phase==2||record.Phase==3)Adopt(RebirthLogisticsTransferProtocol.ConfirmOwnerCompletion(owner,record,Current,out var completed), completed);
+            original=Refresh()?record:null;if(original?.Phase==4){Dispose();return true;}return false;
         }
-        catch(Exception error){Log.Warning("[QuickStack] Original transfer retained for reconciliation: "+error.Message);Refresh();original=record;return false;}
+        catch(Exception error){Log.Warning("[QuickStack] Original transfer retained for reconciliation: "+error.Message);original=Refresh()?record:null;return false;}
     }
     public void Dispose(){if(closed)return;foreach(var lease in native.Values)lease.Dispose();npcAdmission?.Dispose();closed=true;}
 }

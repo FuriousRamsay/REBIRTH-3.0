@@ -6,6 +6,7 @@ using System.Globalization;
 
 public static class RebirthSurvivorCreationValidator
 {
+    public const int MaxSelectedTraits = 10;
     public static bool SupportsCreationTraitTarget(string target)
     {
         string t=(target??string.Empty).Trim();
@@ -94,6 +95,7 @@ public static class RebirthSurvivorCreationValidator
             RebirthTraitDefinition t; if(!RebirthSurvivorDefinitionRegistry.TryGetTrait(id,out t)) { errors.Add(E(RebirthSurvivorCreationErrorCode.UnknownTrait,id,"")); continue; }
             selectedTraits.Add(t); normalizedTraitIds.Add(t.Id);
         }
+        if(selectedTraits.Count>MaxSelectedTraits) errors.Add(E(RebirthSurvivorCreationErrorCode.TooManyTraits,"",""));
 
         if(background!=null)
         {
@@ -118,15 +120,15 @@ public static class RebirthSurvivorCreationValidator
         }
 
         // Trait-point accounting must exactly match the creator UI: Background and Diet adjust the
-        // base allowance, positive Traits/Aptitudes spend points, and every selected negative Trait
+        // base allowance, positive and mixed Traits and Aptitudes spend points, and every selected negative Trait
         // refunds its authored value when max_negative_trait_refund is -1 (the current design).
         int points=bundle.Progression.BaseCreationPoints + (background!=null?background.CreationPointModifier:0) + (diet!=null?diet.Points:0);
         if(background!=null&&string.Equals(background.Id,RebirthSurvivorIds.BackgroundCleanSlate,StringComparison.OrdinalIgnoreCase)) points+=bundle.Progression.CleanSlateBonus;
         int positiveSpend=0,negativeRefundRequested=0;
         foreach(RebirthTraitDefinition t in selectedTraits)
         {
-            if(t.Polarity==RebirthTraitPolarity.Positive) positiveSpend+=t.Points;
-            else if(t.Polarity==RebirthTraitPolarity.Negative) negativeRefundRequested+=t.Points;
+            if(t.Polarity==RebirthTraitPolarity.Negative) negativeRefundRequested+=t.Points;
+            else positiveSpend+=t.Points;
         }
         int negativeRefundApplied=RebirthSurvivorTraitPointEconomy.ApplyNegativeRefund(bundle.Progression.MaxNegativeTraitRefund,negativeRefundRequested);
         points+=negativeRefundApplied-positiveSpend;

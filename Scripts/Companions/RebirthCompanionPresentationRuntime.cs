@@ -51,6 +51,21 @@ public static class RebirthCompanionCardStyleRuntime
 
 internal static class RebirthOwnedCompanionIndex
 {
+    private static float nextLocalRefresh;
+
+    internal static void RefreshLocalPresentation(EntityPlayerLocal player)
+    {
+        float now = Time.realtimeSinceStartup;
+        if (player == null || player.world == null || now < nextLocalRefresh) return;
+        nextLocalRefresh = now + 0.5f;
+
+        var companions = Snapshot(player);
+        RebirthCompanionColorService.RefreshLocalNavColors(player, companions);
+        RebirthCompanionCollisionService.RefreshOwnedCompanionPlayerCollision(player, companions);
+    }
+
+    internal static void ResetForWorldChange() => nextLocalRefresh = 0f;
+
     public static List<EntityAlive> Snapshot(EntityPlayer player)
     {
         var result=new List<EntityAlive>();var seen=new HashSet<int>();
@@ -61,12 +76,10 @@ internal static class RebirthOwnedCompanionIndex
         string ownerId;
         if(RebirthDogLifecycleService.TryResolveOwnerId(player,out ownerId)&&!string.IsNullOrEmpty(ownerId))
         {
-            RebirthNpcRuntimeState[] states=RebirthNpcRuntimeRegistry.GetSnapshot();
+            RebirthNpcRuntimeState[] states=RebirthNpcRuntimeRegistry.GetOwnedActiveSnapshot(ownerId);
             for(int i=0;i<states.Length;i++)
             {
                 RebirthNpcRuntimeState state=states[i];
-                if(state==null||state.Presence!=RebirthNpcPresenceState.Active||state.OwnershipKind!=RebirthNpcOwnershipKind.Player||
-                   !string.Equals(state.OwnerId??string.Empty,ownerId,StringComparison.OrdinalIgnoreCase))continue;
                 int entityId;if(RebirthNpcRuntimeRegistry.TryGetEntityId(state.StableId,out entityId))Add(player.world.GetEntity(entityId) as EntityAlive,result,seen);
             }
         }
@@ -127,7 +140,6 @@ public static class RebirthCompanionColorService
         new Color32(125, 210, 115, 255)
     };
 
-    private static float nextNavRefresh;
 
     public static Color GetColor(EntityAlive companion, EntityPlayerLocal localPlayer)
     {
@@ -151,13 +163,8 @@ public static class RebirthCompanionColorService
         ApplyNavColor(marker, GetDogColor(stableId));
     }
 
-    public static void RefreshLocalNavColors(EntityPlayerLocal player)
+    internal static void RefreshLocalNavColors(EntityPlayerLocal player, List<EntityAlive> entities)
     {
-        if (player == null || player.world == null || Time.realtimeSinceStartup < nextNavRefresh)
-            return;
-        nextNavRefresh = Time.realtimeSinceStartup + 0.5f;
-
-        List<EntityAlive> entities=RebirthOwnedCompanionIndex.Snapshot(player);
         for (int i = 0; i < entities.Count; i++)
         {
             EntityAlive alive=entities[i];
@@ -236,7 +243,6 @@ public static class RebirthCompanionColorService
     public static void ResetForWorldChange()
     {
         lock (Sync) AssignedSlots.Clear();
-        nextNavRefresh = 0f;
     }
 }
 
@@ -249,7 +255,6 @@ public static class RebirthCompanionCollisionService
 {
     private static readonly object Sync = new object();
     private static readonly HashSet<long> IgnoredEntityPairs = new HashSet<long>();
-    private static float nextLocalRefresh;
 
     public static void PrepareForRecall(EntityAlive companion, EntityPlayer owner)
     {
@@ -275,11 +280,8 @@ public static class RebirthCompanionCollisionService
         }
     }
 
-    public static void RefreshOwnedCompanionPlayerCollision(EntityPlayerLocal localPlayer)
+    internal static void RefreshOwnedCompanionPlayerCollision(EntityPlayerLocal localPlayer, List<EntityAlive> entities)
     {
-        if (localPlayer == null || localPlayer.world == null || Time.realtimeSinceStartup < nextLocalRefresh) return;
-        nextLocalRefresh = Time.realtimeSinceStartup + 0.5f;
-        List<EntityAlive> entities=RebirthOwnedCompanionIndex.Snapshot(localPlayer);
         for(int i=0;i<entities.Count;i++)IgnoreEntityPair(entities[i],localPlayer);
     }
 
@@ -364,7 +366,6 @@ public static class RebirthCompanionCollisionService
     public static void ResetForWorldChange()
     {
         lock (Sync) IgnoredEntityPairs.Clear();
-        nextLocalRefresh = 0f;
     }
 
     private static bool IsOwnedBy(EntityAlive entity, EntityPlayer owner)

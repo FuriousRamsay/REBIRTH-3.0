@@ -40,35 +40,98 @@ $deaths = 0
 $script:CurBowDrop = $BowDrop
 $script:CurLead = $Lead
 $summary = New-Object System.Collections.ArrayList
+$priorSession = $env:REBIRTH_BRIDGE_SESSION
+$priorReceipt = $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT
+$priorChores = $env:REBIRTH_BRIDGE_NOCHORES
+$script:watchdog = $null
+$script:profiler = $null
+$script:profilerStartUtc = $null
 
-# Watchdog: a screen the script does not know about (respawn, dead) must never eat hours unattended.
-#  - stuck on the respawn/dead screen for 25 s: click Spawn
-#  - no new line in the log for 8 minutes (long operations write heartbeat lines): stop the game so the run ends (the summary still prints)
-$watchdog = Start-Job -ScriptBlock {
-    param($gb, $log)
-    $badSince = $null
-    while ($true) {
-        Start-Sleep 20
-        $s = (& powershell -ExecutionPolicy Bypass -File $gb status 2>$null) -join ''
-        $state = if ($s -match '"state":"([a-z]+)"') { $Matches[1] } else { 'unknown' }
-        if ($state -eq 'spawning' -or $state -eq 'dead') {
-            if (-not $badSince) { $badSince = Get-Date }
-            if (((Get-Date) - $badSince).TotalSeconds -gt 25) {
-                ("{0:HH:mm:ss} WATCHDOG: stuck in '{1}' - clicking Spawn" -f (Get-Date), $state) | Add-Content $log
-                & powershell -ExecutionPolicy Bypass -File $gb click 'text=Spawn near my backpack' 2>$null | Out-Null
-                & powershell -ExecutionPolicy Bypass -File $gb click 'text=Spawn' 2>$null | Out-Null
-                $badSince = Get-Date
-            }
-        } else { $badSince = $null }
-        if (Test-Path $log) {
-            if (((Get-Date) - (Get-Item $log).LastWriteTime).TotalMinutes -gt 8) {
-                ("{0:HH:mm:ss} WATCHDOG: no progress for 8 minutes - stopping the game" -f (Get-Date)) | Add-Content $log
-                Get-Process 7DaysToDie -ErrorAction SilentlyContinue | Stop-Process -Force
-                Start-Sleep 60
+# Watch the pinned session. Only an eval-launched game can be asked to quit.
+function Stop-Watchdog {
+    if ($script:watchdog) {
+        Stop-Job $script:watchdog -ErrorAction SilentlyContinue
+        Remove-Job $script:watchdog -Force -ErrorAction SilentlyContinue
+        $script:watchdog = $null
+    }
+}
+
+function Start-Watchdog {
+    $script:watchdog = Start-Job -ScriptBlock {
+        param($gb, $log, $ownsGame)
+        $badSince = $null
+        while ($true) {
+            Start-Sleep 20
+            $s = (& powershell -ExecutionPolicy Bypass -File $gb status 2>$null) -join ''
+            $state = if ($s -match '"state":"([a-z]+)"') { $Matches[1] } else { 'unknown' }
+            if ($state -eq 'spawning' -or $state -eq 'dead') {
+                if (-not $badSince) { $badSince = Get-Date }
+                if (((Get-Date) - $badSince).TotalSeconds -gt 25) {
+                    ("{0:HH:mm:ss} WATCHDOG: stuck in '{1}' - clicking Spawn" -f (Get-Date), $state) | Add-Content $log
+                    & powershell -ExecutionPolicy Bypass -File $gb click 'text=Spawn near my backpack' 2>$null | Out-Null
+                    & powershell -ExecutionPolicy Bypass -File $gb click 'text=Spawn' 2>$null | Out-Null
+                    $badSince = Get-Date
+                }
+            } else { $badSince = $null }
+            if (((Get-Date) - (Get-Item -LiteralPath $log).LastWriteTime).TotalMinutes -gt 8) {
+                ("{0:HH:mm:ss} WATCHDOG: no progress for 8 minutes" -f (Get-Date)) | Add-Content $log
+                if ($ownsGame) { & powershell -ExecutionPolicy Bypass -File $gb quit 2>&1 | Add-Content -LiteralPath $log }
+                break
             }
         }
+    } -ArgumentList $gb, $log, (-not $NoLaunch)
+}
+
+function Invoke-EvalBridge {
+    param([string[]]$a)
+    $output = & powershell -ExecutionPolicy Bypass -File $gb @a 2>&1
+    if ($LASTEXITCODE -ne 0) { throw ("Game Bridge " + $a[0] + " failed: " + ($output -join ' ')) }
+    $output | Out-Host
+}
+
+function Confirm-EvalAttach([string]$configPath, [int]$expectedPid) {
+    $config = Get-Content -LiteralPath $configPath -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+    if ($config.save -cnotmatch '^(CodexTest|RebirthBridge)[A-Za-z0-9_-]*$' -or
+        [string]::IsNullOrWhiteSpace($config.world)) {
+        throw '-NoLaunch requires a configured disposable Bridge world and save.'
     }
-} -ArgumentList $gb, $log
+
+    $status = J (B 'status')
+    if ($status.state -cne 'ingame' -or $status.pid -ne $expectedPid) {
+        throw '-NoLaunch needs the selected live Bridge session in game.'
+    }
+
+    $role = (J (B 'call', 'GET', '/auditstate', 'domain=topology')).domains.topology
+    $state = J (B 'state', '-Sections', 'world')
+    if ($role.remote -ne $false -or $role.server -ne $true -or $role.dedicated -ne $false -or
+        $role.localActor -ne $true -or $role.connected -ne $false -or
+        $role.gameName -cne $config.save -or $state.state -cne 'ingame' -or
+        $state.world.gameName -cne $config.save -or $state.world.gameWorld -cne $config.world) {
+        throw '-NoLaunch needs the configured disposable world and save on the local authority.'
+    }
+}
+
+function Stop-EvalGame {
+    if ($NoLaunch -or -not $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT -or
+        -not (Test-Path -LiteralPath $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT)) { return }
+    Invoke-EvalBridge 'quit'
+}
+
+function Get-EvalPlayReport([string]$launchReceipt, [string]$profileOut, [int]$profilerPid, [datetime]$profilerStartUtc) {
+    try {
+        if ([IO.Path]::GetFileName($launchReceipt) -cnotmatch '^(combat-eval-[0-9a-f]{32})\.launch\.json\z') { return }
+        $expectedPath = [IO.Path]::GetFullPath((Join-Path $profileOut ('play_' + $Matches[1] + '.json')))
+        $owner = Get-Content -LiteralPath $launchReceipt -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $report = Get-Content -LiteralPath ($launchReceipt + '.play-report.json') -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $gamePid = [int]$owner.pid
+        if ($gamePid -le 0 -or [int]$report.gamePid -ne $gamePid -or
+            ([datetime]$report.gameStartUtc).ToUniversalTime().Ticks -ne ([datetime]$owner.processStartUtc).ToUniversalTime().Ticks -or
+            $profilerPid -le 0 -or [int]$report.profilerPid -ne $profilerPid -or
+            ([datetime]$report.profilerStartUtc).ToUniversalTime().Ticks -ne $profilerStartUtc.Ticks -or
+            $report.path -isnot [string] -or $report.path -ine $expectedPath -or -not [IO.File]::Exists($expectedPath)) { return }
+        return $report.path
+    } catch { return }
+}
 
 function Get-LoadErrors {
     if (-not (Test-Path $plog)) { return @() }
@@ -76,37 +139,39 @@ function Get-LoadErrors {
 }
 
 function Start-Game {
-    $env:REBIRTH_BRIDGE_NOCHORES = '1'     # no food/water/crafting chores at start: Prepare-Body tops everything up directly
+    if ($NoLaunch) { throw 'The existing session ended during -NoLaunch. Resume it manually before another eval.' }
+    Stop-Watchdog
+    Stop-EvalGame
+    if ($script:profiler -and -not $script:profiler.WaitForExit(20000)) { throw 'The previous eval profiler has not finished its report.' }
+    $env:REBIRTH_BRIDGE_NOCHORES = '1'
+    $env:REBIRTH_BRIDGE_SESSION = $null
+    $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = Join-Path $outDir ("combat-eval-{0}.launch.json" -f [guid]::NewGuid().ToString('N'))
     $script:arena = $null
     L 'launching the game with a fresh copy of the test save'
-    Get-Process 7DaysToDie -ErrorAction SilentlyContinue | Stop-Process -Force
-    Start-Sleep 3
     if ($Profile) {
-        # Reset the test save and build with the normal launcher, stop that game at once, then start it again under the profiler.
-        & powershell -ExecutionPolicy Bypass -File $gb launch -Reset -NoWait 2>&1 | Out-Null
-        Start-Sleep 5; Get-Process 7DaysToDie -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 5
-        Get-Process RebirthProfiler -ErrorAction SilentlyContinue | Stop-Process -Force
-        $pout = Join-Path $root 'Tools\Profiler\out'
-        $before = @(Get-ChildItem $pout -Filter 'profile_2026*.json' -ErrorAction SilentlyContinue | ForEach-Object Name)
-        Start-Process (Join-Path $root 'Tools\Profiler\bin\RebirthProfiler.exe') -ArgumentList '--launch', '--record=40', '--threads'
-        $deadline = (Get-Date).AddMinutes(8)
-        do { Start-Sleep 8; $st = B 'status' } until ($st -match '"state":"ingame"' -or (Get-Date) -gt $deadline)
-        $script:prof = Get-ChildItem $pout -Filter 'profile_2026*.json' -ErrorAction SilentlyContinue | Where-Object { $before -notcontains $_.Name } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-        L ('profiler attached, profile file: ' + $(if ($script:prof) { $script:prof.Name } else { 'NOT FOUND' }))
-        $out = ''
+        Invoke-EvalBridge 'build'
+        Invoke-EvalBridge 'reset-save'
+        $profilerExe = Join-Path $root 'Tools/Profiler/bin/RebirthProfiler.exe'
+        $script:profiler = Start-Process -FilePath $profilerExe -ArgumentList @('--launch','--keep-save','--record=40','--threads',
+            ('"--eval-launch-receipt=' + $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT + '"')) -WindowStyle Hidden -PassThru
+        $script:profilerStartUtc = $script:profiler.StartTime.ToUniversalTime()
+        $deadline = (Get-Date).AddSeconds(30)
+        while (-not (Test-Path -LiteralPath $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT)) {
+            if ($script:profiler.HasExited -or (Get-Date) -ge $deadline) { throw 'The eval profiler did not publish its owned launch receipt.' }
+            Start-Sleep -Milliseconds 250
+        }
+        Invoke-EvalBridge 'wait','-Timeout','480'
     } else {
-        $out = & powershell -ExecutionPolicy Bypass -File $gb launch -Reset 2>&1 | Out-String
+        Invoke-EvalBridge 'launch','-Reset'
     }
     $errs = Get-LoadErrors
     if ($errs) { L ('LOAD ERRORS (stopping): ' + ($errs -join ' | ')); throw 'load errors' }
     L 'in game, no load errors'
-    # No eating/drinking chores for these tests: food, water and coffee are topped up directly (Prepare-Body). Switch the
-    # instincts off at once and wait only for a chore that already started to finish.
-    B 'guard', 'enabled=0', 'heal=0', 'needs=0' | Out-Null
-    if (-not $NaturalSpawns) { B 'enemyspawns', 'on=0' | Out-Null }   # no sleepers/hordes/wanderers wandering into the tests; fights spawn their own zombies
+    if (-not $NaturalSpawns) { B 'enemyspawns', 'on=0' | Out-Null }
     for ($i = 0; $i -lt 25; $i++) { $g = B 'guard'; if ($g -notmatch '"busy":true') { break }; Start-Sleep 1 }
     Set-Conditions
     B 'console', 'killall' | Out-Null
+    Start-Watchdog
 }
 
 function Set-Kit {
@@ -290,7 +355,26 @@ function Run-Fight($label, [scriptblock]$spawn, $maxSeconds = 70, $radius = 30) 
 
 try {
     L ('variant: fight args = ' + ($FightArgs -join ' ') + ', when = ' + $When)
-    if (-not $NoLaunch) { Start-Game }
+    if ($NoLaunch) {
+        $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = $null
+        $discovery = if ($priorSession) { $priorSession } else { Join-Path $outDir 'session.json' }
+        $session = Get-Content -LiteralPath $discovery -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $pinned = Join-Path $session.outputDir 'session.json'
+        $pinnedSession = Get-Content -LiteralPath $pinned -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        foreach ($field in 'pid','port','token','processStartUtc','startedUtc','outputDir') {
+            if ([string]$session.$field -cne [string]$pinnedSession.$field) {
+                throw '-NoLaunch Bridge discovery changed before attachment.'
+            }
+        }
+        $env:REBIRTH_BRIDGE_SESSION = $pinned
+        if (-not $priorSession) { $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = Join-Path $outDir 'launch.json' }
+        Confirm-EvalAttach (Join-Path $PSScriptRoot 'gamebridge.config.json') $session.pid
+        $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = $null
+        Start-Watchdog
+    } else {
+        $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = $null
+        Start-Game
+    }
     Set-Kit
     $want = $Phases -split ','
     if ($want -contains 'melee1' -or $want -contains 'melee2' -or $want -contains 'bow' -or $want -contains 'bowcal' -or $want -contains 'bowstatic' -or $want -contains 'leadcal' -or $want -contains 'pillar' -or $want -contains 'pillardry') { Go-OpenGround }
@@ -406,16 +490,29 @@ try {
 }
 catch { L ("stopped: " + $_.Exception.Message) }
 
-Stop-Job $watchdog -ErrorAction SilentlyContinue; Remove-Job $watchdog -Force -ErrorAction SilentlyContinue
+Stop-Watchdog
 L '--- summary ---'
 $summary | Format-Table -AutoSize | Out-String | ForEach-Object { $_.TrimEnd() } | ForEach-Object { L $_ }
 $errs = Select-String -Path $plog -Pattern ' EXC ' -ErrorAction SilentlyContinue
 L ("exceptions in Player.log: " + (@($errs)).Count)
-if ($Profile) {
-    Get-Process 7DaysToDie -ErrorAction SilentlyContinue | ForEach-Object { $_.CloseMainWindow() | Out-Null }
-    Start-Sleep 30
-    Get-Process 7DaysToDie, RebirthProfiler -ErrorAction SilentlyContinue | Stop-Process -Force
-    $rep = Get-ChildItem (Join-Path $root 'Tools\Profiler\out') -Filter 'play_2026*.txt' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-    L ('profiler play report: ' + $(if ($rep) { $rep.FullName } else { 'not found' }))
+try {
+    Stop-EvalGame
+    if ($Profile) {
+        $rep = $null
+        if ($script:profiler) {
+            if (-not $script:profiler.WaitForExit(20000)) { L 'owned profiler is still writing its report' }
+            elseif ($script:profiler.ExitCode -ne 0) { L ('owned profiler exited with code ' + $script:profiler.ExitCode) }
+            else {
+                $profileOut = Join-Path $root 'Tools/Profiler/out'
+                $rep = Get-EvalPlayReport $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT $profileOut $script:profiler.Id $script:profilerStartUtc
+            }
+        }
+        L ('profiler play report: ' + $(if ($rep) { $rep } else { 'not found' }))
+    }
+} catch { L ('cleanup: ' + $_.Exception.Message) }
+finally {
+    $env:REBIRTH_BRIDGE_SESSION = $priorSession
+    $env:REBIRTH_BRIDGE_LAUNCH_RECEIPT = $priorReceipt
+    $env:REBIRTH_BRIDGE_NOCHORES = $priorChores
 }
 L "log: $log"

@@ -16,6 +16,7 @@ public sealed class RebirthVehicleTransferPlan
     public string ActorId { get; private set; }
     public string Fingerprint { get; private set; }
     public string BeforePayload { get; private set; }
+    internal Guid BeforeAssemblyId { get; private set; }
     public string AfterPayload { get; private set; }
     public RebirthVehicleTransferTarget Target { get; private set; }
     public RebirthVehicleTransferFuel Fuel { get; private set; }
@@ -51,7 +52,8 @@ public sealed class RebirthVehicleTransferPlan
             || after.LastAppliedInventoryTransferId != transactionId)
             throw new InvalidDataException("Vehicle transfer snapshots do not describe one completed revision.");
         if (fuel != null && (target == null || target.Carrier != RebirthVehicleAssemblyCarrier.VehicleEntity
-            || before.FuelPercent != fuel.BeforeLevel / fuel.Capacity || after.FuelPercent != fuel.AfterLevel / fuel.Capacity))
+            || before.FuelPercent != RebirthVehicleTransferFuel.AssemblyFraction(fuel.BeforeLevel, fuel.Capacity)
+            || after.FuelPercent != RebirthVehicleTransferFuel.AssemblyFraction(fuel.AfterLevel, fuel.Capacity)))
             throw new InvalidDataException("Native fuel transition does not match the entity assembly snapshots.");
         if (health != null && (target == null || target.Carrier != RebirthVehicleAssemblyCarrier.VehicleEntity || fuel != null))
             throw new InvalidDataException("Repair transition requires an entity target without fuel mutation.");
@@ -64,6 +66,7 @@ public sealed class RebirthVehicleTransferPlan
             TransactionId = transactionId, CreationId = normalizedCreation??string.Empty, NativeDeaths=nativeDeaths,ActorId = actorId,
             Fingerprint = fingerprint, Target = target, Fuel = fuel, Health = health,Custody=custody,
             BeforePayload = RebirthVehicleAssemblySerializer.ToBase64(before),
+            BeforeAssemblyId = before.AssemblyId,
             AfterPayload = RebirthVehicleAssemblySerializer.ToBase64(after),
             Items = Array.AsReadOnly(operations)
         };

@@ -15,7 +15,7 @@ class RebirthMetabolismState {public ItemStack HydrationSlotItem=new ItemStack()
 static class RebirthMetabolismStateRepository{public static System.Collections.Generic.Dictionary<EntityPlayer,RebirthMetabolismState> States=new System.Collections.Generic.Dictionary<EntityPlayer,RebirthMetabolismState>();public static bool TryGet(EntityPlayer p,out RebirthMetabolismState state)=>States.TryGetValue(p,out state);}
 static class RebirthConsumptionOwnerPublication{public static bool TryCaptureCreation(EntityPlayer p,out string creation){creation=p.Creation;return creation!=null;}}
 static class RebirthStationGridIngredients{public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a!=null&&b!=null&&a.count==b.count&&a.itemValue.type==b.itemValue.type&&a.itemValue.Metadata==b.itemValue.Metadata&&a.itemValue.Texture==b.itemValue.Texture;}
-static class RebirthVehicleInventoryWrite{public static ItemStack[] Snapshot(ItemStack[] slots){var result=new ItemStack[slots.Length];for(int i=0;i<slots.Length;i++)result[i]=slots[i].Clone();return result;}public static bool SameSlots(ItemStack[] a,ItemStack[] b){if(a.Length!=b.Length)return false;for(int i=0;i<a.Length;i++)if(!RebirthStationGridIngredients.IsSameStackSnapshot(a[i],b[i]))return false;return true;}}
+static class RebirthVehicleInventoryWrite{public static int Snapshots, Comparisons;public static ItemStack[] Snapshot(ItemStack[] slots){Snapshots++;var result=new ItemStack[slots.Length];for(int i=0;i<slots.Length;i++)result[i]=slots[i].Clone();return result;}public static bool SameSlots(ItemStack[] a,ItemStack[] b){Comparisons++;if(a.Length!=b.Length)return false;for(int i=0;i<a.Length;i++)if(!RebirthStationGridIngredients.IsSameStackSnapshot(a[i],b[i]))return false;return true;}}
 static class RebirthConsumptionTrace{public static void Note(string name,EntityPlayer player=null,RebirthMetabolismSourceKind kind=default(RebirthMetabolismSourceKind),int slot=-1,ItemStack before=null,ItemStack after=null,string reason=null,bool? success=null){}}
 static class RebirthToolbeltCapacity {public static int GetOwnedSlotCount(EntityPlayer p,int length){return length-1;}}
 static class RebirthBackpackLibraryReservation {public static bool Held;public static bool BlocksResourceUse(EntityPlayer p){return Held;}}
@@ -29,8 +29,50 @@ class Check {static void Assert(bool b,string m){if(!b)throw new Exception(m);}s
  Assert(!RebirthConsumptionSourceWriteback.TryCommit(local,RebirthMetabolismSourceKind.HydrationSlot,-1,expected,replacement,s)&&s.HydrationSlotItem.count==3,"hydration transfer hold consumed retained source");
  RebirthHydrationOwnerHold.Held=false;Assert(RebirthConsumptionSourceWriteback.TryCommit(local,RebirthMetabolismSourceKind.HydrationSlot,-1,expected,replacement,s),"unheld hydration source remained blocked");
  s.HydrationSlotItem=expected.Clone();RebirthHydrationServerSourceHold.Held=true;Assert(!RebirthConsumptionSourceWriteback.TryCommit(p,RebirthMetabolismSourceKind.HydrationSlot,-1,expected,replacement,s)&&s.HydrationSlotItem.count==3,"remote server hydration custody consumed retained source");
- RebirthHydrationServerSourceHold.Held=false;ScopeCases();
+ RebirthHydrationServerSourceHold.Held=false;ScopeCases();HydrationOnlyCases();
  Console.WriteLine("PASS: actual consumption source commit scope/full native images and existing writeback vectors; native identity/item codec/storage are adapters, durability NOT_RUN.");}
+ static void HydrationOnlyCases()
+ {
+  var world = new World();
+  var owner = new EntityPlayerLocal();
+  world.Bind(owner);
+  GameManager.Instance.World = world;
+  var state = new RebirthMetabolismState();
+  RebirthMetabolismStateRepository.States[owner] = state;
+  var first = state.HydrationSlotItem.Clone();
+  var second = first.Clone();
+  second.itemValue.Metadata = "375 ml";
+  var third = first.Clone();
+  third.itemValue.Metadata = "250 ml";
+  int snapshots = RebirthVehicleInventoryWrite.Snapshots;
+  int comparisons = RebirthVehicleInventoryWrite.Comparisons;
+  Assert(RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, first, second, state) &&
+    RebirthStationGridIngredients.IsSameStackSnapshot(state.HydrationSlotItem, second), "first exact hydration field change failed");
+  Assert(RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, second, third, state) &&
+    RebirthStationGridIngredients.IsSameStackSnapshot(state.HydrationSlotItem, third), "second exact hydration field change failed");
+  Assert(!RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, second, first, state),
+    "stale hydration preimage admitted");
+  RebirthMetabolismStateRepository.States[owner] = new RebirthMetabolismState();
+  Assert(!RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, third, second, state),
+    "detached hydration state admitted");
+  RebirthMetabolismStateRepository.States[owner] = state;
+  owner.Dead = true;
+  Assert(!RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, third, second, state),
+    "dead hydration owner admitted");
+  owner.Dead = false;
+  world.Actors[owner.entityId] = new EntityPlayer();
+  Assert(!RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.HydrationSlot, -1, third, second, state),
+    "replaced hydration owner admitted");
+  world.Bind(owner);
+  Assert(RebirthVehicleInventoryWrite.Snapshots == snapshots && RebirthVehicleInventoryWrite.Comparisons == comparisons &&
+    owner.bag.Writes == 0 && owner.inventory.Writes == 0, "canonical hydration branch reached inventory");
+  var bagBefore = owner.bag.Items[0].Clone();
+  var bagAfter = bagBefore.Clone();
+  bagAfter.count--;
+  Assert(RebirthConsumptionSourceWriteback.TryCommit(owner, RebirthMetabolismSourceKind.Backpack, 0, bagBefore, bagAfter, state) &&
+    RebirthVehicleInventoryWrite.Snapshots == snapshots + 2 && RebirthVehicleInventoryWrite.Comparisons == comparisons + 2,
+    "native inventory path lost full-grid evidence");
+ }
  static void ScopeCases(){
   for(int variant=0;variant<12;variant++){
    ThreadManager.Main=true;var world=new World();var player=new EntityPlayer();world.Bind(player);GameManager.Instance.World=world;var state=new RebirthMetabolismState();RebirthMetabolismStateRepository.States[player]=state;

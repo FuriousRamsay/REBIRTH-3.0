@@ -381,7 +381,12 @@ internal static class RebirthRepairSignatureQueuePatch
     [HarmonyPriority(Priority.Last)]
     private static bool Prefix(XUiC_RecipeStack __instance,ItemValue _itemToRepair,int _amountToRepair,ref bool __result,bool __runOriginal)
     {if(!__runOriginal)return true;if(RebirthRepairOriginalCorrection.QueuePrefix(__instance,_itemToRepair,_amountToRepair))return true;__result=false;return false;}
-    private static void Postfix(XUiC_RecipeStack __instance,bool __result,bool __runOriginal)=>RebirthRepairOriginalCorrection.QueueAccepted(__instance,__runOriginal&&__result);
+    private static void Postfix(XUiC_RecipeStack __instance, ItemValue _itemToRepair, bool __result, bool __runOriginal)
+    {
+        bool accepted = __runOriginal && __result;
+        if (accepted) RebirthEquippedArmorRepair.RememberQueueCopy(_itemToRepair, __instance.originalItem);
+        RebirthRepairOriginalCorrection.QueueAccepted(__instance, accepted);
+    }
 }
 [HarmonyPatch(typeof(XUiC_RecipeStack),nameof(XUiC_RecipeStack.HandleOnPress))]
 internal static class RebirthRepairSignatureCancelPatch
@@ -391,6 +396,45 @@ internal static class RebirthRepairSignatureCancelPatch
     {__state=null;return !__runOriginal||RebirthRepairOriginalCorrection.CancelPrefix(__instance,out __state);}
     private static void Postfix(XUiC_RecipeStack __instance,object __state,bool __runOriginal)
     {if(__runOriginal)RebirthRepairOriginalCorrection.Cancelled(__instance,__state);}
+
+    private static Exception Finalizer(Exception __exception,object __state)
+    {
+        RebirthRepairOriginalCorrection.EndCancelOverflow(__state);
+        return __exception;
+    }
+
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        var code=new List<CodeInstruction>(instructions);
+        var clear=AccessTools.Method(typeof(XUiC_RecipeStack),nameof(XUiC_RecipeStack.ClearRecipe),Type.EmptyTypes);
+        var wrapper=AccessTools.Method(typeof(RebirthRepairOriginalCorrection),nameof(RebirthRepairOriginalCorrection.ClearNativeCancelCard));
+        var matches=code.FindAll(instruction=>instruction.Calls(clear));
+        var drop=AccessTools.Method(typeof(GameManager),nameof(GameManager.ItemDropServer),
+            new[]{typeof(ItemStack),typeof(Vector3),typeof(Vector3),typeof(int),typeof(float),typeof(bool)});
+        var drops=code.FindAll(instruction=>instruction.Calls(drop));
+        if(drops.Count==2)
+        {
+            WrapDrop(code,drops[1],nameof(RebirthRepairOriginalCorrection.DropCancelKits));
+            WrapDrop(code,drops[0],nameof(RebirthRepairOriginalCorrection.DropCancelTool));
+        }
+        if(matches.Count!=1)return code;
+        matches[0].opcode=System.Reflection.Emit.OpCodes.Call;
+        matches[0].operand=wrapper;
+        return code;
+    }
+
+    private static void WrapDrop(List<CodeInstruction> code, CodeInstruction call, string wrapper)
+    {
+        int index=code.IndexOf(call);
+        var card=new CodeInstruction(System.Reflection.Emit.OpCodes.Ldarg_0);
+        card.labels.AddRange(call.labels);
+        card.blocks.AddRange(call.blocks);
+        call.labels.Clear();
+        call.blocks.Clear();
+        code.Insert(index,card);
+        call.opcode=System.Reflection.Emit.OpCodes.Call;
+        call.operand=AccessTools.Method(typeof(RebirthRepairOriginalCorrection),wrapper);
+    }
 }
 [HarmonyPatch(typeof(XUiC_RecipeStack),"outputStack")]
 internal static class RebirthRepairSignatureCompletionPatch
@@ -400,4 +444,15 @@ internal static class RebirthRepairSignatureCompletionPatch
     {__state=false;if(!__runOriginal)return true;__state=RebirthRepairOriginalCorrection.OutputPrefix(__instance);if(__state)return true;__result=false;return false;}
     private static void Postfix(XUiC_RecipeStack __instance,bool __result,bool __state,bool __runOriginal)
     {if(__state&&__runOriginal)RebirthRepairOriginalCorrection.OutputSucceeded(__instance,__result);}
+
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        var insert = AccessTools.Method(typeof(XUiM_PlayerInventory), nameof(XUiM_PlayerInventory.AddItemNoPartial),
+            new[] { typeof(ItemStack), typeof(bool) });
+        return RebirthEquippedArmorRepair.PassController(instructions, insert,
+            AccessTools.Method(typeof(RebirthRepairSignatureCompletionPatch), nameof(InsertOutput)));
+    }
+
+    private static bool InsertOutput(XUiM_PlayerInventory inventory, ItemStack offered, bool playCollectSound, XUiC_RecipeStack card)
+        => RebirthEquippedArmorRepair.TryReturn(card, offered) || inventory.AddItemNoPartial(offered, playCollectSound);
 }

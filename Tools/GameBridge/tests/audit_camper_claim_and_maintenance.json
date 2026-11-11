@@ -1,0 +1,82 @@
+{
+  "name": "Camper Camp projection and maintenance keep native owner and mode gates",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run on solo Purge and on a genuine dedicated Purge client. Use a disposable owned 80s camper parked in Travel and the real Energy radial window. Owner is a living Maintenance Technician with a damaged owned powered device inside its claim and known repair materials in camper cargo. Put a second camper, non-owner, and an unrelated powered device nearby on dedicated if available. Record before-state for each device and exact cargo counts with the read-only host observations."
+    },
+    {
+      "expectWindowOpen": "rebirthCamperEnergyManagement"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCamperEnergyManagement",
+        "id": "energyMode",
+        "exactText": "Travel"
+      }
+    },
+    {
+      "click": {
+        "window": "rebirthCamperEnergyManagement",
+        "id": "energyCamp"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthCamperEnergyManagement",
+        "id": "energyMode",
+        "exactText": "Camp",
+        "timeout": 40
+      }
+    },
+    {
+      "screenshot": "audit_camper_camp_claim"
+    },
+    {
+      "_note": "Observe the host once the maintenance scan is due (60 seconds from scheduling). Verify the current owner can repair only their powered device and consumes exactly the corresponding camper cargo once. A non-owner or a disconnected/dead owner earns no repair. Verify a remote late join sees the currently pinned Camp claim and no other camper's claim is substituted."
+    },
+    {
+      "click": {
+        "window": "rebirthCamperEnergyManagement",
+        "id": "energyTravel"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthCamperEnergyManagement",
+        "id": "energyMode",
+        "exactText": "Travel",
+        "timeout": 40
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "vehicleFuelCaption",
+        "text": "TRAVEL",
+        "timeout": 5
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "rebirthVehiclePoiIcon"
+      }
+    },
+    {
+      "screenshot": "audit_camper_travel_claim_retracted"
+    },
+    {
+      "_note": "On the host confirm no new maintenance occurs after Travel. Repeat from a reloaded Camp camper, and verify an unload/reload revokes stale client claim while cold native repair receipt remains settleable. The scripted assertions qualify mode UI only. The host observations are the authority and conservation checks."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

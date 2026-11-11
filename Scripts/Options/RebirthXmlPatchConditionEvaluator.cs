@@ -80,6 +80,7 @@ public static class RebirthXmlOptionConditionResolver
             case "poicleartrackingenabled": value = RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.TrackingEnabled(s); return true;
             case "effectivespawnprogression": value = RebirthPurgeReleasePolicy.Enabled ? RebirthThemePolicy.SpawnProgression(s) : s.SpawnProgression; return true;
             case "playerprogression": value = s.PlayerProgression; return true;
+            case "keepinjuriesondeath": value = s.KeepInjuriesOnDeath; return true;
             case "advancedfarming": value = s.AdvancedFarming; return true;
             case "instantblockpickup": value = s.InstantBlockPickup; return true;
             case "quickstack": value = s.QuickStack; return true;

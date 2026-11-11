@@ -109,7 +109,7 @@ internal static class RebirthCamperCampStationAppearance
                         // Restore its original native owner before activating the body.
                         view.CamperHull = hull;
                         if (hull.attachedRigidbody != vehicle.vehicleRB)
-                            t.SetParent(vehicle.PhysicsTransform, true);
+                            RebirthCamperOwnCollision.CopyColliderPose(t, t, vehicle.ModelTransform, vehicle.PhysicsTransform);
                         t.gameObject.SetActive(true);
                         hull.enabled = false;
                     }

@@ -24,6 +24,11 @@ internal static partial class RebirthRepairOriginalCorrection
         {
             original=saved;expected=Encode(saved);
             if(original.Published||original.After.Length!=0||original.BaseOnly||original.NativeDelivered||original.OutputInvoking)return;
+            if(request.CancelOverflow!=null||original.CancelOverflow!=null)
+            {
+                if(original.CancelConfirmed)Reply(owner,original);
+                return;
+            }
         }
         else
         {

@@ -324,22 +324,21 @@ public sealed class XUiC_RebirthBonusWorkspace : XUiController
         // Read the slot controllers themselves: GetSlots() returns the grid's cached array, which can lag behind what
         // the slots show after a drag or shift-click (owner 2026-11-08: armor and kit in place, workspace still empty).
         var controllers = grid?.GetItemStackControllers();
-        var slots = controllers?.Select(c => c?.ItemStack).ToArray();
-        ItemValue item = null, kit = null;
-        if (slots != null && slots.Length >= 2)
-        {
-            if (slots[0] != null && !slots[0].IsEmpty()) item = slots[0].itemValue;
-            if (slots[1] != null && !slots[1].IsEmpty() && RebirthArmorBonusKits.IsKit(slots[1].itemValue)) kit = slots[1].itemValue;
-        }
+        ItemStack armorStack = controllers != null && controllers.Length >= 2 ? controllers[0]?.ItemStack : null;
+        ItemStack kitStack = controllers != null && controllers.Length >= 2 ? controllers[1]?.ItemStack : null;
+        ItemValue item = armorStack != null && !armorStack.IsEmpty() ? armorStack.itemValue : null;
+        ItemValue kit = kitStack != null && !kitStack.IsEmpty() && RebirthArmorBonusKits.IsKit(kitStack.itemValue)
+            ? kitStack.itemValue : null;
         string newKit = kit?.ItemClass?.GetItemName() ?? string.Empty;
         int newType = item?.type ?? 0;
-        string newSignature = item == null ? string.Empty : RebirthArmorBonusKitRequest.BonusText(item) + "#" + item.Quality;
-        if (newKit != kitName || newType != itemType || newSignature != signature)
+        int newQuality = item?.Quality ?? 0;
+        string newSignature = RebirthArmorBonusKitRequest.BonusText(item);
+        if (newKit != kitName || newType != itemType || newQuality != quality || newSignature != signature)
         {
             kitName = newKit;
             itemType = newType;
             signature = newSignature;
-            quality = item?.Quality ?? 0;
+            quality = newQuality;
             itemName = item?.ItemClass?.GetLocalizedItemName() ?? string.Empty;
             bonuses = item == null ? new RebirthArmorRolledBonus[0] : RebirthArmorBonusStorage.Read(item);
             var oldSlot = slot;
@@ -351,9 +350,9 @@ public sealed class XUiC_RebirthBonusWorkspace : XUiController
             if (mode == Mode.Explorer) { mode = Mode.Rows; ClearSearch(); }
             if (mode == Mode.Result && Ready && SlotKey() != resultSnapshot) mode = Mode.Rows;
             dirty = true;
-            RebirthDebug.Log("armorbonuses", "[REBIRTH BonusWorkspace] slots: grid=" + (grid != null) + " count=" + (slots?.Length ?? -1)
-                + " item=" + (slots != null && slots.Length > 0 && slots[0] != null && !slots[0].IsEmpty() ? slots[0].itemValue.ItemClass?.GetItemName() + " (" + slot + ")" : "none")
-                + " kitSlot=" + (slots != null && slots.Length > 1 && slots[1] != null && !slots[1].IsEmpty() ? slots[1].itemValue.ItemClass?.GetItemName() : "none")
+            RebirthDebug.Log("armorbonuses", "[REBIRTH BonusWorkspace] slots: grid=" + (grid != null) + " count=" + (controllers?.Length ?? -1)
+                + " item=" + (item == null ? "none" : item.ItemClass?.GetItemName() + " (" + slot + ")")
+                + " kitSlot=" + (kitStack == null || kitStack.IsEmpty() ? "none" : kitStack.itemValue.ItemClass?.GetItemName())
                 + " bonuses=" + bonuses.Length + " ready=" + Ready);
         }
 
@@ -376,7 +375,7 @@ public sealed class XUiC_RebirthBonusWorkspace : XUiController
         bool tool = HasTool();
         if (tool != toolPresent) { toolPresent = tool; dirty = true; }
         if (mode != Mode.Rows && (!Ready || !toolPresent)) { mode = Mode.Rows; ClearSearch(); dirty = true; }
-        UpdateActionButton();
+        UpdateActionButton(tool);
     }
 
     /// <summary>
@@ -384,15 +383,18 @@ public sealed class XUiC_RebirthBonusWorkspace : XUiController
     /// fitting kit, a valid choice (something to reroll, replace or remove), enough Tailoring for every focus, and room in
     /// Output. The server still checks everything again.
     /// </summary>
-    private void UpdateActionButton()
+    private void UpdateActionButton(bool toolPresent)
     {
         var button = windowGroup?.Controller?.GetChildById("btnEnchant")?.ViewComponent;
         if (button == null) return;
-        bool can = CanApply;
+        bool can = CanApplyNow(toolPresent);
         if (button.IsVisible != can) button.IsVisible = can;
     }
 
-    internal bool CanApply => Ready && Blocker() == null && HasTool() && OutputHasRoom() && FocusesAllowed();
+    internal bool CanApply => CanApplyNow();
+
+    private bool CanApplyNow(bool? observedTool = null) =>
+        Ready && Blocker() == null && (observedTool ?? HasTool()) && OutputHasRoom() && FocusesAllowed();
 
     private bool FocusesAllowed()
     {
@@ -422,7 +424,7 @@ public sealed class XUiC_RebirthBonusWorkspace : XUiController
         return grid.GetItemStackControllers().Any(c => c?.ItemStack == null || c.ItemStack.IsEmpty());
     }
 
-    private string SlotKey() => kitName + "|" + itemType + "|" + signature;
+    private string SlotKey() => kitName + "|" + itemType + "|" + signature + "#" + quality;
 
     private static RebirthArmorRolledBonus[] ParseBonuses(string raw)
     {

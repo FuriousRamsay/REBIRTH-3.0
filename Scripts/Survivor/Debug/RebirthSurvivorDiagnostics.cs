@@ -313,7 +313,7 @@ public static class RebirthSurvivorDiagnostics
             RebirthTraitDefinition t;
             if (!RebirthSurvivorDefinitionRegistry.TryGetTrait(selection.TraitIds[i], out t) || t == null) continue;
             if (t.Polarity == RebirthTraitPolarity.Negative) negativeRaw += t.Points;
-            else if (t.Polarity == RebirthTraitPolarity.Positive)
+            else
             {
                 positiveSpend += t.Points;
                 if (RebirthSkillAptitudeTraitFactory.IsAptitude(t)) aptitudeSpend += t.Points;

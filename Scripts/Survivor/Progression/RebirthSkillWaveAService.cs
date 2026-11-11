@@ -30,9 +30,13 @@ public static class RebirthSkillWaveAService
     public const string ArmorStaminaWalkCVar = "$rbSurvivorSkillArmorStaminaWalk";
     public const string ArmorStaminaRunCVar = "$rbSurvivorSkillArmorStaminaRun";
     public const string ArmorNoiseCVar = "$rbSurvivorSkillArmorNoise";
+    private const float FullMediumWalkBurden = 4f * 0.0281f;
+    private const float FullMediumRunBurden = 4f * 0.0562f;
 
     private sealed class MovementState
     {
+        public EntityPlayer Player;
+        public int Deaths;
         public Vector3 LastPosition;
         public bool HasPosition;
         public float AthleticsDistance;
@@ -240,7 +244,10 @@ public static class RebirthSkillWaveAService
     private static void ResetRuntime()
     {
         MovementByEntity.Clear(); LockpickAttempts.Clear(); TradeWitnessByEntity.Clear(); nextPassiveSync = 0f; nextSample = 0f;
+        RebirthOrdinarySkillPractice.ResetClient();
     }
+
+    private static float MovementSampleSeconds => Mathf.Max(0.25f, RebirthProgressionRuntimeConfig.WaveASampleSeconds);
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
@@ -254,12 +261,19 @@ public static class RebirthSkillWaveAService
         // every frame; the bridge is intentionally throttled and remains independent from LBD sampling.
         if (world.IsRemote())
         {
+            EntityPlayerLocal local = world.GetPrimaryPlayer();
             if (now >= nextPassiveSync)
             {
                 nextPassiveSync = now + Mathf.Max(0.25f, RebirthProgressionRuntimeConfig.WaveAPassiveSyncSeconds);
-                EntityPlayerLocal local = world.GetPrimaryPlayer();
                 if (local != null) SyncNativePassiveEffects(local);
             }
+            if (local != null && now >= nextSample)
+            {
+                nextSample = now + MovementSampleSeconds;
+                if (RebirthOrdinarySkillPractice.IsReady(local)) SampleMovement(local);
+                else MovementByEntity.Remove(local.entityId);
+            }
+            RebirthOrdinarySkillPractice.Tick(world, local);
             return;
         }
         if (connection == null || !connection.IsServer || !RebirthWorldCharacterRepository.IsServerAuthority || !RebirthSurvivorMode.IsEnabledForCurrentWorld()) return;
@@ -271,24 +285,25 @@ public static class RebirthSkillWaveAService
             for (int i = 0; i < players.Count; i++) SyncNativePassiveEffects(players[i]);
         }
         if (now < nextSample) return;
-        nextSample = now + Mathf.Max(0.25f, RebirthProgressionRuntimeConfig.WaveASampleSeconds);
+        nextSample = now + MovementSampleSeconds;
         for (int i = 0; i < players.Count; i++)
         {
             CaptureServerInventoryWitness(players[i], now);
-            SampleServerMovement(players[i]);
+            if (players[i] is EntityPlayerLocal local && RebirthSkillAwardService.TryGetEligible(local, out _, out _))
+                SampleMovement(local);
         }
         PruneExpired(now);
     }
 
-    private static void SampleServerMovement(EntityPlayer player)
+    private static void SampleMovement(EntityPlayerLocal player)
     {
-        if (player == null) return;
-        RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
-        if (!RebirthSkillAwardService.TryGetEligible(player, out identity, out record)) { MovementByEntity.Remove(player.entityId); return; }
+        if (player.IsDead() || !player.IsSpawned()) { MovementByEntity.Remove(player.entityId); return; }
         MovementState state;
-        if (!MovementByEntity.TryGetValue(player.entityId, out state) || state == null)
+        if (!MovementByEntity.TryGetValue(player.entityId, out state) ||
+            !ReferenceEquals(state.Player, player) || state.Deaths != player.Died)
         {
-            state = new MovementState(); MovementByEntity[player.entityId] = state;
+            state = new MovementState { Player = player, Deaths = player.Died };
+            MovementByEntity[player.entityId] = state;
         }
         Vector3 pos = player.position;
         if (!state.HasPosition) { state.LastPosition = pos; state.HasPosition = true; return; }
@@ -301,7 +316,7 @@ public static class RebirthSkillWaveAService
         float exertionDistance = NormalizeLocomotionDistance(player, distance, movementTags);
         if (exertionDistance <= 0f) return;
 
-        // Phase 10 exertion witness: displacement alone is not enough. The server must also report
+        // Displacement alone is not enough. The local actor must also report
         // one of the native locomotion movement tags (walking/running). Observed distance is then
         // converted back to a neutral Walk/Run/Crouch x Mobility distance equivalent so movement
         // speed bonuses or penalties do not directly multiply Skill. Idle jitter, knockback/slide,
@@ -310,8 +325,8 @@ public static class RebirthSkillWaveAService
         while (state.AthleticsDistance >= RebirthProgressionRuntimeConfig.AthleticsDistance)
         {
             state.AthleticsDistance -= RebirthProgressionRuntimeConfig.AthleticsDistance;
-            AwardWaveADiscrete(player,"skill.athletics",RebirthProgressionRuntimeConfig.AthleticsAward,
-                "wavea:athletics:exertion","25m-equivalent genuine locomotion");
+            AwardWaveADiscrete(player, RebirthSurvivorIds.SkillAthletics, RebirthProgressionRuntimeConfig.AthleticsAward,
+                "wavea:athletics:exertion", "25m-equivalent genuine locomotion", ordinary: true);
         }
 
         // Armor Proficiency trains only the incremental armor burden layered on top of the same
@@ -320,18 +335,16 @@ public static class RebirthSkillWaveAService
         ArmorBurden trainingBurden=GetArmorBurden(player);
         if (trainingBurden.HasBurden)
         {
-            const float fullMediumWalkBurden=4f*0.0281f;
-            const float fullMediumRunBurden=4f*0.0562f;
             bool runningExertion=HasMovementTagToken(movementTags,"running");
             float burden=runningExertion?trainingBurden.StaminaRun:trainingBurden.StaminaWalk;
-            float reference=runningExertion?fullMediumRunBurden:fullMediumWalkBurden;
+            float reference=runningExertion?FullMediumRunBurden:FullMediumWalkBurden;
             float normalizedBurden=reference>0f?Mathf.Max(0f,burden/reference):0f;
             state.ArmorDistance += exertionDistance*normalizedBurden;
             while (state.ArmorDistance >= RebirthProgressionRuntimeConfig.ArmorDistance)
             {
                 state.ArmorDistance -= RebirthProgressionRuntimeConfig.ArmorDistance;
-                AwardWaveADiscrete(player,"skill.armor_proficiency",RebirthProgressionRuntimeConfig.ArmorAward,
-                    "wavea:armor:burden-exertion","30m-equivalent incremental armor burden");
+                AwardWaveADiscrete(player, RebirthSurvivorIds.SkillArmorProficiency, RebirthProgressionRuntimeConfig.ArmorAward,
+                    "wavea:armor:burden-exertion", "30m-equivalent incremental armor burden", ordinary: true);
             }
         }
     }
@@ -656,11 +669,12 @@ public static class RebirthSkillWaveAService
         else c.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthSkillWaveAActionRequest>().Setup(player.entityId, action, x, y, z, itemType, count, value));
     }
 
-    private static bool AwardWaveADiscrete(EntityPlayer player,string skillId,float raw,string source,string description)
+    private static bool AwardWaveADiscrete(EntityPlayer player,string skillId,float raw,string source,string description,bool ordinary=false)
     {
         if(player==null||raw<=0f)return false;
         RebirthSkillTrainingEvidence evidence=new RebirthSkillTrainingEvidence{SkillId=skillId,SourceKey=source??string.Empty,ReferenceDescription=description??string.Empty,
             AuthoritativeSuccess=true,Mode=RebirthSkillTrainingEvidenceMode.DiscreteAward,CreditedWork=1f,DiscreteRawAward=raw};
+        if (ordinary) return RebirthSkillAwardService.TryAwardOrdinaryPractice(player as EntityPlayerLocal, evidence, out _, out _, out _);
         RebirthSkillTrainingComputation computation;float appliedSkill,appliedAttribute;
         return RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(player,evidence,out computation,out appliedSkill,out appliedAttribute);
     }

@@ -1,0 +1,51 @@
+{
+  "name": "p19_recycler_preview_resolved_rule",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, real native recycler/shredder workspace already open. Prepare one supported source and exact approved baseline tool/queue state. Fill @TOKENS@ for actual expected localized row. Run once with healthy tools and once with missing or broken tool, preserving the same rule and source type. Change tools or queue while preview open in dedicated and check projected status before actual insertion."
+    },
+    {
+      "expectWindowOpen": "@WINDOW@"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "@SOURCE_PATH@"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "@WINDOW@",
+        "id": "scrapRowName0",
+        "exactText": "@OUTPUT_LABEL@",
+        "timeout": 3
+      }
+    },
+    {
+      "expectUi": {
+        "window": "@WINDOW@",
+        "id": "scrapRowCount0",
+        "exactText": "@OUTPUT_COUNT@"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "@WINDOW@",
+        "id": "scrapRowTime0",
+        "exactText": "@OUTPUT_TIME@"
+      }
+    },
+    {
+      "screenshot": "p19_recycler_exact_preview"
+    },
+    {
+      "_note": "Compare scrapPreviewStatus exact label in the baseline/candidate UI tree, including empty success label, missing/broken tool and queue full. Execute native drag/shift into the input and verify live AddItem refusal/acceptance independently. Reuse mpA_recycler_tool_inner_loop.json for the native missing-tool inner queue control."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

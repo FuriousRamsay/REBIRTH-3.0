@@ -40,8 +40,13 @@ internal static partial class RebirthProductiveEarnedUiRemote
     private static readonly Dictionary<Guid,QueueTransition> queueTransitions=new Dictionary<Guid,QueueTransition>();
     internal static bool HasRetainedQueueTransition=>queueTransitions.Count>0||emptyQueueAcks.Count>0;
     [ThreadStatic]private static QueueRead readingQueue;
-    internal static bool CanTickHostQueueHandoff(TileEntityWorkstation station)=>!queueTransitions.Values.Any(value=>ReferenceEquals(value.Station,station)&&
-        ReferenceEquals(value.World,GameManager.Instance?.World));
+    internal static bool CanTickHostQueueHandoff(TileEntityWorkstation station)
+    {
+        foreach (var transition in queueTransitions.Values)
+            if (ReferenceEquals(transition.Station, station) &&
+                ReferenceEquals(transition.World, GameManager.Instance?.World)) return false;
+        return true;
+    }
     internal static bool BlocksQueueHandoff(TileEntityWorkstation station)=>!CanTickHostQueueHandoff(station);
     internal static bool RegisterQueueHandoff(EntityPlayer actor,ClientInfo sender,TileEntityWorkstation station,string creation,Guid operation,byte[] image,out RebirthProductiveEarnedWire.Reply reply)
     {

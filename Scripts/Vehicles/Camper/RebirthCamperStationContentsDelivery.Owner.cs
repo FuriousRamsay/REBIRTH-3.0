@@ -259,6 +259,7 @@ internal static partial class RebirthCamperStationContentsDelivery
                 !RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out allocation)||
                 !RebirthCamperEnergySavedOwner.TryRead(identity,out var actual,out var saved)||saved.id!=actor.entityId||saved.deaths!=actor.Died||saved.buffData==null||saved.buffData.Length>1024*1024)return;
             var operations=new List<Guid>();
+            Dictionary<string,float> phases=null;
             using(var stream=new MemoryStream(saved.buffData.ToArray(),false))using(var reader=MemoryPools.poolBinaryReader.AllocSync(true))
             {
                 reader.SetBaseStream(stream);int version=reader.ReadByte();if(version!=EntityBuffs.Version||version<2)return;
@@ -267,8 +268,13 @@ internal static partial class RebirthCamperStationContentsDelivery
                 for(int index=0;index<count;index++)
                 {
                     string name=reader.ReadString();float phase=reader.ReadSingle();
-                    if(name.StartsWith("rbRemovalParcel_",StringComparison.Ordinal)&&name.Length==48&&phase>=1f&&
-                        Guid.TryParseExact(name.Substring(16),"N",out var operation)&&!operations.Contains(operation))operations.Add(operation);
+                    if(!name.StartsWith("rbRemovalParcel_",StringComparison.Ordinal)||name.Length!=48||
+                        !Guid.TryParseExact(name.Substring(16),"N",out var operation))continue;
+
+                    phases ??= new Dictionary<string,float>(StringComparer.Ordinal);
+                    // Any repeated exact CVar name is ambiguous, even if one value cannot nominate a candidate.
+                    phases[name]=phases.ContainsKey(name)?float.NaN:phase;
+                    if(phase>=1f&&!operations.Contains(operation))operations.Add(operation);
                 }
                 if(stream.Position!=stream.Length)return;
             }
@@ -284,8 +290,8 @@ internal static partial class RebirthCamperStationContentsDelivery
                     {actor.Buffs.SetCustomVar(ParcelHeld,0f,true);GameManager.Instance.SaveLocalPlayerData();}
                     continue;
                 }
-                if(plan.Deaths!=actor.Died||!RebirthCookingRemoteAdmissionBackend.NativePhase(saved,plan.Receipt,out float retainedPhase,out bool retainedPresent)||
-                    !retainedPresent||!SavedParcelFrame(plan,actual,retainedPhase)||candidate!=null)return;
+                if(plan.Deaths!=actor.Died||!phases.TryGetValue(plan.Receipt,out float retainedPhase)||
+                    float.IsNaN(retainedPhase)||float.IsInfinity(retainedPhase)||!SavedParcelFrame(plan,actual,retainedPhase)||candidate!=null)return;
                 candidate=new OwnerDelivery{Actor=actor,World=actor.world,Save=GameIO.GetSaveGameDir(),Creation=plan.Creation,Source=plan.Source,Owner=plan.Owner,
                     Operation=operation,Vehicle=plan.Vehicle,Installation=plan.Installation,Deaths=plan.Deaths,Entity=actor.entityId,Plan=plan};
             }

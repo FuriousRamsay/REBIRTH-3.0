@@ -1,0 +1,16 @@
+{
+  "name": "Dedicated Purge ordinary skill practice cadence",
+  "notes": "Disposable Navezgane Purge fixture, current Rebirth Survivor, clear road near -2640,723. Start with no pending practice. This scenario checks immediate owner-visible skill gain, unchanged authority before the checkpoint, and authority gain after one checkpoint. The lifecycle runner separately verifies the clean-disconnect batch and saved progress.",
+  "steps": [
+    { "markSkill": "skill.athletics" },
+    { "walkto": { "x": -2649, "z": 714, "run": 1, "radius": 1.2, "maxSeconds": 8 } },
+    { "walkto": { "x": -2640, "z": 723, "run": 1, "radius": 1.2, "maxSeconds": 8 } },
+    { "walkto": { "x": -2649, "z": 714, "run": 1, "radius": 1.2, "maxSeconds": 8 } },
+    { "walkto": { "x": -2640, "z": 723, "run": 1, "radius": 1.2, "maxSeconds": 8 } },
+    { "expectSkillGain": { "skill": "skill.athletics", "local": true, "op": ">", "value": 0 } },
+    { "expectSkillGain": { "skill": "skill.athletics", "op": "==", "value": 0 } },
+    { "wait": 63 },
+    { "expectSkillGain": { "skill": "skill.athletics", "op": ">", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

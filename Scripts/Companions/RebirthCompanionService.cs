@@ -623,13 +623,11 @@ public static class RebirthCompanionService
             }
         }
 
-        RebirthNpcRuntimeState[] states = RebirthNpcRuntimeRegistry.GetSnapshot();
+        RebirthNpcRuntimeState[] states = RebirthNpcRuntimeRegistry.GetOwnedActiveSnapshot(owner);
         for (int i = 0; i < states.Length; i++)
         {
             RebirthNpcRuntimeState state = states[i];
-            if (state == null || seen.Contains(state.StableId) ||
-                state.Presence != RebirthNpcPresenceState.Active || state.OwnershipKind != RebirthNpcOwnershipKind.Player ||
-                !string.Equals(state.OwnerId ?? string.Empty, owner, StringComparison.OrdinalIgnoreCase)) continue;
+            if (seen.Contains(state.StableId)) continue;
             RebirthNpcProfile profile;
             if (!RebirthNpcProfileRegistry.TryResolve(state.ProfileId, out profile) || !profile.Has(RebirthNpcCapabilities.Ownership)) continue;
             int entityId; if (!RebirthNpcRuntimeRegistry.TryGetEntityId(state.StableId, out entityId)) continue;
@@ -2465,6 +2463,7 @@ public static class RebirthCompanionService
         RebirthOwnedCompanionAttackPassthrough.ResetForWorldChange();
         RebirthDogNavigationMarkerService.ResetForWorldChange();
         RebirthCompanionOwnerTeleportService.ResetForWorldChange();
+        RebirthOwnedCompanionIndex.ResetForWorldChange();
         RebirthCompanionColorService.ResetForWorldChange();
         RebirthCompanionCollisionService.ResetForWorldChange();
         RebirthCompanionCardStyleRuntime.ResetForWorldChange();

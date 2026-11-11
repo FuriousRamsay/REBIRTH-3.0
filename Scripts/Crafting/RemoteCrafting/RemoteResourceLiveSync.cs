@@ -73,6 +73,7 @@ public static class RemoteResourceLiveSync
         StationProjections = new ConditionalWeakTable<TileEntityWorkstation, StationProjection>();
         currentWorld = world;
         RemoteResourceSnapshotCache.InvalidateAll(); RemoteResourceClientAvailability.Clear();
+        RebirthRemoteResourceClientOriginal.ClearPendingRecovery();
     }
     public static void Reset()
     {
@@ -83,6 +84,7 @@ public static class RemoteResourceLiveSync
             currentWorld = null;
         }
         RemoteResourceSnapshotCache.InvalidateAll(); RemoteResourceClientAvailability.Clear();
+        RebirthRemoteResourceClientOriginal.ClearPendingRecovery();
     }
     public static void NotifyWorkstationModified(TileEntityWorkstation station)
     {
@@ -196,17 +198,17 @@ public static class RemoteResourceLiveSync
             if (!affected) foreach (Vector3 position in changes.Values) if ((player.position - position).sqrMagnitude <= radiusSq) { affected = true; break; }
             if (!affected) continue;
             RemoteResourceSnapshotCache.InvalidatePlayer(player.entityId); // Also discovers newly eligible sources.
-            EntityPlayerLocal local = player as EntityPlayerLocal;
-            RequestScope scope = null;
-            if (local == null)
+            if (player is EntityPlayerLocal local)
             {
-                lock (Sync) Requests.TryGetValue(player.entityId, out scope);
-                // Keep invalidation above even without a subscriber; transaction reads
-                // rebuild on demand. Do not discover/clone inventories for an unused push.
-                if (scope == null || !ReferenceEquals(scope.Player, player)) continue;
+                // The native dirty event lets an open consumer rebuild on demand.
+                DispatchLocalUi(local);
+                continue;
             }
+
+            RequestScope scope;
+            lock (Sync) Requests.TryGetValue(player.entityId, out scope);
+            if (scope == null || !ReferenceEquals(scope.Player, player)) continue;
             RemoteResourceAvailabilitySnapshot snapshot = RemoteResourceSnapshotCache.Get(player);
-            if (local != null) { DispatchLocalUi(local); continue; }
             connection.SendPackage(NetPackageManager.GetPackage<NetPackageRemoteResourceAvailability>()
                 .Setup(snapshot.CloneStacks(), snapshot.CloneSources(), "coalesced availability", scope.Nonce, Interlocked.Increment(ref sendSequence)),
                 _attachedToEntityId: player.entityId);

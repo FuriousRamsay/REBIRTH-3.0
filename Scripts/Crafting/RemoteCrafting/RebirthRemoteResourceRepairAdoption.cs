@@ -14,7 +14,7 @@ internal static class RebirthRemoteResourceRepairAdoption
         try{return ThreadManager.IsMainThread()&&player?.world?.IsRemote()==true&&player.IsSpawned()&&!player.IsDead()&&original!=null&&
             original.Kind==RemoteResourceClientOperation.ItemRepair&&player.Died>original.Deaths&&
             ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&ReferenceEquals(player.world.GetEntity(player.entityId),player)&&
-            player.world.worldState.Guid==original.World&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
+            RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world)==original.World&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
             RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)&&identity.CanonicalId==original.Owner&&
             RebirthRemoteResourceClientOriginal.HasNeverPreparedRepairAction(original);}
         catch{return false;}

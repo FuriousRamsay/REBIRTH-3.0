@@ -56,7 +56,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
             if(!RebirthRemoteResourcePlacedStationAllocation.TryBeginScratch(memory,RebirthRemoteResourcePlacedStationAllocation.ReadPhase.OwnerEnvelope,out scratch)||
                 !ReadRestartHeader(operation,memory,out var request,out string header,out var source,out _,out _)||
                 !RebirthRemoteResourceClientOriginal.TryDecodeOriginal(request.Element("fetchClientOriginal").ToString(SaveOptions.DisableFormatting),out var original)||
-                original.Owner!=localOwner.CanonicalId||original.World!=joining.World.worldState.Guid||original.Deaths!=joining.File.deaths||
+                original.Owner!=localOwner.CanonicalId||original.World!=RebirthRemoteResourceNetworkScope.ProtocolWorld(joining.World)||original.Deaths!=joining.File.deaths||
                 original.Creation!="native-mode:"+original.Owner||CancellationOperation(original.Operation)!=operation||
                 !TryCancellationClientFiles(original.Operation,out long historicalBytes)||!memory.Reserve(checked(memory.ReservedBytes+historicalBytes))||
                 !ReadCancellationOriginal(original.Operation,memory,out var savedOriginal)||!XNode.DeepEquals(savedOriginal.Copy(),original.Copy()))return null;

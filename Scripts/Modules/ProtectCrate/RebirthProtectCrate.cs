@@ -237,6 +237,7 @@ public static class RebirthProtectCrateService
 
         if (now < nextUpdate) return;
         nextUpdate = now + UpdateInterval;
+        if (crates.Count == 0) return;
 
         List<int> ids = new List<int>(crates.Keys);
         List<EntityPlayer> players = world.GetPlayers();

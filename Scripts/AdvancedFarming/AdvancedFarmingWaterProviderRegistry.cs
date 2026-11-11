@@ -534,6 +534,12 @@ public static class AdvancedFarmingWaterProviderRegistry
 
     public static List<AdvancedFarmingWaterProviderEntry> CollectProvidersInArea(WorldBase world, Vector3i center, int radius, int minY, int maxY, bool includeStorage, bool includePlots, int maxEntries)
     {
+        return CollectProvidersInArea(world, center, radius, minY, maxY, includeStorage, includePlots, maxEntries, includeBlockValue: true);
+    }
+
+    internal static List<AdvancedFarmingWaterProviderEntry> CollectProvidersInArea(WorldBase world, Vector3i center, int radius,
+        int minY, int maxY, bool includeStorage, bool includePlots, int maxEntries, bool includeBlockValue)
+    {
         List<AdvancedFarmingWaterProviderEntry> result = new List<AdvancedFarmingWaterProviderEntry>();
         if (world == null || radius < 0 || maxEntries == 0)
             return result;
@@ -590,7 +596,7 @@ public static class AdvancedFarmingWaterProviderRegistry
                         BlockType = entry.BlockType,
                         Tank = tank,
                         Plot = farmPlot,
-                        BlockValue = world.GetBlock(entry.Pos)
+                        BlockValue = includeBlockValue ? world.GetBlock(entry.Pos) : default
                     });
                 }
             }

@@ -5,11 +5,22 @@ using System.Linq;using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 using System.Security.Cryptography;
-class ItemStack {public string Id;public int count;public ItemStack(string id,int count){Id=id;this.count=count;}public ItemStack Clone()=>new ItemStack(Id,count);public bool IsEmpty()=>count==0;}
-static class RebirthStationGridIngredients {public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a!=null&&b!=null&&a.Id==b.Id&&a.count==b.count;}
+class ItemValue {
+ public string Id;public int Seed;public ItemValue(string id,int seed){Id=id;Seed=seed;}
+ public ItemValue Clone()=>new ItemValue(Id,Seed);
+}
+class ItemStack {
+ public ItemValue itemValue;public string Id=>itemValue.Id;public int count;
+ public ItemStack(string id,int count,int seed=0):this(new ItemValue(id,seed),count){}
+ public ItemStack(ItemValue item,int count){itemValue=item;this.count=count;}
+ public ItemStack Clone()=>new ItemStack(itemValue.Clone(),count);
+ public bool IsEmpty()=>count==0;
+ public bool CanStackWith(ItemStack incoming)=>Id==incoming.Id;
+}
+static class RebirthStationGridIngredients {public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a!=null&&b!=null&&a.Id==b.Id&&a.count==b.count&&a.itemValue.Seed==b.itemValue.Seed;}
 static class RebirthCamperInventorySnapshot {
- public static byte[] Capture(ItemStack[] items){using(var s=new MemoryStream())using(var w=new BinaryWriter(s)){w.Write(items.Length);foreach(var i in items){w.Write(i.Id);w.Write(i.count);}return s.ToArray();}}
- public static ItemStack[] Restore(byte[] bytes){using(var s=new MemoryStream(bytes))using(var r=new BinaryReader(s)){int n=r.ReadInt32();if(n<0||n>200)throw new InvalidDataException();var items=new ItemStack[n];for(int i=0;i<n;i++)items[i]=new ItemStack(r.ReadString(),r.ReadInt32());if(s.Position!=s.Length)throw new InvalidDataException();return items;}}
+ public static byte[] Capture(ItemStack[] items){using(var s=new MemoryStream())using(var w=new BinaryWriter(s)){w.Write(items.Length);foreach(var i in items){w.Write(i.Id);w.Write(i.count);w.Write(i.itemValue.Seed);}return s.ToArray();}}
+ public static ItemStack[] Restore(byte[] bytes){using(var s=new MemoryStream(bytes))using(var r=new BinaryReader(s)){int n=r.ReadInt32();if(n<0||n>200)throw new InvalidDataException();var items=new ItemStack[n];for(int i=0;i<n;i++)items[i]=new ItemStack(r.ReadString(),r.ReadInt32(),r.ReadInt32());if(s.Position!=s.Length)throw new InvalidDataException();return items;}}
 }
 static class RebirthSurvivorRequestScope {public static bool TryNormalize(string text,out string normalized){normalized=text;return Guid.TryParse(text,out _);}}
 static class AdvancedFarmingHarvestOwnerDelta {
@@ -31,6 +42,7 @@ static class AdvancedFarmingHarvestProtocol {public static void ObservePreparedO
 static class AdvancedFarmingHarvestAdmission {
 private const int MaximumReceipts=100000;private static World indexedWorld;private static string indexedDirectory;private static int indexedCount;private static Dictionary<Guid,Guid> reservedSources;private static bool quarantined;private static readonly Dictionary<Guid,string> pendingOriginals=new Dictionary<Guid,string>();
 // PRODUCTION_INDEX_METHODS
+// PRODUCTION_ITEM_MATCH
 static void Check(bool value,string why){if(!value)throw new Exception(why);}
 internal static void ClaimCases(AdvancedFarmingHarvestReceipt.Record first,AdvancedFarmingHarvestReceipt.Record second){
  second.Source=first.Source;indexedWorld=null;Check(Index(GameManager.Instance.World),"fresh reservation index refused");Check(Reserve(first)&&!Reserve(second),"competing original won before first publication");Check(PublishClaim(first)&&!AdvancedFarmingHarvestReceipt.TryRead(first.World,first.Operation,out _),"hold-only claim became native source permission");
@@ -44,6 +56,19 @@ static class Fixture {
  static bool Publish(AdvancedFarmingHarvestReceipt.Record r,out AdvancedFarmingHarvestReceipt.Record next)=>AdvancedFarmingHarvestReceipt.TryPublishSource(r,new AdvancedFarmingHarvestPublication.Proof{Operation=r.Operation,Source=r.Source,World=r.World,X=r.X,Y=r.Y,Z=r.Z,Digest=new string('a',64),Generation=1},out next);
  static AdvancedFarmingHarvestReceipt.Record Make(int assigned=2){var plan=new AdvancedFarmingHarvestOwnerDelta.Plan{Operation=Guid.NewGuid(),World=GameManager.Instance.World.worldState.Guid,Creation=Guid.NewGuid().ToString("N"),Owner="owner",Deaths=2,SourceHash=new string('a',64),BeforeBag=new[]{new ItemStack("",0)},AfterBag=new[]{new ItemStack("corn",assigned)},BeforeBelt=new ItemStack[0],AfterBelt=new ItemStack[0]};return new AdvancedFarmingHarvestReceipt.Record{Operation=plan.Operation,Source=Guid.NewGuid(),World=plan.World,Creation=plan.Creation,Owner=plan.Owner,Deaths=2,X=1,Y=60,Z=1,DropX=1,DropY=60,DropZ=1,Block=7,State=AdvancedFarmingHarvestReceipt.Phase.Reserved,PlanImage=AdvancedFarmingHarvestOwnerDelta.Encode(plan),Outputs=AdvancedFarmingHarvestReceipt.OutputImage(new[]{new ItemStack("corn",2)})};}
  static void Main(string[] args){GameIO.Directory=args[0];GameManager.Instance.World.worldState.Guid=Guid.NewGuid().ToString();var r=Make();
+  var stacked=Make();
+  var stackPlan=AdvancedFarmingHarvestOwnerDelta.Decode(stacked.PlanImage);
+  stackPlan.BeforeBag[0]=new ItemStack("corn",1,12);
+  stackPlan.AfterBag[0]=new ItemStack("corn",3,12);
+  stacked.PlanImage=AdvancedFarmingHarvestOwnerDelta.Encode(stackPlan);
+  stacked.Outputs=AdvancedFarmingHarvestReceipt.OutputImage(new[]{new ItemStack("corn",2,24)});
+  var decodedStack=AdvancedFarmingHarvestReceipt.Decode(AdvancedFarmingHarvestReceipt.Encode(stacked));
+  Check(AdvancedFarmingHarvestReceipt.Remaining(decodedStack).Length==0,"native merge with an existing seed left unassigned output");
+  stackPlan.BeforeBag[0]=new ItemStack("",0);
+  stackPlan.AfterBag[0]=new ItemStack("corn",2,12);
+  stacked.PlanImage=AdvancedFarmingHarvestOwnerDelta.Encode(stackPlan);
+  try {AdvancedFarmingHarvestReceipt.Decode(AdvancedFarmingHarvestReceipt.Encode(stacked));throw new Exception("new slot accepted a different output seed");}
+  catch(InvalidDataException){}
   Check(AdvancedFarmingHarvestReceipt.TryReserve(r),"reserve failed");Check(AdvancedFarmingHarvestReceipt.TryRead(r.World,r.Operation,out var read),"read failed");
   Check(!AdvancedFarmingHarvestReceipt.TryAdvance(read,AdvancedFarmingHarvestReceipt.Phase.SourcePublished,out _),"source phase advanced without proof");
   Check(Publish(read,out var source),"forward source proof failed");

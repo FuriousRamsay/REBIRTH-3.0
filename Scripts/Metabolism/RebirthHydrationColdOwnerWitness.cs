@@ -12,29 +12,55 @@ internal sealed partial class RebirthHydrationColdOwnerWitness
     {Player=player;Original=original;world=player.world;game=GameManager.Instance;manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         bag=player.bag;belt=player.inventory;save=Path.GetFullPath(GameIO.GetSaveGameDir());playerData=Path.GetFullPath(GameIO.GetPlayerDataDir());}
     internal static bool TryObserve(EntityPlayerLocal player,RebirthHydrationTransferOriginal original,out RebirthHydrationColdOwnerWitness witness)
+        =>TryObserve(player,original,completedLocal:false,out witness);
+
+    internal static bool TryObserveCompletedLocal(EntityPlayerLocal player,RebirthHydrationTransferOriginal original,out RebirthHydrationColdOwnerWitness witness)
+        =>TryObserve(player,original,completedLocal:true,out witness);
+
+    private static bool TryObserve(EntityPlayerLocal player,RebirthHydrationTransferOriginal original,bool completedLocal,out RebirthHydrationColdOwnerWitness witness)
     {
         witness=null;
-        try{if(player==null||original==null)return false;var next=new RebirthHydrationColdOwnerWitness(player,original);
-            if(!next.Current())return false;witness=next;return true;}
+        try
+        {
+            if(player==null||original==null)return false;
+            var next=new RebirthHydrationColdOwnerWitness(player,original);
+            if(!(completedLocal?next.CurrentCompletedLocal():next.Current()))return false;
+            witness=next;return true;
+        }
         catch{return false;}
     }
+
     internal bool Current()=>CurrentCore(false);
-    private bool CurrentCore(bool recoveryHeld)
+
+    // Once both financial legs are independently proven Applied, later inventory use
+    // need not preserve the historical slot image to record missing completion metadata.
+    internal bool CurrentCompletedLocal()=>CurrentCore(false,checkInventory:false)&&
+        RebirthHydrationTransferJournal.HasApplied(Player,Original)&&
+        RebirthMetabolismStateRepository.HasSavedColdLocalHydrationAfter(Player,Original)&&
+        CurrentCore(false,checkInventory:false);
+
+    private bool CurrentCore(bool recoveryHeld,bool checkInventory=true)
     {
         try
         {
-            if(!Scope(recoveryHeld)||!LiveReceipts()||!Original.TryGetPlan(out var plan)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)||
+            if(!Scope(recoveryHeld)||!LiveReceipts()||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)||
                 !RebirthGearNativePlayerFile.TryRead(owner,out var file)||file.deaths!=Original.Deaths||
                 file.buffData==null||file.buffData.Length<1||file.buffData.Length>1024*1024)return false;
             byte[] buffs=file.buffData.ToArray();
             if(!RebirthGearReceiptReader.Contains(buffs,Original.Operation.ToString("N"),RebirthGearOwnerReceipt.Applied)||
                 !RebirthGearReceiptReader.TryReadHydrationStage(buffs,Original.Operation,Original.Digest,out var hydration)||hydration!=1f||
                 !RebirthGearReceiptReader.TryReadHydrationRefusedStage(buffs,Original.Operation,Original.Digest,out var refused)||refused!=0f)return false;
-            var savedBag=RebirthGearPlayerDataInventory.ReadSlots(file,true);var savedBelt=RebirthGearPlayerDataInventory.ReadSlots(file,false);
-            return RebirthGearInventorySnapshot.TryCapture(savedBag,savedBelt,Original.OwnedBelt,out var saved)&&
-                plan.MatchesAppliedInventory(saved.Bag,saved.Belt)&&
-                RebirthGearInventorySnapshot.TryCapture(Player.bag?.ItemGrid?.items,Player.inventory?.ItemGrid?.items,Original.OwnedBelt,out var live)&&
-                plan.MatchesAppliedInventory(live.Bag,live.Belt)&&LiveReceipts()&&Scope(recoveryHeld);
+            if(checkInventory)
+            {
+                if(!Original.TryGetPlan(out var plan))return false;
+                var savedBag=RebirthGearPlayerDataInventory.ReadSlots(file,true);
+                var savedBelt=RebirthGearPlayerDataInventory.ReadSlots(file,false);
+                if(!RebirthGearInventorySnapshot.TryCapture(savedBag,savedBelt,Original.OwnedBelt,out var saved)||
+                    !plan.MatchesAppliedInventory(saved.Bag,saved.Belt)||
+                    !RebirthGearInventorySnapshot.TryCapture(Player.bag?.ItemGrid?.items,Player.inventory?.ItemGrid?.items,Original.OwnedBelt,out var live)||
+                    !plan.MatchesAppliedInventory(live.Bag,live.Belt))return false;
+            }
+            return LiveReceipts()&&Scope(recoveryHeld);
         }
         catch{return false;}
     }

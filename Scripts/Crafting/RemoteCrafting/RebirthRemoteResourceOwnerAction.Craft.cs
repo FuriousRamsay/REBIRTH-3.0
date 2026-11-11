@@ -69,10 +69,22 @@ internal static partial class RebirthRemoteResourceOwnerAction
         try
         {
             if(!scope.Entered||scope.Permission?.Invoke()!=true||group is XUiC_WorkstationWindowGroup||!ReferenceEquals(group?.xui,scope.Player.PlayerUI.xui)||
-                !RebirthRemoteResourceCraftOriginal.IsPersonalEntry(scope.Entry)||!holds.TryGetValue(scope.Original.Operation,out var hold)||hold.BlockingOnly||!Current(hold))return false;
+                !RebirthRemoteResourceCraftOriginal.IsPersonalEntry(scope.Entry)||!holds.TryGetValue(scope.Original.Operation,out var hold)||hold.BlockingOnly||!Current(hold))
+            {
+                RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] queue capture scope refused entered={scope.Entered} operation={scope.Original.Operation:N}");
+                return false;
+            }
             if(scope.CapturedRecipe!=null)return ReferenceEquals(scope.CapturedRecipe,recipe)&&StampActualRecipe(recipe,scope.Source,scope.Binding);
-            if(RecipeImage(recipe)!=scope.Original.Copy().Element("action").Element("template").Value)return false;
-            if(!StampActualRecipe(recipe,scope.Source,scope.Binding))return false;
+            if(RecipeImage(recipe)!=scope.Original.Copy().Element("action").Element("template").Value)
+            {
+                RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] queue template differs operation={scope.Original.Operation:N}");
+                return false;
+            }
+            if(!StampActualRecipe(recipe,scope.Source,scope.Binding))
+            {
+                RebirthDebug.Log("remoteresources",$"[REBIRTH RemoteCraft] queue marker refused operation={scope.Original.Operation:N}");
+                return false;
+            }
             scope.CapturedRecipe=recipe;return true;
         }
         catch{return false;}

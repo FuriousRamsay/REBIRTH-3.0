@@ -70,8 +70,8 @@ public static class RebirthCamperClaimProjection
         {
             if(!(entity is EntityVehicle vehicle)||!RebirthCamperRadial.IsCamper(vehicle))continue;
             string identity=Identity(vehicle);if(identity==null)continue;
-            bool ready=RebirthCamperEnergyImmobility.CampClaimReady(vehicle);
             if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out long revision,out float range))continue;
+            bool ready=mode==RebirthCamperEnergyMode.Camp&&RebirthCamperEnergyImmobility.CampClaimReady(vehicle);
             var published=publications.GetValue(vehicle,_=>new Publication());
             if(Time.realtimeSinceStartup<published.RetryAfter)continue;
             if(published.Identity==identity&&published.Ready==ready&&published.Mode==mode&&published.Range==range&&

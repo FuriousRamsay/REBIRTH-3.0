@@ -269,22 +269,26 @@ internal static partial class RebirthProductiveEarnedRemoteHost
     [HarmonyPatch(typeof(TileEntityWorkstation),nameof(TileEntityWorkstation.UpdateTick))]
     private static class HeldTick
     {
-        private sealed class TickPurposes{internal object Milling,NativeTerminal;}
+        private struct TickPurposes
+        {
+            internal RebirthCookingMillingPublication.MillingStationTick Milling;
+            internal RebirthProductiveEarnedCoordinator.NativeTerminalTickState NativeTerminal;
+        }
         private static bool Prefix(TileEntityWorkstation __instance,bool __runOriginal,out TickPurposes __state)
         {
             ObserveNativeTickHandoff(__instance,__runOriginal);
             bool allowed=!RebirthProductiveEarnedUiQueueOwner.HoldsInitialPublication(__instance)&&!RebirthRecyclerPlacedSettlement.HoldsStation(__instance)&&!RebirthCookingMillingPublication.Held(__instance)&&!BlocksQueue(__instance)&&!RebirthProductiveEarnedRemoteClient.HasPending(__instance)&&RebirthProductiveEarnedUiDeferredTransport.CanTickAuthorityNative(__instance)&&RebirthProductiveEarnedUiDeferredTransport.CanTickKnownNativeReceipt(__instance)&&RebirthWorkstationCompletionPipeline.CanTickRemoteNativeCompletion(__instance)&&RebirthProductiveEarnedUiCoordinator.CanTickQueueHandoff(__instance)&&RebirthProductiveEarnedUiRemote.CanTickHostQueueHandoff(__instance);
-            __state=new TickPurposes();try{__state.Milling=RebirthCookingMillingPublication.EnterMillingStationTick(__instance,__runOriginal&&allowed);}catch{}
+            __state=default;try{__state.Milling=RebirthCookingMillingPublication.EnterMillingStationTick(__instance,__runOriginal&&allowed);}catch{}
             try{__state.NativeTerminal=RebirthProductiveEarnedCoordinator.EnterNativeTerminalOuterTick(__instance,__runOriginal&&allowed);}catch{}
             return allowed;
         }
         private static void Postfix(TileEntityWorkstation __instance,bool __runOriginal,TickPurposes __state)
         {
-            try{RebirthCookingMillingPublication.ObserveMillingStationTickReturned(__instance,__runOriginal,__state?.Milling);}catch{}
-            try{RebirthProductiveEarnedCoordinator.ObserveNativeTerminalOuterTickReturned(__instance,__runOriginal,__state?.NativeTerminal);}catch{}
+            try{RebirthCookingMillingPublication.ObserveMillingStationTickReturned(__instance,__runOriginal,__state.Milling);}catch{}
+            try{RebirthProductiveEarnedCoordinator.ObserveNativeTerminalOuterTickReturned(__instance,__runOriginal,__state.NativeTerminal);}catch{}
         }
         private static Exception Finalizer(Exception __exception,TickPurposes __state)
-        {try{RebirthCookingMillingPublication.EndMillingStationTick(__state?.Milling);}catch{}try{RebirthProductiveEarnedCoordinator.EndNativeTerminalOuterTick(__state?.NativeTerminal);}catch{}return __exception;}
+        {try{RebirthCookingMillingPublication.EndMillingStationTick(__state.Milling);}catch{}try{RebirthProductiveEarnedCoordinator.EndNativeTerminalOuterTick(__state.NativeTerminal);}catch{}return __exception;}
     }
     [HarmonyPatch(typeof(NetPackageTileEntity),nameof(NetPackageTileEntity.ProcessPackage))]
     private static class NativeUpload

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine.Scripting;
@@ -12,18 +13,80 @@ public sealed class RebirthPublicPlayerProfile
     public float[] Values=new float[4];
     public static RebirthPublicPlayerProfile Build(EntityPlayer player,RebirthSurvivorOwnerStateSnapshot owner)
     {
-        var result=new RebirthPublicPlayerProfile{EntityId=player.entityId};
-        var snapshot=RebirthCharacterUiSnapshotBuilder.Build(player,owner,false,default(RebirthMetabolismSnapshot),true);
-        if(snapshot==null){result.Background="No background available";return result;}
-        result.BackgroundId=snapshot.BackgroundId;result.Background=snapshot.BackgroundName;result.Identity=snapshot.BackgroundIdentity;
-        var skills=snapshot.Skills.OrderByDescending(s=>s.Practical).ThenBy(s=>s.Name).Take(4).ToArray();
-        for(int i=0;i<skills.Length;i++){result.Names[i]=skills[i].Name;result.Icons[i]=skills[i].Icon;result.Values[i]=skills[i].Practical;}
-        return result;
+        if (player == null) return null;
+        if (owner == null || !owner.RebirthModeEnabled || !owner.HasCharacter)
+            return MissingBackground(player.entityId);
+
+        var values = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
+        foreach (var row in owner.Skills)
+            if (row != null && !string.IsNullOrEmpty(row.Id)) values[row.Id] = row.Value;
+        return Build(player.entityId, owner.BackgroundId, values);
     }
+
     public static RebirthPublicPlayerProfile FromServer(EntityPlayer player)
     {
-        RebirthStablePlayerIdentity identity;
-        return player!=null && RebirthStablePlayerIdentity.TryResolveServerEntity(player,out identity)?Build(player,RebirthSurvivorNetworkService.CaptureOwnerState(identity)):null;
+        if (player == null || !RebirthStablePlayerIdentity.TryResolveServerEntity(player, out var identity))
+            return null;
+        if (!RebirthSurvivorMode.IsEnabledForCurrentWorld() ||
+            !RebirthWorldCharacterRepository.TryGet(identity, out var record) || !record.IsComplete)
+            return MissingBackground(player.entityId);
+
+        var values = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
+        var skills = record.Progression?.Skills;
+        if (skills != null)
+        {
+            IEnumerable<RebirthSkillRuntimeState> publicSkills = skills.Values;
+            if (skills.Count > RebirthSurvivorNetworkProtocol.MaxSkills)
+                publicSkills = skills.OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                    .Take(RebirthSurvivorNetworkProtocol.MaxSkills).Select(pair => pair.Value);
+            foreach (var skill in publicSkills)
+            {
+                if (skill != null && !string.IsNullOrEmpty(skill.SkillId)) values[skill.SkillId] = skill.Value;
+            }
+        }
+        return Build(player.entityId, record.Origin.BackgroundId, values);
+    }
+
+    private static RebirthPublicPlayerProfile MissingBackground(int entityId) =>
+        new RebirthPublicPlayerProfile { EntityId = entityId, Background = "No background available" };
+
+    private static RebirthPublicPlayerProfile Build(int entityId, string backgroundId, Dictionary<string, float> values)
+    {
+        var result = new RebirthPublicPlayerProfile { EntityId = entityId, BackgroundId = backgroundId ?? string.Empty };
+        result.Background = result.BackgroundId;
+        if (RebirthSurvivorDefinitionRegistry.TryGetBackground(result.BackgroundId, out var background) && background != null)
+        {
+            result.Background = RebirthUiProjectionTextCache.L(background.NameKey, background.Id);
+            result.Identity = background.Identity ?? string.Empty;
+        }
+
+        var definitions = RebirthSurvivorDefinitionRegistry.Bundle?.Progression?.Skills;
+        if (definitions == null) return result;
+        var top = definitions.Where(definition => definition != null)
+            .Select(definition => new {
+                Definition = definition,
+                Name = RebirthUiProjectionTextCache.L(definition.NameKey, definition.Id),
+                Practical = values.TryGetValue(definition.Id, out var practical) ? practical : definition.Min
+            })
+            .OrderByDescending(row => row.Practical).ThenBy(row => row.Name).Take(result.Names.Length);
+        int i = 0;
+        foreach (var row in top)
+        {
+            result.Names[i] = row.Name;
+            result.Icons[i] = RebirthSkillAptitudeTraitFactory.SkillIconKey(row.Definition.Id);
+            result.Values[i++] = row.Practical;
+        }
+        return result;
+    }
+
+    internal bool HasSameFields(RebirthPublicPlayerProfile other)
+    {
+        if (other == null || BackgroundId != other.BackgroundId || Background != other.Background || Identity != other.Identity)
+            return false;
+        for (int i = 0; i < Names.Length; i++)
+            if (Names[i] != other.Names[i] || Icons[i] != other.Icons[i] || !Values[i].Equals(other.Values[i]))
+                return false;
+        return true;
     }
     public static event Action<RebirthPublicPlayerProfile> Received;
     public static void Receive(RebirthPublicPlayerProfile value){Received?.Invoke(value);}

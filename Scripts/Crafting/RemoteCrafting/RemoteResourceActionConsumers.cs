@@ -1,6 +1,8 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
 
 #nullable disable
 
@@ -23,6 +25,7 @@ public static class RemoteResourceActionConsumerPatchInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteUpgradeRemoveResourcePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteRepairCanRemoveItemPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteRepairRemoveItemPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteRepairDebitResultPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemotePaintCheckAmmoPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemotePaintDecreaseAmmoPatch));
     }
@@ -33,9 +36,14 @@ public static class RemoteResourceActionConsumerPatchInstaller
         BlockValue blockValue,
         ref bool __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __result || data == null) return;
-        ItemStack requirement;
-        if (!TryBuildUpgradeRequirement(__instance, blockValue, out requirement)) return;
+        if (__result || data == null || !TryBuildUpgradeRequirement(__instance, blockValue, out var requirement)) return;
+        if (!RemoteResourceClientGrantContext.Active && data.holdingEntity is EntityPlayerLocal carried &&
+            carried.inventory.GetItemCount(requirement.itemValue) + carried.bag.GetItemCount(requirement.itemValue) >= requirement.count)
+        {
+            __result = true;
+            return;
+        }
+        if (!RemoteResourcesRuntimePolicy.Enabled) return;
         EntityPlayer player;
         if (TryGetServerPlayer(data, out player))
         {
@@ -58,9 +66,14 @@ public static class RemoteResourceActionConsumerPatchInstaller
         BlockValue blockValue,
         ref bool __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || data == null) return true;
-        ItemStack requirement;
-        if (!TryBuildUpgradeRequirement(__instance, blockValue, out requirement)) return true;
+        if (data == null || !TryBuildUpgradeRequirement(__instance, blockValue, out var requirement)) return true;
+        if (!RemoteResourceClientGrantContext.Active && data.holdingEntity is EntityPlayerLocal carried &&
+            TryPayCarried(carried, requirement, out __result))
+        {
+            if (__result) carried.AddUIHarvestingItem(new ItemStack(requirement.itemValue, -requirement.count));
+            return false;
+        }
+        if (!RemoteResourcesRuntimePolicy.Enabled) return true;
         EntityPlayer player;
         if (!TryGetServerPlayer(data, out player))
         {
@@ -80,12 +93,40 @@ public static class RemoteResourceActionConsumerPatchInstaller
         return false;
     }
 
+    private static bool TryPayCarried(EntityPlayerLocal player, ItemStack requirement, out bool paid)
+    {
+        paid = false;
+        var material = requirement.itemValue;
+        int cost = requirement.count;
+        if (RebirthBackpackLibraryReservation.BlocksResourceUse(player)) return true;
+        int belt = player.inventory.GetItemCount(material);
+        if (belt >= cost)
+        {
+            paid = player.inventory.DecItem(material, cost) == cost;
+            return true;
+        }
+
+        int bag = player.bag.GetItemCount(material);
+        if (bag < cost - belt) return false;
+        if (bag >= cost) belt = 0;
+        if (belt == 0 || player.inventory.DecItem(material, belt) == belt)
+            paid = player.bag.DecItem(material, cost - belt) == cost - belt;
+        return true;
+    }
+
     internal static void AfterCanRemoveRepairItem(
         ItemInventoryData _data,
         ItemStack _itemStack,
         ref bool __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __result || _itemStack == null || _itemStack.IsEmpty() || _data == null) return;
+        if (__result || _itemStack == null || _itemStack.IsEmpty() || _data == null) return;
+        if (!RemoteResourceClientGrantContext.Active && _data.holdingEntity is EntityPlayerLocal carried &&
+            carried.inventory.GetItemCount(_itemStack.itemValue) + carried.bag.GetItemCount(_itemStack.itemValue) >= _itemStack.count)
+        {
+            __result = true;
+            return;
+        }
+        if (!RemoteResourcesRuntimePolicy.Enabled) return;
         EntityPlayer player;
         if (TryGetServerPlayer(_data, out player))
         {
@@ -104,7 +145,10 @@ public static class RemoteResourceActionConsumerPatchInstaller
         ItemStack _itemStack,
         ref bool __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || _itemStack == null || _itemStack.IsEmpty() || _data == null) return true;
+        if (_itemStack == null || _itemStack.IsEmpty() || _data == null) return true;
+        if (!RemoteResourceClientGrantContext.Active && _data.holdingEntity is EntityPlayerLocal carried &&
+            TryPayCarried(carried, _itemStack, out __result)) return false;
+        if (!RemoteResourcesRuntimePolicy.Enabled) return true;
         EntityPlayer player;
         if (!TryGetServerPlayer(_data, out player))
         {
@@ -170,21 +214,39 @@ public static class RemoteResourceActionConsumerPatchInstaller
         BlockValue blockValue,
         out ItemStack requirement)
     {
+        Block block = action == null ? null : blockValue.Block;
+        return TryBuildUpgradeRequirement(action, block, requireHitCount: true, out requirement);
+    }
+
+    // Only for callers that just parsed UpgradeHitCount on this exact definition.
+    internal static bool TryBuildUpgradeRequirementAfterHitCountCheck(
+        ItemActionRepair action,
+        Block block,
+        out ItemStack requirement)
+    {
+        return TryBuildUpgradeRequirement(action, block, requireHitCount: false, out requirement);
+    }
+
+    private static bool TryBuildUpgradeRequirement(
+        ItemActionRepair action,
+        Block block,
+        bool requireHitCount,
+        out ItemStack requirement)
+    {
         requirement = ItemStack.Empty.Clone();
-        if (action == null || blockValue.Block == null) return false;
-        string itemName = action.GetUpgradeItemName(blockValue.Block);
+        if (action == null || block == null) return false;
+        string itemName = action.GetUpgradeItemName(block);
         if (string.IsNullOrEmpty(itemName)) return false;
         if ((action.allowedUpgradeItems.Length > 0 &&
              !action.allowedUpgradeItems.ContainsCaseInsensitive(itemName)) ||
             (action.restrictedUpgradeItems.Length > 0 &&
              action.restrictedUpgradeItems.ContainsCaseInsensitive(itemName))) return false;
-        int hitCount;
-        if (!int.TryParse(
-            blockValue.Block.Properties.GetString("UpgradeBlock", "UpgradeHitCount"),
-            out hitCount)) return false;
+        if (requireHitCount && !int.TryParse(
+            block.Properties.GetString("UpgradeBlock", "UpgradeHitCount"),
+            out _)) return false;
         int count;
         if (!int.TryParse(
-            blockValue.Block.Properties.GetString(Block.PropUpgradeBlockClass, Block.PropUpgradeBlockItemCount),
+            block.Properties.GetString(Block.PropUpgradeBlockClass, Block.PropUpgradeBlockItemCount),
             out count) || count <= 0) return false;
         ItemValue itemValue = ItemClass.GetItem(itemName);
         if (itemValue == null || itemValue.IsEmpty()) return false;
@@ -230,6 +292,58 @@ internal static class RemoteRepairRemoveItemPatch
 {
     private static bool Prefix(ItemInventoryData _data, ItemStack _itemStack, ref bool __result)
     { return RemoteResourceActionConsumerPatchInstaller.BeforeRemoveRepairItem(_data, _itemStack, ref __result); }
+}
+
+[HarmonyPatch(typeof(ItemActionRepair), nameof(ItemActionRepair.ExecuteAction))]
+internal static class RemoteRepairDebitResultPatch
+{
+    private static bool ContinueAfterDebit(bool paid, float[] credit, float prior)
+    {
+        if (paid || credit.Length != 1) return true;
+        credit[0] = prior;
+        return false;
+    }
+
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+    {
+        var code = instructions.ToList();
+        var debit = AccessTools.DeclaredMethod(typeof(ItemActionRepair), nameof(ItemActionRepair.removeRequiredItem));
+        var credit = AccessTools.Field(typeof(ItemActionRepair.InventoryDataRepair), nameof(ItemActionRepair.InventoryDataRepair.lastRepairItemsPercents));
+        var finish = AccessTools.DeclaredMethod(typeof(RemoteRepairDebitResultPatch), nameof(ContinueAfterDebit));
+        if (debit == null || credit == null || finish == null || code.Count(item => item.Calls(debit)) != 1) return code;
+        int call = code.FindIndex(item => item.Calls(debit));
+        if (call < 14 || call + 2 >= code.Count || code[call + 1].opcode != OpCodes.Pop || code[call + 1].blocks.Count != 0)
+            return code;
+
+        // The native due branch adds the new credit and subtracts the cost
+        // immediately before calling removeRequiredItem.
+        int subtract = code.FindLastIndex(call - 1, item => item.opcode == OpCodes.Ldelema && Equals(item.operand, typeof(float)));
+        int add = subtract - 10;
+        if (add < 3 || subtract + 5 >= call || !Equals(code[add - 2].operand, credit) ||
+            !Equals(code[subtract - 2].operand, credit) || code[add].opcode != OpCodes.Ldelema ||
+            !Equals(code[add].operand, typeof(float)) || code[add + 5].opcode != OpCodes.Add ||
+            code[add + 6].opcode != OpCodes.Stind_R4 || code[subtract + 4].opcode != OpCodes.Sub ||
+            code[subtract + 5].opcode != OpCodes.Stind_R4 || code[add + 1].labels.Count != 0 || code[add + 1].blocks.Count != 0)
+            return code;
+
+        var prior = generator.DeclareLocal(typeof(float));
+        var resume = generator.DefineLabel();
+        var loadData = code[add - 3];
+        var afterCall = code[call + 1];
+        afterCall.opcode = loadData.opcode;
+        afterCall.operand = loadData.operand;
+        code[call + 2].labels.Add(resume);
+        code.InsertRange(call + 2, new[]
+        {
+            new CodeInstruction(OpCodes.Ldfld, credit), new CodeInstruction(OpCodes.Ldloc, prior),
+            new CodeInstruction(OpCodes.Call, finish), new CodeInstruction(OpCodes.Brtrue, resume), new CodeInstruction(OpCodes.Ret)
+        });
+        code.InsertRange(add + 1, new[]
+        {
+            new CodeInstruction(OpCodes.Dup), new CodeInstruction(OpCodes.Ldind_R4), new CodeInstruction(OpCodes.Stloc, prior)
+        });
+        return code;
+    }
 }
 
 [HarmonyPatch(typeof(ItemActionTextureBlock), "checkAmmo")]

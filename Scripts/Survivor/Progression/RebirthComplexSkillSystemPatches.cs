@@ -5,11 +5,11 @@ using HarmonyLib;
 [HarmonyPatch(typeof(GameManager), "explode")]
 internal static class RebirthSurvivorExplosiveBlockSkillPatch
 {
-    private static void Prefix(int _entityId,ItemValue _itemValueExplosionSource,out RebirthExplosionWorkWitness.Scope __state)
-        =>__state=RebirthExplosionWorkWitness.Begin(_entityId,_itemValueExplosionSource);
-    private static void Postfix(RebirthExplosionWorkWitness.Scope __state,bool __runOriginal)
-        =>RebirthExplosionWorkWitness.Finish(__state,__runOriginal);
-    private static System.Exception Finalizer(System.Exception __exception,RebirthExplosionWorkWitness.Scope __state)
+    private static void Prefix(int _entityId,ItemValue _itemValueExplosionSource,out RebirthExplosionWorkWitness.Frame __state)
+        =>RebirthExplosionWorkWitness.Begin(_entityId,_itemValueExplosionSource,out __state);
+    private static void Postfix(RebirthExplosionWorkWitness.Frame __state,bool __runOriginal)
+        =>RebirthExplosionWorkWitness.Finish(__state.Witness,__runOriginal);
+    private static System.Exception Finalizer(System.Exception __exception,RebirthExplosionWorkWitness.Frame __state)
     {
         RebirthExplosionWorkWitness.Close(__state);return __exception;
     }
@@ -23,12 +23,16 @@ internal static class RebirthSurvivorExplosionPlannedBlocksPatch
 
 internal static class RebirthExplosionWorkWitness
 {
+    internal struct Frame
+    {
+        internal Scope Previous,Witness;
+        internal bool Open;
+    }
     internal sealed class Scope
     {
-        internal Scope Previous;internal World World;internal EntityPlayer Player;
+        internal World World;internal EntityPlayer Player;internal int Deaths;
         internal RebirthStablePlayerIdentity Owner;internal RebirthWorldCharacterRecord Record;internal string Creation,Receipt;
-        internal readonly System.Collections.Generic.Dictionary<Vector3i,BlockValue> Before=new System.Collections.Generic.Dictionary<Vector3i,BlockValue>();
-        internal readonly System.Collections.Generic.Dictionary<Vector3i,BlockValue> After=new System.Collections.Generic.Dictionary<Vector3i,BlockValue>();
+        internal System.Collections.Generic.Dictionary<Vector3i,BlockValue> ChangedBlocks;
         internal bool Finished;
     }
     [System.ThreadStatic]private static Scope current;
@@ -46,16 +50,18 @@ internal static class RebirthExplosionWorkWitness
         player=player??GameManager.Instance?.World?.GetPrimaryPlayer();ExplosionCounts counts=null;if(player!=null)Counts.TryGetValue(player,out counts);
         return new Newtonsoft.Json.Linq.JObject{["actor"]=player?.entityId??-1,["accepted"]=counts?.Accepted??0,["settled"]=counts?.Settled??0,["pending"]=Pending.FindAll(scope=>ReferenceEquals(scope.Player,player)).Count};
     }
-    internal static Scope Begin(int actor,ItemValue source)
+    internal static void Begin(int actor,ItemValue source,out Frame frame)
     {
-        var scope=new Scope{Previous=current};current=scope;
+        // An unqualified nested explosion still masks the outer witness.
+        frame=new Frame{Previous=current,Open=true};
+        current=null;
         var world=GameManager.Instance?.World;
         if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||source==null||
-            RebirthProgressionRuntimeConfig.ClassifyCombat(source)!="skill.explosives")return scope;
+            RebirthProgressionRuntimeConfig.ClassifyCombat(source)!="skill.explosives")return;
         var player=world.GetEntity(actor) as EntityPlayer;
-        if(!RebirthSkillAwardService.TryGetEligible(player,out var owner,out var record))return scope;
-        scope.World=world;scope.Player=player;scope.Owner=owner;scope.Record=record;scope.Creation=record.Origin?.CreationId;scope.Receipt="explosion-block:"+System.Guid.NewGuid().ToString("N");
-        return scope;
+        if(player==null||player.IsDead()||!RebirthSkillAwardService.TryGetEligible(player,out var owner,out var record))return;
+        frame.Witness=current=new Scope{World=world,Player=player,Deaths=player.Died,Owner=owner,Record=record,
+            Creation=record.Origin?.CreationId};
     }
     internal static void Capture(Explosion explosion)
     {
@@ -64,28 +70,50 @@ internal static class RebirthExplosionWorkWitness
         {
             var before=scope.World.GetBlock(pair.Key);var after=pair.Value.blockValue;
             if(before.Equals(after))continue; // protected/zero-damage candidate
-            scope.Before[pair.Key]=before;scope.After[pair.Key]=after;
+            (scope.ChangedBlocks??=new System.Collections.Generic.Dictionary<Vector3i,BlockValue>())[pair.Key]=after;
         }
     }
     internal static void Finish(Scope scope,bool ran)
     {
         if(scope==null||scope.Finished)return;scope.Finished=true;
-        if(scope.Record==null||!ran||!ReferenceEquals(GameManager.Instance?.World,scope.World)||scope.World.IsRemote())return;
-        bool accepted=false;
-        foreach(var pair in scope.After)
-            if(!scope.Before[pair.Key].Equals(pair.Value)&&scope.World.GetBlock(pair.Key).Equals(pair.Value)){accepted=true;break;}
-        if(accepted){Counts.GetOrCreateValue(scope.Player).Accepted++;Pending.Add(scope);Tick();}
+        var changed=scope.ChangedBlocks;
+        scope.ChangedBlocks=null;
+        if(!ran||changed==null||!ReferenceEquals(GameManager.Instance?.World,scope.World)||scope.World.IsRemote())return;
+        foreach(var pair in changed)
+        {
+            if(!scope.World.GetBlock(pair.Key).Equals(pair.Value))continue;
+            scope.Receipt="explosion-block:"+System.Guid.NewGuid().ToString("N");
+            Counts.GetOrCreateValue(scope.Player).Accepted++;
+            Pending.Add(scope);
+            Tick();
+            break;
+        }
     }
-    internal static void Close(Scope scope){if(scope!=null&&ReferenceEquals(current,scope))current=scope.Previous;}
+    internal static void Close(Frame frame)
+    {
+        if(frame.Open&&ReferenceEquals(current,frame.Witness))current=frame.Previous;
+    }
     internal static void Tick()
     {
+        if(Pending.Count==0||!ThreadManager.IsMainThread())return;
         foreach(var scope in Pending.ToArray())
         {
             if(!ReferenceEquals(GameManager.Instance?.World,scope.World)||!ReferenceEquals(scope.World.GetEntity(scope.Player.entityId),scope.Player)||
-                !RebirthSkillAwardService.TryGetEligible(scope.Player,out var owner,out var record)||owner.StorageKey!=scope.Owner.StorageKey||
-                !ReferenceEquals(record,scope.Record)||!RebirthSurvivorRequestScope.Matches(scope.Creation,record.Origin?.CreationId))continue;
+                scope.Player.IsDead()||scope.Player.Died!=scope.Deaths)
+            {
+                Pending.Remove(scope);
+                continue;
+            }
+            if(!RebirthSkillAwardService.TryGetEligible(scope.Player,out var owner,out var record))continue;
+            if(owner.StorageKey!=scope.Owner.StorageKey||!RebirthSurvivorRequestScope.Matches(scope.Creation,record.Origin?.CreationId))
+            {
+                Pending.Remove(scope);
+                continue;
+            }
+            if(!ReferenceEquals(record,scope.Record))continue;
             if(RebirthSkillAwardService.TryAwardDurable(scope.Player,"skill.explosives",RebirthProgressionRuntimeConfig.ExplosivesBlockAward,
-                "explosion:block",0f,scope.Receipt,out _,out _)){Pending.Remove(scope);Counts.GetOrCreateValue(scope.Player).Settled++;}
+                "explosion:block",0f,scope.Receipt,out _,out _)&&Pending.Remove(scope))
+                Counts.GetOrCreateValue(scope.Player).Settled++;
         }
     }
 }

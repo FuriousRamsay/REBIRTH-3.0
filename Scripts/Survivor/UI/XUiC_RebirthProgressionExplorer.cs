@@ -798,7 +798,7 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         {Set(focusSkillKnowledgeLabel,string.Empty);return;}
         if(preparedMode==RebirthProgressionExplorerMode.Neutral)
         {Set(focusSkillKnowledgeLabel,L("xuiRebirthProgressionExplorerSkillLayerLabels","PRACTICAL SKILL  •  THEORY"));return;}
-        RebirthSurvivorOwnerStateSnapshot snapshot=RebirthSurvivorClientState.GetOwnerStateSnapshot();
+        RebirthSurvivorOwnerStateSnapshot snapshot=RebirthSurvivorClientState.GetOwnerStateSnapshot(out _, showOrdinaryProgress: true);
         float practical=0f,theory=0f;bool hasPractical=false,hasTheory=false;
         if(preparedMode==RebirthProgressionExplorerMode.CreatorPreview&&creatorPreviewResult!=null)
         {hasPractical=creatorPreviewResult.StartingSkills.TryGetValue(node.Id,out practical);hasTheory=creatorPreviewResult.StartingSkillKnowledge.TryGetValue(node.Id,out theory);}

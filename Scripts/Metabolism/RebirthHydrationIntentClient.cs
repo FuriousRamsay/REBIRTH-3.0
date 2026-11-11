@@ -15,7 +15,9 @@ internal static class RebirthHydrationIntentClient
             if(!intent.Current()||!ReferenceEquals(game,GameManager.Instance)||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance))return false;
             game.SaveLocalPlayerData();
             if(!intent.Current())return false;
-            game.TriggerSendOfLocalPlayerDataFile(0f);
+            // The host reads latestPlayerData during proposal admission. Queue
+            // this native snapshot before the request instead of scheduling it later.
+            manager.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(intent.Player));
             if(!intent.Current()||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance))return false;
             manager.SendToServer(packet);return intent.Current();
         }

@@ -1,0 +1,59 @@
+{
+  "name": "p25_recycler_empty_chunk_marker",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, Guard ON, no UI. Native placed SonjaRecyclerStation at 30,45,995 in a confirmed loaded chunk with empty custom metadata for the fast path, empty queue and output. After the read-only no-work observation, use the same coordinates and a genuine retained clone with either unrelated metadata, another station marker, this station's valid or malformed matching marker. Do not inject an authoritative receipt in the scenario."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "expectStation": {
+        "x": 30,
+        "y": 45,
+        "z": 995,
+        "station": "SonjaRecyclerStation",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "station": {
+        "x": 30,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "station": {
+        "x": 30,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "expectStation": {
+        "x": 30,
+        "y": 45,
+        "z": 995,
+        "station": "SonjaRecyclerStation",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "For actual marker parity capture GET /auditstate?domain=recyclerPlacedOriginals on the genuine owner and authority. Confirm same station key/prefix, hold/refusal on valid or malformed matching key, unrelated keys allow the established route, and completed cold recovery/cancel is unchanged. The JSON only proves the base native idle control."
+    }
+  ]
+}

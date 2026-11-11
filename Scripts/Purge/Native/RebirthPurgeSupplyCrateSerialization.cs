@@ -55,20 +55,14 @@ internal static class RebirthPurgeSupplyCrateSerialization
         };
     }
     internal static void Reset()=>entries=new ConditionalWeakTable<EntitySupplyCrate,Entry>();
-    internal static bool TryAttach(EntitySupplyCrate crate,RebirthPurgeSupplyCrateStamp stamp,object nativeOwner,Func<bool> current)=>
-        Attach(crate,stamp,nativeOwner,current,false);
-    internal static bool TryAttachBeforeSpawn(EntitySupplyCrate crate,RebirthPurgeSupplyCrateStamp stamp,object nativeOwner,Func<bool> current)=>
-        Attach(crate,stamp,nativeOwner,current,true);
-    private static bool Attach(EntitySupplyCrate crate,RebirthPurgeSupplyCrateStamp stamp,object nativeOwner,Func<bool> current,bool beforeSpawn)
+    internal static bool TryAttachBeforeSpawn(EntitySupplyCrate crate,RebirthPurgeSupplyCoordinator.Reservation request)
     {
         try
         {
-            if(!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||!ThreadManager.IsMainThread()||crate==null||stamp==null||nativeOwner==null||current==null||!current())return false;
-            var world=crate.world as World;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
-            Entity registered;Guid guid;RebirthPurgeSupplyAccount account;
-            var accounts=RebirthPurgeSupplyService.Published;
-            if(world==null||manager==null||!manager.IsServer||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||!Guid.TryParseExact(world.worldState?.Guid,"N",out guid)||guid!=stamp.World||
-                (beforeSpawn?world.Entities.dict.ContainsKey(crate.entityId):!world.Entities.dict.TryGetValue(crate.entityId,out registered)||!ReferenceEquals(registered,crate))||accounts==null||!accounts.TryGetValue(stamp.Player,out account)||(account.InFlight!=stamp.Sequence&&account.DeliveredDrops<stamp.Sequence)||RebirthPurgeSupplyAccount.DeliveryToken(guid,stamp.Player,stamp.Sequence)!=stamp.Token)return false;
+            var world=crate?.world as World;
+            if(world==null||request?.CanStamp(world)!=true||world.Entities.dict.ContainsKey(crate.entityId)||
+                !Guid.TryParseExact(world.worldState?.Guid,"N",out var guid)||guid!=request.Stamp.World)return false;
+            var stamp=request.Stamp;
             Entry existing;if(entries.TryGetValue(crate,out existing)){if(existing.EntityId==crate.entityId&&existing.Born==crate.WorldTimeBorn)return existing.Authoritative&&Same(existing.Stamp,stamp);entries.Remove(crate);}
             entries.Add(crate,new Entry{Stamp=stamp,Authoritative=true,EntityId=crate.entityId,Born=crate.WorldTimeBorn});return true;
         }

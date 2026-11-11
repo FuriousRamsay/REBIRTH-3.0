@@ -1,0 +1,15 @@
+{
+  "name": "Dedicated Workbench Craft pays through native RemoveItems",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "In a disposable dedicated Purge save, open the Workbench and select Cooler. Have four Scrap Polymers in the backpack and at least four in a nearby eligible crate. Observe crate totals with the server console before and after. Confirm the Workbench output grows by one." },
+    { "expectWindowOpen": "workstation_workbench" },
+    { "expectItem": { "name": "resourceScrapPolymers", "min": 4, "max": 4 } },
+    { "console": "rbdebug on crafting" },
+    { "click": { "path": "workstation_workbench/craftingInfoPanel/contentCraftingInfo/itemActions/item_action_entry#1/background" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] queue recipe=cntCoolerVariantHelper accepted=True" } },
+    { "expectLog": { "contains": "[REBIRTH ContainerCraft] debit recipe=cntCoolerVariantHelper batches=1 local=4 remote=4 shortfall=0" } },
+    { "expectNoItem": "resourceScrapPolymers" },
+    { "expectNoErrors": true }
+  ]
+}

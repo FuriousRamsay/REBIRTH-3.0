@@ -144,8 +144,7 @@ internal static class RebirthPurgeHudProgress
     {
         biomeName=percentage=counts="—";
         var world=GameManager.Instance?.World;
-        if(player==null||world==null)return;
-        var biome=world.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
+        var biome=CurrentBiome(world,player);
         if(biome==null)return;
         biomeName=Localization.Get("biome_"+biome);
         int cleared,eligible,mode=RebirthPurgeObjectivePolicy.ProgressionMode;
@@ -166,9 +165,20 @@ internal static class RebirthPurgeHudProgress
     }
     internal static bool HasBiomeSummary(EntityPlayerLocal player)
     {
-        string biome,percentage,counts;
-        BiomeSummary(player,out biome,out percentage,out counts);
-        return counts!="—";
+        var world=GameManager.Instance?.World;
+        var biome=CurrentBiome(world,player);
+        if(biome==null)return false;
+        if(world.IsRemote())
+        {
+            var frame=RebirthPoiMapSync.LocalObjectives;
+            return CurrentFrame(frame)&&frame.Biomes.ContainsKey(biome);
+        }
+        return CurrentLocalProgress()?.ContainsKey(biome)==true;
+    }
+    private static string CurrentBiome(World world,EntityPlayerLocal player)
+    {
+        if(world==null||player==null)return null;
+        return world.GetBiome(Utils.Fastfloor(player.position.x),Utils.Fastfloor(player.position.z))?.m_sBiomeName;
     }
     private static string Percentage(int cleared,int eligible)
     {return eligible<=0?"—":Math.Min(100d,100d*cleared/eligible).ToString("0.#",CultureInfo.InvariantCulture)+"%";}

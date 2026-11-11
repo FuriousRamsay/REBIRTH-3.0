@@ -287,6 +287,8 @@ public sealed class RebirthMetabolismState
     internal RebirthHydrationTransferOriginal HydrationTransferReceipt;
     public ulong LastProcessedWorldTime;
     public int NextEntryId = 1;
+    internal float NutritionBeforeDeath = -1f;
+    internal float HydrationBeforeDeath = -1f;
 
     // Runtime-only fields.
     public float NextRealTickTime;

@@ -30,17 +30,23 @@ public static class RebirthCamperEnergyMaintenanceCargoGuard
                 new[]{"SetItem","SetItems","Resize","ChangeCount","Clear","Reset","CopyFrom","CopyItemsFrom","SetSlotLocks","SetLocked","SetPreferences"})
                 if(!type.GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Any(m=>m.DeclaringType==type&&m.Name==name))throw new MissingMethodException(type.FullName,name);
         // Resolve ALL mandatory anchors before installing the first detour.
-        foreach(var type in new[]{typeof(RebirthCamperMaintenanceCargoMutation),typeof(RebirthCamperMaintenanceCargoResize),typeof(RebirthCamperMaintenanceCargoLock),
-            typeof(RebirthCamperMaintenanceCargoSync),typeof(RebirthCamperMaintenanceCargoCursor)})
+        var patches = new[] { typeof(RebirthCamperMaintenanceCargoSlotMutation), typeof(RebirthCamperMaintenanceCargoMutation),
+            typeof(RebirthCamperMaintenanceCargoResize), typeof(RebirthCamperMaintenanceCargoLock),
+            typeof(RebirthCamperMaintenanceCargoSync), typeof(RebirthCamperMaintenanceCargoCursor) };
+        foreach(var type in patches)
             foreach(var method in Targets(type))if(method==null)throw new MissingMethodException("Maintenance cargo anchor unavailable: "+type.Name);
-        foreach(var type in new[]{typeof(RebirthCamperMaintenanceCargoMutation),typeof(RebirthCamperMaintenanceCargoResize),typeof(RebirthCamperMaintenanceCargoLock),
-            typeof(RebirthCamperMaintenanceCargoSync),typeof(RebirthCamperMaintenanceCargoCursor)})RebirthHarmonyBootstrap.PatchClassOnce(harmony,type);
+        foreach(var type in patches)RebirthHarmonyBootstrap.PatchClassOnce(harmony,type);
         installed=true;
     }
     private static void Require(Type type,string name,Type result,params Type[] parameters)
     {var method=AccessTools.DeclaredMethod(type,name,parameters);if(method==null||method.ReturnType!=result)throw new MissingMethodException(type.FullName,name);}
     private static IEnumerable<MethodBase> Targets(Type type)
     {
+        if (type == typeof(RebirthCamperMaintenanceCargoSlotMutation))
+        {
+            foreach (var method in SlotMutationTargets()) yield return method;
+            yield break;
+        }
         if(type==typeof(RebirthCamperMaintenanceCargoLock)){yield return AccessTools.DeclaredMethod(typeof(EntityVehicle),nameof(EntityVehicle.OnLockRequestServer));yield break;}
         if(type==typeof(RebirthCamperMaintenanceCargoSync)){yield return AccessTools.DeclaredMethod(typeof(EntityVehicle),nameof(EntityVehicle.ReadSyncData));yield break;}
         if(type==typeof(RebirthCamperMaintenanceCargoCursor))
@@ -48,7 +54,13 @@ public static class RebirthCamperEnergyMaintenanceCargoGuard
         foreach(var native in new[]{typeof(Bag),typeof(ItemStackGrid)})foreach(var method in native.GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
             if(method.DeclaringType==native&&(type==typeof(RebirthCamperMaintenanceCargoResize)?method.Name=="Resize":MutationNames.Contains(method.Name)))yield return method;
     }
-    internal static IEnumerable<MethodBase> MutationTargets()=>Targets(typeof(RebirthCamperMaintenanceCargoMutation));
+    internal static IEnumerable<MethodBase> SlotMutationTargets()
+    {
+        var parameters = new[] { typeof(int), typeof(ItemStack) };
+        yield return AccessTools.DeclaredMethod(typeof(Bag), nameof(Bag.SetSlot), parameters);
+        yield return AccessTools.DeclaredMethod(typeof(ItemStackGrid), nameof(ItemStackGrid.SetItem), parameters);
+    }
+    internal static IEnumerable<MethodBase> MutationTargets()=>Targets(typeof(RebirthCamperMaintenanceCargoMutation)).Except(SlotMutationTargets());
     internal static IEnumerable<MethodBase> ResizeTargets()=>Targets(typeof(RebirthCamperMaintenanceCargoResize));
     internal static IEnumerable<MethodBase> CursorTargets()=>Targets(typeof(RebirthCamperMaintenanceCargoCursor));
     private static bool Current(Hold hold)=>ThreadManager.IsMainThread()&&hold?.Vehicle?.world!=null&&!hold.World.IsRemote()&&
@@ -80,12 +92,13 @@ public static class RebirthCamperEnergyMaintenanceCargoGuard
         var desired=RebirthCamperEnergyItems.Copy(new[]{value})[0];permit=new Permit{Hold=hold,Slot=index,Desired=desired};
         try{bag.SetSlot(index,desired.Clone());}finally{permit=null;}
     }
-    internal static bool AllowsMutation(object target,MethodBase method,object[] args)
+    internal static bool AllowsSlotMutation(object target, int index, ItemStack stack)
     {
-        if(!Blocks(target))return true;var p=permit;
-        if(p==null||!Current(p.Hold)||!ReferenceEquals(target,p.Hold.Bag)&&!ReferenceEquals(target,p.Hold.Grid)||args==null||args.Length<2||
-            !(args[0] is int index)||index!=p.Slot||!(args[1] is ItemStack stack))return false;
-        return (ReferenceEquals(target,p.Hold.Bag)?method.Name=="SetSlot":method.Name=="SetItem")&&RebirthCamperEnergyItems.Same(stack,p.Desired);
+        if (!Blocks(target)) return true;
+        var current = permit;
+        return current != null && Current(current.Hold) && index == current.Slot && stack != null &&
+            (ReferenceEquals(target, current.Hold.Bag) || ReferenceEquals(target, current.Hold.Grid)) &&
+            RebirthCamperEnergyItems.Same(stack, current.Desired);
     }
     internal static bool BlocksGesture(XUiC_ItemStack slot,MethodBase method)
     {
@@ -98,11 +111,18 @@ public static class RebirthCamperEnergyMaintenanceCargoGuard
 }
 
 [HarmonyPatch]
+internal static class RebirthCamperMaintenanceCargoSlotMutation
+{
+    private static IEnumerable<MethodBase> TargetMethods()=>RebirthCamperEnergyMaintenanceCargoGuard.SlotMutationTargets();
+    [HarmonyPriority(Priority.First)]private static bool Prefix(object __instance, int __0, ItemStack __1)
+        =>RebirthCamperEnergyMaintenanceCargoGuard.AllowsSlotMutation(__instance, __0, __1);
+}
+[HarmonyPatch]
 internal static class RebirthCamperMaintenanceCargoMutation
 {
     private static IEnumerable<MethodBase> TargetMethods()=>RebirthCamperEnergyMaintenanceCargoGuard.MutationTargets();
-    [HarmonyPriority(Priority.First)]private static bool Prefix(object __instance,MethodBase __originalMethod,object[] __args)
-        =>RebirthCamperEnergyMaintenanceCargoGuard.AllowsMutation(__instance,__originalMethod,__args);
+    [HarmonyPriority(Priority.First)]private static bool Prefix(object __instance)
+        =>!RebirthCamperEnergyMaintenanceCargoGuard.Blocks(__instance);
 }
 [HarmonyPatch]
 internal static class RebirthCamperMaintenanceCargoResize

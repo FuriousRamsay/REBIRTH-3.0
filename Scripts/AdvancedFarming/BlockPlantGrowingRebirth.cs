@@ -290,7 +290,8 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
             return;
         }
 
-        if (IsFullyGrown(blockValue))
+        bool fullyGrown = IsFullyGrown(blockValue);
+        if (fullyGrown)
         {
             if (!world.IsRemote())
                 world.GetWBT().InvalidateScheduledBlockUpdate(blockPos, blockID);
@@ -301,7 +302,7 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
             AdvancedFarmingCatchupService.LogCatchupDebug("BlockLoaded ENTER pos=" + blockPos
                 + " block=" + (blockValue.Block != null ? blockValue.Block.GetBlockName() : "<null>")
                 + " isServer=" + SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer
-                + " fullyGrown=" + IsFullyGrown(blockValue));
+                + " fullyGrown=" + fullyGrown);
 
         if (!SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
             return;
@@ -310,7 +311,7 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
         if (te != null)
             te.SanitizeTimingBaselines();
 
-        if (!IsFullyGrown(blockValue) && te != null)
+        if (te != null)
         {
             if (AdvancedFarmingCatchupService.CatchupDebugEnabled)
                 AdvancedFarmingCatchupService.LogCatchupDebug("BlockLoaded PROCESS_SHARED pos=" + blockPos
@@ -342,7 +343,7 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
         else if (AdvancedFarmingCatchupService.CatchupDebugEnabled)
         {
             AdvancedFarmingCatchupService.LogCatchupDebug("BlockLoaded SKIP pos=" + blockPos
-                + " reason=" + (te == null ? "noTileEntity" : "fullyGrown")
+                + " reason=noTileEntity"
                 + " block=" + (blockValue.Block != null ? blockValue.Block.GetBlockName() : "<null>"));
         }
     }

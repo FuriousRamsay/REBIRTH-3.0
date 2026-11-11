@@ -1,0 +1,17 @@
+{
+  "name": "Solo Purge remote source rebuild on demand",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Disposable solo Rebirth Purge. Prepare an eligible static crate in range with exactly 2 Small Stone, 2 Plant Fibers and 1 Tree Branch. Keep all three out of carried inventory. Prepare a nearby eligible Workbench with a real native job finishing inside the four-second idle interval, then close every XUi window. Confirm that the station output changed with the same bridge station observer before treating the idle log assertion as evidence. Do not use rbrr refresh, which intentionally rebuilds eagerly."},
+    {"console": ["rbdebug on Crafting", "rbrr debug on"]},
+    {"wait": 4},
+    {"expectNoLog": {"contains": "[RemoteResources] snapshot player="}},
+    {"action": {"command": "key", "args": {"name": "Tab"}}},
+    {"action": {"command": "click", "args": {"recipe": "meleeToolRepairT0StoneAxe", "exact": 1}}},
+    {"waitForUi": {"id": "rebirthCraftingOutcomeStatusValue", "exactText": "Ready to craft", "timeout": 5}},
+    {"expectLog": {"contains": "[RemoteResources] snapshot player="}},
+    {"screenshot": "audit_remote_availability_local_lazy"},
+    {"console": "rbrr debug off"},
+    {"expectNoErrors": true}
+  ]
+}

@@ -163,6 +163,8 @@ public class XUiC_RebirthSandboxSummary : XUiController
                 + Localization.Get(state.PlayerProgression == RebirthPlayerProgressionMode.Rebirth
                     ? "xuiRebirthPlayerProgressionRebirth"
                     : "xuiRebirthPlayerProgressionBaseGame") + "[-]");
+        if (state.PlayerProgression == RebirthPlayerProgressionMode.Rebirth && !state.KeepInjuriesOnDeath)
+            changes.Add(Localization.Get("xuiRebirthDeathDebuffs") + ": " + Localization.Get("xuiRebirthDeathDebuffsClear"));
 
         if (state.Theme != defaults.Theme)
             changes.Add(Localization.Get("xuiRebirthTheme") + ": " + Localization.Get("xuiRebirthThemePurge"));

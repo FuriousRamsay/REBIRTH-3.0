@@ -111,10 +111,16 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
     }
     public override void OnClose()
     {
-        ReleaseCameraSubscription();
-        ready=false;isOpen=false;
+        StopMap();
         foreach(var child in children)child.OnClose();
         ViewComponent.OnClose();
+    }
+
+    private void StopMap()
+    {
+        ReleaseCameraSubscription();
+        ready = false;
+        isOpen = false;
     }
     public override void Update(float dt)
     {
@@ -311,5 +317,21 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
             finally {RenderTexture.active=previousTarget;}
         }
     }
-    public override void Cleanup(){if(ActiveInstance==this)ActiveInstance=null;OnClose();if(opacityMaterial!=null)UnityEngine.Object.Destroy(opacityMaterial);opacityMaterial=null;if(mapSourceMaterial!=null)UnityEngine.Object.Destroy(mapSourceMaterial);if(mapSurface!=null){mapSurface.Release();UnityEngine.Object.Destroy(mapSurface);}mapSourceMaterial=null;mapSurface=null;base.Cleanup();}
+    public override void Cleanup()
+    {
+        if (ActiveInstance == this) ActiveInstance = null;
+        // XUi closes showing windows before Cleanup. An unfinished view can reach Cleanup directly.
+        StopMap();
+        if (opacityMaterial != null) UnityEngine.Object.Destroy(opacityMaterial);
+        opacityMaterial = null;
+        if (mapSourceMaterial != null) UnityEngine.Object.Destroy(mapSourceMaterial);
+        if (mapSurface != null)
+        {
+            mapSurface.Release();
+            UnityEngine.Object.Destroy(mapSurface);
+        }
+        mapSourceMaterial = null;
+        mapSurface = null;
+        base.Cleanup();
+    }
 }

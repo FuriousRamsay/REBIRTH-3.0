@@ -1,0 +1,112 @@
+{
+  "name": "p18_loose_stone_native_prompt",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge. Prepare two separate natural small loose rocks within safe native tap range. Fill exact @TOKENS@ after observing the target. Compare the two native target replies for localized activationText and native label. SETTLE_SECONDS is baseline observation time for grants, not a measured latency result."
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@STONE_A_X@",
+          "y": "@STONE_A_Y@",
+          "z": "@STONE_A_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@STONE_A_BLOCK@"
+    },
+    {
+      "action": {
+        "command": "target",
+        "args": {}
+      }
+    },
+    {
+      "markItem": "resourceRockSmall"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "wait": "@REPEAT_SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@STONE_B_X@",
+          "y": "@STONE_B_Y@",
+          "z": "@STONE_B_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectTarget": "@STONE_B_BLOCK@"
+    },
+    {
+      "action": {
+        "command": "target",
+        "args": {}
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "E"
+        }
+      }
+    },
+    {
+      "wait": "@SETTLE_SECONDS@"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": 2
+      }
+    },
+    {
+      "_note": "Repeat torch and frame shape in the same world with exact crosshair text and native award. Repeat blocked-claim, native-priority text, and changed cell while running controls. Capture local request count and before/after authority raw for a stale cell. This template exercises the two exact native stone grants and same-target repeat."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

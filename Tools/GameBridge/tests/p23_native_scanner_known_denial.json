@@ -1,0 +1,39 @@
+{
+  "name": "p23_native_scanner_known_denial",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in a disposable solo Purge client or authenticated dedicated client standing in a native prefab whose exact published record is Cleared or ResetPending, rather than outside the POI or behind generic scanner eligibility. Confirm the authority's exact key, mode, state and epoch before applying this scenario. Keep guard ON. Repeat with a discovered, withheld record separately to prove diagnostics still happen and room data can remain visible."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "id": "TotalVolumesValue"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "TotalEntitiesValue"
+      }
+    },
+    {
+      "console": "rbpurgetestobserve projection"
+    },
+    {
+      "screenshot": "p23_scanner_known_denial"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Projection reply must show scannerCurrent false and zero markers after exact authority gating. Use existing purge_map_scanner_counts for accepted discovered solo control, and projection plus native compass in dedicated. The withheld/assisted diagnostic trace is an independent gate with exact author state and real targets."
+    }
+  ]
+}

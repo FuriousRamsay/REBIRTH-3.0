@@ -1,0 +1,45 @@
+{
+  "name": "Map native-detail view leaves the overview atlas idle",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepared single-player or dedicated Purge client at native detail zoom. Leave guard enabled. Open with the real Map key, without scrolling. Debug build only. Run the companion overview/threshold scenario after this one."
+    },
+    {
+      "_note": "Include the queued-close case before the overview owns a texture and a normal close with the overview visibly bound. Check the native texture binding after each close and verify that a second close leaves the binding alone."
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "M"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "map"
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectNoLog": {
+        "contains": "[REBIRTH MapOverview] atlas build"
+      }
+    },
+    {
+      "screenshot": "audit_map_overview_native"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    }
+  ]
+}

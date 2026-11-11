@@ -48,13 +48,20 @@ public static class RebirthBlockPickupService
 
     public static bool ShouldUseRebirthPickup(Block block)
     {
+        return TryResolvePickupTarget(block, out _);
+    }
+
+    private static bool TryResolvePickupTarget(Block block, out RebirthBlockPickupTargetDecision target)
+    {
+        target = null;
         if (block == null || !RebirthBlockPickupClassifier.Evaluate(block).Allowed)
             return false;
 
         // While Block Pickup is active, the XML-loading prefix converts the base
         // CanPickup property into REBIRTH metadata and removes the vanilla prompt.
         // Every eligible block therefore uses this one validated pickup path.
-        return RebirthBlockPickupTargetResolver.Resolve(block).IsValid;
+        target = RebirthBlockPickupTargetResolver.Resolve(block);
+        return target.IsValid;
     }
 
     public static BlockActivationCommand[] AppendPickupCommandIfNeeded(
@@ -83,9 +90,8 @@ public static class RebirthBlockPickupService
         }
 
         CopyAndConfigureTakeResult(entry);
-        bool forceRadial = ShouldForceRadialMenu(block);
-        int enabledCommandCount = CountEnabled(entry.TakeResult) + CountEnabled(block.CustomCmds);
-        if (!forceRadial || enabledCommandCount >= 2)
+        if (!ShouldForceRadialMenu(block) ||
+            CountEnabled(entry.TakeResult) + CountEnabled(block.CustomCmds) >= 2)
             return entry.TakeResult;
 
         CopyAndConfigureRadialResult(entry);
@@ -188,8 +194,8 @@ public static class RebirthBlockPickupService
         ref string activationText)
     {
         if (!string.IsNullOrEmpty(activationText) || block == null || world == null ||
-            !(focusingEntity is EntityPlayerLocal) || !ShouldUseRebirthPickup(block) ||
-            !IsDirectPressPickupTarget(block))
+            !(focusingEntity is EntityPlayerLocal) || !TryResolvePickupTarget(block, out var target) ||
+            !IsDirectPressPickupTarget(block, target))
             return;
 
         PersistentPlayerData persistent = GameManager.Instance != null
@@ -198,8 +204,6 @@ public static class RebirthBlockPickupService
         if (persistent == null || !world.CanPickupBlockAt(blockPos, persistent))
             return;
 
-        RebirthBlockPickupTargetDecision target =
-            RebirthBlockPickupTargetResolver.Resolve(block);
         if (!target.IsValid || target.TargetItem.ItemClass == null)
             return;
 
@@ -219,6 +223,11 @@ public static class RebirthBlockPickupService
     /// and the player-placeable wall torch that returns meleeToolTorch.
     /// </summary>
     public static bool IsDirectPressPickupTarget(Block block)
+    {
+        return IsDirectPressPickupTarget(block, null);
+    }
+
+    private static bool IsDirectPressPickupTarget(Block block, RebirthBlockPickupTargetDecision target)
     {
         if (block == null)
             return false;
@@ -240,8 +249,7 @@ public static class RebirthBlockPickupService
         if (!HasTrueProperty(block, RebirthBlockPickupClassifier.PropertyVanillaCanPickup))
             return false;
 
-        RebirthBlockPickupTargetDecision target =
-            RebirthBlockPickupTargetResolver.Resolve(block);
+        target = target ?? RebirthBlockPickupTargetResolver.Resolve(block);
         if (!target.IsValid || target.TargetItem.ItemClass == null)
             return false;
 
@@ -416,10 +424,6 @@ public static class RebirthBlockPickupService
         if (isCancel)
             return true;
 
-        RebirthBlockPickupDecision decision = RebirthBlockPickupClassifier.Evaluate(block);
-        if (!decision.Allowed)
-            return false;
-
         string denial;
         if (!ValidateLocalStart(world, blockPos, blockValue, player, out denial))
         {
@@ -557,13 +561,8 @@ public static class RebirthBlockPickupService
         BlockValue sourceValue,
         int playerId)
     {
-        if (gameManager == null || sourceValue.isair || sourceValue.Block == null ||
-            !ShouldUseRebirthPickup(sourceValue.Block))
-            return false;
-
-        RebirthBlockPickupTargetDecision targetDecision =
-            RebirthBlockPickupTargetResolver.Resolve(sourceValue.Block);
-        if (!targetDecision.IsValid)
+        if (gameManager == null || sourceValue.isair ||
+            !TryResolvePickupTarget(sourceValue.Block, out var targetDecision))
             return false;
 
         World world = gameManager.World;

@@ -1,0 +1,49 @@
+{
+  "name": "p24_native_seeker_eligibility",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge natural event observation only. Place a level-90 or higher authenticated player at the chosen native roof/cave/POI setup before a known host-side natural opportunity. Use the runtime controller or paired RNG/callback instrumentation to witness due and an accepted roll. Guard stays ON. Do not use rbseeker, Game Bridge spawn, or a forced authored group as a natural producer. Run both baseline and candidate for all mode and restriction controls described in the handoff."
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,world"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "entities",
+        "args": {
+          "radius": 110,
+          "contains": "FuriousRamsaySeeker",
+          "limit": 20
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "entities",
+        "args": {
+          "radius": 110,
+          "contains": "FuriousRamsaySeeker",
+          "limit": 20
+        }
+      }
+    },
+    {
+      "screenshot": "p24_native_seeker_eligibility"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Pair the captured entity IDs and tooltip with the authoritative due, RNG and per-member outcome. A quiet sample with no due/roll witness is inconclusive. Verify the native scan/probe count, mounted and live world/entity rechecks, ordinary basement vs caveAir and tagged POI, true roof predicate, moon branch and notification."
+    }
+  ]
+}

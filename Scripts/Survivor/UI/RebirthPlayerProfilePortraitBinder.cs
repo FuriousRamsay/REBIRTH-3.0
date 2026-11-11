@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -16,7 +17,8 @@ public sealed class RebirthPlayerProfilePortraitBinder
 {
     private const string LogPrefix = "[REBIRTH Survivor][PlayerProfilePortrait]";
     private const int PortraitSize = 384;
-    private const int CacheVersion = 5;
+    private const int CacheVersion = 8;
+    private const int SnapshotLayer = 31;
     private const string ManifestExtension = ".current";
 
     private sealed class CacheEntry
@@ -152,12 +154,11 @@ public sealed class RebirthPlayerProfilePortraitBinder
                 RenderTexture.active = previous;
             }
 
-            if (!TryPublish(profileName, snapshot, signature))
+            if (!HasVisiblePortrait(snapshot))
             {
                 UnityEngine.Object.Destroy(snapshot); snapshot = null; return false;
             }
-            ReplaceMemory(profileName, snapshot, signature);
-            snapshot = null;
+            CacheCapturedPortrait(profileName, ref snapshot, signature);
             RebirthDebug.Log("survivor", LogPrefix + " native preview captured profile='" + profileName +
                 "' source=" + source.width + "x" + source.height + " cacheVersion=" + CacheVersion);
             return true;
@@ -196,9 +197,12 @@ public sealed class RebirthPlayerProfilePortraitBinder
         RenderTexture normalizedPortrait = null;
         try
         {
-            SDCSUtils.CreateVizUI(archetype, ref portraitRig, ref boneCatalog, (EntityPlayer)null, false);
+            // Match the native profile preview's overload so the named profile supplies its hair and outfit.
+            SDCSUtils.CreateVizUI(archetype, ref portraitRig, ref boneCatalog);
             if ((UnityEngine.Object)portraitRig == (UnityEngine.Object)null)
                 throw new InvalidOperationException("CreateVizUI returned no portrait rig.");
+            if (portraitRig.transform.FindRecursive("eyes") == null)
+                return false;
 
             Animator animator = portraitRig.GetComponentInChildren<Animator>();
             if ((UnityEngine.Object)animator != (UnityEngine.Object)null) animator.Update(0f);
@@ -212,7 +216,8 @@ public sealed class RebirthPlayerProfilePortraitBinder
             portraitRig.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
             portraitRig.transform.localPosition = new Vector3(0f, -0.9f, 0f);
             renderSystem.TargetGO.transform.localPosition = new Vector3(-0.015f, -0.78f, 2.14f);
-            Utils.SetLayerRecursively(renderSystem.TargetGO, 11);
+            // The live creator preview uses layer 11. A thumbnail must see only its own rig.
+            Utils.SetLayerRecursively(renderSystem.TargetGO, SnapshotLayer);
 
             Camera camera = renderSystem.CameraGO != null ? renderSystem.CameraGO.GetComponent<Camera>() : null;
             if ((UnityEngine.Object)camera == (UnityEngine.Object)null)
@@ -220,6 +225,7 @@ public sealed class RebirthPlayerProfilePortraitBinder
 
             camera.transform.localPosition = Vector3.zero;
             camera.transform.localRotation = Quaternion.Euler(1.5f, 0f, 0f);
+            camera.cullingMask = 1 << SnapshotLayer;
             camera.orthographic = false;
             camera.fieldOfView = 9f;
             camera.clearFlags = CameraClearFlags.Color;
@@ -230,6 +236,7 @@ public sealed class RebirthPlayerProfilePortraitBinder
             {
                 renderSystem.LightGO.transform.localPosition = new Vector3(0.35f, 0.45f, 0.5f);
                 light.type = LightType.Point;
+                light.cullingMask = 1 << SnapshotLayer;
                 light.range = 20f;
                 light.intensity = 1.5f;
                 light.color = new Color(1f, 0.92f, 0.84f, 1f);
@@ -265,12 +272,11 @@ public sealed class RebirthPlayerProfilePortraitBinder
                 RenderTexture.active = previous;
             }
 
-            if (!TryPublish(profileName, snapshot, signature))
+            if (!HasVisiblePortrait(snapshot))
             {
                 UnityEngine.Object.Destroy(snapshot); snapshot = null; return false;
             }
-            ReplaceMemory(profileName, snapshot, signature);
-            snapshot = null; // cache owns it now
+            CacheCapturedPortrait(profileName, ref snapshot, signature);
             return true;
         }
         catch (Exception ex)
@@ -421,42 +427,43 @@ public sealed class RebirthPlayerProfilePortraitBinder
         }
     }
 
-    private static bool TryPublish(string profileName, Texture2D texture, long signature)
+    private static void CacheCapturedPortrait(string profileName, ref Texture2D snapshot, long signature)
     {
-        if(texture==null||string.IsNullOrEmpty(profileName)||signature==0L)return false;
-        // The native preview can exist before its rig has rendered. Never persist that
-        // blank frame: callers can use the explicit rig capture instead, and old blank
-        // cache entries are rejected on load above.
-        if (!HasVisiblePortrait(texture)) return false;
+        var texture = snapshot;
+        ReplaceMemory(profileName, texture, signature);
+        snapshot = null;
+        if (GameManager.Instance != null)
+            GameManager.Instance.StartCoroutine(PersistAfterDisplay(profileName, texture, signature));
+    }
+
+    private static IEnumerator PersistAfterDisplay(string profileName, Texture2D texture, long signature)
+    {
+        yield return null;
+        // A later capture or invalidation can replace the frame before this write.
+        if (Cache.TryGetValue(profileName, out var entry) && ReferenceEquals(entry.Texture, texture))
+            PersistPortrait(profileName, texture, signature);
+    }
+
+    private static void PersistPortrait(string profileName, Texture2D texture, long signature)
+    {
         string stagedPng=string.Empty, stagedManifest=string.Empty, generationPath=string.Empty;
         try
         {
             string dir=GetCacheDirectory(); Directory.CreateDirectory(dir);
-            byte[] bytes=texture.EncodeToPNG(); if(bytes==null||bytes.Length==0)return false;
+            byte[] bytes=texture.EncodeToPNG(); if(bytes==null||bytes.Length==0)return;
             string key=GetProfileDiskKey(profileName);
             string generation=signature.ToString("X16",CultureInfo.InvariantCulture)+"_"+Guid.NewGuid().ToString("N");
             string fileName=key+"."+generation+".png"; generationPath=Path.Combine(dir,fileName);
             stagedPng=generationPath+".tmp"; File.WriteAllBytes(stagedPng,bytes);
 
-            // Verify the exact bytes before they can be named by an authoritative manifest.
-            Texture2D verify=new Texture2D(2,2,TextureFormat.RGBA32,false);
-            try
-            {
-                byte[] verifyBytes=File.ReadAllBytes(stagedPng);
-                if(!ImageConversion.LoadImage(verify,verifyBytes,false)||verify.width!=PortraitSize||verify.height!=PortraitSize)
-                    throw new InvalidDataException("staged portrait failed dimension/content validation");
-            }
-            finally { UnityEngine.Object.Destroy(verify); }
             File.Move(stagedPng,generationPath); stagedPng=string.Empty;
 
             string manifest=GetManifestPath(profileName); stagedManifest=manifest+".tmp";
             string name64=Convert.ToBase64String(Encoding.UTF8.GetBytes(profileName));
             File.WriteAllText(stagedManifest,"version="+CacheVersion.ToString(CultureInfo.InvariantCulture)+"\nname64="+name64+"\nsignature="+signature.ToString(CultureInfo.InvariantCulture)+"\nsize="+PortraitSize.ToString(CultureInfo.InvariantCulture)+"\nfile="+fileName+"\n",new UTF8Encoding(false));
-            string[] check=File.ReadAllLines(stagedManifest); if(check.Length<5)throw new InvalidDataException("staged portrait manifest incomplete");
             string error; if(!RebirthDurableFileCommit.TryPublish(stagedManifest,manifest,out error))throw new IOException("manifest publication failed: "+error);
             stagedManifest=string.Empty;
             CleanupObsoleteGenerations(profileName,fileName);
-            return true;
         }
         catch(Exception ex)
         {
@@ -465,7 +472,6 @@ public sealed class RebirthPlayerProfilePortraitBinder
             try{if(stagedManifest.Length>0&&File.Exists(stagedManifest))File.Delete(stagedManifest);}catch{}
             // An unpublished generation is non-authoritative and safe to remove.
             try{if(generationPath.Length>0&&File.Exists(generationPath))File.Delete(generationPath);}catch{}
-            return false;
         }
     }
 

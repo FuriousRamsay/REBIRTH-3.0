@@ -25,48 +25,85 @@ public sealed partial class RebirthVehicleTransferPlanStore
         directory = Path.Combine(this.saveDirectory, "RebirthVehicleTransfers");
     }
 
+    internal enum NativeAdmission { Prepared, Retained, Untouched, Conflict, Changed }
+
     public void Prepare(RebirthVehicleTransferPlan plan)
     {
         if (plan == null) throw new ArgumentNullException(nameof(plan));
         lock (Sync)
         {
-            // All existing records retain custody until a separate durable completion
-            // protocol proves release. Validate the entire catalogue even for retries.
-            var catalogue = Discover();
+            var catalogue = DiscoverLocked(Guid.Empty, out _);
             string path = PlanPath(plan.TransactionId);
-            string xml = plan.ToXml().ToString(SaveOptions.DisableFormatting);
             if (File.Exists(path))
             {
-                if (ReadFile(path).ToXml().ToString(SaveOptions.DisableFormatting) != xml)
+                var exact = ReadFile(path);
+                if (exact.ToXml().ToString(SaveOptions.DisableFormatting) != plan.ToXml().ToString(SaveOptions.DisableFormatting))
                     throw new InvalidDataException("Vehicle transfer ID already belongs to a different plan.");
                 AssertScope();
                 return;
             }
-            Guid assemblyId = plan.ReadBefore().AssemblyId;
-            var incomingReceipts = new HashSet<Guid>(plan.Items.Select(i => i.ReceiptId));
-            foreach (var existing in catalogue)
-            {
-                if (string.Equals(existing.ActorId, plan.ActorId, StringComparison.Ordinal)
-                    || existing.ReadBefore().AssemblyId == assemblyId)
-                    throw new InvalidDataException("An unresolved vehicle transfer retains actor or assembly custody.");
-                if (incomingReceipts.Contains(existing.TransactionId)
-                    || existing.Items.Any(i => i.ReceiptId == plan.TransactionId || incomingReceipts.Contains(i.ReceiptId)))
-                    throw new InvalidDataException("Vehicle transfer identity is already in custody.");
-            }
-            AssertScope();
-            Directory.CreateDirectory(directory);
-            string temporary = path + ".tmp";
-            // An interrupted temporary file is retained for diagnosis. Never replace
-            // it, infer rejection, or issue an owner offer after a write exception.
-            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            {
-                new XDocument(plan.ToXml()).Save(stream, SaveOptions.DisableFormatting);
-                if (stream.Length > MaximumFileBytes) throw new InvalidDataException("Vehicle transfer file exceeds limit.");
-                stream.Flush(true);
-            }
-            AssertScope();
-            File.Move(temporary, path);
+            if (Conflicts(catalogue, plan.ActorId, plan.BeforeAssemblyId))
+                throw new InvalidDataException("An unresolved vehicle transfer retains actor or assembly custody.");
+            AssertReceipts(catalogue, plan);
+            PublishPlan(plan, path);
         }
+    }
+
+    // Used only by the authenticated fresh native request after its detached
+    // preflight. The same catalogue verdict also gates an untouched refusal.
+    internal NativeAdmission AdmitNative(Guid operation, string actor, Guid assembly,
+        RebirthVehicleTransferPlan draft, Func<bool> draftCurrent, out RebirthVehicleTransferPlan retained)
+    {
+        lock (Sync)
+        {
+            var catalogue = DiscoverLocked(operation, out retained);
+            if (retained != null) return NativeAdmission.Retained;
+            string path = PlanPath(operation);
+            if (File.Exists(path))
+            {
+                retained = ReadFile(path);
+                AssertScope();
+                return NativeAdmission.Retained;
+            }
+            if (Conflicts(catalogue, actor, assembly)) return NativeAdmission.Conflict;
+            if (draftCurrent?.Invoke() != true) return NativeAdmission.Changed;
+            AssertScope();
+            if (draft == null) return NativeAdmission.Untouched;
+            if (draft.TransactionId != operation || draft.ActorId != actor || draft.BeforeAssemblyId != assembly)
+                throw new InvalidDataException("Vehicle draft identity changed.");
+            AssertReceipts(catalogue, draft);
+            PublishPlan(draft, path);
+            return NativeAdmission.Prepared;
+        }
+    }
+
+    private static bool Conflicts(IReadOnlyList<RebirthVehicleTransferPlan> catalogue, string actor, Guid assembly) =>
+        catalogue.Any(existing => string.Equals(existing.ActorId, actor, StringComparison.Ordinal) ||
+            existing.BeforeAssemblyId == assembly);
+
+    private static void AssertReceipts(IReadOnlyList<RebirthVehicleTransferPlan> catalogue, RebirthVehicleTransferPlan plan)
+    {
+        var incomingReceipts = new HashSet<Guid>(plan.Items.Select(i => i.ReceiptId));
+        foreach (var existing in catalogue)
+            if (incomingReceipts.Contains(existing.TransactionId) ||
+                existing.Items.Any(i => i.ReceiptId == plan.TransactionId || incomingReceipts.Contains(i.ReceiptId)))
+                throw new InvalidDataException("Vehicle transfer identity is already in custody.");
+    }
+
+    private void PublishPlan(RebirthVehicleTransferPlan plan, string path)
+    {
+        AssertScope();
+        Directory.CreateDirectory(directory);
+        string temporary = path + ".tmp";
+        // Keep an interrupted preparation for the existing recovery path.
+        using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        {
+            new XDocument(plan.ToXml()).Save(stream, SaveOptions.DisableFormatting);
+            if (stream.Length > MaximumFileBytes) throw new InvalidDataException("Vehicle transfer file exceeds limit.");
+            stream.Flush(true);
+        }
+        AssertScope();
+        File.Move(temporary, path);
     }
 
     public RebirthVehicleTransferPlan Read(Guid transactionId)
@@ -86,32 +123,38 @@ public sealed partial class RebirthVehicleTransferPlanStore
     // custody and permit a second operation against the same actor or assembly.
     public IReadOnlyList<RebirthVehicleTransferPlan> Discover()
     {
-        lock (Sync)
+        lock (Sync) return DiscoverLocked(Guid.Empty, out _);
+    }
+
+    private IReadOnlyList<RebirthVehicleTransferPlan> DiscoverLocked(Guid operation, out RebirthVehicleTransferPlan retained)
+    {
+        AssertAvailable();
+        retained = null;
+        var plans = new List<RebirthVehicleTransferPlan>();
+        var identities = new HashSet<Guid>();
+        var receipts = new HashSet<Guid>();
+        var actors = new HashSet<string>(StringComparer.Ordinal);
+        var assemblies = new HashSet<Guid>();
+        if (Directory.Exists(directory))
         {
-            AssertAvailable();
-            var plans = new List<RebirthVehicleTransferPlan>();
-            var identities = new HashSet<Guid>();
-            var receipts = new HashSet<Guid>();
-            var actors = new HashSet<string>(StringComparer.Ordinal);
-            var assemblies = new HashSet<Guid>();
-            if (Directory.Exists(directory))
+            foreach (string path in Directory.EnumerateFiles(directory, "*.xml").OrderBy(p => p, StringComparer.Ordinal))
             {
-                foreach (string path in Directory.EnumerateFiles(directory, "*.xml").OrderBy(p => p, StringComparer.Ordinal))
-                {
-                    AssertScope();
-                    var plan = ReadFile(path);
-                    if(HasCompletion(plan))continue;
-                    if (!identities.Add(plan.TransactionId) || receipts.Contains(plan.TransactionId)) throw new InvalidDataException("Duplicate vehicle transfer identity.");
-                    if (!actors.Add(plan.ActorId) || !assemblies.Add(plan.ReadBefore().AssemblyId))
-                        throw new InvalidDataException("Conflicting unresolved vehicle custody records.");
-                    foreach (var item in plan.Items)
-                        if (!receipts.Add(item.ReceiptId) || identities.Contains(item.ReceiptId)) throw new InvalidDataException("Vehicle item receipt belongs to multiple plans.");
-                    plans.Add(plan);
-                }
+                AssertScope();
+                var plan = ReadFile(path);
+                if (plan.TransactionId == operation) retained = plan;
+                if (HasCompletion(plan)) continue;
+                if (!identities.Add(plan.TransactionId) || receipts.Contains(plan.TransactionId))
+                    throw new InvalidDataException("Duplicate vehicle transfer identity.");
+                if (!actors.Add(plan.ActorId) || !assemblies.Add(plan.BeforeAssemblyId))
+                    throw new InvalidDataException("Conflicting unresolved vehicle custody records.");
+                foreach (var item in plan.Items)
+                    if (!receipts.Add(item.ReceiptId) || identities.Contains(item.ReceiptId))
+                        throw new InvalidDataException("Vehicle item receipt belongs to multiple plans.");
+                plans.Add(plan);
             }
-            AssertScope();
-            return plans.AsReadOnly();
         }
+        AssertScope();
+        return plans.AsReadOnly();
     }
 
     private string PlanPath(Guid transactionId)

@@ -157,16 +157,7 @@ public static class RebirthResourceFieldSkillService
         Block block = actionData.attackDetails.blockBeingDamaged.Block;
         string blockName = block != null ? block.GetBlockName() : string.Empty;
         string skillId = RebirthProgressionRuntimeConfig.ClassifyHarvest(actionData.invData.itemValue, blockName);
-        float mining, logging, salvage, farming, animal, tracking;
-        if (!TryGetSixSkillValues(player, out mining, out logging, out salvage, out farming, out animal, out tracking))
-        {
-            SetCVar(player, ResourceHarvestCVar, 0f);
-            return;
-        }
-        float selected = 0f;
-        if (skillId == "skill.mining") selected = mining;
-        else if (skillId == "skill.logging") selected = logging;
-        else if (skillId == "skill.salvage") selected = salvage;
+        float selected = GetResourceHarvestSkillValue(player, skillId);
         SetCVar(player, ResourceHarvestCVar, SignedEndpoint(selected, RebirthProgressionRuntimeConfig.ResourceHarvestNegative, RebirthProgressionRuntimeConfig.ResourceHarvestPositive));
     }
 
@@ -391,6 +382,24 @@ public static class RebirthResourceFieldSkillService
             best = d2; bestEntity = candidate; targetTier = tier;
         }
         return bestEntity;
+    }
+
+    private static float GetResourceHarvestSkillValue(EntityPlayer player, string skillId)
+    {
+        if (skillId != "skill.mining" && skillId != "skill.logging" && skillId != "skill.salvage")
+            return 0f;
+
+        if (player.world != null && player.world.IsRemote())
+        {
+            var snapshot = RebirthSurvivorClientState.GetOwnerStateSnapshot();
+            if (snapshot == null || !snapshot.RebirthModeEnabled || !snapshot.HasCharacter || !snapshot.DefinitionsCompatible)
+                return 0f;
+            return SnapshotSkill(snapshot, skillId);
+        }
+
+        if (!RebirthWorldCharacterService.TryGet(player, out var record) || record == null || !record.IsComplete || record.Progression == null)
+            return 0f;
+        return RecordSkill(record, skillId);
     }
 
     private static bool TryGetSixSkillValues(EntityPlayer player, out float mining, out float logging, out float salvage, out float farming, out float animal, out float tracking)

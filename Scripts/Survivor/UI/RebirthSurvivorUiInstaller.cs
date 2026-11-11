@@ -16,6 +16,7 @@ public static class RebirthSurvivorUiInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCreativeCloseInputPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthBackpackSectionEscapeReturnPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSurvivorMainMenuButtonsInitPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCreatorPreviewStagePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSurvivorShortcutRoutePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSurvivorSelectedPageRoutePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthProgressionRadialMenuRoutePatch));

@@ -28,7 +28,16 @@ internal static class RebirthStashBatchPrice
     }
     internal static bool Plan(EntityPlayer player,TraderData trader,ItemValue pack,out ItemValue after,out List<ItemStack> sold,out int total)
     {
-        after=null;sold=new List<ItemStack>();total=0;
+        sold=new List<ItemStack>();
+        return Plan(player,trader,pack,out after,out total,sold);
+    }
+
+    internal static bool Plan(EntityPlayer player,TraderData trader,ItemValue pack,out ItemValue after,out int total)
+        => Plan(player,trader,pack,out after,out total,null);
+
+    private static bool Plan(EntityPlayer player,TraderData trader,ItemValue pack,out ItemValue after,out int total,List<ItemStack> sold)
+    {
+        after=null;total=0;
         if(!RebirthBackpackSellStashContents.TryRead(pack,out var cells))return false;
         var reserved=new Dictionary<int,int>();long sum=0;
         for(int i=0;i<cells.Length;i++)
@@ -41,7 +50,11 @@ internal static class RebirthStashBatchPrice
             if(count<=0)continue;
             int price=Price(player,trader,stack.itemValue,count);if(price<=0)continue;
             sum+=price;if(sum>int.MaxValue)return false;
-            var selling=stack.Clone();selling.count=count;sold.Add(selling);reserved[type]=used+count;
+            if(sold!=null)
+            {
+                var selling=stack.Clone();selling.count=count;sold.Add(selling);
+            }
+            reserved[type]=used+count;
             cells[i]=stack.Clone();cells[i].count-=count;if(cells[i].count==0)cells[i]=ItemStack.Empty.Clone();
         }
         if(sum==0||!RebirthBackpackSellStashContents.TryWrite(pack,cells,out after))return false;

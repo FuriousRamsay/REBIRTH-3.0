@@ -114,9 +114,9 @@ internal static class RebirthPurgeScanner
         }
         Render(world);
     }
-    private static bool TryNativeView(World world,EntityPlayer player,out PrefabInstance prefab,out RebirthPoiIdentity identity,out EntityAlive[] actors)
+    private static bool TryNativePoi(World world,EntityPlayer player,out PrefabInstance prefab,out RebirthPoiIdentity identity)
     {
-        prefab=null;identity=null;actors=Array.Empty<EntityAlive>();
+        prefab=null;identity=null;
         // Match legacy scanner occupancy without borrowing the native name/info-area gate.
         prefab=RebirthPurgeScannerPoi.Resolve(world,player.position);
         var authored=prefab?.prefab;
@@ -139,6 +139,11 @@ internal static class RebirthPurgeScanner
         if(biome==null)return false;
         try{identity=new RebirthPoiIdentity(authored.PrefabName,origin.x,origin.y,origin.z,(int)prefab.rotation,size.x,size.y,size.z,biome.m_sBiomeName);}
         catch(ArgumentException){return false;}
+        return true;
+    }
+
+    private static EntityAlive[] NativeActors(World world,PrefabInstance prefab)
+    {
         var live=new List<EntityAlive>();var seen=new HashSet<int>();int roomBudget=4096,entryBudget=8192;
         foreach(var room in prefab.sleeperVolumes)
         {
@@ -146,17 +151,17 @@ internal static class RebirthPurgeScanner
             if(room==null||!ReferenceEquals(room.prefabInstance,prefab))continue;
             foreach(int id in room.respawnMap.Keys)
             {
-                if(entryBudget--<=0){actors=live.ToArray();return true;}
+                if(entryBudget--<=0)return live.ToArray();
                 if(!seen.Add(id))continue;
                 // GetEntity force-finishes an entity still being created, stalling the frame. A pending
                 // sleeper can wait for the next half-second pulse.
                 world.Entities.dict.TryGetValue(id,out var known);var entity=known as EntityAlive;
                 if(entity!=null&&entity.IsAlive()&&entity.IsSleeper&&RebirthPoiCombatantPolicy.IsRequired(
                     EntityClass.GetEntityClass(entity.entityClass)?.entityClassName))live.Add(entity);
-                if(seen.Count>=8192){actors=live.ToArray();return true;}
+                if(seen.Count>=8192)return live.ToArray();
             }
         }
-        actors=live.ToArray();return true;
+        return live.ToArray();
     }
     private static View Build(World world,EntityPlayer player)
     {
@@ -164,8 +169,8 @@ internal static class RebirthPurgeScanner
         var lifetime=RebirthPurgeSupplyService.LifetimeKills;
         string playerKey=RebirthPurgeKillContributor.Identify(player,world);
         if(lifetime!=null&&playerKey!=null){long kills;lifetime.TryGetValue(playerKey,out kills);result.LifetimeKills=kills;}
-        PrefabInstance prefab;RebirthPoiIdentity identity;EntityAlive[] actors;
-        if(!Eligible(player)||!TryNativeView(world,player,out prefab,out identity,out actors))
+        PrefabInstance prefab;RebirthPoiIdentity identity;
+        if(!Eligible(player)||!TryNativePoi(world,player,out prefab,out identity))
         {roomHistory.Remove(player.entityId);return result;}
         // Room HUD is a native presentation, not a durable clearance proof.
         // A partially loaded POI need not yet have a complete evidence manifest
@@ -175,6 +180,7 @@ internal static class RebirthPurgeScanner
             store.Published.TryGet(identity,out record);
         if(record!=null&&(record.ResetOnly||record.State!=RebirthPoiClearanceState.Discovered))
         {roomHistory.Remove(player.entityId);return result;}
+        var actors=NativeActors(world,prefab);
         result.PoiKey=identity.Key;result.Epoch=record?.Epoch??0;
         result.Prefab=identity.Prefab;result.X=identity.X;result.Y=identity.Y;result.Z=identity.Z;
         result.Tier=prefab.prefab.DifficultyTier;

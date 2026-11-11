@@ -38,12 +38,16 @@ internal static partial class RebirthHydrationProposalClient
     {
         if(!ThreadManager.IsMainThread())return false;
         var world=GameManager.Instance?.World;var player=world?.GetPrimaryPlayer();
-        if(world?.IsRemote()!=true||player==null)return false;
+        if(world?.IsRemote()!=true||player==null)
+        {
+            RebirthHydrationClientOriginals.ClearIdleRecovery();
+            return false;
+        }
         double now=Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency;
         if(TryGetCurrent(player,out var intent))return intent.Advance(now);
         if(now<lastRecovery)nextRecovery=now;
         if(now<nextRecovery)return false;
         lastRecovery=now;nextRecovery=now+0.75d;
-        return RebirthHydrationClientOriginals.TryRead(player,out var saved)&&saved!=null&&Intent.TryRecover(player,saved,out intent)&&intent.Advance(now);
+        return RebirthHydrationClientOriginals.TryReadForIdleRecovery(player,out var saved)&&saved!=null&&Intent.TryRecover(player,saved,out intent)&&intent.Advance(now);
     }
 }

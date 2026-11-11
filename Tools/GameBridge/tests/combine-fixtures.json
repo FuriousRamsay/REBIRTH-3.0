@@ -1,0 +1,2111 @@
+{
+  "prefabs": {
+    "trader_bob": {
+      "size": [
+        60,
+        28,
+        60
+      ],
+      "yOffset": -1,
+      "rawAuthoredCells": [
+        {
+          "xyz": [
+            35,
+            1,
+            8
+          ],
+          "child": false,
+          "rotationBits": 2
+        }
+      ],
+      "baseExpectedBlock": "combineStation",
+      "rebirthExpectedFreshBlock": "air",
+      "ttsSha256": "20e236e43443f85a46186de9a091530718ec7fae0da282614b2e8a436edd45f4",
+      "nimSha256": "b4090a3503b81cc39ba742e80dd875ccae9bb1f0ade24defcd362bd490d54fe8"
+    },
+    "trader_hugh": {
+      "size": [
+        60,
+        21,
+        60
+      ],
+      "yOffset": -1,
+      "rawAuthoredCells": [
+        {
+          "xyz": [
+            30,
+            1,
+            46
+          ],
+          "child": false,
+          "rotationBits": 2
+        }
+      ],
+      "baseExpectedBlock": "combineStation",
+      "rebirthExpectedFreshBlock": "air",
+      "ttsSha256": "8eba1f3b2a49fa6dec17a8fc7658e9037518bf8cf0a7c1dab0ae8dd9feea69ff",
+      "nimSha256": "7aee0670a816c14674c74c0439f7c85ef2957917cd53800f4b10b37d35aea68a"
+    },
+    "trader_jen": {
+      "size": [
+        60,
+        28,
+        60
+      ],
+      "yOffset": -2,
+      "rawAuthoredCells": [
+        {
+          "xyz": [
+            52,
+            2,
+            40
+          ],
+          "child": false,
+          "rotationBits": 1
+        }
+      ],
+      "baseExpectedBlock": "combineStation",
+      "rebirthExpectedFreshBlock": "air",
+      "ttsSha256": "7d642cd69546ce444c6e2be8a16e3861bd216b894bc908040fbb0eb89141bb9f",
+      "nimSha256": "7e62212e45e68c2b2e6184c22c663b1f46f970c536051c6839e9db4979cd8da4"
+    },
+    "trader_joel": {
+      "size": [
+        60,
+        48,
+        60
+      ],
+      "yOffset": -1,
+      "rawAuthoredCells": [
+        {
+          "xyz": [
+            26,
+            1,
+            33
+          ],
+          "child": false,
+          "rotationBits": 1
+        }
+      ],
+      "baseExpectedBlock": "combineStation",
+      "rebirthExpectedFreshBlock": "air",
+      "ttsSha256": "3076e98b72c193b85fbcd792531fbef06f25a8a3d60d361c16bb56c315791820",
+      "nimSha256": "d0b18d38c847ea9c29baf271902deb0b69747fb9e4b863b7aa75895eba0776ff"
+    },
+    "trader_rekt": {
+      "size": [
+        60,
+        21,
+        60
+      ],
+      "yOffset": -1,
+      "rawAuthoredCells": [
+        {
+          "xyz": [
+            35,
+            1,
+            51
+          ],
+          "child": false,
+          "rotationBits": 0
+        }
+      ],
+      "baseExpectedBlock": "combineStation",
+      "rebirthExpectedFreshBlock": "air",
+      "ttsSha256": "284e6bab2df9841f3cb16e725c7e14c86a233cd3b3ce33c5d255a940428e8200",
+      "nimSha256": "08e9ff3353dd9db5733470c74a17ebc058b9665256e4990cbf565dd24ca12818"
+    }
+  },
+  "worlds": {
+    "Navezgane": {
+      "prefabsXmlSha256": "b5b1db520e444de54970a53d29cbeacfe802b578484060c73e8cd96142345493",
+      "targets": [
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            941,
+            65,
+            -1566
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            992,
+            66,
+            -1531
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -957,
+            75,
+            1717
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -927,
+            76,
+            1763
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            190,
+            72,
+            -144
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            197,
+            74,
+            -125
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1586,
+            65,
+            -1215
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -1560,
+            66,
+            -1182
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            428,
+            60,
+            644
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            452,
+            61,
+            652
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    },
+    "Pregen06k01": {
+      "prefabsXmlSha256": "30639134ddcb961b98e88d8b6831e76e9135f2ba3a3ae7df16f57405e876cfa0",
+      "targets": [
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -2468,
+            49,
+            1323
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2442,
+            50,
+            1349
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -2727,
+            49,
+            2632
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -2694,
+            50,
+            2658
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1417,
+            49,
+            1881
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -1391,
+            50,
+            1907
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            2673,
+            37,
+            -368
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            2697,
+            38,
+            -317
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -368,
+            62,
+            -1827
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -355,
+            63,
+            -1797
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -817,
+            62,
+            -2763
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -804,
+            63,
+            -2733
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -2018,
+            49,
+            273
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -1992,
+            50,
+            299
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -1636,
+            62,
+            -1077
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1590,
+            63,
+            -1048
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            1433,
+            36,
+            1587
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            1452,
+            38,
+            1639
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            2033,
+            37,
+            -1226
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2084,
+            38,
+            -1191
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -287,
+            36,
+            2540
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -247,
+            38,
+            2547
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            2183,
+            36,
+            2524
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2202,
+            38,
+            2576
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            233,
+            37,
+            874
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            257,
+            38,
+            882
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            383,
+            37,
+            -476
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            407,
+            38,
+            -468
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -513,
+            44,
+            1513
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -461,
+            46,
+            1553
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    },
+    "Pregen06k02": {
+      "prefabsXmlSha256": "9773f433b4cf8a582502f3b92693488a1a54e76aee8c4694ad19d507a4c50b42",
+      "targets": [
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            123,
+            49,
+            -2018
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            156,
+            50,
+            -1992
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            833,
+            49,
+            -1269
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            859,
+            50,
+            -1243
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            1773,
+            49,
+            -2168
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            1806,
+            50,
+            -2142
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -1227,
+            37,
+            982
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -1203,
+            38,
+            1033
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -2087,
+            37,
+            440
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -2079,
+            38,
+            464
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -1786,
+            62,
+            -477
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1740,
+            63,
+            -448
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            2524,
+            49,
+            -137
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            2550,
+            50,
+            -104
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -777,
+            37,
+            2332
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -753,
+            38,
+            2383
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -1810,
+            37,
+            2033
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -1786,
+            38,
+            2084
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            383,
+            36,
+            2187
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            402,
+            38,
+            2239
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -667,
+            62,
+            -1376
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -654,
+            63,
+            -1346
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            1733,
+            36,
+            2524
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            1752,
+            38,
+            2576
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            2263,
+            36,
+            1040
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            2303,
+            38,
+            1047
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -287,
+            37,
+            -610
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -252,
+            38,
+            -559
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -517,
+            37,
+            424
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -493,
+            38,
+            432
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            983,
+            49,
+            87
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            1007,
+            50,
+            95
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -2168,
+            74,
+            -1827
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2155,
+            75,
+            -1797
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    },
+    "Pregen08k01": {
+      "prefabsXmlSha256": "741156557a7d05db60b1c2232032f7eb99a1b4ad363fa778d280406fce85be6c",
+      "targets": [
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            2208,
+            49,
+            3299
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2234,
+            50,
+            3325
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            2999,
+            49,
+            2208
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            3032,
+            50,
+            2234
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            1759,
+            49,
+            2057
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            1785,
+            50,
+            2083
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -1760,
+            62,
+            2099
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1714,
+            63,
+            2128
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -2441,
+            62,
+            1307
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2428,
+            63,
+            1337
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -3191,
+            37,
+            -1387
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3140,
+            38,
+            -1352
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -3191,
+            37,
+            -2737
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3140,
+            38,
+            -2702
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            2958,
+            49,
+            449
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2984,
+            50,
+            475
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            259,
+            62,
+            3263
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            272,
+            63,
+            3293
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            408,
+            62,
+            2249
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            421,
+            63,
+            2279
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -2661,
+            37,
+            466
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -2653,
+            38,
+            490
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            1500,
+            36,
+            -2961
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            1552,
+            38,
+            -2921
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            449,
+            36,
+            -3110
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            501,
+            38,
+            -3070
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -711,
+            36,
+            -2534
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -671,
+            38,
+            -2527
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            490,
+            36,
+            -1801
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            530,
+            38,
+            -1794
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -1687,
+            37,
+            -1461
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -1652,
+            38,
+            -1453
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            409,
+            37,
+            413
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            433,
+            38,
+            421
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            749,
+            37,
+            -942
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            800,
+            38,
+            -918
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -711,
+            37,
+            316
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -676,
+            38,
+            367
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -411,
+            37,
+            -884
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -376,
+            38,
+            -833
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    },
+    "Pregen08k02": {
+      "prefabsXmlSha256": "ff24900250dbf48cce82f1309847659764ecf368e45a3d32257eb4ff51fd8218",
+      "targets": [
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1801,
+            49,
+            2440
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -1775,
+            50,
+            2473
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1991,
+            49,
+            1007
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -1965,
+            50,
+            1033
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -2891,
+            49,
+            1457
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2865,
+            50,
+            1483
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            2590,
+            62,
+            299
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            2636,
+            63,
+            328
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            1613,
+            62,
+            789
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            1643,
+            63,
+            835
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            2513,
+            37,
+            -2361
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            2548,
+            38,
+            -2353
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            1066,
+            49,
+            2959
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            1099,
+            50,
+            2985
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            2659,
+            62,
+            2550
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2672,
+            63,
+            2580
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            559,
+            37,
+            -1950
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            610,
+            38,
+            -1915
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -2360,
+            36,
+            -451
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -2320,
+            38,
+            -444
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -2210,
+            36,
+            599
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -2170,
+            38,
+            606
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -3491,
+            39,
+            -1800
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3472,
+            41,
+            -1748
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            -1461,
+            36,
+            -1334
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1421,
+            38,
+            -1327
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -1161,
+            37,
+            -2834
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1153,
+            38,
+            -2810
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            1649,
+            62,
+            -410
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            1679,
+            63,
+            -364
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -491,
+            37,
+            1200
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -467,
+            38,
+            1208
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -941,
+            37,
+            0
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -917,
+            38,
+            8
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            409,
+            37,
+            -637
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            433,
+            38,
+            -629
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            939,
+            37,
+            466
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            974,
+            38,
+            517
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            -900,
+            48,
+            -1761
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -865,
+            49,
+            -1753
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    },
+    "West Xuyofu Territory": {
+      "prefabsXmlSha256": "e23edff13d2b06a52c6f8e84b55cdf258d95d1f5fa49fe458961455520d6f391",
+      "targets": [
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -2592,
+            49,
+            3599
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2566,
+            50,
+            3625
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -3491,
+            49,
+            2507
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3465,
+            50,
+            2533
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            1759,
+            37,
+            -1800
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            1810,
+            38,
+            -1765
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -3491,
+            62,
+            -1650
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3478,
+            63,
+            -1620
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1537,
+            49,
+            1389
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -1511,
+            50,
+            1422
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_joel",
+          "origin": [
+            -1461,
+            49,
+            3616
+          ],
+          "size": [
+            60,
+            48,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            -1428,
+            50,
+            3649
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            2850,
+            37,
+            189
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            2885,
+            38,
+            197
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -3341,
+            62,
+            -2887
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -3328,
+            63,
+            -2857
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            2139,
+            36,
+            1516
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            2179,
+            38,
+            1523
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            3109,
+            36,
+            2513
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            3128,
+            38,
+            2565
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            789,
+            36,
+            2566
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            829,
+            38,
+            2573
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            3189,
+            37,
+            -1784
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 3,
+          "parent": [
+            3197,
+            38,
+            -1760
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -2591,
+            62,
+            -937
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            -2578,
+            63,
+            -907
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_bob",
+          "origin": [
+            1200,
+            37,
+            -3411
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            1235,
+            38,
+            -3403
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            1239,
+            37,
+            1066
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            1274,
+            38,
+            1117
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            1309,
+            37,
+            -300
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            1333,
+            38,
+            -292
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -491,
+            37,
+            1013
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 2,
+          "parent": [
+            -467,
+            38,
+            1021
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_rekt",
+          "origin": [
+            -861,
+            37,
+            -284
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -826,
+            38,
+            -233
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_hugh",
+          "origin": [
+            -750,
+            42,
+            -1461
+          ],
+          "size": [
+            60,
+            21,
+            60
+          ],
+          "prefabRotation": 0,
+          "parent": [
+            -720,
+            43,
+            -1415
+          ],
+          "rawAuthoredWorldChildren": []
+        },
+        {
+          "prefab": "trader_jen",
+          "origin": [
+            2958,
+            47,
+            749
+          ],
+          "size": [
+            60,
+            28,
+            60
+          ],
+          "prefabRotation": 1,
+          "parent": [
+            2977,
+            49,
+            801
+          ],
+          "rawAuthoredWorldChildren": []
+        }
+      ]
+    }
+  },
+  "maps": {
+    "stock_b10": {
+      "mapsScanned": 1866,
+      "exactByteMatches": [
+        "POIs/trader_bob.blocks.nim",
+        "POIs/trader_hugh.blocks.nim",
+        "POIs/trader_jen.blocks.nim",
+        "POIs/trader_joel.blocks.nim",
+        "POIs/trader_rekt.blocks.nim"
+      ]
+    },
+    "july_base": {
+      "mapsScanned": 1733,
+      "exactByteMatches": []
+    },
+    "july_mods": {
+      "mapsScanned": 835,
+      "exactByteMatches": []
+    }
+  }
+}

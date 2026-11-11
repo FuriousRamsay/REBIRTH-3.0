@@ -154,6 +154,8 @@ internal static class RebirthVehicleServicePointerDrop
         state.HeldFrame=-1;
         ReleaseRestoration(owner,state);
     }
+    internal static void KeepCursorOnRelease(XUiC_RebirthVehicleRestoration owner)
+        => States.GetValue(owner, _ => new Gesture()).Claimed = true;
     // Toolbelt's native release can return the cursor to inventory before the
     // restoration controller updates. Resolve the already-held gesture first.
     internal static void ToolbeltReleaseBeforeNative(XUiC_RebirthVehicleRestoration owner)

@@ -1,0 +1,140 @@
+{
+  "name": "p19_sip_admission_debug_scope",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Use audit_sip_idle_recovery's exact native Character slot fixture in solo with high projected hydration. The Game Bridge starts with rbdebug on. The explicit first console disables it. A second cycle enables only the metabolism area. Both cycles use the same real input and must transfer exactly one Boiled Water."
+    },
+    {
+      "console": "rbdebug off"
+    },
+    {
+      "expectUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "EMPTY"
+      }
+    },
+    {
+      "expectItem": {
+        "name": "drinkJarBoiledWater",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "characterBagSlot1",
+          "to.id": "survivorGearInputSupport",
+          "strict": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "IN SLOT",
+        "timeout": 12
+      }
+    },
+    {
+      "expectNoItem": "drinkJarBoiledWater"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "survivorGearInputSupport",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "EMPTY",
+        "timeout": 12
+      }
+    },
+    {
+      "expectItem": {
+        "name": "drinkJarBoiledWater",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "expectNoLog": {
+        "contains": "[REBIRTH HydrationTransfer] admission"
+      }
+    },
+    {
+      "console": "rbdebug on metabolism"
+    },
+    {
+      "expectUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "EMPTY"
+      }
+    },
+    {
+      "expectItem": {
+        "name": "drinkJarBoiledWater",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "characterBagSlot1",
+          "to.id": "survivorGearInputSupport",
+          "strict": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "IN SLOT",
+        "timeout": 12
+      }
+    },
+    {
+      "expectNoItem": "drinkJarBoiledWater"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "survivorGearInputSupport",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "survivorOverviewDrinkSlotState",
+        "exactText": "EMPTY",
+        "timeout": 12
+      }
+    },
+    {
+      "expectItem": {
+        "name": "drinkJarBoiledWater",
+        "min": 1,
+        "max": 1
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH HydrationTransfer] admission"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

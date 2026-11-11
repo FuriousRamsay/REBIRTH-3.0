@@ -170,12 +170,23 @@ static class Program
             int Arg(string k, int d) { var v = args.FirstOrDefault(a => a.StartsWith(k + "=")); return v != null && int.TryParse(v.Substring(k.Length + 1), out var n) ? n : d; }
             form.Shown += (_, _) => form.BeginInvoke(() => form.StartBenchmarkFromCommandLine(ba.Substring(8), Arg("--warmup", 30), Arg("--duration", 120), !args.Contains("--keep-open")));
         }
-        if (args.Contains("--launch")) form.Shown += (_, _) => form.BeginInvoke(form.LaunchGame);
+        const string evalReceiptPrefix = "--eval-launch-receipt=";
+        var evalReceipt = args.FirstOrDefault(a => a.StartsWith(evalReceiptPrefix, StringComparison.Ordinal));
+        if (evalReceipt != null) form.SetEvalLaunchReceipt(Path.GetFullPath(evalReceipt.Substring(evalReceiptPrefix.Length)));
+        if (args.Contains("--launch"))
+        {
+            if (evalReceipt != null) form.Load += (_, _) => form.BeginInvoke(form.LaunchGame);
+            else form.Shown += (_, _) => form.BeginInvoke(form.LaunchGame);
+        }
         if (args.Contains("--playmode")) form.SetPlayMode(true);
         if (args.Contains("--nogamesense")) form.AppendGameArg("-nogamesense");
         if (args.Contains("--threads")) form.SetSampleThreads(true);
         var ra = args.FirstOrDefault(a => a.StartsWith("--record="));
-        if (ra != null) form.Shown += (_, _) => form.BeginInvoke(() => form.StartPlayRecordingWhenReady(double.Parse(ra.Substring(9))));
+        if (ra != null)
+        {
+            if (evalReceipt != null) form.Load += (_, _) => form.BeginInvoke(() => form.StartPlayRecordingWhenReady(double.Parse(ra.Substring(9))));
+            else form.Shown += (_, _) => form.BeginInvoke(() => form.StartPlayRecordingWhenReady(double.Parse(ra.Substring(9))));
+        }
         if (args.Contains("--scenarios")) form.Shown += (_, _) => form.BeginInvoke(() => form.StartScenariosFromCommandLine(args.Contains("--close-when-done")));
         var ha = args.FirstOrDefault(a => a.StartsWith("--hitch="));
         if (ha != null) form.Shown += (_, _) => form.BeginInvoke(() => form.StartHitchFromCommandLine(int.Parse(ha.Substring(8)), args.Contains("--close-when-done"), args.Contains("--hitch-camper")));
@@ -565,7 +576,69 @@ sealed class MainForm : Form
     }
 
     string launchRequestError = "";
-    public void LaunchGame() => LaunchGameCore(false);
+    string evalLaunchReceipt;
+    internal void SetEvalLaunchReceipt(string path)
+    {
+        evalLaunchReceipt = path;
+        // The runner names each launch combat-eval-<guid>.launch.json.
+        playTab.EvalStem = "play_" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(path));
+    }
+    public void LaunchGame()
+    {
+        if (!LaunchGameCore(evalLaunchReceipt != null) && evalLaunchReceipt != null) Close();
+    }
+
+    static void WriteEvalReceipt<T>(string path, T receipt)
+    {
+        string temporaryReceipt = path + ".tmp";
+        using (var stream = new FileStream(temporaryReceipt, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            JsonSerializer.Serialize(stream, receipt);
+        File.Move(temporaryReceipt, path);
+    }
+
+    void TrackEvalGame(int launchedPid, string executable)
+    {
+        var game = Process.GetProcessById(launchedPid);
+        try
+        {
+            var owner = new { pid = launchedPid, executable, processStartUtc = game.StartTime.ToUniversalTime().ToString("o") };
+            using var profiler = Process.GetCurrentProcess();
+            int profilerPid = profiler.Id;
+            string profilerStartUtc = profiler.StartTime.ToUniversalTime().ToString("o");
+            string launchReceipt = evalLaunchReceipt;
+            game.Exited += (_, _) =>
+            {
+                game.Dispose();
+                if (IsDisposed || !IsHandleCreated) return;
+                try
+                {
+                    BeginInvoke(async () =>
+                    {
+                        try
+                        {
+                            string path = await playTab.StopAndSave(requireWrite: true);
+                            if (path != null)
+                                WriteEvalReceipt(launchReceipt + ".play-report.json", new
+                                {
+                                    gamePid = owner.pid, gameStartUtc = owner.processStartUtc,
+                                    profilerPid, profilerStartUtc, path
+                                });
+                        }
+                        catch (Exception ex)
+                        {
+                            Environment.ExitCode = 1;
+                            summary.Text = "Could not save the eval Play report: " + ex.Message;
+                        }
+                        finally { Close(); }
+                    });
+                }
+                catch (InvalidOperationException) when (IsDisposed || !IsHandleCreated) { }
+            };
+            game.EnableRaisingEvents = true;
+            WriteEvalReceipt(launchReceipt, owner);
+        }
+        catch { game.Dispose(); throw; }
+    }
 
     bool LaunchGameCore(bool automated)
     {
@@ -603,7 +676,8 @@ sealed class MainForm : Form
             try
             {
                 if (!playMode.Checked) Environment.SetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES", "1");
-                gamePid = GameLauncher.Launch(exe, launchArgs, module, outPath, trackAlloc.Checked);
+                Action<int> beforeResume = evalLaunchReceipt == null ? null : pid => TrackEvalGame(pid, exe);
+                gamePid = GameLauncher.Launch(exe, launchArgs, module, outPath, trackAlloc.Checked, beforeResume);
             }
             finally { Environment.SetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES", oldNoChores); }
             if (playMode.Checked) StartPlayRecordingWhenReady();

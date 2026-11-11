@@ -192,6 +192,12 @@ internal static class RebirthSurvivorNetworkCodec
         }
         if(s.ProtocolVersion>=10) length+=EstimateString(RebirthImprovisationProgressPersistence.Write(s.ImprovisationProgress).ToString(System.Xml.Linq.SaveOptions.DisableFormatting),16384);
         if(s.ProtocolVersion>=13)length+=20+EstimateString(s.BlackMagicActions,1024);
+        if (s.ProtocolVersion >= 14)
+        {
+            length += 5;
+            for (int i = 0; i < s.OrdinaryPracticeLessons.Count && i < RebirthSurvivorNetworkProtocol.MaxSkills; i++)
+                length += 8 + EstimateString(s.OrdinaryPracticeLessons[i].SkillId, RebirthSurvivorNetworkProtocol.MaxIdLength);
+        }
         return length + 40;
     }
     public static string Clean(string value, int maxLength)
@@ -459,13 +465,26 @@ internal static class RebirthSurvivorNetworkCodec
             writer.Write(s.RageSecondsRemaining);
             WriteString(writer,s.BlackMagicActions,1024);
         }
+        if (s.ProtocolVersion >= 14)
+        {
+            writer.Write(s.OrdinaryPracticeSequence);
+            int count = Math.Min(s.OrdinaryPracticeLessons.Count, RebirthSurvivorNetworkProtocol.MaxSkills);
+            writer.Write((byte)count);
+            for (int i = 0; i < count; i++)
+            {
+                var lesson = s.OrdinaryPracticeLessons[i];
+                WriteString(writer, lesson.SkillId, RebirthSurvivorNetworkProtocol.MaxIdLength);
+                writer.Write(lesson.Multiplier);
+                writer.Write(lesson.RemainingActiveSeconds);
+            }
+        }
     }
 
     public static RebirthSurvivorOwnerStateSnapshot ReadOwnerState(BinaryReader reader)
     {
         RebirthSurvivorOwnerStateSnapshot s = new RebirthSurvivorOwnerStateSnapshot();
         s.ProtocolVersion = reader.ReadInt32();
-        if(s.ProtocolVersion != 11 && s.ProtocolVersion != 12 && s.ProtocolVersion != 13) throw new InvalidDataException("Unsupported owner snapshot layout");
+        if(s.ProtocolVersion < 11 || s.ProtocolVersion > RebirthSurvivorNetworkProtocol.Version) throw new InvalidDataException("Unsupported owner snapshot layout");
         s.RebirthModeEnabled = reader.ReadBoolean();
         s.HasCharacter = reader.ReadBoolean();
         s.CreationState = (RebirthSurvivorOwnerCreationState)reader.ReadByte();
@@ -589,6 +608,22 @@ internal static class RebirthSurvivorNetworkCodec
                 s.PublicationSerial<=0||s.RageTier<0||s.RageTier>4||float.IsNaN(s.RageSecondsRemaining)||float.IsInfinity(s.RageSecondsRemaining)||
                 s.RageSecondsRemaining<0f||s.RageSecondsRemaining>RebirthRageService.DurationSeconds)
                 throw new InvalidDataException("Invalid owner effect projection");
+        }
+        if (s.ProtocolVersion >= 14)
+        {
+            s.OrdinaryPracticeSequence = reader.ReadUInt32();
+            int count = reader.ReadByte();
+            if (count > RebirthSurvivorNetworkProtocol.MaxSkills) throw new InvalidDataException("Too many projected lessons");
+            for (int i = 0; i < count; i++)
+            {
+                string skillId = ReadBoundedString(reader, RebirthSurvivorNetworkProtocol.MaxIdLength);
+                float multiplier = reader.ReadSingle();
+                float remaining = reader.ReadSingle();
+                if (string.IsNullOrEmpty(skillId) || !(multiplier >= 1f && multiplier <= 3f) ||
+                    !(remaining > 0f) || float.IsInfinity(remaining))
+                    throw new InvalidDataException("Invalid projected lesson");
+                s.OrdinaryPracticeLessons.Add(new RebirthSurvivorOrdinaryPracticeLesson(skillId, multiplier, remaining));
+            }
         }
         return s;
     }

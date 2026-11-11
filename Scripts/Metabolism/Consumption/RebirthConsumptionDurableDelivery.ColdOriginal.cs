@@ -120,18 +120,59 @@ internal static partial class RebirthConsumptionDurableDelivery
             load.ResumeCursor=(load.ResumeCursor+count)%operations.Length;
         }
     }
+    // Legacy ingestion could reach the saved repository before its stage head.
+    // The only tolerated drift is from a solid serving waiting in the stomach.
+    // Compare the complete row after normalizing its clock, energy and hold time.
+    internal static bool MatchesUnmarkedSolidIngestion(string before, string after, string saved)
+    {
+        var original = RebirthCookingRemoteAdmission.ReadProtocolXml(before, 8 * 1024 * 1024);
+        var planned = RebirthCookingRemoteAdmission.ReadProtocolXml(after, 8 * 1024 * 1024);
+        var actual = RebirthCookingRemoteAdmission.ReadProtocolXml(saved, 8 * 1024 * 1024);
+        if (original.Name != "player" || planned.Name != "player" || actual.Name != "player" ||
+            original.Element("ingestionEntries") is not XElement originalEntries ||
+            planned.Element("ingestionEntries") is not XElement plannedEntries ||
+            actual.Element("ingestionEntries") is not XElement actualEntries ||
+            (long?)original.Attribute("nextEntryId") is not long newId || newId < 1 ||
+            originalEntries.Elements("entry").Any(entry => (long?)entry.Attribute("id") == newId) ||
+            plannedEntries.Elements("entry").Count() != originalEntries.Elements("entry").Count() + 1)
+            return false;
+
+        var plannedEntry = plannedEntries.Elements("entry").SingleOrDefault(entry => (long?)entry.Attribute("id") == newId);
+        var actualEntry = actualEntries.Elements("entry").SingleOrDefault(entry => (long?)entry.Attribute("id") == newId);
+        if (plannedEntry == null || actualEntry == null ||
+            (int?)plannedEntry.Attribute("kind") != (int)RebirthIngestionKind.Food ||
+            (float?)plannedEntry.Attribute("solidMl") is not float solids || !(solids > 0f) || float.IsInfinity(solids) ||
+            (float?)plannedEntry.Attribute("fluidMl") != 0f ||
+            (ulong?)planned.Attribute("lastWorldTime") is not ulong plannedTime ||
+            (ulong?)actual.Attribute("lastWorldTime") is not ulong actualTime || actualTime < plannedTime ||
+            !NonincreasingServingValue(actual.Attribute("energy"), planned.Attribute("energy")) ||
+            !NonincreasingServingValue(actualEntry.Attribute("solidHoldSeconds"), plannedEntry.Attribute("solidHoldSeconds")))
+            return false;
+
+        actual.SetAttributeValue("lastWorldTime", planned.Attribute("lastWorldTime").Value);
+        actual.SetAttributeValue("energy", planned.Attribute("energy").Value);
+        actualEntry.SetAttributeValue("solidHoldSeconds", plannedEntry.Attribute("solidHoldSeconds").Value);
+        return XNode.DeepEquals(actual, planned);
+    }
+
+    private static bool NonincreasingServingValue(XAttribute observed, XAttribute planned)
+        => (float?)observed is float current && (float?)planned is float expected &&
+            current >= 0f && current <= expected && !float.IsInfinity(expected);
+
     private static void TryResumeInventoryOriginal(InventoryNativeLoad load,Guid operation)
     {
         IDisposable memory=null;
         try
         {
             var actor=load.Actor;
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] entering native serving continuation");
             if(!load.Current()||load.Dead||actor.IsDead()||inventoryOriginals.Count>=16||
                 !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)||identity.CanonicalId!=load.Account||
                 !RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerFileMatches(load.Path,load.Native)||
                 !RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out memory))return;
-            string directory=Path.Combine(load.Save,"RebirthData","PlayerConsumption",identity.StorageKey,operation.ToString("N"));
+            string directory=InventoryOriginalDirectory(load.Save,identity.StorageKey,operation);
             var history=ReadInventoryHistory(directory,operation,out string text);
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] authenticated journal stage count="+history.Count);
             var image=RebirthCookingRemoteAdmission.ReadProtocolXml(text,16*1024*1024);
             string[] names={"beforeBag","beforeBelt","afterBag","afterBelt","bagLocks","beltLocks","source","replacement","siblings","serving","plan","metabolismBefore","metabolismAfter"};
             if(image.Name!="playerSourceConsumption"||image.Attributes().Count()!=9||(int?)image.Attribute("version")!=1||
@@ -159,6 +200,7 @@ internal static partial class RebirthConsumptionDurableDelivery
             if(!history.ContainsKey("owner-before-intent")||prefix>0&&!history.ContainsKey("source-intent"))return;
             for(int ordinal=0;ordinal<prefix;ordinal++)if(!history.ContainsKey("source-command-"+ordinal))return;
             byte[] nativeBefore=ReadInventoryNativeStage(history,"before");
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] qualified paid owner prefix="+prefix);
             bool applied=history.TryGetValue("ingestion-saved",out var ingestion);
             // An entered deferred callback without its positive return is
             // genuinely ambiguous. A source checkpoint never authorizes replay.
@@ -172,9 +214,27 @@ internal static partial class RebirthConsumptionDurableDelivery
             bool deferredStateSaved=history.TryGetValue("secondary-state-saved",out var secondaryState);
             if((secondary==1f||used==1f||committed)&&!deferredStateSaved)return;
             var metabolism=committed?RebirthMetabolismStateRepository.CaptureNpcServingState(actor,out _):applied?
-                RebirthMetabolismStateRepository.QualifyColdAppliedNpcServing(actor,(string)(deferredStateSaved?secondaryState:ingestion).Element("saved"),(string)image.Element("metabolismBefore")):
-                RebirthMetabolismStateRepository.QualifyColdNpcServing(actor,(string)image.Element("metabolismBefore"),out _);
-            if(metabolism==null)return;
+                RebirthMetabolismStateRepository.QualifyColdAppliedNpcServing(actor,(string)(deferredStateSaved?secondaryState:ingestion).Element("saved"),(string)image.Element("metabolismBefore"),ignoreFormattingWhitespace:true):
+                RebirthMetabolismStateRepository.QualifyColdNpcServing(actor,(string)image.Element("metabolismBefore"),out _,ignoreFormattingWhitespace:true);
+            string recoveredIngestion = null;
+            if (metabolism == null && !applied && paid == 1f && secondary == 0f && used == 0f &&
+                !history.ContainsKey("secondary-intent") && !deferredStateSaved &&
+                history.ContainsKey("source-saved") && history.ContainsKey("ingestion-intent") &&
+                HasQualifiedInventoryNative(history, "source"))
+            {
+                var observed = RebirthMetabolismStateRepository.CaptureNpcServingState(actor, out _);
+                string beforeState = (string)image.Element("metabolismBefore");
+                string afterState = (string)image.Element("metabolismAfter");
+                if (observed != null && MatchesUnmarkedSolidIngestion(beforeState, afterState, observed.Before))
+                {
+                    metabolism = RebirthMetabolismStateRepository.QualifyColdAppliedNpcServing(actor, observed.Before, beforeState, ignoreFormattingWhitespace: true);
+                    if (metabolism != null) recoveredIngestion = observed.Before;
+                }
+                applied = recoveredIngestion != null;
+            }
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] canonical serving qualified="+(metabolism!=null)+
+                " recoveredMissingMarker="+(recoveredIngestion!=null));
+            if (metabolism == null) return;
             var state=committed?RebirthMetabolismStateRepository.ReadHistoricalNpcServing(metabolism.Id,(string)completion.Element("saved")):
                 applied?metabolism.After:RebirthMetabolismStateRepository.HydrateColdNpcAfter(metabolism,(string)image.Element("metabolismAfter"));
             if(state==null||image.Element("serving").HasAttributes||image.Element("serving").HasElements||!RebirthNativeItemCodec.TryDecode(image.Element("serving").Value,out var serving))return;
@@ -184,6 +244,8 @@ internal static partial class RebirthConsumptionDurableDelivery
                 DeferredStateSaved=deferredStateSaved,
                 SecondaryEntered=history.ContainsKey("owner-secondary-intent"),SecondarySaved=secondary==1f||committed,NativeEntered=history.ContainsKey("owner-use-intent"),NativeSaved=used==1f||committed,Committed=committed};
             if(!original.Current()||!load.Current())return;
+            if (recoveredIngestion != null)
+                original.Record("ingestion-saved", new XElement("saved", recoveredIngestion));
             // Retain the complete actual loaded file under its immutable body
             // identity. Later saved secondary/use files must not overwrite the
             // historical earlier source-stage image.

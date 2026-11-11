@@ -140,6 +140,7 @@ public static class RebirthBossEventRegistry
     private static readonly Queue<Guid> ArchiveOrder = new Queue<Guid>();
     private static readonly Dictionary<int, RebirthBossEventEntityState> Entities = new Dictionary<int, RebirthBossEventEntityState>();
     public static IEnumerable<RebirthBossEventInstance> ActiveEvents { get { return Events.Values; } }
+    internal static bool HasLiveEvents => Events.Count != 0;
     public static IEnumerable<RebirthBossEventEntityState> EntityStates { get { return Entities.Values; } }
     public static void Register(RebirthBossEventInstance e)
     {

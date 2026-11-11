@@ -82,10 +82,12 @@ public static class RebirthCamperEnergyMaintenance
     private static EntityPlayer Owner(EntityVehicle v,out string creation,out string key)
     {
         creation=null;key=null;var owner=v.GetOwner();if(owner==null)return null;
-        foreach(var entity in v.world.Entities.list)
+        var persistentPlayers=GameManager.Instance.GetPersistentPlayerList();
+        if(persistentPlayers==null)return null;
+        foreach(var p in v.world.GetPlayers())
         {
-            if(!(entity is EntityPlayer p)||p.IsDead())continue;
-            var native=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(p.entityId);
+            if(p==null||p.IsDead())continue;
+            var native=persistentPlayers.GetPlayerDataFromEntityID(p.entityId);
             if(native==null||!owner.Equals(native.PrimaryId)&&!owner.Equals(native.NativeId))continue;
             if(!RebirthSurvivorMode.IsEnabledForCurrentWorld()||RebirthCharacterCreationHoldService.IsHeld(p)||
                 !RebirthWorldCharacterService.TryGet(p,out var r)||r==null||!r.IsComplete||!RebirthWorldCharacterRepository.IsCurrentCachedRecord(r)||

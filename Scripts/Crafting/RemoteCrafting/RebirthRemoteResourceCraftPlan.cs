@@ -6,6 +6,22 @@ using System.Linq;
 // It grants no source payment, queue admission or owner mutation permission.
 internal static class RebirthRemoteResourceCraftPlan
 {
+    // The marked native queue row and phase 2 establish that the accepted
+    // action ran. Its inventory evidence belongs to the debited cells only.
+    internal static bool MatchesPaidCells(RebirthCamperEnergyActorImage before,
+        RebirthCamperEnergyActorImage after, RebirthCamperEnergyActorImage actual) =>
+        actual != null && MatchesPaidCells(before.Bag, after.Bag, actual.Bag) &&
+        MatchesPaidCells(before.Belt, after.Belt, actual.Belt);
+
+    private static bool MatchesPaidCells(ItemStack[] before, ItemStack[] after, ItemStack[] actual)
+    {
+        if (actual == null || before.Length != after.Length || after.Length != actual.Length) return false;
+        for (int i = 0; i < after.Length; i++)
+            if (!RebirthCamperEnergyItems.Same(before[i], after[i]) && !RebirthCamperEnergyItems.Same(after[i], actual[i]))
+                return false;
+        return true;
+    }
+
     internal static bool IsExactShortfall(RebirthCamperEnergyActorImage before,IReadOnlyList<ItemStack> requirements,IReadOnlyList<ItemStack> remote,int beltCount)
     {
         try

@@ -59,8 +59,8 @@ public static partial class RebirthNpcAggregatePersistenceStore
                         !string.Equals(record.Vitals.DeathOrIncapacitationState,"alive",StringComparison.OrdinalIgnoreCase))return false;
                     if(record.NativeReconstruction!=null)
                     {
-                        var native=record.NativeReconstruction.Write().Element("actor");
-                        if(native==null||!source.MatchesSavedBodyFrame(Convert.FromBase64String(native.Value)))return false;
+                        string payload=(string)record.NativeReconstruction.Write().Element("actor")?.Attribute("payload");
+                        if(string.IsNullOrEmpty(payload)||!source.MatchesSavedBodyFrame(Convert.FromBase64String(payload)))return false;
                     }
                     var next=new RebirthNpcRuntimeState(source.StableId,record.Profile.ProfileId){Presence=presence,OwnershipKind=ownership,
                         OwnerId=record.Ownership?.OwnerPlatformIdOrPersistentPlayerId??string.Empty,Order=order,Travel=RebirthNpcTravelState.None,

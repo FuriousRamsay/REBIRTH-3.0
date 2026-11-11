@@ -163,12 +163,19 @@ public static partial class RebirthNpcSocialService
         nextDecay = now + TimeSpan.FromMinutes(1).Ticks;
         lock (Sync)
         {
-            recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();foreach (List<RebirthNpcSocialMemory> list in Memories.Values)
+            bool changed = false;
+            foreach (List<RebirthNpcSocialMemory> list in Memories.Values)
             {
                 for (int i=list.Count-1;i>=0;i--)
                 {
                     RebirthNpcSocialMemory m=list[i];
                     if (m.Importance >= 0.9f) continue;
+                    if (!changed)
+                    {
+                        recoveryEpoch = new object();
+                        RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();
+                        changed = true;
+                    }
                     long from=m.LastDecayUtcTicks>0?m.LastDecayUtcTicks:m.LastReinforcedUtcTicks;if(from<=0)from=m.CreatedUtcTicks;
                     double days = new TimeSpan(Math.Max(0,now-from)).TotalDays;
                     m.Confidence = Clamp01(m.Confidence - (float)(days * 0.01));m.LastDecayUtcTicks=now;

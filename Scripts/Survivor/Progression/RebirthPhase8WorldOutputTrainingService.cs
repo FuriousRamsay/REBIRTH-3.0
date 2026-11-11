@@ -172,6 +172,11 @@ public static class RebirthPhase8WorldOutputTrainingService
     {
         state=new CollectedState(); HarvestScope scope=activeScope;
         if(scope==null||actionData==null||item==null||item.IsEmpty()||!ReferenceEquals(scope.ActionData,actionData)||scope.Player==null)return;
+        // Continuous mining and logging practice use credited work, independent of collected quantity.
+        if (!scope.MatureCrop && scope.Carcass == null &&
+            (scope.SalvageWeights == null || !scope.SalvageWeights.TryGetValue(item.type, out float weight) || !(weight > 0f)))
+            return;
+
         state.ActionData=actionData;state.Player=scope.Player;state.Item=item;state.Before=CountPlayerItem(scope.Player,item.type);state.Eligible=true;
     }
 

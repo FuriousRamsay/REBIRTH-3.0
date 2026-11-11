@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 
 internal static partial class RebirthNpcMetabolismCustody
 {
@@ -8,11 +9,71 @@ internal static partial class RebirthNpcMetabolismCustody
     {
         internal PlayerDataFile Data;internal byte[] Buffs,Bag,Belt;internal Guid[] Operations,PlayerOperations;internal PooledBinaryReader Reader;internal long Start;
         internal World World;internal EntityPlayerLocal Actor;internal INetConnection Connection;internal NetPackagePlayerId Packet;
-        internal int Deaths;internal bool Dead,Returned,HydrationEntered,Hydrated,Joined;internal IDisposable Memory;
+        internal int Deaths;internal bool Dead,Returned,HydrationEntered,Hydrated,Joined,PlayerWorkerRead;internal IDisposable Memory;
     }
     private static readonly object clientNativeGate=new object();
     private static readonly List<NpcClientRead> clientNativeReads=new List<NpcClientRead>();
     [ThreadStatic]private static NpcClientRead enteredClientJoin;
+    [ThreadStatic]private static NpcClientRead enteredPlayerPacketRead;
+    private static NpcClientRead pendingPlayerPacketRead;
+    private static IDisposable playerPacketReadBudget;
+
+    private static void InstallClientNativePlayerPacketObserver()
+    {
+        if(GameManager.IsDedicatedServer)return;
+        // One reader slot reserved before connections. The worker never opens
+        // a main-thread budget or looks up any player/world state.
+        lock(clientNativeGate)
+            if(playerPacketReadBudget==null)
+                RebirthProductiveEarnedObservationBudget.TryRetainDetached(16L*1024*1024,out playerPacketReadBudget);
+        RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.player-consumption.native-packet-read"),typeof(ClientNativePlayerPacketRead));
+    }
+
+    [HarmonyPatch(typeof(NetPackagePlayerId),nameof(NetPackagePlayerId.read))]
+    private static class ClientNativePlayerPacketRead
+    {
+        private static void Prefix(NetPackagePlayerId __instance,bool __runOriginal,out NpcClientRead __state)
+        {
+            __state=null;
+            if(!__runOriginal||__instance.Sender!=null||ThreadManager.IsMainThread()||enteredPlayerPacketRead!=null||
+                !RebirthConsumptionDurableDelivery.InventoryProtocolActive)return;
+            lock(clientNativeGate)
+            {
+                if(playerPacketReadBudget==null||pendingPlayerPacketRead!=null)return;
+                __state=new NpcClientRead{Packet=__instance,PlayerWorkerRead=true};
+                pendingPlayerPacketRead=enteredPlayerPacketRead=__state;
+            }
+        }
+        private static Exception Finalizer(NetPackagePlayerId __instance,Exception __exception,NpcClientRead __state)
+        {
+            if(__state==null)return __exception;
+            if(ReferenceEquals(enteredPlayerPacketRead,__state))enteredPlayerPacketRead=null;
+            lock(clientNativeGate)
+                if(__exception!=null||!__state.Returned||!ReferenceEquals(__state.Packet,__instance)||
+                    !ReferenceEquals(__state.Data,__instance.playerDataFile))DropClientNativeRead(__state);
+            return __exception;
+        }
+    }
+
+    internal static void ForgetClientNativePlayerPacket(NetPackagePlayerId packet)
+    {
+        lock(clientNativeGate)
+            if(pendingPlayerPacketRead!=null&&ReferenceEquals(pendingPlayerPacketRead.Packet,packet))
+                DropClientNativeRead(pendingPlayerPacketRead);
+    }
+
+    private static NpcClientRead PromoteClientNativePlayerPacket(NetPackagePlayerId packet)
+    {
+        // Only reached inside the current authenticated main-thread PlayerId.
+        var scope=pendingPlayerPacketRead;
+        if(scope==null||!ReferenceEquals(scope.Packet,packet))return null;
+        if(!scope.Returned||!ReferenceEquals(scope.Data,packet.playerDataFile)||!SameClientNativeData(scope)||
+            clientNativeReads.Count>=2||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(96L*1024*1024,out scope.Memory))
+        {DropClientNativeRead(scope);return null;}
+        pendingPlayerPacketRead=null;
+        clientNativeReads.Add(scope);
+        return scope;
+    }
     private static object EnterClientNativeRead(PlayerDataFile data,PooledBinaryReader reader,uint version,StreamModeRead mode,bool run)
     {
         NpcClientRead scope=null;
@@ -21,6 +82,13 @@ internal static partial class RebirthNpcMetabolismCustody
             if(!run||data==null||version!=uint.MaxValue||mode!=StreamModeRead.FromServer||reader?.BaseStream==null||!reader.BaseStream.CanSeek||reader.BaseStream.Length>16L*1024*1024)return null;
             lock(clientNativeGate)
             {
+                if(!ThreadManager.IsMainThread())
+                {
+                    scope=enteredPlayerPacketRead;
+                    if(scope==null||!ReferenceEquals(scope,pendingPlayerPacketRead)||scope.Data!=null||
+                        !ReferenceEquals(scope.Packet?.playerDataFile,data))return null;
+                    scope.Data=data;scope.Reader=reader;scope.Start=reader.BaseStream.Position;return scope;
+                }
                 if(clientNativeReads.Count>=2||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(96L*1024*1024,out var memory))return null;
                 scope=new NpcClientRead{Data=data,Reader=reader,Start=reader.BaseStream.Position,Memory=memory};clientNativeReads.Add(scope);return scope;
             }
@@ -37,9 +105,14 @@ internal static partial class RebirthNpcMetabolismCustody
                 if(!run||!ReferenceEquals(scope.Reader,reader)||reader.BaseStream.Position<=scope.Start||scope.Data.buffData==null||scope.Data.buffData.Length>1024*1024)return;
                 scope.Buffs=scope.Data.buffData.ToArray();
                 if(!RebirthRemoteResourcePlacedStationSavedReceipt.TryNpcConsumptionKeys(scope.Buffs,out var operations)||
-                    !RebirthRemoteResourcePlacedStationSavedReceipt.TryPlayerConsumptionKeys(scope.Buffs,out var playerOperations)||operations.Length==0&&playerOperations.Length==0)return;
+                    !RebirthRemoteResourcePlacedStationSavedReceipt.TryPlayerConsumptionKeys(scope.Buffs,out var playerOperations)||
+                    (scope.PlayerWorkerRead?playerOperations.Length==0:operations.Length==0&&playerOperations.Length==0))return;
+                if(scope.PlayerWorkerRead&&(!scope.Data.bLoaded||scope.Data.bDead||
+                    scope.Data.bagData==null||scope.Data.bagData.Length>4L*1024*1024||
+                    scope.Data.inventoryData==null||scope.Data.inventoryData.Length>4L*1024*1024))return;
                 scope.Bag=scope.Data.bagData.ToArray();scope.Belt=scope.Data.inventoryData.ToArray();
-                scope.Operations=operations;scope.PlayerOperations=playerOperations;scope.Deaths=scope.Data.deaths;scope.Dead=scope.Data.bDead;scope.Returned=true;scope.Reader=null;
+                scope.Operations=scope.PlayerWorkerRead?Array.Empty<Guid>():operations;
+                scope.PlayerOperations=playerOperations;scope.Deaths=scope.Data.deaths;scope.Dead=scope.Data.bDead;scope.Returned=true;scope.Reader=null;
             }
             catch{}
             finally{if(!scope.Returned)DropClientNativeRead(scope);}
@@ -55,7 +128,8 @@ internal static partial class RebirthNpcMetabolismCustody
         lock(clientNativeGate)
         {
             foreach(var old in clientNativeReads.Where(value=>!ReferenceEquals(value.Data,packet.playerDataFile)).ToArray())DropClientNativeRead(old);
-            var scope=clientNativeReads.SingleOrDefault(value=>ReferenceEquals(value.Data,packet.playerDataFile)&&value.Returned);
+            var scope=clientNativeReads.SingleOrDefault(value=>ReferenceEquals(value.Data,packet.playerDataFile)&&value.Returned)
+                ??PromoteClientNativePlayerPacket(packet);
             if(scope==null||!SameClientNativeData(scope))return null;
             scope.Packet=packet;scope.World=world;scope.Connection=connection;enteredClientJoin=scope;return scope;
         }
@@ -79,7 +153,18 @@ internal static partial class RebirthNpcMetabolismCustody
         if(scope.Joined)foreach(var operation in scope.Operations)
             SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthNpcConsumptionRestartReady>().Setup(scope.Actor.entityId,operation),false);
         if(scope.Joined&&scope.PlayerOperations.Length>0)
-            RebirthConsumptionDurableDelivery.ObserveInventoryClientNativeHydration(scope.Actor,scope.Data,scope.Connection,scope.PlayerOperations);
+        {
+            var actor=scope.Actor;var data=scope.Data;var connection=scope.Connection;var operations=scope.PlayerOperations;
+            if(scope.PlayerWorkerRead)
+            {
+                // The actual authenticated packet still owns this hydrated file.
+                // Its player-only detached comparison has finished. Release it
+                // before the synchronous journal restore reserves its workspace.
+                if(!ReferenceEquals(data,packet.playerDataFile))return;
+                DropClientNativeRead(scope);
+            }
+            RebirthConsumptionDurableDelivery.ObserveInventoryClientNativeHydration(actor,data,connection,operations);
+        }
     }
     internal static void EndClientNativeJoin(object state,Exception error)
     {
@@ -90,14 +175,25 @@ internal static partial class RebirthNpcMetabolismCustody
     private static void DropClientNativeRead(NpcClientRead scope)
     {
         lock(clientNativeGate)
-        {clientNativeReads.Remove(scope);scope.Memory?.Dispose();scope.Memory=null;scope.Data=null;scope.Buffs=null;scope.Bag=null;scope.Belt=null;scope.Operations=null;scope.PlayerOperations=null;scope.Reader=null;scope.Actor=null;scope.World=null;scope.Connection=null;scope.Packet=null;}
+        {
+            if(ReferenceEquals(pendingPlayerPacketRead,scope))pendingPlayerPacketRead=null;
+            clientNativeReads.Remove(scope);scope.Memory?.Dispose();scope.Memory=null;scope.Data=null;scope.Buffs=null;scope.Bag=null;scope.Belt=null;
+            scope.Operations=null;scope.PlayerOperations=null;scope.Reader=null;scope.Actor=null;scope.World=null;scope.Connection=null;scope.Packet=null;
+        }
     }
     private static void RetireClientNativeObservations()
     {
-        if(clientNativeReads.Count==0)return;
+        if(clientNativeReads.Count==0&&System.Threading.Volatile.Read(ref pendingPlayerPacketRead)==null)return;
         if(!ThreadManager.IsMainThread())return;
         lock(clientNativeGate)
-            foreach(var scope in clientNativeReads.Where(value=>value.World!=null&&(!ReferenceEquals(value.World,GameManager.Instance?.World)||!ReferenceEquals(value.Connection,SingletonMonoBehaviour<ConnectionManager>.Instance?.connectionToServer?[0]))).ToArray())DropClientNativeRead(scope);
+        {
+
+            var connection=SingletonMonoBehaviour<ConnectionManager>.Instance?.connectionToServer?[0];
+            if(pendingPlayerPacketRead!=null&&(connection==null||connection.IsDisconnected()))
+                DropClientNativeRead(pendingPlayerPacketRead);
+            foreach(var scope in clientNativeReads.Where(value=>value.World!=null&&(!ReferenceEquals(value.World,GameManager.Instance?.World)||!ReferenceEquals(value.Connection,connection))).ToArray())
+                DropClientNativeRead(scope);
+        }
     }
     private static bool LoadedClientReceipt(EntityPlayerLocal actor,Guid operation,string key,float value)
     {

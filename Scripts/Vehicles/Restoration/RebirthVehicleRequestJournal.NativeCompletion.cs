@@ -27,17 +27,22 @@ public static partial class RebirthVehicleRequestJournal
     {
         EnsureLoaded();lock(Sync)
         {
-            if(loadFailed||loadedDirectory.Length==0||!string.Equals(loadedDirectory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase)||!current())return false;
-            if(InFlight.TryGetValue(id,out var original)&&(original.Actor!=result.ActorId||original.Fingerprint!=result.Fingerprint))return false;
-            if(Completed.TryGetValue(id,out var previous))
+            long expectedGeneration = generation;
+            if (WritingCurrentJournal || loadFailed || loadedDirectory.Length == 0 ||
+                !string.Equals(loadedDirectory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase) ||
+                !current() || generation != expectedGeneration || loadFailed) return false;
+            if (InFlight.TryGetValue(id, out var original) &&
+                (original.Actor != result.ActorId || original.Fingerprint != result.Fingerprint)) return false;
+            if (Completed.TryGetValue(id, out var previous))
             {
-                if(previous.ActorId!=result.ActorId||previous.Fingerprint!=result.Fingerprint)return false;
-                if(previous.Outcome!=RebirthVehicleRequestOutcome.Indeterminate)return previous.Outcome==result.Outcome;
+                if (previous.ActorId != result.ActorId || previous.Fingerprint != result.Fingerprint) return false;
+                if (previous.Outcome != RebirthVehicleRequestOutcome.Indeterminate) return previous.Outcome == result.Outcome;
             }
-            else Order.Enqueue(id);
-            Completed[id]=CloneResult(result);InFlight.Remove(id);TrimResolved(MaxEntries);
-            Persist(loadedDirectory);
-            return !loadFailed&&current()&&Completed.TryGetValue(id,out var saved)&&saved.Outcome==result.Outcome&&saved.ActorId==result.ActorId&&saved.Fingerprint==result.Fingerprint;
+            if (!PublishResult(id, result)) return false;
+
+            return current() && generation == expectedGeneration && !loadFailed &&
+                Completed.TryGetValue(id, out var saved) && saved.Outcome == result.Outcome &&
+                saved.ActorId == result.ActorId && saved.Fingerprint == result.Fingerprint;
         }
     }
 }

@@ -12,12 +12,16 @@ internal static class RebirthVehicleInventoryWrite
         return image;
     }
     internal static bool CanMutate(EntityPlayer player,bool bag)
+        => CanMutate(player,bag,allowVehicleCustody:true);
+
+    internal static bool CanMutate(EntityPlayer player,bool bag,bool allowVehicleCustody)
     {
         if(!ThreadManager.IsMainThread()||player?.world==null||player.IsDead()||
             !ReferenceEquals(GameManager.Instance?.World,player.world)||!ReferenceEquals(player.world.GetEntity(player.entityId),player))return false;
         object inventory=bag?(object)player.bag:player.inventory;
         return inventory!=null&&!RebirthCamperStationNativeActorPayment.Blocks(inventory)
-            &&(!RebirthGearOwnerReservation.BlocksInventory(inventory,bag)||RebirthVehicleOwnerCustody.NativeCanEnter(player,bag))
+            &&(!RebirthGearOwnerReservation.BlocksInventory(inventory,bag)||
+                allowVehicleCustody&&RebirthVehicleOwnerCustody.NativeCanEnter(player,bag))
             &&!(player is EntityPlayerLocal local&&RebirthRemoteResourceOwnerAction.IsHeld(local));
     }
     internal static bool SameSlots(ItemStack[] expected,ItemStack[] actual)
@@ -103,13 +107,15 @@ internal static class RebirthVehicleInventoryWrite
         var original=before.Clone();var expected=after.Clone();
         var beforeBag=Snapshot(player.bag?.ItemGrid.items??new ItemStack[0]);
         var beforeBelt=Snapshot(player.inventory?.ItemGrid.items??new ItemStack[0]);
-        var expectedBag=Snapshot(beforeBag);var expectedBelt=Snapshot(beforeBelt);
-        (bag?expectedBag:expectedBelt)[slot]=expected.Clone();
+        // Both before grids are detached. Only the expected target grid needs a new array.
+        var expectedSlots=(ItemStack[])(bag?beforeBag:beforeBelt).Clone();
+        expectedSlots[slot]=expected.Clone();
         if(bag)player.bag.SetSlot(slot,expected.Clone());else player.inventory.SetItem(slot,expected.Clone());
         current=bag?player.bag.ItemGrid.items[slot]:player.inventory.GetItemStack(slot);
         var actualBag=player.bag?.ItemGrid.items??new ItemStack[0];
         var actualBelt=player.inventory?.ItemGrid.items??new ItemStack[0];
-        if(CanMutate(player,bag)&&SameSlots(expectedBag,actualBag)&&SameSlots(expectedBelt,actualBelt))return true;
+        if(CanMutate(player,bag)&&SameSlots(bag?expectedSlots:beforeBag,actualBag)&&
+            SameSlots(bag?beforeBelt:expectedSlots,actualBelt))return true;
         if(SameSlots(beforeBag,actualBag)&&SameSlots(beforeBelt,actualBelt)&&RebirthStationGridIngredients.IsSameStackSnapshot(current,original))return false;
         throw new InvalidOperationException("Vehicle inventory debit has an unknown native postimage; retain original custody.");
     }

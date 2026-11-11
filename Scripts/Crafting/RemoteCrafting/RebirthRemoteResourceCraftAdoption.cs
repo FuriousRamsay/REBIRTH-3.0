@@ -10,7 +10,7 @@ internal static class RebirthRemoteResourceCraftAdoption
         return ThreadManager.IsMainThread()&&player?.world!=null&&player.IsSpawned()&&!player.IsDead()&&original?.Kind==RemoteResourceClientOperation.Craft&&
             player.Died>original.Deaths&&original.Deaths>=0&&RebirthRemoteResourceCraftOriginal.ValidateInput(original,out _,out _,out _,out _,out _)&&
             ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&ReferenceEquals(player.world.GetEntity(player.entityId),player)&&
-            player.world.worldState.Guid==original.World&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
+            RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world)==original.World&&original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
             RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)&&identity.CanonicalId==original.Owner;
     }
     internal static bool HostScope(EntityPlayer actor,RebirthRemoteResourceClientOriginal.Intent original)=>

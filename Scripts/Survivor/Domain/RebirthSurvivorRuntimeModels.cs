@@ -535,6 +535,7 @@ public sealed class RebirthWorldCharacterRecord
     public string MigrationOriginAudit { get; private set; }
     public string MigrationProgressionAudit { get; private set; }
     public bool Dirty { get; private set; }
+    internal bool RequiresDurableOwnerPublication { get; private set; }
     public string LastDirtyReason { get; private set; }
 
     public bool IsComplete
@@ -574,17 +575,21 @@ public sealed class RebirthWorldCharacterRecord
         MigrationProgressionAudit = migrationProgressionAudit ?? string.Empty;
     }
 
-    public void Touch(string reason)
+    public void Touch(string reason) => Touch(reason, requiresDurability: true);
+
+    internal void Touch(string reason, bool requiresDurability)
     {
         Revision = Revision == long.MaxValue ? long.MaxValue : Revision + 1L;
         ModifiedAtUtc = DateTime.UtcNow;
         Dirty = true;
+        RequiresDurableOwnerPublication |= requiresDurability;
         LastDirtyReason = reason ?? string.Empty;
     }
 
     public void MarkPersisted()
     {
         Dirty = false;
+        RequiresDurableOwnerPublication = false;
         LastDirtyReason = string.Empty;
     }
 
@@ -595,6 +600,7 @@ public sealed class RebirthWorldCharacterRecord
             Condition != null ? Condition.Clone() : null, Support != null ? Support.Clone() : null,
             MigrationSourceSchema, MigrationTargetSchema, MigrationPolicyId, MigrationApplied, MigrationOriginAudit, MigrationProgressionAudit);
         copy.Dirty = Dirty;
+        copy.RequiresDurableOwnerPublication = RequiresDurableOwnerPublication;
         copy.LastDirtyReason = LastDirtyReason;
         return copy;
     }

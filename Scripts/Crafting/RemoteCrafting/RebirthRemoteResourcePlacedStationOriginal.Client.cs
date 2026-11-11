@@ -52,7 +52,7 @@ internal static partial class RebirthRemoteResourcePlacedStationOriginal
         if(now>=clientScan)
         {
             clientScan=now+5;
-            if(RebirthRemoteResourceClientOriginal.TryReadPending(out var pending))foreach(var original in pending)
+            if(RebirthRemoteResourceClientOriginal.TryReadPendingForRecovery(player,out var pending))foreach(var original in pending)
                 if(IsCandidate(original)&&(RebirthRemoteResourceClientOriginal.Current(player,original)||EndedClientScope(player,original))&&!clientJobs.ContainsKey(original.Operation)&&clientJobs.Count<32)
                     clientJobs.Add(original.Operation,new ClientJob{Original=original,Stage=1});
         }

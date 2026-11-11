@@ -7,6 +7,21 @@ using Newtonsoft.Json.Linq;
 internal static partial class RebirthConsumptionDurableDelivery
 {
 #if REBIRTH_DEBUG
+    private static bool InventoryAuditSave()
+    {
+        string name = GamePrefs.GetString(EnumGamePrefs.GameName);
+        if (name == "CodexTest") return true;
+        const string prefix = "CodexTestReports-";
+        if (name == null || name.Length != prefix.Length + 10 || !name.StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+        for (int i = prefix.Length; i < name.Length; i++)
+        {
+            char digit = name[i];
+            if ((digit < '0' || digit > '9') && (digit < 'a' || digit > 'f')) return false;
+        }
+        return true;
+    }
+
     private static readonly Dictionary<Guid,int[]> inventoryNativeCalls=new Dictionary<Guid,int[]>();
     private static readonly Dictionary<Guid,EntityPlayer> inventoryAuditActors=new Dictionary<Guid,EntityPlayer>();
     private static readonly Dictionary<Guid,int> inventoryAuditPurposeBytes=new Dictionary<Guid,int>();
@@ -15,7 +30,7 @@ internal static partial class RebirthConsumptionDurableDelivery
     private static string CaptureInventoryAuditFingerprint(EntityPlayer actor)
     {
 #if REBIRTH_DEBUG
-        try{if(GamePrefs.GetString(EnumGamePrefs.GameName)=="CodexTest")return RebirthRemoteResourceDurableJournal.Digest(Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(actor.bag.ItemGrid.items))+"|"+Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(actor.inventory.ItemGrid.items)));}catch{}
+        try{if(InventoryAuditSave())return RebirthRemoteResourceDurableJournal.Digest(Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(actor.bag.ItemGrid.items))+"|"+Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(actor.inventory.ItemGrid.items)));}catch{}
 #endif
         return null;
     }
@@ -24,7 +39,7 @@ internal static partial class RebirthConsumptionDurableDelivery
 #if REBIRTH_DEBUG
         try
         {
-            if(GamePrefs.GetString(EnumGamePrefs.GameName)!="CodexTest"||token==null||before==null||inventoryRefusals.Count>=128&&!inventoryRefusals.ContainsKey(actor))return;
+            if(!InventoryAuditSave()||token==null||before==null||inventoryRefusals.Count>=128&&!inventoryRefusals.ContainsKey(actor))return;
             string canonical=RebirthMetabolismStateRepository.TryGet(actor,out var state)?RebirthMetabolismStateRepository.DescribeNpcServing(token.Id,state):null;
             inventoryRefusals[actor]=new JObject{["sequence"]=++inventoryRefusalSequence,["sourceBefore"]=before,["sourceAfter"]=CaptureInventoryAuditFingerprint(actor),
                 ["canonicalBefore"]=RebirthRemoteResourceDurableJournal.Digest(token.Before),["canonicalAfter"]=canonical==null?null:RebirthRemoteResourceDurableJournal.Digest(canonical),
@@ -35,14 +50,14 @@ internal static partial class RebirthConsumptionDurableDelivery
     private static void ObserveInventoryAdmission(Guid operation,EntityPlayer actor,string purpose)
     {
 #if REBIRTH_DEBUG
-        if(ThreadManager.IsMainThread()&&GamePrefs.GetString(EnumGamePrefs.GameName)=="CodexTest"&&inventoryAuditActors.Count<128)
+        if(ThreadManager.IsMainThread()&&InventoryAuditSave()&&inventoryAuditActors.Count<128)
         {inventoryAuditActors[operation]=actor;inventoryAuditPurposeBytes[operation]=System.Text.Encoding.UTF8.GetByteCount(purpose);}
 #endif
     }
     private static void ObserveInventoryCall(Guid operation,int kind)
     {
 #if REBIRTH_DEBUG
-        if(!ThreadManager.IsMainThread()||GamePrefs.GetString(EnumGamePrefs.GameName)!="CodexTest")return;
+        if(!ThreadManager.IsMainThread()||!InventoryAuditSave())return;
         if(!inventoryNativeCalls.TryGetValue(operation,out var calls))
         {if(inventoryNativeCalls.Count>=128)return;inventoryNativeCalls.Add(operation,calls=new int[5]);}
         calls[kind]++;
@@ -52,7 +67,7 @@ internal static partial class RebirthConsumptionDurableDelivery
     {
         var result=new JObject{["schema"]=1,["available"]=false};
 #if REBIRTH_DEBUG
-        if(!ThreadManager.IsMainThread()||GamePrefs.GetString(EnumGamePrefs.GameName)!="CodexTest"||actor?.world==null||
+        if(!ThreadManager.IsMainThread()||!InventoryAuditSave()||actor?.world==null||
             !ReferenceEquals(actor.world,GameManager.Instance?.World)||!ReferenceEquals(actor.world.GetEntity(actor.entityId),actor))return result;
         var ids=new HashSet<Guid>();if(selected!=Guid.Empty)ids.Add(selected);
         else
@@ -70,6 +85,14 @@ internal static partial class RebirthConsumptionDurableDelivery
         foreach(var operation in ids.OrderBy(value=>value))
         {
             var row=new JObject{["operation"]=operation.ToString("N"),["activeOriginal"]=false,["activeClient"]=false,["diskPresent"]=false};rows.Add(row);
+            var load=inventoryNativeLoads.FirstOrDefault(value=>ReferenceEquals(value.Actor,actor)&&value.Operations.Contains(operation));
+            row["nativeLoadObserved"]=load!=null;
+            if(load!=null)
+            {
+                row["nativeLoadOwnerCurrent"]=load.OwnerCurrent();
+                row["nativeLoadDataCurrent"]=load.Current();
+                row["nativeLoadFileCurrent"]=RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerFileMatches(load.Path,load.Native);
+            }
             if(inventoryAuditPurposeBytes.TryGetValue(operation,out int purposeBytes))row["purposeBytes"]=purposeBytes;
             if(inventoryOriginals.TryGetValue(operation,out var original)&&ReferenceEquals(original.Actor,actor))
             {
@@ -90,7 +113,7 @@ internal static partial class RebirthConsumptionDurableDelivery
             else foreach(string field in new[]{"sourceCalls","canonicalCalls","deferredCalls","hydrationCalls","useCalls"})row[field]=0;
             if(!actor.world.IsRemote()&&RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner))
             {
-                string directory=Path.Combine(GameIO.GetSaveGameDir(),"RebirthData","PlayerConsumption",owner.StorageKey,operation.ToString("N"));
+                string directory=InventoryOriginalDirectory(GameIO.GetSaveGameDir(),owner.StorageKey,operation);
                 if(!System.IO.Directory.Exists(directory))continue;row["diskPresent"]=true;
                 if(!RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out var memory)){row["unknown"]=true;continue;}
                 using(memory)try

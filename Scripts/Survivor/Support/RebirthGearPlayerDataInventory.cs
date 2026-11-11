@@ -8,7 +8,12 @@ using System.Text;
 internal static class RebirthGearPlayerDataInventory
 {
     internal static ItemStack[] ReadSlots(PlayerDataFile data,bool bag)
+        =>ReadSlots(data,bag,false,out _);
+    internal static ItemStack[] ReadSlots(PlayerDataFile data,bool bag,out bool[] locks)
+        =>ReadSlots(data,bag,true,out locks);
+    private static ItemStack[] ReadSlots(PlayerDataFile data,bool bag,bool readLocks,out bool[] locks)
     {
+        locks=null;
         try
         {
             MemoryStream blob=bag?data?.bagData:data?.inventoryData;
@@ -61,6 +66,7 @@ internal static class RebirthGearPlayerDataInventory
                         // ordering and all native item bytes remain exact.
                         slots[i]=new ItemStack(value,stackCount);
                     }
+                    if(readLocks)locks=RebirthCamperStationNativeActorPayment.Locks(grid.SlotLocks);
                     return slots;
                 }
                 finally{reader.Encoding=previous;}

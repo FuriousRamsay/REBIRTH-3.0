@@ -12,6 +12,8 @@ public static class RebirthSurvivorClientState
     private static object ownerWorld;
     private static EntityPlayer ownerPlayer;
     private static long projectionGeneration;
+    private static long ordinaryProgressGeneration;
+    private static float ownerReceivedAt;
     private static bool ownerNotificationPending;
     private static readonly Queue<RebirthSurvivorCreationNetworkResponse> PendingCreationNotifications = new Queue<RebirthSurvivorCreationNetworkResponse>();
     private static readonly Dictionary<ulong, RebirthSurvivorCreationNetworkResponse> CreationResults = new Dictionary<ulong, RebirthSurvivorCreationNetworkResponse>();
@@ -65,23 +67,58 @@ public static class RebirthSurvivorClientState
         return true;
     }
 
-    public static RebirthSurvivorOwnerHeader GetOwnerHeader()
+    public static RebirthSurvivorOwnerHeader GetOwnerHeader() => GetOwnerHeader(showOrdinaryProgress: false);
+
+    internal static RebirthSurvivorOwnerHeader GetOwnerHeader(bool showOrdinaryProgress)
     {
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         EntityPlayerLocal player = world != null ? world.GetPrimaryPlayer() : null;
-        lock (Sync) return new RebirthSurvivorOwnerHeader(projectionGeneration,
+        lock (Sync) return new RebirthSurvivorOwnerHeader(DisplayGeneration(showOrdinaryProgress),
             ScopeMatches(world, player) ? ownerState : null, world, player);
     }
 
-    public static RebirthSurvivorOwnerStateSnapshot GetOwnerStateSnapshot(out RebirthSurvivorOwnerHeader header)
+    public static RebirthSurvivorOwnerStateSnapshot GetOwnerStateSnapshot(out RebirthSurvivorOwnerHeader header) =>
+        GetOwnerStateSnapshot(out header, showOrdinaryProgress: false);
+
+    internal static RebirthSurvivorOwnerStateSnapshot GetOwnerStateSnapshot(out RebirthSurvivorOwnerHeader header, bool showOrdinaryProgress)
     {
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         EntityPlayerLocal player = world != null ? world.GetPrimaryPlayer() : null;
         lock (Sync)
         {
             bool valid = ScopeMatches(world, player);
-            header = new RebirthSurvivorOwnerHeader(projectionGeneration, valid ? ownerState : null, world, player);
-            return valid ? ownerState.Clone() : null;
+            header = new RebirthSurvivorOwnerHeader(DisplayGeneration(showOrdinaryProgress), valid ? ownerState : null, world, player);
+            if (!valid) return null;
+            var snapshot = ownerState.Clone();
+            if (showOrdinaryProgress && world.IsRemote())
+                RebirthOrdinarySkillPractice.ApplyDisplay(player, snapshot);
+            return snapshot;
+        }
+    }
+
+    private static long DisplayGeneration(bool showOrdinaryProgress) =>
+        unchecked(projectionGeneration + (showOrdinaryProgress ? ordinaryProgressGeneration : 0));
+
+    internal static void MarkOrdinaryProgressChanged()
+    {
+        lock (Sync) unchecked { ordinaryProgressGeneration++; }
+    }
+
+    // The stored projection is replaced rather than edited. Award calculation
+    // may read it under its current owner scope without cloning it per action.
+    internal static bool TryReadOrdinaryProgressBase(EntityPlayerLocal player,
+        out RebirthSurvivorOwnerStateSnapshot state, out float elapsed)
+    {
+        state = null;
+        elapsed = 0;
+        lock (Sync)
+        {
+            if (!ScopeMatches(player?.world, player) || !ownerState.DefinitionsCompatible ||
+                !ownerState.RebirthModeEnabled || !ownerState.HasCharacter ||
+                !RebirthSurvivorRequestScope.TryNormalize(ownerState.CreationId, out _)) return false;
+            state = ownerState;
+            elapsed = Math.Max(0f, UnityEngine.Time.realtimeSinceStartup - ownerReceivedAt);
+            return true;
         }
     }
 
@@ -322,6 +359,7 @@ public static class RebirthSurvivorClientState
                     return;
             }
             ownerState = incoming.Clone();
+            ownerReceivedAt = UnityEngine.Time.realtimeSinceStartup;
             ownerScalars = new RebirthSurvivorOwnerScalars(ownerState);
             World world = GameManager.Instance != null ? GameManager.Instance.World : null;
             ownerWorld = world;

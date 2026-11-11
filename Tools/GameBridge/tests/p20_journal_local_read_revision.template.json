@@ -1,0 +1,86 @@
+{
+  "name": "p20_journal_local_read_revision",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge with a currently open Journal. Fill GUIDE_ROW_HIT from the observed authored guide's row, and localized READ_ACTION/UNREAD_ACTION from the actual UI. Capture native journal state before input. This covers the local successful/no-op revision path. Also repeat journal_reopen and purge_all_journal_guides_reload for external guide/catalog refresh and authored markup."
+    },
+    {
+      "expectWindowOpen": "rebirthJournal"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "@GUIDE_ROW_HIT@",
+          "window": "rebirthJournal"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "id": "journalReadToggleLabel",
+        "exactText": "@UNREAD_ACTION@"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "@GUIDE_ROW_HIT@",
+          "window": "rebirthJournal"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "id": "journalReadToggleLabel",
+        "exactText": "@UNREAD_ACTION@"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalReadToggleHit",
+          "window": "rebirthJournal"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "id": "journalReadToggleLabel",
+        "exactText": "@READ_ACTION@"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalReadAllHit",
+          "window": "rebirthJournal"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "id": "journalReadToggleLabel",
+        "exactText": "@UNREAD_ACTION@"
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "journal"
+        }
+      }
+    },
+    {
+      "screenshot": "p20_journal_read_revision"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

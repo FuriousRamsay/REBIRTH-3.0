@@ -62,8 +62,7 @@ public static class RebirthRemoteGearEquipPlan
             Attribute(record, "strength") + .001f < profile.GearMinStrength ||
             Attribute(record, "constitution") + .001f < profile.GearMinConstitution) return false;
         if (profile.GearSlotId == RebirthSurvivorGearService.SupportSlotId &&
-            RebirthMetabolismStateRepository.TryGet(player, out var metabolism) &&
-            metabolism?.HydrationSlotItem != null && !metabolism.HydrationSlotItem.IsEmpty()) return false;
+            RebirthMetabolismLiveAction.BlocksSupportGear(player)) return false;
 
         var state = record.Support;
         state.EquippedGearBySlot.TryGetValue(profile.GearSlotId, out var oldId);
@@ -115,9 +114,7 @@ public static class RebirthRemoteGearEquipPlan
             !string.Equals(oldValue.ItemClass.GetItemName(),oldId,StringComparison.OrdinalIgnoreCase)||
             !RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(oldId,out var profile)||profile==null||
             !string.Equals(profile.Kind,"survivor_gear",StringComparison.OrdinalIgnoreCase)||profile.GearSlotId!=slot)return false;
-        if(slot==RebirthSurvivorGearService.SupportSlotId&&
-            RebirthMetabolismStateRepository.TryGet(player,out var metabolism)&&
-            metabolism?.HydrationSlotItem!=null&&!metabolism.HydrationSlotItem.IsEmpty())return false;
+        if(slot==RebirthSurvivorGearService.SupportSlotId&&RebirthMetabolismLiveAction.BlocksSupportGear(player))return false;
         int bagSlots=RebirthSurvivorGearService.GetDesiredPhysicalBagSlots(record,slot,null);
         int beltBonus=slot==RebirthSurvivorGearService.BeltSlotId?0:RebirthSurvivorGearService.GetToolbeltBonus(player);
         int beltSlots=Math.Min(RebirthToolbeltCapacity.MaximumSlots,RebirthToolbeltCapacity.GetSlotsForLevel(1)+

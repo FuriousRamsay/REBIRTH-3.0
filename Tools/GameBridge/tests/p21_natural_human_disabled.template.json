@@ -1,0 +1,39 @@
+{
+  "name": "p21_natural_human_disabled",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepared fresh disposable solo or authenticated dedicated Purge with effective ConfigsDump NaturalGroupEnabled=false, zero previous naturalgroup- keys, and no explicitly manufactured humans. Select a loaded outdoor native region, validate that natural spawn would otherwise have an eligible world/player and stay within the area. This checks an observation interval, not world-wide absence. Do not arm an optional natural human route. Verify journal and placed-dog setup separately on authority."
+    },
+    {
+      "action": {
+        "command": "surroundings",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "radius": 80,
+        "contains": "npcRebirth",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "wait": 21
+    },
+    {
+      "expectLivingEntities": {
+        "radius": 80,
+        "contains": "npcRebirth",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -57,6 +57,16 @@ def validate_case(case):
         raise ValueError('Unsafe case id')
     if not 1 <= case.get('timeoutSeconds', 600) <= 3600:
         raise ValueError('Case timeout must be between 1 and 3600 seconds')
+    conditions = case.get('readyWhen', [])
+    if not isinstance(conditions, list):
+        raise ValueError('readyWhen must be a list')
+    for condition in conditions:
+        path = condition.get('path') if isinstance(condition, dict) else None
+        if (not isinstance(path, list) or len(path) < 2 or path[0] not in ('state', 'surroundings')
+                or not all(isinstance(key, str) and key for key in path)
+                or set(condition) != {'path', 'equals'}
+                or type(condition['equals']) not in (str, bool, int, float, type(None))):
+            raise ValueError('readyWhen requires a state or surroundings field path and scalar equals')
     if case['kind'] == 'manual':
         return
     path = inside(case['file'])
@@ -225,6 +235,21 @@ def require_settled_custody(bridge):
         raise RuntimeError('Original cooking return/cancellation remains uncertain; batch ownership retained')
 
 
+def unmet_requirements(conditions, snapshot, surroundings):
+    observations = {'state': snapshot, 'surroundings': surroundings}
+    missing = object()
+    unmet = []
+    for condition in conditions:
+        value = observations
+        for field in condition['path']:
+            value = value.get(field, missing) if isinstance(value, dict) else missing
+        expected = condition['equals']
+        if type(value) is not type(expected) or value != expected:
+            unmet.append({**condition, 'available': value is not missing,
+                          'observed': None if value is missing else value})
+    return unmet
+
+
 def run(plan, prepared, session_path, transport_factory=Transport, executor=subprocess.run):
     run_id = time.strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:8]
     directory = OUT / run_id
@@ -302,7 +327,14 @@ def run(plan, prepared, session_path, transport_factory=Transport, executor=subp
                 if snapshot.get('world', {}).get('gameName') != plan['save'] or snapshot.get('world', {}).get('gameWorld') != plan['world']:
                     raise RuntimeError('World/save changed during batch')
                 write(evidence / 'before.json', snapshot)
-                write(evidence / 'surroundings.json', bridge.call('/surroundings', radius=30))
+                surroundings = bridge.call('/surroundings', radius=30)
+                write(evidence / 'surroundings.json', surroundings)
+                unmet = unmet_requirements(case.get('readyWhen', []), snapshot, surroundings)
+                if unmet:
+                    write(evidence / 'prerequisites.json', unmet)
+                    require_settled_custody(bridge)
+                    row.update(status='PARKED', reason='Live prerequisites not met before case input')
+                    continue
                 timeout = case.get('timeoutSeconds', 600)
                 # No shell and no launch/build/quit in this runner. One sequential child at a time.
                 result = executor(command(case, evidence), cwd=HERE, env=os.environ.copy(), capture_output=True, text=True, timeout=timeout)
@@ -329,18 +361,25 @@ def run(plan, prepared, session_path, transport_factory=Transport, executor=subp
                 healthy = False
             finally:
                 row['seconds'] = round(time.monotonic() - start, 3)
-                try:
-                    bridge.call('/stop', 'POST')
-                    write(evidence / 'after.json', bridge.call('/state', sections='player,stats,world,ui'))
-                    if plan.get('captureScreenshots', True):
-                        shot = bridge.call('/screenshot', 'POST', name=run_id + '-' + case['id'])
-                        write(evidence / 'screenshot.json', shot)
-                except Exception as error:
-                    row['captureError'] = str(error)
-                    healthy = False
+                if row['status'] != 'PARKED':
+                    try:
+                        bridge.call('/stop', 'POST')
+                        write(evidence / 'after.json', bridge.call('/state', sections='player,stats,world,ui'))
+                        if plan.get('captureScreenshots', True):
+                            shot = bridge.call('/screenshot', 'POST', name=run_id + '-' + case['id'])
+                            write(evidence / 'screenshot.json', shot)
+                    except Exception as error:
+                        row['captureError'] = str(error)
+                        healthy = False
                 write(report_path, report)
                 print(json.dumps({'case': row['id'], 'status': row['status'], 'seconds': row['seconds']}), flush=True)
-        report['status'] = 'FAIL' if any(r['status'] in ('FAIL', 'BLOCKED') for r in report['cases']) else ('PASS_SELECTED' if any(r['status'] == 'PASS' for r in report['cases']) else 'NOT_RUN')
+        statuses = {row['status'] for row in report['cases']}
+        if statuses & {'FAIL', 'BLOCKED'}:
+            report['status'] = 'FAIL'
+        elif 'PARKED' in statuses:
+            report['status'] = 'PARTIAL_SELECTED' if 'PASS' in statuses else 'PARKED'
+        else:
+            report['status'] = 'PASS_SELECTED' if 'PASS' in statuses else 'NOT_RUN'
     except BaseException as error:
         report['status'] = 'INTERRUPTED' if isinstance(error, KeyboardInterrupt) else 'FAIL'
         if acquired and isinstance(error, KeyboardInterrupt):

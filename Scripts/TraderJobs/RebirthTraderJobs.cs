@@ -1052,18 +1052,33 @@ public static class RebirthQuestJournalAcceptedTraderJobLimitPatch
     // Returning false from an AddQuest prefix therefore loses the offer without
     // giving the quest. The preflight patch above performs every rejection before
     // vanilla is allowed to close the offer window.
-    public static void Postfix(QuestJournal __instance, Quest q)
+    [HarmonyPriority(Priority.Last)]
+    private static void Prefix(QuestJournal __instance, Quest q, bool __runOriginal,
+        out (EntityPlayer Owner, Quest Candidate, World World) __state)
     {
-        if (__instance == null || q == null || __instance.OwnerPlayer == null) return;
-        if (!RebirthUtilities.IsVanillaTrader(q.QuestGiverID) || q.SharedOwnerID != -1) return;
+        __state = default;
+        EntityPlayer owner = __instance?.OwnerPlayer;
+        World world = GameManager.Instance?.World;
+        if (!__runOriginal || owner == null || world == null || !ReferenceEquals(owner.world, world) ||
+            q == null || q.SharedOwnerID != -1 || !RebirthUtilities.IsVanillaTrader(q.QuestGiverID) ||
+            __instance.FindActiveQuest(q.QuestCode) != null) return;
 
-        // Persist the acceptance day on the quest. This makes the configured daily
-        // limit an actual per-day acceptance budget instead of a permanent penalty
-        // for unfinished jobs carried across midnight.
+        __state = (owner, q, world);
+    }
+
+    private static void Postfix(QuestJournal __instance, Quest q, bool __runOriginal,
+        (EntityPlayer Owner, Quest Candidate, World World) __state)
+    {
+        if (!__runOriginal || __state.Owner == null || !ReferenceEquals(q, __state.Candidate) ||
+            !ReferenceEquals(__instance?.OwnerPlayer, __state.Owner) ||
+            !ReferenceEquals(GameManager.Instance?.World, __state.World) ||
+            !ReferenceEquals(__state.Owner.world, __state.World) ||
+            q.SharedOwnerID != -1 || !RebirthUtilities.IsVanillaTrader(q.QuestGiverID) ||
+            !ReferenceEquals(__instance.FindActiveQuest(q.QuestCode), q)) return;
+
+        // Persist the actual acceptance day before consuming the matching offer.
         RebirthTraderJobPolicy.StampAcceptedDay(q);
-
-        if (__instance.FindActiveQuest(q.QuestCode) != null)
-            RebirthTraderOfferSnapshotService.Consume(__instance, q);
+        RebirthTraderOfferSnapshotService.Consume(__instance, q);
     }
 }
 

@@ -1,0 +1,15 @@
+{
+  "name": "Dedicated Purge Workbench Craft from same-chunk storage",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Prepare an authorized disposable Dedicated Purge client with a known Baking Pan recipe, an empty native Workbench queue, and all ten Forged Iron in one eligible crate in the Workbench's actual loaded chunk. Use the real Workbench interaction. Start the paired authority source and native chunk-save observer before input. A visible queue row alone does not prove settlement or timing." },
+    { "expectWindowOpen": "workstation_workbench" },
+    { "expectNoItem": "resourceForgedIron" },
+    { "expectNoUi": { "id": "rebirthQueueName", "exactText": "Baking Pan", "window": "workstation_workbench" } },
+    { "click": { "exactText": "Baking Pan", "window": "workstation_workbench" } },
+    { "click": { "exactText": "Craft", "window": "workstation_workbench" } },
+    { "waitForUi": { "id": "rebirthQueueName", "exactText": "Baking Pan", "window": "workstation_workbench", "timeout": 4 } },
+    { "expectNoItem": "resourceForgedIron" },
+    { "expectNoErrors": true }
+  ]
+}

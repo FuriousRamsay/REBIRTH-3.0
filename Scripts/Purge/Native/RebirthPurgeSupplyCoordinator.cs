@@ -11,12 +11,23 @@ internal static class RebirthPurgeSupplyCoordinator
         internal AIDirectorAirDropComponent Controller;
         internal AIAirDrop Flight;
         internal EntityPlayer Player;
-        internal RebirthPurgeSupplyCrateStamp Stamp;
+        private readonly RebirthPoiWorldBinding binding;
+        internal readonly RebirthPurgeSupplyCrateStamp Stamp;
+        internal ChunkManager.ChunkObserver CrateObserver;
         internal Vector3 PlayerPosition,Drop;
         internal float Radius;
         internal bool Spawned;
         internal bool OriginAnchored;
+
+        internal Reservation(RebirthPoiWorldBinding binding, RebirthPurgeSupplyAccount account)
+        {
+            this.binding=binding;
+            Stamp=new RebirthPurgeSupplyCrateStamp(binding.WorldId,account.Player,account.InFlight,account.Token(binding.WorldId));
+        }
+
         internal bool Current()=>NativePurge(Controller)&&ReferenceEquals(Controller.activeAirDrop,Flight)&&Flight!=null;
+        internal bool CanStamp(World target)=>ReferenceEquals(active,this)&&Current()&&
+            ReferenceEquals(binding.Scope,target)&&binding.IsCurrent;
         internal void ProjectOwner(EntitySupplyCrate crate)
         {
             // The owner label shows the player's visible name (EntityName is not a player's display name).
@@ -87,21 +98,30 @@ internal static class RebirthPurgeSupplyCoordinator
         // Match native CreateFlightPaths: its Tick waits for this location, then
         // passes the observer into SpawnSupplyCrate for native landing cleanup.
         crate.ChunkRef=request.Controller.Director.World.GetGameManager().AddChunkObserver(crate.SpawnPos,false,3,-1);
+        request.CrateObserver=crate.ChunkRef;
         path.Crates.Add(crate);
         __instance.flightPaths=new List<AIAirDrop.FlightPath>{path};
         return false;
     }
-    internal static void BeforeCrate(AIDirectorAirDropComponent __instance,Vector3 __0,out RebirthPurgeSupplySpawnScope __state)
+    internal static bool BeforeCrate(AIDirectorAirDropComponent __instance,Vector3 __0,
+        ChunkManager.ChunkObserver __1,out RebirthPurgeSupplySpawnScope __state)
     {
-        __state=null;var request=active;
-        if(request==null||request.Spawned||!ReferenceEquals(request.Controller,__instance)||!request.Current()||
-           (__0-request.Drop).sqrMagnitude>1f)return;
-        request.Spawned=true;
-        __state=new RebirthPurgeSupplySpawnScope(world,request.Stamp,request,request.Current);
+        __state=null;
+        var request=active;
+        if(request==null||!ReferenceEquals(request.Controller,__instance)||
+           __1==null||!ReferenceEquals(request.CrateObserver,__1))return true;
+        if(request.Spawned||!request.Current()||(__0-request.Drop).sqrMagnitude>1f)return false;
+        __state=new RebirthPurgeSupplySpawnScope(world,request);
+        return true;
     }
     internal static Exception AfterCrate(Exception __exception,RebirthPurgeSupplySpawnScope __state)
     {
-        __state?.Dispose();return __exception;
+        if(__state!=null)
+        {
+            try{__state.ObserveRegistration();}
+            finally{__state.Dispose();}
+        }
+        return __exception;
     }
     internal static void Pulse()
     {
@@ -183,8 +203,12 @@ internal static class RebirthPurgeSupplyCoordinator
                 if(!RebirthPurgeSupplyService.TryInvoking(account,id,out invoking))return;
                 account=invoking;
             }
-            var request=new Reservation {Controller=director,Player=player,PlayerPosition=playerPosition,Drop=drop,Radius=radius,OriginAnchored=origin!=null,
-                Stamp=new RebirthPurgeSupplyCrateStamp(id,key,account.InFlight,account.Token(id))};
+            var flightBinding=RebirthPurgeSupplyService.CurrentFlightBinding(account,id);
+            if(flightBinding==null)return;
+            var request=new Reservation(flightBinding,account)
+            {
+                Controller=director,Player=player,PlayerPosition=playerPosition,Drop=drop,Radius=radius,OriginAnchored=origin!=null
+            };
             queued=request;
             try
             {

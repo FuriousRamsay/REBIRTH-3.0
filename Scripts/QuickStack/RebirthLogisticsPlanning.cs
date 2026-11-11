@@ -224,9 +224,11 @@ internal sealed class RebirthLogisticsPlanning:IDisposable
         {
             if(item?.Source==null||item.NativeObject==null||string.IsNullOrEmpty(item.Identity)||item.Identity.Length>1024||!Known(item.Source)||!SameObject(item)||
                 resources.ContainsKey(item.Source.StableId))throw new InvalidDataException("Original native endpoint observation differs.");
-            var detached=new Observation{Source=item.Source,NativeObject=item.NativeObject,Identity=item.Identity,Items=ItemStack.Clone(item.Items),Locks=CopyLocks(item.Locks,item.Items.Length)};
-            var view=plan.Capture(detached.Source.StableId,detached.Identity,detached.Source.Kind,detached.Items,LockImage(detached.Locks,detached.Items.Length));
-            resources.Add(view.Id,new Resource{Scope=this,Original=detached,View=view,Locks=CopyLocks(detached.Locks,detached.Items.Length)});
+            var items=item.Items;
+            // Capture owns its own Before and After copies. The retained source needs only identity and locks.
+            var detached=new Observation{Source=item.Source,NativeObject=item.NativeObject,Identity=item.Identity,Locks=CopyLocks(item.Locks,items.Length)};
+            var view=plan.Capture(detached.Source.StableId,detached.Identity,detached.Source.Kind,items,LockImage(detached.Locks,items.Length));
+            resources.Add(view.Id,new Resource{Scope=this,Original=detached,View=view,Locks=CopyLocks(detached.Locks,items.Length)});
         }
         if(logicalNpcs?.Count>128)throw new InvalidDataException();
         if(logicalNpcs!=null)

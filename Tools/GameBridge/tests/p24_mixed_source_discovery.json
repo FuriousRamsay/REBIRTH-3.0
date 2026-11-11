@@ -1,0 +1,64 @@
+{
+  "name": "p24_mixed_source_discovery",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge. Prepare known ordered mixed sources around one authentic actor: an activated static crate, unlocked or owned vehicle, drone, authorized companion when available, and workstation output. Include equal-distance sources and a chunk edge. Keep Guard ON. Run baseline and candidate with the same exact coordinates and configuration."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "action": {
+        "command": "entities",
+        "args": {
+          "radius": 80,
+          "limit": 100
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "meleeToolRepairT0StoneAxe",
+          "exact": 1
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "rebirthCraftingOutcomeStatusValue",
+        "exactText": "Ready to craft",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "p24_mixed_source_discovery"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Capture the exact ordered rbrr status resourceRockSmall source rows as solo host, or on the dedicated authority with the authenticated sender. A plain dedicated console may have no player and a local client invocation does not prove authority. Hold then repeat after real movement, chunk unload and native source removal. Compare ids, positions, stock, denied companion and same-distance tie order; compare native Craft debit separately. This scenario checks native UI availability and records entity candidates. It does not assert ordering alone."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Companion roster after filtering the authoritative runtime snapshot by owner",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run on solo and dedicated Purge with a real owner-deployed dog. Dedicated control needs one other player's dog or an authored foreign-owner fixture. Compare screenshots and UI rows to expected stable roster order and assert the other owner's dog never appears. No natural human spawns are required."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabOverview"
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "audit_companion_owned_roster"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    }
+  ]
+}

@@ -30,8 +30,9 @@ public sealed class NetPackageRebirthRepairConditionCorrection : NetPackage
 internal static class RebirthRepairOriginalWire
 {
     private const int Maximum=2*1024*1024;
-    internal static string Read(PooledBinaryReader input){int length=input.ReadInt32();if(length<0||length>Maximum)throw new InvalidDataException();var bytes=input.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException();return new System.Text.UTF8Encoding(false,true).GetString(bytes);}
-    internal static void Write(PooledBinaryWriter output,string image){var bytes=new System.Text.UTF8Encoding(false,true).GetBytes(image);if(bytes.Length>Maximum)throw new InvalidDataException();output.Write(bytes.Length);output.Write(bytes);}
+    private static readonly System.Text.UTF8Encoding StrictUtf8=new System.Text.UTF8Encoding(false,true);
+    internal static string Read(PooledBinaryReader input){int length=input.ReadInt32();if(length<0||length>Maximum)throw new InvalidDataException();var bytes=input.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException();return StrictUtf8.GetString(bytes);}
+    internal static void Write(PooledBinaryWriter output,string image){var bytes=StrictUtf8.GetBytes(image);if(bytes.Length>Maximum)throw new InvalidDataException();output.Write(bytes.Length);output.Write(bytes);}
 }
 [Preserve]
 public sealed class NetPackageRebirthRepairOriginalRequest:NetPackage
@@ -41,7 +42,7 @@ public sealed class NetPackageRebirthRepairOriginalRequest:NetPackage
     public NetPackageRebirthRepairOriginalRequest Setup(int id,string value){playerId=id;image=value;return this;}
     public override void read(PooledBinaryReader input){playerId=input.ReadInt32();image=RebirthRepairOriginalWire.Read(input);}
     public override void write(PooledBinaryWriter output){base.write(output);output.Write(playerId);RebirthRepairOriginalWire.Write(output,image);}
-    public override void ProcessPackage(World world,GameManager callbacks){if(world?.IsRemote()!=false||!ValidEntityIdForSender(playerId))return;RebirthRepairOriginalCorrection.ReceiveServer(world,playerId,image);}
+    public override void ProcessPackage(World world,GameManager callbacks){if(world?.IsRemote()!=false||!ValidEntityIdForSender(playerId))return;RebirthRepairOriginalCorrection.ReceiveServer(world,playerId,image,Sender);}
     public int GetLength()=>8+System.Text.Encoding.UTF8.GetByteCount(image);
 }
 [Preserve]

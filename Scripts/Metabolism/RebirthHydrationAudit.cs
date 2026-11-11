@@ -93,8 +93,8 @@ internal static partial class RebirthHydrationClientOriginals
     {
         try
         {
-            if(!Scope(player,out var world,out var owner,out var creation,out var path))return null;
-            var session=new Session(player,world,owner,creation,path);var result=new JArray();
+            if(!Scope(player,out var world,out var owner,out var creation,out var path,out var root))return null;
+            var session=new Session(player,world,owner,creation,path,root);var result=new JArray();
             if(System.IO.Directory.Exists(path))foreach(var record in new RebirthCamperTransferJournal(path).ReadForIndex())
             {
                 if(result.Count>=64)return null;var original=Decode(record.Before);
@@ -111,8 +111,8 @@ internal static partial class RebirthHydrationClientOriginals
         try
         {
             if(operation==Guid.Empty)return TryRead(player,out original);
-            if(!Scope(player,out var world,out var owner,out var creation,out var path)||!System.IO.Directory.Exists(path))return false;
-            var session=new Session(player,world,owner,creation,path);
+            if(!Scope(player,out var world,out var owner,out var creation,out var path,out var root)||!System.IO.Directory.Exists(path))return false;
+            var session=new Session(player,world,owner,creation,path,root);
             var record=new RebirthCamperTransferJournal(path).Read(operation);if(record==null)return session.Current();
             var found=Decode(record.Before);
             if(!Matches(record,found)||found.World!=world||found.Owner!=owner||found.Digest!=digest)return false;

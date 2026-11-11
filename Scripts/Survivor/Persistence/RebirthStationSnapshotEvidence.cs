@@ -24,7 +24,7 @@ public static partial class RebirthStationSnapshotEvidence
         // A writer may recycle its pooled snapshot before the next main-thread tick.
         internal Action<long,string> OnPublished;
         internal Request(object world,object chunk,int x,int z,Func<bool> observe){World=world;Chunk=chunk;X=x;Z=z;Observe=observe;ThreadId=System.Threading.Thread.CurrentThread.ManagedThreadId;}
-        public void Dispose(){lock(gate){Closed=true;requests.Remove(this);Invalidate(Snapshot);DisposeEntityEvidence(this);Snapshot=null;World=null;}}
+        public void Dispose(){lock(gate){Closed=true;requests.Remove(this);InvalidateOwnedSnapshot(this);DisposeEntityEvidence(this);Snapshot=null;World=null;}}
     }
     internal static object CaptureDiagnostics()
     {
@@ -57,7 +57,7 @@ public static partial class RebirthStationSnapshotEvidence
             if(serializing)foreach(var r in requests)if(!r.Closed&&ReferenceEquals(r.World,world)&&ReferenceEquals(r.Chunk,chunk)&&r.ThreadId==System.Threading.Thread.CurrentThread.ManagedThreadId&&r.X==x&&r.Z==z){request=r;break;}
             if(request==null)return null;
             try{if(request.Observe!=null&&!request.Observe())return null;}catch{return null;}
-            Invalidate(request.Snapshot);request.Snapshot=null;request.Published=false;request.Proof=null;request.SnapshotProof=null;
+            InvalidateOwnedSnapshot(request);request.Snapshot=null;request.Published=false;request.Proof=null;request.SnapshotProof=null;
             var state=states.GetOrCreateValue(snapshot);state.Generation++;
             var frame=new Frame{Previous=active,Snapshot=snapshot,Chunk=chunk,Request=request,Generation=state.Generation};
             request.Diagnostic="serializing";active=frame;return frame;}
@@ -118,7 +118,7 @@ public static partial class RebirthStationSnapshotEvidence
         if(frame.Request.ValidateTerminal!=null&&(!SpanMatches(bytes,frame.OutputStart,frame.OutputBytes)||!SpanMatches(bytes,frame.CompletionStart,frame.CompletionBytes)))return;
         if(!ValidateEntityEvidence(frame,finalStream,bytes))return;
         lock(gate){if(frame.Request.Closed||!states.TryGetValue(frame.Snapshot,out var state)||state.Generation!=frame.Generation)return;
-            if(!ReferenceEquals(frame.Request.Snapshot,frame.Snapshot))Invalidate(frame.Request.Snapshot);
+            if(!ReferenceEquals(frame.Request.Snapshot,frame.Snapshot))InvalidateOwnedSnapshot(frame.Request);
             state.Allocation?.Dispose();state.Allocation=allocation;allocation=null;state.Bytes=bytes;state.InputStart=(int)frame.InputStart;state.QueueStart=(int)frame.QueueStart;state.InputLength=frame.InputBytes?.Length??0;state.QueueLength=frame.QueueBytes?.Length??0;state.OutputStart=(int)frame.OutputStart;state.CompletionStart=(int)frame.CompletionStart;state.OutputLength=frame.OutputBytes?.Length??0;state.CompletionLength=frame.CompletionBytes?.Length??0;state.Request=frame.Request;frame.Request.Snapshot=frame.Snapshot;frame.Request.Generation=frame.Generation;frame.Request.Diagnostic="snapshot-captured";CommitEntityEvidence(frame);}
         }
         finally{allocation?.Dispose();}
@@ -128,7 +128,17 @@ public static partial class RebirthStationSnapshotEvidence
         if(snapshot==null||span==null||start<8||start>snapshot.Length-span.Length)return false;
         for(int i=0;i<span.Length;i++)if(snapshot[(int)start+i]!=span[i])return false;
         return true;
-    }    public static void Invalidate(object snapshot)
+    }
+    // The request may still point to a native snapshot that the pool reused.
+    // All callers hold gate. Only native object reuse invalidates unconditionally.
+    private static void InvalidateOwnedSnapshot(Request request)
+    {
+        var snapshot=request.Snapshot;
+        if(snapshot!=null&&states.TryGetValue(snapshot,out var state)&&
+            ReferenceEquals(state.Request,request)&&state.Generation==request.Generation)
+            Invalidate(snapshot);
+    }
+    public static void Invalidate(object snapshot)
     {if(snapshot==null)return;lock(gate){InvalidateEntityEvidence(snapshot);if(states.TryGetValue(snapshot,out var s)){if(s.Request!=null){s.Request.SnapshotProof=null;s.Request.Proof=null;s.Request.Published=false;}s.Generation++;s.Bytes=null;s.Request=null;var allocation=s.Allocation;s.Allocation=null;allocation?.Dispose();}}}
     public static bool TryCopy(Request request,out byte[] serialized)
     {

@@ -44,12 +44,15 @@ internal sealed class RebirthConsumptionInventoryPlan
         try
         {
             if(bag==null||belt==null||bag.Length<1||bag.Length>169||belt.Length>20||beltCount<0||beltCount>belt.Length||
-                bagLocks?.Length!=bag.Length||beltLocks?.Length!=belt.Length||source==null||source.IsEmpty()||source.count<1||
+                bagLocks!=null&&bagLocks.Length!=bag.Length||beltLocks!=null&&beltLocks.Length!=belt.Length||source==null||source.IsEmpty()||source.count<1||
                 bag.Any(item=>item==null)||belt.Any(item=>item==null)||replacement==null||replacement.itemValue==null||replacement.count<0||
                 replacement.count>source.count||siblings!=null&&(siblings.itemValue==null||siblings.count<0))return false;
             var selected=kind==RebirthMetabolismSourceKind.Backpack?bag:kind==RebirthMetabolismSourceKind.HeldToolbelt?belt:null;
             if(selected==null||slot<0||slot>=selected.Length||kind==RebirthMetabolismSourceKind.HeldToolbelt&&slot>=beltCount||
                 !RebirthStationGridIngredients.IsSameStackSnapshot(selected[slot],source))return false;
+            // A native grid without a lock bitmap has no locked slots.
+            bagLocks??=new bool[bag.Length];
+            beltLocks??=new bool[belt.Length];
             var nextBag=ItemStack.Clone(bag);var nextBelt=ItemStack.Clone(belt);
             (kind==RebirthMetabolismSourceKind.Backpack?nextBag:nextBelt)[slot]=replacement.Clone();
             if(siblings!=null&&!siblings.IsEmpty())
@@ -67,7 +70,8 @@ internal sealed class RebirthConsumptionInventoryPlan
     internal bool MatchesLocks(EntityPlayer actor)
     {
         var bag=RebirthCamperStationNativeActorPayment.Locks(actor?.bag?.LockedSlots);var belt=RebirthCamperStationNativeActorPayment.Locks(actor?.inventory?.ItemGrid?.SlotLocks);
-        return bag!=null&&belt!=null&&BagLocks.SequenceEqual(bag)&&BeltLocks.SequenceEqual(belt);
+        return (bag==null?!BagLocks.Any(locked=>locked):BagLocks.SequenceEqual(bag))&&
+            (belt==null?!BeltLocks.Any(locked=>locked):BeltLocks.SequenceEqual(belt));
     }
     internal bool MatchesAfter(ItemStack[] bag,ItemStack[] belt)=>RebirthVehicleInventoryWrite.SameSlots(AfterBag,bag)&&RebirthVehicleInventoryWrite.SameSlots(AfterBelt,belt);
 }

@@ -38,7 +38,7 @@ internal static class RebirthP4NaturalGroupOccurrence
 
     private struct Policy
     {
-        public bool Enabled; public int Cap; public float Chance, MinPlayer, MaxPlayer, Spacing;
+        public int Cap; public float Chance, MinPlayer, MaxPlayer, Spacing;
     }
 
     internal static void Tick(World world)
@@ -48,7 +48,7 @@ internal static class RebirthP4NaturalGroupOccurrence
            RebirthNpcPersistenceTimelineService.IsAlignmentFailed || Time.unscaledTime < nextCheck) return;
         if(!ReferenceEquals(boundWorld, world)) { boundWorld = world; rolledSlot = ulong.MaxValue; tries = 0; leaderRefresh = 0f; }
         nextCheck = Time.unscaledTime + CheckSeconds;
-        if(!TryPolicy(out var policy) || !policy.Enabled || world.Players == null || world.Players.list.Count == 0) return;
+        if(!TryPolicy(out var policy) || world.Players == null || world.Players.list.Count == 0) return;
 
         ulong slot = world.worldTime / SlotTicks;
         // Every pending natural request counts toward the cap, however old: a request in an unloaded
@@ -110,6 +110,8 @@ internal static class RebirthP4NaturalGroupOccurrence
         leaderRefresh = 0f; // recount next time: a new leader now exists
     }
 
+    internal static bool IsEnabled => TryPolicy(out _);
+
     private static string Key(ulong slot) => KeyPrefix + slot;
 
     private static bool TryPolicy(out Policy policy)
@@ -119,7 +121,7 @@ internal static class RebirthP4NaturalGroupOccurrence
         int id = EntityClass.FromString(LeaderMan);
         if(!EntityClass.list.TryGetValue(id, out var definition) || definition?.Properties == null) return false;
         var p = definition.Properties;
-        policy.Enabled = p.GetBool("NaturalGroupEnabled");
+        if(!p.GetBool("NaturalGroupEnabled")) return false;
         policy.Cap = Mathf.Clamp(p.GetInt("NaturalGroupWorldCap"), 0, 8);
         policy.Chance = Mathf.Clamp01(p.GetFloat("NaturalGroupSlotChance"));
         policy.MinPlayer = Mathf.Max(32f, p.GetFloat("NaturalGroupMinPlayerDistance"));

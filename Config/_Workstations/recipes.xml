@@ -113,11 +113,8 @@
       <ingredient name="resourceWood" count="5" />
       <ingredient name="resourceNail" count="3" />
     </recipe>
-    <recipe name="FuriousRamsayHammerPliers" count="1" craft_time="10" always_unlocked="true">
-      <ingredient name="meleeToolRepairT1ClawHammer" count="1" />
-      <ingredient name="FuriousRamsayPliers" count="1" />
-    </recipe>
   </append>
+  <include filename="hammer_pliers_recipe.xml"/>
   <!-- Restore the original tool requirement lost from these migrated workbench recipes. -->
   <setattribute xpath="/recipes/recipe[(@name='meleeToolPickT3Auger' or @name='meleeToolAxeT3Chainsaw') and @craft_area='workbench']" name="craft_tool">FuriousRamsayScrewdriver</setattribute>
 </configs>

@@ -1,0 +1,12 @@
+{
+  "name": "Second player native Purge spawn",
+  "status": "AUTHORED_NOT_RUN",
+  "setup": "Use a disposable dedicated Purge world with AllowSpawnNearFriend set as in the reported world. Join with a first real account and complete its truck start. Have a second account with no record for this world select a survivor profile and press Spawn while the first account stays connected.",
+  "expect": [
+    "The joining client's native spawn position is the server's Purge roadside staging position for that player.",
+    "Neither native respawn chunk wait nor world readiness times out. Server logs PlayerSpawnedInWorld for the second client.",
+    "Both accounts receive distinct trucks. The second player leaves Building Environment in the driver seat and sees the Purge briefing once.",
+    "A returning account with a completed claim joins normally without a fresh starter truck or briefing."
+  ],
+  "followUp": "Repeat with an incomplete Published claim left by a failed first entry. Reuse the same truck entity and finish the existing claim."
+}

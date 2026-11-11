@@ -60,8 +60,12 @@ internal static class RebirthPurgeDiscoveryService
         {
             Reset();binding=snapshot.Binding;census=source.Published;receipts=earned;
             tiers=EarnedTiers();
-            scan=source.Published.Values.GetEnumerator();nextSweep=Time.realtimeSinceStartup+30;
+            if(tiers!=null&&tiers.Count!=0)
+            {
+                scan=source.Published.Values.GetEnumerator();nextSweep=Time.realtimeSinceStartup+30;
+            }
         }
+        if(tiers==null||tiers.Count==0)return;
         if(scan==null&&pending.Count==0&&Time.realtimeSinceStartup>=nextSweep)
         {scan=source.Published.Values.GetEnumerator();nextSweep=Time.realtimeSinceStartup+30;}
         if(store.HasPending)return;

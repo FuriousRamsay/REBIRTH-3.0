@@ -2837,7 +2837,7 @@
               <label name="traitSelectedHeading" pos="14,-8" width="548" height="27" font_size="20" text_key="xuiRebirthSurvivorSelectedTraits" pivot="topleft" justify="center" color="181,140,255,255" upper_case="true" />
               <rect pos="14,-40" width="548" height="122" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
                 <defaultscrollbar />
-                <scrollview width="518" height="122" clippingsoftness="0,6">
+                <scrollview name="traitSelectedNativeScrollView" width="518" height="122" clippingsoftness="0,6">
                   <sprite name="traitSelectedNativeScrollProxy" pos="0,0" width="1" height="118" sprite="menu_empty" type="sliced" color="0,0,0,1" />
                   <label name="traitSelectedText" pos="0,0" width="500" height="118" font_size="18" pivot="topleft" color="220,220,220,255" overflow="resizeheight" support_bb_code="true" />
                 </scrollview>
@@ -3809,11 +3809,11 @@
             <rect name="backgroundIdentityPanel" pos="24,-20" width="296" height="178">
               <sprite depth="0" sprite="menu_empty2px" type="sliced" color="24,24,24,245" width="296" height="178" />
               <label name="backgroundVisualName" pos="14,-12" width="268" height="38" font_size="29" pivot="topleft" color="[white]" upper_case="true" />
-              <label name="backgroundVisualDescription" pos="14,-57" width="268" height="64" font_size="18" pivot="topleft" color="190,190,190,255" overflow="resizeheight" />
-              <sprite depth="2" pos="14,-126" width="268" height="2" sprite="menu_empty" color="58,58,58,255" />
-              <sprite depth="2" pos="14,-136" width="28" height="28" atlas="RebirthSurvivorIcons" sprite="rb_ui_trait_points" color="241,185,37,255" />
-              <label pos="50,-137" width="174" height="26" font_size="18" text_key="xuiRebirthSurvivorBackgroundListBonusTraitPoints" pivot="topleft" color="241,185,37,255" upper_case="true" />
-              <label name="backgroundTraitPointsValue" pos="226,-136" width="56" height="32" font_size="25" justify="right" pivot="topleft" color="241,185,37,255" support_bb_code="true" />
+              <label name="backgroundVisualDescription" pos="14,-57" width="268" height="73" font_size="18" pivot="topleft" color="190,190,190,255" overflow="shrinkcontent" />
+              <sprite depth="2" pos="14,-135" width="268" height="2" sprite="menu_empty" color="58,58,58,255" />
+              <sprite depth="2" pos="14,-143" width="28" height="28" atlas="RebirthSurvivorIcons" sprite="rb_ui_trait_points" color="241,185,37,255" />
+              <label pos="50,-157" width="174" height="26" font_size="18" text_key="xuiRebirthSurvivorBackgroundListBonusTraitPoints" pivot="left" color="241,185,37,255" upper_case="true" />
+              <label name="backgroundTraitPointsValue" pos="226,-157" width="56" height="32" font_size="25" justify="right" pivot="left" color="241,185,37,255" support_bb_code="true" />
             </rect>
             <texture name="backgroundArtTexture" pos="330,-20" width="530" height="178" color="[white]" visible="false" />
             <rect name="backgroundArtPlaceholder" pos="330,-20" width="530" height="178" visible="false">

@@ -46,6 +46,7 @@ public sealed class RebirthSkillTrainingProfile
     public string Coefficients = string.Empty;
     public string SourceBasis = string.Empty;
     public string State = string.Empty;
+    public bool OwnerLocalPractice;
 }
 
 public sealed class RebirthSkillTrainingComputation
@@ -122,7 +123,8 @@ public static class RebirthSkillTrainingProfileRegistry
                 RebirthSkillTrainingProfile profile=new RebirthSkillTrainingProfile
                 {
                     SkillId=Req(p,"skill_id"), Family=Req(p,"family"), ReferenceUnit=Req(p,"reference_unit"), Formula=Req(p,"formula"),
-                    Coefficients=Req(p,"coefficients"), SourceBasis=(string)p.Attribute("source_basis")??string.Empty, State=Req(p,"state")
+                    Coefficients=Req(p,"coefficients"), SourceBasis=(string)p.Attribute("source_basis")??string.Empty, State=Req(p,"state"),
+                    OwnerLocalPractice=Bool(p,"owner_local_practice",false)
                 };
                 if(!string.Equals(profile.State,"LOCKED",StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Training profile '"+profile.SkillId+"' is not LOCKED.");
                 if(Profiles.ContainsKey(profile.SkillId))throw new InvalidDataException("Duplicate training profile '"+profile.SkillId+"'.");
@@ -177,13 +179,18 @@ public static class RebirthSkillTrainingProfileRegistry
 /// </summary>
 public static class RebirthSkillTrainingCalculator
 {
-    public static bool TryCalculate(RebirthSkillTrainingEvidence evidence,float practicalSkill,out RebirthSkillTrainingComputation result)
+    public static bool TryCalculate(RebirthSkillTrainingEvidence evidence,float practicalSkill,out RebirthSkillTrainingComputation result) =>
+        TryCalculate(evidence, practicalSkill, out result, ownerLocalPractice: false);
+
+    internal static bool TryCalculate(RebirthSkillTrainingEvidence evidence, float practicalSkill,
+        out RebirthSkillTrainingComputation result, bool ownerLocalPractice)
     {
         result=null;
         if(evidence==null||!evidence.AuthoritativeSuccess||string.IsNullOrEmpty(evidence.SkillId)||!Finite(practicalSkill))return false;
         if(!UnitMultiplier(evidence.RelevanceMultiplier)||!UnitMultiplier(evidence.RepetitionMultiplier)||!UnitMultiplier(evidence.AssistanceMultiplier))return false;
         if(!Finite(evidence.CreditedWork)||evidence.CreditedWork<=0f)return false;
-        RebirthSkillTrainingProfile profile; if(!RebirthSkillTrainingProfileRegistry.TryGet(evidence.SkillId,out profile)||profile==null)return false;
+        if (!RebirthSkillTrainingProfileRegistry.TryGet(evidence.SkillId, out var profile) ||
+            ownerLocalPractice && !profile.OwnerLocalPractice) return false;
         float normalized=0f,equivalent=0f,band=1f;
         if(evidence.Mode==RebirthSkillTrainingEvidenceMode.ContinuousWork)
         {

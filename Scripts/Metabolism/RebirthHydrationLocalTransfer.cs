@@ -74,7 +74,8 @@ internal static class RebirthHydrationLocalTransfer
             int owned=RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length);
             if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var snapshot))return Refuse(player,returning,sourceIsBag,sourceIndex,"native-snapshot-failed");
             var hydration=state.HydrationSlotItem;
-            Trace(player,returning,sourceIsBag,sourceIndex,"admission",$"slot={SafeName(hydration)} count={(hydration==null||hydration.IsEmpty()?0:hydration.count)} bag={bag.Length} freeUnlocked={FreeUnlocked(player,bag)} stateRevision={state.Revision}");
+            if (RebirthDebug.IsOn("metabolism"))
+                Trace(player,returning,sourceIsBag,sourceIndex,"admission",$"slot={SafeName(hydration)} count={(hydration==null||hydration.IsEmpty()?0:hydration.count)} bag={bag.Length} freeUnlocked={FreeUnlocked(player,bag)} stateRevision={state.Revision}");
             var cell=new RebirthGearInventoryPlan.Stack{Count=hydration==null||hydration.IsEmpty()?0:hydration.count};
             cell.ItemData=cell.Count==0?string.Empty:RebirthNativeItemCodec.Encode(hydration.itemValue);
             var nativeLocks=player.bag.LockedSlots;
@@ -127,7 +128,8 @@ internal static class RebirthHydrationLocalTransfer
         {
             pending.TryGetValue(player,out var prior);
             if(!ThreadManager.IsMainThread()||player?.world?.IsRemote()!=false||
-                !RebirthHydrationTransferJournal.TryReadPending(player,out var saved,out _)||saved==null)return prior==null?Result.Refused:Result.Pending;
+                !RebirthHydrationTransferJournal.TryReadPending(player,out var saved,out _))return Result.Pending;
+            if(saved==null)return prior==null?Result.Refused:Result.Pending;
             if(prior!=null)
             {
                 if(prior.Original.Digest!=saved.Digest||RebirthHydrationOwnerHold.Matches(player,prior.Original))return Result.Pending;

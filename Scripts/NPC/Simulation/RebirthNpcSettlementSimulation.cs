@@ -396,8 +396,10 @@ public static partial class RebirthNpcSettlementSimulation
 
     private static void TickNeeds(long now)
     {
+        bool hasNeeds;
         lock(Sync)
         {
+            hasNeeds = Needs.Count != 0;
             foreach(KeyValuePair<RebirthNpcStableId,RebirthNpcNeedState> pair in Needs)
             {
                 RebirthNpcNeedState n=pair.Value;
@@ -411,14 +413,17 @@ public static partial class RebirthNpcSettlementSimulation
                 RebirthNpcDecisionEngine.SubmitSignal(pair.Key,"need.fatigue",Get(n,RebirthNpcNeedKind.Fatigue));
             }
         }
-        RebirthNpcSettlementPersistenceStore.MarkDirty();
+        if (hasNeeds) RebirthNpcSettlementPersistenceStore.MarkDirty();
         Interlocked.Increment(ref needTicks);
     }
 
     private static void TickAssignments(long now)
     {
+        bool hasAssignmentState;
         lock(Sync)
         {
+            // Keep processing any transient queue entries, even without persisted work.
+            hasAssignmentState = Work.Count != 0 || AvailableQueued.Count != 0 || ClaimExpiryByDue.Count != 0;
             ProcessExpiredClaimsLocked(now, ClaimExpiryBudget);
             int discovered=0;
             int claimed=0;
@@ -474,7 +479,7 @@ public static partial class RebirthNpcSettlementSimulation
             if(discovered>=WorkDiscoveryBudget && HasAvailableWorkLocked())
                 Interlocked.Increment(ref budgetDeferrals);
         }
-        RebirthNpcSettlementPersistenceStore.MarkDirty();
+        if (hasAssignmentState) RebirthNpcSettlementPersistenceStore.MarkDirty();
     }
 
 

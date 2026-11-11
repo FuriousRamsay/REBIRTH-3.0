@@ -157,7 +157,7 @@ public static class RebirthMusicLibraryClient
         var request=NetPackageManager.GetPackage<NetPackageRebirthMusicLibraryRequest>();
         if(!CanSend(connection,request))return false;
         useWorld=player.world;useOwner=player.entityId;useCreation=creation;pendingUse=item.Clone();
-        Dispatch(player,0);return true;
+        DispatchProjection(player,request);return true;
     }
     private static void ApplyPendingUse(EntityPlayerLocal player)
     {
@@ -271,6 +271,12 @@ public static class RebirthMusicLibraryClient
         return true; // Dispatch admission, not a delivery or saved-order acknowledgement.
     }
     public static void Dispatch(EntityPlayerLocal player,int operation,int index=0,ItemValue item=null)
+        => Dispatch(player,operation,index,item,null);
+
+    internal static void DispatchProjection(EntityPlayerLocal player,NetPackageRebirthMusicLibraryRequest request)
+        => Dispatch(player,0,0,null,request);
+
+    private static void Dispatch(EntityPlayerLocal player,int operation,int index,ItemValue item,NetPackageRebirthMusicLibraryRequest projectionRequest)
     {
         if(player==null)return;
         bool current=EnsureCurrent(player);
@@ -281,7 +287,7 @@ public static class RebirthMusicLibraryClient
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
         if(player.world != null && player.world.IsRemote())
         {
-            var request = NetPackageManager.GetPackage<NetPackageRebirthMusicLibraryRequest>();
+            var request = projectionRequest ?? NetPackageManager.GetPackage<NetPackageRebirthMusicLibraryRequest>();
             var inventory = operation == 1 ? NetPackageManager.GetPackage<NetPackagePlayerInventory>() : null;
             if (!CanSend(connection, request) || (inventory != null && !CanSend(connection, inventory)))
             {

@@ -4,7 +4,14 @@ using System.Xml;
 using System.Collections.Generic;
 class GameIO {public static string DirectoryPath;public static string GetSaveGameDir(){return DirectoryPath;}}
 class Log {public static void Warning(string s){}}
-public struct Vector3i {public int x,y,z;public Vector3i(int a,int b,int c){x=a;y=b;z=c;}}
+public struct Vector3i {
+ public int x,y,z;
+ public Vector3i(int a,int b,int c){x=a;y=b;z=c;}
+ public static bool operator ==(Vector3i a,Vector3i b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
+ public static bool operator !=(Vector3i a,Vector3i b){return !(a==b);}
+ public override bool Equals(object other){return other is Vector3i position&&this==position;}
+ public override int GetHashCode(){return x^y^z;}
+}
 public enum RebirthVehicleAssemblyCarrier:byte {RepairableBlock,VehicleEntity}
 public enum RebirthVehicleRequestOutcome:byte {Rejected,Applied,ReadOnly,Indeterminate}
 public class RebirthVehicleAssembly {public int Value;public RebirthVehicleAssembly DeepClone(){return new RebirthVehicleAssembly{Value=Value};}}
@@ -95,14 +102,18 @@ class Test {
  if(!Begin(failedWriteId,"owner","save-failure",out result))throw new Exception("pre-failure intent admission");
  Directory.CreateDirectory(PathName+".tmp");
  string durableBeforeFailure=File.ReadAllText(PathName);
- RebirthVehicleRequestJournal.Remember(failedWriteId,new RebirthVehicleRequestResult {ActorId="owner",Fingerprint="save-failure",Message="known in memory"},sessionGeneration);
+ if(RebirthVehicleRequestJournal.Remember(failedWriteId,new RebirthVehicleRequestResult {ActorId="owner",Fingerprint="save-failure",Message="unsaved"},sessionGeneration))
+     throw new Exception("failed write reported success");
  if(RebirthVehicleRequestJournal.IsAvailable||Begin(Guid.NewGuid(),"owner","after-failure",out result))throw new Exception("save failure admitted more mutations");
- if(!RebirthVehicleRequestJournal.TryGet(failedWriteId,out result)||result.Message!="known in memory")throw new Exception("failed write lost known live outcome");
- result.Message="caller mutation";
- if(!RebirthVehicleRequestJournal.TryGet(failedWriteId,out result)||result.Message!="known in memory")throw new Exception("failed-store replay exposed mutable result");
+ if(RebirthVehicleRequestJournal.TryGet(failedWriteId,"owner","save-failure",out result))throw new Exception("failed write exposed an unsaved result");
+ if(!RebirthVehicleRequestJournal.TryGet(id,"owner","request",out result)||result.Outcome!=RebirthVehicleRequestOutcome.Applied)
+     throw new Exception("failed write hid an earlier durable result");
  if(File.ReadAllText(PathName)!=durableBeforeFailure)throw new Exception("failed write altered durable primary");
  Directory.Delete(PathName+".tmp");
- Console.WriteLine("PASS: valid load, malformed fields/payload, duplicate beyond retention, corrupt-file preservation, orphan backup, fresh admission, missing-directory isolation, failed-write admission blocking/live replay isolation/unchanged durable primary, read/admission result isolation");
+ RebirthVehicleRequestJournal.Clear();
+ if(!RebirthVehicleRequestJournal.TryGet(failedWriteId,"owner","save-failure",out result)||result.Outcome!=RebirthVehicleRequestOutcome.Indeterminate)
+     throw new Exception("failed write lost the original durable intent on cold load");
+ Console.WriteLine("PASS: valid load, invalid store refusal, identity and generation gates, durable intent and result replay, and no unsaved terminal replay after a failed write");
  } finally {RebirthVehicleRequestJournal.Clear();Directory.Delete(dir,true);}
  }
 }

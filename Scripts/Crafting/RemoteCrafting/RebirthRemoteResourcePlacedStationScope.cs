@@ -39,11 +39,37 @@ internal static class RebirthRemoteResourcePlacedStationScope
     internal static bool TryObserveWindow(EntityPlayerLocal player,ItemActionEntryCraft entry,out TileEntityWorkstation station,out PaymentSource payment)
         =>TryObserveWindow(player,entry,out station,out payment,out _);
     internal static bool TryObserveWindow(EntityPlayerLocal player,ItemActionEntryCraft entry,out TileEntityWorkstation station,out PaymentSource payment,out bool turnsOn)
+        =>TryObserveCurrentWindow(player,entry,true,out station,out payment,out turnsOn,out _);
+
+    internal static bool TryObserveAuthorityWindow(EntityPlayerLocal player,ItemActionEntryCraft entry,
+        XUiC_CraftingQueue queue,out TileEntityWorkstation station,out XUiC_WorkstationInputGrid input)
     {
-        station=null;payment=default;turnsOn=false;
+        station=null;input=null;
+        if(queue==null||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||
+            !TryObserveCurrentWindow(player,entry,false,out var candidate,out _,out _,out var window)||
+            !ReferenceEquals(window.craftingQueue,queue)||candidate.IsSharedLock(0)||
+            LockManager.Instance?.singleLocks.TryGetByKey(player.entityId,out var locks)!=true||
+            locks==null||!locks.Any(value=>ReferenceEquals(value.Target,candidate)&&value.Channel==0))
+            return false;
+        var grid=window.inputWindow;
+        if(grid!=null)
+        {
+            var slots=grid.GetSlots();
+            if(slots==null||slots.Length>byte.MaxValue||slots.Length!=candidate.Input?.Length||
+                slots.Where((item,index)=>!RebirthStationGridIngredients.IsSameStackSnapshot(item,candidate.Input[index])).Any())
+                return false;
+        }
+        station=candidate;input=grid;
+        return true;
+    }
+
+    private static bool TryObserveCurrentWindow(EntityPlayerLocal player,ItemActionEntryCraft entry,bool remote,
+        out TileEntityWorkstation station,out PaymentSource payment,out bool turnsOn,out XUiC_WorkstationWindowGroup currentWindow)
+    {
+        station=null;payment=default;turnsOn=false;currentWindow=null;
         try
         {
-            if(!ThreadManager.IsMainThread()||player?.world?.IsRemote()!=true||player.IsDead()||!player.IsSpawned()||
+            if(!ThreadManager.IsMainThread()||player?.world?.IsRemote()!=remote||player.IsDead()||!player.IsSpawned()||
                 !ReferenceEquals(player.world,GameManager.Instance?.World)||!ReferenceEquals(player.world.GetPrimaryPlayer(),player)||
                 !ReferenceEquals(player.world.GetEntity(player.entityId),player)||!ReferenceEquals(entry?.ItemController?.xui?.playerUI?.entityPlayer,player))return false;
             var window=entry.ItemController.GetParentByType<XUiC_WorkstationWindowGroup>();
@@ -57,7 +83,7 @@ internal static class RebirthRemoteResourcePlacedStationScope
             // Native AddItemToQueue calls TurnOn whenever the actual window
             // has a fuel controller, including when its fuel is empty.
             turnsOn=window.fuelWindow!=null;
-            station=candidate;payment=actualGrid==null?PaymentSource.OwnerInventory:PaymentSource.StationInput;return true;
+            station=candidate;payment=actualGrid==null?PaymentSource.OwnerInventory:PaymentSource.StationInput;currentWindow=window;return true;
         }
         catch{station=null;return false;}
     }

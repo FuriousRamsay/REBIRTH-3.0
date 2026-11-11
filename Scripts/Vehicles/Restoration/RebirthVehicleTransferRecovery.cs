@@ -27,12 +27,14 @@ public static class RebirthVehicleTransferRecovery
         }
         var before = plan.ReadBefore();
         var after = plan.ReadAfter();
-        bool original = SameSnapshot(observed, before);
+        // The full payload includes native part metadata and transfer IDs.
+        string observedImage = RebirthVehicleAssemblySerializer.ToBase64(observed);
+        bool original = observedImage == RebirthVehicleAssemblySerializer.ToBase64(before);
         var reserved = before.DeepClone();
         if (!RebirthVehicleTransferReservation.TryReserve(reserved, plan.TransactionId, before.Revision))
             return RebirthVehicleTransferStep.Reconcile;
-        bool held = SameSnapshot(observed, reserved);
-        bool applied = SameSnapshot(observed, after);
+        bool held = observedImage == RebirthVehicleAssemblySerializer.ToBase64(reserved);
+        bool applied = observedImage == RebirthVehicleAssemblySerializer.ToBase64(after);
         if (!original && !held && !applied) return RebirthVehicleTransferStep.Reconcile;
         bool paidPendingAssembly=held&&plan.Items.Where(item=>item.Debit).All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Applied)&&
             plan.Items.Where(item=>!item.Debit).All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Pending);
@@ -105,10 +107,4 @@ public static class RebirthVehicleTransferRecovery
         return true;
     }
 
-    private static bool SameSnapshot(RebirthVehicleAssembly left, RebirthVehicleAssembly right)
-    {
-        // Do not treat a matching revision alone as evidence of matching contents.
-        // Serialization also includes full native part metadata and transfer IDs.
-        return RebirthVehicleAssemblySerializer.ToBase64(left) == RebirthVehicleAssemblySerializer.ToBase64(right);
-    }
 }

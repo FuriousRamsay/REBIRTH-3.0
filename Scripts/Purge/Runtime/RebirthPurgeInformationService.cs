@@ -169,8 +169,7 @@ internal static class RebirthPurgeInformationService
         }
         if(currentPlayer!=null && !ReferenceEquals(restoredPlayer,currentPlayer))
         {
-            // The first-start handoff opens the introduction at gameplay reveal.
-            // Journal unlock/dismissal supplies the existing per-save once-only state.
+            // Restore Journal discovery independently of the first-start truck reveal.
             RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,"PurgeIntro");
             List<RebirthJournalEntry> unread;
             if(RebirthJournalGuideService.TryGetUnlockedPurgeGuides(currentPlayer,out unread,true))
@@ -192,15 +191,8 @@ internal static class RebirthPurgeInformationService
                     var topic=RebirthPurgeInformationTopics.Find(entry.Id);
                     if(topic==null)continue;
                     RebirthPurgeInformationTopics.UnlockReadingRecipe(currentPlayer,topic);
-                    // World-GUID-scoped unread introductions remain pending until actually dismissed.
-                    if(entry.Id=="PurgeIntro")
-                    {
-                        if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry))continue;
-                        bool introQueued=false;
-                        foreach(var queued in pending)if(queued.Player==currentPlayer&&queued.Id==entry.Id){introQueued=true;break;}
-                        if(!introQueued)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite,AtReveal=true});
-                        continue;
-                    }
+                    // The starter truck handoff owns the automatic introduction.
+                    if(entry.Id=="PurgeIntro")continue;
                     // Dismissal hides the automatic window, not the earned reading recipe.
                     if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)||RebirthJournalGuideService.IsPurgeReadingOnly(entry)||
                         ReferenceEquals(readingPlayer,currentPlayer)&&readingOnly.Contains(entry.Id))continue;

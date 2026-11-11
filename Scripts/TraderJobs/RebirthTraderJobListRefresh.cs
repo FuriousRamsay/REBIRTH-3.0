@@ -42,9 +42,31 @@ public static class RebirthTraderJobListRefresh
     public static void ResetPendingListRequest()
     {
         pendingTraderId = -1; pendingPlayerId = -1; pendingJobsStatement = string.Empty;
-        pendingWorld = null; pendingDialog = null; pendingListEpoch = 0; pendingListRequestId = 0; pendingListDeadline = 0f;
+        pendingWorld = null; pendingDialog = null; pendingDialogGroup = null; pendingSourceStatement = null;
+        pendingListEpoch = 0; pendingListRequestId = 0; pendingListDeadline = 0f;
         unchecked { clientListEpoch++; }
         if (clientListEpoch == 0) clientListEpoch = 1;
+    }
+
+    internal static void RetirePendingListOnDialogClose(XUiC_DialogWindowGroup group)
+    {
+        if (pendingListRequestId != 0 && ReferenceEquals(group, pendingDialogGroup))
+            ResetPendingListRequest();
+    }
+
+    private static bool PendingListOwnsSource(XUiC_DialogWindowGroup group)
+        => group != null && ReferenceEquals(group, pendingDialogGroup) && ReferenceEquals(group.CurrentDialog, pendingDialog) &&
+           pendingSourceStatement != null && ReferenceEquals(group.CurrentDialog?.CurrentStatement, pendingSourceStatement);
+
+    internal static ulong CapturePendingListPress(XUiC_DialogResponseList list)
+        => pendingListRequestId != 0 && list != null && ReferenceEquals(pendingDialogGroup?.responseWindow, list) &&
+           PendingListOwnsSource(pendingDialogGroup) ? pendingListRequestId : 0;
+
+    internal static void RetirePendingListAfterPress(XUiC_DialogResponseList list, ulong request)
+    {
+        if (request != 0 && request == pendingListRequestId && ReferenceEquals(pendingDialogGroup?.responseWindow, list) &&
+            !PendingListOwnsSource(pendingDialogGroup))
+            ResetPendingListRequest();
     }
 
     private static bool PendingListExpired()
@@ -64,6 +86,8 @@ public static class RebirthTraderJobListRefresh
     private static string pendingJobsStatement = string.Empty;
     private static World pendingWorld;
     private static Dialog pendingDialog;
+    private static XUiC_DialogWindowGroup pendingDialogGroup;
+    private static DialogStatement pendingSourceStatement;
     private static ulong clientListEpoch = 1;
     private static ulong nextListRequestId;
     private static ulong pendingListEpoch;
@@ -205,15 +229,19 @@ public static class RebirthTraderJobListRefresh
         }
 
         PendingListExpired();
-        Dialog currentDialog = ui != null && ui.xui != null && ui.xui.Dialog != null && ui.xui.Dialog.DialogWindowGroup != null
-            ? ui.xui.Dialog.DialogWindowGroup.CurrentDialog : null;
+        XUiC_DialogWindowGroup currentDialogGroup = ui?.xui?.Dialog?.DialogWindowGroup;
+        Dialog currentDialog = currentDialogGroup?.CurrentDialog;
+        DialogStatement sourceStatement = currentDialog?.CurrentStatement;
         if (pendingListRequestId != 0)
         {
-            // Never overlap native list fetches. Exact response correlation is carried by
-            // the generated offer stamp, but suppressing duplicates also avoids needless regeneration.
-            RebirthTraderDebug.Trace("JOBS_ENTRY remote request already pending request=" + pendingListRequestId);
-            return false;
+            // Repeat Jobs while this exact source statement owns a request.
+            if (RequirePendingListDialog(trader, player) != null)
+            {
+                RebirthTraderDebug.Trace("JOBS_ENTRY remote request already pending request=" + pendingListRequestId);
+                return false;
+            }
         }
+        if (sourceStatement == null) return false;
         unchecked { pendingListRequestId = ++nextListRequestId; }
         if (pendingListRequestId == 0) pendingListRequestId = ++nextListRequestId;
         pendingListEpoch = clientListEpoch;
@@ -222,6 +250,8 @@ public static class RebirthTraderJobListRefresh
         pendingJobsStatement = targetStatement;
         pendingWorld = GameManager.Instance != null ? GameManager.Instance.World : null;
         pendingDialog = currentDialog;
+        pendingDialogGroup = currentDialogGroup;
+        pendingSourceStatement = sourceStatement;
         pendingListDeadline = Time.unscaledTime + ListRequestTimeoutSeconds;
 
         PersistentPlayerData persistent = GameManager.Instance != null
@@ -269,51 +299,41 @@ public static class RebirthTraderJobListRefresh
         var originalXui = ui.xui;
         var originalQuestClass = offered.QuestClass;
         var originalOffers = trader.activeQuests;
-        var offerSequence = originalOffers != null ? originalOffers.ToArray() : new Quest[0];
-        bool ownOfferRemoved = false;
-        bool Admitted()
+        bool ContextCurrent()
         {
-            if (admission == null) return true;
-            if (!admission() || !ReferenceEquals(player.QuestJournal, originalJournal) ||
-                !ReferenceEquals(ui.windowManager, originalManager) || !ReferenceEquals(ui.xui, originalXui) ||
-                !ReferenceEquals(questResponse.Quest, offered) || !ReferenceEquals(offered.QuestClass, originalQuestClass) ||
-                !ReferenceEquals(trader.activeQuests, originalOffers) || originalOffers == null)
-                return false;
-            int position = 0;
-            for (int i = 0; i < offerSequence.Length; i++)
-            {
-                if (ownOfferRemoved && ReferenceEquals(offerSequence[i], offered)) continue;
-                if (position >= originalOffers.Count || !ReferenceEquals(originalOffers[position++], offerSequence[i]))
-                    return false;
-            }
-            return position == originalOffers.Count;
+            return (admission == null || admission()) && ReferenceEquals(player.QuestJournal, originalJournal) &&
+                ReferenceEquals(ui.windowManager, originalManager) && ReferenceEquals(ui.xui, originalXui) &&
+                ReferenceEquals(questResponse.Quest, offered) && ReferenceEquals(offered.QuestClass, originalQuestClass) &&
+                ReferenceEquals(trader.activeQuests, originalOffers) && originalOffers != null;
         }
-        if (!Admitted()) return false;
+        if (!ContextCurrent()) return false;
 
         int tier = RebirthTraderPoiHistory.GetTier(offered);
-        int listIndex = GetListIndex(questResponse);
+        int nativeTier = originalQuestClass.DifficultyTier;
 
-        int openBefore = RebirthTraderJobPolicy.CountOpenPersonalTraderJobs(player.QuestJournal);
         int dailyUsedBefore = RebirthTraderJobPolicy.CountDailyReservedTraderJobs(player.QuestJournal);
         int dailyLimit = RebirthTraderJobPolicy.GetDailyQuestLimit();
         int tierLimit = RebirthTraderJobPolicy.GetAcceptedJobLimit(
             tier, RebirthTraderJobPolicy.IsMultiplayerClient());
 
-        RebirthTraderDebug.Trace(
-            "CARD_CLICK quest='" + (offered.QuestClass.ID ?? "") +
-            "' tier=" + tier +
-            " listIndex=" + listIndex +
-            " poi='" + SafePoi(offered) +
-            "' code=" + offered.QuestCode +
-            " open=" + openBefore + "/" + tierLimit +
-            " dailyUsed=" + dailyUsedBefore + "/" + dailyLimit);
+        if (RebirthTraderDebug.Enabled)
+            RebirthTraderDebug.Trace(
+                "CARD_CLICK quest='" + (offered.QuestClass.ID ?? "") +
+                "' tier=" + tier +
+                " poi='" + SafePoi(offered) +
+                "' code=" + offered.QuestCode +
+                " open=" + RebirthTraderJobPolicy.CountOpenPersonalTraderJobs(player.QuestJournal) + "/" + tierLimit +
+                " dailyUsed=" + dailyUsedBefore + "/" + dailyLimit);
 
-        DirectAcceptResult validation = ValidateDirectAcceptance(player, offered);
-        RebirthTraderDebug.Trace("CARD_CLICK validation=" + validation);
+        DirectAcceptResult validation = ValidateDirectAcceptance(player, offered, tier, dailyUsedBefore, dailyLimit, tierLimit);
+#if DEBUG
+        if (RebirthTraderDebug.Enabled)
+            RebirthTraderDebug.Trace("CARD_CLICK validation=" + validation);
+#endif
 
         if (validation != DirectAcceptResult.Allowed)
         {
-            if (!Admitted()) return false;
+            if (!ContextCurrent()) return false;
             ShowDirectAcceptFailure(player, validation, tier);
 
             if (validation == DirectAcceptResult.DailyLimit ||
@@ -322,25 +342,28 @@ public static class RebirthTraderJobListRefresh
                 bool anyTierRoom =
                     RebirthTraderJobPolicy.CanAcceptAnyListedJob(player, trader);
 
-                RebirthTraderDebug.Trace(
-                    "CARD_CLICK max reached before accept anyTierRoom=" +
-                    anyTierRoom);
+#if DEBUG
+                if (RebirthTraderDebug.Enabled)
+                    RebirthTraderDebug.Trace(
+                        "CARD_CLICK max reached before accept anyTierRoom=" +
+                        anyTierRoom);
+#endif
 
-                if (!anyTierRoom && Admitted())
-                    if (Admitted()) ui.windowManager.Close("dialog");
+                if (!anyTierRoom && ContextCurrent()) ui.windowManager.Close("dialog");
             }
 
             return true;
         }
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        bool remote = connection != null && !connection.IsServer;
         // Treat the visible offer as a reservation until QuestJournal confirms the accepted
         // clone is actually present. Never mutate/remove the visible offer first: a failed
         // AddQuest must leave the player able to retry the exact same card.
         Quest accepted = offered.Clone();
         if (accepted == null)
         {
-            if (Admitted()) GameManager.ShowTooltip(player, "Unable to reserve this trader job. The offer was kept.");
+            if (ContextCurrent()) GameManager.ShowTooltip(player, "Unable to reserve this trader job. The offer was kept.");
             return true;
         }
 
@@ -354,99 +377,106 @@ public static class RebirthTraderJobListRefresh
 
         accepted.QuestGiverID = trader.entityId;
         RebirthTraderListRequestCorrelation.ClearOfferStamp(accepted);
-        var journal = admission != null ? originalJournal : player.QuestJournal;
+        if (!ContextCurrent() || FindDirectOffer(originalOffers, offered, remote, nativeTier, out int nativeIndex) < 0 ||
+            (remote && nativeIndex > byte.MaxValue)) return false;
+
+        var journal = originalJournal;
         int journalBefore = journal.quests != null ? journal.quests.Count : -1;
         Exception addFailure = null;
         try
         {
-            if (!Admitted()) return false;
             journal.AddQuest(accepted, Quest.QuestSource.Trader);
         }
         catch (Exception ex)
         {
             addFailure = ex;
-            RebirthTraderDebug.Trace("CARD_CLICK AddQuest threw " + ex.GetType().Name + ": " + ex.Message);
+#if DEBUG
+            if (RebirthTraderDebug.Enabled)
+                RebirthTraderDebug.Trace("CARD_CLICK AddQuest threw " + ex.GetType().Name + ": " + ex.Message);
+#endif
         }
 
-        // AddQuest is irreversible. A retired scope is completion uncertainty, never a retry or rollback.
-        if (!Admitted()) return true;
+        // AddQuest can reenter the dialog or change the native offer list.
+        if (!ContextCurrent() || offered.QuestClass.DifficultyTier != nativeTier) return true;
+        int offerPosition = FindDirectOffer(originalOffers, offered, remote, nativeTier, out int currentNativeIndex);
+        if (offerPosition < 0) return true;
+
         Quest committed = journal.FindActiveQuest(accepted.QuestCode);
         int journalAfter = journal.quests != null ? journal.quests.Count : -1;
         // A pre-existing quest with the same code is not proof that this reservation committed.
         // Require the journal population to advance as well as the accepted identity to resolve.
-        bool addCommitted = committed != null && journalAfter > journalBefore;
-        RebirthTraderDebug.Trace(
-            "CARD_CLICK AddQuest complete journalBefore=" + journalBefore +
-            " journalAfter=" + journalAfter +
-            " activeQuestFound=" + addCommitted);
+        bool addCommitted = ReferenceEquals(committed, accepted) && journalAfter > journalBefore;
+#if DEBUG
+        if (RebirthTraderDebug.Enabled)
+            RebirthTraderDebug.Trace(
+                "CARD_CLICK AddQuest complete journalBefore=" + journalBefore +
+                " journalAfter=" + journalAfter +
+                " activeQuestFound=" + addCommitted);
+#endif
 
         if (!addCommitted)
         {
-            if (!Admitted()) return true;
             GameManager.ShowTooltip(player, addFailure != null
                 ? "Trader job could not be accepted. The offer was kept."
                 : "Trader job was not added. The offer was kept.");
             return true;
         }
 
-        if (!Admitted()) return true;
-        bool removed = false;
-        if (trader.activeQuests != null) removed = trader.activeQuests.Remove(offered);
-        ownOfferRemoved = removed;
-        RebirthTraderDebug.Trace(
-            "CARD_CLICK committed offer remove=" + removed +
-            " remaining=" + (trader.activeQuests != null ? trader.activeQuests.Count : -1));
+        if (remote && currentNativeIndex != nativeIndex) return true;
+        originalOffers.RemoveAt(offerPosition);
+#if DEBUG
+        if (RebirthTraderDebug.Enabled)
+            RebirthTraderDebug.Trace(
+                "CARD_CLICK committed offer remove=True remaining=" + originalOffers.Count);
+#endif
 
         // The remote offer-removal packet is sent only after the quest commit is observable.
         // If AddQuest fails, no server/local offer removal is published and no compensation is needed.
-        if (connection != null && !connection.IsServer)
+        if (remote)
         {
-            RebirthTraderDebug.Trace(
-                "CARD_CLICK send RemoveQuest trader=" + trader.entityId +
-                " player=" + player.entityId +
-                " tier=" + tier +
-                " tierRelativeIndex=" + listIndex);
-            if (!Admitted()) return true;
-            var removalPackage = NetPackageManager.GetPackage<NetPackageNPCQuestList>()
-                .Setup(trader.entityId, player.entityId, tier, (byte)Math.Max(0, listIndex));
-            if (!Admitted()) return true;
-            connection.SendToServer(removalPackage);
+#if DEBUG
+            if (RebirthTraderDebug.Enabled)
+                RebirthTraderDebug.Trace(
+                    "CARD_CLICK send RemoveQuest trader=" + trader.entityId +
+                    " player=" + player.entityId +
+                    " tier=" + nativeTier +
+                    " tierRelativeIndex=" + nativeIndex);
+#endif
+            connection.SendToServer(NetPackageManager.GetPackage<NetPackageNPCQuestList>()
+                .Setup(trader.entityId, player.entityId, nativeTier, (byte)nativeIndex));
+            if (!ContextCurrent()) return true;
         }
 
-        if (!Admitted()) return true;
         trader.PlayVoiceSetEntry("quest_accepted", player);
         if (offered.QuestTags.Test_AnySet(QuestEventManager.treasureTag) && GameSparksCollector.CollectGamePlayData)
         {
-            if (!Admitted()) return true;
+            if (!ContextCurrent()) return true;
             GameSparksCollector.IncrementCounter(
                 GameSparksCollector.GSDataKey.QuestAcceptedDistance,
                 ((int)Vector3.Distance(offered.Position, trader.position) / 50 * 50).ToString(),
                 1);
         }
 
-        bool mayTakeAnotherInThisTier =
-            RebirthTraderJobPolicy.CanAcceptAnotherJobAtTier(
-                player.QuestJournal, tier);
-
         bool mayTakeAnotherAnywhere =
             RebirthTraderJobPolicy.CanAcceptAnyListedJob(
                 player,
                 trader);
 
-        RebirthTraderDebug.Trace(
-            "CARD_CLICK postAccept tier=" + tier +
-            " mayTakeAnotherInThisTier=" + mayTakeAnotherInThisTier +
-            " mayTakeAnotherAnywhere=" + mayTakeAnotherAnywhere +
-            " openNow=" +
-            RebirthTraderJobPolicy.CountOpenPersonalTraderJobs(player.QuestJournal) +
-            " dailyUsedNow=" +
-            RebirthTraderJobPolicy.CountDailyReservedTraderJobs(player.QuestJournal));
+        if (RebirthTraderDebug.Enabled)
+            RebirthTraderDebug.Trace(
+                "CARD_CLICK postAccept tier=" + tier +
+                " mayTakeAnotherInThisTier=" + RebirthTraderJobPolicy.CanAcceptAnotherJobAtTier(player.QuestJournal, tier) +
+                " mayTakeAnotherAnywhere=" + mayTakeAnotherAnywhere +
+                " openNow=" +
+                RebirthTraderJobPolicy.CountOpenPersonalTraderJobs(player.QuestJournal) +
+                " dailyUsedNow=" +
+                RebirthTraderJobPolicy.CountDailyReservedTraderJobs(player.QuestJournal));
 
-        if (!mayTakeAnotherAnywhere && Admitted())
+        if (!mayTakeAnotherAnywhere)
         {
             RebirthTraderDebug.Trace(
                 "CARD_CLICK accepted final job allowed by all accessible tiers -> close trader dialog");
-            if (Admitted()) ui.windowManager.Close("dialog");
+            if (ContextCurrent()) ui.windowManager.Close("dialog");
         }
 
         return true;
@@ -490,12 +520,40 @@ public static class RebirthTraderJobListRefresh
         return true;
     }
 
-    internal static bool AcceptsCorrelatedList(World world,int trader,int player,ulong epoch,ulong request)
+    internal static bool AcceptsCorrelatedList(
+        World world, int traderId, int playerId, ulong epoch, ulong request,
+        out EntityTrader trader, out EntityPlayerLocal player)
     {
+        trader = null;
+        player = null;
         PendingListExpired();
-        return world!=null&&world.IsRemote()&&ReferenceEquals(world,pendingWorld)&&ReferenceEquals(GameManager.Instance?.World,world)&&
-            pendingJobsStatement.Length>0&&pendingTraderId==trader&&pendingPlayerId==player&&epoch!=0&&request!=0&&
-            pendingListEpoch==epoch&&pendingListRequestId==request&&world.GetPrimaryPlayer()?.entityId==player;
+        if (world == null || !world.IsRemote() || !ReferenceEquals(world, pendingWorld) ||
+            !ReferenceEquals(GameManager.Instance?.World, world) || pendingJobsStatement.Length == 0 ||
+            pendingTraderId != traderId || pendingPlayerId != playerId || epoch == 0 || request == 0 ||
+            pendingListEpoch != epoch || pendingListRequestId != request)
+            return false;
+
+        player = world.GetPrimaryPlayer();
+        if (player == null || player.entityId != playerId) return false;
+        trader = world.GetEntity(traderId) as EntityTrader;
+        if (trader == null) return false;
+
+        // SetActiveQuests replaces the native list even when the response is empty.
+        return RequirePendingListDialog(trader, player) != null;
+    }
+
+    private static XUiC_DialogWindowGroup RequirePendingListDialog(EntityTrader trader, EntityPlayer player)
+    {
+        LocalPlayerUI ui = player is EntityPlayerLocal local ? LocalPlayerUI.GetUIForPlayer(local) : null;
+        var model = ui?.xui?.Dialog;
+        var group = model?.DialogWindowGroup;
+        if (ui?.windowManager?.IsWindowOpen("dialog") == true && PendingListOwnsSource(group) &&
+            ReferenceEquals(model.Respondent, trader))
+            return group;
+
+        RebirthTraderDebug.Trace("LIST_ARRIVED dialog generation no longer matches request");
+        ResetPendingListRequest();
+        return null;
     }
     public static void ClientListArrived(EntityTrader trader, EntityPlayer player,ulong wireEpoch=0,ulong wireRequest=0)
     {
@@ -529,15 +587,8 @@ public static class RebirthTraderJobListRefresh
             return;
         }
 
-        EntityPlayerLocal local = player as EntityPlayerLocal;
-        LocalPlayerUI ui = local != null ? LocalPlayerUI.GetUIForPlayer(local) : null;
-        XUiC_DialogWindowGroup group = ui != null && ui.xui != null ? ui.xui.Dialog.DialogWindowGroup : null;
-        if (group == null || group.CurrentDialog == null || !ReferenceEquals(group.CurrentDialog, pendingDialog))
-        {
-            RebirthTraderDebug.Trace("LIST_ARRIVED dialog generation no longer matches request");
-            ResetPendingListRequest();
-            return;
-        }
+        XUiC_DialogWindowGroup group = RequirePendingListDialog(trader, player);
+        if (group == null) return;
 
         Dialog dialog = group.CurrentDialog;
         DialogStatement target = dialog.GetStatement(pendingJobsStatement);
@@ -559,24 +610,27 @@ public static class RebirthTraderJobListRefresh
         group.RefreshDialog();
     }
 
-    private static int GetListIndex(DialogResponseQuest response)
+    private static int FindDirectOffer(List<Quest> offers, Quest offered, bool remote, int nativeTier, out int nativeIndex)
     {
-        if (response == null || response.Actions == null)
-            return 0;
-
-        for (int i = 0; i < response.Actions.Count; i++)
+        nativeIndex = 0;
+        for (int i = 0; i < offers.Count; i++)
         {
-            DialogActionAddQuest add = response.Actions[i] as DialogActionAddQuest;
-            if (add != null)
-                return add.ListIndex;
+            Quest candidate = offers[i];
+            if (ReferenceEquals(candidate, offered)) return i;
+            // Native RemoveQuest counts all offers in the tier, including special offers.
+            if (remote && candidate?.QuestClass?.DifficultyTier == nativeTier) nativeIndex++;
         }
 
-        return 0;
+        return -1;
     }
 
     private static DirectAcceptResult ValidateDirectAcceptance(
         EntityPlayerLocal player,
-        Quest quest)
+        Quest quest,
+        int tier,
+        int dailyUsed,
+        int dailyLimit,
+        int concurrentLimit)
     {
         QuestJournal journal = player != null ? player.QuestJournal : null;
         if (journal == null || quest == null)
@@ -588,7 +642,6 @@ public static class RebirthTraderJobListRefresh
         if (snapshot != RebirthTraderOfferValidation.Allowed)
             return DirectAcceptResult.Stale;
 
-        int tier = RebirthTraderPoiHistory.GetTier(quest);
         RebirthTraderPoiIdentity identity = RebirthTraderPoiIdentity.FromQuest(quest);
 
         if (identity.HasPoi &&
@@ -596,12 +649,8 @@ public static class RebirthTraderJobListRefresh
                 .IsActivePhysical(identity.PhysicalPoiKey))
             return DirectAcceptResult.RepeatPoi;
 
-        if (!RebirthTraderJobPolicy.CanUseDailyQuestSlot(journal))
+        if (dailyLimit != -1 && dailyUsed >= Math.Max(0, dailyLimit))
             return DirectAcceptResult.DailyLimit;
-
-        int concurrentLimit = RebirthTraderJobPolicy.GetAcceptedJobLimit(
-            tier,
-            RebirthTraderJobPolicy.IsMultiplayerClient());
 
         if (RebirthTraderJobPolicy.CountOpenPersonalTraderJobs(journal) >= concurrentLimit)
             return DirectAcceptResult.ConcurrentLimit;
@@ -806,6 +855,13 @@ public sealed class NetPackageRebirthTraderListIntent : NetPackage
 /// Keeping the Harmony target on the CLASS is deliberate: REBIRTH's targeted
 /// CreateClassProcessor installer is class-centric.
 /// </summary>
+[HarmonyPatch(typeof(XUiC_DialogWindowGroup), nameof(XUiC_DialogWindowGroup.OnClose))]
+internal static class RebirthTraderPendingListDialogClosePatch
+{
+    private static void Prefix(XUiC_DialogWindowGroup __instance)
+        => RebirthTraderJobListRefresh.RetirePendingListOnDialogClose(__instance);
+}
+
 [HarmonyPatch(typeof(XUiC_DialogResponseList), nameof(XUiC_DialogResponseList.OnPressResponse))]
 public static class RebirthTraderResponseClickPatch
 {
@@ -813,8 +869,10 @@ public static class RebirthTraderResponseClickPatch
     public static bool Prefix(
         XUiC_DialogResponseList __instance,
         XUiController _sender,
-        int _mouseButton)
+        int _mouseButton,
+        out ulong __state)
     {
+        __state = RebirthTraderJobListRefresh.CapturePendingListPress(__instance);
         XUiC_DialogResponseEntry entry = _sender as XUiC_DialogResponseEntry;
         DialogResponse response = entry != null ? entry.CurrentResponse : null;
 
@@ -853,6 +911,12 @@ public static class RebirthTraderResponseClickPatch
         }
 
         return true;
+    }
+
+    private static void Postfix(XUiC_DialogResponseList __instance, bool __runOriginal, ulong __state)
+    {
+        if (__runOriginal)
+            RebirthTraderJobListRefresh.RetirePendingListAfterPress(__instance, __state);
     }
 }
 
@@ -999,10 +1063,12 @@ public sealed class NetPackageRebirthCorrelatedTraderList : NetPackage
     }
     public override void ProcessPackage(World world,GameManager callbacks)
     {
-        if(!RebirthTraderJobListRefresh.AcceptsCorrelatedList(world,trader,player,epoch,request))return;
-        var npc=world.GetEntity(trader) as EntityTrader;var owner=world.GetPrimaryPlayer();if(npc==null||owner==null||entries==null)return;
-        npc.SetActiveQuests(owner,entries);
-        RebirthTraderJobListRefresh.ClientListArrived(npc,owner,epoch,request);
+        if (entries == null ||
+            !RebirthTraderJobListRefresh.AcceptsCorrelatedList(world, trader, player, epoch, request, out var npc, out var owner))
+            return;
+
+        npc.SetActiveQuests(owner, entries);
+        RebirthTraderJobListRefresh.ClientListArrived(npc, owner, epoch, request);
     }
     public int GetLength()=>0;
 }

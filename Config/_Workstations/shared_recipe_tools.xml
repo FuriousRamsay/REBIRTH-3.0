@@ -1,0 +1,44 @@
+<configs>
+  <append xpath="/items">
+    <!-- Source: REBIRTH 2.6. These simple tools used vanilla sack models in 2.6 and can be ported directly. -->
+    <item name="FuriousRamsayHammerPliers">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_HammerPliers_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="400"/>
+      <property name="EconomicValue" value="300"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+    <item name="FuriousRamsayPliers">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_Pliers_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="100"/>
+      <property name="EconomicValue" value="200"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+    <item name="FuriousRamsayScrewdriver">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_Screwdriver_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="100"/>
+      <property name="EconomicValue" value="200"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+  </append>
+</configs>

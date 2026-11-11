@@ -1,0 +1,20 @@
+{
+  "name": "Character progression death respawn",
+  "status": "AUTHORED_NOT_RUN",
+  "setup": "Use disposable solo and dedicated Purge worlds. Select Character Progression and Debuffs on Death in the REBIRTH sandbox. On dedicated, export the settings as the normal REBIRTH sandbox code. Record needs as a percentage of each modified maximum immediately before a native death and at the first controllable respawn.",
+  "cases": [
+    { "progression": "Rebirth", "nativeDeathPenalty": "Injured", "deathDebuffs": "Keep Injuries", "beforePercent": [30, 95], "afterPercent": [80, 95], "debuff": "Splinted arm and sprained leg remain. Infection resumes at its previous level." },
+    { "progression": "Rebirth", "nativeDeathPenalty": "None", "deathDebuffs": "Keep Injuries", "beforePercent": [95, 30], "afterPercent": [95, 80], "debuff": "Concussion and broken arm remain after both native death and respawn actions." },
+    { "progression": "Rebirth", "nativeDeathPenalty": "Injured", "deathDebuffs": "Clear", "beforePercent": [0, 0], "afterPercent": [80, 80], "debuff": "Concussion and broken leg clear and infection does not restart." },
+    { "progression": "Rebirth", "nativeDeathPenalty": "XP Only", "deathDebuffs": "Keep Injuries", "beforePercent": [90, 85], "afterPercent": [90, 85], "debuff": "Concussion and broken leg remain. Native XP penalty applies." },
+    { "progression": "Base Game", "nativeDeathPenalty": "Injured", "beforePercent": [30, 95], "afterPercent": [50, 50], "debuff": "Native Injured handling. The REBIRTH selector is hidden." }
+  ],
+  "controls": [
+    "On a Debug build, run rbdebug on metabolism in the client and dedicated consoles before applying injuries. Capture [REBIRTH Injury] lines through death and respawn, including the effective keep tags, concussion counter and any explicit removal caller. Run rbdebug off metabolism afterward.",
+    "Before dying, verify the actual concussion and limb buffs are active in Game Bridge state. On dedicated confirm authority and owner agree. Use server buffplayer with buffInjuryConcussion and buffLegBroken for the main reported case.",
+    "Check the dedicated authority and first client HUD sample within one percentage point for ordinary drain.",
+    "Reconnect while alive with both values below 80%. Reconnecting must leave both values below 80%.",
+    "Reopen the sandbox or import the exported Clear code and confirm Clear remains selected. Open a previously saved code without the setting and confirm Keep Injuries.",
+    "In a disposable Permadeath world verify that the existing native resets still run and injuries clear."
+  ]
+}

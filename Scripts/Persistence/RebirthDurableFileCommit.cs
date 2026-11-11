@@ -11,6 +11,18 @@ using System.IO;
 /// </summary>
 public static class RebirthDurableFileCommit
 {
+    internal static string WindowsIoPath(string fullPath, bool includeDescendants = false)
+    {
+        // A root used to build receipt, staging, and archive paths must cover its descendants.
+        // Keep its on-disk name and directory so stale candidates remain discoverable.
+        if ((!includeDescendants && fullPath.Length < 260) || Environment.OSVersion.Platform != PlatformID.Win32NT ||
+            fullPath.StartsWith(@"\\?\", StringComparison.Ordinal) || fullPath.StartsWith(@"\\.\", StringComparison.Ordinal))
+            return fullPath;
+        return fullPath.StartsWith(@"\\", StringComparison.Ordinal)
+            ? @"\\?\UNC\" + fullPath.Substring(2)
+            : @"\\?\" + fullPath;
+    }
+
     public static bool TryPublish(string tempPath, string finalPath, out string error)
     {
         error = string.Empty;

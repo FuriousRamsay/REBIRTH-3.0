@@ -114,7 +114,7 @@ internal static partial class RebirthRemoteResourceBlockProtocol
         if(now>=clientScan)
         {
             clientScan=now+5;
-            if(RebirthRemoteResourceClientOriginal.TryReadPending(out var originals))foreach(var original in originals)
+            if(RebirthRemoteResourceClientOriginal.TryReadPendingForRecovery(player,out var originals))foreach(var original in originals)
             {
                 if(original.Kind!=RemoteResourceClientOperation.BlockRepair&&original.Kind!=RemoteResourceClientOperation.BlockUpgrade||clientPending.Values.Count(value=>!value.UsedTerminal)>=32||clientPending.ContainsKey(original.Operation)||!RebirthRemoteResourceBlockOriginal.TerminalScope(player,original))continue;
                 try

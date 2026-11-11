@@ -48,7 +48,110 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
             else if(expectedCreationId!=string.Empty)return DenyNative(37);
             var store=new RebirthVehicleTransferPlanStore(save,GameIO.GetSaveGameDir,Current);
             var plan=store.Read(requestId);
-            if(plan!=null)
+            bool preparedHere=false,retained=plan!=null;
+            if(!retained)
+            {
+                if(ownerCustodyProof==null||!RebirthVehicleTransferCoordinator.TryReadNativeReservation(player,requestId,actor,expectedCreationId,fingerprint,ownerCustodyProof,false,Current,out var bag,out var belt))
+                    return DenyNative(55);
+
+                bool exactOwnerImage=RebirthVehicleTransferCustody.Image(bag,belt)==ownerCustodyProof.OwnerImageHash;
+                if(exactOwnerImage)
+                {
+                    if(ownerLocks==null||ownerLocks.Length!=bag.Length||ownerBeltLocks==null||
+                        ownerBeltLocks.Length!=belt.Length||ownerBeltSlots!=RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length))return DenyNative(63);
+                    bool cursorDebit=(action==RebirthVehicleAssemblyAction.Install||action==RebirthVehicleAssemblyAction.Replace)&&
+                        sourceLocation==RebirthVehiclePartSourceLocation.None&&offeredPart!=null;
+                    if(ownerCustodyProof.CursorDebit!=cursorDebit||ownerCustodyProof.CursorCredit!=(action==RebirthVehicleAssemblyAction.Pickup))return DenyNative(65);
+                    if(!ReauthorizeReply(world,player))return DenyNative(66);
+                }
+
+                EntityVehicle entity=null;
+                TileEntityRepairableVehicleRebirth tile=null;
+                RebirthVehicleAssembly indexed;
+                if(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity)
+                {
+                    entity=world.GetEntity(entityId) as EntityVehicle;
+                    RebirthVehicleAssemblyIndex.TryGetEntity(entity,out indexed);
+                }
+                else
+                {
+                    tile=world.GetTileEntity(position) as TileEntityRepairableVehicleRebirth;
+                    indexed=tile?.Assembly;
+                }
+                var indexedId=indexed?.AssemblyId;
+                var indexedRevision=indexed?.Revision;
+                var indexedPending=indexed?.PendingInventoryTransferId;
+                var indexedApplied=indexed?.LastAppliedInventoryTransferId;
+                string refusal=null;
+                var nativeVehicle=entity?.vehicle;
+                if(!exactOwnerImage)
+                    refusal=Localization.Get("xuiRebirthVehicleChanged");
+                else
+                {
+                    if(indexed==null)
+                        refusal=Localization.Get("xuiRebirthVehicleMissing");
+                    else if(indexedId!=assemblyId||indexedRevision!=expectedRevision||indexedPending!=Guid.Empty)
+                        refusal=Localization.Get("xuiRebirthVehicleChanged");
+                    else
+                    {
+                        var before=indexed.DeepClone();
+                        float? maximum=nativeVehicle?.GetMaxFuelLevel(),level=nativeVehicle?.GetFuelLevel();
+                        if(maximum>0f)
+                        {
+                            float fuel=level.Value, capacity=maximum.Value;
+                            if(float.IsNaN(fuel)||float.IsInfinity(fuel)||fuel<0f||fuel>capacity)return DenyNative(77);
+                            before.FuelPercent=RebirthVehicleTransferFuel.AssemblyFraction(fuel,capacity);
+                        }
+                        try { plan=BuildNativePlan(world,player,before,entity,level,maximum,bag,belt,actor,fingerprint,out refusal); }
+                        catch(InvalidDataException error) when(action==RebirthVehicleAssemblyAction.Refuel)
+                        {
+                            Log.Warning("[REBIRTH Vehicle] Refuel plan refused before debit: "+error.Message);
+                            refusal=Localization.Get("xuiRebirthVehicleCannotRefuel");
+                        }
+                        if(plan==null&&refusal==null)return DenyNative(96);
+                        if(plan!=null&&plan.CreationId.Length>0&&(action==RebirthVehicleAssemblyAction.Install||
+                            action==RebirthVehicleAssemblyAction.Replace||action==RebirthVehicleAssemblyAction.Repair))
+                        {
+                            string componentSource=(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity?"entity:":"block:")+before.ContentId+":"+slotId;
+                            string trainingAction=action==RebirthVehicleAssemblyAction.Repair?"repair":before.Parts.ContainsKey(slotId)?"replace":"install";
+                            float fraction=plan.Health==null?1f:(float)(plan.Health.After-plan.Health.Before)/plan.Health.Maximum;
+                            plan=plan.WithTraining(new RebirthVehicleTransferTraining(
+                                RebirthPhase9TechnicalTrainingService.CaptureMechanicsOriginalTraining(trainingAction,fraction,componentSource),componentSource));
+                        }
+                    }
+                }
+
+                bool DraftCurrent()
+                {
+                    RebirthVehicleAssembly currentAssembly;
+                    if(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity)
+                    {
+                        if(!ReferenceEquals(world.GetEntity(entityId) as EntityVehicle,entity)||
+                            !ReferenceEquals(entity?.vehicle,nativeVehicle))return false;
+                        RebirthVehicleAssemblyIndex.TryGetEntity(entity,out currentAssembly);
+                    }
+                    else
+                    {
+                        if(!ReferenceEquals(world.GetTileEntity(position) as TileEntityRepairableVehicleRebirth,tile))return false;
+                        currentAssembly=tile?.Assembly;
+                    }
+                    return ReferenceEquals(currentAssembly,indexed)&&currentAssembly?.AssemblyId==indexedId&&
+                        currentAssembly?.Revision==indexedRevision&&currentAssembly?.PendingInventoryTransferId==indexedPending&&
+                        currentAssembly?.LastAppliedInventoryTransferId==indexedApplied;
+                }
+
+                if(!Current())return DenyNative(104);
+                var admission=store.AdmitNative(requestId,actor,assemblyId,plan,DraftCurrent,out var raced);
+                if(admission==RebirthVehicleTransferPlanStore.NativeAdmission.Conflict)return DenyNative(54);
+                if(admission==RebirthVehicleTransferPlanStore.NativeAdmission.Changed)return DenyNative(104);
+                if(admission==RebirthVehicleTransferPlanStore.NativeAdmission.Untouched)
+                    return RefuseNative(player,store,Current,indexed,out snapshot,out message,out outcome,refusal);
+                if(admission==RebirthVehicleTransferPlanStore.NativeAdmission.Retained)
+                {plan=raced;retained=true;}
+                if(!Current())return DenyNative(106);
+                preparedHere=true;
+            }
+            if(retained)
             {
                 if(plan.ActorId!=actor||plan.Fingerprint!=fingerprint||plan.NativeDeaths<0||plan.NativeDeaths>deaths||plan.CreationId!=expectedCreationId||plan.Custody==null)return DenyNative(42);
                 bool completedOriginal=store.HasCompletion(plan);
@@ -57,99 +160,126 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
                 ownerCustodyProof=plan.Custody;
                 if(!completedOriginal&&!RebirthVehicleTransferCoordinator.TryReadNativeReservation(player,requestId,actor,expectedCreationId,fingerprint,ownerCustodyProof,false,Current,out _,out _))return DenyNative(47);
             }
-            else
-            {
-                // Catalogue validation before a new plan also refuses unfinished
-                // temp publication and another original's actor/assembly custody.
-                var pending=store.Discover();
-                if(pending.Any(original=>original.ActorId==actor||original.ReadBefore().AssemblyId==assemblyId))return DenyNative(54);
-                if(ownerCustodyProof==null||!RebirthVehicleTransferCoordinator.TryReadNativeReservation(player,requestId,actor,expectedCreationId,fingerprint,ownerCustodyProof,false,Current,out var bag,out var belt))return DenyNative(55);
-                if(RebirthVehicleTransferCustody.Image(bag,belt)!=ownerCustodyProof.OwnerImageHash)
-                {
-                    RebirthVehicleAssembly untouched=null;
-                    if(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity)RebirthVehicleAssemblyIndex.TryGetEntity(world.GetEntity(entityId) as EntityVehicle,out untouched);
-                    else untouched=(world.GetTileEntity(position) as TileEntityRepairableVehicleRebirth)?.Assembly;
-                    return RefuseNative(player,store,Current,untouched,out snapshot,out message,out outcome,Localization.Get("xuiRebirthVehicleChanged"));
-                }
-                if(ownerLocks==null||ownerLocks.Length!=bag.Length||ownerBeltLocks==null||ownerBeltLocks.Length!=belt.Length||ownerBeltSlots!=RebirthToolbeltCapacity.GetOwnedSlotCount(player,belt.Length))return DenyNative(63);
-                bool cursorDebit=(action==RebirthVehicleAssemblyAction.Install||action==RebirthVehicleAssemblyAction.Replace)&&sourceLocation==RebirthVehiclePartSourceLocation.None&&offeredPart!=null;
-                if(ownerCustodyProof.CursorDebit!=cursorDebit||ownerCustodyProof.CursorCredit!=(action==RebirthVehicleAssemblyAction.Pickup))return DenyNative(65);
-                if(!ReauthorizeReply(world,player))return DenyNative(66);
-                RebirthVehicleAssembly before;EntityVehicle entity=null;
-                if(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity)
-                {
-                    entity=world.GetEntity(entityId) as EntityVehicle;
-                    if(entity==null||!RebirthVehicleAssemblyIndex.TryGetEntity(entity,out before)||before==null)return RefuseNative(player,store,Current,null,out snapshot,out message,out outcome,Localization.Get("xuiRebirthVehicleMissing"));
-                    before=before.DeepClone();
-                    if(before.AssemblyId!=assemblyId||before.Revision!=expectedRevision||before.PendingInventoryTransferId!=Guid.Empty)return RefuseNative(player,store,Current,before,out snapshot,out message,out outcome);
-                    float maximum=entity.vehicle?.GetMaxFuelLevel()??0f,level=entity.vehicle?.GetFuelLevel()??0f;
-                    if(maximum>0f)
-                    {
-                        if(float.IsNaN(level)||float.IsInfinity(level)||level<0f||level>maximum)return DenyNative(77);
-                        before.FuelPercent=level/maximum;
-                        string derived=RebirthVehicleAssemblySerializer.ToBase64(before);
-                        if(!RebirthVehicleAssemblyIndex.TryGetEntity(entity,out var indexed))return DenyNative(80);
-                        if(RebirthVehicleAssemblySerializer.ToBase64(indexed)!=derived)
-                        {
-                            RebirthVehicleAssemblyIndex.RegisterEntity(entity,before.DeepClone());
-                            if(!Current()||!RebirthVehicleAssemblyIndex.TryGetEntity(entity,out indexed)||RebirthVehicleAssemblySerializer.ToBase64(indexed)!=derived||entity.vehicle.GetFuelLevel()!=level||entity.vehicle.GetMaxFuelLevel()!=maximum)return DenyNative(84);
-                            before=RebirthVehicleAssemblySerializer.FromBase64(derived);
-                        }
-                    }
-                }
-                else
-                {
-                    var tile=world.GetTileEntity(position) as TileEntityRepairableVehicleRebirth;if(tile?.Assembly==null)return RefuseNative(player,store,Current,null,out snapshot,out message,out outcome,Localization.Get("xuiRebirthVehicleMissing"));before=tile.Assembly.DeepClone();
-                    if(before.AssemblyId!=assemblyId||before.Revision!=expectedRevision||before.PendingInventoryTransferId!=Guid.Empty)return RefuseNative(player,store,Current,before,out snapshot,out message,out outcome);
-                }
-                string refusal;
-                try { plan=BuildNativePlan(world,player,before,entity,bag,belt,actor,fingerprint,out refusal); }
-                catch(InvalidDataException error) when(action==RebirthVehicleAssemblyAction.Refuel)
-                {
-                    // Planning has not debited inventory or changed native fuel.
-                    // Retire the exact saved owner reservation instead of retrying
-                    // this deterministic refusal forever with both grids held.
-                    Log.Warning("[REBIRTH Vehicle] Refuel plan refused before debit: "+error.Message);
-                    return RefuseNative(player,store,Current,before,out snapshot,out message,out outcome,
-                        Localization.Get("xuiRebirthVehicleCannotRefuel"));
-                }
-                if(plan==null)
-                {if(refusal!=null&&Current())return RefuseNative(player,store,Current,before,out snapshot,out message,out outcome,refusal);return DenyNative(96);}
-                if(plan.CreationId.Length>0&&(action==RebirthVehicleAssemblyAction.Install||action==RebirthVehicleAssemblyAction.Replace||action==RebirthVehicleAssemblyAction.Repair))
-                {
-                    string componentSource=(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity?"entity:":"block:")+before.ContentId+":"+slotId;
-                    string trainingAction=action==RebirthVehicleAssemblyAction.Repair?"repair":before.Parts.ContainsKey(slotId)?"replace":"install";
-                    float fraction=plan.Health==null?1f:(float)(plan.Health.After-plan.Health.Before)/plan.Health.Maximum;
-                    plan=plan.WithTraining(new RebirthVehicleTransferTraining(RebirthPhase9TechnicalTrainingService.CaptureMechanicsOriginalTraining(trainingAction,fraction,componentSource),componentSource));
-                }
-                if(!Current())return DenyNative(104);
-                store.Prepare(plan);
-                if(!Current()||store.Read(requestId)?.ToXml().ToString()!=plan.ToXml().ToString())return DenyNative(106);
-            }
-            if(!RebirthVehicleTransferCoordinator.TryRetain(player,sender,plan,out var transfer))
+            if(!RebirthVehicleTransferCoordinator.TryRetain(player,sender,plan,preparedHere,out var transfer))
             {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryAdmissionTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] server id="+requestId+" transfer retain refused");return true;}
             bool advanced=transfer.Advance();
             if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryAdmissionTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] server id="+requestId+" advance="+advanced+" finished="+transfer.Finished);
             snapshot=transfer.Finished&&!transfer.Rejected?plan.ReadAfter():plan.ReadBefore();
             if(!transfer.Finished&&RebirthVehicleTransferResolver.TryObserve(world,plan,Current,out var actual,out _,out _))snapshot=actual;
             if(!transfer.Finished)return true;
-            // The original training amount was captured before the first debit.
-            // The existing character award receipt settles the exact successful
-            // native completion once, including after a failed character save.
-            if(!transfer.Rejected&&plan.Training!=null&&!store.HasTrainingCompletion(plan))
-            {
-                if(!RebirthPhase9TechnicalTrainingService.AwardMechanicsOriginal(player,plan.Training.Raw,plan.Training.Source,"vehicle:"+plan.TransactionId.ToString("N"))||
-                    !Current()||!store.TryCompleteTraining(plan,identity))return DenyNative(118);
-            }
-            outcome=transfer.Rejected?RebirthVehicleRequestOutcome.Rejected:RebirthVehicleRequestOutcome.Applied;
-            message=transfer.Rejected?Localization.Get("xuiRebirthVehicleInventoryFull"):NativeCompletionMessage(plan);
-            var result=new RebirthVehicleRequestResult{ActorId=userId?.ToString()??string.Empty,Fingerprint=fingerprint,Carrier=carrier,Position=position,EntityId=entityId,Snapshot=snapshot.DeepClone(),Message=message,Outcome=outcome,
-                PickupNativeItem=outcome==RebirthVehicleRequestOutcome.Applied&&ownerCustodyProof.CursorCredit?NativePickup(plan):string.Empty};
-            if(!RebirthVehicleRequestJournal.RememberNativeCompletion(requestId,result,transfer))outcome=RebirthVehicleRequestOutcome.Indeterminate;
+            var route=new NativeResultRoute(this,userId?.ToString()??string.Empty,fingerprint);
+            PublishNativeTerminal(transfer,plan,store,identity,Current,route,snapshot,ownerCustodyProof.CursorCredit,ref message,ref outcome,out var result);
+            if(result==null)return DenyNative(118);
             return true;
         }
         catch(Exception error){Log.Warning("[REBIRTH Vehicle] native transfer threw "+error.GetType().Name+": "+error.Message+"\n"+error.StackTrace);return DenyNative(127);}
     }
+    private readonly struct NativeResultRoute
+    {
+        internal readonly string Actor,Fingerprint,Slot;
+        internal readonly RebirthVehicleAssemblyAction Action;
+        internal readonly RebirthVehicleAssemblyCarrier Carrier;
+        internal readonly Vector3i Position;
+        internal readonly int EntityId;
+
+        internal NativeResultRoute(NetPackageRebirthVehicleAssemblyRequest request,string actor,string fingerprint)
+        {
+            Actor=actor;Fingerprint=fingerprint;Slot=request.slotId;Action=request.action;
+            Carrier=request.carrier;Position=request.position;EntityId=request.entityId;
+        }
+    }
+
+    private static bool PublishNativeTerminal(RebirthVehicleTransferCoordinator.Transfer transfer,RebirthVehicleTransferPlan plan,
+        RebirthVehicleTransferPlanStore store,RebirthStablePlayerIdentity identity,Func<bool> current,NativeResultRoute route,
+        RebirthVehicleAssembly snapshot,bool cursorCredit,ref string message,ref RebirthVehicleRequestOutcome outcome,out RebirthVehicleRequestResult result)
+    {
+        result=null;
+        // The original training amount was captured before the first debit.
+        // The existing character award receipt settles the exact successful
+        // native completion once, including after a failed character save.
+        if(!transfer.Rejected&&plan.Training!=null&&!store.HasTrainingCompletion(plan))
+        {
+            if(!RebirthPhase9TechnicalTrainingService.AwardMechanicsOriginal(transfer.Player,plan.Training.Raw,plan.Training.Source,"vehicle:"+plan.TransactionId.ToString("N"))||
+                !current()||!store.TryCompleteTraining(plan,identity))return false;
+        }
+        outcome=transfer.Rejected?RebirthVehicleRequestOutcome.Rejected:RebirthVehicleRequestOutcome.Applied;
+        message=transfer.Rejected?Localization.Get("xuiRebirthVehicleInventoryFull"):NativeCompletionMessage(plan,route.Action,route.Slot);
+        result=new RebirthVehicleRequestResult{ActorId=route.Actor,Fingerprint=route.Fingerprint,Carrier=route.Carrier,Position=route.Position,
+            EntityId=route.EntityId,Snapshot=snapshot.DeepClone(),Message=message,Outcome=outcome,
+            PickupNativeItem=outcome==RebirthVehicleRequestOutcome.Applied&&cursorCredit?NativePickup(plan,route.Slot):string.Empty};
+        if(RebirthVehicleRequestJournal.RememberNativeCompletion(plan.TransactionId,result,transfer))return true;
+        outcome=RebirthVehicleRequestOutcome.Indeterminate;
+        return false;
+    }
+
+    private void RememberNativeTerminalQuery(World world,EntityPlayer player,ClientInfo sender,string game,string creation,string hash,string actor,string fingerprint,
+        RebirthVehicleTransferCustody incomingProof)
+    {
+        if(readVersion!=3||action!=RebirthVehicleAssemblyAction.Refuel||carrier!=RebirthVehicleAssemblyCarrier.VehicleEntity||
+            sender==null||incomingProof==null||!RebirthVehicleTransferCoordinator.TryGet(requestId,out var transfer)||
+            !transfer.CanRememberTerminalQuery(world,player,sender,game,creation,fingerprint))return;
+
+        var custody=transfer.Plan.Custody;
+        if(transfer.Plan.Fuel==null||transfer.Plan.Training!=null||custody==null||custody.CursorDebit||custody.CursorCredit||
+            incomingProof.Reservation!=custody.Reservation||incomingProof.Binding!=custody.Binding||
+            incomingProof.OwnerImageHash!=custody.OwnerImageHash||incomingProof.CursorDebit!=custody.CursorDebit||
+            incomingProof.CursorCredit!=custody.CursorCredit||
+            !RebirthVehicleRequestJournal.HasRetainedNativeOriginal(requestId,actor,fingerprint))return;
+
+        // Keep only immutable reply metadata. The hash comes from the exact
+        // incoming frame; neither the frame nor a packet survives this call.
+        transfer.RememberTerminalQuery(new NativeTerminalQuery(this,world,player,sender,game,creation,hash,actor,fingerprint));
+    }
+
+    internal sealed class NativeTerminalQuery
+    {
+        private readonly Guid id;
+        private readonly World world;
+        private readonly EntityPlayer player;
+        private readonly ClientInfo sender;
+        private readonly string game,creation,hash;
+        private readonly NativeResultRoute route;
+
+        internal NativeTerminalQuery(NetPackageRebirthVehicleAssemblyRequest request,World world,EntityPlayer player,ClientInfo sender,
+            string game,string creation,string hash,string actor,string fingerprint)
+        {
+            id=request.requestId;this.world=world;this.player=player;this.sender=sender;
+            this.game=game;this.creation=creation;this.hash=hash;route=new NativeResultRoute(request,actor,fingerprint);
+        }
+
+        internal void Publish(RebirthVehicleTransferCoordinator.Transfer transfer,ref bool attemptedAdvance)
+        {
+            bool Current()=>transfer.Plan.TransactionId==id&&transfer.MatchesTerminalQuery(world,player,sender,game,creation,route.Fingerprint);
+            bool Active()=>RebirthVehicleTransferCoordinator.IsRetained(transfer)&&Current();
+            if(!Active()||!RebirthVehicleRequestJournal.HasRetainedNativeOriginal(id,route.Actor,route.Fingerprint)||
+                !RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)||identity.CanonicalId!=transfer.Plan.ActorId)return;
+
+            var plan=transfer.Plan;
+            var store=new RebirthVehicleTransferPlanStore(GameIO.GetSaveGameDir(),GameIO.GetSaveGameDir,Active);
+            if(store.Read(id)?.ToXml().ToString()!=plan.ToXml().ToString()||
+                !transfer.AdvanceAcknowledgedTerminal(ref attemptedAdvance)||!Active()||
+                !RebirthVehicleRequestJournal.HasRetainedNativeOriginal(id,route.Actor,route.Fingerprint))return;
+
+            var snapshot=plan.ReadAfter();
+            string message=null;
+            var outcome=RebirthVehicleRequestOutcome.Indeterminate;
+            if(!PublishNativeTerminal(transfer,plan,store,identity,Active,route,snapshot,false,ref message,ref outcome,out var published))return;
+
+            // Publication can retire the Transfer, but the original live route
+            // must still match before either existing reply is sent.
+            if(!Current()||!RebirthVehicleRequestJournal.IsAvailable||
+                !RebirthVehicleRequestJournal.TryGet(id,route.Actor,route.Fingerprint,out var saved)||
+                saved.Outcome!=RebirthVehicleRequestOutcome.Applied||saved.Carrier!=route.Carrier||saved.Position!=route.Position||
+                saved.EntityId!=route.EntityId||saved.Message!=published.Message||saved.PickupNativeItem!=published.PickupNativeItem||
+                saved.Snapshot==null||RebirthVehicleAssemblySerializer.ToBase64(saved.Snapshot)!=plan.AfterPayload||
+                !Current())return;
+
+            var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+            SendRemoteCustodySnapshot(connection,sender,id,creation,saved);
+            if(Current())SendRemoteCustodyReply(connection,sender,id,game,creation,hash,saved.Outcome,saved.PickupNativeItem);
+        }
+    }
+
     // Every fail-closed exit of TryNativeTransfer reports the same "awaiting recovery" text with an
     // Indeterminate outcome, so a valid transfer that trips one predicate looks stuck. Name the exit
     // (line id in the original file) once per exit so the batch log shows which predicate refused.
@@ -168,7 +298,8 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
     }
     private static bool RejectUntouched(RebirthVehicleAssembly before,out RebirthVehicleAssembly snapshot,out string message,out RebirthVehicleRequestOutcome outcome,string reason=null)
     {snapshot=before?.DeepClone();message=reason??Localization.Get("xuiRebirthVehicleChanged");outcome=RebirthVehicleRequestOutcome.Rejected;return true;}
-    private RebirthVehicleTransferPlan BuildNativePlan(World world,EntityPlayer player,RebirthVehicleAssembly before,EntityVehicle entity,ItemStack[] bag,ItemStack[] belt,string actor,string fingerprint,out string refusal)
+    private RebirthVehicleTransferPlan BuildNativePlan(World world,EntityPlayer player,RebirthVehicleAssembly before,EntityVehicle entity,
+        float? nativeFuelLevel,float? nativeFuelCapacity,ItemStack[] bag,ItemStack[] belt,string actor,string fingerprint,out string refusal)
     {
         refusal=null;bool Locked(int index)=>index>=0&&index<ownerLocks.Length&&ownerLocks[index]=='1';
         bool BeltLocked(int index)=>index<0||index>=ownerBeltLocks.Length||ownerBeltLocks[index]=='1';
@@ -189,20 +320,22 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
         }
         if(action==RebirthVehicleAssemblyAction.Refuel)
         {
-            if(entity?.vehicle==null){refusal=Localization.Get("xuiRebirthVehicleCannotRefuel");return null;}float level=entity.vehicle.GetFuelLevel(),maximum=entity.vehicle.GetMaxFuelLevel();
+            if(!nativeFuelLevel.HasValue||!nativeFuelCapacity.HasValue){refusal=Localization.Get("xuiRebirthVehicleCannotRefuel");return null;}
+            float level=nativeFuelLevel.Value,maximum=nativeFuelCapacity.Value;
             if(level>=maximum){refusal=Localization.Get("xuiRebirthVehicleFuelFull");return null;}
             int requested=(int)Math.Ceiling(Math.Min(2500f,(maximum-level)*25f));
-            var fuel=RebirthVehicleFuelSelection.Select(belt,ownerBeltSlots,bag,Locked,entity.GetVehicle().GetFuelItem(),requested,BeltLocked);
+            string fuelItem=entity.GetVehicle().GetFuelItem();
+            var fuel=RebirthVehicleFuelSelection.Select(belt,ownerBeltSlots,bag,Locked,fuelItem,requested,BeltLocked);
             if(fuel.Count==0){refusal=Localization.Get("xuiRebirthVehicleNeedFuel");return null;}
-            return RebirthVehicleTransferPlanner.Refuel(requestId,expectedCreationId,actor,fingerprint,target,before,expectedRevision,entity.GetVehicle().GetFuelItem(),level,maximum,fuel,player.Died).WithCustody(ownerCustodyProof);
+            return RebirthVehicleTransferPlanner.Refuel(requestId,expectedCreationId,actor,fingerprint,target,before,expectedRevision,fuelItem,level,maximum,fuel,player.Died).WithCustody(ownerCustodyProof);
         }
         if(action==RebirthVehicleAssemblyAction.Siphon)
         {
-            if(entity!=null&&entity.vehicle==null){refusal=Localization.Get("xuiRebirthVehicleCannotRefuel");return null;}
-            float gas=entity!=null?entity.vehicle.GetFuelLevel()*25f:before.FuelPercent*500f;
+            if(entity!=null&&!nativeFuelLevel.HasValue){refusal=Localization.Get("xuiRebirthVehicleCannotRefuel");return null;}
+            float gas=nativeFuelLevel.HasValue?nativeFuelLevel.Value*25f:before.FuelPercent*500f;
             if(!float.IsNaN(gas)&&!float.IsInfinity(gas)&&Math.Round((double)gas,MidpointRounding.ToEven)<1d)
             {refusal=Localization.Get("xuiRebirthVehicleNoFuel");return null;}
-            return RebirthVehicleTransferPlanner.Siphon(requestId,expectedCreationId,actor,fingerprint,target,before,expectedRevision,entity?.vehicle?.GetFuelLevel(),entity?.vehicle?.GetMaxFuelLevel(),entity?.GetVehicle()?.GetFuelItem(),player.Died).WithCustody(ownerCustodyProof);
+            return RebirthVehicleTransferPlanner.Siphon(requestId,expectedCreationId,actor,fingerprint,target,before,expectedRevision,nativeFuelLevel,nativeFuelCapacity,entity?.GetVehicle()?.GetFuelItem(),player.Died).WithCustody(ownerCustodyProof);
         }
         var family=RebirthVehicleDefinitionRegistry.GetFamily(before.FamilyId);if(family==null){refusal=Localization.Get("xuiRebirthVehicleInvalidDefinition");return null;}
         var after=before.DeepClone();var items=new List<RebirthVehicleTransferItem>();
@@ -249,7 +382,7 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
         if(after.Revision==long.MaxValue)return null;after.Revision++;after.PendingInventoryTransferId=Guid.Empty;after.LastAppliedInventoryTransferId=requestId;
         return RebirthVehicleTransferPlan.Create(requestId,expectedCreationId,actor,fingerprint,before,after,items,target,null,null,player.Died,ownerCustodyProof);
     }
-    private string NativeCompletionMessage(RebirthVehicleTransferPlan plan)
+    private static string NativeCompletionMessage(RebirthVehicleTransferPlan plan,RebirthVehicleAssemblyAction action,string slotId)
     {
         switch(action)
         {
@@ -262,7 +395,7 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest
             default:return Localization.Get(plan.ReadBefore().Parts.ContainsKey(slotId)?"xuiRebirthVehiclePartReplaced":"xuiRebirthVehiclePartInstalled");
         }
     }
-    private string NativePickup(RebirthVehicleTransferPlan plan)
+    private static string NativePickup(RebirthVehicleTransferPlan plan,string slotId)
     {
         if(!plan.ReadBefore().Parts.TryGetValue(slotId,out var part))return string.Empty;
         var stack=RebirthVehicleInventoryTransactions.CreateItemStack(part);return stack==null||stack.IsEmpty()?string.Empty:RebirthNativeItemCodec.Encode(stack.itemValue);

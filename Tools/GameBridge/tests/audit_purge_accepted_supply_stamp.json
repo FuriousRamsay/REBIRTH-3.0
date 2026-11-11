@@ -1,0 +1,30 @@
+{
+  "name": "Purge accepted supply crate retains owner through account outage",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge save only. The native director must have accepted one earned A flight. Establish the shared account publication fault after A's durable reservation and acceptance, before the native crate callback. No second flight or forced crate may be spawned. Leave the affected area streamed. Record the two-player native sequence with rbpurgetestobserve player <entity-id> on the authority. The fault setup requires the disposable native test harness."
+    },
+    {
+      "console": "rbpurgetestobserve"
+    },
+    {
+      "wait": 1
+    },
+    {
+      "console": "rbpurgetestobserve"
+    },
+    {
+      "_note": "Continue the existing Wait-PurgeSupplyBatch22 observer until the real crate registers, then inspect both owners. While the shared store is unavailable, A must have one loaded authoritative crate with the original world/owner/sequence/token and B must have no flight or crate. Reopen the same store and verify one B flight with its own exact durable reservation. Verify owner-only access, normal landing and removal of the original native observer, then unload/reload and recheck persisted stamp and balances. A healthy-store retained v3 owner-local case is a separate control."
+    },
+    {
+      "expectNoLog": {
+        "contains": "Original supply custody could not precede native crate registration.",
+        "level": "error"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

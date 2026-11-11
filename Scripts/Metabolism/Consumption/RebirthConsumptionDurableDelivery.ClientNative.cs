@@ -22,12 +22,32 @@ internal static partial class RebirthConsumptionDurableDelivery
             try
             {
                 if(operation==Guid.Empty||inventoryClients.ContainsKey(operation)||inventoryClients.Count>=4||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(192L*1024*1024,out memory))continue;
-                string path=Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PlayerConsumptionClient",operation.ToString("N"));var journal=new RebirthCamperTransferJournal(path);var record=journal.Read(operation);
-                if(record==null||record.Operation!=operation||record.Vehicle!=operation||record.OwnerCreation!=RebirthCamperCharacterAccess.CurrentCreation(actor)||record.Revision!=0||
-                    record.Before.Length>MaximumInventoryPurpose||!record.Before.SequenceEqual(record.After)||record.State==RebirthCamperTransferJournal.Phase.Rejected)continue;
-                string text=new UTF8Encoding(false,true).GetString(record.Before);
+                string currentCreation=RebirthCamperCharacterAccess.CurrentCreation(actor);
+                if(string.IsNullOrEmpty(currentCreation))continue;
+                string path=Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PlayerConsumptionClient",operation.ToString("N"));var journal=new RebirthCamperTransferJournal(path);
+                var record=journal.ReadBounded(operation,MaximumInventoryPurpose,currentCreation);
+                if (record == null || record.Operation != operation || record.Vehicle != operation ||
+                    record.OwnerCreation != currentCreation ||
+                    record.Revision != 0 || record.State == RebirthCamperTransferJournal.Phase.Rejected) continue;
+                string creation = record.OwnerCreation;
+                byte[] purposeBytes = record.Before;
+                if (purposeBytes.Length > MaximumInventoryPurpose || !purposeBytes.SequenceEqual(record.After)) continue;
+                string text = new UTF8Encoding(false, true).GetString(purposeBytes);
+                // Journal hydration and purpose decoding use the same reserved
+                // workspace in order. Only the exact text and creation carry forward.
+                record = null;
+                purposeBytes = null;
                 if(!RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(data,InventorySourceReceipt(operation),out float terminalSource,out _))continue;
-                if(!TryReadInventoryPurpose(actor,text,out var decoded,out var plan,out var serving,out float cost,out var result,terminalSource==3f)||decoded!=operation)return;
+                if(!ReadInventoryPurposeInWorkspace(actor,text,out var decoded,out var plan,out var serving,out float cost,out var result,out var identity,terminalSource==3f)||decoded!=operation)
+                {
+                    // The exact retired native state has no pending source debit.
+                    // Preserve its unreadable original and consider the next native key.
+                    if(terminalSource==3f&&actor.Buffs!=null&&actor.Buffs.GetCustomVar(InventorySourceReceipt(operation))==3f&&
+                        InventoryNativeMarkerCleared(actor,data,InventoryBeforeReceipt(operation))&&
+                        InventoryNativeMarkerCleared(actor,data,InventorySecondaryReceipt(operation))&&
+                        InventoryNativeMarkerCleared(actor,data,InventoryUseReceipt(operation)))continue;
+                    return;
+                }
                 if(!RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(data,InventoryBeforeReceipt(operation),out float before,out _)||
                     !RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(data,InventorySourceReceipt(operation),out float source,out _)||
                     !RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(data,InventorySecondaryReceipt(operation),out float secondary,out _)||
@@ -39,20 +59,22 @@ internal static partial class RebirthConsumptionDurableDelivery
                     actor.Buffs.GetCustomVar(InventorySecondaryReceipt(operation))!=secondary||actor.Buffs.GetCustomVar(InventoryUseReceipt(operation))!=use)continue;
                 var commands=plan.Commands();int completed=source==1f||source==3f?commands.Length:source>=101f&&(float)(int)source==source?(int)source-100:0;
                 if(completed<0||completed>commands.Length||source>=0f&&source!=3f&&!plan.MatchesPrefix(bag,belt,completed))continue;
-                var client=new InventoryClient{Operation=operation,Actor=actor,World=actor.world,Manager=manager,Connection=connection,Creation=record.OwnerCreation,Deaths=actor.Died,
-                    Text=text,Path=path,Plan=plan,Serving=serving,HydrationCost=cost,Result=result,Memory=memory,Local=local};
+                var client=new InventoryClient{Operation=operation,Actor=actor,World=actor.world,Manager=manager,Connection=connection,Creation=creation,Deaths=actor.Died,
+                    Text=text,Path=path,Plan=plan,Serving=serving,HydrationCost=cost,Result=result,Memory=memory,Local=local,PurposeIdentity=identity};
                 bool valid=true;
                 for(int ordinal=0;ordinal<commands.Length;ordinal++)
                 {
-                    var command=commands[ordinal];var key=InventoryCommandKey(operation,ordinal);var saved=journal.Read(key);
+                    var command=commands[ordinal];var key=InventoryCommandKey(operation,ordinal);
                     byte[] first=RebirthCamperInventorySnapshot.Capture(new[]{command.Before}),last=RebirthCamperInventorySnapshot.Capture(new[]{command.After});
+                    int maximumCommandFrame=Math.Max(first.Length,last.Length);
+                    var saved=journal.ReadBounded(key,maximumCommandFrame,client.Creation);
                     if(saved==null||saved.Operation!=key||saved.Vehicle!=operation||saved.OwnerCreation!=client.Creation||saved.Revision!=ordinal||
                         !saved.Before.SequenceEqual(first)||!saved.After.SequenceEqual(last)||saved.State==RebirthCamperTransferJournal.Phase.Rejected){valid=false;break;}
                     if(ordinal<completed)
                     {
                         // Full authentic native saved prefix, published only
                         // after this actual setter returned, repairs metadata.
-                        if(saved.State==RebirthCamperTransferJournal.Phase.Uncertain)saved=journal.Advance(key,saved.State,RebirthCamperTransferJournal.Phase.Applied);
+                        if(saved.State==RebirthCamperTransferJournal.Phase.Uncertain)saved=journal.AdvanceBounded(key,saved.State,RebirthCamperTransferJournal.Phase.Applied,maximumCommandFrame,client.Creation);
                         if(saved.State!=RebirthCamperTransferJournal.Phase.Applied){valid=false;break;}
                     }
                     // An entered future command remains held. It is never
@@ -68,4 +90,8 @@ internal static partial class RebirthConsumptionDurableDelivery
             finally{memory?.Dispose();}
         }
     }
+
+    private static bool InventoryNativeMarkerCleared(EntityPlayerLocal actor,PlayerDataFile data,string key)
+        =>RebirthRemoteResourcePlacedStationSavedReceipt.TryRead(data,key,out float saved,out _)&&
+            saved==0f&&actor.Buffs.GetCustomVar(key)==0f;
 }

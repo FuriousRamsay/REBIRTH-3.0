@@ -30,14 +30,15 @@ public static partial class RebirthRecyclerRuntime
 
         var original = source.itemValue.Clone();
         var attachments = Detach(original);
-        var operation = Guid.NewGuid();
+        string groupId = Guid.NewGuid().ToString("N");
+        string sourceImage = RebirthNativeItemCodec.Encode(original);
         for (int outputIndex = 0; outputIndex < rule.Outputs.Count; outputIndex++)
         {
             var output = rule.Outputs[outputIndex];
             var stack = output.Stack;
             float time = output.TimeSeconds * units;
             var token = original.Clone();
-            token.SetMetadata(Prefix + "group", operation.ToString("N")); token.SetMetadata(Prefix + "source", RebirthNativeItemCodec.Encode(original));
+            token.SetMetadata(Prefix + "group", groupId); token.SetMetadata(Prefix + "source", sourceImage);
             token.SetMetadata(Prefix + "units", units); token.SetMetadata(Prefix + "outputs", rule.Outputs.Count); token.SetMetadata(Prefix + "index", outputIndex);
             token.SetMetadata(Prefix + "owner", owner); token.SetMetadata(Prefix + "creation", creation); token.SetMetadata(Prefix + "rule", rule.SourceId);
             var recipe = new Recipe { itemValueType = stack.itemValue.type, count = checked(stack.count * units), IsScrap = true, IsTrackable = false,

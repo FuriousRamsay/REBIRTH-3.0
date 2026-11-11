@@ -1,0 +1,12 @@
+{
+  "name": "Survivor Creator Experience text and bonus alignment",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Start on Experience with Scavenger visible in Available Backgrounds. Review the screenshot for the full description above the divider and the icon, label, and value on one centerline." },
+    { "expectWindowOpen": "rebirthSurvivorCreator" },
+    { "click": { "exactText": "Scavenger", "window": "rebirthSurvivorCreator" } },
+    { "waitForUi": { "id": "backgroundVisualDescription", "text": "Expert Packing", "timeout": 3 } },
+    { "expectUi": { "id": "backgroundTraitPointsValue" } },
+    { "screenshot": "creator_experience_scavenger_bonus_alignment" }
+  ]
+}

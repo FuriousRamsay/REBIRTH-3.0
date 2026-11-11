@@ -105,7 +105,8 @@ public enum RebirthSandboxOptionId
     TornadoMultiplier = 94,
     ScreamerMax = 95,
     GamestageMultiplier = 96,
-    BossEventZombieAnimals = 97
+    BossEventZombieAnimals = 97,
+    KeepInjuriesOnDeath = 98
 }
 
 
@@ -443,6 +444,7 @@ public static class RebirthSandboxOptionDependencyPolicy
 public sealed class RebirthSandboxState
 {
     public RebirthPlayerProgressionMode PlayerProgression = RebirthPlayerProgressionMode.Rebirth;
+    public bool KeepInjuriesOnDeath = true;
     public RebirthWorldTheme Theme = RebirthWorldTheme.None;
     public bool ShowClearedPois;
     // Zero preserves the authored target for existing saves and presets.
@@ -539,6 +541,7 @@ public sealed class RebirthSandboxState
         return new RebirthSandboxState
         {
             PlayerProgression = PlayerProgression,
+            KeepInjuriesOnDeath = KeepInjuriesOnDeath,
             Theme = Theme,
             ShowClearedPois = ShowClearedPois,
             PurgeCompletionPercentage = PurgeCompletionPercentage,
@@ -706,6 +709,7 @@ public sealed class RebirthSandboxOptionManager
     public static RebirthSandboxOptionManager Current { get { return s_current; } }
     public IList<RebirthSandboxPreset> Presets { get { return presets.AsReadOnly(); } }
     public RebirthPlayerProgressionMode PlayerProgression { get { return currentState.PlayerProgression; } }
+    public bool KeepInjuriesOnDeath => currentState.KeepInjuriesOnDeath;
     public RebirthWorldTheme Theme { get { return currentState.Theme; } }
     public bool ShowClearedPois { get { return currentState.ShowClearedPois; } }
     public int PurgeProgression { get { return currentState.PurgeProgression; } }
@@ -1493,6 +1497,8 @@ public sealed class RebirthSandboxOptionManager
         }
         if (state.PlayerProgression != RebirthPlayerProgressionMode.Rebirth)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.PlayerProgression) + IndexToAlpha((int)state.PlayerProgression);
+        if (!state.KeepInjuriesOnDeath)
+            result += IndexToAlpha2((int)RebirthSandboxOptionId.KeepInjuriesOnDeath) + IndexToAlpha(0);
         if (!state.AdvancedFarming)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.AdvancedFarming) + IndexToAlpha(0);
         if (state.InstantBlockPickup != RebirthInstantBlockPickupMode.Default)
@@ -2029,6 +2035,7 @@ public sealed class RebirthSandboxOptionManager
             else if (optionIndex == (int)RebirthSandboxOptionId.ScreamerMax) { if (valueIndex > 7) return false; decoded.ScreamerMax = 3 + valueIndex; }
             else if (optionIndex == (int)RebirthSandboxOptionId.GamestageMultiplier) { if (valueIndex > 15) return false; decoded.GamestageMultiplier = 50 + valueIndex * 10; }
             else if (optionIndex == (int)RebirthSandboxOptionId.BossEventZombieAnimals) { if (valueIndex > 1) return false; decoded.BossEventZombieAnimals = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.KeepInjuriesOnDeath) { if (valueIndex > 1) return false; decoded.KeepInjuriesOnDeath = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHordeFrequency) { if (valueIndex > 8) return false; decoded.WanderingHordeFrequency = (RebirthWanderingHordeFrequency)valueIndex; }
             else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHordeSize) { if (valueIndex > 9) return false; decoded.WanderingHordeSize = (RebirthWanderingHordeSize)valueIndex; }
             else if (optionIndex == (int)RebirthSandboxOptionId.WanderingHerdRestriction) { if (valueIndex > 3) return false; decoded.WanderingHerdRestriction = (RebirthWanderingHerdRestriction)valueIndex; }

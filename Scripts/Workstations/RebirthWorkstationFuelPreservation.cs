@@ -53,8 +53,8 @@ public static class RebirthWorkstationFuelPreservation
         if (workstation == null)
             return false;
 
-        ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue);
-        ApplyToolBlock(workstation,ref queue);
+        ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue, out var current);
+        ApplyToolBlock(workstation, current, ref queue);
         if (queue.State == ProductiveWorkState.Active || queue.State == ProductiveWorkState.Pending)
             return true;
         if (queue.State == ProductiveWorkState.Blocked)
@@ -74,8 +74,8 @@ public static class RebirthWorkstationFuelPreservation
         if (workstation == null)
             return result;
 
-        ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue);
-        ApplyToolBlock(workstation,ref queue);
+        ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue, out var current);
+        ApplyToolBlock(workstation, current, ref queue);
         if (queue.HasQueuedRecipe)
             return queue;
 
@@ -111,8 +111,9 @@ public static class RebirthWorkstationFuelPreservation
         return result;
     }
 
-    private static ProductiveWorkSnapshot EvaluateQueue(RecipeQueueItem[] queue)
+    private static ProductiveWorkSnapshot EvaluateQueue(RecipeQueueItem[] queue, out RecipeQueueItem current)
     {
+        current = null;
         ProductiveWorkSnapshot result = new ProductiveWorkSnapshot
         {
             State = ProductiveWorkState.Complete
@@ -120,7 +121,6 @@ public static class RebirthWorkstationFuelPreservation
         if (queue == null)
             return result;
 
-        int first = -1;
         float remaining = 0f;
         // Native HandleRecipeQueue processes the tail and cycles toward it.
         for (int i = queue.Length - 1; i >= 0; i--)
@@ -129,19 +129,18 @@ public static class RebirthWorkstationFuelPreservation
             if (entry == null || entry.Recipe == null || entry.Multiplier <= 0)
                 continue;
 
-            if (first < 0) first = i;
+            if (current == null) current = entry;
             if (entry.CraftingTimeLeft > 0f)
                 remaining += entry.CraftingTimeLeft;
             if (entry.Multiplier > 1 && entry.OneItemCraftTime > 0f)
                 remaining += entry.OneItemCraftTime * (entry.Multiplier - 1f);
         }
 
-        if (first < 0)
+        if (current == null)
             return result;
 
         result.HasQueuedRecipe = true;
         result.RemainingSeconds = remaining;
-        RecipeQueueItem current = queue[first];
 
         if (current.CraftingTimeLeft > 0f)
         {
@@ -168,28 +167,23 @@ public static class RebirthWorkstationFuelPreservation
         result.State = ProductiveWorkState.Blocked;
         return result;
     }
-    private static void ApplyToolBlock(TileEntityWorkstation station,ref ProductiveWorkSnapshot state)
+    private static void ApplyToolBlock(TileEntityWorkstation station, RecipeQueueItem row, ref ProductiveWorkSnapshot state)
     {
-        if(station.Queue==null)return;
-        for(int i=station.Queue.Length-1;i>=0;i--)
+        if (row == null) return;
+        if(RebirthCookingHeat.Managed(row.Recipe)&&RebirthCookingBatch.NeedsHeat(row.Recipe)&&RebirthCookingHeat.Ready(row.Recipe))
         {
-            var row=station.Queue[i];if(row?.Recipe==null||row.Multiplier<=0)continue;
-            if(RebirthCookingHeat.Managed(row.Recipe)&&RebirthCookingBatch.NeedsHeat(row.Recipe)&&RebirthCookingHeat.Ready(row.Recipe))
-            {
-                // Manual cooking keeps the remaining food burn or drink evaporation interval.
-                // A prepared collection freezes that original result instead.
-                if(!RebirthCookingHeat.Burnt(row.Recipe)&&!RebirthCookingHeat.Evaporated(row.Recipe)&&!RebirthCookingOutputDelivery.HasPrepared(row.Recipe))
-                {state.State=ProductiveWorkState.Active;state.RemainingSeconds=Math.Max(0,RebirthCookingHeatRules.BurnAfter(RebirthCookingHeat.Text(row.Recipe,"method"))-RebirthCookingHeat.Number(row.Recipe,"overdue"));}
-                else state.State=ProductiveWorkState.Blocked;
-            }
-            else if(state.State==ProductiveWorkState.Active&&!RebirthRecyclerRuntime.HasProductiveTools(station,row))state.State=ProductiveWorkState.Blocked;
-            return;
+            // Manual cooking keeps the remaining food burn or drink evaporation interval.
+            // A prepared collection freezes that original result instead.
+            if(!RebirthCookingHeat.Burnt(row.Recipe)&&!RebirthCookingHeat.Evaporated(row.Recipe)&&!RebirthCookingOutputDelivery.HasPrepared(row.Recipe))
+            {state.State=ProductiveWorkState.Active;state.RemainingSeconds=Math.Max(0,RebirthCookingHeatRules.BurnAfter(RebirthCookingHeat.Text(row.Recipe,"method"))-RebirthCookingHeat.Number(row.Recipe,"overdue"));}
+            else state.State=ProductiveWorkState.Blocked;
         }
+        else if(state.State==ProductiveWorkState.Active&&!RebirthRecyclerRuntime.HasProductiveTools(station,row))state.State=ProductiveWorkState.Blocked;
     }
 
     public static bool HasOutstandingRecipe(RecipeQueueItem[] queue)
     {
-        ProductiveWorkSnapshot state = EvaluateQueue(queue);
+        ProductiveWorkSnapshot state = EvaluateQueue(queue, out _);
         return state.State == ProductiveWorkState.Active
             || state.State == ProductiveWorkState.Pending;
     }

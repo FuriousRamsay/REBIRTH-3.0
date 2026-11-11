@@ -196,20 +196,41 @@ public static class RebirthTraitSupportService
 
     public static float GetSkillGainMultiplier(RebirthWorldCharacterRecord record, float currentSkillValue)
     {
-        if (record == null || record.Support == null || currentSkillValue >= FocusSkillLevelCeiling || RebirthSurvivorDefinitionRegistry.Bundle == null) return 1f;
+        var profiles = RebirthSurvivorDefinitionRegistry.Bundle?.SupportProfiles;
+        if (record?.Support == null || currentSkillValue >= FocusSkillLevelCeiling || profiles == null) return 1f;
         float multiplier = 1f;
-        foreach (RebirthTraitSupportProfileDefinition profile in RebirthSurvivorDefinitionRegistry.Bundle.SupportProfiles)
-        {
-            RebirthTraitSupportRuntimeState state;
-            if (!record.Support.Entries.TryGetValue(profile.Id, out state) || state == null || state.PositiveRemainingActiveSeconds <= 0f) continue;
-            for (int i = 0; i < profile.Effects.Count; i++)
-            {
-                RebirthTraitSupportEffectDefinition effect = profile.Effects[i];
-                if (effect == null || !string.Equals(effect.Target, "skill.gain", StringComparison.OrdinalIgnoreCase) || !string.Equals(effect.State, "positive", StringComparison.OrdinalIgnoreCase) || !ScopeApplies(record, profile, effect.Scope)) continue;
-                if (string.Equals(effect.Operation, "multiply", StringComparison.OrdinalIgnoreCase)) multiplier *= effect.Value;
-            }
-        }
+        foreach (var profile in profiles)
+            if (record.Support.Entries.TryGetValue(profile.Id, out var state) && state != null && state.PositiveRemainingActiveSeconds > 0f)
+                multiplier = ApplySkillGainEffects(multiplier, profile, record.Origin?.TraitIds);
         return Mathf.Clamp(multiplier, 1f, FocusGlobalMultiplierCap);
+    }
+
+    internal static float GetProjectedSkillGainMultiplier(RebirthSurvivorOwnerStateSnapshot owner, float currentSkillValue, float elapsed)
+    {
+        var profiles = RebirthSurvivorDefinitionRegistry.Bundle?.SupportProfiles;
+        if (currentSkillValue >= FocusSkillLevelCeiling || profiles == null) return 1f;
+        float multiplier = 1f;
+        foreach (var profile in profiles)
+            foreach (var entry in owner.SupportEntries)
+                if (string.Equals(entry.ProfileId, profile.Id, StringComparison.OrdinalIgnoreCase) &&
+                    entry.PositiveRemainingActiveSeconds > elapsed)
+                {
+                    multiplier = ApplySkillGainEffects(multiplier, profile, owner.TraitIds);
+                    break;
+                }
+        return Mathf.Clamp(multiplier, 1f, FocusGlobalMultiplierCap);
+    }
+
+    private static float ApplySkillGainEffects(float multiplier, RebirthTraitSupportProfileDefinition profile, IReadOnlyList<string> traits)
+    {
+        foreach (var effect in profile.Effects)
+        {
+            if (effect != null && string.Equals(effect.Target, "skill.gain", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(effect.State, "positive", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(effect.Operation, "multiply", StringComparison.OrdinalIgnoreCase) && ScopeApplies(traits, profile, effect.Scope))
+                multiplier *= effect.Value;
+        }
+        return multiplier;
     }
 
     /// <summary>Consumes one armed seasoning state only when a real meaningful meal is being recorded.</summary>
@@ -274,29 +295,34 @@ public static class RebirthTraitSupportService
         return state;
     }
 
-    private static bool OwnsTrait(RebirthWorldCharacterRecord record, string traitId)
+    private static bool OwnsTrait(RebirthWorldCharacterRecord record, string traitId) =>
+        OwnsTrait(record?.Origin?.TraitIds, traitId);
+
+    private static bool OwnsTrait(IReadOnlyList<string> traits, string traitId)
     {
-        if (record == null || record.Origin == null || string.IsNullOrEmpty(traitId)) return false;
-        for (int i = 0; i < record.Origin.TraitIds.Count; i++) if (string.Equals(record.Origin.TraitIds[i], traitId, StringComparison.OrdinalIgnoreCase)) return true;
+        if (traits == null || string.IsNullOrEmpty(traitId)) return false;
+        for (int i = 0; i < traits.Count; i++)
+            if (string.Equals(traits[i], traitId, StringComparison.OrdinalIgnoreCase)) return true;
         return false;
     }
 
-    private static bool OwnsAnySupportedTrait(RebirthWorldCharacterRecord record, RebirthTraitSupportProfileDefinition profile)
-    {
-        if (record == null || profile == null) return false;
-        for (int i = 0; i < profile.SupportedTraitIds.Count; i++) if (OwnsTrait(record, profile.SupportedTraitIds[i])) return true;
-        return false;
-    }
+    private static bool ScopeApplies(RebirthWorldCharacterRecord record, RebirthTraitSupportProfileDefinition profile, string scope) =>
+        ScopeApplies(record?.Origin?.TraitIds, profile, scope);
 
-    private static bool ScopeApplies(RebirthWorldCharacterRecord record, RebirthTraitSupportProfileDefinition profile, string scope)
+    private static bool ScopeApplies(IReadOnlyList<string> traits, RebirthTraitSupportProfileDefinition profile, string scope)
     {
         scope = (scope ?? string.Empty).Trim();
         if (scope.Length == 0 || string.Equals(scope, "universal", StringComparison.OrdinalIgnoreCase)) return true;
-        if (string.Equals(scope, "supported_trait", StringComparison.OrdinalIgnoreCase)) return OwnsAnySupportedTrait(record, profile);
-        if (string.Equals(scope, "habit_trait", StringComparison.OrdinalIgnoreCase)) return OwnsTrait(record, profile.HabitTraitId);
-        if (string.Equals(scope, "non_habit_trait", StringComparison.OrdinalIgnoreCase)) return !OwnsTrait(record, profile.HabitTraitId);
+        if (string.Equals(scope, "supported_trait", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var trait in profile.SupportedTraitIds)
+                if (OwnsTrait(traits, trait)) return true;
+            return false;
+        }
+        if (string.Equals(scope, "habit_trait", StringComparison.OrdinalIgnoreCase)) return OwnsTrait(traits, profile.HabitTraitId);
+        if (string.Equals(scope, "non_habit_trait", StringComparison.OrdinalIgnoreCase)) return !OwnsTrait(traits, profile.HabitTraitId);
         const string prefix = "trait:";
-        return scope.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && OwnsTrait(record, scope.Substring(prefix.Length));
+        return scope.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && OwnsTrait(traits, scope.Substring(prefix.Length));
     }
 
     private static bool IsEffectStateActive(RebirthTraitSupportProfileDefinition profile, RebirthTraitSupportRuntimeState state, bool equipped, RebirthWorldCharacterRecord record, string requiredState)

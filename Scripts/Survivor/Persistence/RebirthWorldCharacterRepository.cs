@@ -44,6 +44,7 @@ public static partial class RebirthWorldCharacterRepository
             Issues.Clear();
             RetryAfterUtcTicks.Clear();
             RepositoryEpoch = new object(); // Stable gates survive reset; epoch revokes old selections.
+            ClearOrdinaryPracticeCheckpointsLocked();
             serverAuthority = asServer;
         }
     }
@@ -1071,6 +1072,20 @@ public static partial class RebirthWorldCharacterRepository
             selected = CaptureWriteSelectionLocked(identity.StorageKey, record);
         }
         return SaveSnapshot(selected, reason);
+    }
+
+    // These callers keep their retry or native leave when the writer throws.
+    internal static bool TrySaveIfDirtyForLifecycle(RebirthStablePlayerIdentity identity, string reason)
+    {
+        try
+        {
+            return SaveIfDirty(identity, reason);
+        }
+        catch (Exception ex)
+        {
+            AddIssue(identity?.StorageKey, null, "save retained (" + reason + "): " + ex.Message, false);
+            return false;
+        }
     }
 
     public static int SaveAllDirty(string reason)

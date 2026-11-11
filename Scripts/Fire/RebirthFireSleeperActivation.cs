@@ -101,7 +101,8 @@ public static class RebirthFireSleeperActivation
             PrefabInstance prefab = FindPrefab(position);
             if (prefab == null || prefab.sleeperVolumes == null) return;
 
-            EntityPlayer player = FindNearestPlayer(world, position);
+            EntityPlayer player = null;
+            bool playerCaptured = false;
             for (int i = 0; i < prefab.sleeperVolumes.Count; i++)
             {
                 SleeperVolume volume = prefab.sleeperVolumes[i];
@@ -115,6 +116,12 @@ public static class RebirthFireSleeperActivation
                 {
                     QueueCapRejected++;
                     return;
+                }
+
+                if (!playerCaptured)
+                {
+                    player = FindNearestPlayer(world, position);
+                    playerCaptured = true;
                 }
 
                 PendingVolumes.Add(key);

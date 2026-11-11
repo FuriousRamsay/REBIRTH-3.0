@@ -9,7 +9,7 @@ internal static class RebirthCamperCoastPolicy
     {
         if(float.IsNaN(throttle)||float.IsInfinity(throttle)||Math.Abs(throttle)>.001f||motor!=0||
             float.IsNaN(fullBrake)||float.IsInfinity(fullBrake)||fullBrake<=0)return current;
-        return Math.Max(current,fullBrake*.01f);
+        return Math.Max(current,fullBrake*.005f);
     }
 }
 [HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.SetWheelsForces))]

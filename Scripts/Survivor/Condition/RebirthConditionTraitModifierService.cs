@@ -16,12 +16,20 @@ public static class RebirthConditionTraitModifierService
         if (record == null || record.Origin == null || result == null)
             return;
 
+        bool injured = player != null && player.Stats != null &&
+            EffectManager.GetValue(PassiveEffects.HealthMaxBlockage, _entity: player) > 0.01f;
+        ApplyRuntimeComponents(player, metabolism, record, result, injured, IsSeriousIllness(player));
+    }
+
+    internal static void ApplyRuntimeComponents(EntityPlayer player, RebirthMetabolismState metabolism,
+        RebirthWorldCharacterRecord record, RebirthConditionResolvedSnapshot result, bool injured, bool ill)
+    {
+        if (record == null || record.Origin == null || result == null)
+            return;
+
         bool strenuous = metabolism != null && metabolism.SmoothedActivity >= 1.5f;
         bool sprintLike = metabolism != null && metabolism.SmoothedActivity >= 2.5f;
         bool moving = metabolism != null && metabolism.SmoothedActivity >= 0.5f;
-        bool injured = player != null && player.Stats != null &&
-            EffectManager.GetValue(PassiveEffects.HealthMaxBlockage, _entity: player) > 0.01f;
-        bool ill = IsSeriousIllness(player);
         bool encumbered = IsActuallyEncumbered(player);
 
         for (int i = 0; i < record.Origin.TraitIds.Count; i++)

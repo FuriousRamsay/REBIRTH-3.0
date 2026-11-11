@@ -44,7 +44,8 @@ internal static partial class RebirthNpcMetabolismCustody
             var world=GameManager.Instance?.World;if(world==null||world.IsRemote())return null;
             RetireNativeOwnerObservations();if(nativeOwners.Count>=4)return null;
             string save=Path.GetFullPath(GameIO.GetSaveGameDir()),root=Path.Combine(save,"RebirthData","NpcConsumption"),archiveRoot=Path.Combine(save,"RebirthData","NpcConsumptionTerminal");
-            bool playerConsumption=RebirthConsumptionDurableDelivery.InventoryProtocolActive&&Directory.Exists(Path.Combine(save,"RebirthData","PlayerConsumption",RebirthStablePlayerIdentity.ComputeStorageKey(account)));
+            bool playerConsumption=RebirthConsumptionDurableDelivery.InventoryProtocolActive&&RebirthConsumptionDurableDelivery.InventoryOriginalsMayExist(save,account);
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] load candidate playerFolder="+playerConsumption);
             if(!Directory.Exists(root)&&!Directory.Exists(archiveRoot)&&!playerConsumption)return null;
             RequirePath(root);RequirePath(archiveRoot);string path=Path.GetFullPath(Path.Combine(directory,account+"."+PlayerDataFile.EXT));
             if(!RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerPathSafe(path)||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(128L*1024*1024,out var memory))return null;
@@ -68,6 +69,7 @@ internal static partial class RebirthNpcMetabolismCustody
                 }
             }
             if(scope.Originals.Count==0&&scope.MetadataCandidates.Count==0&&!Directory.Exists(archiveRoot)&&!playerConsumption)throw new InvalidDataException("No original owner registration");
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] entered native owner load");
             enteredNpcOwner=scope;return scope;
         }
         catch{scope?.Memory?.Dispose();return null;}
@@ -86,6 +88,7 @@ internal static partial class RebirthNpcMetabolismCustody
         {
             var stream=reader?.BaseStream;if(stream==null||!ReferenceEquals(stream,scope.Stream)||!stream.CanSeek||stream.Position!=5||stream.Length<6||stream.Length>16*1024*1024)return null;
             var bytes=new byte[checked((int)stream.Length)];try{stream.Position=0;int offset=0;while(offset<bytes.Length){int count=stream.Read(bytes,offset,bytes.Length-offset);if(count<1)throw new EndOfStreamException();offset+=count;}}finally{stream.Position=5;}
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] captured native read stream bytes="+bytes.Length);
             scope.Native=bytes;scope.Entered=true;return scope;
         }
         catch{return null;}
@@ -94,36 +97,94 @@ internal static partial class RebirthNpcMetabolismCustody
     {
         if(state is NpcClientRead){ObserveClientNativeRead(reader,run,state);return;}
         if(state is not NpcOwnerLoad scope)return;
-        try{scope.ReadReturned=run&&ReferenceEquals(scope,enteredNpcOwner)&&ReferenceEquals(reader.BaseStream,scope.Stream)&&scope.Stream.Position==scope.Stream.Length;}catch{}
+        try
+        {
+            scope.ReadReturned=run&&ReferenceEquals(scope,enteredNpcOwner)&&ReferenceEquals(reader.BaseStream,scope.Stream)&&
+                scope.Stream.Position==scope.Stream.Length;
+            if(!scope.ReadReturned||!scope.PlayerConsumption)return;
+            scope.PlayerConsumption=false;
+            var data=scope.Data;
+            if(data.bagData==null||data.inventoryData==null||data.buffData==null||
+                data.bagData.Length>4L*1024*1024||data.inventoryData.Length>4L*1024*1024||
+                data.buffData.Length>RebirthRemoteResourcePlacedStationSavedReceipt.MaximumBytes)return;
+            CaptureNativeOwnerInput(scope,data);
+            scope.PlayerConsumption=RebirthRemoteResourcePlacedStationSavedReceipt.TryPlayerConsumptionKeys(scope.Buffs,out var operations)&&operations.Length>0;
+        }
+        catch{}
     }
+
     internal static void ObserveNativeOwnerLoad(PlayerDataFile data,bool run,object state)
     {
         if(state is not NpcOwnerLoad scope)return;
         try
         {
-            if(!run||!ReferenceEquals(scope,enteredNpcOwner)||!scope.ReadReturned||!data.bLoaded||!ReferenceEquals(scope.Data,data)||
-                !scope.Native.SequenceEqual(CaptureNativeOwnerImage(data))||!RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerFileMatches(scope.Path,scope.Native))return;
-            scope.Belt=data.inventoryData.ToArray();scope.Bag=data.bagData.ToArray();scope.Buffs=data.buffData.ToArray();scope.Deaths=data.deaths;scope.Dead=data.bDead;
-            if(!RebirthRemoteResourcePlacedStationSavedReceipt.TryNpcConsumptionKeys(scope.Buffs,out var operations))return;
-            foreach(var operation in operations)
+            if(!run||!ReferenceEquals(scope,enteredNpcOwner)||!scope.ReadReturned||!data.bLoaded||!ReferenceEquals(scope.Data,data))
             {
-                string archivedDirectory=Path.Combine(scope.ArchiveRoot,operation.ToString("N"));RequirePath(archivedDirectory);
-                if(scope.Originals.Keys.Any(path=>Path.GetFileName(path)==operation.ToString("N")))
-                {if(Directory.Exists(archivedDirectory))throw new InvalidDataException("Original pending/archive registrations conflict");continue;}
-                if(!scope.MetadataCandidates.TryGetValue(operation,out var terminalDirectory))
-                {if(!Directory.Exists(archivedDirectory))continue;terminalDirectory=archivedDirectory;}
-                else if(Directory.Exists(archivedDirectory))throw new InvalidDataException("Original metadata namespaces conflict");
-                var prepared=ReadRecord(Path.Combine(terminalDirectory,"prepared.xml"));string text=(string)prepared.Element("original");var original=ParseOriginal(text);
-                if(!Stage(terminalDirectory,"prepared",text)||!Guid.TryParseExact((string)original.Attribute("operation"),"N",out var archivedOperation)||archivedOperation!=operation||(string)original.Attribute("save")!=scope.Save||
-                    scope.Originals.Count>=32||scope.Originals.Values.Sum(value=>(long)value.Length)+text.Length>8L*1024*1024||!IsPositiveTerminal(terminalDirectory,text,original)&&!PositiveNoEffect(terminalDirectory,text)||(string)original.Attribute("owner")!=scope.Account)throw new InvalidDataException("NPC terminal registration changed");
-                scope.Originals.Add(terminalDirectory,text);
+                RebirthDebug.Log("metabolism","[REBIRTH ServingCold] native owner load did not qualify readReturned="+scope.ReadReturned+" loaded="+data.bLoaded);
+                return;
             }
-            scope.MetadataCandidates.Clear();if(scope.Originals.Count==0&&!scope.PlayerConsumption)return;
+            if(!RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerFileMatches(scope.Path,scope.Native))
+            {
+                RebirthDebug.Log("metabolism","[REBIRTH ServingCold] native owner load final file differs");
+                return;
+            }
+
+            // The native Read and ToPlayer must agree on the exact serving inputs.
+            // Unrelated native fields can be normalized when reserialized.
+            scope.PlayerConsumption=scope.PlayerConsumption&&NativeOwnerInput(scope,data);
+            bool npcQualified=false;
+            if(scope.Originals.Count>0||scope.MetadataCandidates.Count>0||Directory.Exists(scope.ArchiveRoot))
+            {
+                try{npcQualified=QualifyNpcNativeOwnerLoad(scope,data);}
+                catch{}
+            }
+            if(!npcQualified)
+            {
+                scope.Originals.Clear();
+                scope.Lives.Clear();
+                scope.LiveByDirectory.Clear();
+                scope.MetadataCandidates.Clear();
+            }
+            if(!scope.PlayerConsumption&&!npcQualified)return;
+
             nativeOwners.Add(data,scope);scope.Loaded=true;
+            RebirthDebug.Log("metabolism","[REBIRTH ServingCold] native owner load retained playerInput="+scope.PlayerConsumption+" npcInput="+npcQualified);
         }
         catch{}
         finally{EndNativeOwnerLoad(state);}
     }
+
+    private static void CaptureNativeOwnerInput(NpcOwnerLoad scope,PlayerDataFile data)
+    {
+        scope.Belt=data.inventoryData.ToArray();
+        scope.Bag=data.bagData.ToArray();
+        scope.Buffs=data.buffData.ToArray();
+        scope.Deaths=data.deaths;
+        scope.Dead=data.bDead;
+    }
+
+    private static bool QualifyNpcNativeOwnerLoad(NpcOwnerLoad scope,PlayerDataFile data)
+    {
+        if(!scope.Native.SequenceEqual(CaptureNativeOwnerImage(data)))return false;
+        if(!scope.PlayerConsumption)CaptureNativeOwnerInput(scope,data);
+        if(!RebirthRemoteResourcePlacedStationSavedReceipt.TryNpcConsumptionKeys(scope.Buffs,out var operations))return false;
+        foreach(var operation in operations)
+        {
+            string archivedDirectory=Path.Combine(scope.ArchiveRoot,operation.ToString("N"));RequirePath(archivedDirectory);
+            if(scope.Originals.Keys.Any(path=>Path.GetFileName(path)==operation.ToString("N")))
+            {if(Directory.Exists(archivedDirectory))throw new InvalidDataException("Original pending/archive registrations conflict");continue;}
+            if(!scope.MetadataCandidates.TryGetValue(operation,out var terminalDirectory))
+            {if(!Directory.Exists(archivedDirectory))continue;terminalDirectory=archivedDirectory;}
+            else if(Directory.Exists(archivedDirectory))throw new InvalidDataException("Original metadata namespaces conflict");
+            var prepared=ReadRecord(Path.Combine(terminalDirectory,"prepared.xml"));string text=(string)prepared.Element("original");var original=ParseOriginal(text);
+            if(!Stage(terminalDirectory,"prepared",text)||!Guid.TryParseExact((string)original.Attribute("operation"),"N",out var archivedOperation)||archivedOperation!=operation||(string)original.Attribute("save")!=scope.Save||
+                scope.Originals.Count>=32||scope.Originals.Values.Sum(value=>(long)value.Length)+text.Length>8L*1024*1024||!IsPositiveTerminal(terminalDirectory,text,original)&&!PositiveNoEffect(terminalDirectory,text)||(string)original.Attribute("owner")!=scope.Account)throw new InvalidDataException("NPC terminal registration changed");
+            scope.Originals.Add(terminalDirectory,text);
+        }
+        scope.MetadataCandidates.Clear();
+        return scope.Originals.Count>0;
+    }
+
     internal static void EndNativeOwnerLoad(object state)
     {
         if(state is not NpcOwnerLoad scope)return;
@@ -152,6 +213,7 @@ internal static partial class RebirthNpcMetabolismCustody
             if(nativeOwners.TryGetValue(data,out var scope)&&run&&scope.HydrationEntered&&ReferenceEquals(scope.Actor,actor)&&ReferenceEquals(actor.world,scope.World)&&NativeOwnerInput(scope,data))
             {
                 scope.Hydrated=true;
+                RebirthDebug.Log("metabolism","[REBIRTH ServingCold] native owner ToPlayer returned with exact inputs");
                 if(scope.PlayerConsumption&&RebirthConsumptionDurableDelivery.ObserveInventoryServerNativeHydration(actor,data,scope.Native,scope.Account,scope.Path)&&scope.Originals.Count==0)
                     ReleaseNativeOwner(scope); // explicit player load has its own retained copy; no NPC original is discarded.
             }

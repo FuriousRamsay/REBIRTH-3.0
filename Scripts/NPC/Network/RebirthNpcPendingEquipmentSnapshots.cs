@@ -10,7 +10,8 @@ internal static partial class RebirthNpcPendingEquipmentSnapshots
     {internal int Entity;internal RebirthNpcStableId Id;internal uint Epoch,Revision;internal ulong Generation;internal Dictionary<RebirthNpcEquipmentSlot,string> Slots;internal DateTime Expires;internal float Next;}
     private static Dictionary<int,Snapshot> pending=new Dictionary<int,Snapshot>();
     private static World context;private static uint epoch,connection;
-    internal static void Reset(){if(pending.Count!=0)throw new InvalidOperationException("Original pending equipment views require typed retirement");pending.Clear();context=null;epoch=connection=0;}
+    private static float nextSweep;
+    internal static void Reset(){if(pending.Count!=0)throw new InvalidOperationException("Original pending equipment views require typed retirement");pending.Clear();context=null;epoch=connection=0;nextSweep=0f;}
     private static void Scope(World world)
     {if(!ReferenceEquals(context,world)||epoch!=RebirthNpcNetworkEpoch.ClientEpoch||connection!=RebirthNpcNetworkEpoch.ClientConnectionEpoch){Reset();context=world;epoch=RebirthNpcNetworkEpoch.ClientEpoch;connection=RebirthNpcNetworkEpoch.ClientConnectionEpoch;}}
     internal static void Receive(World world,int entity,string stable,uint receivedEpoch,ulong generation,uint revision,IDictionary<RebirthNpcEquipmentSlot,string> slots)
@@ -21,7 +22,7 @@ internal static partial class RebirthNpcPendingEquipmentSnapshots
         if(pending.Count>=RebirthNpcNetworkProtocol.MaxBaselineActors&&!pending.ContainsKey(entity))
         {foreach(var stale in pending.Values.Where(value=>value.Expires<=DateTime.UtcNow).ToArray())pending.Remove(stale.Entity);if(pending.Count>=RebirthNpcNetworkProtocol.MaxBaselineActors)return;}
         var snapshot=new Snapshot{Entity=entity,Id=id,Epoch=receivedEpoch,Generation=generation,Revision=revision,Slots=new Dictionary<RebirthNpcEquipmentSlot,string>(slots),Expires=DateTime.UtcNow.AddMinutes(2)};
-        pending[entity]=snapshot;TryApply(world,snapshot);
+        pending[entity]=snapshot;nextSweep=0f;TryApply(world,snapshot);
     }
     private static void TryApply(World world,Snapshot snapshot)
     {
@@ -36,11 +37,45 @@ internal static partial class RebirthNpcPendingEquipmentSnapshots
         pending.Remove(snapshot.Entity);
     }
     internal static void ApplyOnAdded(EntityRebirthNPC npc)
-    {if(npc?.world?.IsRemote()!=true||!ReferenceEquals(npc.world,GameManager.Instance?.World))return;Scope(npc.world);if(pending.TryGetValue(npc.entityId,out var snapshot))TryApply(npc.world,snapshot);}
+    {
+        if(npc?.world?.IsRemote()!=true||!ReferenceEquals(npc.world,GameManager.Instance?.World))return;
+        Scope(npc.world);
+        if(!pending.TryGetValue(npc.entityId,out var snapshot))return;
+        if(snapshot.Expires<=DateTime.UtcNow){pending.Remove(snapshot.Entity);return;}
+        TryApply(npc.world,snapshot);
+    }
     internal static void Tick()
     {
-        var world=GameManager.Instance?.World;if(!ThreadManager.IsMainThread()||world?.IsRemote()!=true)return;Scope(world);float now=UnityEngine.Time.realtimeSinceStartup;int count=0;
-        foreach(var snapshot in pending.Values.ToArray())
-        {if(snapshot.Expires<=DateTime.UtcNow){pending.Remove(snapshot.Entity);continue;}if(now<snapshot.Next)continue;if(count++>=8)break;snapshot.Next=now+.5f;TryApply(world,snapshot);}
+        var world = GameManager.Instance?.World;
+        if (!ThreadManager.IsMainThread() || world?.IsRemote() != true) return;
+        Scope(world);
+        if (pending.Count == 0) return;
+
+        float now = UnityEngine.Time.realtimeSinceStartup;
+        if (now < nextSweep) return;
+
+        nextSweep = now + .5f;
+        int count = 0;
+        DateTime utcNow = DateTime.UtcNow;
+        foreach (var snapshot in pending.Values.ToArray())
+        {
+            if (snapshot.Expires <= utcNow)
+            {
+                pending.Remove(snapshot.Entity);
+                continue;
+            }
+            if (now < snapshot.Next)
+            {
+                nextSweep = Math.Min(nextSweep, snapshot.Next);
+                continue;
+            }
+            if (count++ >= 8)
+            {
+                nextSweep = now;
+                break;
+            }
+            snapshot.Next = now + .5f;
+            TryApply(world, snapshot);
+        }
     }
 }

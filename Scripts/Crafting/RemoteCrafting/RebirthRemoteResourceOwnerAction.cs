@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 
@@ -13,13 +14,41 @@ internal static partial class RebirthRemoteResourceOwnerAction
         internal EntityPlayerLocal Player;internal World World;internal string Directory;internal RebirthRemoteResourceClientOriginal.Intent Original;
         internal RebirthCamperEnergyActorImage Before,After;internal ItemStackGrid Bag,Belt;internal Func<bool> Authorized;
         internal Guid SourceOperation;internal string SourceBinding;internal bool Refund,BlockRefund,BlockingOnly;internal int RefundDeaths;
+        internal int[] CraftBagSlots, CraftBeltSlots;
     }
     private sealed class Permit{internal Hold Hold;internal ItemStackGrid Grid;internal int Slot;internal ItemStack Value;internal bool Used;}
     private static readonly System.Collections.Generic.Dictionary<Guid,Hold> holds=new System.Collections.Generic.Dictionary<Guid,Hold>();
     [ThreadStatic]private static Permit permit;
-    internal static bool IsHeld(EntityPlayerLocal player)=>PlacedCancellationIsHeld(player)||player!=null&&player.IsSpawned()&&!player.IsDead()&&holds.Values.Any(hold=>
+    internal static bool IsHeld(EntityPlayerLocal player)=>PlacedCancellationIsHeld(player)||player!=null&&player.IsSpawned()&&!player.IsDead()&&holds.Values.Any(hold=>InScope(hold,player));
+    private static bool InScope(Hold hold,EntityPlayerLocal player)=>
         ReferenceEquals(hold.Player,player)&&ReferenceEquals(hold.World,GameManager.Instance?.World)&&(hold.Refund?hold.RefundDeaths:hold.Original.Deaths)==player.Died&&
-        hold.Directory==GameIO.GetSaveGameDir()&&hold.Original.World==player.world.worldState.Guid&&hold.Original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player));
+        hold.Directory==GameIO.GetSaveGameDir()&&hold.Original.Creation==RebirthCamperCharacterAccess.CurrentCreation(player)&&
+        (hold.Original.World==RebirthRemoteResourceClientOriginal.ProtocolWorld(player.world,hold.Original.Kind)||hold.Original.World==player.world.worldState.Guid);
+
+    internal static void MarkNativeCraftQueued(EntityPlayerLocal player, RebirthRemoteResourceClientOriginal.Intent original)
+    {
+        if(!holds.TryGetValue(original.Operation,out var hold)||hold.Refund||hold.BlockingOnly||!InScope(hold,player))return;
+        hold.CraftBagSlots=PaidSlots(hold.Before.Bag,hold.After.Bag);
+        hold.CraftBeltSlots=PaidSlots(hold.Before.Belt,hold.After.Belt);
+    }
+
+    private static int[] PaidSlots(ItemStack[] before,ItemStack[] after) =>
+        Enumerable.Range(0,after.Length).Where(slot=>!Same(before[slot],after[slot])).ToArray();
+
+    internal static bool BlocksNativeInventory(EntityPlayerLocal player, ItemStackGrid grid=null, int slot=-1)
+    {
+        if(PlacedCancellationIsHeld(player))return true;
+        if(player==null||!player.IsSpawned()||player.IsDead())return false;
+        foreach(var hold in holds.Values)
+        {
+            if(!InScope(hold,player))continue;
+            if(hold.CraftBagSlots==null)return true;
+            if(grid==null)continue;
+            var paid=ReferenceEquals(grid,hold.Bag)?hold.CraftBagSlots:ReferenceEquals(grid,hold.Belt)?hold.CraftBeltSlots:null;
+            if(paid!=null&&(slot<0?paid.Length!=0:Array.IndexOf(paid,slot)>=0))return true;
+        }
+        return false;
+    }
     internal static bool HoldsOriginalScope(EntityPlayerLocal player,RebirthRemoteResourceClientOriginal.Intent original)=>
         original!=null&&IsHeld(player)&&holds.TryGetValue(original.Operation,out var hold)&&ReferenceEquals(hold.Player,player)&&
         ReferenceEquals(hold.World,player.world)&&hold.Directory==GameIO.GetSaveGameDir()&&hold.Original.Deaths==player.Died&&
@@ -201,7 +230,7 @@ internal static partial class RebirthRemoteResourceOwnerAction
             var controller=entry?.ItemController;var player=controller?.xui?.playerUI?.entityPlayer;
             if(player==null||payment==null||!TryDecodeRepairPaymentIntent(payment.Encode(),out _)||player.Died!=payment.Deaths||
                 !TrySource(entry,out int sourceKind,out int sourceSlot,out string actualInput)||sourceKind!=payment.SourceKind||sourceSlot!=payment.SourceSlot||actualInput!=paidInput||
-                player.world.worldState.Guid!=payment.World||RebirthCamperCharacterAccess.CurrentCreation(player)!=payment.Creation||
+                RebirthRemoteResourceNetworkScope.ProtocolWorld(player.world)!=payment.World||RebirthCamperCharacterAccess.CurrentCreation(player)!=payment.Creation||
                 !RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)||identity.CanonicalId!=payment.CanonicalOwner||
                 RebirthRemoteResourceDurableJournal.Digest(paidInput)!=payment.InputHash)return false;
             var source=controller is XUiC_EquipmentStack equipment?equipment.ItemStack:(controller as IItemStackController)?.ItemStack;
@@ -256,6 +285,29 @@ internal static partial class RebirthRemoteResourceOwnerAction
         }
         catch{return false;}
     }
+    private sealed class LegacyCraftLocation { internal string Directory; }
+    private static readonly ConditionalWeakTable<Recipe,LegacyCraftLocation> legacyCraftLocations=new();
+
+    private static LegacyCraftLocation FindLegacyCraftLocation(EntityPlayerLocal player,Guid operation,string binding)
+    {
+        var location=new LegacyCraftLocation();
+        if(player?.world?.IsRemote()!=true)return location;
+        // Old dedicated clients wrote into their selected local save directory.
+        // Only look for this exact terminal once per restored recipe.
+        string current=Path.GetFullPath(GameIO.GetSaveGameDir());
+        foreach(string directory in Directory.EnumerateDirectories(Path.GetDirectoryName(current)))
+        {
+            if(string.Equals(directory,current,StringComparison.OrdinalIgnoreCase)||
+                !RebirthRemoteResourceClientOriginal.TryReadCraftTerminal(operation,binding,out var terminal,directory)||
+                !Guid.TryParseExact((string)terminal.Attribute("original"),"N",out var originalId)||
+                !RebirthRemoteResourceClientOriginal.TryRead(originalId,out var original,directory)||
+                !RebirthRemoteResourceClientOriginal.Current(player,original))continue;
+            location.Directory=directory;
+            break;
+        }
+        return location;
+    }
+
     internal static bool BlocksPersonalQueue(XUiC_RecipeStack card)
     {
         if(card?.GetParentByType<XUiC_WorkstationWindowGroup>()!=null)return false;
@@ -268,20 +320,39 @@ internal static partial class RebirthRemoteResourceOwnerAction
         {
             var marked=recipe.ingredients.Where(ingredient=>ingredient?.itemValue?.HasMetadata(Marker)==true).ToArray();if(marked.Length!=1)return true;
             var item=marked[0].itemValue;
-            if(!item.TryGetMetadata(Marker,out string operationText)||!Guid.TryParseExact(operationText,"N",out var operation)||
-                !item.TryGetMetadata(BindingMarker,out string binding)||!RebirthRemoteResourceClientOriginal.TryReadCraftTerminal(operation,binding,out var terminal)||
-                !Guid.TryParseExact((string)terminal.Attribute("original"),"N",out var originalId)||!RebirthRemoteResourceClientOriginal.TryRead(originalId,out var original))return true;
             var player=card.xui?.playerUI?.entityPlayer;
+            if(!item.TryGetMetadata(Marker,out string operationText)||!Guid.TryParseExact(operationText,"N",out var operation)||
+                !item.TryGetMetadata(BindingMarker,out string binding))return true;
+            string saveDirectory=null;
+            if(!RebirthRemoteResourceClientOriginal.TryReadCraftTerminal(operation,binding,out var terminal))
+            {
+                if(player?.world?.IsRemote()!=true||!player.IsSpawned()||
+                    string.IsNullOrEmpty(RebirthCamperCharacterAccess.CurrentCreation(player)))return true;
+                saveDirectory=legacyCraftLocations.GetValue(recipe,_=>FindLegacyCraftLocation(player,operation,binding)).Directory;
+                if(saveDirectory==null||!RebirthRemoteResourceClientOriginal.TryReadCraftTerminal(operation,binding,out terminal,saveDirectory))
+                {
+                    // Dedicated client: the paid proof lives only in the server save. Ask the server instead of
+                    // holding the card (and every card behind it) forever.
+                    if(!RebirthLegacyCraftServerRelease.ServerConfirmsUsed(player,operation,binding))return true;
+                    var released=item.Clone();released.Metadata.Remove(Marker);released.Metadata.Remove(BindingMarker);marked[0].itemValue=released;
+                    RebirthDebug.Log("crafting",$"[REBIRTH ContainerCraft] server released saved recipe={recipe.GetName()} operation={operation:N}");
+                    GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);return IsHeld(player);
+                }
+            }
+            if(!Guid.TryParseExact((string)terminal.Attribute("original"),"N",out var originalId)||
+                !RebirthRemoteResourceClientOriginal.TryRead(originalId,out var original,saveDirectory))return true;
             if(!RebirthRemoteResourceClientOriginal.Current(player,original)||RecipeImage(recipe)!=terminal.Element("markedRecipe").Value||
-                card.GetRecipeCount()!=(int)terminal.Attribute("count")||card.OutputQuality!=(int)terminal.Attribute("quality")||
-                !RebirthRemoteResourceClientOriginal.ReadActor(terminal.Element("afterActor").Value).Matches(RebirthCamperEnergyActorImage.Capture(player)))return true;
-            if(holds.TryGetValue(originalId,out var retained)&&(retained.Original.Digest!=original.Digest||retained.SourceOperation!=operation||retained.SourceBinding!=binding))return true;
+                card.GetRecipeCount()!=(int)terminal.Attribute("count")||card.OutputQuality!=(int)terminal.Attribute("quality"))return true;
+            if(holds.TryGetValue(originalId,out var retained)&&(retained.Original.Digest!=original.Digest||retained.Refund||
+                retained.SourceOperation!=Guid.Empty&&(retained.SourceOperation!=operation||retained.SourceBinding!=binding)))return true;
             // Positive host-terminal mirror was flushed before cleanup. Remove
             // only our marker so native cancellation returns original item
-            // metadata and normal native output/cost behavior remains intact.
-            if(!RebirthRemoteResourceClientOriginal.CompleteCraftTerminal(original,operation,binding))return true;
+            // metadata. Other completed crafts may already have changed the bag.
+            if(!RebirthRemoteResourceClientOriginal.CompleteCraftTerminal(original,operation,binding,saveDirectory))return true;
             var clone=item.Clone();clone.Metadata.Remove(Marker);clone.Metadata.Remove(BindingMarker);marked[0].itemValue=clone;
-            holds.Remove(originalId);player.Buffs.SetCustomVar(Receipt(originalId),0f,true);player.Buffs.RemoveCustomVar(Receipt(originalId));
+            holds.Remove(originalId);RebirthRemoteResourceCraftProtocol.ForgetCompleted(originalId);
+            player.Buffs.SetCustomVar(Receipt(originalId),0f,true);player.Buffs.RemoveCustomVar(Receipt(originalId));
+            RebirthDebug.Log("crafting",$"[REBIRTH ContainerCraft] resumed saved recipe={recipe.GetName()} operation={operation:N}");
             GameManager.Instance.SaveLocalPlayerData();GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);return IsHeld(player);
         }
         catch{return true;}
@@ -774,7 +845,8 @@ internal static partial class RebirthRemoteResourceOwnerAction
             if(rows.Length!=1||rows[0].RepairItem!=null&&rows[0].RepairItem.type!=0||rows[0].AmountToRepair!=0||rows[0].Multiplier!=count||rows[0].Quality!=quality||SavedRecipeImage(rows[0].Recipe,captured)!=exactMarkedRecipe)return false;
             // The same final native file must contain both accepted queue and
             // local debit. No second file/cache read can supply either half.
-            if(!after.Matches(actual))return false;
+            var before=RebirthRemoteResourceClientOriginal.ReadActor(original.Copy().Element("actorBefore").Value);
+            if(!RebirthRemoteResourceCraftPlan.MatchesPaidCells(before,after,actual))return false;
             proof=RebirthRemoteResourceDurableJournal.Digest(sourceOperation.ToString("N")+"|"+sourceBinding+"|"+original.Digest+"|"+exactMarkedRecipe+"|"+count+"|"+quality+"|"+RebirthRemoteResourceClientOriginal.ActorImage(after));return true;
         }
         catch{proof=null;return false;}

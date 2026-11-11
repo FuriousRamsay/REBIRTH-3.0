@@ -1,0 +1,29 @@
+{
+  "name": "Character Overview preview lighting and close/reopen",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Prepare an isolated in-world Purge Survivor with menus closed. Run once at verified midnight, then again at verified noon after a visible equipment change to force a new appearance render. For dedicated, set native world time at the host and confirm both peers. Leave guard on. The screenshot and rendering-state replies require visual and lifecycle review." },
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "state", "args": { "sections": "world,rendering,equipment" } } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "waitForWindowOpen": { "window": "crafting", "timeout": 8 } },
+    { "action": { "command": "click", "args": { "window": "crafting", "id": "btnRebirthCraftingTabCharacter" } } },
+    { "waitForWindowOpen": { "window": "rebirthSurvivorCharacter", "timeout": 8 } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorOverviewModel" } },
+    { "expectLog": { "contains": "[CharacterModel] full-body bounds=" } },
+    { "screenshot": "character_preview_fresh" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoUi": { "window": "rebirthSurvivorCharacter", "id": "survivorOverviewModel" } },
+    { "action": { "command": "state", "args": { "sections": "world,rendering,equipment" } } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "waitForWindowOpen": { "window": "crafting", "timeout": 8 } },
+    { "action": { "command": "click", "args": { "window": "crafting", "id": "btnRebirthCraftingTabCharacter" } } },
+    { "waitForWindowOpen": { "window": "rebirthSurvivorCharacter", "timeout": 8 } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorOverviewModel" } },
+    { "screenshot": "character_preview_reopen" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoUi": { "window": "rebirthSurvivorCharacter", "id": "survivorOverviewModel" } },
+    { "action": { "command": "state", "args": { "sections": "world,rendering,equipment" } } },
+    { "expectNoErrors": true }
+  ]
+}

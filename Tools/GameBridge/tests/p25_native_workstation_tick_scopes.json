@@ -1,0 +1,78 @@
+{
+  "name": "p25_native_workstation_tick_scopes",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, Guard ON, no UI. Native placed Workbench at 18,45,995 with one real accepted ordinary Cooler row already queued and captured by authority. Prepare 4\u20137 seconds remaining at first observation, empty output and exactly one paid application. Queue preparation uses actual native Craft outside this observation."
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "queueCount",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "output",
+        "item": "cntCoolerVariantHelper",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "station": {
+        "x": 18,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "wait": 10
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 18,
+        "y": 45,
+        "z": 995,
+        "station": "workbench",
+        "field": "output",
+        "item": "cntCoolerVariantHelper",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "station": {
+        "x": 18,
+        "y": 45,
+        "z": 995
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Verify one native receipt and intact ingredient debit separately. This is a positive native scope smoke for both solo and remote. Pair explicit native prefix veto, exception, nested station and both attached observer checks with a diagnostic fixture. Keep runtime disabled reviewed feature labels exact."
+    }
+  ]
+}

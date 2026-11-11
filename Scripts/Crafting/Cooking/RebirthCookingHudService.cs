@@ -17,6 +17,7 @@ public static class RebirthCookingHudService
 [Preserve]
 public sealed class XUiC_RebirthCookingHud : XUiController
 {
+    private const int CruiseRowStep = 36;
     private sealed class Card
     {
         public XUiController Root;
@@ -40,10 +41,12 @@ public sealed class XUiC_RebirthCookingHud : XUiController
     private World world;
     private EntityPlayerLocal owner;
     private XUiView cachedRoot;
+    private XUiView cruiseHud;
+    private XUiV_Label cruiseLabel;
     private XUiController ammoHud, pickupHud;
     private bool active, inFlight, dirty = true;
     private string lastXml, pendingXml;
-    private int generation, displayed, lastRows = -1, lastColumns = -1;
+    private int generation, displayed, lastRows = -1, lastColumns = -1, cruiseMode;
     private bool lastVisible;
     private float nextRefresh, nextDiscovery;
 
@@ -64,7 +67,8 @@ public sealed class XUiC_RebirthCookingHud : XUiController
     public override void Cleanup()
     {
         active = false; ResetPresentation(); world = null; owner = null;
-        cachedRoot = null; Array.Clear(cards, 0, cards.Length); base.Cleanup();
+        cachedRoot = cruiseHud = null; cruiseLabel = null;
+        Array.Clear(cards, 0, cards.Length); base.Cleanup();
     }
     private void ResetPresentation()
     {
@@ -74,6 +78,7 @@ public sealed class XUiC_RebirthCookingHud : XUiController
     }
     private void HideCards()
     {
+        SetCruiseMode(0);
         var overflow = GetChildById("cookingHudOverflow")?.ViewComponent;
         if(overflow != null) overflow.IsVisible = false;
         for (int i = 0; i < displayed; i++)
@@ -86,7 +91,13 @@ public sealed class XUiC_RebirthCookingHud : XUiController
         bool rebound = !ReferenceEquals(cachedRoot, ViewComponent);
         if (!rebound && now < nextDiscovery) return;
         nextDiscovery = now + 1f;
-        if (rebound) { HideCards(); cachedRoot = ViewComponent; Array.Clear(cards, 0, cards.Length); dirty = true; }
+        if (rebound)
+        {
+            HideCards(); cachedRoot = ViewComponent; Array.Clear(cards, 0, cards.Length); dirty = true;
+            var cruise = GetChildById("rebirthCruiseControlHud");
+            cruiseHud = cruise?.ViewComponent;
+            cruiseLabel = cruise?.GetChildById("cruiseMode")?.ViewComponent as XUiV_Label;
+        }
         // Positive references are reused; only missing entries retry. A recreated root invalidates
         // the whole pool. This fixed-pool lookup is not performed in an ordinary frame.
         for (int i = 0; i < cards.Length; i++)
@@ -120,6 +131,7 @@ public sealed class XUiC_RebirthCookingHud : XUiController
         }
         float now = UnityEngine.Time.realtimeSinceStartup;
         Discover(now);
+        SetCruiseMode(cruiseHud != null ? RebirthNativeControls.GetCruiseState(player) : 0);
         if (!lastVisible) { dirty = true; nextRefresh = 0f; }
         lastVisible = true;
         if (!inFlight && now >= nextRefresh)
@@ -153,9 +165,10 @@ public sealed class XUiC_RebirthCookingHud : XUiController
         // Count-based, row-major cards immediately above the minimap.
         Vector2i screen = xui.GetXUiScreenSize();
         int columns = jobs.Count <= 1 ? 1 : jobs.Count <= 4 ? 2 : jobs.Count <= 6 ? 3 : 4;
-        int rows = Math.Max(1, (screen.y - 70 - 247) / 64 + 1);
+        int cruiseOffset = cruiseMode != 0 ? CruiseRowStep : 0;
+        int rows = Math.Max(1, (screen.y - 70 - 247 - cruiseOffset) / 64 + 1);
         if (lastRows != rows || lastColumns != columns) { lastRows = rows; lastColumns = columns; dirty = true; }
-        PositionHud(columns);
+        PositionHud(columns, cruiseOffset);
         if (!dirty) return;
         dirty = false;
         int count = Math.Min(Math.Min(cards.Length, rows * columns), jobs.Count), end = Math.Max(displayed, count);
@@ -168,7 +181,7 @@ public sealed class XUiC_RebirthCookingHud : XUiController
             if (!show) continue;
             int left = (i % columns) * 245 / columns, right = ((i % columns) + 1) * 245 / columns;
             int width = right - left - (i % columns == columns - 1 ? 0 : 4);
-            SetPosition(card.Root.ViewComponent, new Vector2i(-255 + left, 247 + (i / columns) * 64));
+            SetPosition(card.Root.ViewComponent, new Vector2i(-255 + left, 247 + cruiseOffset + (i / columns) * 64));
             Layout(card, width, columns > 1);
             Job job = jobs[i];
             string status = job.Status.StartsWith("OVERCOOKING", StringComparison.Ordinal) ? "Burning" : job.Status.StartsWith("EVAPORATING", StringComparison.Ordinal) ? "Evaporating" : job.Status.StartsWith("EVAPORATED", StringComparison.Ordinal) ? "Evaporated" : job.Status.StartsWith("READY", StringComparison.Ordinal) ? "Ready" : job.Status == "BURNT" ? "Burnt" : job.Status.StartsWith("PAUSED", StringComparison.Ordinal) ? "Paused" : "Cooking";
@@ -183,11 +196,24 @@ public sealed class XUiC_RebirthCookingHud : XUiController
         var overflow = GetChildById("cookingHudOverflow")?.ViewComponent as XUiV_Label;
         if (overflow != null)
         {
+            SetPosition(overflow, new Vector2i(-595, 183 + cruiseOffset));
             overflow.IsVisible = jobs.Count > count;
             if (overflow.IsVisible) SetText(overflow, string.Format(Localization.Get("rebirthCookingHudOverflow"), jobs.Count - count));
         }
     }
-    private void PositionHud(int columns)
+    private void SetCruiseMode(int mode)
+    {
+        if (cruiseMode == mode) return;
+        cruiseMode = mode;
+        dirty = true;
+        if (cruiseHud != null) cruiseHud.IsVisible = mode != 0;
+        if (mode == 0 || cruiseLabel == null) return;
+        bool turbo = mode == 2;
+        SetText(cruiseLabel, Localization.Get(turbo ? "ttCruiseFast" : "ttCruiseNormal"));
+        cruiseLabel.Color = turbo ? new Color32(146, 218, 137, 255) : new Color32(242, 236, 167, 255);
+    }
+
+    private void PositionHud(int columns, int cruiseOffset)
     {
         if (ammoHud == null || pickupHud == null)
         {
@@ -201,10 +227,10 @@ public sealed class XUiC_RebirthCookingHud : XUiController
         int visibleCount = Math.Min(jobs.Count, Math.Min(cards.Length, lastRows * columns));
         int top = visibleCount > 0 ? 247 + ((visibleCount - 1) / columns) * 64 : 228;
         int ammoY = visibleCount > 0 ? top + 54 : 228;
-        if (ammoHud?.ViewComponent != null) SetPosition(ammoHud.ViewComponent, new Vector2i(-194, ammoY));
+        if (ammoHud?.ViewComponent != null) SetPosition(ammoHud.ViewComponent, new Vector2i(-194, ammoY + cruiseOffset));
         bool ammoVisible = ammoHud?.Children != null && ammoHud.Children.Count > 0 && ammoHud.Children[0].ViewComponent?.IsVisible == true;
         int pickupY = visibleCount > 0 ? top + 24 + (ammoVisible ? 14 : 0) : ammoVisible ? ammoY + 14 : 223;
-        if (pickupHud?.ViewComponent != null) SetPosition(pickupHud.ViewComponent, new Vector2i(-90, pickupY));
+        if (pickupHud?.ViewComponent != null) SetPosition(pickupHud.ViewComponent, new Vector2i(-90, pickupY + cruiseOffset));
     }
     private static void Layout(Card card, int width, bool compact)
     {

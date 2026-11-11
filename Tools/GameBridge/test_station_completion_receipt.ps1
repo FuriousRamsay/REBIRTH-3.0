@@ -1,24 +1,111 @@
 #requires -Version 7.0
+param([string]$Root=(Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),[string]$SourceRoot=$Root)
 $ErrorActionPreference='Stop'
-$root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$source=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Crafting/UI/RebirthStationCompletionReceipt.cs'))
-$scope=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Survivor/Network/RebirthSurvivorRequestScope.cs')).Replace('using System;','')
-$capture=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Crafting/UI/RebirthStationCompletionCapture.cs')).Replace('using System;','')
-$delta=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Crafting/UI/RebirthStationOutputDelta.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','')
-$terminal=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Survivor/Persistence/RebirthStationTerminalContents.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','').Replace('using System.IO;','')
+$source=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/UI/RebirthStationCompletionReceipt.cs')) -replace '(?m)^using System(?:\.Collections\.Generic)?;\r?\n',''
+$scope=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Survivor/Network/RebirthSurvivorRequestScope.cs')).Replace('using System;','')
+$capture=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/UI/RebirthStationCompletionCapture.cs')).Replace('using System;','')
+$delta=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/UI/RebirthStationOutputDelta.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','').Replace('using System.Linq;','')
+$terminal=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Survivor/Persistence/RebirthStationTerminalContents.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','').Replace('using System.IO;','')
 $terminal=$terminal.Replace('MemoryPools.poolBinaryReader.AllocSync(true)','new BinaryReader(stream,System.Text.Encoding.UTF8,true)').Replace('reader.SetBaseStream(stream);','')
-$expectation=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Survivor/Persistence/RebirthStationTerminalExpectation.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','')
-$terminalSnapshot=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Crafting/UI/RebirthStationTerminalSnapshot.cs')).Replace('using System;','').Replace('using System.IO;','').Replace('MemoryPools.poolBinaryWriter.AllocSync(true)','new BinaryWriter(stream,System.Text.Encoding.UTF8,true)').Replace('writer.SetBaseStream(stream);','')
-$inputSnapshot=[IO.File]::ReadAllText((Join-Path $root 'Scripts/Crafting/UI/RebirthStationNativeInputSnapshot.cs')).Replace('using System;','').Replace('using System.IO;','').Replace('MemoryPools.poolBinaryWriter.AllocSync(true)','new BinaryWriter(stream,System.Text.Encoding.UTF8,true)').Replace('writer.SetBaseStream(stream);','')
+$expectation=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Survivor/Persistence/RebirthStationTerminalExpectation.cs')).Replace('using System;','').Replace('using System.Collections.Generic;','')
+$terminalSnapshot=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/UI/RebirthStationTerminalSnapshot.cs')).Replace('using System;','').Replace('using System.IO;','').Replace('MemoryPools.poolBinaryWriter.AllocSync(true)','new BinaryWriter(stream,System.Text.Encoding.UTF8,true)').Replace('writer.SetBaseStream(stream);','')
+$inputSnapshot=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/UI/RebirthStationNativeInputSnapshot.cs')).Replace('using System;','').Replace('using System.IO;','').Replace('MemoryPools.poolBinaryWriter.AllocSync(true)','new BinaryWriter(stream,System.Text.Encoding.UTF8,true)').Replace('writer.SetBaseStream(stream);','')
+$integration=[IO.File]::ReadAllText((Join-Path $SourceRoot 'Scripts/Crafting/Recycling/RebirthRecipeOutputIntegration.cs'))
+function Slice([string]$start,[string]$end){
+    $i=$integration.IndexOf($start,[StringComparison]::Ordinal)
+    $j=if($i -ge 0){$integration.IndexOf($end,$i,[StringComparison]::Ordinal)}else{-1}
+    if($i -lt 0 -or $j -le $i){throw "Native receipt method boundary missing: $start"}
+    $integration.Substring($i,$j-$i)
+}
+$receiptMethods='public static class RebirthRecipeOutputIntegration { internal const string ReceiptField="outputs";'+
+    (Slice '    internal static bool Predict(' '    // Native cached Update')+
+    (Slice '    internal static bool StampReceipt(' '    internal static bool BeginUi(')+'}'
 $double=@"
 public class TileEntityWorkstation{public RecipeQueueItem[] Queue;public ItemStack[] Output;public System.Collections.Generic.List<CraftCompleteData> CraftCompleteList;public bool FailNotify;public int Notifications;public void SetModified(){Notifications++;if(FailNotify)throw new Exception("notify fault");}}public static class RebirthStationObservationDispatcher{public static bool Verified=true;public static RebirthStationGridAdmission Admission;public static bool TryGetVerifiedQueuedAdmission(TileEntityWorkstation s,RecipeQueueItem q,out RebirthStationGridAdmission a){a=Admission;return Verified;}}public class ItemClass{public bool HasQuality=true;}
 public class ItemValue{public int type=7,Quality=4;public ItemClass ItemClass=new ItemClass();public System.Collections.Generic.Dictionary<string,object> Metadata=new System.Collections.Generic.Dictionary<string,object>();public bool TryGetMetadata<T>(string k,out T value){object raw;if(Metadata.TryGetValue(k,out raw)&&raw is T){value=(T)raw;return true;}value=default(T);return false;}public bool HasMetadata(string k){return Metadata.ContainsKey(k);}public void SetMetadata(string k,object v){Metadata[k]=v;}public ItemValue Clone(){return new ItemValue{type=type,Quality=Quality,ItemClass=ItemClass,Metadata=new System.Collections.Generic.Dictionary<string,object>(Metadata)};}}
-public class ItemStack{public ItemStack Clone(){return new ItemStack(itemValue.Clone(),count);}public ItemStack(){}public void Write(BinaryWriter w){w.Write(itemValue.type);w.Write(itemValue.Quality);w.Write(count);w.Write(itemValue.Metadata.Count);foreach(var pair in itemValue.Metadata){w.Write(pair.Key);w.Write(pair.Value is int);if(pair.Value is int)w.Write((int)pair.Value);else w.Write((string)pair.Value);}}public ItemStack Read(BinaryReader reader){itemValue=new ItemValue{type=reader.ReadInt32(),Quality=reader.ReadInt32()};count=reader.ReadInt32();int entries=reader.ReadInt32();for(int i=0;i<entries;i++){string key=reader.ReadString();bool integer=reader.ReadBoolean();itemValue.Metadata[key]=integer?(object)reader.ReadInt32():reader.ReadString();}return this;}public ItemValue itemValue;public int count;public ItemStack(ItemValue v,int c){itemValue=v;count=c;}}
+public class ItemStack{public static ItemStack[] Clone(ItemStack[] a){return a.Select(x=>x.Clone()).ToArray();}public bool IsEmpty(){return count<=0||itemValue.type<=0;}public bool CanStackWith(ItemStack other){return !IsEmpty()&&RebirthStationGridIngredients.IsSameStackSnapshot(this,new ItemStack(other.itemValue,count));}public ItemStack Clone(){return new ItemStack(itemValue.Clone(),count);}public ItemStack(){}public void Write(BinaryWriter w){w.Write(itemValue.type);w.Write(itemValue.Quality);w.Write(count);w.Write(itemValue.Metadata.Count);foreach(var pair in itemValue.Metadata){w.Write(pair.Key);w.Write(pair.Value is int);if(pair.Value is int)w.Write((int)pair.Value);else w.Write((string)pair.Value);}}public ItemStack Read(BinaryReader reader){itemValue=new ItemValue{type=reader.ReadInt32(),Quality=reader.ReadInt32()};count=reader.ReadInt32();int entries=reader.ReadInt32();for(int i=0;i<entries;i++){string key=reader.ReadString();bool integer=reader.ReadBoolean();itemValue.Metadata[key]=integer?(object)reader.ReadInt32():reader.ReadString();}return this;}public ItemValue itemValue;public int count;public ItemStack(ItemValue v,int c){itemValue=v;count=c;}}
 public static class RebirthStationGridIngredients{public static bool IsSameStackSnapshot(ItemStack a,ItemStack b){if(a.count!=b.count||a.itemValue.type!=b.itemValue.type||a.itemValue.Quality!=b.itemValue.Quality||a.itemValue.Metadata.Count!=b.itemValue.Metadata.Count)return false;foreach(var p in a.itemValue.Metadata){object v;if(!b.itemValue.Metadata.TryGetValue(p.Key,out v)||!object.Equals(p.Value,v))return false;}return true;}}public class Recipe{public int itemValueType=7,count=12,craftExpGain=8;public string GetName(){return "recipe";}}
 public class RecipeQueueItem{public Recipe Recipe=new Recipe();public int StartingEntityId=42;public int Multiplier=1;public byte Quality=4;}
 public class CraftCompleteData{public int CrafterEntityID,CraftExpGain;public ushort RecipeUsedCount;public ItemStack CraftedItemStack;public string RecipeName,ItemScrapped;public CraftCompleteData(int id,ItemStack s,string r,string scrap,int xp,ushort used){CrafterEntityID=id;CraftedItemStack=s;RecipeName=r;ItemScrapped=scrap;CraftExpGain=xp;RecipeUsedCount=used;}}
 public class RebirthStationGridAdmission{public bool IsPublicationAttempted=true,Match=true;public string JobId=Guid.NewGuid().ToString("N"),CreationId=Guid.NewGuid().ToString("N"),DefinitionId=new string('a',64);public RebirthStationGridAdmission Clone(){return new RebirthStationGridAdmission{IsPublicationAttempted=IsPublicationAttempted,Match=Match,JobId=JobId,CreationId=CreationId,DefinitionId=DefinitionId};}public bool TryMaterialize(IList<Recipe> definitions,out Recipe recipe,out ItemStack[] before,out ItemStack[] after){recipe=new Recipe{count=definitions[0].count,itemValueType=definitions[0].itemValueType,craftExpGain=definitions[0].craftExpGain};before=after=null;return Match;}public bool MatchesQueuedQuality(Recipe r,int m,int q){return Match&&m==1&&q==4;}}
-public static class ReceiptBuilderFixture{static int checks;static void Check(bool b){checks++;if(!b)throw new Exception("receipt assertion");}public static string Run(){var a=new RebirthStationGridAdmission();var q=new RecipeQueueItem();var output=new ItemValue();CraftCompleteData r;
+internal sealed class RebirthStationCompletionOriginalScope
+{
+ internal readonly TileEntityWorkstation Station;
+ internal readonly RebirthStationGridAdmission Admission;
+ private readonly RecipeQueueItem active;
+ private readonly Recipe recipe;
+ private readonly int thread;
+ private RebirthStationCompletionOriginalScope(TileEntityWorkstation station,RecipeQueueItem row,RebirthStationGridAdmission admission)
+ {Station=station;Admission=admission.Clone();active=row;recipe=row.Recipe;thread=Environment.CurrentManagedThreadId;}
+ internal static bool TryCapture(TileEntityWorkstation station,RecipeQueueItem row,out RebirthStationCompletionOriginalScope scope)
+ {
+  scope=null;
+  if(!RebirthStationObservationDispatcher.TryGetVerifiedQueuedAdmission(station,row,out var admission))return false;
+  var candidate=new RebirthStationCompletionOriginalScope(station,row,admission);
+  if(!candidate.IsCurrent())return false;
+  scope=candidate;return true;
+ }
+ internal bool IsCurrent()
+ {
+  return thread==Environment.CurrentManagedThreadId&&Station.Queue!=null&&Station.Queue.Length>0&&
+   ReferenceEquals(active,Station.Queue[Station.Queue.Length-1])&&ReferenceEquals(recipe,active.Recipe)&&
+   RebirthStationObservationDispatcher.TryGetVerifiedQueuedAdmission(Station,active,out var current)&&current.JobId==Admission.JobId;
+ }
+}
+public static class RebirthNativeItemCodec
+{
+ public static string Encode(ItemValue value)=>Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(new[]{new ItemStack(value,1)}));
+}
+public static class RebirthNativeItemConformanceReader
+{
+ public static bool TryDecodeStationCompletions(byte[] bytes,out CraftCompleteData[] values)
+ {
+  values=null;
+  try{using(var s=new MemoryStream(bytes))using(var r=new BinaryReader(s)){
+   int count=r.ReadInt16();if(count<1)return false;
+   var rows=new CraftCompleteData[count];for(int i=0;i<count;i++){if(r.ReadUInt16()!=1)return false;s.Position-=2;rows[i]=new CraftCompleteData();rows[i].Read(r);}
+   if(s.Position!=s.Length)return false;values=rows;return true;
+  }}catch{return false;}
+ }
+ public static bool TryDecodeStackArrayV1(string text,int expected,int maximumBytes,int maximumText,out ItemStack[] output)
+ {
+  output=null;
+  try{var bytes=Convert.FromBase64String(text);if(bytes.Length>maximumBytes||text.Length>maximumText)return false;
+   using(var s=new MemoryStream(bytes))using(var r=new BinaryReader(s)){
+    if(r.ReadByte()!=1||r.ReadByte()!=expected)return false;
+    var rows=new ItemStack[expected];for(int i=0;i<expected;i++)rows[i]=new ItemStack().Read(r);
+    if(s.Position!=s.Length)return false;output=rows;return true;
+   }
+  }catch{return false;}
+ }
+}
+public static class RebirthRecipeOutputs
+{
+ public static IReadOnlyList<ItemStack> Extras=Array.Empty<ItemStack>();
+ public static bool HasOutputs(Recipe r){return Extras.Count>0;}
+ public static bool TryPlan(Recipe r,int count,out IReadOnlyList<ItemStack> outputs,out string reason){outputs=Extras;reason=null;return true;}
+}
+public static class RebirthCamperInventorySnapshot
+{
+ public static int Restores;
+ public static byte[] Capture(ItemStack[] values)
+ {
+  using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream)){
+   writer.Write(values.Length);foreach(var value in values)value.Write(writer);writer.Flush();return stream.ToArray();
+  }
+ }
+ public static ItemStack[] Restore(byte[] bytes)
+ {
+  Restores++;
+  using(var stream=new MemoryStream(bytes))using(var reader=new BinaryReader(stream)){
+   int count=reader.ReadInt32();
+   if(count<0||count>65)throw new InvalidDataException();
+   var values=new ItemStack[count];for(int i=0;i<count;i++)values[i]=new ItemStack().Read(reader);
+   return values;
+  }
+ }
+}
+public static class ReceiptBuilderFixture{static int checks;static void Check(bool b){checks++;if(!b)throw new Exception("receipt assertion "+checks);}public static string Run(){var a=new RebirthStationGridAdmission();var q=new RecipeQueueItem();var output=new ItemValue();CraftCompleteData r;
 Check(RebirthStationCompletionReceipt.TryCreate(a,q,output,12,out r)&&r.CrafterEntityID==42&&r.CraftExpGain==8&&r.RecipeUsedCount==1&&r.CraftedItemStack.count==12&&r.CraftedItemStack.itemValue.HasMetadata(RebirthStationCompletionReceipt.Prefix+"job")&&!output.HasMetadata(RebirthStationCompletionReceipt.Prefix+"job")&&!object.ReferenceEquals(r.CraftedItemStack.itemValue,output));
 Check(!RebirthStationCompletionReceipt.TryCreate(a,q,output,13,out r)&&r==null);output.type=8;Check(!RebirthStationCompletionReceipt.TryCreate(a,q,output,12,out r));output.type=7;
 output.Quality=5;Check(!RebirthStationCompletionReceipt.TryCreate(a,q,output,12,out r));output.ItemClass.HasQuality=false;Check(RebirthStationCompletionReceipt.TryCreate(a,q,output,12,out r));output.ItemClass.HasQuality=true;output.Quality=4;
@@ -115,6 +202,30 @@ legacyReceipt.CraftedItemStack.itemValue.SetMetadata(RebirthStationCompletionRec
 legacyAdmission.CreationId="legacy-"+new string('b',63);Check(!RebirthStationCompletionReceipt.TryCreate(legacyAdmission,q,new ItemValue(),12,out legacyReceipt)&&legacyReceipt==null);
 legacyAdmission.CreationId=Guid.NewGuid().ToString("D");Check(!RebirthStationCompletionReceipt.TryCreate(legacyAdmission,q,new ItemValue(),12,out legacyReceipt));
 legacyAdmission.CreationId=Guid.Empty.ToString("N");Check(!RebirthStationCompletionReceipt.TryCreate(legacyAdmission,q,new ItemValue(),12,out legacyReceipt));
+var extra=new ItemStack(new ItemValue{type=8},2);
+RebirthRecipeOutputs.Extras=new[]{extra};
+Check(RebirthStationCompletionReceipt.TryCreate(a,q,new ItemValue(),12,out var addedReceipt));
+var startCells=new[]{new ItemStack(new ItemValue{type=0},0),new ItemStack(new ItemValue{type=0},0)};
+var afterCells=new[]{new ItemStack(new ItemValue(),12),extra.Clone()};
+RebirthCamperInventorySnapshot.Restores=0;
+Check(RebirthStationOutputDelta.Matches(startCells,afterCells,addedReceipt));
+Check(RebirthCamperInventorySnapshot.Restores==1);
+RebirthCamperInventorySnapshot.Restores=0;
+Check(RebirthStationCompletionReceipt.TryReadIdentity(addedReceipt,out identity)&&RebirthCamperInventorySnapshot.Restores==1);
+var field=RebirthStationCompletionReceipt.Prefix+RebirthRecipeOutputIntegration.ReceiptField;
+string canonical;
+Check(addedReceipt.CraftedItemStack.itemValue.TryGetMetadata(field,out canonical));
+addedReceipt.CraftedItemStack.itemValue.SetMetadata(field,canonical+" ");
+Check(!RebirthStationOutputDelta.Matches(startCells,afterCells,addedReceipt));
+addedReceipt.CraftedItemStack.itemValue.SetMetadata(field,"malformed");
+Check(!RebirthStationCompletionReceipt.TryReadIdentity(addedReceipt,out identity));
+Check(!RebirthStationOutputDelta.Matches(startCells,afterCells,addedReceipt));
+addedReceipt.CraftedItemStack.itemValue.SetMetadata(field,3);
+Check(!RebirthStationOutputDelta.Matches(startCells,afterCells,addedReceipt));
+addedReceipt.CraftedItemStack.itemValue.Metadata.Remove(field);
+Check(RebirthRecipeOutputIntegration.ReadReceipt(addedReceipt,out var emptyExtras)&&ReferenceEquals(emptyExtras,Array.Empty<ItemStack>()));
+Check(RebirthStationOutputDelta.Matches(startCells,new[]{afterCells[0],startCells[1]},addedReceipt));
+Check(!RebirthStationOutputDelta.Matches(startCells,afterCells,addedReceipt));
 return "PASS "+checks+" actual receipt/capture checks plus exact native CraftCompleteData.Write/Read algorithms with item/admission doubles; no native ItemValue/disk/output settlement";}}
 "@
 # Extract exact native completion record Write/Read algorithms; ItemStack/ItemValue remain explicit doubles.
@@ -124,5 +235,5 @@ if($begin-lt0-or$finish-lt$begin){throw 'Native completion codec boundary missin
 $methods=$native.Substring($begin,$finish-$begin).Replace('PooledBinaryWriter','BinaryWriter').Replace('PooledBinaryReader','BinaryReader')
 # Pool signatures are fixture adapters only; actual installed codec method bodies are retained.
 $double=$double.Replace('RecipeUsedCount=used;}}','RecipeUsedCount=used;}public CraftCompleteData(){}'+$methods+'}')
-Add-Type -TypeDefinition ('using System.IO;using System.Collections.Generic;'+$source+$scope+$capture+$delta+$terminal+$expectation+$terminalSnapshot+$inputSnapshot+$double)
+Add-Type -TypeDefinition ('using System;using System.IO;using System.Collections.Generic;using System.Linq;'+$source+$scope+$capture+$delta+$terminal+$expectation+$terminalSnapshot+$inputSnapshot+$receiptMethods+$double)
 [ReceiptBuilderFixture]::Run()

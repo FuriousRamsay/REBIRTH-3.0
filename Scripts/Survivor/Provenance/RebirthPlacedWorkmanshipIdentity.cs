@@ -28,11 +28,35 @@ internal static class RebirthPlacedWorkmanshipIdentity
     private static Chunk ChunkAt(WorldBase world,Vector3i position)=>world?.GetChunkSync(World.toChunkXZ(position.x),World.toChunkXZ(position.z)) as Chunk;
     private static bool Current(WorldBase world,Chunk chunk)=>ThreadManager.IsMainThread()&&world!=null&&!world.IsRemote()&&ReferenceEquals(GameManager.Instance?.World,world)&&chunk!=null&&!chunk.InProgressUnloading;
     internal static string NativeKey(Vector3i position)=>Key(position);
-    internal static byte[] CopyMarker(WorldBase world,Vector3i position){if(Read(world,position)==null)return null;var bytes=ChunkAt(world,position).ChunkCustomData.dict[Key(position)].data;return bytes==null?null:(byte[])bytes.Clone();}
-    internal static string Read(WorldBase world,Vector3i position)
+    internal static byte[] CopyMarker(WorldBase world, Vector3i position)
+        => TryReadMarker(world, position, out var bytes, out _, out _) ? (byte[])bytes.Clone() : null;
+
+    internal static string Read(WorldBase world, Vector3i position)
+        => TryReadMarker(world, position, out _, out var id, out _) ? id.ToString("N") : null;
+
+    private static bool TryReadMarker(WorldBase world, Vector3i position, out byte[] bytes, out Guid id, out BlockValue block)
     {
-        var chunk=ChunkAt(world,position);if(!Current(world,chunk)||!chunk.ChunkCustomData.dict.TryGetValue(Key(position),out var marker)||marker?.data==null||marker.data.Length<19||marker.expiresInWorldTime!=ulong.MaxValue||marker.isSavedToNetwork||marker.TriggerWriteDataDelegate!=null)return null;
-        var bytes=marker.data;if(BitConverter.ToUInt16(bytes,16)!=world.GetBlock(position).type)return null;var guidBytes=new byte[16];Array.Copy(bytes,guidBytes,16);var id=new Guid(guidBytes);return id==Guid.Empty?null:id.ToString("N");
+        bytes = null;
+        id = Guid.Empty;
+        block = default;
+
+        var chunk = ChunkAt(world, position);
+        if (!Current(world, chunk) || !chunk.ChunkCustomData.dict.TryGetValue(Key(position), out var marker) ||
+            marker == null || marker.expiresInWorldTime != ulong.MaxValue || marker.isSavedToNetwork ||
+            marker.TriggerWriteDataDelegate != null) return false;
+
+        var data = marker.data;
+        if (data == null || data.Length < 19) return false;
+
+        block = world.GetBlock(position);
+        if (BitConverter.ToUInt16(data, 16) != block.type) return false;
+
+        var guidBytes = new byte[16];
+        Array.Copy(data, guidBytes, guidBytes.Length);
+        id = new Guid(guidBytes);
+        if (id == Guid.Empty) return false;
+        bytes = data;
+        return true;
     }
     internal static bool Matches(WorldBase world,RebirthPlacedWorkmanshipRecord record)=>record!=null&&!string.IsNullOrEmpty(record.SourceIncarnation)&&Read(world,record.Position)==record.SourceIncarnation;
     private static bool Write(WorldBase world,Vector3i position,string id,RebirthPlacedWorkmanshipRecord record)
@@ -57,8 +81,9 @@ internal static class RebirthPlacedWorkmanshipIdentity
     internal static bool Store(WorldBase world,RebirthPlacedWorkmanshipRecord record)=>Matches(world,record)&&Write(world,record.Position,record.SourceIncarnation,record);
     internal static RebirthPlacedWorkmanshipRecord ReadRecord(WorldBase world,Vector3i position)
     {
-        string id=Read(world,position);if(id==null)return null;
-        return Decode(ChunkAt(world,position).ChunkCustomData.dict[Key(position)].data,id,position,world.GetBlock(position).Block.GetBlockName());
+        if (!TryReadMarker(world, position, out var bytes, out var id, out var block)) return null;
+        var definition = block.Block;
+        return definition == null ? null : Decode(bytes, id.ToString("N"), position, definition.GetBlockName());
     }
     private static RebirthPlacedWorkmanshipRecord Decode(byte[] bytes,string id,Vector3i position,string blockName)
     {
@@ -85,7 +110,27 @@ internal static class RebirthPlacedWorkmanshipIdentity
 [HarmonyPatch(typeof(Chunk),"SetBlock",new[]{typeof(WorldBase),typeof(int),typeof(int),typeof(int),typeof(BlockValue),typeof(bool),typeof(bool),typeof(bool),typeof(bool),typeof(int)})]
 internal static class RebirthPlacedWorkmanshipBlockCommit
 {
-    private static void Prefix(Chunk __instance,int __1,int __2,int __3,out BlockValue __state)=>__state=__instance.GetBlock(new Vector3i(__1,__2,__3));
-    private static void Postfix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,BlockValue __state)=>RebirthPlacedWorkmanshipIdentity.Committed(__instance,__0,__1,__2,__3,__state);
-    private static Exception Finalizer(Chunk __instance,WorldBase __0,int __1,int __2,int __3,BlockValue __state,Exception __exception){if(__exception!=null)try{RebirthPlacedWorkmanshipIdentity.Committed(__instance,__0,__1,__2,__3,__state);}catch{}return __exception;}
+    private static void Prefix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,out BlockValue? __state)
+    {
+        // World argument and caller thread are fixed for this native invocation.
+        __state = null;
+        if (__0 != null && ThreadManager.IsMainThread())
+            __state = __instance.GetBlock(new Vector3i(__1,__2,__3));
+    }
+
+    private static void Postfix(Chunk __instance,WorldBase __0,int __1,int __2,int __3,BlockValue? __state)
+    {
+        if (__state.HasValue)
+            RebirthPlacedWorkmanshipIdentity.Committed(__instance,__0,__1,__2,__3,__state.Value);
+    }
+
+    private static Exception Finalizer(Chunk __instance,WorldBase __0,int __1,int __2,int __3,BlockValue? __state,Exception __exception)
+    {
+        if (__exception != null && __state.HasValue)
+        {
+            try { RebirthPlacedWorkmanshipIdentity.Committed(__instance,__0,__1,__2,__3,__state.Value); }
+            catch { }
+        }
+        return __exception;
+    }
 }

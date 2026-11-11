@@ -1,0 +1,211 @@
+{
+  "name": "Cooking workspace rows clear and refill while active jobs still settle through the native station",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in solo Purge and with a real client on a dedicated Purge host. Disposable spawned survivor, empty native campfire at (-272,61,451), player beside it and Baked Potato known. Keep guard ON. For dedicated confirm the host has a separate idle owner when available. Use rbcooking profile with rbdebug on cooking if comparing workspace render counts."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "toolCookingPot",
+          "count": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "resourceWood",
+          "count": 30
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "foodCropPotato",
+          "count": 2
+        }
+      }
+    },
+    {
+      "activate": {
+        "x": -272,
+        "y": 61,
+        "z": 451,
+        "block": 1
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 10
+      }
+    },
+    {
+      "expectUi": {
+        "window": "workstation_campfire",
+        "text": "Baked Potato"
+      }
+    },
+    {
+      "console": "rbcooking profile"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "cookingSearch",
+          "value": "RBAuditNoRecipe"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "window": "workstation_campfire",
+        "text": "Baked Potato"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "cookingSearch",
+          "value": "Baked Potat"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "workstation_campfire",
+        "text": "Baked Potato",
+        "timeout": 5
+      }
+    },
+    {
+      "screenshot": "audit_cooking_filter_restored"
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "item": "toolCookingPot",
+        "shift": 1
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "item": "resourceWood",
+        "shift": 1
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "text": "Turn On"
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "text": "Baked Potato"
+      }
+    },
+    {
+      "markItem": "foodCropPotato"
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "id": "pullIngredients"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodCropPotato",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "markItem": "foodBakedPotato"
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "text": "COOK"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "workstation_campfire",
+        "text": "READY TO TAKE",
+        "timeout": 120
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "id": "rebirthCookingTake"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodBakedPotato",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectStation": {
+        "x": -272,
+        "y": 61,
+        "z": 451,
+        "station": "campfire",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "workspace layout="
+      }
+    },
+    {
+      "_note": "Compare cooking jobs before/after; one native ticket must clear after take and no second output or XP may appear. For a cold restart keep a separate real job in progress and compare its token and eventual output/XP across rejoin. Use nearby-storage input and two active plus one idle owners in the dedicated follow-up. Inspect camper cooking and shared milling station screenshots separately. For layout, compare idle and repeated ingredient/fuel changes while profiling. Change window size and panel opacity on the open workspace and verify their new values appear on the existing layout cadence."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

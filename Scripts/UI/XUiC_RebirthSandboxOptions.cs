@@ -21,6 +21,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
     [XuiBindComponent("cbxPlayerProgression", true)]
     public readonly XUiC_ComboBoxList<string> cbxPlayerProgression;
+    [XuiBindComponent("cbxDeathDebuffs", true)]
+    public readonly XUiC_ComboBoxList<string> cbxDeathDebuffs;
 
     [XuiBindComponent("cbxTheme", false)] public readonly XUiC_ComboBoxList<string> cbxTheme;
     [XuiBindComponent("cbxPurgeProgression", false)] public readonly XUiC_ComboBoxList<string> cbxPurgeProgression;
@@ -227,6 +229,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private bool suppressEvents;
     private bool comboEventsBound;
     private RebirthPlayerProgressionMode workingPlayerProgression = RebirthPlayerProgressionMode.Rebirth;
+    private bool workingKeepInjuriesOnDeath = true;
     private RebirthSpawnProgressionMode workingSpawnProgression = RebirthSpawnProgressionMode.Gamestage;
     private bool workingAdvancedFarming = true;
     private int workingGuardDistance = RebirthCompanionDistancePolicy.GuardDefault;
@@ -386,6 +389,12 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
     [XuiXmlBinding("rebirth_player_progression_default")]
     public bool PlayerProgressionIsDefault { get { return workingPlayerProgression == RebirthPlayerProgressionMode.Rebirth; } }
+
+    [XuiXmlBinding("rebirth_death_debuffs_available")]
+    public bool DeathDebuffsAvailable => workingPlayerProgression == RebirthPlayerProgressionMode.Rebirth;
+
+    [XuiXmlBinding("rebirth_death_debuffs_changed")]
+    public bool DeathDebuffsChanged => GetBaselineState().KeepInjuriesOnDeath != workingKeepInjuriesOnDeath;
 
     [XuiXmlBinding("rebirth_player_progression_changed")]
     public bool PlayerProgressionChanged { get { return GetBaselineState().PlayerProgression != workingPlayerProgression; } }
@@ -868,6 +877,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         return new RebirthSandboxState
         {
             PlayerProgression = workingPlayerProgression,
+            KeepInjuriesOnDeath = workingKeepInjuriesOnDeath,
             Theme = workingTheme,
             PurgeCompletionPercentage = workingPurgeCompletionPercentage,
             PurgeProgression = workingPurgeProgression,
@@ -963,6 +973,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     {
         if (state == null) state = new RebirthSandboxState();
         workingPlayerProgression = state.PlayerProgression;
+        workingKeepInjuriesOnDeath = state.KeepInjuriesOnDeath;
         workingTheme = state.Theme;
         workingPurgeCompletionPercentage = state.PurgeCompletionPercentage;
         workingPurgeProgression = state.PurgeProgression;
@@ -1222,6 +1233,13 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             "VALUE-CHANGED accepted working=" + before + "->" + workingPlayerProgression); }
         MarkWorkingStateChanged();
         TracePlayerProgressionState("value-changed-after-publish", true);
+    }
+
+    public void DeathDebuffs_OnValueChanged(XUiController sender, string oldValue, string newValue)
+    {
+        if (suppressEvents || !DeathDebuffsAvailable) return;
+        workingKeepInjuriesOnDeath = cbxDeathDebuffs.SelectedIndex == 0;
+        MarkWorkingStateChanged();
     }
 
     public void SpawnProgression_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -2056,6 +2074,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             cbxPreset.OnValueChanged += Preset_OnValueChanged;
         if (cbxPlayerProgression != null)
             cbxPlayerProgression.OnValueChanged += PlayerProgression_OnValueChanged;
+        if (cbxDeathDebuffs != null)
+            cbxDeathDebuffs.OnValueChanged += DeathDebuffs_OnValueChanged;
         if (cbxSpawnProgression != null)
             cbxSpawnProgression.OnValueChanged += SpawnProgression_OnValueChanged;
         if (cbxAdvancedFarming != null)
@@ -2170,6 +2190,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             cbxPreset.OnValueChanged -= Preset_OnValueChanged;
         if (cbxPlayerProgression != null)
             cbxPlayerProgression.OnValueChanged -= PlayerProgression_OnValueChanged;
+        if (cbxDeathDebuffs != null)
+            cbxDeathDebuffs.OnValueChanged -= DeathDebuffs_OnValueChanged;
         if (cbxSpawnProgression != null)
             cbxSpawnProgression.OnValueChanged -= SpawnProgression_OnValueChanged;
         if (cbxAdvancedFarming != null)
@@ -2289,6 +2311,14 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
                     + " index=" + cbxPlayerProgression.SelectedIndex
                     + " working=" + workingPlayerProgression
                     + " values=" + FormatPlayerProgressionElements()); }
+            }
+
+            if (cbxDeathDebuffs != null)
+            {
+                cbxDeathDebuffs.Elements.Clear();
+                cbxDeathDebuffs.Elements.Add(Localization.Get("xuiRebirthDeathDebuffsKeep"));
+                cbxDeathDebuffs.Elements.Add(Localization.Get("xuiRebirthDeathDebuffsClear"));
+                cbxDeathDebuffs.SelectedIndex = workingKeepInjuriesOnDeath ? 0 : 1;
             }
 
             if(cbxTheme!=null){cbxTheme.Elements.Clear();cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemeNone"));cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemePurge"));cbxTheme.SelectedIndex=(int)workingTheme;}
@@ -2782,6 +2812,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
                     + " enabled=" + (cbxPlayerProgression.ViewComponent == null ? "<no-view>" : cbxPlayerProgression.ViewComponent.Enabled.ToString())
                     + " " + RebirthSandboxUiSession.CharacterProgressionDebugContext); }
             }
+            if (cbxDeathDebuffs != null) cbxDeathDebuffs.SelectedIndex = workingKeepInjuriesOnDeath ? 0 : 1;
             if(cbxTheme!=null)cbxTheme.SelectedIndex=(int)workingTheme;
             if(cbxPurgeProgression!=null)cbxPurgeProgression.SelectedIndex=workingPurgeProgression;
             if(cbxPurgeCompletionPercentage!=null)cbxPurgeCompletionPercentage.SelectedIndex=workingPurgeCompletionPercentage==0?0:1+(workingPurgeCompletionPercentage-10)/5;

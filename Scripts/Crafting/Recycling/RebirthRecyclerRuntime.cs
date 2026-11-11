@@ -98,10 +98,15 @@ public static partial class RebirthRecyclerRuntime
     }
     public static bool CanAccept(EntityPlayer actor,TileEntityWorkstation station,ItemStack source,out string reason)
     {
+        return CanAcceptWithRule(station,source,null,out reason);
+    }
+
+    internal static bool CanAcceptWithRule(TileEntityWorkstation station,ItemStack source,RebirthRecyclerRule rule,out string reason)
+    {
         reason="xuiCannotBeScrappedHere";
         if(!Supports(station)||source==null||source.IsEmpty()||source.count<1||source.count>ushort.MaxValue
             ||source.itemValue.Metadata?.Count>byte.MaxValue-10||source.itemValue.Metadata?.Keys.Any(k=>k.StartsWith(Prefix,StringComparison.Ordinal))==true)return false;
-        if(!RebirthRecyclerRules.TryResolve(source.itemValue.type,station.block.GetBlockName(),out var rule,out reason))return false;
+        if(rule==null&&!RebirthRecyclerRules.TryResolve(source.itemValue.type,station.block.GetBlockName(),out rule,out reason))return false;
         if(!RebirthRecyclerRules.ToolsHealthy(station.Tools,rule,out var missing,out _))
         {reason=missing.Count>0?"xuiScrapToolRequired":"xuiScrapToolBroken";return false;}
         if(RebirthRecyclerBonuses.UnavailableLegacyFeatures(source.itemValue).Any(issue=>issue!="legacy-armor-mastery-progression"))
@@ -132,11 +137,13 @@ public static partial class RebirthRecyclerRuntime
         var queue=(RecipeQueueItem[])station.Queue.Clone();
         // Append behind existing active rows. Output order matches legacy input-rule order.
         var vacant=Enumerable.Range(0,queue.Length).Reverse().Where(i=>queue[i]==null||queue[i].Recipe==null||queue[i].Multiplier<=0).ToArray();
+        string groupId=operation.ToString("N");
+        string sourceImage=RebirthNativeItemCodec.Encode(original);
         for(int outputIndex=0;outputIndex<rule.Outputs.Count;outputIndex++)
         {
             var output=rule.Outputs[outputIndex];var stack=output.Stack;float time=output.TimeSeconds*units;
             var token=original.Clone();
-            token.SetMetadata(Prefix+"group",operation.ToString("N"));token.SetMetadata(Prefix+"source",RebirthNativeItemCodec.Encode(original));
+            token.SetMetadata(Prefix+"group",groupId);token.SetMetadata(Prefix+"source",sourceImage);
             token.SetMetadata(Prefix+"units",units);token.SetMetadata(Prefix+"outputs",rule.Outputs.Count);token.SetMetadata(Prefix+"index",outputIndex);
             token.SetMetadata(Prefix+"owner",owner);token.SetMetadata(Prefix+"creation",creation);token.SetMetadata(Prefix+"rule",rule.SourceId);
             var recipe=new Recipe {itemValueType=stack.itemValue.type,count=checked(stack.count*units),IsScrap=true,IsTrackable=false,
@@ -359,8 +366,8 @@ public static partial class RebirthRecyclerRuntime
                 }
                 queue[queue.Length-1]=new RecipeQueueItem {StartingEntityId=-1};
                 bool final=!queue.Any(sibling=>TryGroup(sibling?.Recipe,out var id)&&id==group.Id);
-                var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id,group.Units,CrafterLevel(world,row.StartingEntityId)):new List<ItemStack>();
-                if(bonuses.Count>0&&!world.IsRemote()&&!(station is RebirthCamperStationState))
+                var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id,group.Units,CrafterLevel(world,row.StartingEntityId)):null;
+                if(bonuses?.Count>0&&!world.IsRemote()&&!(station is RebirthCamperStationState))
                 {
                     // 2.6 (ScrapBonusPartDropper): bonus parts go into the station output; what does not fit is dropped at the station.
                     foreach(var bonus in bonuses)
@@ -368,7 +375,7 @@ public static partial class RebirthRecyclerRuntime
                             GameManager.Instance.ItemDropServer(bonus.Clone(),station.ToWorldPos().ToVector3()+UnityEngine.Vector3.up*1.5f,UnityEngine.Vector3.zero,row.StartingEntityId,120f,false);
                     bonuses.Clear();
                 }
-                if(bonuses.Count>0)
+                if(bonuses?.Count>0)
                 {
                     if(world.IsRemote()&&!(station is RebirthCamperStationState)&&
                         (Identity(nativeActor)!=group.Owner||RebirthCamperCharacterAccess.CurrentCreation(nativeActor)!=group.Creation))

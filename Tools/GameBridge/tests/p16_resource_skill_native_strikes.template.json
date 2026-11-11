@@ -1,0 +1,195 @@
+{
+  "name": "p16_resource_skill_native_strikes",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run in an isolated loaded Purge save with a completed Survivor, closed UI, clear surroundings and reachable live targets. Copy this file to temp and replace every @TOKEN@ with the measured position, toolbelt slot, native hold duration or exact baseline item delta. Use identical tool, position, capacity, damage, and progression for baseline and candidate. No direct mutation or synthetic award. Confirm actual crosshair target with the bridge before opening the batch."
+    },
+    {
+      "_note": "Use the same Stone Axe in both slots for the dual-tag control, or an already authored tool with both tags. Fixture the accepted Mining and Logging values to opposite sides of zero before item baselines are recorded. ORE and TREE must be positive stock-yield fixtures. SALVAGE_ITEM is the actual dropped item in the baseline. For the unsupported target select a block whose native target/item delta is known, and verify zero resource-CVar after the hit."
+    },
+    {
+      "markItem": "resourceRockSmall"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@ORE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@ORE_X@",
+          "y": "@ORE_Y@",
+          "z": "@ORE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@ORE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceRockSmall",
+        "op": "==",
+        "value": "@ORE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "resourceWood"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@TREE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@TREE_X@",
+          "y": "@TREE_Y@",
+          "z": "@TREE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@TREE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceWood",
+        "op": "==",
+        "value": "@TREE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "@SALVAGE_ITEM@"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@SALVAGE_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@SALVAGE_X@",
+          "y": "@SALVAGE_Y@",
+          "z": "@SALVAGE_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@SALVAGE_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "@SALVAGE_ITEM@",
+        "op": "==",
+        "value": "@SALVAGE_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "@UNSUPPORTED_ITEM@"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": "@UNSUPPORTED_SLOT@"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": "@UNSUPPORTED_X@",
+          "y": "@UNSUPPORTED_Y@",
+          "z": "@UNSUPPORTED_Z@",
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": "@UNSUPPORTED_SECONDS@"
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "@UNSUPPORTED_ITEM@",
+        "op": "==",
+        "value": "@UNSUPPORTED_DELTA@"
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "$rbSurvivorSkillResourceHarvest",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

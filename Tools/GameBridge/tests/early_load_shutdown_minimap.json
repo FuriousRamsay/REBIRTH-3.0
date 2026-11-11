@@ -1,0 +1,19 @@
+{
+  "name": "early_load_shutdown_initialized_minimap_control",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable Purge, complete native entry, awake guard on and visible minimap. Confirm the MinimapVisibility action exists and the player is alive, on foot and out of windows. Compare both screenshots visually, then use the normal native Leave/Disconnect and re-enter in the same process for teardown coverage."
+    },
+    { "expectUi": { "window": "toolbelt", "id": "rebirthMiniMap" } },
+    { "screenshot": "minimap_before_native_toggle" },
+    { "action": { "command": "press", "args": { "action": "rebirth.MinimapVisibility", "seconds": 0.15 } } },
+    { "wait": 0.2 },
+    { "expectNoUi": { "window": "toolbelt", "id": "rebirthMiniMap" } },
+    { "action": { "command": "press", "args": { "action": "rebirth.MinimapVisibility", "seconds": 0.15 } } },
+    { "wait": 0.2 },
+    { "expectUi": { "window": "toolbelt", "id": "rebirthMiniMap" } },
+    { "screenshot": "minimap_after_native_toggle" },
+    { "expectNoErrors": true }
+  ]
+}

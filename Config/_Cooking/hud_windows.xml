@@ -1,6 +1,11 @@
 <configs>
   <append xpath="/windows">
     <window name="rebirthCookingHud" controller="RebirthCookingHud, RebirthUtils" anchor="BottomRight" width="1" height="1" cursor_area="false">
+      <rect name="rebirthCruiseControlHud" pos="-255,215" width="245" height="32" visible="false">
+        <sprite pos="0,0" width="245" height="32" sprite="menu_empty" depth="1" color="16,16,20,235" globalopacitymod="0" />
+        <sprite pos="0,0" width="245" height="2" sprite="menu_empty" depth="2" color="181,140,255,255" />
+        <label name="cruiseMode" text="" pos="8,-4" width="229" height="24" font_size="19" justify="center" depth="3" overflow="shrinkcontent" />
+      </rect>
       <label name="cookingHudOverflow" pos="-595,183" width="245" height="20" font_size="17" color="220,198,87,255" depth="15" visible="false"/>
       <rect name="cookingHud0" pos="-255,247" width="245" height="60" visible="false">
         <sprite name="background" pos="0,0" width="245" height="60" sprite="menu_empty" depth="1" color="16,16,20,235" globalopacitymod="0" />

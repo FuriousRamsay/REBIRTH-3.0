@@ -48,10 +48,21 @@ internal static partial class RebirthVehicleClientCustody
         if(!ThreadManager.IsMainThread()||player?.world==null||!ReferenceEquals(player.world,GameManager.Instance?.World)||
             !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||!ReferenceEquals(player.world.GetEntity(player.entityId),player)||
             !RebirthStablePlayerIdentity.TryFromLocalPlatform(out var identity)||!XUiC_RebirthVehicleRestoration.TryGetRequestCharacter(player,out creation))return false;
-        owner=identity.CanonicalId;world=player.world.worldState?.Guid;
-        if(string.IsNullOrEmpty(owner)||!Guid.TryParse(world,out _))return false;
-        try{root=Path.GetFullPath(GameIO.GetPlayerDataDir());return Directory.Exists(root);}catch{return false;}
+        owner=identity.CanonicalId;world=ProtocolWorld(player.world);
+        if(string.IsNullOrEmpty(owner)||!Guid.TryParse(world,out var worldId)||worldId==Guid.Empty)return false;
+        try
+        {
+            string directory = GameIO.GetPlayerDataDir();
+            if (string.IsNullOrWhiteSpace(directory)) return false;
+            // A fresh remote client may have no native Player directory until
+            // its first checkpoint. Save creates the scoped journal directory.
+            root = Path.GetFullPath(directory);
+            return player.world.IsRemote() || Directory.Exists(root);
+        }
+        catch{return false;}
     }
+    internal static string ProtocolWorld(World world) =>
+        world?.IsRemote() == true ? GamePrefs.GetString(EnumGamePrefs.GameGuidClient) : world?.worldState?.Guid;
     private static string DirectoryFor(string root,string owner,string world,string creation)
         =>Path.Combine(root,"RebirthVehicleClientCustody",Digest(owner+"|"+world+"|"+creation));
     private static bool Current(EntityPlayerLocal player,Entry e)
@@ -113,6 +124,23 @@ internal static partial class RebirthVehicleClientCustody
         entries.Clear();loadedScope=scope;unavailable=false;
         try
         {
+            if (player.world.IsRemote())
+            {
+                string legacyWorld = player.world.worldState?.Guid;
+                if (Guid.TryParse(legacyWorld, out _) && legacyWorld != world)
+                {
+                    string legacy = DirectoryFor(root, owner, legacyWorld, creation);
+                    if (Directory.Exists(legacy) &&
+                        (Directory.EnumerateFiles(legacy, "*.tmp").Any() ||
+                         Directory.EnumerateFiles(legacy, "*.xml").Any(path =>
+                         {
+                             var record = Read(path, root);
+                             return record.World != legacyWorld || record.Owner != owner ||
+                                 record.Creation != creation || record.Phase != 3;
+                         })))
+                        throw new InvalidDataException("Unresolved vehicle custody under the former client world ID.");
+                }
+            }
             if(!Directory.Exists(scope))return true;
             foreach(string temp in Directory.EnumerateFiles(scope,"*.tmp"))
                 if(!RecoverPublication(player,temp,root))throw new InvalidDataException("Interrupted custody publication has no exact native final receipt.");
@@ -612,9 +640,7 @@ internal static partial class RebirthVehicleClientCustody
                 // A later saved inventory image may differ after owner-ready was
                 // checkpointed. Keep querying the exact server original so its
                 // journal can finish; the query itself cannot grant an item.
-                bool reservationSaved=Saved(player,e,e.ReserveReceipt,1f);
-                bool reservationReceiptSaved=reservationSaved||Saved(player,e,e.ReserveReceipt,1f,null,null);
-                if(!reservationReceiptSaved)
+                if(!Saved(player,e,e.ReserveReceipt,1f))
                 {
                     continue;
                 }
@@ -628,7 +654,13 @@ internal static partial class RebirthVehicleClientCustody
                 {
                     var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
                     TryGetTransferProof(player,e.Id,out var proof);
-                    if(player.world.IsRemote())connection?.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyQuery>().Setup(e.Id,e.World,e.Creation,e.Frame,proof));
+                    if(player.world.IsRemote())
+                    {
+                        if (connection == null) continue;
+                        if (proof != null)
+                            connection.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(player));
+                        connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyQuery>().Setup(e.Id,e.World,e.Creation,e.Frame,proof));
+                    }
                     else NetPackageRebirthVehicleAssemblyRequest.QueryCustody(player.world as World,null,e.Id,e.World,e.Creation,e.Frame,proof);
                 }
             }

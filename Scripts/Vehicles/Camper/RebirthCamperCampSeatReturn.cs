@@ -58,14 +58,13 @@ internal static class RebirthCamperCampSeatReturn
             if (!Physics.GetIgnoreLayerCollision(layer, other)) mask |= 1 << other;
         return mask;
     }
-    private static bool InteriorFloor(EntityVehicle vehicle, EntityPlayerLocal player, Vector3 feet)
+    private static bool InteriorFloor(EntityVehicle vehicle, EntityPlayerLocal player,
+        CharacterController controller, Vector3 feet, int collisionMask)
     {
         // Both cabin floor levels and their connecting ramp are inside the door.
         // The external stair ramp/landing does not qualify.
-        var controller = player.vp_FPController?.CharacterController;
-        if (controller == null) return false;
         var hits = Physics.RaycastAll(feet + Vector3.up * .12f, Vector3.down, .35f,
-            CollisionMask(controller), QueryTriggerInteraction.Ignore);
+            collisionMask, QueryTriggerInteraction.Ignore);
         Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
         Collider collider = null;
         foreach (var hit in hits)
@@ -91,7 +90,7 @@ internal static class RebirthCamperCampSeatReturn
         if (controller == null || !controller.enabled)
         { Trace(player, "capture-rejected", "controller unavailable/disabled"); return null; }
         var feet = controller.transform.TransformPoint(controller.center - Vector3.up * (controller.height * .5f));
-        if (!InteriorFloor(vehicle, player, feet)) return null;
+        if (!InteriorFloor(vehicle, player, controller, feet, CollisionMask(controller))) return null;
         var point = new Point { Vehicle = vehicle, World = player.world, Root = vehicle.RootTransform,
             Model = vehicle.ModelTransform,
             // The FP controller is the native local movement authority; Entity.position
@@ -129,11 +128,12 @@ internal static class RebirthCamperCampSeatReturn
         float radius = controller.radius * Mathf.Max(Mathf.Abs(controller.transform.lossyScale.x), Mathf.Abs(controller.transform.lossyScale.z));
         float height = controller.height * Mathf.Abs(controller.transform.lossyScale.y);
         var feet = center - Vector3.up * (height * .5f);
-        if (!InteriorFloor(vehicle, player, feet) || radius <= 0 || height < radius * 2) return;
+        int collisionMask = CollisionMask(controller);
+        if (!InteriorFloor(vehicle, player, controller, feet, collisionMask) || radius <= 0 || height < radius * 2) return;
         var lower = feet + Vector3.up * (radius + .035f);
         var upper = feet + Vector3.up * (height - radius);
         foreach (var collider in Physics.OverlapCapsule(lower, upper, Mathf.Max(.01f, radius - .025f),
-            CollisionMask(controller), QueryTriggerInteraction.Ignore))
+            collisionMask, QueryTriggerInteraction.Ignore))
             if (collider != null && !OwnPlayer(collider, player) && !Physics.GetIgnoreCollision(controller, collider))
             { Trace(player, "exit-native", "capsule blocked=" + collider.name + " layer=" + collider.gameObject.layer + " feet=" + feet.ToString("F3")); return; }
         // Native Detach already restored parent/controller/camera/driving activity.

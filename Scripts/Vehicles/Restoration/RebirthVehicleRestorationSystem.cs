@@ -1125,6 +1125,39 @@ public static class RebirthVehicleInventoryTransactions
         return false;
     }
 
+    internal static bool TryTakeOrdinaryPartAt(EntityPlayerLocal player, bool fromBag, int slot, string itemName,
+        out RebirthInstalledVehiclePart installed)
+    {
+        installed = null;
+        var bag = player.bag;
+        var belt = player.inventory;
+        var grid = fromBag ? bag?.ItemGrid : belt?.ItemGrid;
+        if (grid?.items == null || RebirthVehicleNativePolicy.IsLocked(player, fromBag, slot) ||
+            (!fromBag && slot >= RebirthToolbeltCapacity.GetOwnedSlotCount(player, belt.Length))) return false;
+        var source = grid.items[slot];
+        if (!Matches(source, itemName)) return false;
+
+        var before = source.Clone();
+        var part = FromItemValue(before.itemValue.Clone(), player.world as World);
+        var expected = before.count == 1 ? ItemStack.Empty.Clone() : before.Clone();
+        if (before.count > 1) expected.count--;
+        if (fromBag) bag.SetSlot(slot, expected.Clone());
+        else belt.SetItem(slot, expected.Clone());
+
+        var currentGrid = fromBag ? player.bag?.ItemGrid : player.inventory?.ItemGrid;
+        if (!ReferenceEquals(grid, currentGrid) || currentGrid.items == null || slot >= currentGrid.items.Length)
+            throw new InvalidOperationException("Vehicle part source changed during the native write.");
+        // Native setter prefixes can refuse this void call. Read only its affected cell.
+        var current = currentGrid.items[slot];
+        if (RebirthStationGridIngredients.IsSameStackSnapshot(current, expected))
+        {
+            installed = part;
+            return true;
+        }
+        if (RebirthStationGridIngredients.IsSameStackSnapshot(current, before)) return false;
+        throw new InvalidOperationException("Vehicle part source changed during the native write.");
+    }
+
     public static bool TryTakeExactPartAt(EntityPlayer player, RebirthVehiclePartSourceLocation sourceLocation, int sourceSlot, string itemName, out RebirthInstalledVehiclePart installed)
     {
         installed = null;
@@ -1650,6 +1683,130 @@ public static partial class RebirthVehicleAssemblyService
             return assembly.DeepClone();
         }
         return assembly.DeepClone();
+    }
+
+    internal static bool IsCarriedPartSource(RebirthVehiclePartSourceLocation source)
+        => source == RebirthVehiclePartSourceLocation.Backpack || source == RebirthVehiclePartSourceLocation.Toolbelt;
+
+    internal static RebirthVehicleAssembly ProcessOrdinaryNativeService(EntityPlayerLocal player, EntityVehicle entity,
+        RebirthVehicleAssembly displayed, RebirthVehicleAssemblyAction action, string slotId,
+        RebirthVehiclePartSourceLocation source, int sourceSlot, XUiC_DragAndDropWindow pickupCursor, out string message)
+    {
+        message = Localization.Get("xuiRebirthVehicleChanged");
+        var world = GameManager.Instance?.World;
+        if (displayed == null || !OrdinaryNativeServiceCurrent(world, player, entity) ||
+            !RebirthVehicleAssemblyIndex.TryGetEntity(entity, out var indexed) || indexed == null ||
+            indexed.AssemblyId != displayed.AssemblyId || indexed.Revision != displayed.Revision)
+            return null;
+
+        if (indexed.PendingInventoryTransferId != Guid.Empty ||
+            (RebirthCamperRadial.IsCamper(entity) &&
+             entity.vehicle.itemValue?.TryGetMetadata("RebirthCamperTransferPending", out string pending) == true && pending == "1"))
+        {
+            message = Localization.Get("xuiRebirthVehicleTransferPending");
+            return null;
+        }
+
+        bool refuel = action == RebirthVehicleAssemblyAction.Refuel;
+        bool pickup = action == RebirthVehicleAssemblyAction.Pickup;
+        bool remove = action == RebirthVehicleAssemblyAction.Remove || pickup;
+        if (!refuel && !remove && (action != RebirthVehicleAssemblyAction.Install || !IsCarriedPartSource(source))) return null;
+        bool fromBag = source == RebirthVehiclePartSourceLocation.Backpack;
+        if (refuel || remove
+            ? !RebirthVehicleInventoryWrite.CanMutate(player, true, allowVehicleCustody:false) ||
+              !RebirthVehicleInventoryWrite.CanMutate(player, false, allowVehicleCustody:false)
+            : !RebirthVehicleInventoryWrite.CanMutate(player, fromBag, allowVehicleCustody:false))
+        {
+            message = Localization.Get("xuiRebirthVehicleTransferPending");
+            return null;
+        }
+
+        var updated = indexed.DeepClone();
+        if (refuel)
+        {
+            if (entity.vehicle.GetFuelPercent() >= 1f)
+            {
+                message = Localization.Get("xuiRebirthVehicleFuelFull");
+                return null;
+            }
+            float beforeFuel = entity.vehicle.GetFuelLevel();
+            bool ran = entity.AddFuelFromInventory(player);
+            if (!ran || entity.vehicle.GetFuelLevel() <= beforeFuel)
+            {
+                message = Localization.Get("xuiRebirthVehicleNeedFuel");
+                return null;
+            }
+            message = Localization.Get("xuiRebirthVehicleRefueled");
+        }
+        else
+        {
+            var slot = FindSlot(RebirthVehicleDefinitionRegistry.GetFamily(indexed.FamilyId), slotId);
+            if (slot == null) return null;
+            if (remove)
+            {
+                if (!updated.Parts.TryGetValue(slot.SlotId, out var part))
+                {
+                    message = Localization.Get("xuiRebirthVehicleSlotEmpty");
+                    return null;
+                }
+                var stack = RebirthVehicleInventoryTransactions.CreateItemStack(part);
+                if (stack.IsEmpty()) return null;
+                if (pickup)
+                {
+                    message = Localization.Get("xuiRebirthVehicleCursorChanged");
+                    if (pickupCursor?.IsEmpty() != true) return null;
+                    pickupCursor.SetCurrentStack(stack, false);
+                    if (pickupCursor.IsEmpty()) return null;
+                    pickupCursor.PickUpType = XUiC_ItemStack.StackLocationTypes.Part;
+                }
+                else if (player.PlayerUI?.xui?.PlayerInventory?.AddItemNoPartial(stack, false) != true)
+                {
+                    message = Localization.Get("xuiRebirthVehicleInventoryFull");
+                    return null;
+                }
+                updated.Parts.Remove(slot.SlotId);
+            }
+            else
+            {
+                if (updated.Parts.ContainsKey(slot.SlotId)) return null;
+                if (!RebirthVehicleInventoryTransactions.TryTakeOrdinaryPartAt(player, fromBag, sourceSlot, slot.ItemName, out var part))
+                {
+                    message = string.Format(Localization.Get("xuiRebirthVehicleNeedPart"), Localization.Get(slot.DisplayKey));
+                    return null;
+                }
+                part.SlotId = slot.SlotId;
+                updated.Parts.Add(slot.SlotId, part);
+            }
+            message = string.Empty;
+        }
+
+        if (!ReferenceEquals(world, GameManager.Instance?.World) || !ReferenceEquals(world.GetEntity(entity.entityId), entity) ||
+            !RebirthVehicleAssemblyIndex.TryGetEntity(entity, out var current) || !ReferenceEquals(current, indexed))
+            throw new InvalidOperationException("Vehicle Service changed during the native write.");
+        SyncFuelFromEntity(entity, updated);
+        RebirthVehicleAssemblyIndex.CommitEntity(entity, updated);
+        if (action == RebirthVehicleAssemblyAction.Install && !world.IsRemote()) AwardOrdinaryInstallMechanics(player, updated, slotId);
+        return updated;
+    }
+
+    private static bool OrdinaryNativeServiceCurrent(World world, EntityPlayerLocal player, EntityVehicle entity)
+        => ThreadManager.IsMainThread() && world != null && player != null && !player.IsDead() &&
+            ReferenceEquals(player.world, world) && ReferenceEquals(world.GetPrimaryPlayer(), player) &&
+            ReferenceEquals(world.GetEntity(player.entityId), player) && entity?.vehicle != null &&
+            ReferenceEquals(entity.world, world) && ReferenceEquals(world.GetEntity(entity.entityId), entity) &&
+            LockManager.Instance?.IsLockedByLocalPlayer(entity, 0) == true && entity.CheckUIInteraction() &&
+            entity.AllowActivationCommand("service".AsSpan(), player);
+
+    internal static void AwardOrdinaryInstallMechanics(EntityPlayer player, RebirthVehicleAssembly assembly, string slotId)
+    {
+        try
+        {
+            RebirthSkillEventRouter.OnMechanicsCompleted(player, "install", 1f, "entity:" + assembly.ContentId + ":" + slotId);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("[REBIRTH Vehicle] Ordinary install Mechanics award failed: " + ex.Message);
+        }
     }
 
     public static RebirthVehicleAssembly ProcessEntity(World world, EntityPlayer player, int entityId, Guid assemblyId, long expectedRevision, RebirthVehicleAssemblyAction action, string slotId, RebirthInstalledVehiclePart offeredPart, RebirthVehiclePartSourceLocation sourceLocation, int sourceSlot, out string message, out RebirthVehicleRequestOutcome outcome)
@@ -2355,6 +2512,42 @@ public static class RebirthVehicleEntityPersistence
         }
     }
 
+    private static void ObserveOrdinaryNativeInstall(EntityVehicle entity, int senderId,
+        RebirthVehicleAssembly prior, RebirthVehicleAssembly received)
+    {
+        // NetPackageVehicleDataSync has already authenticated senderId.
+        var world = GameManager.Instance?.World;
+        var locks = LockManager.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !ReferenceEquals(entity.world, world) ||
+            !ReferenceEquals(world.GetEntity(entity.entityId), entity) || locks == null ||
+            !locks.singleLocks.TryGetByValue(new LockManager.LockEntry(entity, 0), out int owner) || owner != senderId ||
+            world.GetEntity(senderId) is not EntityPlayer player || !ReferenceEquals(player.world, world)) return;
+
+        if (received.AssemblyId != prior.AssemblyId || received.ContentId != prior.ContentId ||
+            received.FamilyId != prior.FamilyId || received.Revision <= prior.Revision ||
+            received.Revision != prior.Revision + 1 || received.Parts.Count != prior.Parts.Count + 1) return;
+
+        string slotId = null;
+        RebirthInstalledVehiclePart installed = null;
+        foreach (var entry in received.Parts)
+        {
+            if (prior.Parts.ContainsKey(entry.Key)) continue;
+            if (slotId != null) return;
+            slotId = entry.Key;
+            installed = entry.Value;
+        }
+        if (installed == null) return;
+
+        var family = RebirthVehicleDefinitionRegistry.GetFamily(received.FamilyId);
+        if (family == null) return;
+        foreach (var slot in family.Slots)
+        {
+            if (slot.SlotId != slotId || slot.ItemName != installed.ItemName) continue;
+            RebirthVehicleAssemblyService.AwardOrdinaryInstallMechanics(player, received, slotId);
+            return;
+        }
+    }
+
     public static void BeforeWriteSyncData(EntityVehicle entity, BinaryWriter writer, ushort syncFlags)
     {
         if (entity == null || writer == null || (syncFlags & 4) == 0)
@@ -2366,6 +2559,9 @@ public static class RebirthVehicleEntityPersistence
     }
 
     public static void AfterReadSyncData(EntityVehicle entity, BinaryReader reader, ushort syncFlags)
+        => AfterReadSyncData(entity, reader, syncFlags, 0);
+
+    internal static void AfterReadSyncData(EntityVehicle entity, BinaryReader reader, ushort syncFlags, int senderId)
     {
         if (entity == null || reader == null)
             return;
@@ -2373,7 +2569,12 @@ public static class RebirthVehicleEntityPersistence
         RebirthVehicleAssembly assembly;
         if ((syncFlags & 4) != 0 && TryReadAssemblyFromVehicleItem(entity, out assembly))
         {
+            RebirthVehicleAssembly prior = null;
+            if (syncFlags == 4 && senderId > 0 && entity.world?.IsRemote() == false &&
+                RebirthSurvivorMode.IsEnabledForCurrentWorld())
+                RebirthVehicleAssemblyIndex.TryGetEntity(entity, out prior);
             RebirthVehicleAssemblyIndex.RegisterEntity(entity, assembly);
+            if (prior != null) ObserveOrdinaryNativeInstall(entity, senderId, prior, assembly);
             return;
         }
 
@@ -2720,8 +2921,8 @@ public sealed class RebirthVehicleRequestResult
 
 public static partial class RebirthVehicleRequestJournal
 {
-    private static readonly Dictionary<Guid, RebirthVehicleRequestResult> Completed = new Dictionary<Guid, RebirthVehicleRequestResult>();
-    private static readonly Queue<Guid> Order = new Queue<Guid>();
+    private static Dictionary<Guid, RebirthVehicleRequestResult> Completed = new Dictionary<Guid, RebirthVehicleRequestResult>();
+    private static Queue<Guid> Order = new Queue<Guid>();
     private sealed class RequestIntent {internal string Actor,Fingerprint;internal bool Mutating;}
     private static readonly Dictionary<Guid,RequestIntent> InFlight = new Dictionary<Guid,RequestIntent>();
     private static readonly object Sync = new object();
@@ -2730,6 +2931,8 @@ public static partial class RebirthVehicleRequestJournal
     private static string loadedDirectory = string.Empty;
     private static bool loadFailed;
     private static long generation;
+    private static long? writingGeneration;
+    private static bool WritingCurrentJournal => writingGeneration == generation;
     public static bool IsAvailable { get { EnsureLoaded(); lock (Sync) return !loadFailed && loadedDirectory.Length > 0; } }
     public static int Count { get { EnsureLoaded(); lock (Sync) return Completed.Count; } }
 
@@ -2762,7 +2965,7 @@ public static partial class RebirthVehicleRequestJournal
         EnsureLoaded();
         lock (Sync)
         {
-            if (loadFailed || loadedDirectory.Length == 0) return false;
+            if (WritingCurrentJournal || loadFailed || loadedDirectory.Length == 0) return false;
             RebirthVehicleRequestResult stored;
             if (Completed.TryGetValue(requestId, out stored))
             {
@@ -2782,8 +2985,7 @@ public static partial class RebirthVehicleRequestJournal
             if(Completed.Count+InFlight.Count>=MaxEntries)return false;
             admittedGeneration = generation;
             InFlight[requestId] = new RequestIntent{Actor=actorId,Fingerprint=fingerprint,Mutating=mutating};
-            if(mutating)Persist(loadedDirectory);
-            return !loadFailed;
+            return !mutating || Persist(loadedDirectory);
         }
     }
 
@@ -2792,7 +2994,8 @@ public static partial class RebirthVehicleRequestJournal
         if (requestId == Guid.Empty) return;
         lock (Sync)
         {
-            if(generation!=expectedGeneration||!InFlight.TryGetValue(requestId,out var original))return;
+            if (WritingCurrentJournal || generation != expectedGeneration ||
+                !InFlight.TryGetValue(requestId, out var original)) return;
             InFlight.Remove(requestId);
             if(original.Mutating)Persist(loadedDirectory);
         }
@@ -2801,25 +3004,59 @@ public static partial class RebirthVehicleRequestJournal
     public static bool Remember(Guid requestId, RebirthVehicleRequestResult result, long expectedGeneration)
     {
         if (requestId == Guid.Empty || result == null) return false;
-        bool changed = false;
         lock (Sync)
         {
-            if (generation != expectedGeneration || loadFailed || loadedDirectory.Length == 0 ||
-                !string.Equals(loadedDirectory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase)) return false;
-            if(InFlight.TryGetValue(requestId,out var original)&&
-                (original.Actor!=result.ActorId||original.Fingerprint!=result.Fingerprint))return false;
+            if (WritingCurrentJournal || generation != expectedGeneration || loadFailed || loadedDirectory.Length == 0)
+                return false;
+            if (!string.Equals(loadedDirectory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase) ||
+                generation != expectedGeneration || loadFailed) return false;
+            if (InFlight.TryGetValue(requestId, out var original) &&
+                (original.Actor != result.ActorId || original.Fingerprint != result.Fingerprint)) return false;
+            if (Completed.TryGetValue(requestId, out var prior))
+                return MatchesPublishedResult(prior, result);
+            return PublishResult(requestId, result);
+        }
+    }
+
+    private static bool MatchesPublishedResult(RebirthVehicleRequestResult prior, RebirthVehicleRequestResult result)
+    {
+        if (prior.ActorId != result.ActorId || prior.Fingerprint != result.Fingerprint ||
+            prior.Outcome != result.Outcome || prior.Carrier != result.Carrier || prior.Position != result.Position ||
+            prior.EntityId != result.EntityId || prior.Message != (result.Message ?? string.Empty) ||
+            prior.PickupNativeItem != (result.PickupNativeItem ?? string.Empty)) return false;
+        if (prior.Snapshot == null || result.Snapshot == null) return prior.Snapshot == result.Snapshot;
+        try
+        {
+            return RebirthVehicleAssemblySerializer.ToBase64(prior.Snapshot) ==
+                RebirthVehicleAssemblySerializer.ToBase64(result.Snapshot);
+        }
+        catch (Exception) { return false; }
+    }
+
+    // Under Sync, a synchronous callback may read the last verified view but cannot write this generation.
+    private static bool PublishResult(Guid requestId, RebirthVehicleRequestResult result)
+    {
+        long? priorWriter = writingGeneration;
+        long expectedGeneration = generation;
+        writingGeneration = expectedGeneration;
+        try
+        {
+            string directory = loadedDirectory;
+            var completed = new Dictionary<Guid, RebirthVehicleRequestResult>(Completed);
+            var order = new Queue<Guid>(Order);
+            if (!completed.ContainsKey(requestId)) order.Enqueue(requestId);
+            completed[requestId] = CloneResult(result);
+            TrimResolved(completed, order, MaxEntries);
+            if (completed.Count > MaxEntries || !completed.ContainsKey(requestId) ||
+                generation != expectedGeneration ||
+                !Persist(directory, completed, order, requestId)) return false;
+
+            Completed = completed;
+            Order = order;
             InFlight.Remove(requestId);
-            if (!Completed.ContainsKey(requestId))
-            {
-                Completed[requestId] = CloneResult(result);
-                Order.Enqueue(requestId);
-                TrimResolved(MaxEntries);
-                changed = true;
-            }
-            // Serialize publication, temp-file use and reset against this journal.
-            if (changed) Persist(loadedDirectory);
             return true;
         }
+        finally { writingGeneration = priorWriter; }
     }
 
     public static void Clear()
@@ -2850,15 +3087,21 @@ public static partial class RebirthVehicleRequestJournal
 
     // Indeterminate outcomes may own unresolved native inventory/drop effects.
     // Capacity pressure must not erase them and permit the same original again.
-    private static void TrimResolved(int maximum)
+    private static void TrimResolved(int maximum) => TrimResolved(Completed, Order, maximum);
+
+    private static void TrimResolved(Dictionary<Guid, RebirthVehicleRequestResult> completed, Queue<Guid> order, int maximum)
     {
-        int scan=Order.Count;
-        while(Completed.Count>maximum&&scan-->0&&Order.Count>0)
+        int scan = order.Count;
+        while (completed.Count > maximum && scan-- > 0 && order.Count > 0)
         {
-            Guid id=Order.Dequeue();
-            if(!Completed.TryGetValue(id,out var record))continue;
-            if(record==null||record.Outcome==RebirthVehicleRequestOutcome.Indeterminate){Order.Enqueue(id);continue;}
-            Completed.Remove(id);
+            Guid id = order.Dequeue();
+            if (!completed.TryGetValue(id, out var record)) continue;
+            if (record == null || record.Outcome == RebirthVehicleRequestOutcome.Indeterminate)
+            {
+                order.Enqueue(id);
+                continue;
+            }
+            completed.Remove(id);
         }
     }
 
@@ -2970,14 +3213,25 @@ public static partial class RebirthVehicleRequestJournal
         else File.Move(temp, path);
     }
 
-    private static void Persist(string directory)
+    private static bool Persist(string directory)
+    {
+        long? priorWriter = writingGeneration;
+        writingGeneration = generation;
+        try { return Persist(directory, Completed, Order, Guid.Empty); }
+        finally { writingGeneration = priorWriter; }
+    }
+
+    private static bool Persist(string directory, Dictionary<Guid, RebirthVehicleRequestResult> completed,
+        Queue<Guid> order, Guid settledRequest)
     {
         // Called under Sync with the directory whose records are being published.
+        long expectedGeneration = generation;
         try
         {
             if (loadFailed || string.IsNullOrEmpty(directory) ||
-                !string.Equals(directory, loadedDirectory, StringComparison.OrdinalIgnoreCase) ||
-                !string.Equals(directory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase))
+                !string.Equals(directory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase) ||
+                generation != expectedGeneration ||
+                !string.Equals(directory, loadedDirectory, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Vehicle journal save session changed.");
             Directory.CreateDirectory(directory);
             string path = Path.Combine(directory, JournalFileName);
@@ -2991,14 +3245,14 @@ public static partial class RebirthVehicleRequestJournal
             {
                 foreach(var pair in InFlight)
                 {
-                    if(!pair.Value.Mutating)continue;
+                    if (!pair.Value.Mutating || pair.Key == settledRequest) continue;
                     var intent=document.CreateElement("intent");intent.SetAttribute("id",pair.Key.ToString("D"));
                     intent.SetAttribute("actor",pair.Value.Actor);intent.SetAttribute("fingerprint",pair.Value.Fingerprint);root.AppendChild(intent);
                 }
-                foreach (Guid id in Order)
+                foreach (Guid id in order)
                 {
                     RebirthVehicleRequestResult result;
-                    if (!Completed.TryGetValue(id, out result) || result == null) continue;
+                    if (!completed.TryGetValue(id, out result) || result == null) continue;
                     XmlElement entry = document.CreateElement("request");
                     entry.SetAttribute("id", id.ToString("D"));
                     entry.SetAttribute("carrier", ((int)result.Carrier).ToString());
@@ -3026,12 +3280,21 @@ public static partial class RebirthVehicleRequestJournal
             using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null}))verified.Load(reader);
             if(verified.DocumentElement?.OuterXml!=document.DocumentElement.OuterXml)
                 throw new InvalidDataException("Vehicle journal publication readback mismatch.");
+            if (!string.Equals(directory, GameIO.GetSaveGameDir(), StringComparison.OrdinalIgnoreCase) ||
+                generation != expectedGeneration || loadFailed ||
+                !string.Equals(directory, loadedDirectory, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Vehicle journal save session changed after publication.");
+            return true;
         }
         catch (Exception ex)
         {
-            // Keep known in-memory outcomes for duplicate replies, but admit no more mutations.
-            lock (Sync) loadFailed = true;
+            // Fence new writes for the failed journal before any synchronous log callback.
+            lock (Sync)
+                if (generation == expectedGeneration &&
+                    string.Equals(directory, loadedDirectory, StringComparison.OrdinalIgnoreCase))
+                    loadFailed = true;
             Log.Warning("[REBIRTH Vehicle] request journal save failed; new requests blocked: " + ex.GetType().Name + ": " + ex.Message);
+            return false;
         }
     }
 }
@@ -3338,7 +3601,16 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest : NetPackage
         playerId=player.entityId; // Not fingerprinted; native ID may change on reconnect.
         if(action!=RebirthVehicleAssemblyAction.Read&&readVersion>=3&&!RebirthVehicleClientCustody.TryGetTransferProof(player,requestId,out ownerCustodyProof))return;
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(player.world.IsRemote()){if(!RebirthMusicLibraryClient.CanSend(connection,this))return;connection.SendToServer(this);return;}
+        if(player.world.IsRemote())
+        {
+            if(!RebirthMusicLibraryClient.CanSend(connection,this))return;
+            // The host must see the native reservation and binding receipts
+            // before reading the request from this connection.
+            if (ownerCustodyProof != null)
+                connection.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(player));
+            connection.SendToServer(this);
+            return;
+        }
         string actor=userId?.ToString()??string.Empty,fingerprint=BuildFingerprint();
         if(!RebirthVehicleRequestJournal.TryBegin(requestId,actor,fingerprint,out var existing,out long generation,action!=RebirthVehicleAssemblyAction.Read)){QueryCustody(player.world as World,null,requestId,player.world.worldState.Guid,expectedCreationId,originalFrame);return;}
         RebirthVehicleAssembly snapshot=null;string message;RebirthVehicleRequestOutcome outcome;
@@ -3401,21 +3673,36 @@ public sealed partial class NetPackageRebirthVehicleAssemblyRequest : NetPackage
         else if(creation.Length!=0)return;
         frozen.AdvanceNativeQuery(world,player,sender);
         var outcome=RebirthVehicleRequestOutcome.Indeterminate;string nativePickup=null;
-        if(RebirthVehicleRequestJournal.TryGet(id,frozen.userId?.ToString()??string.Empty,frozen.BuildFingerprint(),out var result))
+        string actor=frozen.userId?.ToString()??string.Empty,fingerprint=frozen.BuildFingerprint();
+        if(RebirthVehicleRequestJournal.TryGet(id,actor,fingerprint,out var result))
         {
             outcome=result.Outcome;
             nativePickup=result.PickupNativeItem;
             if(sender==null)XUiC_RebirthVehicleRestoration.Receive(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome,result.PickupNativeItem);
-            else if(!string.IsNullOrEmpty(result.PickupNativeItem))connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome,result.PickupNativeItem,creation),_attachedToEntityId:sender.entityId);
-            else connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome),_attachedToEntityId:sender.entityId);
+            else SendRemoteCustodySnapshot(connection,sender,id,creation,result);
         }
         string hash=RebirthVehicleClientCustody.FrameHash(frame);
         if(sender==null)RebirthVehicleClientCustody.Observe(world,id,game,creation,hash,outcome,nativePickup);
-        else connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyReply>().Setup(id,game,creation,hash,outcome,nativePickup),_attachedToEntityId:sender.entityId);
+        else
+        {
+            SendRemoteCustodyReply(connection,sender,id,game,creation,hash,outcome,nativePickup);
+            if(outcome==RebirthVehicleRequestOutcome.Indeterminate)
+                frozen.RememberNativeTerminalQuery(world,player,sender,game,creation,hash,actor,fingerprint,proof);
+        }
         // Legacy/missing history never authorizes a financial replay. Only the
         // typed v3 original advances above through its saved native authority;
         // a saved completion admits metadata retirement, never another delta.
     }
+    private static void SendRemoteCustodySnapshot(ConnectionManager connection,ClientInfo sender,Guid id,string creation,RebirthVehicleRequestResult result)
+    {
+        if(!string.IsNullOrEmpty(result.PickupNativeItem))
+            connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome,result.PickupNativeItem,creation),_attachedToEntityId:sender.entityId);
+        else
+            connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome),_attachedToEntityId:sender.entityId);
+    }
+    private static void SendRemoteCustodyReply(ConnectionManager connection,ClientInfo sender,Guid id,string game,string creation,string hash,RebirthVehicleRequestOutcome outcome,string pickup)
+        =>connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyReply>().Setup(id,game,creation,hash,outcome,pickup),_attachedToEntityId:sender.entityId);
+
     private string BuildFingerprint()
     {
         return (readVersion>=3?"native-owner-plan-v1|"+(ownerLocks??string.Empty)+"|"+(ownerBeltLocks??string.Empty)+"|"+ownerBeltSlots+"|":string.Empty)+(expectedCreationId??string.Empty) + "|" + ((byte)carrier) + "|" + position + "|" + entityId + "|" + assemblyId + "|" + expectedRevision + "|" +
@@ -3634,7 +3921,11 @@ public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
             owner.RequestInstallFromCursor(this, cursor);
             return;
         }
-        if (CanRemove()) owner.RequestPickup(this);
+        if (!CanRemove()) return;
+        var pointer = xui?.playerUI?.CursorController;
+        bool dragging = pointer != null && pointer.GetMouseButton(UICamera.MouseButton.LeftButton) &&
+            !pointer.GetMouseButtonDown(UICamera.MouseButton.LeftButton);
+        if (owner.RequestPickup(this, dragging)) lastClicked = false;
     }
 
     public void RequestPreferredRemove()
@@ -4184,15 +4475,25 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         Send(RebirthVehicleAssemblyAction.Remove, slot.RestorationSlotId, null, false, RebirthVehiclePartSourceLocation.None, -1);
     }
 
-    public void RequestPickup(XUiC_RebirthVehicleRestorationSlot slot)
+    internal bool RequestPickup(XUiC_RebirthVehicleRestorationSlot slot, bool dragging)
     {
-        if (slot == null || !CanInteract || string.IsNullOrEmpty(slot.RestorationSlotId) || slot.ItemStack == null || slot.ItemStack.IsEmpty()) return;
+        if (slot == null || !CanInteract || string.IsNullOrEmpty(slot.RestorationSlotId) || slot.ItemStack == null || slot.ItemStack.IsEmpty()) return false;
         XUiC_DragAndDropWindow dragAndDrop = GetDragAndDropWindow();
-        if (dragAndDrop == null || (dragAndDrop.CurrentStack != null && !dragAndDrop.CurrentStack.IsEmpty())) return;
+        if (dragAndDrop?.IsEmpty() != true) return false;
+
+        if (dragging && carrier == RebirthVehicleAssemblyCarrier.VehicleEntity &&
+            xui?.playerUI?.entityPlayer is EntityPlayerLocal player)
+        {
+            ApplyOrdinaryNativeService(player, RebirthVehicleAssemblyAction.Pickup, slot.RestorationSlotId,
+                RebirthVehiclePartSourceLocation.None, -1, dragAndDrop);
+            if (!dragAndDrop.IsEmpty()) RebirthVehicleServicePointerDrop.KeepCursorOnRelease(this);
+            return true;
+        }
 
         ItemStack picked = slot.ItemStack.Clone();
         // Retain a private delivery snapshot; no player-owned item exists until acknowledgement.
         Send(RebirthVehicleAssemblyAction.Pickup, slot.RestorationSlotId, null, false, RebirthVehiclePartSourceLocation.None, -1, picked);
+        return false;
     }
 
     public bool TryShiftInstallFromInventory(XUiC_ItemStack source)
@@ -4238,17 +4539,24 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     private void Send(RebirthVehicleAssemblyAction action, string slotId, RebirthInstalledVehiclePart offeredPart, bool reserveCursorItem, RebirthVehiclePartSourceLocation sourceLocation, int sourceSlot, ItemStack pickedCursorItem = null)
     {
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
-        PersistentPlayerData persistent = GameManager.Instance != null ? GameManager.Instance.GetPersistentLocalPlayer() : null;
-        if (player == null || persistent == null || persistent.PrimaryId == null)
-        {
-            return;
-        }
+        if (player == null) return;
         if (pendingRequestId != Guid.Empty)
         {
             SetStatus(string.Empty);
             GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleRequestPending"));
             return;
         }
+
+        if (carrier == RebirthVehicleAssemblyCarrier.VehicleEntity && !reserveCursorItem && offeredPart == null &&
+            pickedCursorItem == null && (action == RebirthVehicleAssemblyAction.Refuel || action == RebirthVehicleAssemblyAction.Remove ||
+            (action == RebirthVehicleAssemblyAction.Install && RebirthVehicleAssemblyService.IsCarriedPartSource(sourceLocation))))
+        {
+            ApplyOrdinaryNativeService(player, action, slotId, sourceLocation, sourceSlot);
+            return;
+        }
+
+        PersistentPlayerData persistent = GameManager.Instance != null ? GameManager.Instance.GetPersistentLocalPlayer() : null;
+        if (persistent?.PrimaryId == null) return;
 
         if (action == RebirthVehicleAssemblyAction.Repair)
         {
@@ -4425,6 +4733,41 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                 return;
             }
         }
+        Refresh();
+    }
+
+    private void ApplyOrdinaryNativeService(EntityPlayerLocal player, RebirthVehicleAssemblyAction action, string slotId,
+        RebirthVehiclePartSourceLocation source, int sourceSlot, XUiC_DragAndDropWindow pickupCursor = null)
+    {
+        if (!ReferenceEquals(current, this) || windowGroup?.isShowing != true) return;
+        var entity = entityCarrier;
+        var displayed = assembly;
+        RebirthVehicleAssembly updated = null;
+        string message;
+        bool partChanged = false;
+        try
+        {
+            updated = RebirthVehicleAssemblyService.ProcessOrdinaryNativeService(player, entity, displayed, action,
+                slotId, source, sourceSlot, pickupCursor, out message);
+            partChanged = updated != null && action != RebirthVehicleAssemblyAction.Refuel;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("[REBIRTH Vehicle] Ordinary Service result is indeterminate: " + ex.Message);
+            message = Localization.Get("xuiRebirthVehicleDeliveryUnknown");
+            // The local native result may already have been published before a send failed.
+            if (entity != null && ReferenceEquals(player.world?.GetEntity(entity.entityId), entity))
+                RebirthVehicleAssemblyIndex.TryGetEntity(entity, out updated);
+        }
+        if (!ReferenceEquals(current, this) || windowGroup?.isShowing != true ||
+            !ReferenceEquals(entityCarrier, entity) || !ReferenceEquals(assembly, displayed) ||
+            !ReferenceEquals(xui?.playerUI?.entityPlayer, player) ||
+            !ReferenceEquals(player.world, GameManager.Instance?.World)) return;
+
+        if (updated != null) assembly = updated;
+        SetStatus(string.Empty);
+        if (partChanged) Audio.Manager.PlayInsidePlayerHead("item_pickup");
+        else if (!string.IsNullOrEmpty(message)) GameManager.ShowTooltip(player, message);
         Refresh();
     }
 
@@ -5092,9 +5435,9 @@ internal static class RebirthVehicleWriteSyncPatch
 })]
 internal static class RebirthVehicleReadSyncPatch
 {
-    private static void Postfix(EntityVehicle __instance, PooledBinaryReader _br, ushort syncFlags)
+    private static void Postfix(EntityVehicle __instance, PooledBinaryReader _br, ushort syncFlags, int senderId, bool __runOriginal)
     {
-        RebirthVehicleEntityPersistence.AfterReadSyncData(__instance, _br, syncFlags);
+        RebirthVehicleEntityPersistence.AfterReadSyncData(__instance, _br, syncFlags, __runOriginal ? senderId : 0);
     }
 }
 

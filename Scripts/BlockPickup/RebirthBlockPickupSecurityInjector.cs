@@ -58,7 +58,9 @@ public static class RebirthBlockPickupSecurityInjector
                 StringComparison.OrdinalIgnoreCase))
             return true;
 
-        return RebirthBlockPickupClassifier.HasFilterTag(block, "MC_playerBlocks");
+        // This runs before Block.Init builds the parsed FilterTags array.
+        return block.Properties.Values.TryGetValue(Block.PropFilterTag, out string filterTags) &&
+            ContainsCsvToken(filterTags, "MC_playerBlocks");
     }
 
     private static bool HasTrueOrNonEmptyProperty(Block block, string propertyName)

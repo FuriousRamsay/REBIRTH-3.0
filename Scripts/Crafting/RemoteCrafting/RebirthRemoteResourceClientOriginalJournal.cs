@@ -8,8 +8,9 @@ using System.Linq;
 internal sealed class RebirthRemoteResourceClientOriginalJournal
 {
     private readonly string root;
-    internal RebirthRemoteResourceClientOriginalJournal(string directory)
-    {root=Path.GetFullPath(directory);Directory.CreateDirectory(root);Check(root);}
+    private readonly Action beforeMutation;
+    internal RebirthRemoteResourceClientOriginalJournal(string directory,Action beforeMutation=null)
+    {root=Path.GetFullPath(directory);this.beforeMutation=beforeMutation;Directory.CreateDirectory(root);Check(root);}
     private static void Check(string directory)
     {if(Directory.Exists(directory)&&(File.GetAttributes(directory)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("Original journal path changed.");}
     private string ArchiveDirectory(Guid operation)
@@ -46,20 +47,26 @@ internal sealed class RebirthRemoteResourceClientOriginalJournal
     internal RebirthCamperTransferJournal.Record Prepare(Guid operation,Guid vehicle,string creation,long revision,byte[] before,byte[] after)
     {
         var retained=Read(operation);
-        if(retained==null)return new RebirthCamperTransferJournal(root).Prepare(operation,vehicle,creation,revision,before,after);
+        if(retained==null)
+        {
+            beforeMutation?.Invoke();
+            return new RebirthCamperTransferJournal(root).Prepare(operation,vehicle,creation,revision,before,after);
+        }
         if(retained.Vehicle!=vehicle||retained.OwnerCreation!=creation||retained.Revision!=revision||!retained.Before.SequenceEqual(before)||!retained.After.SequenceEqual(after))throw new InvalidDataException("Original identity reused.");
         return retained;
     }
-    internal RebirthCamperTransferJournal.Record Advance(Guid operation,RebirthCamperTransferJournal.Phase expected,RebirthCamperTransferJournal.Phase next)
+    internal RebirthCamperTransferJournal.Record Advance(Guid operation,RebirthCamperTransferJournal.Phase expected,RebirthCamperTransferJournal.Phase next,bool archiveTerminal=true)
     {
         var current=Read(operation);if(current==null||current.State!=expected)throw new InvalidDataException("Original phase changed.");
+        beforeMutation?.Invoke();
         var advanced=new RebirthCamperTransferJournal(root).Advance(operation,expected,next);
-        if(next==RebirthCamperTransferJournal.Phase.Applied||next==RebirthCamperTransferJournal.Phase.Rejected)Archive(operation);
+        if(archiveTerminal&&(next==RebirthCamperTransferJournal.Phase.Applied||next==RebirthCamperTransferJournal.Phase.Rejected))Archive(operation);
         return advanced;
     }
     internal void Archive(Guid operation)
     {
         var original=Read(operation);if(original==null||original.State!=RebirthCamperTransferJournal.Phase.Applied&&original.State!=RebirthCamperTransferJournal.Phase.Rejected)return;
+        beforeMutation?.Invoke();
         string archive=ArchiveDirectory(operation);Directory.CreateDirectory(archive);Check(archive);
         var files=Directory.GetFiles(root,operation.ToString("N")+".*.rcj");
         foreach(string file in files)
@@ -68,7 +75,7 @@ internal sealed class RebirthRemoteResourceClientOriginalJournal
             if(File.Exists(destination)){if(!bytes.SequenceEqual(File.ReadAllBytes(destination)))throw new InvalidDataException();continue;}
             // Preserve failed temporary evidence; only a completely flushed
             // immutable phase file can become a terminal archive member.
-            string temporary=destination+"."+Guid.NewGuid().ToString("N")+".tmp";
+            string temporary=Path.Combine(archive,Guid.NewGuid().ToString("N")+".tmp");
             using(var stream=new FileStream(temporary,FileMode.CreateNew,FileAccess.Write,FileShare.None)){stream.Write(bytes,0,bytes.Length);stream.Flush(true);}
             File.Move(temporary,destination);
         }
